@@ -45,12 +45,18 @@ object ArcTo {
             largeArcFlag: Boolean,
             sweepFlag: Boolean) =
     new ArcTo(
-        new jfxss.ArcTo(
-            radiusX, radiusY, xAxisRotation, x, y, largeArcFlag, sweepFlag))
+        new jfxss.ArcTo(radiusX,
+                        radiusY,
+                        xAxisRotation,
+                        x,
+                        y,
+                        largeArcFlag,
+                        sweepFlag))
 }
 
 class ArcTo(override val delegate: jfxss.ArcTo = new jfxss.ArcTo)
-    extends PathElement(delegate) with PositionDelegate[jfxss.ArcTo]
+    extends PathElement(delegate)
+    with PositionDelegate[jfxss.ArcTo]
     with SFXDelegate[jfxss.ArcTo] {
 
   /**

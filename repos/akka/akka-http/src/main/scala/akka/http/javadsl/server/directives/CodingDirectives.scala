@@ -25,7 +25,8 @@ abstract class CodingDirectives extends CacheConditionDirectives {
   def encodeResponse(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.EncodeResponse(
         CodingDirectives._DefaultCodersToEncodeResponse)(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   /**
     * A directive that Wraps its inner routes with encoding support.
@@ -43,10 +44,11 @@ abstract class CodingDirectives extends CacheConditionDirectives {
     * If the request encoding doesn't match the request is rejected with an `UnsupportedRequestEncodingRejection`.
     */
   @varargs
-  def decodeRequestWith(
-      decoder: Coder, innerRoute: Route, moreInnerRoutes: Route*): Route =
-    RouteStructure.DecodeRequest(decoder :: Nil)(
-        innerRoute, moreInnerRoutes.toList)
+  def decodeRequestWith(decoder: Coder,
+                        innerRoute: Route,
+                        moreInnerRoutes: Route*): Route =
+    RouteStructure
+      .DecodeRequest(decoder :: Nil)(innerRoute, moreInnerRoutes.toList)
 
   /**
     * Decodes the incoming request if it is encoded with one of the given
@@ -65,8 +67,8 @@ abstract class CodingDirectives extends CacheConditionDirectives {
   @varargs
   def decodeRequest(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.DecodeRequest(
-        CodingDirectives._DefaultCodersToDecodeRequest)(
-        innerRoute, moreInnerRoutes.toList)
+        CodingDirectives._DefaultCodersToDecodeRequest)(innerRoute,
+                                                        moreInnerRoutes.toList)
 }
 
 /**
@@ -78,6 +80,6 @@ private[http] object CodingDirectives {
       .map(c ⇒ Coder.values().find(_._underlyingScalaCoder() == c).get)
 
   private[http] val _DefaultCodersToDecodeRequest =
-    scaladsl.server.directives.CodingDirectives.DefaultCoders
-      .map(c ⇒ Coder.values().find(_._underlyingScalaCoder() == c).get)
+    scaladsl.server.directives.CodingDirectives.DefaultCoders.map(c ⇒
+      Coder.values().find(_._underlyingScalaCoder() == c).get)
 }

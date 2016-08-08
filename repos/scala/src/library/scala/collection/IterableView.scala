@@ -23,8 +23,8 @@ trait IterableView[+A, +Coll]
   */
 object IterableView {
   type Coll = TraversableView[_, C] forSome { type C <: Traversable[_] }
-  implicit def canBuildFrom[A]: CanBuildFrom[
-      Coll, A, IterableView[A, Iterable[_]]] =
+  implicit def canBuildFrom[A]
+    : CanBuildFrom[Coll, A, IterableView[A, Iterable[_]]] =
     new CanBuildFrom[Coll, A, IterableView[A, Iterable[_]]] {
       def apply(from: Coll) = new NoBuilder
       def apply() = new NoBuilder

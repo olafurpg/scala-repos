@@ -19,7 +19,12 @@ package org.apache.spark.sql.streaming
 
 import org.apache.spark.SparkException
 import org.apache.spark.sql.StreamTest
-import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, MemoryStream, StreamExecution}
+import org.apache.spark.sql.execution.streaming.{
+  CompositeOffset,
+  LongOffset,
+  MemoryStream,
+  StreamExecution
+}
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
@@ -38,24 +43,27 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         CheckAnswer(6, 3),
         TestAwaitTermination(ExpectBlocked),
         TestAwaitTermination(ExpectBlocked, timeoutMs = 2000),
-        TestAwaitTermination(
-            ExpectNotBlocked, timeoutMs = 10, expectedReturnValue = false),
+        TestAwaitTermination(ExpectNotBlocked,
+                             timeoutMs = 10,
+                             expectedReturnValue = false),
         StopStream,
         AssertOnQuery(_.isActive === false),
         AssertOnQuery(_.exception.isEmpty),
         TestAwaitTermination(ExpectNotBlocked),
-        TestAwaitTermination(
-            ExpectNotBlocked, timeoutMs = 2000, expectedReturnValue = true),
-        TestAwaitTermination(
-            ExpectNotBlocked, timeoutMs = 10, expectedReturnValue = true),
+        TestAwaitTermination(ExpectNotBlocked,
+                             timeoutMs = 2000,
+                             expectedReturnValue = true),
+        TestAwaitTermination(ExpectNotBlocked,
+                             timeoutMs = 10,
+                             expectedReturnValue = true),
         StartStream,
         AssertOnQuery(_.isActive === true),
         AddData(inputData, 0),
         ExpectFailure[SparkException],
         AssertOnQuery(_.isActive === false),
         TestAwaitTermination(ExpectException[SparkException]),
-        TestAwaitTermination(
-            ExpectException[SparkException], timeoutMs = 2000),
+        TestAwaitTermination(ExpectException[SparkException],
+                             timeoutMs = 2000),
         TestAwaitTermination(ExpectException[SparkException], timeoutMs = 10),
         AssertOnQuery(q =>
                         q.exception.get.startOffset.get === q.streamProgress
@@ -105,15 +113,15 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
       expectedBehavior: ExpectedBehavior,
       timeoutMs: Int = -1,
       expectedReturnValue: Boolean = false
-  )
-      extends AssertOnQuery(
-          TestAwaitTermination.assertOnQueryCondition(
-              expectedBehavior, timeoutMs, expectedReturnValue),
+  ) extends AssertOnQuery(
+          TestAwaitTermination.assertOnQueryCondition(expectedBehavior,
+                                                      timeoutMs,
+                                                      expectedReturnValue),
           "Error testing awaitTermination behavior"
       ) {
     override def toString(): String = {
       s"TestAwaitTermination($expectedBehavior, timeoutMs = $timeoutMs, " +
-      s"expectedReturnValue = $expectedReturnValue)"
+        s"expectedReturnValue = $expectedReturnValue)"
     }
   }
 

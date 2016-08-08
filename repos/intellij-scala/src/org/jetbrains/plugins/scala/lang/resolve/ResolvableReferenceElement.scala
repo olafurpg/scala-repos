@@ -32,7 +32,8 @@ object ResolvableReferenceElement {
       ProgressManager.checkCanceled()
       val results = elem.multiResolve(false)
       if (results.length == 1)
-        Some(results(0).asInstanceOf[ScalaResolveResult]) else None
+        Some(results(0).asInstanceOf[ScalaResolveResult])
+      else None
     }
   }
 }

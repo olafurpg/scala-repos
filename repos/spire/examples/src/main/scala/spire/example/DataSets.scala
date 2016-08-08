@@ -57,8 +57,9 @@ object DataSet {
   type Output[+K] = (Int, String => K)
 
   protected def fromLines[CC[_], F, K](
-      lines: List[List[String]], variables: List[Variable[F]], out: Output[K])(
-      implicit cbf: CanBuildFrom[Nothing, F, CC[F]])
+      lines: List[List[String]],
+      variables: List[Variable[F]],
+      out: Output[K])(implicit cbf: CanBuildFrom[Nothing, F, CC[F]])
     : (Int, List[(CC[F], K)]) = {
 
     // Perform our first pass, building the conversion functions.
@@ -114,9 +115,11 @@ object DataSet {
       Ignored("Species"))
 
   def Iris =
-    fromResource[Vector, Rational, String](
-        "Iris", "/datasets/iris.data", ',', IrisVars, (4, identity))(
-        CoordinateSpace.seq)
+    fromResource[Vector, Rational, String]("Iris",
+                                           "/datasets/iris.data",
+                                           ',',
+                                           IrisVars,
+                                           (4, identity))(CoordinateSpace.seq)
 
   private val YeastVars = List[Variable[Double]](Ignored("Protein"),
                                                  Continuous("mcg", _.toDouble),
@@ -130,9 +133,11 @@ object DataSet {
                                                  Ignored("Location"))
 
   def Yeast =
-    fromResource[Array, Double, String](
-        "Yeast", "/datasets/yeast.data", ',', YeastVars, (9, identity))(
-        CoordinateSpace.array)
+    fromResource[Array, Double, String]("Yeast",
+                                        "/datasets/yeast.data",
+                                        ',',
+                                        YeastVars,
+                                        (9, identity))(CoordinateSpace.array)
 
   private val MpgVars = List[Variable[Double]](
       Ignored("MPG"),
@@ -146,9 +151,11 @@ object DataSet {
       Ignored("Model Name"))
 
   def MPG =
-    fromResource[Array, Double, Double](
-        "MPG", "/datasets/auto-mpg.data", ',', MpgVars, (0, _.toDouble))(
-        CoordinateSpace.array)
+    fromResource[Array, Double, Double]("MPG",
+                                        "/datasets/auto-mpg.data",
+                                        ',',
+                                        MpgVars,
+                                        (0, _.toDouble))(CoordinateSpace.array)
 }
 
 sealed trait Variable[+F]
@@ -182,7 +189,7 @@ object Variable {
     }
   }
 
-  case class Categorical[+F : Ring](label: String = Unlabeled)
+  case class Categorical[+F: Ring](label: String = Unlabeled)
       extends Variable[F] {
     def apply() = new Builder[String, String => List[F]] {
       var categories: Set[String] = Set.empty
@@ -197,7 +204,7 @@ object Variable {
 
         { s =>
           orderedCategories map
-          (cat => if (cat == s) Ring[F].one else Ring[F].zero)
+            (cat => if (cat == s) Ring[F].one else Ring[F].zero)
         }
       }
     }
@@ -225,13 +232,11 @@ object Variable {
           val k = real(v)
           acc + (k -> (acc.getOrElse(k, 0) + 1))
         }
-        val mostCommon = occurences
-          .maxBy(_._2)
-          ._1
+        val mostCommon = occurences.maxBy(_._2)._1
 
-          { s =>
-            if (s == sentinel) mostCommon else real(s)
-          }
+        { s =>
+          if (s == sentinel) mostCommon else real(s)
+        }
       }
     }
   }
@@ -245,8 +250,8 @@ object CrossValidation {
     * predictor results.
     */
   def crossValidate[V, @sp(Double) F, K](
-      dataset: DataSet[V, F, K], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, K)] => (V => K))(
+      dataset: DataSet[V, F, K],
+      k: Int = 10)(train: CoordinateSpace[V, F] => List[(V, K)] => (V => K))(
       score: List[Result[V, K]] => F): F = {
     implicit val field = dataset.space.scalar
 
@@ -275,7 +280,8 @@ object CrossValidation {
     * predictor.
     */
   def crossValidateClassification[V, @sp(Double) F, K](
-      dataset: DataSet[V, F, K], k: Int = 10)(
+      dataset: DataSet[V, F, K],
+      k: Int = 10)(
       train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)): F = {
     implicit val field = dataset.space.scalar
 
@@ -292,8 +298,8 @@ object CrossValidation {
   /**
     * For cross-validating regression, we use the R^2 to score the predictor.
     */
-  def crossValidateRegression[V, @sp(Double) F](
-      dataset: DataSet[V, F, F], k: Int = 10)(
+  def crossValidateRegression[V, @sp(Double) F](dataset: DataSet[V, F, F],
+                                                k: Int = 10)(
       train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)): F = {
     implicit val field = dataset.space.scalar
 

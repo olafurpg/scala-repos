@@ -5,11 +5,18 @@ import mesosphere.marathon.Protos
 import mesosphere.marathon.Protos.Constraint
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.api.v2.Validation._
-import mesosphere.marathon.api.serialization.{ContainerSerializer, PortDefinitionSerializer, ResidencySerializer}
+import mesosphere.marathon.api.serialization.{
+  ContainerSerializer,
+  PortDefinitionSerializer,
+  ResidencySerializer
+}
 import mesosphere.marathon.health.HealthCheck
 import mesosphere.marathon.plugin
 import mesosphere.marathon.state.AppDefinition.VersionInfo
-import mesosphere.marathon.state.AppDefinition.VersionInfo.{FullVersionInfo, OnlyVersion}
+import mesosphere.marathon.state.AppDefinition.VersionInfo.{
+  FullVersionInfo,
+  OnlyVersion
+}
 import mesosphere.marathon.state.Container.Docker.PortMapping
 import mesosphere.mesos.TaskBuilder
 import mesosphere.mesos.protos.{Resource, ScalarResource}
@@ -181,7 +188,8 @@ case class AppDefinition(
 
     val containerOption =
       if (proto.hasContainer)
-        Some(ContainerSerializer.fromProto(proto.getContainer)) else None
+        Some(ContainerSerializer.fromProto(proto.getContainer))
+      else None
 
     val acceptedResourceRoles: Option[Set[String]] =
       if (proto.hasAcceptedResourceRoles)
@@ -203,7 +211,8 @@ case class AppDefinition(
 
     val residencyOption =
       if (proto.hasResidency)
-        Some(ResidencySerializer.fromProto(proto.getResidency)) else None
+        Some(ResidencySerializer.fromProto(proto.getResidency))
+      else None
 
     // TODO (gkleiman): we have to be able to read the ports from the deprecated field in order to perform migrations
     // until the deprecation cycle is complete.
@@ -233,24 +242,23 @@ case class AppDefinition(
         mem = resourcesMap.getOrElse(Resource.MEM, this.mem),
         disk = resourcesMap.getOrElse(Resource.DISK, this.disk),
         env = envMap,
-        fetch = proto.getCmd.getUrisList.asScala
-            .map(FetchUri.fromProto)
-            .to[Seq],
+        fetch =
+          proto.getCmd.getUrisList.asScala.map(FetchUri.fromProto).to[Seq],
         storeUrls = proto.getStoreUrlsList.asScala.to[Seq],
         container = containerOption,
         healthChecks = proto.getHealthChecksList.asScala
-            .map(new HealthCheck().mergeFromProto)
-            .toSet,
+          .map(new HealthCheck().mergeFromProto)
+          .toSet,
         labels = proto.getLabelsList.asScala.map { p =>
           p.getKey -> p.getValue
         }.toMap,
         versionInfo = versionInfoFromProto,
-        upgradeStrategy = if (proto.hasUpgradeStrategy)
+        upgradeStrategy =
+          if (proto.hasUpgradeStrategy)
             UpgradeStrategy.fromProto(proto.getUpgradeStrategy)
           else UpgradeStrategy.empty,
-        dependencies = proto.getDependenciesList.asScala
-            .map(PathId.apply)
-            .toSet,
+        dependencies =
+          proto.getDependenciesList.asScala.map(PathId.apply).toSet,
         ipAddress = ipAddressOption,
         residency = residencyOption
     )
@@ -412,8 +420,8 @@ object AppDefinition {
   }
 
   val RandomPortValue: Int = 0
-  val RandomPortDefinition: PortDefinition = PortDefinition(
-      RandomPortValue, "tcp", None, Map.empty[String, String])
+  val RandomPortDefinition: PortDefinition =
+    PortDefinition(RandomPortValue, "tcp", None, Map.empty[String, String])
 
   // App defaults
   val DefaultId: PathId = PathId.empty
@@ -490,7 +498,7 @@ object AppDefinition {
     appDef.disk should be >= 0.0
     appDef must definesCorrectResidencyCombination
     (appDef.isResident is false) or
-    (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
+      (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
   }
 
   /**
@@ -541,10 +549,10 @@ object AppDefinition {
       hc =>
         hc.protocol == Protocol.COMMAND ||
         (hc.portIndex match {
-              case Some(idx) => hostPortsIndices contains idx
-              case None =>
-                hostPortsIndices.length == 1 && hostPortsIndices.head == 0
-            })
+          case Some(idx) => hostPortsIndices contains idx
+          case None =>
+            hostPortsIndices.length == 1 && hostPortsIndices.head == 0
+        })
     }
 
   def residentUpdateIsValid(from: AppDefinition): Validator[AppDefinition] = {

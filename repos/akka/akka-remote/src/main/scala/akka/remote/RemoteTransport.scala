@@ -24,7 +24,8 @@ class RemoteTransportException(message: String, cause: Throwable)
   */
 @SerialVersionUID(1L)
 class RemoteTransportExceptionNoStackTrace(message: String, cause: Throwable)
-    extends RemoteTransportException(message, cause) with NoStackTrace
+    extends RemoteTransportException(message, cause)
+    with NoStackTrace
 
 /**
   * INTERNAL API
@@ -37,7 +38,8 @@ class RemoteTransportExceptionNoStackTrace(message: String, cause: Throwable)
   * received or when the start() method returns, whatever happens first.
   */
 private[akka] abstract class RemoteTransport(
-    val system: ExtendedActorSystem, val provider: RemoteActorRefProvider) {
+    val system: ExtendedActorSystem,
+    val provider: RemoteActorRefProvider) {
 
   /**
     * Shuts down the remoting

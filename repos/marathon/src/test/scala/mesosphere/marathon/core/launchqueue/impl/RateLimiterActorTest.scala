@@ -49,8 +49,9 @@ class RateLimiterActorTest extends MarathonSpec {
 
   private val backoff: FiniteDuration = 10.seconds
   private val backoffFactor: Double = 2.0
-  private[this] val app = AppDefinition(
-      id = PathId("/test"), backoff = backoff, backoffFactor = backoffFactor)
+  private[this] val app = AppDefinition(id = PathId("/test"),
+                                        backoff = backoff,
+                                        backoffFactor = backoffFactor)
 
   private[this] implicit val timeout: Timeout = 3.seconds
   private[this] implicit var actorSystem: ActorSystem = _

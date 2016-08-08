@@ -19,7 +19,8 @@ object Product2 {
   */
 trait Product2[
     @specialized(Int, Long, Double) +T1, @specialized(Int, Long, Double) +T2]
-    extends Any with Product {
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 2

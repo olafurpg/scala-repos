@@ -17,7 +17,7 @@ package rules
 import scala.language.postfixOps
 import scala.language.reflectiveCalls
 
-/** 
+/**
   * A workaround for the difficulties of dealing with
   * a contravariant 'In' parameter type...
   */
@@ -34,7 +34,7 @@ class InRule[In, +Out, +A, +X](rule: Rule[In, Out, A, X]) {
     case Success(_, _) =>
       in: In =>
         Failure
-      case _ =>
+    case _ =>
       in: In =>
         Success(in, ())
   }
@@ -44,10 +44,10 @@ class InRule[In, +Out, +A, +X](rule: Rule[In, Out, A, X]) {
     case Success(_, a) =>
       in: In =>
         Success(in, a)
-      case Failure =>
+    case Failure =>
       in: In =>
         Failure
-      case Error(x) =>
+    case Error(x) =>
       in: In =>
         Error(x)
   }
@@ -60,15 +60,15 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
     case Success(out, a) =>
       in: S =>
         Success(out, Some(a))
-      case Failure =>
+    case Failure =>
       in: S =>
         Success(in, None)
-      case Error(x) =>
+    case Error(x) =>
       in: S =>
         Error(x)
   }
 
-  /** Creates a rule that always succeeds with a Boolean value.  
+  /** Creates a rule that always succeeds with a Boolean value.
     *  Value is 'true' if this rule succeeds, 'false' otherwise */
   def -? = ? map { _ isDefined }
 
@@ -86,16 +86,18 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
   def + = rule ~++ *
 
   def ~>?[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f ?) yield
-      fs.foldLeft[B](a) { (b, f) =>
-        f(b)
-      }
+    for (a <- rule; fs <- f ?)
+      yield
+        fs.foldLeft[B](a) { (b, f) =>
+          f(b)
+        }
 
   def ~>*[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f *) yield
-      fs.foldLeft[B](a) { (b, f) =>
-        f(b)
-      }
+    for (a <- rule; fs <- f *)
+      yield
+        fs.foldLeft[B](a) { (b, f) =>
+          f(b)
+        }
 
   def ~*~[B >: A, X2 >: X](join: => Rule[S, S, (B, B) => B, X2]) = {
     this ~>* (for (f <- join; a <- rule) yield f(_: B, a))
@@ -119,9 +121,9 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
       else
         rule(in) match {
           case Success(out, a) => {
-              result(i) = a
-              rep(i + 1, out)
-            }
+            result(i) = a
+            rep(i + 1, out)
+          }
           case Failure => Failure
           case err: Error[_] => err
         }

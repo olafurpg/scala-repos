@@ -28,7 +28,8 @@ object SupervisorMiscSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SupervisorMiscSpec
-    extends AkkaSpec(SupervisorMiscSpec.config) with DefaultTimeout {
+    extends AkkaSpec(SupervisorMiscSpec.config)
+    with DefaultTimeout {
 
   "A Supervisor" must {
 
@@ -36,12 +37,11 @@ class SupervisorMiscSpec
       filterEvents(EventFilter[Exception]("Kill")) {
         val countDownLatch = new CountDownLatch(4)
 
-        val supervisor = system.actorOf(Props(new Supervisor(OneForOneStrategy(
-                        maxNrOfRetries = 3, withinTimeRange = 5 seconds)(List(
-                            classOf[Exception])))))
+        val supervisor = system.actorOf(Props(new Supervisor(
+            OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 5 seconds)(
+                List(classOf[Exception])))))
 
-        val workerProps = Props(
-            new Actor {
+        val workerProps = Props(new Actor {
           override def postRestart(cause: Throwable) {
             countDownLatch.countDown()
           }
@@ -53,16 +53,16 @@ class SupervisorMiscSpec
 
         val actor1, actor2 =
           Await.result((supervisor ? workerProps.withDispatcher(
-                               "pinned-dispatcher")).mapTo[ActorRef],
+                           "pinned-dispatcher")).mapTo[ActorRef],
                        timeout.duration)
 
         val actor3 = Await.result((supervisor ? workerProps.withDispatcher(
-                                          "test-dispatcher")).mapTo[ActorRef],
+                                      "test-dispatcher")).mapTo[ActorRef],
                                   timeout.duration)
 
         val actor4 =
           Await.result((supervisor ? workerProps.withDispatcher(
-                               "pinned-dispatcher")).mapTo[ActorRef],
+                           "pinned-dispatcher")).mapTo[ActorRef],
                        timeout.duration)
 
         actor1 ! Kill
@@ -85,8 +85,7 @@ class SupervisorMiscSpec
     }
 
     "be able to create named children in its constructor" in {
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         context.actorOf(Props.empty, "bob")
         def receive = { case x: Exception ⇒ throw x }
         override def preStart(): Unit = testActor ! "preStart"

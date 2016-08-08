@@ -23,15 +23,16 @@ class FormBodyParserSpec extends PlaySpecification {
         mat: Materializer): Either[Result, A] = {
       await(
           bodyParser(FakeRequest().withHeaders(
-                  writeable.contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+              writeable.contentType.map(CONTENT_TYPE -> _).toSeq: _*))
             .run(Source.single(writeable.transform(body)))
       )
     }
 
     case class User(name: String, age: Int)
 
-    val userForm = Form(mapping("name" -> nonEmptyText, "age" -> number)(
-            User.apply)(User.unapply))
+    val userForm = Form(
+        mapping("name" -> nonEmptyText, "age" -> number)(User.apply)(
+            User.unapply))
 
     "bind JSON requests" in new WithApplication() {
       parse(Json.obj("name" -> "Alice", "age" -> 42),
@@ -54,7 +55,7 @@ class FormBodyParserSpec extends PlaySpecification {
             BodyParsers.parse.form(
                 userForm,
                 onErrors = (form: Form[User]) =>
-                    Results.BadRequest(form.errorsAsJson))) must beLeft.which {
+                  Results.BadRequest(form.errorsAsJson))) must beLeft.which {
         result =>
           result.header.status must equalTo(BAD_REQUEST)
           val json = contentAsJson(Future.successful(result))

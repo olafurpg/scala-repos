@@ -7,14 +7,34 @@ import java.io.File
 import java.net.URI
 import java.util.Locale
 import Project.{Initialize => _, Setting => _, _}
-import Keys.{appConfiguration, stateBuildStructure, commands, configuration, historyPath, projectCommand, sessionSettings, shellPrompt, thisProject, thisProjectRef, watch}
+import Keys.{
+  appConfiguration,
+  stateBuildStructure,
+  commands,
+  configuration,
+  historyPath,
+  projectCommand,
+  sessionSettings,
+  shellPrompt,
+  thisProject,
+  thisProjectRef,
+  watch
+}
 import Scope.{GlobalScope, ThisScope}
 import Def.{Flattened, Initialize, ScopedKey, Setting}
 import sbt.internal.util.Types.{const, idFun}
 import sbt.internal.util.complete.DefaultParsers
 import sbt.librarymanagement.Configuration
 
-import sbt.internal.util.{AttributeKey, AttributeMap, Dag, Relation, Settings, Show, ~>}
+import sbt.internal.util.{
+  AttributeKey,
+  AttributeMap,
+  Dag,
+  Relation,
+  Settings,
+  Show,
+  ~>
+}
 
 import language.experimental.macros
 
@@ -86,11 +106,11 @@ sealed trait ProjectDefinition[PR <: ProjectReference] {
     val autos = ifNonEmpty("autoPlugins", autoPlugins.map(_.label))
     val fields =
       s"id $id" :: s"base: $base" :: agg ::: dep ::: conf :::
-      (s"plugins: List($plugins)" :: autos)
+        (s"plugins: List($plugins)" :: autos)
     s"Project(${fields.mkString(", ")})"
   }
-  private[this] def ifNonEmpty[T](
-      label: String, ts: Iterable[T]): List[String] =
+  private[this] def ifNonEmpty[T](label: String,
+                                  ts: Iterable[T]): List[String] =
     if (ts.isEmpty) Nil else s"$label: $ts" :: Nil
 }
 sealed trait Project extends ProjectDefinition[ProjectReference] {
@@ -230,8 +250,8 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
   /** Disable the given plugins on this project. */
   def disablePlugins(ps: AutoPlugin*): Project =
     setPlugins(
-        Plugins.and(
-            plugins, Plugins.And(ps.map(p => Plugins.Exclude(p)).toList)))
+        Plugins.and(plugins,
+                    Plugins.And(ps.map(p => Plugins.Exclude(p)).toList)))
 
   private[this] def setPlugins(ns: Plugins): Project = {
     // TODO: for 0.14.0, use copy when it has the additional `plugins` parameter
@@ -271,11 +291,11 @@ sealed trait ResolvedProject extends ProjectDefinition[ProjectRef] {
 sealed trait ClasspathDep[PR <: ProjectReference] {
   def project: PR; def configuration: Option[String]
 }
-final case class ResolvedClasspathDependency(
-    project: ProjectRef, configuration: Option[String])
+final case class ResolvedClasspathDependency(project: ProjectRef,
+                                             configuration: Option[String])
     extends ClasspathDep[ProjectRef]
-final case class ClasspathDependency(
-    project: ProjectReference, configuration: Option[String])
+final case class ClasspathDependency(project: ProjectReference,
+                                     configuration: Option[String])
     extends ClasspathDep[ProjectReference]
 
 object Project extends ProjectExtra {
@@ -294,8 +314,8 @@ object Project extends ProjectExtra {
   def showContextKey(state: State): Show[ScopedKey[_]] =
     showContextKey(state, None)
 
-  def showContextKey(
-      state: State, keyNameColor: Option[String]): Show[ScopedKey[_]] =
+  def showContextKey(state: State,
+                     keyNameColor: Option[String]): Show[ScopedKey[_]] =
     if (isProjectLoaded(state))
       showContextKey(session(state), structure(state), keyNameColor)
     else Def.showFullKey
@@ -303,8 +323,9 @@ object Project extends ProjectExtra {
   def showContextKey(session: SessionSettings,
                      structure: BuildStructure,
                      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
-    Def.showRelativeKey(
-        session.current, structure.allProjects.size > 1, keyNameColor)
+    Def.showRelativeKey(session.current,
+                        structure.allProjects.size > 1,
+                        keyNameColor)
 
   def showLoadingKey(loaded: LoadedBuild,
                      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
@@ -356,9 +377,11 @@ object Project extends ProjectExtra {
 
   /** This is a variation of def apply that mixes in GeneratedRootProject. */
   private[sbt] def mkGeneratedRoot(
-      id: String, base: File, aggregate: => Seq[ProjectReference]): Project = {
-    validProjectID(id).foreach(
-        errMsg => sys.error("Invalid project ID: " + errMsg))
+      id: String,
+      base: File,
+      aggregate: => Seq[ProjectReference]): Project = {
+    validProjectID(id).foreach(errMsg =>
+      sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,
@@ -447,8 +470,8 @@ object Project extends ProjectExtra {
                          auto: AddSettings,
                          plugins: Plugins,
                          autoPlugins: Seq[AutoPlugin]): Project = {
-    validProjectID(id).foreach(
-        errMsg => sys.error("Invalid project ID: " + errMsg))
+    validProjectID(id).foreach(errMsg =>
+      sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,
@@ -488,15 +511,16 @@ object Project extends ProjectExtra {
     Extracted(st, se, se.current)(showContextKey(se, st))
 
   def getProjectForReference(
-      ref: Reference, structure: BuildStructure): Option[ResolvedProject] =
+      ref: Reference,
+      structure: BuildStructure): Option[ResolvedProject] =
     ref match {
       case pr: ProjectRef => getProject(pr, structure); case _ => None
     }
-  def getProject(
-      ref: ProjectRef, structure: BuildStructure): Option[ResolvedProject] =
+  def getProject(ref: ProjectRef,
+                 structure: BuildStructure): Option[ResolvedProject] =
     getProject(ref, structure.units)
-  def getProject(
-      ref: ProjectRef, structure: LoadedBuild): Option[ResolvedProject] =
+  def getProject(ref: ProjectRef,
+                 structure: LoadedBuild): Option[ResolvedProject] =
     getProject(ref, structure.units)
   def getProject(ref: ProjectRef,
                  units: Map[URI, LoadedBuildUnit]): Option[ResolvedProject] =
@@ -506,8 +530,9 @@ object Project extends ProjectExtra {
     val previousOnUnload = orIdentity(s get Keys.onUnload.key)
     previousOnUnload(s.runExitHooks())
   }
-  def setProject(
-      session: SessionSettings, structure: BuildStructure, s: State): State = {
+  def setProject(session: SessionSettings,
+                 structure: BuildStructure,
+                 s: State): State = {
     val unloaded = runUnloadHooks(s)
     val (onLoad, onUnload) = getHooks(structure.data)
     val newAttrs = unloaded.attributes
@@ -538,15 +563,15 @@ object Project extends ProjectExtra {
 
     val allCommands =
       commandsIn(ref) ++ commandsIn(BuildRef(ref.build)) ++
-      (commands in Global get structure.data toList)
+        (commands in Global get structure.data toList)
     val history = get(historyPath) flatMap idFun
     val prompt = get(shellPrompt)
     val watched = get(watch)
     val commandDefs =
       allCommands.distinct.flatten[Command].map(_ tag (projectCommand, true))
     val newDefinedCommands =
-      commandDefs ++ BasicCommands.removeTagged(
-          s.definedCommands, projectCommand)
+      commandDefs ++ BasicCommands.removeTagged(s.definedCommands,
+                                                projectCommand)
     val newAttrs = setCond(Watched.Configuration, watched, s.attributes)
       .put(historyPath.key, history)
     s.copy(attributes = setCond(shellPrompt.key, prompt, newAttrs),
@@ -606,13 +631,13 @@ object Project extends ProjectExtra {
       ScopedKey(f(key.scope), key.key)
   }
 
-  def transform(
-      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
+  def transform(g: Scope => Scope,
+                ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
     val f = mapScope(g)
     ss.map(_ mapKey f mapReferenced f)
   }
-  def transformRef(
-      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
+  def transformRef(g: Scope => Scope,
+                   ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
     val f = mapScope(g)
     ss.map(_ mapReferenced f)
   }
@@ -629,11 +654,11 @@ object Project extends ProjectExtra {
       ScopedKeyData(ScopedKey(scope, key), v)
     }
 
-  def details(structure: BuildStructure,
-              actual: Boolean,
-              scope: Scope,
-              key: AttributeKey[_])(
-      implicit display: Show[ScopedKey[_]]): String = {
+  def details(
+      structure: BuildStructure,
+      actual: Boolean,
+      scope: Scope,
+      key: AttributeKey[_])(implicit display: Show[ScopedKey[_]]): String = {
     val scoped = ScopedKey(scope, key)
 
     val data =
@@ -652,8 +677,9 @@ object Project extends ProjectExtra {
     val definingScoped = definingScope match {
       case Some(sc) => ScopedKey(sc, key); case None => scoped
     }
-    val comp = Def.compiled(structure.settings, actual)(
-        structure.delegates, structure.scopeLocal, display)
+    val comp = Def.compiled(structure.settings, actual)(structure.delegates,
+                                                        structure.scopeLocal,
+                                                        display)
     val definedAt =
       comp get definingScoped map { c =>
         Def.definedAtString(c.settings).capitalize
@@ -706,13 +732,19 @@ object Project extends ProjectExtra {
       }
 
     data + "\n" + description + providedBy + definedAt +
-    printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
-    printDepScopes("Reverse dependencies", "derives", reverse, derivedReverse) +
-    printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
-        "Related", related, 10)
+      printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
+      printDepScopes("Reverse dependencies",
+                     "derives",
+                     reverse,
+                     derivedReverse) +
+      printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
+        "Related",
+        related,
+        10)
   }
-  def settingGraph(
-      structure: BuildStructure, basedir: File, scoped: ScopedKey[_])(
+  def settingGraph(structure: BuildStructure,
+                   basedir: File,
+                   scoped: ScopedKey[_])(
       implicit display: Show[ScopedKey[_]]): SettingGraph =
     SettingGraph(structure, basedir, scoped, 0)
   def graphSettings(structure: BuildStructure, basedir: File)(
@@ -733,8 +765,9 @@ object Project extends ProjectExtra {
   def relation(structure: BuildStructure, actual: Boolean)(
       implicit display: Show[ScopedKey[_]])
     : Relation[ScopedKey[_], ScopedKey[_]] =
-    relation(structure.settings, actual)(
-        structure.delegates, structure.scopeLocal, display)
+    relation(structure.settings, actual)(structure.delegates,
+                                         structure.scopeLocal,
+                                         display)
 
   private[sbt] def relation(settings: Seq[Def.Setting[_]], actual: Boolean)(
       implicit delegates: Scope => Seq[Scope],
@@ -759,8 +792,9 @@ object Project extends ProjectExtra {
     s.map(display.apply).sorted.mkString("\n\t", "\n\t", "\n\n")
 
   def definitions(
-      structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(
-      implicit display: Show[ScopedKey[_]]): Seq[Scope] =
+      structure: BuildStructure,
+      actual: Boolean,
+      key: AttributeKey[_])(implicit display: Show[ScopedKey[_]]): Seq[Scope] =
     relation(structure, actual)(display)._1s.toSeq flatMap { sk =>
       if (sk.key == key) sk.scope :: Nil else Nil
     }
@@ -772,11 +806,11 @@ object Project extends ProjectExtra {
   def reverseDependencies(cMap: Map[ScopedKey[_], Flattened],
                           scoped: ScopedKey[_]): Iterable[ScopedKey[_]] =
     for ((key, compiled) <- cMap; dep <- compiled.dependencies
-                                            if dep == scoped) yield key
+         if dep == scoped) yield key
 
   //@deprecated("Use SettingCompletions.setAll when available.", "0.13.0")
-  def setAll(
-      extracted: Extracted, settings: Seq[Def.Setting[_]]): SessionSettings =
+  def setAll(extracted: Extracted,
+             settings: Seq[Def.Setting[_]]): SessionSettings =
     SettingCompletions.setAll(extracted, settings).session
 
   val ExtraBuilds = AttributeKey[List[URI]](
@@ -804,7 +838,8 @@ object Project extends ProjectExtra {
     token(Space ~> ("plugins" ^^^ Plugins | "return" ^^^ Return)) ?? Current
 
   val ProjectReturn = AttributeKey[List[File]](
-      "project-return", "Maintains a stack of builds visited using reload.")
+      "project-return",
+      "Maintains a stack of builds visited using reload.")
   def projectReturn(s: State): List[File] = getOrNil(s, ProjectReturn)
   def inPluginProject(s: State): Boolean = projectReturn(s).length > 1
   def setProjectReturn(s: State, pr: List[File]): State =
@@ -861,15 +896,21 @@ object Project extends ProjectExtra {
                  state: State,
                  config: EvaluateConfig): Option[(State, Result[T])] = {
     val extracted = Project.extract(state)
-    EvaluateTask(
-        extracted.structure, taskKey, state, extracted.currentRef, config)
+    EvaluateTask(extracted.structure,
+                 taskKey,
+                 state,
+                 extracted.currentRef,
+                 config)
   }
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
                  config: EvaluateTaskConfig): Option[(State, Result[T])] = {
     val extracted = Project.extract(state)
-    EvaluateTask(
-        extracted.structure, taskKey, state, extracted.currentRef, config)
+    EvaluateTask(extracted.structure,
+                 taskKey,
+                 state,
+                 extracted.currentRef,
+                 config)
   }
 
   implicit def projectToRef(p: Project): ProjectReference = LocalProject(p.id)
@@ -945,8 +986,8 @@ trait ProjectExtra {
 
   private[sbt] def inThisBuild[T](i: Initialize[T]): Initialize[T] =
     inScope(ThisScope.copy(project = Select(ThisBuild)), i)
-  private[sbt] def inConfig[T](
-      conf: Configuration, i: Initialize[T]): Initialize[T] =
+  private[sbt] def inConfig[T](conf: Configuration,
+                               i: Initialize[T]): Initialize[T] =
     inScope(ThisScope.copy(config = Select(conf)), i)
   private[sbt] def inTask[T](t: Scoped, i: Initialize[T]): Initialize[T] =
     inScope(ThisScope.copy(task = Select(t.key)), i)

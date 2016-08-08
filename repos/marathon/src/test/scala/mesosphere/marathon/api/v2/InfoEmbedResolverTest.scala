@@ -5,7 +5,9 @@ import mesosphere.marathon.core.appinfo.{GroupInfo, AppInfo}
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class InfoEmbedResolverTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   val prefixes = Seq("", "app.", "apps.")
 
@@ -51,9 +53,10 @@ class InfoEmbedResolverTest
       When(s"embed=${prefix}failures")
       val resolved = InfoEmbedResolver.resolveApp(Set(s"${prefix}failures"))
       Then("it should resolve correctly")
-      resolved should be(Set(AppInfo.Embed.Tasks,
-                             AppInfo.Embed.Deployments,
-                             AppInfo.Embed.LastTaskFailure))
+      resolved should be(
+          Set(AppInfo.Embed.Tasks,
+              AppInfo.Embed.Deployments,
+              AppInfo.Embed.LastTaskFailure))
     }
   }
 

@@ -31,8 +31,8 @@ private[http] object StreamUtils {
       f: ByteString ⇒ ByteString,
       finish: () ⇒ ByteString): Stage[ByteString, ByteString] = {
     new PushPullStage[ByteString, ByteString] {
-      override def onPush(
-          element: ByteString, ctx: Context[ByteString]): SyncDirective = {
+      override def onPush(element: ByteString,
+                          ctx: Context[ByteString]): SyncDirective = {
         val data = f(element)
         if (data.nonEmpty) ctx.push(data)
         else ctx.pull()
@@ -57,12 +57,13 @@ private[http] object StreamUtils {
   def mapErrorTransformer(
       f: Throwable ⇒ Throwable): Flow[ByteString, ByteString, NotUsed] = {
     val transformer = new PushStage[ByteString, ByteString] {
-      override def onPush(
-          element: ByteString, ctx: Context[ByteString]): SyncDirective =
+      override def onPush(element: ByteString,
+                          ctx: Context[ByteString]): SyncDirective =
         ctx.push(element)
 
       override def onUpstreamFailure(
-          cause: Throwable, ctx: Context[ByteString]): TerminationDirective =
+          cause: Throwable,
+          ctx: Context[ByteString]): TerminationDirective =
         ctx.fail(f(cause))
     }
 
@@ -87,14 +88,15 @@ private[http] object StreamUtils {
   }
 
   def sliceBytesTransformer(
-      start: Long, length: Long): Flow[ByteString, ByteString, NotUsed] = {
+      start: Long,
+      length: Long): Flow[ByteString, ByteString, NotUsed] = {
     val transformer = new StatefulStage[ByteString, ByteString] {
 
       def skipping = new State {
         var toSkip = start
 
-        override def onPush(
-            element: ByteString, ctx: Context[ByteString]): SyncDirective =
+        override def onPush(element: ByteString,
+                            ctx: Context[ByteString]): SyncDirective =
           if (element.length < toSkip) {
             // keep skipping
             toSkip -= element.length
@@ -109,8 +111,8 @@ private[http] object StreamUtils {
       def taking(initiallyRemaining: Long) = new State {
         var remaining: Long = initiallyRemaining
 
-        override def onPush(
-            element: ByteString, ctx: Context[ByteString]): SyncDirective = {
+        override def onPush(element: ByteString,
+                            ctx: Context[ByteString]): SyncDirective = {
           val data = element.take(math.min(remaining, Int.MaxValue).toInt)
           remaining -= data.size
           if (remaining <= 0) ctx.pushAndFinish(data)
@@ -179,9 +181,9 @@ private[http] object StreamUtils {
   /**
     * Returns a source that can only be used once for testing purposes.
     */
-  def oneTimeSource[T, Mat](
-      other: Source[T, Mat],
-      errorMsg: String = "One time source can only be instantiated once")
+  def oneTimeSource[T, Mat](other: Source[T, Mat],
+                            errorMsg: String =
+                              "One time source can only be instantiated once")
     : Source[T, Mat] = {
     val onlyOnceFlag = new AtomicBoolean(false)
     other.mapMaterializedValue { elem ⇒
@@ -259,7 +261,8 @@ private[http] object StreamUtils {
 
   /** A one time settable cell */
   class OneTimeWriteCell[T <: AnyRef]
-      extends AtomicReference[T] with ReadableCell[T] {
+      extends AtomicReference[T]
+      with ReadableCell[T] {
     def value: T = {
       val value = get()
       require(value != null, "Value wasn't set yet")
@@ -282,8 +285,8 @@ private[http] object StreamUtils {
         case Some(x) ⇒ { recovery = null; ctx.push(x) }
         case null ⇒ ctx.finish()
       }
-      override def onUpstreamFailure(
-          cause: Throwable, ctx: Context[B]): TerminationDirective =
+      override def onUpstreamFailure(cause: Throwable,
+                                     ctx: Context[B]): TerminationDirective =
         if (pf isDefinedAt cause) {
           recovery = Some(pf(cause))
           ctx.absorbTermination()
@@ -308,7 +311,8 @@ private[http] object StreamUtils {
           ctx.push(elem)
 
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+            cause: Throwable,
+            ctx: Context[T]): TerminationDirective = {
           promise.failure(cause)
           ctx.fail(cause)
         }
@@ -347,10 +351,13 @@ private[http] object StreamUtils {
     def apply(): OneTimeValve = new OneTimeValve {
       val promise = Promise[Unit]()
       val _source =
-        Source.fromFuture(promise.future).drop(1) // we are only interested in the completion event
+        Source
+          .fromFuture(promise.future)
+          .drop(1) // we are only interested in the completion event
 
       def source[T]: Source[T, NotUsed] =
-        _source.asInstanceOf[Source[T, NotUsed]] // safe, because source won't generate any elements
+        _source
+          .asInstanceOf[Source[T, NotUsed]] // safe, because source won't generate any elements
       def open(): Unit = promise.success(())
     }
   }

@@ -40,8 +40,8 @@ object JdbcUtils extends Logging {
     * @param url the JDBC url to connect to.
     * @param properties JDBC connection properties.
     */
-  def createConnectionFactory(
-      url: String, properties: Properties): () => Connection = {
+  def createConnectionFactory(url: String,
+                              properties: Properties): () => Connection = {
     val userSpecifiedDriverClass = Option(properties.getProperty("driver"))
     userSpecifiedDriverClass.foreach(DriverRegistry.register)
     // Performing this part of the logic on the driver guards against the corner-case where the
@@ -130,8 +130,9 @@ object JdbcUtils extends Logging {
         Option(JdbcType("TIMESTAMP", java.sql.Types.TIMESTAMP))
       case DateType => Option(JdbcType("DATE", java.sql.Types.DATE))
       case t: DecimalType =>
-        Option(JdbcType(
-                s"DECIMAL(${t.precision},${t.scale})", java.sql.Types.DECIMAL))
+        Option(
+            JdbcType(s"DECIMAL(${t.precision},${t.scale})",
+                     java.sql.Types.DECIMAL))
       case _ => None
     }
   }
@@ -141,7 +142,7 @@ object JdbcUtils extends Logging {
       .getJDBCType(dt)
       .orElse(getCommonJDBCType(dt))
       .getOrElse(throw new IllegalArgumentException(
-              s"Can't get JDBC type for ${dt.simpleString}"))
+          s"Can't get JDBC type for ${dt.simpleString}"))
   }
 
   /**
@@ -294,8 +295,8 @@ object JdbcUtils extends Logging {
     }
 
     val rddSchema = df.schema
-    val getConnection: () => Connection = createConnectionFactory(
-        url, properties)
+    val getConnection: () => Connection =
+      createConnectionFactory(url, properties)
     val batchSize = properties.getProperty("batchsize", "1000").toInt
     df.foreachPartition { iterator =>
       savePartition(getConnection,

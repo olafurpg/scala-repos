@@ -109,8 +109,9 @@ trait StatefulSnippet extends DispatchSnippet {
   /**
     * Merge the SHtml into the form
     */
-  private[http] def mergeIntoForm(
-      isForm: Boolean, res: NodeSeq, toMerge: => NodeSeq): NodeSeq = {
+  private[http] def mergeIntoForm(isForm: Boolean,
+                                  res: NodeSeq,
+                                  toMerge: => NodeSeq): NodeSeq = {
     val formElem = Helpers.findOption(res) {
       case e: Elem if e.label == "form" && null == e.prefix => Some(e)
       case _ => None
@@ -168,7 +169,9 @@ trait RenderFuncDispatch {
   * This is the common use of stateful snippets and makes things easier.
   */
 trait SimpleStateful
-    extends StatefulSnippet with Whence with RenderFuncDispatch
+    extends StatefulSnippet
+    with Whence
+    with RenderFuncDispatch
 
 trait DispatchSnippet {
   type DispatchIt = PartialFunction[String, NodeSeq => NodeSeq]

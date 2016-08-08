@@ -2,7 +2,7 @@ package lila.pref
 
 import scalaz.NonEmptyList
 
-sealed class SoundSet private[pref](val key: String, val name: String) {
+sealed class SoundSet private[pref] (val key: String, val name: String) {
 
   override def toString = key
 

@@ -80,7 +80,7 @@ private[sql] case class InsertIntoHadoopFsRelation(
         .mkString(", ")
       throw new AnalysisException(
           s"Duplicate column(s) : $duplicateColumns found, " +
-          s"cannot save to file.")
+            s"cannot save to file.")
     }
 
     val hadoopConf = sqlContext.sparkContext.hadoopConfiguration
@@ -96,8 +96,9 @@ private[sql] case class InsertIntoHadoopFsRelation(
       case (SaveMode.Overwrite, true) =>
         Utils.tryOrIOException {
           if (!fs.delete(qualifiedOutputPath, true /* recursively */ )) {
-            throw new IOException(s"Unable to clear output " +
-                s"directory $qualifiedOutputPath prior to writing to it")
+            throw new IOException(
+                s"Unable to clear output " +
+                  s"directory $qualifiedOutputPath prior to writing to it")
           }
         }
         true
@@ -128,8 +129,10 @@ private[sql] case class InsertIntoHadoopFsRelation(
           WriteRelation(sqlContext,
                         dataColumns.toStructType,
                         qualifiedOutputPath.toString,
-                        fileFormat.prepareWrite(
-                            sqlContext, _, options, dataColumns.toStructType),
+                        fileFormat.prepareWrite(sqlContext,
+                                                _,
+                                                options,
+                                                dataColumns.toStructType),
                         bucketSpec)
 
         val writerContainer =
@@ -152,8 +155,8 @@ private[sql] case class InsertIntoHadoopFsRelation(
         writerContainer.driverSideSetup()
 
         try {
-          sqlContext.sparkContext.runJob(
-              queryExecution.toRdd, writerContainer.writeRows _)
+          sqlContext.sparkContext
+            .runJob(queryExecution.toRdd, writerContainer.writeRows _)
           writerContainer.commitJob()
           refreshFunction()
         } catch {

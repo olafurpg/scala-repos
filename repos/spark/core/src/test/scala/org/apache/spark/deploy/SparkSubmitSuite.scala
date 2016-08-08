@@ -37,8 +37,11 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
 // Note: this suite mixes in ResetSystemProperties because SparkSubmit.main() sets a bunch
 // of properties that needed to be cleared after tests.
 class SparkSubmitSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with ResetSystemProperties
+    with Timeouts {
 
   override def beforeEach() {
     super.beforeEach()
@@ -231,10 +234,10 @@ class SparkSubmitSuite
     childArgsStr should include("--queue thequeue")
     childArgsStr should include regex ("--jar .*thejar.jar")
     childArgsStr should include regex
-    ("--addJars .*one.jar,.*two.jar,.*three.jar")
+      ("--addJars .*one.jar,.*two.jar,.*three.jar")
     childArgsStr should include regex ("--files .*file1.txt,.*file2.txt")
     childArgsStr should include regex
-    ("--archives .*archive1.txt,.*archive2.txt")
+      ("--archives .*archive1.txt,.*archive2.txt")
     mainClass should be("org.apache.spark.deploy.yarn.Client")
     classpath should have length (0)
     sysProps("spark.app.name") should be("beauty")
@@ -289,11 +292,11 @@ class SparkSubmitSuite
     sysProps("spark.yarn.queue") should be("thequeue")
     sysProps("spark.executor.instances") should be("6")
     sysProps("spark.yarn.dist.files") should include regex
-    (".*file1.txt,.*file2.txt")
+      (".*file1.txt,.*file2.txt")
     sysProps("spark.yarn.dist.archives") should include regex
-    (".*archive1.txt,.*archive2.txt")
+      (".*archive1.txt,.*archive2.txt")
     sysProps("spark.jars") should include regex
-    (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
+      (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
     sysProps("SPARK_SUBMIT") should be("true")
     sysProps("spark.ui.enabled") should be("false")
   }
@@ -507,8 +510,8 @@ class SparkSubmitSuite
   ignore("correctly builds R packages included in a jar with --packages") {
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val main = MavenCoordinate("my.great.lib", "mylib", "0.1")
-    val sparkHome = sys.props.getOrElse(
-        "spark.test.home", fail("spark.test.home is not set!"))
+    val sparkHome = sys.props
+      .getOrElse("spark.test.home", fail("spark.test.home is not set!"))
     val rScriptDir =
       Seq(sparkHome, "R", "pkg", "inst", "tests", "packageInAJarTest.R")
         .mkString(File.separator)
@@ -698,8 +701,8 @@ class SparkSubmitSuite
 
   // NOTE: This is an expensive operation in terms of time (10 seconds+). Use sparingly.
   private def runSparkSubmit(args: Seq[String]): Unit = {
-    val sparkHome = sys.props.getOrElse(
-        "spark.test.home", fail("spark.test.home is not set!"))
+    val sparkHome = sys.props
+      .getOrElse("spark.test.home", fail("spark.test.home is not set!"))
     val process = Utils.executeCommand(
         Seq("./bin/spark-submit") ++ args,
         new File(sparkHome),
@@ -721,8 +724,8 @@ class SparkSubmitSuite
     val tmpDir = Utils.createTempDir()
 
     val defaultsConf = new File(tmpDir.getAbsolutePath, "spark-defaults.conf")
-    val writer = new OutputStreamWriter(
-        new FileOutputStream(defaultsConf), StandardCharsets.UTF_8)
+    val writer = new OutputStreamWriter(new FileOutputStream(defaultsConf),
+                                        StandardCharsets.UTF_8)
     for ((key, value) <- defaults) writer.write(s"$key $value\n")
 
     writer.close()

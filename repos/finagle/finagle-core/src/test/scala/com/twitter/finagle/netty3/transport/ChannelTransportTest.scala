@@ -16,7 +16,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite
+    with MockitoSugar
+    with OneInstancePerTest {
 
   // For some reason, the scala compiler has a difficult time with
   // mockito's vararg-v-singlearg 'thenReturns'. We force the
@@ -24,7 +26,7 @@ class ChannelTransportTest
   def when[T](o: T) =
     Mockito
       .when(o)
-      .asInstanceOf[ { def thenReturn[T](s: T): OngoingStubbing[T] }]
+      .asInstanceOf[{ def thenReturn[T](s: T): OngoingStubbing[T] }]
 
   val ch = mock[Channel]
   val closeFuture = mock[ChannelFuture]
@@ -171,8 +173,8 @@ class ChannelTransportTest
   test("FIFO queue messages") {
     for (i <- 0 until 10) sendUpstreamMessage("message:%d".format(i))
 
-    for (i <- 0 until 10) assert(
-        Await.result(trans.read()) == "message:%d".format(i))
+    for (i <- 0 until 10)
+      assert(Await.result(trans.read()) == "message:%d".format(i))
 
     assert(!trans.read().isDefined)
   }

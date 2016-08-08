@@ -83,12 +83,10 @@ class ClosableTest extends FunSuite with Eventually with IntegrationPatience {
   }
 
   test("Closable.all,sequence are eager") {
-    assert(
-        (Future
-          .value(1)
-          .map(_ =>
-                Closable.sequence(Closable.nop, Closable.nop).close().isDone))
-          .poll == Some(Return(true)))
+    assert((Future
+      .value(1)
+      .map(_ => Closable.sequence(Closable.nop, Closable.nop).close().isDone))
+      .poll == Some(Return(true)))
     assert(
         (Future
           .value(1)

@@ -13,7 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * Date: 11/23/11
   */
 trait ScDocTagValue
-    extends PsiDocTagValue with PsiReference with PsiNamedElement {
+    extends PsiDocTagValue
+    with PsiReference
+    with PsiNamedElement {
   def getValue: String
 
 //  def getName: String = getText

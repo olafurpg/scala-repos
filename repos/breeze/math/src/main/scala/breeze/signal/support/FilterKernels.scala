@@ -27,8 +27,9 @@ abstract class FilterKernel1D[T] extends FilterKernel[T] {
 
 object FIRKernel1D {
 
-  def apply[T](
-      kernel: DenseVector[T], multiplier: Double, designText: String) =
+  def apply[T](kernel: DenseVector[T],
+               multiplier: Double,
+               designText: String) =
     new FIRKernel1D[T](kernel, multiplier, designText)
 }
 

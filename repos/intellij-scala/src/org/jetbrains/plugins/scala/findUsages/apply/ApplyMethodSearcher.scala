@@ -4,7 +4,10 @@ package apply
 
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, ResolvableReferenceExpression}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceElement,
+  ResolvableReferenceExpression
+}
 
 class ApplyMethodSearcher extends ApplyUnapplyMethodSearcherBase {
 

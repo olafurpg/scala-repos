@@ -105,7 +105,9 @@ private[this] object SharedFactory {
   * of the extracted json object. It will return null if the input json string is invalid.
   */
 case class GetJsonObject(json: Expression, path: Expression)
-    extends BinaryExpression with ExpectsInputTypes with CodegenFallback {
+    extends BinaryExpression
+    with ExpectsInputTypes
+    with CodegenFallback {
 
   import com.fasterxml.jackson.core.JsonToken._
 
@@ -236,8 +238,8 @@ case class GetJsonObject(json: Expression, path: Expression)
         }
         dirty
 
-      case (
-          START_ARRAY, Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
+      case (START_ARRAY,
+            Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
         // special handling for the non-structure preserving double wildcard behavior in Hive
         var dirty = false
         g.writeStartArray()
@@ -269,7 +271,8 @@ case class GetJsonObject(json: Expression, path: Expression)
               // track the number of array elements and only emit an outer array if
               // we've written more than one element, this matches Hive's behavior
               dirty +=
-              (if (evaluatePath(p, flattenGenerator, nextStyle, xs)) 1 else 0)
+                (if (evaluatePath(p, flattenGenerator, nextStyle, xs)) 1
+                 else 0)
             }
             flattenGenerator.writeEndArray()
         }
@@ -326,7 +329,8 @@ case class GetJsonObject(json: Expression, path: Expression)
 }
 
 case class JsonTuple(children: Seq[Expression])
-    extends Generator with CodegenFallback {
+    extends Generator
+    with CodegenFallback {
 
   import SharedFactory._
 
@@ -395,8 +399,8 @@ case class JsonTuple(children: Seq[Expression])
     }
   }
 
-  private def parseRow(
-      parser: JsonParser, input: InternalRow): Seq[InternalRow] = {
+  private def parseRow(parser: JsonParser,
+                       input: InternalRow): Seq[InternalRow] = {
     // only objects are supported
     if (parser.nextToken() != JsonToken.START_OBJECT) {
       return nullRow
@@ -453,8 +457,8 @@ case class JsonTuple(children: Seq[Expression])
     new GenericInternalRow(row) :: Nil
   }
 
-  private def copyCurrentStructure(
-      generator: JsonGenerator, parser: JsonParser): Unit = {
+  private def copyCurrentStructure(generator: JsonGenerator,
+                                   parser: JsonParser): Unit = {
     parser.getCurrentToken match {
       // if the user requests a string field it needs to be returned without enclosing
       // quotes which is accomplished via JsonGenerator.writeRaw instead of JsonGenerator.write

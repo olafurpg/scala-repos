@@ -184,7 +184,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
         val posToReport = in.currentPos
         val msg =
           JavaScannerConfiguration.token2string(token) + " expected but " +
-          JavaScannerConfiguration.token2string(in.token) + " found."
+            JavaScannerConfiguration.token2string(in.token) + " found."
 
         syntaxError(posToReport, msg, skipIt = true)
       }
@@ -452,8 +452,8 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       if (in.token == DOTDOTDOT) {
         in.nextToken()
         t = atPos(t.pos) {
-          AppliedTypeTree(
-              scalaDot(tpnme.JAVA_REPEATED_PARAM_CLASS_NAME), List(t))
+          AppliedTypeTree(scalaDot(tpnme.JAVA_REPEATED_PARAM_CLASS_NAME),
+                          List(t))
         }
       }
       varDecl(in.currentPos,
@@ -518,7 +518,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           optThrows()
           val isConcreteInterfaceMethod =
             !inInterface || (mods hasFlag Flags.JAVA_DEFAULTMETHOD) ||
-            (mods hasFlag Flags.STATIC)
+              (mods hasFlag Flags.STATIC)
           val bodyOk =
             !(mods1 hasFlag Flags.DEFERRED) && isConcreteInterfaceMethod
           val body =
@@ -545,8 +545,12 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           if (!isConcreteInterfaceMethod) mods1 |= Flags.DEFERRED
           List {
             atPos(pos) {
-              DefDef(
-                  mods1, name.toTermName, tparams, List(vparams), rtpt, body)
+              DefDef(mods1,
+                     name.toTermName,
+                     tparams,
+                     List(vparams),
+                     rtpt,
+                     body)
             }
           }
         } else {
@@ -567,8 +571,10 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       *  Once we have reached the end of the statement, we know whether
       *  these potential definitions are real or not.
       */
-    def fieldDecls(
-        pos: Position, mods: Modifiers, tpt: Tree, name: Name): List[Tree] = {
+    def fieldDecls(pos: Position,
+                   mods: Modifiers,
+                   tpt: Tree,
+                   name: Name): List[Tree] = {
       val buf = ListBuffer[Tree](varDecl(pos, mods, tpt, name.toTermName))
       val maybe = new ListBuffer[Tree] // potential variable definitions.
       while (in.token == COMMA) {
@@ -604,8 +610,10 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       buf.toList
     }
 
-    def varDecl(
-        pos: Position, mods: Modifiers, tpt: Tree, name: TermName): ValDef = {
+    def varDecl(pos: Position,
+                mods: Modifiers,
+                tpt: Tree,
+                name: TermName): ValDef = {
       val tpt1 = optArrayBrackets(tpt)
       if (in.token == EQUALS && !mods.isParameter) skipTo(COMMA, SEMI)
       val mods1 =
@@ -654,8 +662,8 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       val cdefNew =
         if (statics.isEmpty) cdef
         else
-          deriveClassDef(cdef)(
-              _ => implWithImport(importCompanionObject(cdef)))
+          deriveClassDef(cdef)(_ =>
+            implWithImport(importCompanionObject(cdef)))
 
       List(makeCompanionObject(cdefNew, statics), cdefNew)
     }
@@ -723,8 +731,10 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       val interfaces = interfacesOpt()
       val (statics, body) = typeBody(CLASS, name)
       addCompanionObject(statics, atPos(pos) {
-        ClassDef(
-            mods, name, tparams, makeTemplate(superclass :: interfaces, body))
+        ClassDef(mods,
+                 name,
+                 tparams,
+                 makeTemplate(superclass :: interfaces, body))
       })
     }
 
@@ -749,16 +759,16 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       })
     }
 
-    def typeBody(
-        leadingToken: Int, parentName: Name): (List[Tree], List[Tree]) = {
+    def typeBody(leadingToken: Int,
+                 parentName: Name): (List[Tree], List[Tree]) = {
       accept(LBRACE)
       val defs = typeBodyDecls(leadingToken, parentName)
       accept(RBRACE)
       defs
     }
 
-    def typeBodyDecls(
-        parentToken: Int, parentName: Name): (List[Tree], List[Tree]) = {
+    def typeBodyDecls(parentToken: Int,
+                      parentName: Name): (List[Tree], List[Tree]) = {
       val inInterface = definesInterface(parentToken)
       val statics = new ListBuffer[Tree]
       val members = new ListBuffer[Tree]

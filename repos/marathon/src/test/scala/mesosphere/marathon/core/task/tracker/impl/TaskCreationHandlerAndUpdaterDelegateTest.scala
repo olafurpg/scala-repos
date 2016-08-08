@@ -12,8 +12,12 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import org.scalatest.concurrent.ScalaFutures
 
 class TaskCreationHandlerAndUpdaterDelegateTest
-    extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with ScalaFutures with Matchers {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with ScalaFutures
+    with Matchers {
 
   test("Created succeeds") {
     val f = new Fixture
@@ -25,8 +29,9 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-        TaskTrackerActor.ForwardTaskOp(
-            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
+        TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
+                                       task.taskId,
+                                       TaskOpProcessor.Action.Update(task))
     )
 
     When("the request is acknowledged")
@@ -45,8 +50,9 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-        TaskTrackerActor.ForwardTaskOp(
-            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
+        TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
+                                       task.taskId,
+                                       TaskOpProcessor.Action.Update(task))
     )
 
     When("the response is an error")
@@ -69,8 +75,9 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-        TaskTrackerActor.ForwardTaskOp(
-            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
+        TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
+                                       task.taskId,
+                                       TaskOpProcessor.Action.Expunge)
     )
 
     When("the request is acknowledged")
@@ -89,8 +96,9 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-        TaskTrackerActor.ForwardTaskOp(
-            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
+        TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
+                                       task.taskId,
+                                       TaskOpProcessor.Action.Expunge)
     )
 
     When("the response is an error")
@@ -165,7 +173,9 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     lazy val config = MarathonTestHelper.defaultConfig()
     lazy val taskTrackerProbe = TestProbe()
     lazy val delegate = new TaskCreationHandlerAndUpdaterDelegate(
-        clock, config, taskTrackerProbe.ref)
+        clock,
+        config,
+        taskTrackerProbe.ref)
     lazy val timeoutDuration = delegate.timeout.duration
     def timeoutFromNow = clock.now() + timeoutDuration
   }

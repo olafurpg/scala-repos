@@ -20,13 +20,20 @@ package org.apache.spark.ml.regression
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.{PredictionModel, Predictor}
 import org.apache.spark.ml.param.ParamMap
-import org.apache.spark.ml.tree.{DecisionTreeModel, RandomForestParams, TreeEnsembleModel, TreeRegressorParams}
+import org.apache.spark.ml.tree.{
+  DecisionTreeModel,
+  RandomForestParams,
+  TreeEnsembleModel,
+  TreeRegressorParams
+}
 import org.apache.spark.ml.tree.impl.RandomForest
 import org.apache.spark.ml.util.{Identifiable, MetadataUtils}
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
-import org.apache.spark.mllib.tree.model.{RandomForestModel => OldRandomForestModel}
+import org.apache.spark.mllib.tree.model.{
+  RandomForestModel => OldRandomForestModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -40,9 +47,11 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class RandomForestRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Predictor[
-        Vector, RandomForestRegressor, RandomForestRegressionModel]
-    with RandomForestParams with TreeRegressorParams {
+    extends Predictor[Vector,
+                      RandomForestRegressor,
+                      RandomForestRegressionModel]
+    with RandomForestParams
+    with TreeRegressorParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("rfr"))
@@ -105,8 +114,11 @@ final class RandomForestRegressor @Since("1.4.0")(
                                         OldAlgo.Regression,
                                         getOldImpurity)
     val trees = RandomForest
-      .run(
-          oldDataset, strategy, getNumTrees, getFeatureSubsetStrategy, getSeed)
+      .run(oldDataset,
+           strategy,
+           getNumTrees,
+           getFeatureSubsetStrategy,
+           getSeed)
       .map(_.asInstanceOf[DecisionTreeRegressionModel])
     val numFeatures = oldDataset.first().features.size
     new RandomForestRegressionModel(trees, numFeatures)
@@ -141,22 +153,23 @@ object RandomForestRegressor {
   */
 @Since("1.4.0")
 @Experimental
-final class RandomForestRegressionModel private[ml](
+final class RandomForestRegressionModel private[ml] (
     override val uid: String,
     private val _trees: Array[DecisionTreeRegressionModel],
     override val numFeatures: Int)
     extends PredictionModel[Vector, RandomForestRegressionModel]
-    with TreeEnsembleModel with Serializable {
+    with TreeEnsembleModel
+    with Serializable {
 
-  require(
-      numTrees > 0, "RandomForestRegressionModel requires at least 1 tree.")
+  require(numTrees > 0,
+          "RandomForestRegressionModel requires at least 1 tree.")
 
   /**
     * Construct a random forest regression model, with all trees weighted equally.
     * @param trees  Component trees
     */
-  private[ml] def this(
-      trees: Array[DecisionTreeRegressionModel], numFeatures: Int) =
+  private[ml] def this(trees: Array[DecisionTreeRegressionModel],
+                       numFeatures: Int) =
     this(Identifiable.randomUID("rfr"), trees, numFeatures)
 
   @Since("1.4.0")
@@ -230,7 +243,7 @@ private[ml] object RandomForestRegressionModel {
     require(
         oldModel.algo == OldAlgo.Regression,
         "Cannot convert RandomForestModel" +
-        s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API).")
+          s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)

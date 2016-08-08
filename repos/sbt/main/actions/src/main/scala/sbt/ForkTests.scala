@@ -65,8 +65,9 @@ private[sbt] object ForkTests {
             server.accept()
           } catch {
             case e: java.net.SocketException =>
-              log.error("Could not accept connection from test agent: " +
-                  e.getClass + ": " + e.getMessage)
+              log.error(
+                  "Could not accept connection from test agent: " +
+                    e.getClass + ": " + e.getMessage)
               log.trace(e)
               server.close()
               return
@@ -81,7 +82,8 @@ private[sbt] object ForkTests {
               new ForkConfiguration(log.ansiCodesSupported, parallel)
             os.writeObject(config)
 
-            val taskdefs = opts.tests.map(t =>
+            val taskdefs = opts.tests.map(
+                t =>
                   new TaskDef(t.name,
                               forkFingerprint(t.fingerprint),
                               t.explicitlySpecified,
@@ -120,8 +122,9 @@ private[sbt] object ForkTests {
           if (ec != 0)
             TestOutput(
                 TestResult.Error,
-                Map("Running java with options " + options.mkString(" ") +
-                    " failed with exit code " + ec -> SuiteResult.Error),
+                Map(
+                    "Running java with options " + options.mkString(" ") +
+                      " failed with exit code " + ec -> SuiteResult.Error),
                 Iterable.empty)
           else {
             // Need to wait acceptor thread to finish its business

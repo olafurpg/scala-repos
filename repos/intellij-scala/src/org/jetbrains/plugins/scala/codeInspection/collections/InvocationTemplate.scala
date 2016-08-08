@@ -41,7 +41,7 @@ class InvocationTemplate(nameCondition: String => Boolean) {
         Some(qualOpt.orNull, args)
       case MethodRepr(call: ScMethodCall, Some(qual), None, args)
           if nameCondition("apply") && call.isApplyOrUpdateCall &&
-          !call.isUpdateCall =>
+            !call.isUpdateCall =>
         val text = qual match {
           case _: ScReferenceExpression | _: ScMethodCall | _: ScGenericCall =>
             s"${qual.getText}.apply"

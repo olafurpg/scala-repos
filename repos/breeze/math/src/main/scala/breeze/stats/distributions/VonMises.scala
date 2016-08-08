@@ -31,7 +31,8 @@ import breeze.linalg.DenseVector
   * @author dlwh
   */
 case class VonMises(mu: Double, k: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] {
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double] {
   require(k >= 0, "K must be positive")
   require(mu <= math.Pi * 2 && mu >= 0, "Mu must be in the range [0,2pi]")
 
@@ -106,10 +107,10 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
       signum(cosineSum) * signum(sineSum) * atan(abs(sineSum / cosineSum))
     val mu =
       (muPart + {
-            if (cosineSum < 0) Pi
-            else if (cosineSum > 0 && sineSum < 0) 2 * Pi
-            else 0.0
-          }) % (2 * Pi)
+        if (cosineSum < 0) Pi
+        else if (cosineSum > 0 && sineSum < 0) 2 * Pi
+        else 0.0
+      }) % (2 * Pi)
 
     val t = sqrt(pow(cosineSum / stats.n, 2) + pow(sineSum / stats.n, 2))
     val k = (1.28 - 0.53 * pow(t, 2)) * tan(Pi / 2 * t)
@@ -136,11 +137,11 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
           val bessel_k = Bessel.i0(k)
           val logprob =
             stats.n * math.log(bessel_k * 2 * Pi) -
-            (stats.sines * sinx + stats.cosines * cosx) * k
+              (stats.sines * sinx + stats.cosines * cosx) * k
           val mugrad = -k * (stats.sines * cos(mu) - stats.cosines * sin(mu))
           val kgrad =
             stats.n * (Bessel.i1(k) / bessel_k) -
-            (stats.sines * sinx + stats.cosines * cosx)
+              (stats.sines * sinx + stats.cosines * cosx)
 
           (logprob, (mugrad, kgrad))
         }

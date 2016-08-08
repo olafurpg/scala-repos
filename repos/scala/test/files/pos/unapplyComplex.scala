@@ -27,8 +27,9 @@ object ComplexPolar {
     else
       z match {
         case ComplexRect(re, im) =>
-          Some(new ComplexPolar(
-                  math.sqrt(re * re + im * im), math.atan(re / im)))
+          Some(
+              new ComplexPolar(math.sqrt(re * re + im * im),
+                               math.atan(re / im)))
       }
   }
 }

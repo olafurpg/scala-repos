@@ -119,7 +119,8 @@ object ClientConnection {
   * This is useful if you want to wrap-but-modify an existing service.
   */
 abstract class ServiceProxy[-Req, +Rep](val self: Service[Req, Rep])
-    extends Service[Req, Rep] with Proxy {
+    extends Service[Req, Rep]
+    with Proxy {
   def apply(request: Req): Future[Rep] = self(request)
   override def close(deadline: Time): Future[Unit] = self.close(deadline)
 
@@ -129,7 +130,8 @@ abstract class ServiceProxy[-Req, +Rep](val self: Service[Req, Rep])
 }
 
 abstract class ServiceFactory[-Req, +Rep]
-    extends (ClientConnection => Future[Service[Req, Rep]]) with Closable { self =>
+    extends (ClientConnection => Future[Service[Req, Rep]])
+    with Closable { self =>
 
   /**
     * Reserve the use of a given service instance. This pins the
@@ -186,11 +188,11 @@ abstract class ServiceFactory[-Req, +Rep]
 object ServiceFactory {
   def const[Req, Rep](service: Service[Req, Rep]): ServiceFactory[Req, Rep] =
     new ServiceFactory[Req, Rep] {
-      private[this] val noRelease = Future.value(
-          new ServiceProxy[Req, Rep](service) {
-        // close() is meaningless on connectionless services.
-        override def close(deadline: Time) = Future.Done
-      })
+      private[this] val noRelease =
+        Future.value(new ServiceProxy[Req, Rep](service) {
+          // close() is meaningless on connectionless services.
+          override def close(deadline: Time) = Future.Done
+        })
 
       def apply(conn: ClientConnection): Future[Service[Req, Rep]] = noRelease
       def close(deadline: Time): Future[Unit] = Future.Done
@@ -210,7 +212,8 @@ object ServiceFactory {
   * and existing `ServiceFactory`.
   */
 abstract class ServiceFactoryProxy[-Req, +Rep](_self: ServiceFactory[Req, Rep])
-    extends ServiceFactory[Req, Rep] with Proxy {
+    extends ServiceFactory[Req, Rep]
+    with Proxy {
   def self: ServiceFactory[Req, Rep] = _self
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] = self(conn)
@@ -268,8 +271,8 @@ object FactoryToService {
            */
           val service = Future.value(
               new ServiceProxy[Req, Rep](new FactoryToService(next)) {
-            override def close(deadline: Time): Future[Unit] = Future.Done
-          })
+                override def close(deadline: Time): Future[Unit] = Future.Done
+              })
           new ServiceFactoryProxy(next) {
             override def apply(
                 conn: ClientConnection): Future[ServiceProxy[Req, Rep]] =

@@ -23,13 +23,14 @@ trait RemoteResourceOwner {
     val encodedArgs =
       arguments.map(s => Base64Converter.encode(s.getBytes("UTF-8")))
     using(new Socket(address, port)) { socket =>
-      using(new DataOutputStream(
+      using(
+          new DataOutputStream(
               new BufferedOutputStream(socket.getOutputStream))) { output =>
         createChunks(command, encodedArgs).foreach(_.writeTo(output))
         output.flush()
         if (client != null) {
           using(new DataInputStream(
-                  new BufferedInputStream(socket.getInputStream))) { input =>
+              new BufferedInputStream(socket.getInputStream))) { input =>
             handle(input, client)
           }
         }
@@ -54,8 +55,8 @@ trait RemoteResourceOwner {
                 val s = new String(data)
                 if (s.length > 50) s.substring(0, 50) + "..." else s
               }
-              client.message(
-                  Kind.ERROR, "Unable to read an event from: " + chars)
+              client
+                .message(Kind.ERROR, "Unable to read an event from: " + chars)
               client.trace(e)
           }
         // Main server class redirects all (unexpected) stdout data to stderr.
@@ -74,7 +75,8 @@ trait RemoteResourceOwner {
     args.map(s => Chunk(NGConstants.CHUNKTYPE_ARGUMENT.toChar, toBytes(s))) :+ Chunk(
         NGConstants.CHUNKTYPE_WORKINGDIRECTORY.toChar,
         toBytes(currentDirectory)) :+ Chunk(
-        NGConstants.CHUNKTYPE_COMMAND.toChar, toBytes(command))
+        NGConstants.CHUNKTYPE_COMMAND.toChar,
+        toBytes(command))
   }
 
   private def toBytes(s: String) = s.getBytes

@@ -50,7 +50,9 @@ class CascadeTestJob(args: Args) extends CascadeJob(args) {
 }
 
 class TwoPhaseCascadeTest
-    extends WordSpec with Matchers with FieldConversions {
+    extends WordSpec
+    with Matchers
+    with FieldConversions {
   "A Cascade job" should {
     CascadeTest("com.twitter.scalding.CascadeTestJob")
       .arg("input0", "input0")
@@ -101,8 +103,11 @@ class TwoPhaseCascadeTest
     val lines = fromFile(output1.getAbsolutePath).getLines.toList
 
     "verify output got changed by both flows" in {
-      lines shouldBe List(
-          "job2job1:a", "job2job1:b", "job2job1:c", "job2job1:d", "job2job1:e")
+      lines shouldBe List("job2job1:a",
+                          "job2job1:b",
+                          "job2job1:c",
+                          "job2job1:d",
+                          "job2job1:e")
     }
 
     input0.delete()

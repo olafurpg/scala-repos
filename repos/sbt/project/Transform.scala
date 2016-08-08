@@ -61,9 +61,9 @@ object Transform {
       fileMappings in transformSources <<= transformSourceMappings,
       transformSources <<=
         (fileMappings in transformSources, sourceProperties) map {
-        (rs, props) =>
-          rs map { case (in, out) => transform(in, out, props) }
-      },
+          (rs, props) =>
+            rs map { case (in, out) => transform(in, out, props) }
+        },
       sourceGenerators <+= transformSources
   )
   def transformSourceMappings =
@@ -74,9 +74,9 @@ object Transform {
   def configSettings = transResourceSettings ++ Seq(
       resourceProperties <<=
         (organization, version, scalaVersion, isSnapshot) map {
-        (org, v, sv, isSnapshot) =>
-          Map("org" -> org, "sbt.version" -> v, "scala.version" -> sv)
-      }
+          (org, v, sv, isSnapshot) =>
+            Map("org" -> org, "sbt.version" -> v, "scala.version" -> sv)
+        }
   )
   def transResourceSettings = Seq(
       inputResourceDirectory := sourceDirectory.value / "input_resources",
@@ -86,9 +86,9 @@ object Transform {
       fileMappings in transformResources <<= transformResourceMappings,
       transformResources <<=
         (fileMappings in transformResources, resourceProperties) map {
-        (rs, props) =>
-          rs map { case (in, out) => transform(in, out, props) }
-      },
+          (rs, props) =>
+            rs map { case (in, out) => transform(in, out, props) }
+        },
       resourceGenerators <+= transformResources
   )
   def transformResourceMappings =

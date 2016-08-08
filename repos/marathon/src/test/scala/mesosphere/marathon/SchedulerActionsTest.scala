@@ -6,7 +6,12 @@ import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.core.task.tracker.TaskTracker.{AppTasks, TasksByApp}
 import mesosphere.marathon.health.HealthCheckManager
-import mesosphere.marathon.state.{AppDefinition, AppRepository, GroupRepository, PathId}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  AppRepository,
+  GroupRepository,
+  PathId
+}
 import mesosphere.marathon.test.{Mockito, MarathonActorSupport}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
@@ -18,7 +23,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class SchedulerActionsTest
-    extends MarathonActorSupport with MarathonSpec with Matchers with Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with Mockito {
   import system.dispatcher
 
   test("Reset rate limiter if application is stopped") {

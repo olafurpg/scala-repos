@@ -14,8 +14,8 @@ private[cross] object MacroUtils {
 
   // Copied from sbt.std.KeyMacros
 
-  def definingValName(
-      c: Context, invalidEnclosingTree: String => String): String = {
+  def definingValName(c: Context,
+                      invalidEnclosingTree: String => String): String = {
     import c.universe._
     val methodName = c.macroApplication.symbol.name
 

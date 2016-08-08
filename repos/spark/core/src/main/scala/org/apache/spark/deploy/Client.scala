@@ -28,7 +28,12 @@ import org.apache.spark.{SecurityManager, SparkConf}
 import org.apache.spark.deploy.DeployMessages._
 import org.apache.spark.deploy.master.{DriverState, Master}
 import org.apache.spark.internal.Logging
-import org.apache.spark.rpc.{RpcAddress, RpcEndpointRef, RpcEnv, ThreadSafeRpcEndpoint}
+import org.apache.spark.rpc.{
+  RpcAddress,
+  RpcEndpointRef,
+  RpcEnv,
+  ThreadSafeRpcEndpoint
+}
 import org.apache.spark.util.{SparkExitCode, ThreadUtils, Utils}
 
 /**
@@ -41,7 +46,8 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
                              driverArgs: ClientArguments,
                              masterEndpoints: Seq[RpcEndpointRef],
                              conf: SparkConf)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   // A scheduled executor used to send messages at the specified time.
   private val forwardMessageThread =
@@ -116,7 +122,7 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
   /**
     * Send the message to master and forward the reply to self asynchronously.
     */
-  private def ayncSendToMasterAndForwardReply[T : ClassTag](
+  private def ayncSendToMasterAndForwardReply[T: ClassTag](
       message: Any): Unit = {
     for (masterEndpoint <- masterEndpoints) {
       masterEndpoint
@@ -197,8 +203,8 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
     }
   }
 
-  override def onNetworkError(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
+  override def onNetworkError(cause: Throwable,
+                              remoteAddress: RpcAddress): Unit = {
     if (!lostMasters.contains(remoteAddress)) {
       logError(s"Error connecting to master ($remoteAddress).")
       logError(s"Cause was: $cause")

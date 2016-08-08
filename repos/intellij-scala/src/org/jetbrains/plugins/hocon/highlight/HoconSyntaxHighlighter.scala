@@ -2,7 +2,10 @@ package org.jetbrains.plugins.hocon.highlight
 
 import com.intellij.lexer.{LayeredLexer, StringLiteralLexer}
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.fileTypes.{SyntaxHighlighter, SyntaxHighlighterFactory}
+import com.intellij.openapi.fileTypes.{
+  SyntaxHighlighter,
+  SyntaxHighlighterFactory
+}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.StringEscapesTokenTypes

@@ -6,8 +6,10 @@ package algebra
   * monoid, not a group). Put another way, a Rig is a Ring without a negative.
   */
 trait Rig[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Semiring[A]
-    with AdditiveMonoid[A] with MultiplicativeMonoid[A] {
+    extends Any
+    with Semiring[A]
+    with AdditiveMonoid[A]
+    with MultiplicativeMonoid[A] {
 
   /**
     * This is similar to `Semigroup#pow`, except that `a pow 0` is defined to be
@@ -28,7 +30,9 @@ object Rig {
   * CRig is a Rig that is commutative under multiplication.
   */
 trait CRig[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Rig[A] with MultiplicativeCMonoid[A]
+    extends Any
+    with Rig[A]
+    with MultiplicativeCMonoid[A]
 
 object CRig {
   @inline final def apply[A](implicit r: CRig[A]): CRig[A] = r

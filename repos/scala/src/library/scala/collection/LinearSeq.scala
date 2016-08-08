@@ -18,12 +18,13 @@ import mutable.Builder
   *
   *  @define  linearSeqInfo
   *  Linear sequences have reasonably efficient `head`, `tail`, and `isEmpty` methods.
-  *  If these methods provide the fastest way to traverse the collection, a 
+  *  If these methods provide the fastest way to traverse the collection, a
   *  collection `Coll` that extends this trait should also extend
   *  `LinearSeqOptimized[A, Coll[A]]`.
   */
 trait LinearSeq[+A]
-    extends Seq[A] with GenericTraversableTemplate[A, LinearSeq]
+    extends Seq[A]
+    with GenericTraversableTemplate[A, LinearSeq]
     with LinearSeqLike[A, LinearSeq[A]] {
   override def companion: GenericCompanion[LinearSeq] = LinearSeq
   override def seq: LinearSeq[A] = this

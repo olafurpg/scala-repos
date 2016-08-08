@@ -34,8 +34,8 @@ trait Naming {
     // Not lots - preserve whitespace and ESC
     else
       cleaned map
-      (ch =>
-            if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
+        (ch =>
+           if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
   }
 
   // The two name forms this is catching are the two sides of this assignment:
@@ -46,7 +46,7 @@ trait Naming {
     val sn = sessionNames
     val members =
       List(sn.read, sn.eval, sn.print) map Regex.quote mkString
-      ("(?:", "|", ")")
+        ("(?:", "|", ")")
     debugging("lineRegex")(
         Regex.quote(sn.line) + """\d+[./]""" + members + """[$.]""")
   }

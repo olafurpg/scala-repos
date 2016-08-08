@@ -29,8 +29,8 @@ private[sbt] object SbtRefactorings {
     val sortedRecordedCommands =
       recordedCommands.sortBy(_._1)(REVERSE_ORDERING_INT)
 
-    val newContent = replaceFromBottomToTop(
-        lines.mkString(END_OF_LINE), sortedRecordedCommands)
+    val newContent = replaceFromBottomToTop(lines.mkString(END_OF_LINE),
+                                            sortedRecordedCommands)
     (file, newContent.lines.toList)
   }
 
@@ -61,8 +61,9 @@ private[sbt] object SbtRefactorings {
         }
     }
 
-  private def treesToReplacements(
-      split: SbtParser, name: String, command: Seq[String]) =
+  private def treesToReplacements(split: SbtParser,
+                                  name: String,
+                                  command: Seq[String]) =
     split.settingsTrees.foldLeft(Seq.empty[(Int, String, String)]) {
       case (acc, (st, tree)) =>
         val treeName = extractSettingName(tree)

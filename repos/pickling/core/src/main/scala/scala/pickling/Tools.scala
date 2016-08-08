@@ -7,7 +7,12 @@ import scala.language.existentials
 import scala.reflect.macros.Context
 import scala.reflect.api.Universe
 
-import scala.collection.mutable.{Map => MutableMap, ListBuffer => MutableList, WeakHashMap, Set => MutableSet}
+import scala.collection.mutable.{
+  Map => MutableMap,
+  ListBuffer => MutableList,
+  WeakHashMap,
+  Set => MutableSet
+}
 import scala.collection.mutable.{Stack => MutableStack, Queue => MutableQueue}
 
 import java.lang.ref.WeakReference
@@ -80,7 +85,7 @@ class Tools[C <: Context](val c: C) {
 
   def blackList(sym: Symbol) =
     sym == AnyClass || sym == AnyRefClass || sym == AnyValClass ||
-    sym == ObjectClass
+      sym == ObjectClass
 
   def isRelevantSubclass(baseSym: Symbol, subSym: Symbol) = {
     !blackList(baseSym) && !blackList(subSym) && subSym.isClass && {
@@ -90,10 +95,12 @@ class Tools[C <: Context](val c: C) {
     }
   }
 
-  def compileTimeDispatchees(
-      tpe: Type, mirror: Mirror, excludeSelf: Boolean): List[Type] = {
-    val subtypes = allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(
-        subtpe => subtpe.typeSymbol != tpe.typeSymbol)
+  def compileTimeDispatchees(tpe: Type,
+                             mirror: Mirror,
+                             excludeSelf: Boolean): List[Type] = {
+    val subtypes =
+      allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(subtpe =>
+        subtpe.typeSymbol != tpe.typeSymbol)
     val selfTpe =
       if (isRelevantSubclass(tpe.typeSymbol, tpe.typeSymbol)) List(tpe)
       else Nil
@@ -102,8 +109,8 @@ class Tools[C <: Context](val c: C) {
     result
   }
 
-  def allStaticallyKnownConcreteSubclasses(
-      tpe: Type, mirror: Mirror): List[Type] = {
+  def allStaticallyKnownConcreteSubclasses(tpe: Type,
+                                           mirror: Mirror): List[Type] = {
     // TODO: so far the search is a bit dumb
     // given `class C[T]; class D extends C[Int]` and `tpe = C[String]`, it will return <symbol of D>
     // TODO: on a more elaborate note
@@ -172,18 +179,17 @@ class Tools[C <: Context](val c: C) {
             // NOTE: only looking for top-level classes!
             val pkgMembers = pkg.typeSignature.members
             pkgMembers foreach
-            (m =>
-                  {
-                    def analyze(m: Symbol): Unit = {
-                      if (m.name.decoded.contains("$")) () // SI-7251
-                      else if (m.isClass)
-                        m.asClass.baseClasses foreach
-                        (bc => updateCache(bc, m))
-                      else if (m.isModule) analyze(m.asModule.moduleClass)
-                      else ()
-                    }
-                    analyze(m)
-                })
+              (m => {
+                 def analyze(m: Symbol): Unit = {
+                   if (m.name.decoded.contains("$")) () // SI-7251
+                   else if (m.isClass)
+                     m.asClass.baseClasses foreach
+                       (bc => updateCache(bc, m))
+                   else if (m.isModule) analyze(m.asModule.moduleClass)
+                   else ()
+                 }
+                 analyze(m)
+               })
             def recurIntoPackage(pkg: Symbol) = {
               pkg.name.toString != "_root_" &&
               pkg.name.toString != "quicktime" &&
@@ -216,25 +222,24 @@ class Tools[C <: Context](val c: C) {
       }
       // NOTE: need to order the list: children first, parents last
       // otherwise pattern match which uses this list might work funnily
-      val subSyms = unsorted.distinct.sortWith(
-          (c1, c2) => c1.asClass.baseClasses.contains(c2))
+      val subSyms = unsorted.distinct.sortWith((c1, c2) =>
+        c1.asClass.baseClasses.contains(c2))
       val subTpes = subSyms
         .map(_.asClass)
-        .map(subSym =>
-              {
-            def tparamNames(sym: TypeSymbol) =
-              sym.typeParams.map(_.name.toString)
-            // val tparamsMatch = subSym.typeParams.nonEmpty && tparamNames(baseSym) == tparamNames(subSym)
-            val tparamsMatch =
-              subSym.typeParams.nonEmpty &&
+        .map(subSym => {
+          def tparamNames(sym: TypeSymbol) =
+            sym.typeParams.map(_.name.toString)
+          // val tparamsMatch = subSym.typeParams.nonEmpty && tparamNames(baseSym) == tparamNames(subSym)
+          val tparamsMatch =
+            subSym.typeParams.nonEmpty &&
               tparamNames(baseSym).length == tparamNames(subSym).length
-            val targsAreConcrete =
-              baseTargs.nonEmpty && baseTargs.forall(_.typeSymbol.isClass)
-            // NOTE: this is an extremely naïve heuristics
-            // see http://groups.google.com/group/scala-internals/browse_thread/thread/3a43a6364b97b521 for more information
-            if (tparamsMatch && targsAreConcrete)
-              appliedType(subSym.toTypeConstructor, baseTargs)
-            else existentialAbstraction(subSym.typeParams, subSym.toType)
+          val targsAreConcrete =
+            baseTargs.nonEmpty && baseTargs.forall(_.typeSymbol.isClass)
+          // NOTE: this is an extremely naïve heuristics
+          // see http://groups.google.com/group/scala-internals/browse_thread/thread/3a43a6364b97b521 for more information
+          if (tparamsMatch && targsAreConcrete)
+            appliedType(subSym.toTypeConstructor, baseTargs)
+          else existentialAbstraction(subSym.typeParams, subSym.toType)
         })
       subTpes
     }
@@ -254,11 +259,12 @@ trait RichTypes {
       tpe.normalize match {
         case ExistentialType(tparams, TypeRef(pre, sym, targs))
             if targs.nonEmpty &&
-            targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
+              targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
           TypeRef(pre, sym, Nil).key
         case TypeRef(pre, sym, targs) if pre.typeSymbol.isModuleClass =>
           sym.fullName + (if (sym.isModuleClass) ".type" else "") +
-          (if (targs.isEmpty) "" else targs.map(_.key).mkString("[", ",", "]"))
+            (if (targs.isEmpty) ""
+             else targs.map(_.key).mkString("[", ",", "]"))
         case _ =>
           tpe.toString
       }
@@ -268,7 +274,7 @@ trait RichTypes {
       case TypeRef(_, sym: ClassSymbol, _) if sym.isPrimitive => true
       case TypeRef(_, sym, eltpe :: Nil)
           if sym == ArrayClass && eltpe.typeSymbol.isClass &&
-          eltpe.typeSymbol.asClass.isPrimitive =>
+            eltpe.typeSymbol.asClass.isPrimitive =>
         true
       case _ => false
     }

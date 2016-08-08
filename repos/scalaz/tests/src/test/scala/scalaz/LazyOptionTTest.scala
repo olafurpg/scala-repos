@@ -28,12 +28,12 @@ object LazyOptionTTest extends SpecLite {
   object instances {
     def functor[F[_]: Functor] = Functor[LazyOptionT[F, ?]]
     def monad[F[_]: Monad] = Monad[LazyOptionT[F, ?]]
-    def bindRec[F[_]: Monad : BindRec] = BindRec[LazyOptionT[F, ?]]
+    def bindRec[F[_]: Monad: BindRec] = BindRec[LazyOptionT[F, ?]]
 
     // checking absence of ambiguity
     def functor[F[_]: Monad] = Functor[LazyOptionT[F, ?]]
-    def functor[F[_]: Monad : BindRec] = Functor[LazyOptionT[F, ?]]
+    def functor[F[_]: Monad: BindRec] = Functor[LazyOptionT[F, ?]]
     def apply[F[_]: Monad] = Apply[LazyOptionT[F, ?]]
-    def bind[F[_]: Monad : BindRec] = Bind[LazyOptionT[F, ?]]
+    def bind[F[_]: Monad: BindRec] = Bind[LazyOptionT[F, ?]]
   }
 }

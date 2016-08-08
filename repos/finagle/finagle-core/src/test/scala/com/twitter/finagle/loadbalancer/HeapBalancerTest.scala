@@ -12,7 +12,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class HeapBalancerTest
-    extends FunSuite with MockitoSugar with AssertionsForJUnit {
+    extends FunSuite
+    with MockitoSugar
+    with AssertionsForJUnit {
   class LoadedFactory(which: String)
       extends ServiceFactory[Unit, LoadedFactory] {
     var load = 0
@@ -272,8 +274,8 @@ class HeapBalancerTest
     for (_ <- 0 until 100 * N) b()
     val f0 = factories(0)
     f0.setStatus(Status.Open)
-    for (_ <- 0 until 100) assert(
-        Await.result(Await.result(b()).apply(())) == f0)
+    for (_ <- 0 until 100)
+      assert(Await.result(Await.result(b()).apply(())) == f0)
 
     assert(f0.load == 201)
     for (f <- factories drop 1) assert(f.load == 101)

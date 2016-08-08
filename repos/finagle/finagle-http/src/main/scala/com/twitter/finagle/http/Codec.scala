@@ -5,12 +5,24 @@ import com.twitter.finagle._
 import com.twitter.finagle.dispatch.GenSerialClientDispatcher
 import com.twitter.finagle.filter.PayloadSizeFilter
 import com.twitter.finagle.http.codec._
-import com.twitter.finagle.http.filter.{ClientContextFilter, DtabFilter, HttpNackFilter, ServerContextFilter}
+import com.twitter.finagle.http.filter.{
+  ClientContextFilter,
+  DtabFilter,
+  HttpNackFilter,
+  ServerContextFilter
+}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Closable, StorageUnit, Try}
-import org.jboss.netty.channel.{Channel, ChannelEvent, ChannelHandlerContext, ChannelPipelineFactory, Channels, UpstreamMessageEvent}
+import org.jboss.netty.channel.{
+  Channel,
+  ChannelEvent,
+  ChannelHandlerContext,
+  ChannelPipelineFactory,
+  Channels,
+  UpstreamMessageEvent
+}
 import org.jboss.netty.handler.codec.http._
 
 private[finagle] case class BadHttpRequest(httpVersion: HttpVersion,
@@ -21,13 +33,16 @@ private[finagle] case class BadHttpRequest(httpVersion: HttpVersion,
 
 object BadHttpRequest {
   def apply(exception: Exception) =
-    new BadHttpRequest(
-        HttpVersion.HTTP_1_0, HttpMethod.GET, "/bad-http-request", exception)
+    new BadHttpRequest(HttpVersion.HTTP_1_0,
+                       HttpMethod.GET,
+                       "/bad-http-request",
+                       exception)
 }
 
 /** Convert exceptions to BadHttpRequests */
-class SafeHttpServerCodec(
-    maxInitialLineLength: Int, maxHeaderSize: Int, maxChunkSize: Int)
+class SafeHttpServerCodec(maxInitialLineLength: Int,
+                          maxHeaderSize: Int,
+                          maxChunkSize: Int)
     extends HttpServerCodec(maxInitialLineLength, maxHeaderSize, maxChunkSize) {
   override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) {
     // this only catches Codec exceptions -- when a handler calls sendUpStream(), it
@@ -38,8 +53,10 @@ class SafeHttpServerCodec(
     } catch {
       case ex: Exception =>
         val channel = ctx.getChannel()
-        ctx.sendUpstream(new UpstreamMessageEvent(
-                channel, BadHttpRequest(ex), channel.getRemoteAddress()))
+        ctx.sendUpstream(
+            new UpstreamMessageEvent(channel,
+                                     BadHttpRequest(ex),
+                                     channel.getRemoteAddress()))
     }
   }
 }
@@ -77,8 +94,7 @@ case class Http(
     _maxHeaderSize: StorageUnit = 8192.bytes,
     _streaming: Boolean = false,
     _statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends CodecFactory[Request, Response] {
+) extends CodecFactory[Request, Response] {
 
   def this(
       _compressionLevel: Int,
@@ -178,11 +194,12 @@ case class Http(
         }
 
       override def newClientTransport(
-          ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+          ch: Channel,
+          statsReceiver: StatsReceiver): Transport[Any, Any] =
         new HttpTransport(super.newClientTransport(ch, statsReceiver))
 
-      override def newClientDispatcher(
-          transport: Transport[Any, Any], params: Stack.Params) =
+      override def newClientDispatcher(transport: Transport[Any, Any],
+                                       params: Stack.Params) =
         new HttpClientDispatcher(
             transport,
             params[param.Stats].statsReceiver
@@ -215,8 +232,8 @@ case class Http(
                                                    maxRequestSizeInBytes))
 
           if (_compressionLevel > 0) {
-            pipeline.addLast(
-                "httpCompressor", new HttpContentCompressor(_compressionLevel))
+            pipeline.addLast("httpCompressor",
+                             new HttpContentCompressor(_compressionLevel))
           } else if (_compressionLevel == -1) {
             pipeline.addLast("httpCompressor", new TextualContentCompressor)
           }
@@ -227,8 +244,8 @@ case class Http(
                            new PayloadSizeHandler(maxRequestSizeInBytes))
 
           // Response to ``Expect: Continue'' requests.
-          pipeline.addLast(
-              "respondToExpectContinue", new RespondToExpectContinue)
+          pipeline
+            .addLast("respondToExpectContinue", new RespondToExpectContinue)
           if (!_streaming)
             pipeline.addLast("httpDechunker",
                              new HttpChunkAggregator(maxRequestSizeInBytes))
@@ -256,7 +273,9 @@ case class Http(
           .andThen(new DtabFilter.Finagle[Request])
           .andThen(new ServerContextFilter[Request, Response])
           .andThenIf(!_streaming -> new PayloadSizeFilter[Request, Response](
-                  stats, _.content.length, _.content.length))
+              stats,
+              _.content.length,
+              _.content.length))
           .andThen(underlying)
       }
 

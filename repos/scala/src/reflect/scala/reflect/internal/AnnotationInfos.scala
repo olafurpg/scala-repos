@@ -65,7 +65,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       withAnnotations(List(annot))
 
     @tailrec private def dropOtherAnnotations(
-        anns: List[AnnotationInfo], cls: Symbol): List[AnnotationInfo] =
+        anns: List[AnnotationInfo],
+        cls: Symbol): List[AnnotationInfo] =
       anns match {
         case ann :: rest =>
           if (ann matches cls) anns else dropOtherAnnotations(rest, cls)
@@ -90,7 +91,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     *  an instance of a Java enumeration value).
     */
   case class LiteralAnnotArg(const: Constant)
-      extends ClassfileAnnotArg with LiteralArgumentApi {
+      extends ClassfileAnnotArg
+      with LiteralArgumentApi {
     def value = const
     override def toString = const.escapedStringValue
   }
@@ -98,14 +100,16 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
 
   /** Represents an array of classfile annotation arguments */
   case class ArrayAnnotArg(args: Array[ClassfileAnnotArg])
-      extends ClassfileAnnotArg with ArrayArgumentApi {
+      extends ClassfileAnnotArg
+      with ArrayArgumentApi {
     override def toString = args.mkString("[", ", ", "]")
   }
   object ArrayAnnotArg extends ArrayArgumentExtractor
 
   /** Represents a nested classfile annotation */
   case class NestedAnnotArg(annInfo: AnnotationInfo)
-      extends ClassfileAnnotArg with NestedArgumentApi {
+      extends ClassfileAnnotArg
+      with NestedArgumentApi {
     // The nested annotation should not have any Scala annotation arguments
     assert(annInfo.args.isEmpty, annInfo.args)
     def annotation = annInfo
@@ -137,8 +141,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   case class ScalaSigBytes(bytes: Array[Byte]) extends ClassfileAnnotArg {
     override def toString =
       (bytes map { byte =>
-            (byte & 0xff).toHexString
-          }).mkString("[ ", " ", " ]")
+        (byte & 0xff).toHexString
+      }).mkString("[ ", " ", " ]")
     lazy val sevenBitsMayBeZero: Array[Byte] = {
       mapToNextModSevenBits(
           scala.reflect.internal.pickling.ByteCodecs.encode8to7(bytes))
@@ -154,8 +158,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       // due to escaping, a zero byte in a classfile-annotation of string-type takes actually two characters.
       val numZeros =
         (sevenBitsMayBeZero count { b =>
-              b == 0
-            })
+          b == 0
+        })
 
       (sevenBitsMayBeZero.length + numZeros) <= 65535
     }
@@ -211,7 +215,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
               case ann if !ann.symbol.isInstanceOf[StubSymbol] => ann.symbol
             }
           categories exists
-          (category => metaSyms exists (_ isNonBottomSubClass category))
+            (category => metaSyms exists (_ isNonBottomSubClass category))
       }
   }
 
@@ -219,8 +223,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       val atp: Type,
       val args: List[Tree],
       val assocs: List[(Name, ClassfileAnnotArg)]
-  )
-      extends AnnotationInfo {
+  ) extends AnnotationInfo {
     // Classfile annot: args empty. Scala annot: assocs empty.
     assert(args.isEmpty || assocs.isEmpty, atp)
 
@@ -252,7 +255,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   final class LazyAnnotationInfo(lazyInfo: => AnnotationInfo)
       extends AnnotationInfo {
     private var forced = false
-    private lazy val forcedInfo = try lazyInfo finally forced = true
+    private lazy val forcedInfo = try lazyInfo
+    finally forced = true
 
     def atp: Type = forcedInfo.atp
     def args: List[Tree] = forcedInfo.args

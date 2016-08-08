@@ -21,9 +21,11 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.DummyASTNode
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScClassParameterImpl private (
-    stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScParameterImpl(stub, nodeType, node) with ScClassParameter {
+class ScClassParameterImpl private (stub: StubElement[ScParameter],
+                                    nodeType: IElementType,
+                                    node: ASTNode)
+    extends ScParameterImpl(stub, nodeType, node)
+    with ScClassParameter {
 
   def this(node: ASTNode) = { this(null, null, node) }
 

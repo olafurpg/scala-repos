@@ -76,12 +76,21 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     testDecode(bb"bf")(Malformed(1))
     testDecode(bb"80 80")(Malformed(1), Malformed(1))
     testDecode(bb"80 80 80")(Malformed(1), Malformed(1), Malformed(1))
-    testDecode(bb"80 80 80 80")(
-        Malformed(1), Malformed(1), Malformed(1), Malformed(1))
-    testDecode(bb"80 80 80 80 80")(
-        Malformed(1), Malformed(1), Malformed(1), Malformed(1), Malformed(1))
-    testDecode(bb"41 80 80 42 80 43")(
-        cb"A", Malformed(1), Malformed(1), cb"B", Malformed(1), cb"C")
+    testDecode(bb"80 80 80 80")(Malformed(1),
+                                Malformed(1),
+                                Malformed(1),
+                                Malformed(1))
+    testDecode(bb"80 80 80 80 80")(Malformed(1),
+                                   Malformed(1),
+                                   Malformed(1),
+                                   Malformed(1),
+                                   Malformed(1))
+    testDecode(bb"41 80 80 42 80 43")(cb"A",
+                                      Malformed(1),
+                                      Malformed(1),
+                                      cb"B",
+                                      Malformed(1),
+                                      cb"C")
 
     // Lonely start characters, separated by spaces
     if (!executingInJVM) {
@@ -105,18 +114,23 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
         Seq(1, 1, 2, 1, 2, 3).map(Malformed(_)): _*)
     // and with normal sequences interspersed
     testDecode(bb"c2 41 e0 41 e0 a0 41 f0 41 f0 90 41 f0 90 80 41")(
-        Seq(1, 1, 2, 1, 2, 3).flatMap(
-            l => Seq[OutPart[CharBuffer]](Malformed(l), cb"A")): _*)
+        Seq(1, 1, 2, 1, 2, 3).flatMap(l =>
+          Seq[OutPart[CharBuffer]](Malformed(l), cb"A")): _*)
 
     // Impossible bytes
     testDecode(bb"fe")(Malformed(1))
     testDecode(bb"ff")(Malformed(1))
-    testDecode(bb"fe fe ff ff")(
-        Malformed(1), Malformed(1), Malformed(1), Malformed(1))
+    testDecode(bb"fe fe ff ff")(Malformed(1),
+                                Malformed(1),
+                                Malformed(1),
+                                Malformed(1))
     // Old 5-byte and 6-byte starts
     if (!executingInJVM) {
-      testDecode(bb"f8 80 80 80 af")(
-          Malformed(1), Malformed(1), Malformed(1), Malformed(1), Malformed(1))
+      testDecode(bb"f8 80 80 80 af")(Malformed(1),
+                                     Malformed(1),
+                                     Malformed(1),
+                                     Malformed(1),
+                                     Malformed(1))
       testDecode(bb"fc 80 80 80 80 af")(Malformed(1),
                                         Malformed(1),
                                         Malformed(1),

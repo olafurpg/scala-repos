@@ -82,9 +82,12 @@ import java.io.{ObjectOutputStream, ObjectInputStream}
   */
 @SerialVersionUID(-6084104484083858598L) // value computed by serialver for 2.11.2, annotation added in 2.11.4
 sealed abstract class List[+A]
-    extends AbstractSeq[A] with LinearSeq[A] with Product
+    extends AbstractSeq[A]
+    with LinearSeq[A]
+    with Product
     with GenericTraversableTemplate[A, List]
-    with LinearSeqOptimized[A, List[A]] with scala.Serializable {
+    with LinearSeqOptimized[A, List[A]]
+    with scala.Serializable {
   override def companion: GenericCompanion[List] = List
 
   def isEmpty: Boolean
@@ -159,8 +162,9 @@ sealed abstract class List[+A]
     // Note to developers: there exists a duplication between this function and `reflect.internal.util.Collections#map2Conserve`.
     // If any successful optimization attempts or other changes are made, please rehash them there too.
     @tailrec
-    def loop(
-        mapped: ListBuffer[B], unchanged: List[A], pending: List[A]): List[B] =
+    def loop(mapped: ListBuffer[B],
+             unchanged: List[A],
+             pending: List[A]): List[B] =
       if (pending.isEmpty) {
         if (mapped eq null) unchanged
         else mapped.prependToList(unchanged)

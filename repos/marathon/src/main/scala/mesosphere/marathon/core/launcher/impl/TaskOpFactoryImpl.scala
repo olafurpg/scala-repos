@@ -46,14 +46,14 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
           val task = Task.LaunchedEphemeral(
               taskId = Task.Id(taskInfo.getTaskId),
               agentInfo = Task.AgentInfo(
-                    host = offer.getHostname,
-                    agentId = Some(offer.getSlaveId.getValue),
-                    attributes = offer.getAttributesList.asScala
-                ),
+                  host = offer.getHostname,
+                  agentId = Some(offer.getSlaveId.getValue),
+                  attributes = offer.getAttributesList.asScala
+              ),
               appVersion = app.version,
               status = Task.Status(
-                    stagedAt = clock.now()
-                ),
+                  stagedAt = clock.now()
+              ),
               networking = Task.HostPorts(ports)
           )
           taskOperationFactory.launch(taskInfo, task)
@@ -105,8 +105,9 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
                 ResourceSelector(
                     config.mesosRole.get.toSet,
                     reserved = true,
-                    requiredLabels = TaskLabels.labelsForTask(
-                          request.frameworkId, volumeMatch.task)
+                    requiredLabels =
+                      TaskLabels.labelsForTask(request.frameworkId,
+                                               volumeMatch.task)
                 )
             )
 
@@ -130,8 +131,10 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
             ResourceSelector(acceptedResourceRoles, reserved = false)
         )
         matchingResourcesForReservation.map { resourceMatch =>
-          reserveAndCreateVolumes(
-              request.frameworkId, app, offer, resourceMatch)
+          reserveAndCreateVolumes(request.frameworkId,
+                                  app,
+                                  offer,
+                                  resourceMatch)
         }
       } else None
 
@@ -152,8 +155,8 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
       case (taskInfo, ports) =>
         val launch = TaskStateOp.Launch(appVersion = app.version,
                                         status = Task.Status(
-                                              stagedAt = clock.now()
-                                          ),
+                                            stagedAt = clock.now()
+                                        ),
                                         networking = Task.HostPorts(ports))
 
         // FIXME (3221): something like reserved.launch(...): LaunchedOnReservation so we don't need to match?
@@ -182,14 +185,17 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
     val task = Task.Reserved(
         taskId = Task.Id.forApp(app.id),
         agentInfo = Task.AgentInfo(
-              host = offer.getHostname,
-              agentId = Some(offer.getSlaveId.getValue),
-              attributes = offer.getAttributesList.asScala
-          ),
-        reservation = Task.Reservation(
-              persistentVolumeIds, Task.Reservation.State.New(timeout = None))
+            host = offer.getHostname,
+            agentId = Some(offer.getSlaveId.getValue),
+            attributes = offer.getAttributesList.asScala
+        ),
+        reservation =
+          Task.Reservation(persistentVolumeIds,
+                           Task.Reservation.State.New(timeout = None))
     )
-    taskOperationFactory.reserveAndCreateVolumes(
-        frameworkId, task, resourceMatch.resources, localVolumes)
+    taskOperationFactory.reserveAndCreateVolumes(frameworkId,
+                                                 task,
+                                                 resourceMatch.resources,
+                                                 localVolumes)
   }
 }

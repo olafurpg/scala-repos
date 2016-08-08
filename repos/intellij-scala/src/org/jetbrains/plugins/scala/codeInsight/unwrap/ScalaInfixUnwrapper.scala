@@ -25,8 +25,8 @@ class ScalaInfixUnwrapper extends ScalaUnwrapper with ShortTextDescription {
     }
   }
 
-  override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = {
+  override def collectAffectedElements(e: PsiElement,
+                                       toExtract: util.List[PsiElement]) = {
     super.collectAffectedElements(e, toExtract)
     e.getParent
   }

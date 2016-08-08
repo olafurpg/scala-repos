@@ -20,11 +20,15 @@ package org.apache.spark.streaming.ui
 import scala.collection.mutable
 
 import org.apache.spark.streaming.Time
-import org.apache.spark.streaming.scheduler.{BatchInfo, OutputOperationInfo, StreamInputInfo}
+import org.apache.spark.streaming.scheduler.{
+  BatchInfo,
+  OutputOperationInfo,
+  StreamInputInfo
+}
 import org.apache.spark.streaming.ui.StreamingJobProgressListener._
 
-private[ui] case class OutputOpIdAndSparkJobId(
-    outputOpId: OutputOpId, sparkJobId: SparkJobId)
+private[ui] case class OutputOpIdAndSparkJobId(outputOpId: OutputOpId,
+                                               sparkJobId: SparkJobId)
 
 private[ui] case class BatchUIData(
     val batchTime: Time,
@@ -32,9 +36,10 @@ private[ui] case class BatchUIData(
     val submissionTime: Long,
     val processingStartTime: Option[Long],
     val processingEndTime: Option[Long],
-    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] = mutable
-        .HashMap(),
-    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] = Seq.empty) {
+    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] =
+      mutable.HashMap(),
+    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] =
+      Seq.empty) {
 
   /**
     * Time taken for the first job of this batch to start processing from the time this batch
@@ -50,7 +55,7 @@ private[ui] case class BatchUIData(
     */
   def processingDelay: Option[Long] = {
     for (start <- processingStartTime;
-    end <- processingEndTime) yield end - start
+         end <- processingEndTime) yield end - start
   }
 
   /**

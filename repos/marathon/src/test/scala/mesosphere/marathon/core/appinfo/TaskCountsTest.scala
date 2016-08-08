@@ -8,7 +8,10 @@ import mesosphere.marathon.{MarathonSpec, MarathonTestHelper}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskCountsTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   test("count no tasks") {
     When("getting counts for no tasks")
     val counts = TaskCounts(appTasks = Seq.empty, healthStatuses = Map.empty)
@@ -21,8 +24,8 @@ class TaskCountsTest
     Given("one unstaged task")
     val oneTaskWithoutTaskState = f.taskWithoutState
     When("getting counts")
-    val counts = TaskCounts(
-        appTasks = Seq(oneTaskWithoutTaskState), healthStatuses = Map.empty)
+    val counts = TaskCounts(appTasks = Seq(oneTaskWithoutTaskState),
+                            healthStatuses = Map.empty)
     Then("the task without taskState is counted as staged")
     counts should be(TaskCounts.zero.copy(tasksStaged = 1))
   }
@@ -117,9 +120,9 @@ class TaskCountsTest
     val counts = TaskCounts(
         appTasks = oneStagedTask,
         healthStatuses = Map(
-              Task.Id("task3") -> aliveHealth,
-              Task.Id("task4") -> notAliveHealth
-          )
+            Task.Id("task3") -> aliveHealth,
+            Task.Id("task4") -> notAliveHealth
+        )
     )
     Then("all counts are 0 except staged")
     counts should be(

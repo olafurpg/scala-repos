@@ -12,9 +12,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractTrait.ScalaExtractMemberInfo
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaChangeContextUtil
 
@@ -67,15 +73,15 @@ class ScalaPullUpProcessor(project: Project,
       } {
         handleOldMember(info)
 
-        templateBody.addBefore(
-            ScalaPsiElementFactory.createNewLine(manager), anchor)
+        templateBody.addBefore(ScalaPsiElementFactory.createNewLine(manager),
+                               anchor)
         val added =
           templateBody.addBefore(memberCopy, anchor).asInstanceOf[ScMember]
         if (info.isToAbstract) TypeAdjuster.markToAdjust(added)
         else movedDefinitions += added
       }
-      templateBody.addBefore(
-          ScalaPsiElementFactory.createNewLine(manager), anchor)
+      templateBody.addBefore(ScalaPsiElementFactory.createNewLine(manager),
+                             anchor)
 
       ScalaChangeContextUtil.decodeContextInfo(movedDefinitions)
     }
@@ -97,8 +103,8 @@ class ScalaPullUpProcessor(project: Project,
     val sourceDocument =
       documentManager.getDocument(sourceClass.getContainingFile)
     documentManager.doPostponedOperationsAndUnblockDocument(sourceDocument)
-    csManager.adjustLineIndent(
-        sourceClass.getContainingFile, sourceClass.getTextRange)
+    csManager.adjustLineIndent(sourceClass.getContainingFile,
+                               sourceClass.getTextRange)
   }
 
   private def memberCopiesToExtract(
@@ -108,7 +114,8 @@ class ScalaPullUpProcessor(project: Project,
         val member = decl.copy().asInstanceOf[ScMember]
         Seq(member)
       case ScalaExtractMemberInfo(m, true) =>
-        declarationsText(m).map(ScalaPsiElementFactory
+        declarationsText(m).map(
+            ScalaPsiElementFactory
               .createDeclarationFromText(_, m.getParent, m)
               .asInstanceOf[ScMember])
       case ScalaExtractMemberInfo(m, false)
@@ -145,12 +152,12 @@ class ScalaPullUpProcessor(project: Project,
         val copy = funDef.copy().asInstanceOf[ScFunctionDefinition]
         copy.setModifierProperty("override", value = false)
         Seq(copy.assignment, copy.body).flatten.foreach(_.delete())
-        copy.accept(
-            new ScalaRecursiveElementVisitor() {
+        copy.accept(new ScalaRecursiveElementVisitor() {
           override def visitSimpleTypeElement(te: ScSimpleTypeElement) = {
             val tpe = te.calcType
-            te.replace(ScalaPsiElementFactory.createTypeElementFromText(
-                    tpe.canonicalText, te.getManager))
+            te.replace(
+                ScalaPsiElementFactory
+                  .createTypeElementFromText(tpe.canonicalText, te.getManager))
           }
         })
         Seq(copy.getText)

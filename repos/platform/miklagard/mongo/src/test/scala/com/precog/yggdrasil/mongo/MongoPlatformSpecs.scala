@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -159,13 +159,17 @@ object MongoPlatformSpecEngine extends Logging {
 }
 
 trait MongoPlatformSpecs
-    extends ParseEvalStackSpecs[Future] with MongoColumnarTableModule
-    with Logging with StringIdMemoryDatasetConsumer[Future] {
-  self =>
+    extends ParseEvalStackSpecs[Future]
+    with MongoColumnarTableModule
+    with Logging
+    with StringIdMemoryDatasetConsumer[Future] { self =>
 
   class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
       with MongoColumnarTableModuleConfig
 
   object yggConfig extends YggConfig {
@@ -179,8 +183,8 @@ trait MongoPlatformSpecs
   def includeIdField = false
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        asyncContext, yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
+                                          yggConfig.maxEvalDuration)
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
   with ExceptionQueryLogger[Future, instructions.Line]
@@ -198,8 +202,9 @@ trait MongoPlatformSpecs
 
     def dbAuthParams = Map.empty
     def mongo = self.mongo
-    override def load(
-        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(table: Table,
+                      apiKey: APIKey,
+                      tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
         case orig: StrColumn =>
@@ -231,8 +236,8 @@ trait MongoPlatformSpecs
   override def map(fs: => Fragments): Fragments =
     (Step { startup() }) ^ fs ^ (Step { shutdown() })
 
-  def Evaluator[N[+ _]](
-      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future) =
     new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]
@@ -251,12 +256,14 @@ trait MongoPlatformSpecs
 }
 
 class MongoBasicValidationSpecs
-    extends BasicValidationSpecs with MongoPlatformSpecs
+    extends BasicValidationSpecs
+    with MongoPlatformSpecs
 
 class MongoHelloQuirrelSpecs extends HelloQuirrelSpecs with MongoPlatformSpecs
 
 class MongoLogisticRegressionSpecs
-    extends LogisticRegressionSpecs with MongoPlatformSpecs
+    extends LogisticRegressionSpecs
+    with MongoPlatformSpecs
 
 class MongoMiscStackSpecs extends MiscStackSpecs with MongoPlatformSpecs
 
@@ -265,7 +272,8 @@ class MongoRankSpecs extends RankSpecs with MongoPlatformSpecs
 class MongoRenderStackSpecs extends RenderStackSpecs with MongoPlatformSpecs
 
 class MongoUndefinedLiteralSpecs
-    extends UndefinedLiteralSpecs with MongoPlatformSpecs
+    extends UndefinedLiteralSpecs
+    with MongoPlatformSpecs
 
 class MongoIdFieldSpecs extends MongoPlatformSpecs {
   override def includeIdField = true

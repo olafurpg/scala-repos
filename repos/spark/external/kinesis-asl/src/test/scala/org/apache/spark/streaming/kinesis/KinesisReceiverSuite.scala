@@ -37,7 +37,10 @@ import org.apache.spark.util.Utils
   * Suite of Kinesis streaming receiver tests focusing mostly on the KinesisRecordProcessor
   */
 class KinesisReceiverSuite
-    extends TestSuiteBase with Matchers with BeforeAndAfter with MockitoSugar {
+    extends TestSuiteBase
+    with Matchers
+    with BeforeAndAfter
+    with MockitoSugar {
 
   val app = "TestKinesisReceiver"
   val stream = "mySparkStream"
@@ -88,10 +91,10 @@ class KinesisReceiverSuite
     recordProcessor.processRecords(batch, checkpointerMock)
 
     verify(receiverMock, times(1)).isStopped()
-    verify(receiverMock, never).addRecords(
-        anyString, anyListOf(classOf[Record]))
-    verify(receiverMock, never).setCheckpointer(
-        anyString, meq(checkpointerMock))
+    verify(receiverMock, never)
+      .addRecords(anyString, anyListOf(classOf[Record]))
+    verify(receiverMock, never)
+      .setCheckpointer(anyString, meq(checkpointerMock))
   }
 
   test("shouldn't update checkpointer when exception occurs during store") {
@@ -108,8 +111,8 @@ class KinesisReceiverSuite
 
     verify(receiverMock, times(1)).isStopped()
     verify(receiverMock, times(1)).addRecords(shardId, batch)
-    verify(receiverMock, never).setCheckpointer(
-        anyString, meq(checkpointerMock))
+    verify(receiverMock, never)
+      .setCheckpointer(anyString, meq(checkpointerMock))
   }
 
   test("shutdown should checkpoint if the reason is TERMINATE") {
@@ -135,7 +138,8 @@ class KinesisReceiverSuite
     recordProcessor.shutdown(checkpointerMock, null)
 
     verify(receiverMock, times(2)).removeCheckpointer(
-        meq(shardId), meq[IRecordProcessorCheckpointer](null))
+        meq(shardId),
+        meq[IRecordProcessorCheckpointer](null))
   }
 
   test("retry success on first attempt") {

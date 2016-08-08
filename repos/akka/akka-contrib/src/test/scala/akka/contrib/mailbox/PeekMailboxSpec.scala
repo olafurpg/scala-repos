@@ -5,7 +5,14 @@ package akka.contrib.mailbox
 
 import com.typesafe.config.ConfigFactory
 
-import akka.actor.{Actor, ActorSystem, DeadLetter, PoisonPill, Props, actorRef2Scala}
+import akka.actor.{
+  Actor,
+  ActorSystem,
+  DeadLetter,
+  PoisonPill,
+  Props,
+  actorRef2Scala
+}
 import akka.testkit.{AkkaSpec, EventFilter, ImplicitSender}
 
 object PeekMailboxSpec {
@@ -27,7 +34,8 @@ object PeekMailboxSpec {
         PeekMailboxExtension.ack()
     }
     override def preRestart(cause: Throwable, msg: Option[Any]) {
-      for (m ← msg if m == "DIE") context stop self // for testing the case of mailbox.cleanUp
+      for (m ← msg if m == "DIE")
+        context stop self // for testing the case of mailbox.cleanUp
     }
   }
 }
@@ -38,7 +46,8 @@ class PeekMailboxSpec
       mailbox-type = "akka.contrib.mailbox.PeekMailboxType"
       max-retries = 2
     }
-    """) with ImplicitSender {
+    """)
+    with ImplicitSender {
 
   import PeekMailboxSpec._
 
@@ -119,7 +128,8 @@ class MyActor extends Actor {
 object MyApp extends App {
   val system = ActorSystem(
       "MySystem",
-      ConfigFactory.parseString("""
+      ConfigFactory.parseString(
+          """
     peek-dispatcher {
       mailbox-type = "akka.contrib.mailbox.PeekMailboxType"
       max-retries = 2
@@ -127,7 +137,8 @@ object MyApp extends App {
     """))
 
   val myActor = system.actorOf(
-      Props[MyActor].withDispatcher("peek-dispatcher"), name = "myActor")
+      Props[MyActor].withDispatcher("peek-dispatcher"),
+      name = "myActor")
 
   myActor ! "Hello"
   myActor ! "World"

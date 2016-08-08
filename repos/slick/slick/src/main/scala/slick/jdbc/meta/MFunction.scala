@@ -17,7 +17,8 @@ object MFunction {
     ResultSetAction[MFunction] { s =>
       try s.metaData.getFunctions(namePattern.catalog_?,
                                   namePattern.schema_?,
-                                  namePattern.name) catch {
+                                  namePattern.name)
+      catch {
         case _: AbstractMethodError => null
       }
     } { r =>

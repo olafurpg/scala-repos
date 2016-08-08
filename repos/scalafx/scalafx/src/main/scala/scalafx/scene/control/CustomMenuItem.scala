@@ -59,7 +59,8 @@ object CustomMenuItem {
   */
 class CustomMenuItem(
     override val delegate: jfxsc.CustomMenuItem = new jfxsc.CustomMenuItem)
-    extends MenuItem(delegate) with SFXDelegate[jfxsc.CustomMenuItem] {
+    extends MenuItem(delegate)
+    with SFXDelegate[jfxsc.CustomMenuItem] {
 
   /**
     * Constructs a CustomMenuItem and initializes its content with the node specified.

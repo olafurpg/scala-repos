@@ -55,7 +55,7 @@ object Assign {
 
   val zz = Def.task {
     mk.value + tk.value + mk.value + tk.value + mk.value + tk.value +
-    mk.value + tk.value + mk.value + tk.value + mk.value + tk.value
+      mk.value + tk.value + mk.value + tk.value + mk.value + tk.value
   }
 
   import DefaultParsers._

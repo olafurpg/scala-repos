@@ -41,13 +41,15 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       val Template(_, _, body) = tree
       clearStatics()
       val newBody = transformTrees(body)
-      val templ = deriveTemplate(tree)(
-          _ => transformTrees(newStaticMembers.toList) ::: newBody)
+      val templ = deriveTemplate(tree)(_ =>
+        transformTrees(newStaticMembers.toList) ::: newBody)
       try if (newStaticInits.isEmpty) templ
       else
-        deriveTemplate(templ)(body =>
+        deriveTemplate(templ)(
+            body =>
               staticConstructor(body, localTyper, templ.pos)(
-                  newStaticInits.toList) :: body) finally clearStatics()
+                  newStaticInits.toList) :: body)
+      finally clearStatics()
     }
     private def mkTerm(prefix: String): TermName = unit.freshTermName(prefix)
 
@@ -85,7 +87,9 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
 
       def addStaticMethodToClass(forBody: (Symbol, Symbol) => Tree): Symbol = {
         val methSym = currentClass.newMethod(
-            mkTerm(nme.reflMethodName.toString), ad.pos, STATIC | SYNTHETIC)
+            mkTerm(nme.reflMethodName.toString),
+            ad.pos,
+            STATIC | SYNTHETIC)
         val params = methSym.newSyntheticValueParams(List(ClassClass.tpe))
         methSym setInfoAndEnter MethodType(params, MethodClass.tpe)
 
@@ -94,8 +98,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
         methSym
       }
 
-      def reflectiveMethodCache(
-          method: String, paramTypes: List[Type]): Symbol = {
+      def reflectiveMethodCache(method: String,
+                                paramTypes: List[Type]): Symbol = {
         /* Implementation of the cache is as follows for method "def xyz(a: A, b: B)"
              (SoftReference so that it does not interfere with classloader garbage collection,
              see ticket #2365 for details):
@@ -124,44 +128,46 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
             in Java 8 interfaces, which don't support private static fields.
          */
 
-        addStaticMethodToClass(
-            (reflMethodSym, forReceiverSym) =>
-              {
-            val methodCache =
-              reflMethodSym.newVariable(mkTerm("methodCache"), ad.pos) setInfo StructuralCallSite.tpe
-            val methodSym =
-              reflMethodSym.newVariable(mkTerm("method"), ad.pos) setInfo MethodClass.tpe
+        addStaticMethodToClass((reflMethodSym, forReceiverSym) => {
+          val methodCache =
+            reflMethodSym
+              .newVariable(mkTerm("methodCache"), ad.pos) setInfo StructuralCallSite.tpe
+          val methodSym =
+            reflMethodSym
+              .newVariable(mkTerm("method"), ad.pos) setInfo MethodClass.tpe
 
-            val dummyMethodType =
-              MethodType(NoSymbol.newSyntheticValueParams(paramTypes), AnyTpe)
-            BLOCK(
-                ValDef(methodCache,
-                       ApplyDynamic(
-                           gen.mkAttributedIdent(StructuralCallSite_dummy),
-                           LIT(StructuralCallSite_bootstrap) :: LIT(
-                               dummyMethodType) :: Nil)
-                         .setType(StructuralCallSite.tpe)),
-                ValDef(methodSym,
-                       (REF(methodCache) DOT StructuralCallSite_find)(
-                           REF(forReceiverSym))),
-                IF(REF(methodSym) OBJ_NE NULL).THEN(Return(REF(methodSym))) ELSE {
-                  def methodSymRHS =
-                    ( (REF(forReceiverSym) DOT Class_getMethod)(
-                        LIT(method),
-                        (REF(methodCache) DOT StructuralCallSite_getParameterTypes)(
-                            )))
-                  def cacheAdd =
-                    ( (REF(methodCache) DOT StructuralCallSite_add)(
-                        REF(forReceiverSym), REF(methodSym)))
-                  BLOCK(
-                      REF(methodSym) ===
+          val dummyMethodType =
+            MethodType(NoSymbol.newSyntheticValueParams(paramTypes), AnyTpe)
+          BLOCK(
+              ValDef(
+                  methodCache,
+                  ApplyDynamic(gen.mkAttributedIdent(StructuralCallSite_dummy),
+                               LIT(StructuralCallSite_bootstrap) :: LIT(
+                                   dummyMethodType) :: Nil)
+                    .setType(StructuralCallSite.tpe)),
+              ValDef(methodSym,
+                     (REF(methodCache) DOT StructuralCallSite_find)(
+                         REF(forReceiverSym))),
+              IF(REF(methodSym) OBJ_NE NULL)
+                .THEN(Return(REF(methodSym))) ELSE {
+                def methodSymRHS =
+                  ((REF(forReceiverSym) DOT Class_getMethod)(
+                      LIT(method),
+                      (REF(methodCache) DOT StructuralCallSite_getParameterTypes)(
+                          )))
+                def cacheAdd =
+                  ((REF(methodCache) DOT StructuralCallSite_add)(
+                      REF(forReceiverSym),
+                      REF(methodSym)))
+                BLOCK(
+                    REF(methodSym) ===
                       (REF(currentRun.runDefinitions.ensureAccessibleMethod) APPLY
-                          (methodSymRHS)),
-                      cacheAdd,
-                      Return(REF(methodSym))
-                  )
-                }
-            )
+                        (methodSymRHS)),
+                    cacheAdd,
+                    Return(REF(methodSym))
+                )
+              }
+          )
         })
       }
 
@@ -170,12 +176,12 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       def testForName(name: Name): Tree => Tree =
         t =>
           (if (nme.CommonOpNames(name))
-             gen.mkMethodCall(
-                 currentRun.runDefinitions.Boxes_isNumberOrBool, t :: Nil)
+             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumberOrBool,
+                              t :: Nil)
            else if (nme.BooleanOpNames(name)) t IS_OBJ BoxedBooleanClass.tpe
            else
-             gen.mkMethodCall(
-                 currentRun.runDefinitions.Boxes_isNumber, t :: Nil))
+             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumber,
+                              t :: Nil))
 
       /*  The Tree => Tree function in the return is necessary to prevent the original qual
        *  from being duplicated in the resulting code.  It may be a side-effecting expression,
@@ -222,7 +228,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
           // and the method name should be in the primitive->structural map.
           def isJavaValueMethod =
             ((resType :: paramTypes forall isJavaValueType) && // issue #1110
-                (getPrimitiveReplacementForStructuralCall(methSym.name).isDefined))
+              (getPrimitiveReplacementForStructuralCall(methSym.name).isDefined))
           // Erasure lets Unit through as Unit, but a method returning Any will have an
           // erased return type of Object and should also allow Unit.
           def isDefinitelyUnit = (resultSym == UnitClass)
@@ -282,7 +288,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
 
             // exception catching machinery
             val invokeExc =
-              currentOwner.newValue(mkTerm(""), ad.pos) setInfo InvocationTargetExceptionClass.tpe
+              currentOwner
+                .newValue(mkTerm(""), ad.pos) setInfo InvocationTargetExceptionClass.tpe
             def catchVar =
               Bind(invokeExc,
                    Typed(Ident(nme.WILDCARD),
@@ -312,7 +319,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
               methSym.name match {
                 case nme.length =>
                   REF(boxMethod(IntClass)) APPLY
-                  (REF(arrayLengthMethod) APPLY args)
+                    (REF(arrayLengthMethod) APPLY args)
                 case nme.update =>
                   REF(arrayUpdateMethod) APPLY List(
                       args(0),
@@ -320,7 +327,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
                       args(2))
                 case nme.apply =>
                   REF(arrayApplyMethod) APPLY List(
-                      args(0), (REF(unboxMethod(IntClass)) APPLY args(1)))
+                      args(0),
+                      (REF(unboxMethod(IntClass)) APPLY args(1)))
                 case nme.clone_ => REF(arrayCloneMethod) APPLY List(args(0))
               },
               mustBeUnit = methSym.name == nme.update
@@ -334,11 +342,11 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
             IF((qual1() GETCLASS ()) DOT nme.isArray) THEN genArrayCall ELSE genDefaultCall
 
           localTyper typed
-          (if (isMaybeBoxed && isJavaValueMethod) genValueCallWithTest
-           else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
-           else if (isArrayMethodSignature && isMaybeArray)
-             genArrayCallWithTest
-           else genDefaultCall)
+            (if (isMaybeBoxed && isJavaValueMethod) genValueCallWithTest
+             else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
+             else if (isArrayMethodSignature && isMaybeArray)
+               genArrayCallWithTest
+             else genDefaultCall)
         }
       }
 
@@ -373,13 +381,13 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
               reporter.warning(
                   ad.pos,
                   s"Overloaded type reached the backend! This is a bug in scalac.\n     Symbol: ${ad.symbol}\n  Overloads: $tpe\n  Arguments: " +
-                  ad.args.map(_.tpe))
+                    ad.args.map(_.tpe))
               alts filter (_.paramss.flatten.size == params.length) map (_.tpe) match {
                 case mt @ MethodType(mparams, resType) :: Nil =>
                   reporter.warning(
                       NoPosition,
                       "Only one overload has the right arity, proceeding with overload " +
-                      mt)
+                        mt)
                   (mparams, resType)
                 case _ =>
                   reporter.error(ad.pos, "Cannot resolve overload.")
@@ -505,11 +513,11 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       case Apply(fn @ Select(qual, _),
                  (arg @ Literal(Constant(symname: String))) :: Nil)
           if treeInfo.isQualifierSafeToElide(qual) &&
-          fn.symbol == Symbol_apply && !currentClass.isTrait =>
+            fn.symbol == Symbol_apply && !currentClass.isTrait =>
         super.transform(
             treeCopy.ApplyDynamic(tree,
                                   atPos(fn.pos)(Ident(SymbolLiteral_dummy)
-                                        .setType(SymbolLiteral_dummy.info)),
+                                    .setType(SymbolLiteral_dummy.info)),
                                   LIT(SymbolLiteral_bootstrap) :: arg :: Nil))
 
       // Replaces `Array(Predef.wrapArray(ArrayValue(...).$asInstanceOf[...]), <tag>)`
@@ -519,16 +527,17 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       case Apply(
           appMeth,
           List(
-          Apply(wrapRefArrayMeth, List(arg @ StripCast(ArrayValue(_, _)))), _))
+          Apply(wrapRefArrayMeth, List(arg @ StripCast(ArrayValue(_, _)))),
+          _))
           if wrapRefArrayMeth.symbol == currentRun.runDefinitions.Predef_wrapRefArray &&
-          appMeth.symbol == ArrayModule_genericApply =>
+            appMeth.symbol == ArrayModule_genericApply =>
         super.transform(arg)
-      case Apply(
-          appMeth,
-          List(
-          elem0, Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
+      case Apply(appMeth,
+                 List(
+                 elem0,
+                 Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
           if wrapArrayMeth.symbol == Predef_wrapArray(elemtpt.tpe) &&
-          appMeth.symbol == ArrayModule_apply(elemtpt.tpe) =>
+            appMeth.symbol == ArrayModule_apply(elemtpt.tpe) =>
         super.transform(
             treeCopy.ArrayValue(rest, rest.elemtpt, elem0 :: rest.elems))
 

@@ -10,7 +10,13 @@ package scala
 package io
 
 import scala.collection.AbstractIterator
-import java.io.{FileInputStream, InputStream, PrintStream, File => JFile, Closeable}
+import java.io.{
+  FileInputStream,
+  InputStream,
+  PrintStream,
+  File => JFile,
+  Closeable
+}
 import java.net.{URI, URL}
 
 /** This object provides convenience methods to create an iterable
@@ -183,9 +189,8 @@ object Source {
     *  @return              the buffered source
     */
   def fromResource(resource: String,
-                   classLoader: ClassLoader = Thread
-                       .currentThread()
-                       .getContextClassLoader())(
+                   classLoader: ClassLoader =
+                     Thread.currentThread().getContextClassLoader())(
       implicit codec: Codec): BufferedSource =
     fromInputStream(classLoader.getResourceAsStream(resource))
 }
@@ -327,8 +332,8 @@ abstract class Source extends Iterator[Char] with Closeable {
     val line = Position line pos
     val col = Position column pos
 
-    out println "%s:%d:%d: %s%s%s^".format(
-        descr, line, col, msg, lineNum(line), spaces(col - 1))
+    out println "%s:%d:%d: %s%s%s^"
+      .format(descr, line, col, msg, lineNum(line), spaces(col - 1))
   }
 
   /**

@@ -35,7 +35,9 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types._
 
 abstract class HadoopFsRelationTest
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import sqlContext.implicits._
 
   val dataSourceName: String
@@ -63,40 +65,40 @@ abstract class HadoopFsRelationTest
   def checkQueries(df: DataFrame): Unit = {
     // Selects everything
     checkAnswer(df,
-                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar")) yield
-                  Row(i, s"val_$i", p1, p2))
+                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+                  yield Row(i, s"val_$i", p1, p2))
 
     // Simple filtering and partition pruning
     checkAnswer(df.filter('a > 1 && 'p1 === 2),
-                for (i <- 2 to 3; p2 <- Seq("foo", "bar")) yield
-                  Row(i, s"val_$i", 2, p2))
+                for (i <- 2 to 3; p2 <- Seq("foo", "bar"))
+                  yield Row(i, s"val_$i", 2, p2))
 
     // Simple projection and filtering
     checkAnswer(df.filter('a > 1).select('b, 'a + 1),
-                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", i + 1))
+                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar"))
+                  yield Row(s"val_$i", i + 1))
 
     // Simple projection and partition pruning
     checkAnswer(df.filter('a > 1 && 'p1 < 2).select('b, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", 1))
+                for (i <- 2 to 3; _ <- Seq("foo", "bar"))
+                  yield Row(s"val_$i", 1))
 
     // Project many copies of columns with different types (reproduction for SPARK-7858)
-    checkAnswer(df.filter('a > 1 && 'p1 < 2)
-                  .select('b, 'b, 'b, 'b, 'p1, 'p1, 'p1, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
+    checkAnswer(
+        df.filter('a > 1 && 'p1 < 2)
+          .select('b, 'b, 'b, 'b, 'p1, 'p1, 'p1, 'p1),
+        for (i <- 2 to 3; _ <- Seq("foo", "bar"))
+          yield Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
 
     // Self-join
     df.registerTempTable("t")
     withTempTable("t") {
-      checkAnswer(
-          sql("""SELECT l.a, r.b, l.p1, r.p2
+      checkAnswer(sql("""SELECT l.a, r.b, l.p1, r.p2
             |FROM t l JOIN t r
             |ON l.a = r.a AND l.p1 = r.p1 AND l.p2 = r.p2
           """.stripMargin),
-          for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar")) yield
-            Row(i, s"val_$i", p1, p2))
+                  for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+                    yield Row(i, s"val_$i", p1, p2))
     }
   }
 
@@ -145,8 +147,8 @@ abstract class HadoopFsRelationTest
         val schema = new StructType()
           .add("index", IntegerType, nullable = false)
           .add("col", dataType, nullable = true)
-        val rdd = sqlContext.sparkContext.parallelize(
-            (1 to 10).map(i => Row(i, dataGenerator())))
+        val rdd = sqlContext.sparkContext.parallelize((1 to 10).map(i =>
+          Row(i, dataGenerator())))
         val df =
           sqlContext.createDataFrame(rdd, schema).orderBy("index").coalesce(1)
 
@@ -240,7 +242,8 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkQueries(sqlContext.read
+      checkQueries(
+          sqlContext.read
             .format(dataSourceName)
             .option("dataSchema", dataSchema.json)
             .load(file.getCanonicalPath))
@@ -703,8 +706,8 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -756,8 +759,8 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
       sqlContext.sparkContext.conf
         .set("spark.speculation", speculationEnabled.toString)
     }
@@ -776,8 +779,8 @@ class AlwaysFailOutputCommitter(outputPath: Path, context: TaskAttemptContext)
 
 // This class is used to test SPARK-8578. We should not use any custom output committer when
 // we actually append data to an existing dir.
-class AlwaysFailParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class AlwaysFailParquetOutputCommitter(outputPath: Path,
+                                       context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitJob(context: JobContext): Unit = {

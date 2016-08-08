@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.debugger.positionManager
 
-import org.jetbrains.plugins.scala.debugger.{Loc, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  Loc,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * @author Nikolay.Tropin
@@ -8,7 +12,8 @@ import org.jetbrains.plugins.scala.debugger.{Loc, ScalaVersion_2_11, ScalaVersio
 class LocationOfLineTest extends LocationsOfLineTestBase with ScalaVersion_2_11
 
 class LocationOfLineTest_212
-    extends LocationsOfLineTestBase with ScalaVersion_2_12 {
+    extends LocationsOfLineTestBase
+    with ScalaVersion_2_12 {
 
   override def testLambdas(): Unit = {
     checkLocationsOfLine(
@@ -29,7 +34,8 @@ class LocationOfLineTest_212
         Set(Loc("Multilevel$This$1$$anon$1", "<init>", 6)),
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
-        Set(Loc("Multilevel$This$1$$anon$1",
+        Set(
+            Loc("Multilevel$This$1$$anon$1",
                 "Multilevel$This$1$$anon$1$$$anonfun$1",
                 9)),
         Set(Loc("Multilevel$", "main", 18))
@@ -40,7 +46,8 @@ class LocationOfLineTest_212
 abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
   val noLocations = Set.empty[Loc]
 
-  setupFile("Simple.scala", s"""
+  setupFile("Simple.scala",
+            s"""
         |object Simple {
         |  ${offsetMarker}val z = 1
         |  def main(args: Array[String]) {
@@ -67,7 +74,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("SimpleClass.scala", s"""
+  setupFile("SimpleClass.scala",
+            s"""
        |object SimpleClass {
        |  def main(args: Array[String]) {
        |    val b = new Bar(1)
@@ -92,7 +100,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Lambdas.scala", s"""
+  setupFile("Lambdas.scala",
+            s"""
         |object Lambdas {
         |  def main(args: Array[String]): Unit = {
         |    val list = List(1, 2)
@@ -114,7 +123,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("LocalFunction.scala", s"""
+  setupFile("LocalFunction.scala",
+            s"""
         |object LocalFunction {
         |
         |  def main(args: Array[String]) {
@@ -139,7 +149,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Multilevel.scala", s"""
+  setupFile("Multilevel.scala",
+            s"""
         |object Multilevel {
         |  def main(args: Array[String]) {
         |    ${offsetMarker}class This {

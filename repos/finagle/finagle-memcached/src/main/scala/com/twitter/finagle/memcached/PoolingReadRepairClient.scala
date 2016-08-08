@@ -10,12 +10,12 @@ import _root_.java.util.Random
   * This class is designed to support replicated memcached setups.  It supports a limited
   * subset of operations (just get, set, and delete).
   */
-class PoolingReadRepairClient(
-    allClients: Seq[BaseClient[Buf]],
-    readRepairProbability: Float,
-    readRepairCount: Int = 1,
-    futurePool: FuturePool = new ExecutorServiceFuturePool(
-          Executors.newCachedThreadPool()))
+class PoolingReadRepairClient(allClients: Seq[BaseClient[Buf]],
+                              readRepairProbability: Float,
+                              readRepairCount: Int = 1,
+                              futurePool: FuturePool =
+                                new ExecutorServiceFuturePool(
+                                    Executors.newCachedThreadPool()))
     extends Client {
 
   val rand = new Random()
@@ -87,8 +87,11 @@ class PoolingReadRepairClient(
   def stats(args: Option[String]) = unsupported
   def decr(key: String, delta: Long) = unsupported
   def incr(key: String, delta: Long) = unsupported
-  def checkAndSet(
-      key: String, flags: Int, expiry: Time, value: Buf, casUnique: Buf) =
+  def checkAndSet(key: String,
+                  flags: Int,
+                  expiry: Time,
+                  value: Buf,
+                  casUnique: Buf) =
     unsupported
   def replace(key: String, flags: Int, expiry: Time, value: Buf) = unsupported
   def prepend(key: String, flags: Int, expiry: Time, value: Buf) = unsupported

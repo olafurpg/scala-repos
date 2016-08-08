@@ -31,8 +31,9 @@ class ApproxQuantileSuite extends SparkFunSuite {
   private val random =
     "random" -> Seq.fill(n)(math.ceil(r.nextDouble() * 1000))
 
-  private def buildSummary(
-      data: Seq[Double], epsi: Double, threshold: Int): QuantileSummaries = {
+  private def buildSummary(data: Seq[Double],
+                           epsi: Double,
+                           threshold: Int): QuantileSummaries = {
     var summary = new QuantileSummaries(threshold, epsi)
     data.foreach { x =>
       summary = summary.insert(x)
@@ -40,8 +41,9 @@ class ApproxQuantileSuite extends SparkFunSuite {
     summary.compress()
   }
 
-  private def checkQuantile(
-      quant: Double, data: Seq[Double], summary: QuantileSummaries): Unit = {
+  private def checkQuantile(quant: Double,
+                            data: Seq[Double],
+                            summary: QuantileSummaries): Unit = {
     val approx = summary.query(quant)
     // The rank of the approximation.
     val rank = data.count(_ < approx) // has to be <, not <= to be exact

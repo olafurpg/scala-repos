@@ -10,7 +10,10 @@ import java.security.cert.CertPathValidatorException
 import javax.net.ssl._
 
 import org.asynchttpclient.netty.ssl.JsseSslEngineFactory
-import org.asynchttpclient.{AsyncHttpClientConfig, DefaultAsyncHttpClientConfig}
+import org.asynchttpclient.{
+  AsyncHttpClientConfig,
+  DefaultAsyncHttpClientConfig
+}
 import org.slf4j.LoggerFactory
 import play.api.libs.ws.WSClientConfig
 import play.api.libs.ws.ssl._
@@ -147,12 +150,12 @@ class NingAsyncHttpClientConfigBuilder(
     builder.setMaxRequestRetry(ningConfig.maxRequestRetry)
     builder.setDisableUrlEncodingForBoundRequests(
         ningConfig.disableUrlEncoding)
-    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a 
-    // OutOfMemoryException: cannot create new native thread. This is because when executing 
-    // tests in parallel there can be many threads pool that are left around because AHC is 
+    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a
+    // OutOfMemoryException: cannot create new native thread. This is because when executing
+    // tests in parallel there can be many threads pool that are left around because AHC is
     // shutting them down gracefully.
-    // The proper solution is to make these parameters configurable, so that they can be set 
-    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are 
+    // The proper solution is to make these parameters configurable, so that they can be set
+    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are
     // shutdownQuiet=2000 (milliseconds) and shutdownTimeout=15000 (milliseconds).
     builder.setShutdownQuietPeriod(0)
     builder.setShutdownTimeout(0)
@@ -185,8 +188,8 @@ class NingAsyncHttpClientConfigBuilder(
     definedProtocols
   }
 
-  def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
+  def configureCipherSuites(existingCiphers: Array[String],
+                            sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
@@ -224,8 +227,9 @@ class NingAsyncHttpClientConfigBuilder(
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(
-            sslConfig, keyManagerFactory, trustManagerFactory).build()
+        new ConfigSSLContextBuilder(sslConfig,
+                                    keyManagerFactory,
+                                    trustManagerFactory).build()
       }
 
     // protocols!
@@ -274,13 +278,14 @@ class NingAsyncHttpClientConfigBuilder(
       tmf.getTrustManagers()(0).asInstanceOf[X509TrustManager]
 
     val constraints = sslConfig.disabledKeyAlgorithms
-      .map(a =>
+      .map(
+          a =>
             AlgorithmConstraintsParser
               .parseAll(AlgorithmConstraintsParser.expression, a)
               .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(
-        keyConstraints = constraints, signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
+                                                signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)

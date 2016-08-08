@@ -5,7 +5,10 @@ import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.AddCa
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType}
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
@@ -37,7 +40,7 @@ class EmptyParenMethodAccessedAsParameterlessInspection
   def actionFor(holder: ProblemsHolder) = {
     case e: ScReferenceExpression
         if e.isValid &&
-        IntentionAvailabilityChecker.checkInspection(this, e) =>
+          IntentionAvailabilityChecker.checkInspection(this, e) =>
       e.getParent match {
         case gc: ScGenericCall =>
           ScalaPsiUtil.findCall(gc) match {
@@ -61,8 +64,9 @@ class EmptyParenMethodAccessedAsParameterlessInspection
           // this avoids false positives. To be more accurate, we would need an 'etaExpanded'
           // flag in ScalaResolveResult.
           case _ =>
-            holder.registerProblem(
-                e.nameId, getDisplayName, new AddCallParentheses(e))
+            holder.registerProblem(e.nameId,
+                                   getDisplayName,
+                                   new AddCallParentheses(e))
         }
       case _ =>
     }

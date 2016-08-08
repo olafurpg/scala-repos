@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScAccessModifier
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScAccessModifierImpl
@@ -47,8 +52,8 @@ class ScAccessModifierElementType[Func <: ScAccessModifier]
         psi.idText.map(StringRef.fromString(_)))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAccessModifierStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAccessModifierStub = {
     val isProtected = dataStream.readBoolean
     val isPrivate = dataStream.readBoolean
     val isThis = dataStream.readBoolean

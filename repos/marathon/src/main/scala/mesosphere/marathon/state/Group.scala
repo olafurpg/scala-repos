@@ -18,7 +18,8 @@ case class Group(id: PathId,
                  groups: Set[Group] = defaultGroups,
                  dependencies: Set[PathId] = defaultDependencies,
                  version: Timestamp = defaultVersion)
-    extends MarathonState[GroupDefinition, Group] with IGroup {
+    extends MarathonState[GroupDefinition, Group]
+    with IGroup {
 
   override def mergeFromProto(msg: GroupDefinition): Group =
     Group.fromProto(msg)
@@ -61,7 +62,8 @@ case class Group(id: PathId,
     val groupId = path.parent
     makeGroup(groupId).update(timestamp) { group =>
       if (group.id == groupId)
-        group.putApplication(fn(group.apps.find(_.id == path))) else group
+        group.putApplication(fn(group.apps.find(_.id == path)))
+      else group
     }
   }
 
@@ -173,8 +175,8 @@ case class Group(id: PathId,
     val graph = new DefaultDirectedGraph[AppDefinition, DefaultEdge](
         classOf[DefaultEdge])
     for (app <- transitiveApps) graph.addVertex(app)
-    for ((app, dependent) <- applicationDependencies) graph.addEdge(
-        app, dependent)
+    for ((app, dependent) <- applicationDependencies)
+      graph.addEdge(app, dependent)
     new UnmodifiableDirectedGraph(graph)
   }
 
@@ -243,7 +245,7 @@ object Group {
       group.apps is every(AppDefinition.validNestedAppDefinition(base))
       group is noAppsAndGroupsWithSameName
       (group.id.isRoot is false) or
-      (group.dependencies is noCyclicDependencies(group))
+        (group.dependencies is noCyclicDependencies(group))
       group is validPorts
 
       group.dependencies is every(validPathWithBase(base))
@@ -261,11 +263,12 @@ object Group {
     new Validator[Group] {
       override def apply(group: Group): Result = {
         maxApps.filter(group.transitiveApps.size > _).map { num =>
-          Failure(Set(RuleViolation(
-                      group,
-                      s"""This Marathon instance may only handle up to $num Apps!
+          Failure(
+              Set(RuleViolation(
+                  group,
+                  s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,
-                      None)))
+                  None)))
         } getOrElse Success
       } and validator(group)
     }
@@ -292,11 +295,11 @@ object Group {
             servicePorts =>
               for {
                 existingApp <- group.transitiveApps.toList
-                                  if existingApp.id != app.id // in case of an update, do not compare the app against itself
+                if existingApp.id != app.id // in case of an update, do not compare the app against itself
                 existingServicePort <- existingApp.portMappings.toList.flatten
                                         .map(_.servicePort)
-                                          if existingServicePort != 0 // ignore zero ports, which will be chosen at random
-                                      if servicePorts contains existingServicePort
+                if existingServicePort != 0 // ignore zero ports, which will be chosen at random
+                if servicePorts contains existingServicePort
               } yield
                 RuleViolation(
                     app.id,

@@ -30,8 +30,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should not be empty
     val res = resOpt.get
@@ -53,8 +55,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should not be empty
     val res = resOpt.get
@@ -68,30 +72,40 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
 
   test("match resources success with preserved reservations") {
     // have unique reservation to make sure that the reservations are really preserved
-    val cpuReservation = MarathonTestHelper.reservation(
-        principal = "cpuPrincipal", labels = Map("some" -> "label"))
-    val cpuReservation2 = MarathonTestHelper.reservation(
-        principal = "cpuPrincipal", labels = Map("some" -> "label2"))
-    val memReservation = MarathonTestHelper.reservation(
-        principal = "memPrincipal", labels = Map("resource" -> "mem"))
-    val diskReservation = MarathonTestHelper.reservation(
-        principal = "memPrincipal", labels = Map("resource" -> "disk"))
-    val portsReservation = MarathonTestHelper.reservation(
-        principal = "portPrincipal", labels = Map("resource" -> "ports"))
+    val cpuReservation = MarathonTestHelper
+      .reservation(principal = "cpuPrincipal", labels = Map("some" -> "label"))
+    val cpuReservation2 =
+      MarathonTestHelper.reservation(principal = "cpuPrincipal",
+                                     labels = Map("some" -> "label2"))
+    val memReservation =
+      MarathonTestHelper.reservation(principal = "memPrincipal",
+                                     labels = Map("resource" -> "mem"))
+    val diskReservation =
+      MarathonTestHelper.reservation(principal = "memPrincipal",
+                                     labels = Map("resource" -> "disk"))
+    val portsReservation =
+      MarathonTestHelper.reservation(principal = "portPrincipal",
+                                     labels = Map("resource" -> "ports"))
 
     val offer = MarathonTestHelper
       .makeBasicOffer(role = "marathon")
       .clearResources()
-      .addResources(MarathonTestHelper.scalarResource(
-              "cpus", 1.0, "marathon", reservation = Some(cpuReservation)))
-      .addResources(MarathonTestHelper.scalarResource(
-              "cpus", 1.0, "marathon", reservation = Some(cpuReservation2)))
-      .addResources(MarathonTestHelper.scalarResource(
-              "mem", 128.0, "*", reservation = Some(memReservation)))
-      .addResources(MarathonTestHelper.scalarResource(
-              "disk", 2, "*", reservation = Some(diskReservation)))
-      .addResources(MarathonTestHelper.portsResource(
-              80, 80, reservation = Some(portsReservation)))
+      .addResources(MarathonTestHelper.scalarResource("cpus",
+                                                      1.0,
+                                                      "marathon",
+                                                      reservation =
+                                                        Some(cpuReservation)))
+      .addResources(MarathonTestHelper.scalarResource("cpus",
+                                                      1.0,
+                                                      "marathon",
+                                                      reservation =
+                                                        Some(cpuReservation2)))
+      .addResources(MarathonTestHelper
+        .scalarResource("mem", 128.0, "*", reservation = Some(memReservation)))
+      .addResources(MarathonTestHelper
+        .scalarResource("disk", 2, "*", reservation = Some(diskReservation)))
+      .addResources(MarathonTestHelper
+        .portsResource(80, 80, reservation = Some(portsReservation)))
       .build()
 
     val app = AppDefinition(
@@ -139,8 +153,8 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
     )
 
     res.portsMatch.hostPortsWithRole.toSet should be(
-        Set(PortsMatcher.PortWithRole(
-                "*", 80, reservation = Some(portsReservation)))
+        Set(PortsMatcher
+          .PortWithRole("*", 80, reservation = Some(portsReservation)))
     )
 
     // reserved resources should not be matched by selector with reserved = false
@@ -153,18 +167,22 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
   }
 
   test("match resources should not consider resources with disk infos") {
-    val cpuReservation = MarathonTestHelper.reservation(
-        principal = "cpuPrincipal", labels = Map("some" -> "label"))
-    val memReservation = MarathonTestHelper.reservation(
-        principal = "memPrincipal", labels = Map("resource" -> "mem"))
+    val cpuReservation = MarathonTestHelper
+      .reservation(principal = "cpuPrincipal", labels = Map("some" -> "label"))
+    val memReservation =
+      MarathonTestHelper.reservation(principal = "memPrincipal",
+                                     labels = Map("resource" -> "mem"))
 
     val offer = MarathonTestHelper
       .makeBasicOffer(role = "marathon")
       .clearResources()
-      .addResources(MarathonTestHelper.scalarResource(
-              "cpus", 1.0, "marathon", reservation = Some(cpuReservation)))
-      .addResources(MarathonTestHelper.scalarResource(
-              "mem", 128.0, "*", reservation = Some(memReservation)))
+      .addResources(MarathonTestHelper.scalarResource("cpus",
+                                                      1.0,
+                                                      "marathon",
+                                                      reservation =
+                                                        Some(cpuReservation)))
+      .addResources(MarathonTestHelper
+        .scalarResource("mem", 128.0, "*", reservation = Some(memReservation)))
       .addResources(MarathonTestHelper.reservedDisk(id = "disk",
                                                     size = 1024.0))
       .build()
@@ -221,8 +239,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Set(), ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Set(),
+                                                ResourceSelector.wildcard)
 
     resOpt should be('empty)
   }
@@ -238,16 +258,18 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         mem = 128.0,
         disk = 0.0,
         constraints = Set(
-              Constraint.newBuilder
-                .setField("hostname")
-                .setOperator(Operator.LIKE)
-                .setValue("host1")
-                .build()
-            )
-      )
+            Constraint.newBuilder
+              .setField("hostname")
+              .setOperator(Operator.LIKE)
+              .setValue("host1")
+              .build()
+        )
+    )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should not be empty
   }
@@ -263,16 +285,18 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         mem = 128.0,
         disk = 0.0,
         constraints = Set(
-              Constraint.newBuilder
-                .setField("hostname")
-                .setOperator(Operator.LIKE)
-                .setValue("host2")
-                .build()
-            )
-      )
+            Constraint.newBuilder
+              .setField("hostname")
+              .setOperator(Operator.LIKE)
+              .setValue("host2")
+              .build()
+        )
+    )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should be(empty)
   }
@@ -287,8 +311,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should be(empty)
   }
@@ -303,8 +329,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should be(empty)
   }
@@ -319,8 +347,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(0, 0)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should be(empty)
   }
@@ -336,8 +366,10 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(1, 2)
     )
 
-    val resOpt = ResourceMatcher.matchResources(
-        offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
+    val resOpt = ResourceMatcher.matchResources(offer,
+                                                app,
+                                                runningTasks = Iterable.empty,
+                                                ResourceSelector.wildcard)
 
     resOpt should be(empty)
   }

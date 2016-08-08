@@ -266,8 +266,8 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
            weight = 0.1)
       .add(Vectors.dense(0.0, -1.2, -1.7), 0.2)
       .merge((new MultivariateOnlineSummarizer)
-            .add(Vectors.sparse(3, Seq((0, -0.7), (1, 0.01), (2, 1.3))), 0.15)
-            .add(Vectors.dense(-0.5, 0.3, -1.5), 0.05))
+        .add(Vectors.sparse(3, Seq((0, -0.7), (1, 0.01), (2, 1.3))), 0.15)
+        .add(Vectors.dense(-0.5, 0.3, -1.5), 0.05))
 
     assert(summarizer.count === 4)
 

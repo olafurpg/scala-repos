@@ -17,8 +17,8 @@ private[serverset2] object ServiceDiscoverer {
     * Each entry in `ents` is paired with the product of all weights for that
     * entry in `vecs`.
     */
-  def zipWithWeights(
-      ents: Seq[Entry], vecs: Set[Vector]): Seq[(Entry, Double)] = {
+  def zipWithWeights(ents: Seq[Entry],
+                     vecs: Set[Vector]): Seq[(Entry, Double)] = {
     ents map { ent =>
       val w = vecs.foldLeft(1.0) { case (w, vec) => w * vec.weightOf(ent) }
       ent -> w
@@ -112,8 +112,8 @@ private[serverset2] class ServiceDiscoverer(
     * which only reports unhealthy when the rawHealth has been unhealthy for
     * a long enough time (as defined by the stabilization epoch).
     */
-  private[serverset2] val health: Var[ClientHealth] = HealthStabilizer(
-      rawHealth, healthStabilizationEpoch, statsReceiver)
+  private[serverset2] val health: Var[ClientHealth] =
+    HealthStabilizer(rawHealth, healthStabilizationEpoch, statsReceiver)
 
   /**
     * Activity to keep a hydrated list of Entrys or Vectors for a given ZK path.
@@ -163,12 +163,11 @@ private[serverset2] class ServiceDiscoverer(
               // We end up with a Seq[Seq[Entity]] here, b/c cache.get() returns a Seq[Entity]
               // flatten() to fix this (see the comment on ZkNodeDataCache for why we get a Seq[])
               .map(tries => tries.collect { case Return(e) => e }.flatten)
-              .map {
-                seq =>
-                  // if we have *any* results or no-failure, we consider it a success
-                  if (seenFailures && seq.isEmpty)
-                    u() = Activity.Failed(EntryLookupFailureException)
-                  else u() = Activity.Ok(seq)
+              .map { seq =>
+                // if we have *any* results or no-failure, we consider it a success
+                if (seenFailures && seq.isEmpty)
+                  u() = Activity.Failed(EntryLookupFailureException)
+                else u() = Activity.Ok(seq)
               }
               .ensure {
                 if (seenFailures) {

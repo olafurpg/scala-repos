@@ -1,6 +1,13 @@
-/** process tests. 
+/** process tests.
   */
-import java.io.{File, FileNotFoundException, IOException, InputStream, OutputStream, FileInputStream}
+import java.io.{
+  File,
+  FileNotFoundException,
+  IOException,
+  InputStream,
+  OutputStream,
+  FileInputStream
+}
 import java.net.{URI, URISyntaxException, URL}
 import org.scalacheck._
 import Prop._
@@ -76,8 +83,8 @@ object IO {
 class ProcessSpecification extends Properties("Process I/O") {
   implicit val exitCodeArb: Arbitrary[Array[Byte]] = Arbitrary(
       Gen.choose(0, 10) flatMap { size =>
-    Gen.resize(size, Arbitrary.arbArray[Byte].arbitrary)
-  })
+        Gen.resize(size, Arbitrary.arbArray[Byte].arbitrary)
+      })
 
   /*property("Correct exit code") = forAll( (exitCode: Byte) => checkExit(exitCode))
 	property("#&& correct") = forAll( (exitCodes: Array[Byte]) => checkBinary(exitCodes)(_ #&& _)(_ && _))
@@ -150,7 +157,7 @@ class ProcessSpecification extends Properties("Process I/O") {
         .mkString(File.pathSeparator)
     "java -cp " + thisClasspath + " " + command
   }
-  private def getSource[T : Manifest]: String =
+  private def getSource[T: Manifest]: String =
     IO.classLocationFile[T].getAbsolutePath
 }
 private trait SourceTag

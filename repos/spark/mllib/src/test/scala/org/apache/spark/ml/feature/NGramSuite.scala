@@ -25,17 +25,20 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{DataFrame, Row}
 
 @BeanInfo
-case class NGramTestData(
-    inputTokens: Array[String], wantedNGrams: Array[String])
+case class NGramTestData(inputTokens: Array[String],
+                         wantedNGrams: Array[String])
 
 class NGramSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
   import org.apache.spark.ml.feature.NGramSuite._
 
   test("default behavior yields bigram features") {
     val nGram = new NGram().setInputCol("inputTokens").setOutputCol("nGrams")
-    val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
+    val dataset = sqlContext.createDataFrame(
+        Seq(
+            NGramTestData(
                 Array("Test", "for", "ngram", "."),
                 Array("Test for", "for ngram", "ngram .")
             )))
@@ -45,7 +48,9 @@ class NGramSuite
   test("NGramLength=4 yields length 4 n-grams") {
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(4)
-    val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
+    val dataset = sqlContext.createDataFrame(
+        Seq(
+            NGramTestData(
                 Array("a", "b", "c", "d", "e"),
                 Array("a b c d", "b c d e")
             )))
@@ -55,7 +60,9 @@ class NGramSuite
   test("empty input yields empty output") {
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(4)
-    val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
+    val dataset = sqlContext.createDataFrame(
+        Seq(
+            NGramTestData(
                 Array(),
                 Array()
             )))
@@ -65,7 +72,9 @@ class NGramSuite
   test("input array < n yields empty output") {
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(6)
-    val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
+    val dataset = sqlContext.createDataFrame(
+        Seq(
+            NGramTestData(
                 Array("a", "b", "c", "d", "e"),
                 Array()
             )))

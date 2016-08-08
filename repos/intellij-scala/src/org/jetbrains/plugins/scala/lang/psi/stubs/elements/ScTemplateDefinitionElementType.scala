@@ -5,21 +5,31 @@ package stubs
 package elements
 
 import com.intellij.psi.impl.java.stubs.index.JavaStubIndexKeys
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTemplateDefinitionStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 /**
   * @author ilyas, alefas
   */
-abstract class ScTemplateDefinitionElementType[
-    TypeDef <: ScTemplateDefinition](debugName: String)
+abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
+    debugName: String)
     extends ScStubElementType[ScTemplateDefinitionStub, ScTemplateDefinition](
         debugName) {
 
@@ -29,7 +39,8 @@ abstract class ScTemplateDefinitionElementType[
     val file = psi.getContainingFile
     val fileName =
       if (file != null && file.getVirtualFile != null)
-        file.getVirtualFile.getName else null
+        file.getVirtualFile.getName
+      else null
     val signs = psi.functions.map(_.name).toArray
     val isPO = psi match {
       case td: ScTypeDefinition => td.isPackageObject
@@ -39,15 +50,14 @@ abstract class ScTemplateDefinitionElementType[
 
     val isDepr =
       psi.isInstanceOf[ScTypeDefinition] && psi.getModifierList != null &&
-      !psi.getModifierList.getAnnotations.forall(
-          p =>
-            p match {
-          case a: ScAnnotation => {
+        !psi.getModifierList.getAnnotations.forall(p =>
+          p match {
+            case a: ScAnnotation => {
               val typeText = a.constructor.typeElement.getText
               typeText != "deprecated" && typeText != "scala.deprecated"
             }
-          case _ => true
-      })
+            case _ => true
+        })
 
     val isImplicitObject =
       psi.isInstanceOf[ScObject] && psi.hasModifierProperty("implicit")
@@ -72,7 +82,7 @@ abstract class ScTemplateDefinitionElementType[
 
     val isLocal: Boolean =
       psi.containingClass == null &&
-      PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
+        PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
 
     new ScTemplateDefinitionStubImpl[ParentPsi](parent,
                                                 this,
@@ -170,8 +180,8 @@ abstract class ScTemplateDefinitionElementType[
     }
     val javaFqn = stub.javaQualName
     if (javaFqn != null && !stub.isLocal && stub.isVisibleInJava) {
-      sink.occurrence[PsiClass, java.lang.Integer](
-          JavaStubIndexKeys.CLASS_FQN, javaFqn.hashCode)
+      sink.occurrence[PsiClass, java.lang.Integer](JavaStubIndexKeys.CLASS_FQN,
+                                                   javaFqn.hashCode)
       val i = javaFqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -180,8 +190,8 @@ abstract class ScTemplateDefinitionElementType[
     }
     val fqn = stub.qualName
     if (fqn != null && !stub.isLocal) {
-      sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.FQN_KEY, fqn.hashCode)
+      sink.occurrence[PsiClass, java.lang.Integer](ScalaIndexKeys.FQN_KEY,
+                                                   fqn.hashCode)
       val i = fqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -202,9 +212,11 @@ abstract class ScTemplateDefinitionElementType[
         else packageName.substring(index + 1, packageName.size)
       }
       sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.PACKAGE_OBJECT_KEY, packageName.hashCode)
+          ScalaIndexKeys.PACKAGE_OBJECT_KEY,
+          packageName.hashCode)
       sink.occurrence[PsiClass, String](
-          ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY, shortName)
+          ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY,
+          shortName)
     }
   }
 }

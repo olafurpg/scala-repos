@@ -108,8 +108,9 @@ object CpuProfile {
     *   impact, so it seems nonfaithful to exlude them.
     *   - Limit stack depth?
     */
-  def record(
-      howlong: Duration, frequency: Int, state: Thread.State): CpuProfile = {
+  def record(howlong: Duration,
+             frequency: Int,
+             state: Thread.State): CpuProfile = {
     require(frequency < 1000)
 
     // TODO: it may make sense to write a custom hash function here
@@ -128,8 +129,8 @@ object CpuProfile {
 
     while (Time.now < end) {
       for (thread <- bean.dumpAllThreads(false, false)
-                        if thread.getThreadState() == state &&
-                    thread.getThreadId() != myId) {
+           if thread.getThreadState() == state &&
+             thread.getThreadId() != myId) {
         val s = thread.getStackTrace().toSeq
         if (s.nonEmpty) {
           val include = state != Thread.State.RUNNABLE || isRunnable(s.head)

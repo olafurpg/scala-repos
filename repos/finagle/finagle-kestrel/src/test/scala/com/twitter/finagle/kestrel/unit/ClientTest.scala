@@ -19,8 +19,8 @@ import scala.language.postfixOps
 // all this so we can spy() on a client.
 class MockClient extends Client {
   def set(queueName: String, value: Buf, expiry: Time = Time.epoch) = null
-  def get(
-      queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
+  def get(queueName: String,
+          waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
     null
   def delete(queueName: String): Future[Response] = null
   def flush(queueName: String): Future[Response] = null

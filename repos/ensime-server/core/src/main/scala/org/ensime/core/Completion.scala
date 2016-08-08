@@ -63,16 +63,14 @@ trait CompletionControl { self: RichPresentationCompiler =>
       offset: Int,
       prefix: String,
       constructing: Boolean
-  )
-      extends CompletionContext
+  ) extends CompletionContext
 
   case class MemberContext(
       source: SourceFile,
       offset: Int,
       prefix: String,
       constructing: Boolean
-  )
-      extends CompletionContext
+  ) extends CompletionContext
 
   import CompletionUtil._
 
@@ -114,8 +112,8 @@ trait CompletionControl { self: RichPresentationCompiler =>
           val contents = Array.ofDim[Char](orig.length + 1)
           System.arraycopy(orig, 0, contents, 0, point)
           contents(point) = 'a'
-          System.arraycopy(
-              orig, point, contents, point + 1, orig.length - point)
+          System
+            .arraycopy(orig, point, contents, point + 1, orig.length - point)
 
           // uses the same VirtualFile as the original
           val src = new BatchSourceFile(inputP.source.file, contents)
@@ -143,8 +141,11 @@ trait CompletionControl { self: RichPresentationCompiler =>
                 case Select(qual, name)
                     if qual.pos.isDefined && qual.pos.isRange =>
                   val prefix = if (patched) "" else name.decoded
-                  Some(MemberContext(
-                          src, qual.pos.endOrCursor, prefix, constructing))
+                  Some(
+                      MemberContext(src,
+                                    qual.pos.endOrCursor,
+                                    prefix,
+                                    constructing))
                 case _ =>
                   val prefix =
                     if (patched) ""
@@ -152,8 +153,11 @@ trait CompletionControl { self: RichPresentationCompiler =>
                       src.content
                         .slice(fun.pos.startOrCursor, fun.pos.endOrCursor)
                         .mkString
-                  Some(ScopeContext(
-                          src, fun.pos.endOrCursor, prefix, constructing))
+                  Some(
+                      ScopeContext(src,
+                                   fun.pos.endOrCursor,
+                                   prefix,
+                                   constructing))
               }
             case Literal(Constant(_)) => None
             case New(name) =>
@@ -200,10 +204,10 @@ trait CompletionControl { self: RichPresentationCompiler =>
                 .sortWith({ (c1, c2) =>
                   c1.relevance > c2.relevance ||
                   (c1.relevance == c2.relevance &&
-                      c1.name.length < c2.name.length)
+                  c1.name.length < c2.name.length)
                 })
                 .take(maxResults)
-            )
+          )
         case _ => CompletionInfoList("", Nil)
       }
     }
@@ -283,8 +287,10 @@ trait CompletionControl { self: RichPresentationCompiler =>
     askOption[Unit] {
       val filtered = members.filter { m =>
         val s = m.sym.nameString
-        matchesPrefix(
-            s, context.prefix, matchEntire = false, caseSens = caseSens) &&
+        matchesPrefix(s,
+                      context.prefix,
+                      matchEntire = false,
+                      caseSens = caseSens) &&
         !s.contains("$")
       }
       logger.info("Filtered down to " + filtered.size + ".")
@@ -294,11 +300,14 @@ trait CompletionControl { self: RichPresentationCompiler =>
             val p = sym.pos
             val inSymbol =
               p.isRange &&
-              (context.offset >= p.startOrCursor &&
+                (context.offset >= p.startOrCursor &&
                   context.offset <= p.endOrCursor)
             if (!sym.isConstructor && !inSymbol) {
-              buff ++= toCompletionInfo(
-                  context, sym, tpe, inherited = false, NoSymbol)
+              buff ++= toCompletionInfo(context,
+                                        sym,
+                                        tpe,
+                                        inherited = false,
+                                        NoSymbol)
             }
           case m @ TypeMember(sym, tpe, accessible, inherited, viaView) =>
             if (!sym.isConstructor) {
@@ -378,8 +387,8 @@ object Keywords {
 
 trait Completion { self: RichPresentationCompiler =>
 
-  def completePackageMember(
-      path: String, prefix: String): List[CompletionInfo] = {
+  def completePackageMember(path: String,
+                            prefix: String): List[CompletionInfo] = {
     packageSymFromPath(path) match {
       case Some(sym) =>
         val memberSyms = packageMembers(sym).filterNot { s =>
@@ -394,7 +403,8 @@ trait Completion { self: RichPresentationCompiler =>
                                CompletionSignature(List.empty, "", false),
                                isCallable = false,
                                50,
-                               None)) else None
+                               None))
+          else None
         }.toList.sortBy(ci => (ci.relevance, ci.name))
       case _ => List.empty
     }

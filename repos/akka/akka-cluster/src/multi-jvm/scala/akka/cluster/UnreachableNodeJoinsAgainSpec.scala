@@ -33,7 +33,7 @@ object UnreachableNodeJoinsAgainMultiNodeConfig extends MultiNodeConfig {
       akka.remote.log-remote-lifecycle-events = off
     """)
         .withFallback(debugConfig(on = false)
-              .withFallback(MultiNodeClusterSpec.clusterConfig)))
+          .withFallback(MultiNodeClusterSpec.clusterConfig)))
 
   testTransport(on = true)
 }
@@ -139,7 +139,7 @@ abstract class UnreachableNodeJoinsAgainSpec
         awaitAssert(clusterView.unreachableMembers should ===(Set.empty),
                     15 seconds)
         awaitAssert(clusterView.members.map(_.address) should ===(
-                (allButVictim map address).toSet))
+            (allButVictim map address).toSet))
       }
 
       endBarrier()
@@ -176,7 +176,8 @@ abstract class UnreachableNodeJoinsAgainSpec
         Await.ready(system.whenTerminated, 10 seconds)
         // create new ActorSystem with same host:port
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
             akka.remote.netty.tcp {
               hostname = ${victimAddress.host.get}
               port = ${victimAddress.port.get}
@@ -186,11 +187,10 @@ abstract class UnreachableNodeJoinsAgainSpec
         try {
           Cluster(freshSystem).join(masterAddress)
           within(15 seconds) {
-            awaitAssert(
-                Cluster(freshSystem).readView.members.map(_.address) should contain(
-                    victimAddress))
+            awaitAssert(Cluster(freshSystem).readView.members
+              .map(_.address) should contain(victimAddress))
             awaitAssert(Cluster(freshSystem).readView.members.size should ===(
-                    expectedNumberOfMembers))
+                expectedNumberOfMembers))
             awaitAssert(
                 Cluster(freshSystem).readView.members.map(_.status) should ===(
                     Set(MemberStatus.Up)))
@@ -198,9 +198,10 @@ abstract class UnreachableNodeJoinsAgainSpec
 
           // signal to master node that victim is done
           val endProbe = TestProbe()(freshSystem)
-          val endActor = freshSystem.actorOf(
-              Props(classOf[EndActor], endProbe.ref, Some(masterAddress)),
-              "end")
+          val endActor = freshSystem.actorOf(Props(classOf[EndActor],
+                                                   endProbe.ref,
+                                                   Some(masterAddress)),
+                                             "end")
           endActor ! EndActor.SendEnd
           endProbe.expectMsg(EndActor.EndAck)
         } finally {

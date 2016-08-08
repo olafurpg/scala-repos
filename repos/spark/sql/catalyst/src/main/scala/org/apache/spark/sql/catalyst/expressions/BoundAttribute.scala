@@ -20,7 +20,10 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.errors.attachTree
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.types._
 
 /**
@@ -71,7 +74,8 @@ case class BoundReference(ordinal: Int, dataType: DataType, nullable: Boolean)
     } else if (nullable) {
       s"""
         boolean ${ev.isNull} = ${ctx.INPUT_ROW}.isNullAt($ordinal);
-        $javaType ${ev.value} = ${ev.isNull} ? ${ctx.defaultValue(dataType)} : ($value);
+        $javaType ${ev.value} = ${ev.isNull} ? ${ctx
+        .defaultValue(dataType)} : ($value);
       """
     } else {
       ev.isNull = "false"

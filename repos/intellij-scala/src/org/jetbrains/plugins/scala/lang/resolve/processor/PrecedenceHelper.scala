@@ -7,10 +7,17 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement, PsiPackage}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportExprUsed, ImportSelectorUsed, ImportWildcardSelectorUsed}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportExprUsed,
+  ImportSelectorUsed,
+  ImportWildcardSelectorUsed
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 
 import scala.collection.mutable
@@ -21,8 +28,7 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 01.12.11
   */
 //todo: logic is too complicated, too many connections between classes. Rewrite?
-trait PrecedenceHelper[T] {
-  this: BaseProcessor =>
+trait PrecedenceHelper[T] { this: BaseProcessor =>
 
   protected def getPlace: PsiElement
   protected lazy val placePackageName: String =
@@ -48,7 +54,8 @@ trait PrecedenceHelper[T] {
     ignoredSet.forall { result =>
       set.forall { otherResult =>
         if (!ScEquivalenceUtil.smartEquivalence(
-                result.getActualElement, otherResult.getActualElement)) {
+                result.getActualElement,
+                otherResult.getActualElement)) {
           (result.getActualElement, otherResult.getActualElement) match {
             case (ta: ScTypeAliasDefinition, cls: PsiClass) =>
               ta.isExactAliasFor(cls)
@@ -86,8 +93,8 @@ trait PrecedenceHelper[T] {
   protected def getQualifiedName(result: ScalaResolveResult): T
 
   private lazy val suspiciousPackages: Set[String] = {
-    def collectPackages(
-        elem: PsiElement, res: Set[String] = Set.empty): Set[String] = {
+    def collectPackages(elem: PsiElement,
+                        res: Set[String] = Set.empty): Set[String] = {
       PsiTreeUtil.getContextOfType(elem, true, classOf[ScPackaging]) match {
         case null => res
         case p: ScPackaging => collectPackages(p, res + p.fullPackageName)
@@ -123,8 +130,8 @@ trait PrecedenceHelper[T] {
     */
   protected def getTopPrecedence(result: ScalaResolveResult): Int
   protected def setTopPrecedence(result: ScalaResolveResult, i: Int)
-  protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+  protected def filterNot(p: ScalaResolveResult,
+                          n: ScalaResolveResult): Boolean = {
     getPrecedence(p) < getTopPrecedence(n)
   }
   protected def isCheckForEqualPrecedence = true
@@ -160,7 +167,7 @@ trait PrecedenceHelper[T] {
     else if (currentPrecedence == topPrecedence) {
       if (isCheckForEqualPrecedence && qualifiedName != null &&
           (levelQualifiedNamesSet.contains(qualifiedName) ||
-              qualifiedNamesSet.contains(qualifiedName))) {
+          qualifiedNamesSet.contains(qualifiedName))) {
         return false
       } else if (qualifiedName != null &&
                  qualifiedNamesSet.contains(qualifiedName)) return false

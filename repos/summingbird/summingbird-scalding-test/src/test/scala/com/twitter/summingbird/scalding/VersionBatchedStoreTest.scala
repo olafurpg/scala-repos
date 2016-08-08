@@ -23,7 +23,10 @@ import com.twitter.summingbird.batch._
 import com.twitter.summingbird.batch.state.HDFSState
 import com.twitter.summingbird.option.JobId
 import com.twitter.summingbird.SummingbirdRuntimeStats
-import com.twitter.summingbird.scalding.store.{VersionedBatchStore, InitialBatchedStore}
+import com.twitter.summingbird.scalding.store.{
+  VersionedBatchStore,
+  InitialBatchedStore
+}
 import com.twitter.bijection._
 import com.twitter.scalding.commons.source.VersionedKeyValSource
 
@@ -40,7 +43,14 @@ import org.scalacheck.Properties
 import org.apache.hadoop.conf.Configuration
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ArrayBuffer, Buffer, HashMap => MutableHashMap, Map => MutableMap, SynchronizedBuffer, SynchronizedMap}
+import scala.collection.mutable.{
+  ArrayBuffer,
+  Buffer,
+  HashMap => MutableHashMap,
+  Map => MutableMap,
+  SynchronizedBuffer,
+  SynchronizedMap
+}
 import scala.util.{Try => ScalaTry}
 
 import cascading.scheme.local.{TextDelimited => CLTextDelimited}
@@ -79,7 +89,7 @@ class VersionedBatchedStoreTest extends WordSpec {
     temp
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   "The VersionedBatchStore" should {
 
@@ -123,10 +133,12 @@ class VersionedBatchedStoreTest extends WordSpec {
       def buildStore(
           ): (String, batch.BatchedStore[Int, Int], Long => Map[Int, Int]) = {
         val rootFolder = createTempDirectory().getAbsolutePath
-        val testStoreVBS = VersionedBatchStore[Int, Int, (Long, Int), Int](
-            rootFolder, 1)(packFn)(unpackFn)
+        val testStoreVBS =
+          VersionedBatchStore[Int, Int, (Long, Int), Int](rootFolder, 1)(
+              packFn)(unpackFn)
         val testStore = new InitialBatchedStore(
-            batcher.batchOf(Timestamp(inWithTime.head._1)), testStoreVBS)
+            batcher.batchOf(Timestamp(inWithTime.head._1)),
+            testStoreVBS)
         val testStoreReader = { version: Long =>
           VersionedKeyValSource[(Long, Int), Int](
               rootFolder,
@@ -149,9 +161,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreA, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreA,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
@@ -162,9 +176,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreC,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
@@ -176,9 +192,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreC,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))

@@ -9,8 +9,15 @@ import com.intellij.psi.stubs.StubIndex
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.finder.ScalaSourceFilterScope
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.light.LightScalaMethod
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
@@ -50,8 +57,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     null
   }
 
-  def getClassesByFQName(
-      fqn: String, scope: GlobalSearchScope): Seq[PsiClass] = {
+  def getClassesByFQName(fqn: String,
+                         scope: GlobalSearchScope): Seq[PsiClass] = {
     if (DumbService.getInstance(project).isDumb) return Seq.empty
 
     val classes = StubIndex.getElements[java.lang.Integer, PsiClass](
@@ -95,14 +102,14 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     while (valIterator.hasNext) {
       res += valIterator.next()
     }
-    val varNames = StubIndex.getInstance.getAllKeys(
-        ScalaIndexKeys.VARIABLE_NAME_KEY, project)
+    val varNames = StubIndex.getInstance
+      .getAllKeys(ScalaIndexKeys.VARIABLE_NAME_KEY, project)
     val varIterator = varNames.iterator()
     while (varIterator.hasNext) {
       res += varIterator.next()
     }
-    val classParamNames = StubIndex.getInstance.getAllKeys(
-        ScalaIndexKeys.CLASS_PARAMETER_NAME_KEY, project)
+    val classParamNames = StubIndex.getInstance
+      .getAllKeys(ScalaIndexKeys.CLASS_PARAMETER_NAME_KEY, project)
     val classParamIterator = classParamNames.iterator()
     while (classParamIterator.hasNext) {
       res += classParamIterator.next()
@@ -110,8 +117,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     res.toSeq
   }
 
-  def getScalaFieldsByName(
-      name: String, scope: GlobalSearchScope): Seq[PsiMember] = {
+  def getScalaFieldsByName(name: String,
+                           scope: GlobalSearchScope): Seq[PsiMember] = {
     val values = StubIndex.getElements(
         ScalaIndexKeys.VALUE_NAME_KEY,
         name,
@@ -157,8 +164,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     classNames.toSeq
   }
 
-  def getMethodsByName(
-      name: String, scope: GlobalSearchScope): Seq[PsiMethod] = {
+  def getMethodsByName(name: String,
+                       scope: GlobalSearchScope): Seq[PsiMethod] = {
     def scalaMethods: Seq[PsiMethod] = {
       val methods = StubIndex.getElements(
           ScalaIndexKeys.METHOD_NAME_KEY,
@@ -196,8 +203,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     scalaMethods ++ javaMethods
   }
 
-  def getFieldsByName(
-      name: String, scope: GlobalSearchScope): Array[PsiField] = {
+  def getFieldsByName(name: String,
+                      scope: GlobalSearchScope): Array[PsiField] = {
     PsiShortNamesCache.getInstance(project).getFieldsByName(name, scope)
   }
 
@@ -210,14 +217,17 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
   }
 
   def getClassesByName(name: String, scope: GlobalSearchScope): Seq[PsiClass] = {
-    val plainClasses = StubIndex.getElements(
-        ScalaIndexKeys.SHORT_NAME_KEY, name, project, scope, classOf[PsiClass])
+    val plainClasses = StubIndex.getElements(ScalaIndexKeys.SHORT_NAME_KEY,
+                                             name,
+                                             project,
+                                             scope,
+                                             classOf[PsiClass])
     import scala.collection.JavaConversions._
     plainClasses.toSeq
   }
 
-  def getPackageObjectByName(
-      fqn: String, scope: GlobalSearchScope): ScTypeDefinition = {
+  def getPackageObjectByName(fqn: String,
+                             scope: GlobalSearchScope): ScTypeDefinition = {
     if (DumbService.getInstance(project).isDumb) return null
 
     val classes = StubIndex.getElements[java.lang.Integer, PsiClass](
@@ -251,8 +261,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     null
   }
 
-  def getImplicitObjectsByPackage(
-      fqn: String, scope: GlobalSearchScope): Seq[ScObject] = {
+  def getImplicitObjectsByPackage(fqn: String,
+                                  scope: GlobalSearchScope): Seq[ScObject] = {
     val classes = StubIndex.getElements(
         ScalaIndexKeys.IMPLICIT_OBJECT_KEY,
         fqn,
@@ -267,8 +277,8 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
     res.toSeq
   }
 
-  def getClasses(
-      psiPackage: PsiPackage, scope: GlobalSearchScope): Array[PsiClass] = {
+  def getClasses(psiPackage: PsiPackage,
+                 scope: GlobalSearchScope): Array[PsiClass] = {
     val otherClassNames = getClassNames(psiPackage, scope)
     val result: ArrayBuffer[PsiClass] = new ArrayBuffer[PsiClass]()
     for (clazzName <- otherClassNames) {

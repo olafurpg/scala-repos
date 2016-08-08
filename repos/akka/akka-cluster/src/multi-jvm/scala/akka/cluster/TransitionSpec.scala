@@ -19,14 +19,13 @@ object TransitionMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false)
+    .withFallback(ConfigFactory.parseString(
+        """
       akka.cluster.periodic-tasks-initial-delay = 300 s # turn off all periodic tasks
       akka.cluster.publish-stats-interval = 0 s # always, when it happens
       """))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+    .withFallback(MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class TransitionMultiJvmNode1 extends TransitionSpec
@@ -34,7 +33,8 @@ class TransitionMultiJvmNode2 extends TransitionSpec
 class TransitionMultiJvmNode3 extends TransitionSpec
 
 abstract class TransitionSpec
-    extends MultiNodeSpec(TransitionMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(TransitionMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import TransitionMultiJvmSpec._

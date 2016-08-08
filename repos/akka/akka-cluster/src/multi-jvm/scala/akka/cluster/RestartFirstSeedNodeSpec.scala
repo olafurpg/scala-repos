@@ -26,7 +26,8 @@ object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+            """
       akka.cluster.auto-down-unreachable-after = off
       akka.cluster.retry-unsuccessful-join-after = 3s
       """))
@@ -39,7 +40,8 @@ class RestartFirstSeedNodeMultiJvmNode3 extends RestartFirstSeedNodeSpec
 
 abstract class RestartFirstSeedNodeSpec
     extends MultiNodeSpec(RestartFirstSeedNodeMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import RestartFirstSeedNodeMultiJvmSpec._
 
@@ -60,7 +62,8 @@ abstract class RestartFirstSeedNodeSpec
 
   override def afterAll(): Unit = {
     runOn(seed1) {
-      shutdown(if (seed1System.whenTerminated.isCompleted) restartedSeed1System
+      shutdown(
+          if (seed1System.whenTerminated.isCompleted) restartedSeed1System
           else seed1System)
     }
     super.afterAll()
@@ -86,7 +89,8 @@ abstract class RestartFirstSeedNodeSpec
         enterBarrier("seed1-address-receiver-ready")
         seedNode1Address = Cluster(seed1System).selfAddress
         List(seed2, seed3) foreach { r ⇒
-          system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
+          system
+            .actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
           expectMsg(5 seconds, "ok")
         }
       }
@@ -120,7 +124,7 @@ abstract class RestartFirstSeedNodeSpec
               Cluster(restartedSeed1System).readView.members.size should ===(
                   3))
           awaitAssert(Cluster(restartedSeed1System).readView.members
-                .map(_.status) should ===(Set(Up)))
+            .map(_.status) should ===(Set(Up)))
         }
       }
       runOn(seed2, seed3) {

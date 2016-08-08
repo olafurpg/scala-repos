@@ -30,8 +30,8 @@ object ScroogeUnionOrderedBuf {
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
       case tpe
           if tpe <:< typeOf[ThriftUnion] &&
-          (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isTrait) &&
-          !tpe.typeSymbol.asClass.knownDirectSubclasses.isEmpty =>
+            (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isTrait) &&
+            !tpe.typeSymbol.asClass.knownDirectSubclasses.isEmpty =>
         ScroogeUnionOrderedBuf(c)(buildDispatcher, tpe)
     }
     pf
@@ -64,8 +64,8 @@ object ScroogeUnionOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         UnionLike.compareBinary(c)(inputStreamA, inputStreamB)(subData)
       override def hash(element: ctx.TermName): ctx.Tree =
         UnionLike.hash(c)(element)(subData)
@@ -73,8 +73,8 @@ object ScroogeUnionOrderedBuf {
         UnionLike.put(c)(inputStream, element)(subData)
       override def get(inputStream: ctx.TermName): ctx.Tree =
         UnionLike.get(c)(inputStream)(subData)
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree =
         UnionLike.compare(c)(outerType, elementA, elementB)(subData)
       override def length(element: Tree): CompileTimeLengthTypes[c.type] =
         UnionLike.length(c)(element)(subData)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Miles Sabin 
+ * Copyright (c) 2011 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class HListConstraintsTests {
   def testUnaryTCConstraint {
     import UnaryTCConstraint._
 
-    def acceptOption[L <: HList : *->*[Option]#λ](l: L) = true
+    def acceptOption[L <: HList: *->*[Option]#λ](l: L) = true
 
     val l1 = Option(23) :: Option(true) :: Option("foo") :: HNil
     val l2 = Option(23) :: true :: Option("foo") :: HNil
@@ -45,7 +45,7 @@ class HListConstraintsTests {
 
     val l3 = 23 :: true :: "foo" :: HNil
 
-    def acceptId[L <: HList : *->*[Id]#λ](l: L) = true
+    def acceptId[L <: HList: *->*[Id]#λ](l: L) = true
 
     acceptId(l3) // Compiles
     acceptId(HNil: HNil)
@@ -53,7 +53,7 @@ class HListConstraintsTests {
     val l4 = "foo" :: "bar" :: "baz" :: HNil
     val l5 = "foo" :: true :: "baz" :: HNil
 
-    def acceptConst[L <: HList : *->*[Const[String]#λ]#λ](l: L) = true
+    def acceptConst[L <: HList: *->*[Const[String]#λ]#λ](l: L) = true
 
     acceptConst(l4) // Compiles
     acceptConst(HNil: HNil)
@@ -61,7 +61,7 @@ class HListConstraintsTests {
     acceptConst(l5)
     """)
 
-    def acceptTypeConstructor[F[_], L <: HList : *->*[F]#λ](l: L) = true
+    def acceptTypeConstructor[F[_], L <: HList: *->*[F]#λ](l: L) = true
 
     acceptTypeConstructor(l1) // Compiles - F = Option
     acceptTypeConstructor(l2) // Compiles - F = Id
@@ -77,7 +77,7 @@ class HListConstraintsTests {
 
     type M = Int :: Boolean :: String :: HNil
 
-    def acceptBasis[L <: HList : Basis[M]#λ](l: L) = true
+    def acceptBasis[L <: HList: Basis[M]#λ](l: L) = true
 
     val l1 = 23 :: true :: 13 :: 7 :: 5 :: false :: "foo" :: "bar" :: HNil
     val l2 = 23 :: true :: 13 :: 7 :: 5 :: 2.0 :: "foo" :: "bar" :: HNil
@@ -93,7 +93,7 @@ class HListConstraintsTests {
   def testLUBConstraint {
     import LUBConstraint._
 
-    def acceptLUB[L <: HList : <<:[Fruit]#λ](l: L) = true
+    def acceptLUB[L <: HList: <<:[Fruit]#λ](l: L) = true
 
     val l1 = Apple :: Pear :: Apple :: Pear :: HNil
     val l2 = Apple :: 23 :: "foo" :: Pear :: HNil
@@ -118,15 +118,16 @@ class HListConstraintsTests {
 
     val book =
       (author ->> "Benjamin Pierce") ::
-      (title ->> "Types and Programming Languages") :: (id ->> 262162091) ::
-      (price ->> 44.11) :: HNil
+        (title ->> "Types and Programming Languages") :: (id ->> 262162091) ::
+          (price ->> 44.11) :: HNil
 
     val summary =
       (author ->> "Benjamin Pierce") ::
-      (title ->> "Types and Programming Languages") :: (id ->> 262162091) :: HNil
+        (title ->> "Types and Programming Languages") :: (id ->> 262162091) :: HNil
 
-    def acceptKeys[R <: HList : Keys[
-            author.type :: title.type :: id.type :: HNil]#λ](r: R) = true
+    def acceptKeys[
+        R <: HList: Keys[author.type :: title.type :: id.type :: HNil]#λ](
+        r: R) = true
 
     acceptKeys(summary) // Compiles
     acceptKeys(HNil: HNil)
@@ -134,7 +135,7 @@ class HListConstraintsTests {
     acceptKeys(book)
     """)
 
-    def acceptValues[R <: HList : Values[Int :: String :: HNil]#λ](r: R) = true
+    def acceptValues[R <: HList: Values[Int :: String :: HNil]#λ](r: R) = true
 
     acceptValues(summary) // Compiles
     acceptValues(HNil: HNil)
@@ -148,7 +149,7 @@ class HListConstraintsTests {
 
     import NotContainsConstraint._
 
-    def notContains[L <: HList : NotContains[String]#λ, U](l: L, u: U)(
+    def notContains[L <: HList: NotContains[String]#λ, U](l: L, u: U)(
         implicit ev: NotContainsConstraint[L, U]) = true
 
     notContains(HNil: HNil, 2)

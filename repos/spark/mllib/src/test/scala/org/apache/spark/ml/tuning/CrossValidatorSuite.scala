@@ -19,8 +19,15 @@ package org.apache.spark.ml.tuning
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.{Estimator, Model, Pipeline}
-import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressionModel}
-import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, Evaluator, RegressionEvaluator}
+import org.apache.spark.ml.classification.{
+  LogisticRegression,
+  LogisticRegressionModel
+}
+import org.apache.spark.ml.evaluation.{
+  BinaryClassificationEvaluator,
+  Evaluator,
+  RegressionEvaluator
+}
 import org.apache.spark.ml.feature.HashingTF
 import org.apache.spark.ml.param.{ParamMap, ParamPair}
 import org.apache.spark.ml.param.shared.HasInputCol
@@ -33,7 +40,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.{StructField, StructType}
 
 class CrossValidatorSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var dataset: DataFrame = _
@@ -69,15 +77,15 @@ class CrossValidatorSuite
 
   test("cross validation with linear regression") {
     val dataset = sqlContext.createDataFrame(
-        sc.parallelize(
-            LinearDataGenerator.generateLinearInput(6.3,
-                                                    Array(4.7, 7.2),
-                                                    Array(0.9, -1.3),
-                                                    Array(0.7, 1.2),
-                                                    100,
-                                                    42,
-                                                    0.1),
-            2))
+        sc.parallelize(LinearDataGenerator.generateLinearInput(6.3,
+                                                               Array(4.7, 7.2),
+                                                               Array(0.9,
+                                                                     -1.3),
+                                                               Array(0.7, 1.2),
+                                                               100,
+                                                               42,
+                                                               0.1),
+                       2))
 
     val trainer = new LinearRegression().setSolver("l-bfgs")
     val lrParamMaps = new ParamGridBuilder()
@@ -157,11 +165,11 @@ class CrossValidatorSuite
       case other =>
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
-            s" LogisticRegression but found ${other.getClass.getName}")
+              s" LogisticRegression but found ${other.getClass.getName}")
     }
 
-    CrossValidatorSuite.compareParamMaps(
-        cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
+    CrossValidatorSuite.compareParamMaps(cv.getEstimatorParamMaps,
+                                         cv2.getEstimatorParamMaps)
   }
 
   test("read/write: CrossValidator with complex estimator") {
@@ -199,8 +207,8 @@ class CrossValidatorSuite
     assert(cv2.getEvaluator.isInstanceOf[BinaryClassificationEvaluator])
     assert(cv.getEvaluator.uid === cv2.getEvaluator.uid)
 
-    CrossValidatorSuite.compareParamMaps(
-        cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
+    CrossValidatorSuite.compareParamMaps(cv.getEstimatorParamMaps,
+                                         cv2.getEstimatorParamMaps)
 
     cv2.getEstimator match {
       case pipeline2: Pipeline =>
@@ -215,23 +223,25 @@ class CrossValidatorSuite
               case other =>
                 throw new AssertionError(
                     s"Loaded internal CrossValidator expected to be" +
-                    s" LogisticRegression but found type ${other.getClass.getName}")
+                      s" LogisticRegression but found type ${other.getClass.getName}")
             }
             assert(lrcv.uid === lrcv2.uid)
             assert(
                 lrcv2.getEvaluator.isInstanceOf[BinaryClassificationEvaluator])
             assert(lrEvaluator.uid === lrcv2.getEvaluator.uid)
-            CrossValidatorSuite.compareParamMaps(
-                lrParamMaps, lrcv2.getEstimatorParamMaps)
+            CrossValidatorSuite.compareParamMaps(lrParamMaps,
+                                                 lrcv2.getEstimatorParamMaps)
           case other =>
             throw new AssertionError(
                 "Loaded Pipeline expected stages (HashingTF, CrossValidator)" +
-                " but found: " + other.map(_.getClass.getName).mkString(", "))
+                  " but found: " + other
+                  .map(_.getClass.getName)
+                  .mkString(", "))
         }
       case other =>
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
-            s" CrossValidator but found ${other.getClass.getName}")
+              s" CrossValidator but found ${other.getClass.getName}")
     }
   }
 
@@ -256,8 +266,9 @@ class CrossValidatorSuite
 
   test("read/write: CrossValidatorModel") {
     val lr = new LogisticRegression().setThreshold(0.6)
-    val lrModel = new LogisticRegressionModel(
-        lr.uid, Vectors.dense(1.0, 2.0), 1.2).setThreshold(0.6)
+    val lrModel = new LogisticRegressionModel(lr.uid,
+                                              Vectors.dense(1.0, 2.0),
+                                              1.2).setThreshold(0.6)
     val evaluator = new BinaryClassificationEvaluator()
       .setMetricName("areaUnderPR") // not default metric
     val paramMaps =
@@ -286,11 +297,11 @@ class CrossValidatorSuite
       case other =>
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
-            s" LogisticRegression but found ${other.getClass.getName}")
+              s" LogisticRegression but found ${other.getClass.getName}")
     }
 
-    CrossValidatorSuite.compareParamMaps(
-        cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
+    CrossValidatorSuite.compareParamMaps(cv.getEstimatorParamMaps,
+                                         cv2.getEstimatorParamMaps)
 
     cv2.bestModel match {
       case lrModel2: LogisticRegressionModel =>
@@ -301,7 +312,7 @@ class CrossValidatorSuite
       case other =>
         throw new AssertionError(
             s"Loaded CrossValidator expected bestModel of type" +
-            s" LogisticRegressionModel but found ${other.getClass.getName}")
+              s" LogisticRegressionModel but found ${other.getClass.getName}")
     }
     assert(cv.avgMetrics === cv2.avgMetrics)
   }
@@ -329,7 +340,8 @@ object CrossValidatorSuite extends SparkFunSuite {
   abstract class MyModel extends Model[MyModel]
 
   class MyEstimator(override val uid: String)
-      extends Estimator[MyModel] with HasInputCol {
+      extends Estimator[MyModel]
+      with HasInputCol {
 
     override def fit(dataset: DataFrame): MyModel = {
       throw new UnsupportedOperationException

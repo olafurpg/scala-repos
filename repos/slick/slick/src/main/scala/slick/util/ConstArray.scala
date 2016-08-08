@@ -10,7 +10,7 @@ import scala.util.hashing.MurmurHash3
 /** An efficient immutable array implementation which is used in the AST. Semantics are generally
   * the same as for Scala collections but for performance reasons it does not implement any
   * standard collection traits. */
-final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
+final class ConstArray[+T] private[util] (a: Array[Any], val length: Int)
     extends Product { self =>
   private def this(a: Array[Any]) = this(a, a.length)
 
@@ -298,14 +298,16 @@ final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
     b.result()
   }
 
-  def toArray[R >: T : ClassTag]: Array[R] = {
+  def toArray[R >: T: ClassTag]: Array[R] = {
     val ar = new Array[R](length)
     System.arraycopy(a, 0, ar, 0, length)
     ar
   }
 
-  private[util] def copySliceTo(
-      dest: Array[Any], srcPos: Int, destPos: Int, len: Int): Unit = {
+  private[util] def copySliceTo(dest: Array[Any],
+                                srcPos: Int,
+                                destPos: Int,
+                                len: Int): Unit = {
     if (len + srcPos > length) throw new IndexOutOfBoundsException
     System.arraycopy(a, srcPos, dest, destPos, len)
   }
@@ -488,8 +490,8 @@ final class RangeConstArrayOp(val r: Range) extends ConstArrayOp[Int] {
 }*/
 
 /** A mutable builder for ConstArrays. */
-final class ConstArrayBuilder[T](
-    initialCapacity: Int = 16, growFactor: Double = 2.0) { self =>
+final class ConstArrayBuilder[T](initialCapacity: Int = 16,
+                                 growFactor: Double = 2.0) { self =>
   private[this] var a: Array[Any] = new Array[Any](initialCapacity)
   private[this] var len: Int = 0
 

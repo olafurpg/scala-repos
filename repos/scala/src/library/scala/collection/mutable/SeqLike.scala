@@ -18,9 +18,9 @@ import parallel.mutable.ParSeq
   *
   */
 trait SeqLike[A, +This <: SeqLike[A, This] with Seq[A]]
-    extends scala.collection.SeqLike[A, This] with Cloneable[This]
-    with Parallelizable[A, ParSeq[A]] {
-  self =>
+    extends scala.collection.SeqLike[A, This]
+    with Cloneable[This]
+    with Parallelizable[A, ParSeq[A]] { self =>
 
   protected[this] override def parCombiner = ParSeq.newCombiner[A]
 

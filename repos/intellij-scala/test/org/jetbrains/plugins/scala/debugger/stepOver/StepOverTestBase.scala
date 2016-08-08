@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.stepOver
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.junit.Assert
 
@@ -24,7 +27,7 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
         lines.head.startsWith(s"object $mainClassName"))
     Assert.assertTrue("Method main should be defined on a second line",
                       lines(1).trim.startsWith("def main") &&
-                      lines(2).trim.nonEmpty)
+                        lines(2).trim.nonEmpty)
 
     def checkLine(expectedLineNumber: Int): Unit = {
       val actualLineNumber = currentLineNumber

@@ -31,8 +31,9 @@ class BooleanBitSetSuite extends SparkFunSuite {
     // Tests encoder
     // -------------
 
-    val builder = TestCompressibleColumnBuilder(
-        new NoopColumnStats, BOOLEAN, BooleanBitSet)
+    val builder = TestCompressibleColumnBuilder(new NoopColumnStats,
+                                                BOOLEAN,
+                                                BooleanBitSet)
     val rows = Seq.fill[InternalRow](count)(makeRandomRow(BOOLEAN))
     val values = rows.map(_.getBoolean(0))
 

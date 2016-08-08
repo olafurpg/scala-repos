@@ -31,9 +31,10 @@ import org.apache.spark.io.CompressionCodec
 import org.apache.spark.streaming.scheduler.JobGenerator
 import org.apache.spark.util.Utils
 
-private[streaming] class Checkpoint(
-    ssc: StreamingContext, val checkpointTime: Time)
-    extends Logging with Serializable {
+private[streaming] class Checkpoint(ssc: StreamingContext,
+                                    val checkpointTime: Time)
+    extends Logging
+    with Serializable {
   val master = ssc.sc.master
   val framework = ssc.sc.appName
   val jars = ssc.sc.jars
@@ -163,7 +164,8 @@ private[streaming] object Checkpoint extends Logging {
       // in other places (e.g., http://jira.codehaus.org/browse/GROOVY-1627)
       val zis = compressionCodec.compressedInputStream(inputStream)
       ois = new ObjectInputStreamWithLoader(
-          zis, Thread.currentThread().getContextClassLoader)
+          zis,
+          Thread.currentThread().getContextClassLoader)
       val cp = ois.readObject.asInstanceOf[Checkpoint]
       cp.validate()
       cp
@@ -183,8 +185,7 @@ private[streaming] class CheckpointWriter(
     conf: SparkConf,
     checkpointDir: String,
     hadoopConf: Configuration
-)
-    extends Logging {
+) extends Logging {
   val MAX_ATTEMPTS = 3
   val executor = Executors.newFixedThreadPool(1)
   val compressionCodec = CompressionCodec.createCodec(conf)
@@ -224,7 +225,7 @@ private[streaming] class CheckpointWriter(
         try {
           logInfo(
               "Saving checkpoint for time " + checkpointTime + " to file '" +
-              checkpointFile + "'")
+                checkpointFile + "'")
 
           // Write checkpoint to temp file
           if (fs.exists(tempFile)) {
@@ -261,10 +262,9 @@ private[streaming] class CheckpointWriter(
           if (allCheckpointFiles.size > 10) {
             allCheckpointFiles
               .take(allCheckpointFiles.size - 10)
-              .foreach(file =>
-                    {
-                  logInfo("Deleting " + file)
-                  fs.delete(file, true)
+              .foreach(file => {
+                logInfo("Deleting " + file)
+                fs.delete(file, true)
               })
           }
 
@@ -272,31 +272,35 @@ private[streaming] class CheckpointWriter(
           val finishTime = System.currentTimeMillis()
           logInfo(
               "Checkpoint for time " + checkpointTime + " saved to file '" +
-              checkpointFile + "', took " + bytes.length + " bytes and " +
-              (finishTime - startTime) + " ms")
-          jobGenerator.onCheckpointCompletion(
-              checkpointTime, clearCheckpointDataLater)
+                checkpointFile + "', took " + bytes.length + " bytes and " +
+                (finishTime - startTime) + " ms")
+          jobGenerator
+            .onCheckpointCompletion(checkpointTime, clearCheckpointDataLater)
           return
         } catch {
           case ioe: IOException =>
             logWarning("Error in attempt " + attempts +
-                       " of writing checkpoint to " + checkpointFile,
+                         " of writing checkpoint to " + checkpointFile,
                        ioe)
             reset()
         }
       }
-      logWarning("Could not write checkpoint for time " + checkpointTime +
-          " to file " + checkpointFile + "'")
+      logWarning(
+          "Could not write checkpoint for time " + checkpointTime +
+            " to file " + checkpointFile + "'")
     }
   }
 
   def write(checkpoint: Checkpoint, clearCheckpointDataLater: Boolean) {
     try {
       val bytes = Checkpoint.serialize(checkpoint, conf)
-      executor.execute(new CheckpointWriteHandler(
-              checkpoint.checkpointTime, bytes, clearCheckpointDataLater))
-      logInfo("Submitted checkpoint of time " + checkpoint.checkpointTime +
-          " writer queue")
+      executor.execute(
+          new CheckpointWriteHandler(checkpoint.checkpointTime,
+                                     bytes,
+                                     clearCheckpointDataLater))
+      logInfo(
+          "Submitted checkpoint of time " + checkpoint.checkpointTime +
+            " writer queue")
     } catch {
       case rej: RejectedExecutionException =>
         logError(
@@ -316,8 +320,9 @@ private[streaming] class CheckpointWriter(
       executor.shutdownNow()
     }
     val endTime = System.currentTimeMillis()
-    logInfo("CheckpointWriter executor terminated ? " + terminated +
-        ", waited for " + (endTime - startTime) + " ms.")
+    logInfo(
+        "CheckpointWriter executor terminated ? " + terminated +
+          ", waited for " + (endTime - startTime) + " ms.")
     stopped = true
   }
 
@@ -370,21 +375,19 @@ private[streaming] object CheckpointReader extends Logging {
     // Try to read the checkpoint files in the order
     logInfo("Checkpoint files found: " + checkpointFiles.mkString(","))
     var readError: Exception = null
-    checkpointFiles.foreach(
-        file =>
-          {
-        logInfo("Attempting to load checkpoint from file " + file)
-        try {
-          val fis = fs.open(file)
-          val cp = Checkpoint.deserialize(fis, conf)
-          logInfo("Checkpoint successfully loaded from file " + file)
-          logInfo("Checkpoint was generated at time " + cp.checkpointTime)
-          return Some(cp)
-        } catch {
-          case e: Exception =>
-            readError = e
-            logWarning("Error reading checkpoint from file " + file, e)
-        }
+    checkpointFiles.foreach(file => {
+      logInfo("Attempting to load checkpoint from file " + file)
+      try {
+        val fis = fs.open(file)
+        val cp = Checkpoint.deserialize(fis, conf)
+        logInfo("Checkpoint successfully loaded from file " + file)
+        logInfo("Checkpoint was generated at time " + cp.checkpointTime)
+        return Some(cp)
+      } catch {
+        case e: Exception =>
+          readError = e
+          logWarning("Error reading checkpoint from file " + file, e)
+      }
     })
 
     // If none of checkpoint files could be read, then throw exception
@@ -397,8 +400,8 @@ private[streaming] object CheckpointReader extends Logging {
   }
 }
 
-private[streaming] class ObjectInputStreamWithLoader(
-    _inputStream: InputStream, loader: ClassLoader)
+private[streaming] class ObjectInputStreamWithLoader(_inputStream: InputStream,
+                                                     loader: ClassLoader)
     extends ObjectInputStream(_inputStream) {
 
   override def resolveClass(desc: ObjectStreamClass): Class[_] = {

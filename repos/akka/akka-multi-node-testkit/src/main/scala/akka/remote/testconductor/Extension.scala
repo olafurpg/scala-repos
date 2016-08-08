@@ -3,7 +3,14 @@
   */
 package akka.remote.testconductor
 
-import akka.actor.{Extension, ExtensionId, ExtensionIdProvider, ExtendedActorSystem, ActorContext, ActorSystem}
+import akka.actor.{
+  Extension,
+  ExtensionId,
+  ExtensionIdProvider,
+  ExtendedActorSystem,
+  ActorContext,
+  ActorSystem
+}
 import akka.remote.RemoteActorRefProvider
 import akka.util.Timeout
 import com.typesafe.config.Config
@@ -20,7 +27,8 @@ import akka.dispatch.ThreadPoolConfig
   * }}}
   */
 object TestConductor
-    extends ExtensionId[TestConductorExt] with ExtensionIdProvider {
+    extends ExtensionId[TestConductorExt]
+    with ExtensionIdProvider {
 
   override def lookup = TestConductor
 
@@ -51,7 +59,9 @@ object TestConductor
   *
   */
 class TestConductorExt(val system: ExtendedActorSystem)
-    extends Extension with Conductor with Player {
+    extends Extension
+    with Conductor
+    with Player {
 
   object Settings {
     val config = system.settings.config.getConfig("akka.testconductor")

@@ -7,7 +7,10 @@ import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.metadata.Metadata
 import org.eclipse.aether.repository.RemoteRepository
 import org.eclipse.aether.spi.connector.layout.RepositoryLayout.Checksum
-import org.eclipse.aether.spi.connector.layout.{RepositoryLayout, RepositoryLayoutFactory}
+import org.eclipse.aether.spi.connector.layout.{
+  RepositoryLayout,
+  RepositoryLayoutFactory
+}
 import org.eclipse.aether.transfer.NoRepositoryLayoutException
 
 import sbt.internal.librarymanagement.mavenint.SbtPomExtraProperties
@@ -22,8 +25,8 @@ class SbtPluginLayoutFactory extends RepositoryLayoutFactory {
       case SbtRepositoryLayout.LAYOUT_NAME =>
         SbtRepositoryLayout
       case _ =>
-        throw new NoRepositoryLayoutException(
-            repository, "Not an sbt-plugin repository")
+        throw new NoRepositoryLayoutException(repository,
+                                              "Not an sbt-plugin repository")
     }
   }
   def getPriority: Float = 100.0f
@@ -41,10 +44,8 @@ object SbtRepositoryLayout extends RepositoryLayout {
     val scalaVersion = Option(
         artifact.getProperties.get(SbtPomExtraProperties.POM_SCALA_VERSION))
     val path = new StringBuilder(128)
-    path
-      .append(artifact.getGroupId.replace('.', '/'))
-      .append('/')
-      (sbtVersion zip scalaVersion).headOption match {
+    path.append(artifact.getGroupId.replace('.', '/')).append('/')
+    (sbtVersion zip scalaVersion).headOption match {
       case Some((sbt, scala)) =>
         if (artifact.getArtifactId contains "_sbt_") {
           val SbtNameVersionSplit(name, sbt2) = artifact.getArtifactId
@@ -98,10 +99,8 @@ object SbtRepositoryLayout extends RepositoryLayout {
     val scalaVersion = Option(
         metadata.getProperties.get(SbtPomExtraProperties.POM_SCALA_VERSION))
     val path = new StringBuilder(128)
-    path
-      .append(metadata.getGroupId.replace('.', '/'))
-      .append('/')
-      (sbtVersion zip scalaVersion).headOption match {
+    path.append(metadata.getGroupId.replace('.', '/')).append('/')
+    (sbtVersion zip scalaVersion).headOption match {
       case Some((sbt, scala)) =>
         if (metadata.getArtifactId contains "_sbt_") {
           val SbtNameVersionSplit(name, sbt2) = metadata.getArtifactId

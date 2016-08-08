@@ -37,7 +37,7 @@ import org.apache.spark.annotation.DeveloperApi
   * @param map an immutable map that stores the data
   */
 @DeveloperApi
-sealed class Metadata private[types](private[types] val map: Map[String, Any])
+sealed class Metadata private[types] (private[types] val map: Map[String, Any])
     extends Serializable {
 
   /** No-arg constructor for kryo. */
@@ -146,13 +146,16 @@ object Metadata {
                   value.asInstanceOf[List[JInt]].map(_.num.toLong).toArray)
             case _: JDouble =>
               builder.putDoubleArray(
-                  key, value.asInstanceOf[List[JDouble]].map(_.num).toArray)
+                  key,
+                  value.asInstanceOf[List[JDouble]].map(_.num).toArray)
             case _: JBool =>
               builder.putBooleanArray(
-                  key, value.asInstanceOf[List[JBool]].map(_.value).toArray)
+                  key,
+                  value.asInstanceOf[List[JBool]].map(_.value).toArray)
             case _: JString =>
               builder.putStringArray(
-                  key, value.asInstanceOf[List[JString]].map(_.s).toArray)
+                  key,
+                  value.asInstanceOf[List[JString]].map(_.s).toArray)
             case _: JObject =>
               builder.putMetadataArray(
                   key,

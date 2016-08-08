@@ -28,8 +28,8 @@ object CertificateGenerator {
   def generateRSAWithSHA256(keySize: Int = 2048,
                             from: Instant = Instant.now,
                             duration: Duration = Days
-                                .days(365)
-                                .toStandardDuration): X509Certificate = {
+                              .days(365)
+                              .toStandardDuration): X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -48,8 +48,8 @@ object CertificateGenerator {
   def generateRSAWithSHA1(keySize: Int = 2048,
                           from: Instant = Instant.now,
                           duration: Duration = Days
-                              .days(365)
-                              .toStandardDuration): X509Certificate = {
+                            .days(365)
+                            .toStandardDuration): X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -77,11 +77,11 @@ object CertificateGenerator {
     pemCert
   }
 
-  def generateRSAWithMD5(keySize: Int = 2048,
-                         from: Instant = Instant.now,
-                         duration: Duration = Days
-                             .days(365)
-                             .toStandardDuration): X509Certificate = {
+  def generateRSAWithMD5(
+      keySize: Int = 2048,
+      from: Instant = Instant.now,
+      duration: Duration = Days.days(365).toStandardDuration)
+    : X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -122,8 +122,8 @@ object CertificateGenerator {
     info.set(X509CertInfo.ISSUER,
              if (justName) owner else new CertificateIssuerName(owner))
     info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic))
-    info.set(
-        X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
+    info
+      .set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
 
     var algo: AlgorithmId = new AlgorithmId(oid)
 

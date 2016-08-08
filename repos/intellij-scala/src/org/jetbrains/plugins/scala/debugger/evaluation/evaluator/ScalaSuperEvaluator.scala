@@ -10,10 +10,12 @@ import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
 trait ScSuperEvaluator
 
 class ScalaSuperEvaluator(iterations: Int = 0)
-    extends ScalaThisEvaluator(iterations) with ScSuperEvaluator
+    extends ScalaThisEvaluator(iterations)
+    with ScSuperEvaluator
 
 class ScalaSuperDelegate(delegate: Evaluator)
-    extends Evaluator with ScSuperEvaluator {
+    extends Evaluator
+    with ScSuperEvaluator {
   def evaluate(context: EvaluationContextImpl): AnyRef =
     delegate.evaluate(context)
 

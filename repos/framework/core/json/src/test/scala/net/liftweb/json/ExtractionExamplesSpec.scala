@@ -42,20 +42,23 @@ object ExtractionExamples extends Specification {
 
   "Partial extraction example" in {
     val json = parse(testJson)
-    json.extract[SimplePerson] mustEqual SimplePerson(
-        "joe", Address("Bulevard", "Helsinki"))
+    json.extract[SimplePerson] mustEqual SimplePerson("joe",
+                                                      Address("Bulevard",
+                                                              "Helsinki"))
   }
 
   "Extract with a default value" in {
     val json = parse(testJson)
-    (json \ "address2").extractOrElse(Address("Tie", "Helsinki")) mustEqual Address(
-        "Tie", "Helsinki")
+    (json \ "address2")
+      .extractOrElse(Address("Tie", "Helsinki")) mustEqual Address("Tie",
+                                                                   "Helsinki")
   }
 
   "Map with primitive values extraction example" in {
     val json = parse(testJson)
     json.extract[PersonWithMap] mustEqual PersonWithMap(
-        "joe", Map("street" -> "Bulevard", "city" -> "Helsinki"))
+        "joe",
+        Map("street" -> "Bulevard", "city" -> "Helsinki"))
   }
 
   "Map with object values extraction example" in {
@@ -117,13 +120,15 @@ object ExtractionExamples extends Specification {
   "Option extraction example" in {
     val json =
       parse("""{ "name": null, "age": 5, "mother":{"name":"Marilyn"}}""")
-    json.extract[OChild] mustEqual OChild(
-        None, 5, Some(Parent("Marilyn")), None)
+    json
+      .extract[OChild] mustEqual OChild(None, 5, Some(Parent("Marilyn")), None)
   }
 
   "Missing JSON array can be extracted as an empty List" in {
     parse(missingChildren).extract[Person] mustEqual Person(
-        "joe", Address("Bulevard", "Helsinki"), Nil)
+        "joe",
+        Address("Bulevard", "Helsinki"),
+        Nil)
   }
 
   "Multidimensional array extraction example" in {
@@ -133,7 +138,8 @@ object ExtractionExamples extends Specification {
   }
 
   "Flatten example with simple case class" in {
-    val f = Extraction.flatten(Extraction.decompose(
+    val f = Extraction.flatten(
+        Extraction.decompose(
             SimplePerson("joe", Address("Bulevard", "Helsinki"))))
     val e = Map(".name" -> "\"joe\"",
                 ".address.street" -> "\"Bulevard\"",
@@ -226,38 +232,48 @@ object ExtractionExamples extends Specification {
   "Extraction failure message example" in {
     val json = parse("""{"city":"San Francisco"}""")
     json.extract[Address] must throwA(MappingException(
-            "No usable value for street\nDid not find value which can be converted into java.lang.String",
-            null))
+        "No usable value for street\nDid not find value which can be converted into java.lang.String",
+        null))
   }
 
   "Best matching constructor selection example" in {
     parse("""{"name":"john","age":32,"size":"M"}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "john", 32, Some("M"))
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
+                                                                    32,
+                                                                    Some("M"))
 
-    parse("""{"name":"john","age":32}""").extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "john", 32, Some("S"))
+    parse("""{"name":"john","age":32}""")
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
+                                                                    32,
+                                                                    Some("S"))
 
-    parse("""{"name":"john","foo":"xxx"}""").extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "john", 30, None)
+    parse("""{"name":"john","foo":"xxx"}""")
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
+                                                                    30,
+                                                                    None)
 
     parse("""{"name":"john","age":32,"size":null}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "john", 32, None)
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
+                                                                    32,
+                                                                    None)
 
     parse("""{"birthYear":1990,"name":"john","foo":2}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "john", 20, None)
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
+                                                                    20,
+                                                                    None)
 
-    parse("""{"foo":2,"age":12,"size":"XS"}""").extract[MultipleConstructors] mustEqual MultipleConstructors(
-        "unknown", 12, Some("XS"))
+    parse("""{"foo":2,"age":12,"size":"XS"}""")
+      .extract[MultipleConstructors] mustEqual MultipleConstructors("unknown",
+                                                                    12,
+                                                                    Some("XS"))
   }
 
   "Partial JSON extraction" in {
-    parse(stringField).extract[ClassWithJSON] mustEqual ClassWithJSON(
-        "one", JString("msg"))
+    parse(stringField)
+      .extract[ClassWithJSON] mustEqual ClassWithJSON("one", JString("msg"))
     parse(objField).extract[ClassWithJSON] mustEqual ClassWithJSON(
-        "one", JObject(List(JField("yes", JString("woo")))))
+        "one",
+        JObject(List(JField("yes", JString("woo")))))
   }
 
   "Double can be coerced to Int or Long" in {

@@ -21,8 +21,10 @@ trait SexpPrettyPrinter extends SexpPrinter {
       case atom: SexpAtom => printAtom(atom, sb)
     }
 
-  protected def printCons(
-      x: Sexp, y: Sexp, sb: StringBuilder, indent: Int): Unit = {
+  protected def printCons(x: Sexp,
+                          y: Sexp,
+                          sb: StringBuilder,
+                          indent: Int): Unit = {
     // recursive, could blow up for big trees
     sb.append('(')
     print(x, sb, indent)
@@ -32,8 +34,9 @@ trait SexpPrettyPrinter extends SexpPrinter {
     sb.append(')')
   }
 
-  protected def printData(
-      data: Map[SexpSymbol, Sexp], sb: StringBuilder, indent: Int): Unit =
+  protected def printData(data: Map[SexpSymbol, Sexp],
+                          sb: StringBuilder,
+                          indent: Int): Unit =
     if (data.isEmpty) print(SexpNil, sb)
     else {
       sb.append("(\n")
@@ -48,8 +51,9 @@ trait SexpPrettyPrinter extends SexpPrinter {
       sb.append(')')
     }
 
-  protected def printList(
-      els: List[Sexp], sb: StringBuilder, indent: Int): Unit =
+  protected def printList(els: List[Sexp],
+                          sb: StringBuilder,
+                          indent: Int): Unit =
     if (els.isEmpty) print(SexpNil, sb)
     else {
       sb.append('(')

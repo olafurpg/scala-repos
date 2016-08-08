@@ -59,7 +59,8 @@ abstract class Reifier extends States with Phases with Errors with Utils {
           reifyTrace("reifying = ")(
               if (settings.Xshowtrees || settings.XshowtreesCompact ||
                   settings.XshowtreesStringified)
-                "\n" + nodePrinters.nodeToString(tree).trim else tree.toString)
+                "\n" + nodePrinters.nodeToString(tree).trim
+              else tree.toString)
           reifyTrace("reifee is located at: ")(tree.pos)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
@@ -70,8 +71,11 @@ abstract class Reifier extends States with Phases with Errors with Utils {
 
           val tpe = typer.packedType(tree, NoSymbol)
           val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) =
-            `package`.reifyType(global)(
-                typer, universe, mirror, tpe, concrete = false)
+            `package`.reifyType(global)(typer,
+                                        universe,
+                                        mirror,
+                                        tpe,
+                                        concrete = false)
           state.reificationIsConcrete &= tpeReificationIsConcrete
           state.symtab ++= tpeSymtab
           ReifiedTree(universe,
@@ -87,8 +91,12 @@ abstract class Reifier extends States with Phases with Errors with Utils {
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
           val rtree = reify(tpe)
-          ReifiedType(
-              universe, mirror, symtab, tpe, rtree, reificationIsConcrete)
+          ReifiedType(universe,
+                      mirror,
+                      symtab,
+                      tpe,
+                      rtree,
+                      reificationIsConcrete)
 
         case _ =>
           throw new Error(
@@ -162,8 +170,9 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       case ex: UnexpectedReificationException =>
         throw ex
       case ex: Throwable =>
-        throw new UnexpectedReificationException(
-            defaultErrorPosition, "reification crashed", ex)
+        throw new UnexpectedReificationException(defaultErrorPosition,
+                                                 "reification crashed",
+                                                 ex)
     }
   }
 }

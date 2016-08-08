@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.project.template
 
 import java.io.{File, FileNotFoundException}
 
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler,
+  ProcessAdapter,
+  ProcessEvent
+}
 import com.intellij.openapi.util.Key
 
 /**

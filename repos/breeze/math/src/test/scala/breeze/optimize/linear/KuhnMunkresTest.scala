@@ -52,9 +52,8 @@ class KuhnMunkresTest extends FunSuite with Checkers {
   }
 
   test("square matrix test 2") {
-    val arr = Array(Seq(10.0, 10.0, 8.0),
-                    Seq(9.0, 8.0, 1.0),
-                    Seq(9.0, 7.0, 4.0));
+    val arr =
+      Array(Seq(10.0, 10.0, 8.0), Seq(9.0, 8.0, 1.0), Seq(9.0, 7.0, 4.0));
 
     val (matching, weight) = KuhnMunkres.extractMatching(arr);
     assert(weight === 18.0);

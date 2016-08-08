@@ -64,7 +64,9 @@ class ClusterConsistentHashingRouterMultiJvmNode3
 
 abstract class ClusterConsistentHashingRouterSpec
     extends MultiNodeSpec(ClusterConsistentHashingRouterMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import ClusterConsistentHashingRouterMultiJvmSpec._
 
   lazy val router1 = system.actorOf(FromConfig.props(Props[Echo]), "router1")
@@ -131,10 +133,10 @@ abstract class ClusterConsistentHashingRouterSpec
         val router2 = system.actorOf(
             ClusterRouterPool(local = ConsistentHashingPool(nrOfInstances = 0),
                               settings = ClusterRouterPoolSettings(
-                                    totalInstances = 10,
-                                    maxInstancesPerNode = 2,
-                                    allowLocalRoutees = true,
-                                    useRole = None)).props(Props[Echo]),
+                                  totalInstances = 10,
+                                  maxInstancesPerNode = 2,
+                                  allowLocalRoutees = true,
+                                  useRole = None)).props(Props[Echo]),
             "router2")
         // it may take some time until router receives cluster member events
         awaitAssert { currentRoutees(router2).size should ===(6) }
@@ -171,14 +173,14 @@ abstract class ClusterConsistentHashingRouterSpec
         }
 
         val router4 = system.actorOf(
-            ClusterRouterPool(
-                local = ConsistentHashingPool(nrOfInstances = 0,
-                                              hashMapping = hashMapping),
-                settings = ClusterRouterPoolSettings(
-                      totalInstances = 10,
-                      maxInstancesPerNode = 1,
-                      allowLocalRoutees = true,
-                      useRole = None)).props(Props[Echo]),
+            ClusterRouterPool(local = ConsistentHashingPool(nrOfInstances = 0,
+                                                            hashMapping =
+                                                              hashMapping),
+                              settings = ClusterRouterPoolSettings(
+                                  totalInstances = 10,
+                                  maxInstancesPerNode = 1,
+                                  allowLocalRoutees = true,
+                                  useRole = None)).props(Props[Echo]),
             "router4")
 
         assertHashMapping(router4)

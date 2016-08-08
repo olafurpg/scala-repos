@@ -7,9 +7,10 @@ import scala.math.Ordering
 import scala.collection.JavaConversions._
 
 class TreeSet[E](_comparator: Comparator[_ >: E])
-    extends AbstractSet[E] with NavigableSet[E] with Cloneable
-    with Serializable {
-  self =>
+    extends AbstractSet[E]
+    with NavigableSet[E]
+    with Cloneable
+    with Serializable { self =>
 
   def this() =
     this(null.asInstanceOf[Comparator[_ >: E]])
@@ -128,7 +129,7 @@ class TreeSet[E](_comparator: Comparator[_ >: E])
     val iter = c.iterator()
     var changed = false
     while (iter.hasNext) changed = inner.remove(
-        Box(iter.next).asInstanceOf[Box[E]]) || changed
+          Box(iter.next).asInstanceOf[Box[E]]) || changed
     changed
   }
 
@@ -182,8 +183,12 @@ class TreeSet[E](_comparator: Comparator[_ >: E])
       base
     }
 
-    new NavigableView(
-        this, tailSetFun, Some(fromElement), inclusive, None, true)
+    new NavigableView(this,
+                      tailSetFun,
+                      Some(fromElement),
+                      inclusive,
+                      None,
+                      true)
   }
 
   def subSet(fromElement: E, toElement: E): SortedSet[E] =

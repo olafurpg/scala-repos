@@ -79,16 +79,15 @@ object PlayRun {
               .toEither
               .right
               .toOption
-      )
+    )
 
-    val runSbtTask: String => AnyRef = (task: String) =>
-      {
-        val parser = Act.scopedKeyParser(state)
-        val Right(sk) = complete.DefaultParsers.result(parser, task)
-        val result = Project
-          .runTask(sk.asInstanceOf[Def.ScopedKey[Task[AnyRef]]], state)
-          .map(_._2)
-        result.flatMap(_.toEither.right.toOption).orNull
+    val runSbtTask: String => AnyRef = (task: String) => {
+      val parser = Act.scopedKeyParser(state)
+      val Right(sk) = complete.DefaultParsers.result(parser, task)
+      val result = Project
+        .runTask(sk.asInstanceOf[Def.ScopedKey[Task[AnyRef]]], state)
+        .map(_._2)
+      result.flatMap(_.toEither.right.toOption).orNull
     }
 
     lazy val devModeServer = Reloader.startDevMode(
@@ -121,7 +120,7 @@ object PlayRun {
 
         println()
         println(Colors.green(
-                "(Server started, use Ctrl+D to stop and go back to the console...)"))
+            "(Server started, use Ctrl+D to stop and go back to the console...)"))
         println()
 
         // If we have both Watched.Configuration and Watched.ContinuousState
@@ -130,7 +129,7 @@ object PlayRun {
         val maybeContinuous = for {
           watched <- state.get(Watched.Configuration)
           watchState <- state.get(Watched.ContinuousState)
-                           if watchState.count == 1
+          if watchState.count == 1
         } yield watched
 
         maybeContinuous match {
@@ -161,7 +160,8 @@ object PlayRun {
                                 reloader: BuildLink,
                                 ws: Option[WatchState] = None): Unit = {
     val ContinuousState = AttributeKey[WatchState](
-        "watch state", "Internal: tracks state for continuous execution.")
+        "watch state",
+        "Internal: tracks state for continuous execution.")
     def isEOF(c: Int): Boolean = c == 4
 
     @tailrec def shouldTerminate: Boolean =
@@ -172,8 +172,10 @@ object PlayRun {
       ws.getOrElse(state get ContinuousState getOrElse WatchState.empty)
 
     val (triggered, newWatchState, newState) = try {
-      val (triggered, newWatchState) = SourceModificationWatch.watch(
-          sourcesFinder, watched.pollInterval, watchState)(shouldTerminate)
+      val (triggered, newWatchState) =
+        SourceModificationWatch.watch(sourcesFinder,
+                                      watched.pollInterval,
+                                      watchState)(shouldTerminate)
       (triggered, newWatchState, state)
     } catch {
       case e: Exception =>
@@ -259,7 +261,8 @@ object PlayRun {
     val filter = Set("--no-exit-sbt")
     val filtered = args.filterNot(filter)
     val devSettings =
-      Seq.empty[(String, String)] // there are no dev settings in a prod website
+      Seq
+        .empty[(String, String)] // there are no dev settings in a prod website
 
     // Parse HTTP port argument
     val (properties, httpPort, httpsPort, httpAddress) = Reloader.filterArgs(
@@ -314,7 +317,8 @@ object PlayRun {
           }
         }.start()
 
-        println(Colors.green("""|
+        println(Colors.green(
+            """|
             |(Starting server. Type Ctrl+D to exit logs, the server will remain in background)
             | """.stripMargin))
 

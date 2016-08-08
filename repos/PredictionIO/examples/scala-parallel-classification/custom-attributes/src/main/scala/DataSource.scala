@@ -18,16 +18,18 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
   override def readTraining(sc: SparkContext): TrainingData = {
     val eventsDb = Storage.getPEvents()
     val gendersMap = Map("Male" -> 0.0, "Female" -> 1.0)
-    val educationMap = Map(
-        "No School" -> 0.0, "High School" -> 1.0, "College" -> 2.0)
+    val educationMap =
+      Map("No School" -> 0.0, "High School" -> 1.0, "College" -> 2.0)
     val labeledPoints: RDD[LabeledPoint] = eventsDb
       .aggregateProperties(
           appId = dsp.appId,
@@ -41,17 +43,18 @@ class DataSource(val dsp: DataSourceParams)
           try {
             LabeledPoint(
                 properties.get[Double]("plan"),
-                Vectors.dense(Array(
+                Vectors.dense(
+                    Array(
                         gendersMap(properties.get[String]("gender")),
                         properties.get[Double]("age"),
                         educationMap(properties.get[String]("education"))
                     )))
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(s"Failed to get properties ${properties} of" +
+                s" ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
       }
       .cache()
@@ -64,5 +67,4 @@ class TrainingData(
     val labeledPoints: RDD[LabeledPoint],
     val gendersMap: Map[String, Double],
     val educationMap: Map[String, Double]
-)
-    extends Serializable
+) extends Serializable

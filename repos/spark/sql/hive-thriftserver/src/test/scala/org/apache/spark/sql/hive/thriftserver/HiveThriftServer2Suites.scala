@@ -71,7 +71,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
     val client = new ThriftCLIServiceClient(new Client(protocol))
 
     transport.open()
-    try f(client) finally transport.close()
+    try f(client)
+    finally transport.close()
   }
 
   test("GetInfo Thrift API") {
@@ -372,7 +373,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         // to demonstrate that cancellation works.
         val f = Future {
           statement.executeQuery("SELECT COUNT(*) FROM test_map " +
-              List.fill(10)("join test_map").mkString(" "))
+            List.fill(10)("join test_map").mkString(" "))
         }
         // Note that this is slightly race-prone: if the cancel is issued before the statement
         // begins executing then we'll fail with a timeout. As a result, this fixed delay is set
@@ -390,7 +391,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
           val sf = Future {
             statement.executeQuery(
                 "SELECT COUNT(*) FROM test_map " +
-                List.fill(4)("join test_map").mkString(" ")
+                  List.fill(4)("join test_map").mkString(" ")
             )
           }
           // Similarly, this is also slightly race-prone on fast machines where the query above
@@ -434,7 +435,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
 
       queries.foreach(statement.execute)
 
-      statement.executeQuery("""
+      statement.executeQuery(
+          """
               |INSERT INTO TABLE addJar SELECT 'k1' as key FROM smallKV limit 1
             """.stripMargin)
 
@@ -534,7 +536,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-11043 check operation log root directory") {
     val expectedLine =
       "Operation log root directory is created: " +
-      operationLogPath.getAbsoluteFile
+        operationLogPath.getAbsoluteFile
     assert(
         Source.fromFile(logPath).getLines().exists(_.contains(expectedLine)))
   }
@@ -655,7 +657,9 @@ abstract class HiveThriftJdbcTest extends HiveThriftServer2Test {
 }
 
 abstract class HiveThriftServer2Test
-    extends SparkFunSuite with BeforeAndAfterAll with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Logging {
   def mode: ServerMode.Value
 
   private val CLASS_NAME =
@@ -789,8 +793,8 @@ abstract class HiveThriftServer2Test
 
     // Ensures that the following "tail" command won't fail.
     logPath.createNewFile()
-    val successLines = Seq(
-        THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
+    val successLines =
+      Seq(THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
 
     logTailingProcess = {
       val command =

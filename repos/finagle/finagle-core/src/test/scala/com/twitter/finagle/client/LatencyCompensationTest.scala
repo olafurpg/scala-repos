@@ -17,16 +17,19 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
   */
 @RunWith(classOf[JUnitRunner])
 class LatencyCompensationTest
-    extends FunSuite with AssertionsForJUnit with Eventually
-    with BeforeAndAfterEach with IntegrationPatience {
+    extends FunSuite
+    with AssertionsForJUnit
+    with Eventually
+    with BeforeAndAfterEach
+    with IntegrationPatience {
   def verifyCompensationModule(expected: Duration) =
     new Stack.Module[ServiceFactory[String, String]] {
       val role = Stack.Role("verify")
       val description = "Verify stack behavior"
       val parameters = Seq(
           implicitly[Stack.Param[LatencyCompensation.Compensator]])
-      def make(
-          prms: Stack.Params, next: Stack[ServiceFactory[String, String]]) = {
+      def make(prms: Stack.Params,
+               next: Stack[ServiceFactory[String, String]]) = {
         val LatencyCompensation.Compensation(compensation) =
           prms[LatencyCompensation.Compensation]
         assert(expected == compensation)
@@ -59,10 +62,10 @@ class LatencyCompensationTest
   }
 
   test("Override can only be set once") {
-    assert(LatencyCompensation.DefaultOverride.set(
-            Compensator(_ => Duration.Zero)))
-    assert(!LatencyCompensation.DefaultOverride.set(
-            Compensator(_ => Duration.Zero)))
+    assert(LatencyCompensation.DefaultOverride.set(Compensator(_ =>
+      Duration.Zero)))
+    assert(!LatencyCompensation.DefaultOverride.set(Compensator(_ =>
+      Duration.Zero)))
   }
 
   class Ctx {
@@ -115,8 +118,8 @@ class LatencyCompensationTest
       val client =
         echoClient.newService(Name.Bound(Var.value(addr), "id"), "label")
 
-      try f(client) finally Await.result(
-          client.close() join server.close(), 10.seconds)
+      try f(client)
+      finally Await.result(client.close() join server.close(), 10.seconds)
     }
   }
 
@@ -150,8 +153,8 @@ class LatencyCompensationTest
     new Ctx {
       // set a compensation to 0 which should cause a failure if the caller does not
       // explicitly .configure the client with a compensation parameter.
-      LatencyCompensation.DefaultOverride.set(
-          new Compensator(_ => Duration.Zero))
+      LatencyCompensation.DefaultOverride.set(new Compensator(_ =>
+        Duration.Zero))
 
       metadata = Addr.Metadata("compensation" -> 2.seconds)
 

@@ -112,9 +112,9 @@ private[http] object Renderer {
         else tRenderer.render(r, value.get)
     }
 
-  def defaultSeqRenderer[T : Renderer] =
+  def defaultSeqRenderer[T: Renderer] =
     genericSeqRenderer[Renderable, T](Rendering.`, `, Rendering.Empty)
-  def seqRenderer[T : Renderer](separator: String = ", ", empty: String = "") =
+  def seqRenderer[T: Renderer](separator: String = ", ", empty: String = "") =
     genericSeqRenderer[String, T](separator, empty)
   def genericSeqRenderer[S, T](separator: S, empty: S)(
       implicit sRenderer: Renderer[S],
@@ -222,8 +222,8 @@ private[http] trait Rendering {
 }
 
 private[http] object Rendering {
-  val floatFormat = new DecimalFormat(
-      "0.0##", DecimalFormatSymbols.getInstance(Locale.ROOT))
+  val floatFormat =
+    new DecimalFormat("0.0##", DecimalFormatSymbols.getInstance(Locale.ROOT))
   val `\"` = CharPredicate('\\', '"')
 
   case object `, ` extends SingletonValueRenderable // default separator
@@ -332,8 +332,8 @@ private[http] class ByteStringRendering(sizeHint: Int) extends Rendering {
 /**
   * INTERNAL API
   */
-private[http] class CustomCharsetByteStringRendering(
-    nioCharset: Charset, sizeHint: Int)
+private[http] class CustomCharsetByteStringRendering(nioCharset: Charset,
+                                                     sizeHint: Int)
     extends Rendering {
   private[this] val charBuffer = CharBuffer.allocate(64)
   private[this] val builder = new ByteStringBuilder

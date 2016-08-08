@@ -64,7 +64,7 @@ case class StringContext(parts: String*) {
     if (parts.length != args.length + 1)
       throw new IllegalArgumentException(
           "wrong number of arguments (" + args.length +
-          ") for interpolated string with " + parts.length + " parts")
+            ") for interpolated string with " + parts.length + " parts")
 
   /** The simple string interpolator.
     *
@@ -175,8 +175,8 @@ object StringContext {
     *  @param  str   The offending string
     *  @param  index   The index of the offending backslash character in `str`.
     */
-  class InvalidEscapeException(
-      str: String, @deprecatedName('idx) val index: Int)
+  class InvalidEscapeException(str: String,
+                               @deprecatedName('idx) val index: Int)
       extends IllegalArgumentException(
           s"""invalid escape ${
             require(index >= 0 && index < str.length)

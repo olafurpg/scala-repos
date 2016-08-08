@@ -25,7 +25,8 @@ trait MilestonesService {
 
   def updateMilestone(milestone: Milestone)(implicit s: Session): Unit =
     Milestones
-      .filter(t =>
+      .filter(
+          t =>
             t.byPrimaryKey(milestone.userName,
                            milestone.repositoryName,
                            milestone.milestoneId))

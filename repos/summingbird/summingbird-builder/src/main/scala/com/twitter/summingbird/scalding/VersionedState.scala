@@ -16,8 +16,20 @@
 
 package com.twitter.summingbird.scalding
 
-import com.twitter.algebird.{InclusiveUpper, Intersection, Interval, ExclusiveUpper}
-import com.twitter.summingbird.batch.{Batcher, BatchID, PrepareState, RunningState, Timestamp, WaitingState}
+import com.twitter.algebird.{
+  InclusiveUpper,
+  Intersection,
+  Interval,
+  ExclusiveUpper
+}
+import com.twitter.summingbird.batch.{
+  Batcher,
+  BatchID,
+  PrepareState,
+  RunningState,
+  Timestamp,
+  WaitingState
+}
 import com.twitter.summingbird.batch.store.HDFSMetadata
 
 import org.slf4j.LoggerFactory
@@ -34,8 +46,9 @@ private[scalding] object VersionedState {
 }
 
 private[scalding] class VersionedState(
-    meta: HDFSMetadata, startDate: Option[Timestamp], maxBatches: Int)(
-    implicit batcher: Batcher)
+    meta: HDFSMetadata,
+    startDate: Option[Timestamp],
+    maxBatches: Int)(implicit batcher: Batcher)
     extends WaitingState[Interval[Timestamp]] { outer =>
 
   private val logger = LoggerFactory.getLogger(classOf[VersionedState])
@@ -85,9 +98,9 @@ private[scalding] class VersionedState(
         case intr @ Intersection(_, _) => // is finite:
           Right(new VersionedRunningState(intr))
         case _ => {
-            logger.info("Will not accept: %s".format(available))
-            Left(outer)
-          }
+          logger.info("Will not accept: %s".format(available))
+          Left(outer)
+        }
       }
 
     /**

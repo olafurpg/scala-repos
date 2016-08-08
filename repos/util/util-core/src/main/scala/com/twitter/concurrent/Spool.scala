@@ -104,10 +104,10 @@ sealed trait Spool[+A] {
 
   /**
     * Zips two [[Spool Spools]] returning a Spool of Tuple2s.
-    * 
+    *
     * If one Spool is shorter, excess elements of the longer
     * Spool are discarded.
-    * 
+    *
     * c.f. scala.collection.immutable.Stream#zip
     */
   def zip[B](that: Spool[B]): Spool[(A, B)] =
@@ -116,13 +116,11 @@ sealed trait Spool[+A] {
     else
       new LazyCons(
           (head, that.head),
-          Future
-            .join(tail, that.tail)
-            .map {
-              case (thisTail, thatTail) =>
-                thisTail.zip(thatTail)
-            }
-        )
+          Future.join(tail, that.tail).map {
+            case (thisTail, thatTail) =>
+              thisTail.zip(thatTail)
+          }
+      )
 
   /**
     * The standard Scala collect, in order to implement map & filter.
@@ -321,11 +319,11 @@ object Spool {
     * @deprecated Both forms of cons are deprecated in favor of {{*::}}. They will eventually
     * be changed in an ABI-breaking fashion in order to act lazily on the tail.
     */
-  @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+  @deprecated("Use *:: instead: the ABI for this method will be changing.",
+              "6.14.1")
   def cons[A](value: A, next: Future[Spool[A]]): Spool[A] = Cons(value, next)
-  @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+  @deprecated("Use *:: instead: the ABI for this method will be changing.",
+              "6.14.1")
   def cons[A](value: A, nextSpool: Spool[A]): Spool[A] =
     Cons(value, Future.value(nextSpool))
 

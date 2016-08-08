@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -100,17 +100,17 @@ object Schema {
         }
 
       case JObjectFixedT(fields) => {
-          fields.toList.flatMap {
-            case (field, tpe) =>
-              val refs0 =
-                refs collect {
-                  case ColumnRef(CPath(CPathField(`field`), rest @ _ *),
-                                 ctype) =>
-                    ColumnRef(CPath(rest: _*), ctype)
-                }
-              buildPath(CPathField(field) :: nodes, refs0, tpe)
-          }
+        fields.toList.flatMap {
+          case (field, tpe) =>
+            val refs0 =
+              refs collect {
+                case ColumnRef(CPath(CPathField(`field`), rest @ _ *),
+                               ctype) =>
+                  ColumnRef(CPath(rest: _*), ctype)
+              }
+            buildPath(CPathField(field) :: nodes, refs0, tpe)
         }
+      }
 
       case JArrayUnfixedT =>
         refs collect {
@@ -139,7 +139,8 @@ object Schema {
       case JNumberT =>
         val path = CPath(nodes.reverse)
         ColumnRef(path, CLong: CType) :: ColumnRef(path, CDouble) :: ColumnRef(
-            path, CNum) :: Nil
+            path,
+            CNum) :: Nil
 
       case JTextT =>
         ColumnRef(CPath(nodes.reverse), CString) :: Nil
@@ -313,7 +314,7 @@ object Schema {
         (row: Int) =>
           leftTypes(row) || rightTypes(row)
 
-        case JArrayHomogeneousT(jtpe) =>
+      case JArrayHomogeneousT(jtpe) =>
         findTypes(jtpe, CPath(seenPath.nodes :+ CPathArray), cols, size)
     }
   }
@@ -371,13 +372,13 @@ object Schema {
     */
   def requiredBy(jtpe: JType, path: CPath, ctpe: CType): Boolean =
     includes(jtpe, path, ctpe) ||
-    ((jtpe, path, ctpe) match {
-          case (JArrayFixedT(elements),
-                CPath(CPathArray, tail @ _ *),
-                CArrayType(elemType)) =>
-            elements.values exists (requiredBy(_, CPath(tail: _*), elemType))
-          case _ => false
-        })
+      ((jtpe, path, ctpe) match {
+        case (JArrayFixedT(elements),
+              CPath(CPathArray, tail @ _ *),
+              CArrayType(elemType)) =>
+          elements.values exists (requiredBy(_, CPath(tail: _*), elemType))
+        case _ => false
+      })
 
   /**
     * Tests whether the supplied JType includes the supplied CPath and CType.
@@ -405,11 +406,11 @@ object Schema {
 
       case (JObjectFixedT(fields),
             (CPath(CPathField(head), tail @ _ *), ctpe)) => {
-          fields
-            .get(head)
-            .map(includes(_, CPath(tail: _*), ctpe))
-            .getOrElse(false)
-        }
+        fields
+          .get(head)
+          .map(includes(_, CPath(tail: _*), ctpe))
+          .getOrElse(false)
+      }
 
       case (JArrayUnfixedT, (CPath.Identity, CEmptyArray)) => true
       case (JArrayUnfixedT, (CPath(CPathArray, _ *), CArrayType(_))) => true
@@ -417,8 +418,8 @@ object Schema {
       case (JArrayFixedT(elements), (CPath.Identity, CEmptyArray))
           if elements.isEmpty =>
         true
-      case (
-          JArrayFixedT(elements), (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
+      case (JArrayFixedT(elements),
+            (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
         elements
           .get(i)
           .map(includes(_, CPath(tail: _*), ctpe))
@@ -471,14 +472,14 @@ object Schema {
     case JObjectFixedT(fields) if fields.isEmpty =>
       ctpes.contains(CPath.Identity, CEmptyObject)
     case JObjectFixedT(fields) => {
-        val keys = fields.keySet
-        keys.forall { key =>
-          subsumes(ctpes.collect {
-            case (CPath(CPathField(`key`), tail @ _ *), ctpe) =>
-              (CPath(tail: _*), ctpe)
-          }, fields(key))
-        }
+      val keys = fields.keySet
+      keys.forall { key =>
+        subsumes(ctpes.collect {
+          case (CPath(CPathField(`key`), tail @ _ *), ctpe) =>
+            (CPath(tail: _*), ctpe)
+        }, fields(key))
       }
+    }
 
     case JArrayUnfixedT if ctpes.contains(CPath.Identity, CEmptyArray) => true
     case JArrayUnfixedT =>
@@ -490,16 +491,16 @@ object Schema {
     case JArrayFixedT(elements) if elements.isEmpty =>
       ctpes.contains(CPath.Identity, CEmptyArray)
     case JArrayFixedT(elements) => {
-        val indices = elements.keySet
-        indices.forall { i =>
-          subsumes(ctpes.collect {
-            case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
-              (CPath(tail: _*), elemType)
-            case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
-              (CPath(tail: _*), ctpe)
-          }, elements(i))
-        }
+      val indices = elements.keySet
+      indices.forall { i =>
+        subsumes(ctpes.collect {
+          case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
+            (CPath(tail: _*), elemType)
+          case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
+            (CPath(tail: _*), ctpe)
+        }, elements(i))
       }
+    }
     case JArrayHomogeneousT(jElemType) =>
       ctpes.exists {
         case (CPath(CPathArray, _ *), CArrayType(cElemType)) =>

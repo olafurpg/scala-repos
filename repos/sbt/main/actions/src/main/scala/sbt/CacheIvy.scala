@@ -3,9 +3,23 @@
  */
 package sbt
 
-import Predef.{Map, Set, implicitly} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
+import Predef.{
+  Map,
+  Set,
+  implicitly
+} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
 
-import sbt.internal.util.{Cache, HList, HNil, InputCache, LinePosition, LineRange, NoPosition, RangePosition, SourcePosition}
+import sbt.internal.util.{
+  Cache,
+  HList,
+  HNil,
+  InputCache,
+  LinePosition,
+  LineRange,
+  NoPosition,
+  RangePosition,
+  SourcePosition
+}
 import sbt.internal.util.FileInfo.{exists, hash}
 import sbt.internal.util.Types.{:+:, idFun}
 import java.io.File
@@ -56,7 +70,8 @@ object CacheIvy {
 
   import Cache._
   implicit def wrapHL[W, H, T <: HList](
-      implicit f: W => H :+: T, cache: InputCache[H :+: T]): InputCache[W] =
+      implicit f: W => H :+: T,
+      cache: InputCache[H :+: T]): InputCache[W] =
     Cache.wrapIn(f, cache)
 
   lazy val excludeMap: Format[Map[ModuleID, Set[String]]] = implicitly
@@ -82,8 +97,8 @@ object CacheIvy {
   implicit def updateStatsFormat: Format[UpdateStats] =
     wrap[UpdateStats, (Long, Long, Long)](
         us => (us.resolveTime, us.downloadTime, us.downloadSize), {
-      case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
-    })
+          case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
+        })
   implicit def confReportFormat(implicit m: Format[String],
                                 mr: Format[Seq[ModuleReport]],
                                 oar: Format[Seq[OrganizationArtifactReport]])
@@ -91,63 +106,80 @@ object CacheIvy {
     wrap[ConfigurationReport,
          (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
         r => (r.configuration, r.modules, r.details), {
-      case (c, m, d) => new ConfigurationReport(c, m, d)
-    })
+          case (c, m, d) => new ConfigurationReport(c, m, d)
+        })
   implicit def moduleReportFormat(implicit cf: Format[Seq[Caller]],
                                   ff: Format[File]): Format[ModuleReport] = {
     wrap[ModuleReport,
-         (ModuleID, Seq[(Artifact, File)], Seq[Artifact], Option[String],
-         Option[Long], Option[String], Option[String], Boolean, Option[String],
-         Option[String], Option[String], Option[String], Map[String, String],
-         Option[Boolean], Option[String], Seq[String],
-         Seq[(String, Option[String])],
-         Seq[Caller])](m =>
-                         (m.module,
-                          m.artifacts,
-                          m.missingArtifacts,
-                          m.status,
-                          m.publicationDate map { _.getTime },
-                          m.resolver,
-                          m.artifactResolver,
-                          m.evicted,
-                          m.evictedData,
-                          m.evictedReason,
-                          m.problem,
-                          m.homepage,
-                          m.extraAttributes,
-                          m.isDefault,
-                          m.branch,
-                          m.configurations,
-                          m.licenses,
-                          m.callers), {
-                         case (m,
-                               as,
-                               ms,
-                               s,
-                               pd,
-                               r,
-                               a,
-                               e,
-                               ed,
-                               er,
-                               p,
-                               h,
-                               ea,
-                               d,
-                               b,
-                               cs,
-                               ls,
-                               ks) =>
-                           new ModuleReport(m, as, ms, s, pd map {
-                             new ju.Date(_)
-                           }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
-                       })
+         (ModuleID,
+          Seq[(Artifact, File)],
+          Seq[Artifact],
+          Option[String],
+          Option[Long],
+          Option[String],
+          Option[String],
+          Boolean,
+          Option[String],
+          Option[String],
+          Option[String],
+          Option[String],
+          Map[String, String],
+          Option[Boolean],
+          Option[String],
+          Seq[String],
+          Seq[(String, Option[String])],
+          Seq[Caller])](m =>
+                          (m.module,
+                           m.artifacts,
+                           m.missingArtifacts,
+                           m.status,
+                           m.publicationDate map { _.getTime },
+                           m.resolver,
+                           m.artifactResolver,
+                           m.evicted,
+                           m.evictedData,
+                           m.evictedReason,
+                           m.problem,
+                           m.homepage,
+                           m.extraAttributes,
+                           m.isDefault,
+                           m.branch,
+                           m.configurations,
+                           m.licenses,
+                           m.callers), {
+                          case (m,
+                                as,
+                                ms,
+                                s,
+                                pd,
+                                r,
+                                a,
+                                e,
+                                ed,
+                                er,
+                                p,
+                                h,
+                                ea,
+                                d,
+                                b,
+                                cs,
+                                ls,
+                                ks) =>
+                            new ModuleReport(m, as, ms, s, pd map {
+                              new ju.Date(_)
+                            }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
+                        })
   }
   implicit def artifactFormat(implicit sf: Format[String],
                               uf: Format[Option[URL]]): Format[Artifact] = {
     wrap[Artifact,
-         (String, String, String, Option[String], Seq[Configuration],
-         Option[URL], Map[String, String])](
+         (String,
+          String,
+          String,
+          Option[String],
+          Seq[Configuration],
+          Option[URL],
+          Map[String, String])](
         a =>
           (a.name,
            a.`type`,
@@ -166,28 +198,33 @@ object CacheIvy {
       df: Format[Seq[ModuleReport]]): Format[OrganizationArtifactReport] =
     wrap[OrganizationArtifactReport, (String, String, Seq[ModuleReport])](
         m => (m.organization, m.name, m.modules), {
-      case (o, n, r) => OrganizationArtifactReport(o, n, r)
-    })
+          case (o, n, r) => OrganizationArtifactReport(o, n, r)
+        })
   implicit def callerFormat: Format[Caller] =
     wrap[Caller,
-         (ModuleID, Seq[String], Map[String, String], Boolean, Boolean,
-         Boolean, Boolean)](c =>
-                              (c.caller,
-                               c.callerConfigurations,
-                               c.callerExtraAttributes,
-                               c.isForceDependency,
-                               c.isChangingDependency,
-                               c.isTransitiveDependency,
-                               c.isDirectlyForceDependency), {
-                              case (c, cc, ea, fd, cd, td, df) =>
-                                new Caller(c, cc, ea, fd, cd, td, df)
-                            })
+         (ModuleID,
+          Seq[String],
+          Map[String, String],
+          Boolean,
+          Boolean,
+          Boolean,
+          Boolean)](c =>
+                      (c.caller,
+                       c.callerConfigurations,
+                       c.callerExtraAttributes,
+                       c.isForceDependency,
+                       c.isChangingDependency,
+                       c.isTransitiveDependency,
+                       c.isDirectlyForceDependency), {
+                      case (c, cc, ea, fd, cd, td, df) =>
+                        new Caller(c, cc, ea, fd, cd, td, df)
+                    })
   implicit def exclusionRuleFormat(
       implicit sf: Format[String]): Format[InclExclRule] =
     wrap[InclExclRule, (String, String, String, Seq[String])](
         e => (e.organization, e.name, e.artifact, e.configurations), {
-      case (o, n, a, cs) => InclExclRule(o, n, a, cs)
-    })
+          case (o, n, a, cs) => InclExclRule(o, n, a, cs)
+        })
   implicit def crossVersionFormat: Format[CrossVersion] =
     wrap(crossToInt, crossFromInt)
   implicit def sourcePositionFormat: Format[SourcePosition] =
@@ -216,12 +253,18 @@ object CacheIvy {
       case f: Full => FullValue
   }
 
-  implicit def moduleIDFormat(
-      implicit sf: Format[String], bf: Format[Boolean]): Format[ModuleID] =
+  implicit def moduleIDFormat(implicit sf: Format[String],
+                              bf: Format[Boolean]): Format[ModuleID] =
     wrap[ModuleID,
-         ((String, String, String, Option[String], Option[String]), (Boolean,
-         Boolean, Boolean, Seq[Artifact], Seq[InclusionRule],
-         Seq[ExclusionRule], Map[String, String], CrossVersion))](
+         ((String, String, String, Option[String], Option[String]),
+          (Boolean,
+           Boolean,
+           Boolean,
+           Seq[Artifact],
+           Seq[InclusionRule],
+           Seq[ExclusionRule],
+           Map[String, String],
+           CrossVersion))](
         m =>
           ((m.organization,
             m.name,

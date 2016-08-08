@@ -17,7 +17,12 @@ import ClassFileParser._
 import scala.reflect.internal.pickling.ByteCodecs
 
 object ScalaSigParser {
-  import Main.{BYTES_VALUE, SCALA_LONG_SIG_ANNOTATION, SCALA_SIG, SCALA_SIG_ANNOTATION}
+  import Main.{
+    BYTES_VALUE,
+    SCALA_LONG_SIG_ANNOTATION,
+    SCALA_SIG,
+    SCALA_SIG_ANNOTATION
+  }
 
   // TODO SI-9296 duplicated code, refactor
   def scalaSigFromAnnotation(classFile: ClassFile): Option[ScalaSig] = {
@@ -86,9 +91,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
     def natN(in: ByteCode, x: Int): Result[ByteCode, Int, Nothing] =
       in.nextByte match {
         case Success(out, b) => {
-            val y = (x << 7) + (b & 0x7f)
-            if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
-          }
+          val y = (x << 7) + (b & 0x7f)
+          if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
+        }
         case _ => Failure
       }
     in =>
@@ -104,8 +109,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
   val longValue = read(_ toLong)
 }
 
-case class ScalaSig(
-    majorVersion: Int, minorVersion: Int, table: Seq[Int ~ ByteCode])
+case class ScalaSig(majorVersion: Int,
+                    minorVersion: Int,
+                    table: Seq[Int ~ ByteCode])
     extends DefaultMemoisable {
 
   case class Entry(index: Int, entryType: Int, byteCode: ByteCode)
@@ -130,8 +136,8 @@ case class ScalaSig(
 
   override def toString =
     "ScalaSig version " + majorVersion + "." + minorVersion + {
-      for (i <- 0 until table.size) yield
-        i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
+      for (i <- 0 until table.size)
+        yield i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
     }.mkString("\n", "\n", "")
 
   lazy val symbols: Seq[Symbol] = ScalaSigParsers.symbols

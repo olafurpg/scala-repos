@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -155,7 +155,7 @@ histogram
       println("load test sim")
       val result = Performance().benchmark(test(10), benchParams, benchParams)
       perfUtil.uploadResults("load_test_sim", result)
-      //val result = Performance().profile(test(10))   
+      //val result = Performance().profile(test(10))
 
       result.report("load test sym", System.out)
       true must_== true
@@ -172,7 +172,7 @@ histogram
                                            singleParams,
                                            singleParams)
       perfUtil.uploadResults("insert_100k", result)
-      //val result = Performance().profile(insert(bifrost, Path("/test/insert/"), 0, batchSize, tests / batchSize))   
+      //val result = Performance().profile(insert(bifrost, Path("/test/insert/"), 0, batchSize, tests / batchSize))
 
       println("starting insert test")
       result.report("insert 100K", System.out)
@@ -190,7 +190,7 @@ histogram
       val result =
         Performance().benchmark(testRead(), benchParams, benchParams)
       perfUtil.uploadResults("read_100k", result)
-      //val result = Performance().profile(testRead())   
+      //val result = Performance().profile(testRead())
       result.report("read 100K", System.out)
       true must_== true
     }
@@ -212,7 +212,7 @@ histogram
 
       val result = Performance().benchmark(test(10), benchParams, benchParams)
       perfUtil.uploadResults("read_10k_10x", result)
-      //val result = Performance().profile(test(100))   
+      //val result = Performance().profile(test(100))
 
       result.report("read 10K elements x 10 times", System.out)
       true must_== true
@@ -248,7 +248,7 @@ histogram
 
       val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("read_10k_10thread", result)
-      //val result = Performance().profile(test(10))   
+      //val result = Performance().profile(test(10))
 
       println("read small thread test")
       result.report("read 10K elements x 1 times with 10 threads", System.out)
@@ -277,7 +277,7 @@ count(tests where tests.gender = "male")
 
       val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("hw2_100k", result)
-      //val result = Performance().profile(test(100))   
+      //val result = Performance().profile(test(100))
 
       result.report("hw2 test 100K * 1", System.out)
       true must_== true
@@ -308,7 +308,7 @@ histogram
 
       val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("hw3_100k", result)
-      //val result = Performance().profile(test(100))   
+      //val result = Performance().profile(test(100))
 
       result.report("hw3 test 100K * 1", System.out)
       true must_== true
@@ -503,7 +503,8 @@ histogram
 }
 
 class TestQueryExecutor(config: Configuration, testShard: TestShard)
-    extends JDBMQueryExecutor with IterableDatasetOpsComponent {
+    extends JDBMQueryExecutor
+    with IterableDatasetOpsComponent {
 
   override type Dataset[A] = IterableDataset[A]
 
@@ -520,18 +521,24 @@ class TestQueryExecutor(config: Configuration, testShard: TestShard)
     val idSource = new FreshAtomicIdSource
 
     object valueSerialization
-        extends SortSerialization[SValue] with SValueRunlengthFormatting
-        with BinarySValueFormatting with ZippedStreamSerialization
+        extends SortSerialization[SValue]
+        with SValueRunlengthFormatting
+        with BinarySValueFormatting
+        with ZippedStreamSerialization
     object eventSerialization
-        extends SortSerialization[SEvent] with SEventRunlengthFormatting
-        with BinarySValueFormatting with ZippedStreamSerialization
+        extends SortSerialization[SEvent]
+        with SEventRunlengthFormatting
+        with BinarySValueFormatting
+        with ZippedStreamSerialization
     object groupSerialization
         extends SortSerialization[(SValue, Identities, SValue)]
-        with GroupRunlengthFormatting with BinarySValueFormatting
+        with GroupRunlengthFormatting
+        with BinarySValueFormatting
         with ZippedStreamSerialization
     object memoSerialization
         extends IncrementalSerialization[(Identities, SValue)]
-        with SEventRunlengthFormatting with BinarySValueFormatting
+        with SEventRunlengthFormatting
+        with BinarySValueFormatting
         with ZippedStreamSerialization
 
     override lazy val flatMapTimeout: Duration = 5000 seconds
@@ -548,7 +555,8 @@ class TestQueryExecutor(config: Configuration, testShard: TestShard)
 }
 
 class TestShard(config: Configuration, dataDir: File)
-    extends ActorYggShard[IterableDataset] with StandaloneActorEcosystem {
+    extends ActorYggShard[IterableDataset]
+    with StandaloneActorEcosystem {
   type YggConfig = ProductionActorConfig
   lazy val yggConfig = new ProductionActorConfig {
     lazy val config = TestShard.this.config

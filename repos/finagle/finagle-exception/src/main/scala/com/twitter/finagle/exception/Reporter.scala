@@ -3,8 +3,17 @@ package com.twitter.finagle.exception
 import com.twitter.app.GlobalFlag
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.exception.thriftscala.{LogEntry, ResultCode, Scribe, Scribe$FinagleClient}
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.exception.thriftscala.{
+  LogEntry,
+  ResultCode,
+  Scribe,
+  Scribe$FinagleClient
+}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.thrift.{Protocols, ThriftClientFramedCodec}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.finagle.util.ReporterFactory
@@ -43,8 +52,9 @@ object Reporter {
     * Default in this case means that the instance of ServiceException it constructs when its
     * receive method is called does not report any endpoints.
     */
-  def defaultReporter(
-      scribeHost: String, scribePort: Int, serviceName: String): Reporter = {
+  def defaultReporter(scribeHost: String,
+                      scribePort: Int,
+                      serviceName: String): Reporter = {
     new Reporter(makeClient(scribeHost, scribePort), serviceName)
   }
 
@@ -86,8 +96,8 @@ object Reporter {
 
       def clientMonitor(serviceName: String): Reporter =
         new Reporter(scribeClient, serviceName).withClient()
-      def serverMonitor(
-          serviceName: String, address: SocketAddress): Reporter =
+      def serverMonitor(serviceName: String,
+                        address: SocketAddress): Reporter =
         new Reporter(scribeClient, serviceName).withSource(address)
     }
 
@@ -124,7 +134,7 @@ sealed case class Reporter(client: Scribe[Future],
                            serviceName: String,
                            statsReceiver: StatsReceiver = NullStatsReceiver,
                            private val sourceAddress: Option[String] = Some(
-                                 InetAddress.getLoopbackAddress.getHostName),
+                               InetAddress.getLoopbackAddress.getHostName),
                            private val clientAddress: Option[String] = None)
     extends Monitor {
 
@@ -161,8 +171,8 @@ sealed case class Reporter(client: Scribe[Future],
     * endpoint).
     */
   def createEntry(e: Throwable): LogEntry = {
-    var se = new ServiceException(
-        serviceName, e, Time.now, Trace.id.traceId.toLong)
+    var se =
+      new ServiceException(serviceName, e, Time.now, Trace.id.traceId.toLong)
 
     sourceAddress foreach { sa =>
       se = se withSource sa
@@ -171,8 +181,8 @@ sealed case class Reporter(client: Scribe[Future],
       se = se withClient ca
     }
 
-    LogEntry(
-        Reporter.scribeCategory, GZIPStringEncoder.encodeString(se.toJson))
+    LogEntry(Reporter.scribeCategory,
+             GZIPStringEncoder.encodeString(se.toJson))
   }
 
   /**

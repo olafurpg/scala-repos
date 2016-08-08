@@ -26,7 +26,8 @@ import akka.cluster.UniqueAddress
   * Protobuf serializer of ReplicatedData.
   */
 class ReplicatedDataSerializer(val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with SerializationSupport
+    extends SerializerWithStringManifest
+    with SerializationSupport
     with BaseSerializer {
 
   private val DeletedDataManifest = "A"
@@ -70,15 +71,15 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
         ORSetKeyManifest -> (bytes ⇒ ORSetKey(keyIdFromBinary(bytes))),
         FlagKeyManifest -> (bytes ⇒ FlagKey(keyIdFromBinary(bytes))),
         LWWRegisterKeyManifest ->
-        (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
         GCounterKeyManifest -> (bytes ⇒ GCounterKey(keyIdFromBinary(bytes))),
         PNCounterKeyManifest -> (bytes ⇒ PNCounterKey(keyIdFromBinary(bytes))),
         ORMapKeyManifest -> (bytes ⇒ ORMapKey(keyIdFromBinary(bytes))),
         LWWMapKeyManifest -> (bytes ⇒ LWWMapKey(keyIdFromBinary(bytes))),
         PNCounterMapKeyManifest ->
-        (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
         ORMultiMapKeyManifest ->
-        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
+          (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: ORSet[_] ⇒ ORSetManifest
@@ -242,7 +243,7 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def orsetFromProto(orset: rd.ORSet): ORSet[Any] = {
     val elements: Iterator[Any] =
       (orset.getStringElementsList.iterator.asScala ++ orset.getIntElementsList.iterator.asScala ++ orset.getLongElementsList.iterator.asScala ++ orset.getOtherElementsList.iterator.asScala
-            .map(otherMessageFromProto))
+        .map(otherMessageFromProto))
 
     val dots = orset.getDotsList.asScala.map(versionVectorFromProto).iterator
     val elementsMap = elements.zip(dots).toMap
@@ -279,7 +280,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.GCounter.newBuilder()
     gcounter.state.toVector.sortBy { case (address, _) ⇒ address }.foreach {
       case (address, value) ⇒
-        b.addEntries(rd.GCounter.Entry
+        b.addEntries(
+            rd.GCounter.Entry
               .newBuilder()
               .setNode(uniqueAddressToProto(address))
               .setValue(ByteString.copyFrom(value.toByteArray)))
@@ -293,8 +295,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def gcounterFromProto(gcounter: rd.GCounter): GCounter = {
     new GCounter(
         state = gcounter.getEntriesList.asScala.map(entry ⇒
-                uniqueAddressFromProto(entry.getNode) -> BigInt(
-                    entry.getValue.toByteArray))(breakOut))
+          uniqueAddressFromProto(entry.getNode) -> BigInt(
+              entry.getValue.toByteArray))(breakOut))
   }
 
   def pncounterToProto(pncounter: PNCounter): rd.PNCounter =
@@ -316,7 +318,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.VersionVector.newBuilder()
     versionVector.versionsIterator.foreach {
       case (node, value) ⇒
-        b.addEntries(rd.VersionVector.Entry
+        b.addEntries(
+            rd.VersionVector.Entry
               .newBuilder()
               .setNode(uniqueAddressToProto(node))
               .setVersion(value))
@@ -335,9 +338,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
                     entries.get(0).getVersion)
     else {
       val versions: TreeMap[UniqueAddress, Long] =
-        versionVector.getEntriesList.asScala.map(
-            entry ⇒ uniqueAddressFromProto(entry.getNode) -> entry.getVersion)(
-            breakOut)
+        versionVector.getEntriesList.asScala.map(entry ⇒
+          uniqueAddressFromProto(entry.getNode) -> entry.getVersion)(breakOut)
       VersionVector(versions)
     }
   }
@@ -346,7 +348,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.ORMap.newBuilder().setKeys(orsetToProto(ormap.keys))
     ormap.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.ORMap.Entry
+        b.addEntries(
+            rd.ORMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(otherMessageToProto(value)))
@@ -360,8 +363,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def ormapFromProto(ormap: rd.ORMap): ORMap[ReplicatedData] = {
     val entries = ormap.getEntriesList.asScala
       .map(entry ⇒
-            entry.getKey -> otherMessageFromProto(entry.getValue)
-              .asInstanceOf[ReplicatedData])
+        entry.getKey -> otherMessageFromProto(entry.getValue)
+          .asInstanceOf[ReplicatedData])
       .toMap
     new ORMap(keys = orsetFromProto(ormap.getKeys).asInstanceOf[ORSet[String]],
               entries)
@@ -372,7 +375,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       rd.LWWMap.newBuilder().setKeys(orsetToProto(lwwmap.underlying.keys))
     lwwmap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.LWWMap.Entry
+        b.addEntries(
+            rd.LWWMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(lwwRegisterToProto(value)))
@@ -388,9 +392,9 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .map(entry ⇒ entry.getKey -> lwwRegisterFromProto(entry.getValue))
       .toMap
     new LWWMap(
-        new ORMap(
-            keys = orsetFromProto(lwwmap.getKeys).asInstanceOf[ORSet[String]],
-            entries))
+        new ORMap(keys =
+                    orsetFromProto(lwwmap.getKeys).asInstanceOf[ORSet[String]],
+                  entries))
   }
 
   def pncountermapToProto(pncountermap: PNCounterMap): rd.PNCounterMap = {
@@ -399,7 +403,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .setKeys(orsetToProto(pncountermap.underlying.keys))
     pncountermap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value: PNCounter) ⇒
-        b.addEntries(rd.PNCounterMap.Entry
+        b.addEntries(
+            rd.PNCounterMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(pncounterToProto(value)))
@@ -416,7 +421,7 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .toMap
     new PNCounterMap(
         new ORMap(keys = orsetFromProto(pncountermap.getKeys)
-                      .asInstanceOf[ORSet[String]],
+                    .asInstanceOf[ORSet[String]],
                   entries))
   }
 
@@ -426,7 +431,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .setKeys(orsetToProto(multimap.underlying.keys))
     multimap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.ORMultiMap.Entry
+        b.addEntries(
+            rd.ORMultiMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(orsetToProto(value)))
@@ -443,7 +449,7 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .toMap
     new ORMultiMap(
         new ORMap(keys = orsetFromProto(multimap.getKeys)
-                      .asInstanceOf[ORSet[String]],
+                    .asInstanceOf[ORSet[String]],
                   entries))
   }
 

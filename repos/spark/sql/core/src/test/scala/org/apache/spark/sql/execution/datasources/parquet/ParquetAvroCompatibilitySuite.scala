@@ -33,7 +33,8 @@ import org.apache.spark.sql.execution.datasources.parquet.test.avro._
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetAvroCompatibilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   private def withWriter[T <: IndexedRecord](path: String, schema: Schema)(
       f: AvroParquetWriter[T] => Unit): Unit = {
     logInfo(
@@ -43,7 +44,8 @@ class ParquetAvroCompatibilitySuite
        """.stripMargin)
 
     val writer = new AvroParquetWriter[T](new Path(path), schema)
-    try f(writer) finally writer.close()
+    try f(writer)
+    finally writer.close()
   }
 
   test("required primitives") {
@@ -62,7 +64,7 @@ class ParquetAvroCompatibilitySuite
                   .setFloatColumn(i.toFloat + 0.1f)
                   .setDoubleColumn(i.toDouble + 0.2d)
                   .setBinaryColumn(ByteBuffer.wrap(
-                          s"val_$i".getBytes(StandardCharsets.UTF_8)))
+                      s"val_$i".getBytes(StandardCharsets.UTF_8)))
                   .setStringColumn(s"val_$i")
                   .build())
           }
@@ -87,7 +89,8 @@ class ParquetAvroCompatibilitySuite
       val path = dir.getCanonicalPath
 
       withWriter[AvroOptionalPrimitives](
-          path, AvroOptionalPrimitives.getClassSchema) { writer =>
+          path,
+          AvroOptionalPrimitives.getClassSchema) { writer =>
         (0 until 10).foreach { i =>
           val record =
             if (i % 3 == 0) {
@@ -110,7 +113,7 @@ class ParquetAvroCompatibilitySuite
                 .setMaybeFloatColumn(i.toFloat + 0.1f)
                 .setMaybeDoubleColumn(i.toDouble + 0.2d)
                 .setMaybeBinaryColumn(ByteBuffer.wrap(
-                        s"val_$i".getBytes(StandardCharsets.UTF_8)))
+                    s"val_$i".getBytes(StandardCharsets.UTF_8)))
                 .setMaybeStringColumn(s"val_$i")
                 .build()
             }
@@ -187,9 +190,9 @@ class ParquetAvroCompatibilitySuite
                 AvroArrayOfArray
                   .newBuilder()
                   .setIntArraysColumn(Seq
-                        .tabulate(3, 3)((i, j) => i * 3 + j: Integer)
-                        .map(_.asJava)
-                        .asJava)
+                    .tabulate(3, 3)((i, j) => i * 3 + j: Integer)
+                    .map(_.asJava)
+                    .asJava)
                   .build())
           }
       }
@@ -213,11 +216,11 @@ class ParquetAvroCompatibilitySuite
                 AvroMapOfArray
                   .newBuilder()
                   .setStringToIntsColumn(Seq
-                        .tabulate(3) { i =>
-                  i.toString -> Seq.tabulate(3)(j => i + j: Integer).asJava
-                }
-                        .toMap
-                        .asJava)
+                    .tabulate(3) { i =>
+                      i.toString -> Seq.tabulate(3)(j => i + j: Integer).asJava
+                    }
+                    .toMap
+                    .asJava)
                   .build())
           }
       }
@@ -225,7 +228,8 @@ class ParquetAvroCompatibilitySuite
       logParquetSchema(path)
 
       checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(Seq
+        Row(
+            Seq
               .tabulate(3)(i => i.toString -> Seq.tabulate(3)(j => i + j))
               .toMap)
       })

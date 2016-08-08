@@ -16,8 +16,10 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -36,10 +38,10 @@ class DataSource(val dsp: DataSourceParams)
             User()
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" user ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(s"Failed to get properties ${properties} of" +
+                s" user ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
           (entityId, user)
       }
@@ -59,10 +61,10 @@ class DataSource(val dsp: DataSourceParams)
                  year = properties.get[Int]("year"))
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" item ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(s"Failed to get properties ${properties} of" +
+                s" item ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
           (entityId, item)
       }
@@ -88,10 +90,10 @@ class DataSource(val dsp: DataSourceParams)
           }
         } catch {
           case e: Exception => {
-              logger.error(s"Cannot convert ${event} to ViewEvent." +
-                  s" Exception: ${e}.")
-              throw e
-            }
+            logger.error(s"Cannot convert ${event} to ViewEvent." +
+              s" Exception: ${e}.")
+            throw e
+          }
         }
         viewEvent
       }
@@ -115,11 +117,10 @@ class TrainingData(
     val users: RDD[(String, User)],
     val items: RDD[(String, Item)],
     val viewEvents: RDD[ViewEvent]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
-    s"items: [${items.count()} (${items.take(2).toList}...)]" +
-    s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
+      s"items: [${items.count()} (${items.take(2).toList}...)]" +
+      s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
   }
 }

@@ -132,19 +132,16 @@ case class Perfs(standard: Perf,
           date =>
             val nb = subs.map(_.nb).sum
             val glicko =
-              Glicko(rating = subs
-                         .map(s => s.glicko.rating * (s.nb / nb.toDouble))
-                         .sum,
-                     deviation = subs
-                         .map(s => s.glicko.deviation * (s.nb / nb.toDouble))
-                         .sum,
-                     volatility = subs
-                         .map(s => s.glicko.volatility * (s.nb / nb.toDouble))
-                         .sum)
-            Perf(glicko = glicko,
-                 nb = nb,
-                 recent = Nil,
-                 latest = date.some)
+              Glicko(
+                  rating =
+                    subs.map(s => s.glicko.rating * (s.nb / nb.toDouble)).sum,
+                  deviation = subs
+                    .map(s => s.glicko.deviation * (s.nb / nb.toDouble))
+                    .sum,
+                  volatility = subs
+                    .map(s => s.glicko.volatility * (s.nb / nb.toDouble))
+                    .sum)
+            Perf(glicko = glicko, nb = nb, recent = Nil, latest = date.some)
         }
       }
   )
@@ -175,13 +172,13 @@ case object Perfs {
     case Speed.Bullet =>
       perfs =>
         perfs.bullet
-      case Speed.Blitz =>
+    case Speed.Blitz =>
       perfs =>
         perfs.blitz
-      case Speed.Classical =>
+    case Speed.Classical =>
       perfs =>
         perfs.classical
-      case Speed.Correspondence =>
+    case Speed.Correspondence =>
       perfs =>
         perfs.correspondence
   }

@@ -17,7 +17,8 @@ trait Alternative[F[_]] extends Applicative[F] with MonoidK[F] { self =>
 }
 
 trait CompositeAlternative[F[_], G[_]]
-    extends Alternative[λ[α => F[G[α]]]] with CompositeApplicative[F, G]
+    extends Alternative[λ[α => F[G[α]]]]
+    with CompositeApplicative[F, G]
     with CompositeMonoidK[F, G] {
 
   implicit def F: Alternative[F]

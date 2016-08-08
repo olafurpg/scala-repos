@@ -6,7 +6,9 @@ import org.ensime.api._
 import org.ensime.util.{EnsimeSpec, EscapingStringInterpolation}
 
 class JerkFormatsSpec
-    extends EnsimeSpec with SprayJsonTestSupport with EnsimeTestData {
+    extends EnsimeSpec
+    with SprayJsonTestSupport
+    with EnsimeTestData {
 
   import JerkFormats._
   import JerkEnvelopeFormats._
@@ -618,11 +620,12 @@ class JerkFormatsSpec
 
     roundtrip(
         ImplicitInfos(
-            List(ImplicitParamInfo(5,
-                                   6,
-                                   symbolInfo,
-                                   List(symbolInfo, symbolInfo),
-                                   true))): EnsimeServerMessage,
+            List(
+                ImplicitParamInfo(5,
+                                  6,
+                                  symbolInfo,
+                                  List(symbolInfo, symbolInfo),
+                                  true))): EnsimeServerMessage,
         """{"typehint":"ImplicitInfos","infos":[{"params":[{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false},{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false}],"typehint":"ImplicitParamInfo","fun":{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false},"funIsImplicit":true,"end":6,"start":5}]}"""
     )
   }

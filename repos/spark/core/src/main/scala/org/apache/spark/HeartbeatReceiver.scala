@@ -56,7 +56,9 @@ private[spark] case class HeartbeatResponse(reregisterBlockManager: Boolean)
   * Lives in the driver to receive heartbeats from executors..
   */
 private[spark] class HeartbeatReceiver(sc: SparkContext, clock: Clock)
-    extends ThreadSafeRpcEndpoint with SparkListener with Logging {
+    extends ThreadSafeRpcEndpoint
+    with SparkListener
+    with Logging {
 
   def this(sc: SparkContext) {
     this(sc, new SystemClock)
@@ -76,15 +78,16 @@ private[spark] class HeartbeatReceiver(sc: SparkContext, clock: Clock)
   private val slaveTimeoutMs =
     sc.conf.getTimeAsMs("spark.storage.blockManagerSlaveTimeoutMs", "120s")
   private val executorTimeoutMs =
-    sc.conf.getTimeAsSeconds("spark.network.timeout", s"${slaveTimeoutMs}ms") * 1000
+    sc.conf
+      .getTimeAsSeconds("spark.network.timeout", s"${slaveTimeoutMs}ms") * 1000
 
   // "spark.network.timeoutInterval" uses "seconds", while
   // "spark.storage.blockManagerTimeoutIntervalMs" uses "milliseconds"
   private val timeoutIntervalMs =
     sc.conf.getTimeAsMs("spark.storage.blockManagerTimeoutIntervalMs", "60s")
   private val checkTimeoutIntervalMs =
-    sc.conf.getTimeAsSeconds(
-        "spark.network.timeoutInterval", s"${timeoutIntervalMs}ms") * 1000
+    sc.conf.getTimeAsSeconds("spark.network.timeoutInterval",
+                             s"${timeoutIntervalMs}ms") * 1000
 
   private var timeoutCheckingTask: ScheduledFuture[_] = null
 
@@ -129,8 +132,10 @@ private[spark] class HeartbeatReceiver(sc: SparkContext, clock: Clock)
           executorLastSeen(executorId) = clock.getTimeMillis()
           eventLoopThread.submit(new Runnable {
             override def run(): Unit = Utils.tryLogNonFatalError {
-              val unknownExecutor = !scheduler.executorHeartbeatReceived(
-                  executorId, accumUpdates, blockManagerId)
+              val unknownExecutor =
+                !scheduler.executorHeartbeatReceived(executorId,
+                                                     accumUpdates,
+                                                     blockManagerId)
               val response =
                 HeartbeatResponse(reregisterBlockManager = unknownExecutor)
               context.reply(response)
@@ -205,10 +210,12 @@ private[spark] class HeartbeatReceiver(sc: SparkContext, clock: Clock)
       if (now - lastSeenMs > executorTimeoutMs) {
         logWarning(
             s"Removing executor $executorId with no recent heartbeats: " +
-            s"${now - lastSeenMs} ms exceeds timeout $executorTimeoutMs ms")
-        scheduler.executorLost(executorId,
-                               SlaveLost("Executor heartbeat " +
-                                   s"timed out after ${now - lastSeenMs} ms"))
+              s"${now - lastSeenMs} ms exceeds timeout $executorTimeoutMs ms")
+        scheduler.executorLost(
+            executorId,
+            SlaveLost(
+                "Executor heartbeat " +
+                  s"timed out after ${now - lastSeenMs} ms"))
         // Asynchronously kill the executor to avoid blocking the current thread
         killExecutorThread.submit(new Runnable {
           override def run(): Unit = Utils.tryLogNonFatalError {

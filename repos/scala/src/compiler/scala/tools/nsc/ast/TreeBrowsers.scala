@@ -136,8 +136,9 @@ abstract class TreeBrowsers {
     var treeModel: ASTTreeModel = _
     var jTree: JTree = _
     val textArea: JTextArea = new JTextArea(30, 120)
-    textArea.setBorder(BorderFactory.createEmptyBorder(
-            borderSize, borderSize, borderSize, borderSize))
+    textArea.setBorder(
+        BorderFactory
+          .createEmptyBorder(borderSize, borderSize, borderSize, borderSize))
 
     val infoPanel = new TextInfoPanel()
 
@@ -171,8 +172,7 @@ abstract class TreeBrowsers {
 
       frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
 
-      frame.addWindowListener(
-          new WindowAdapter() {
+      frame.addWindowListener(new WindowAdapter() {
 
         /** Release the lock, so compilation may resume after the window is closed. */
         override def windowClosed(e: WindowEvent): Unit = lock.release()
@@ -195,26 +195,27 @@ abstract class TreeBrowsers {
 
       jTree.addTreeSelectionListener(
           new javax.swing.event.TreeSelectionListener() {
-        def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit = {
-          textArea.setText(e.getPath().getLastPathComponent().toString)
-          infoPanel.update(e.getPath().getLastPathComponent())
-        }
-      })
+            def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit = {
+              textArea.setText(e.getPath().getLastPathComponent().toString)
+              infoPanel.update(e.getPath().getLastPathComponent())
+            }
+          })
 
-      val topSplitPane = new JSplitPane(
-          JSplitPane.HORIZONTAL_SPLIT, topLeftPane, topRightPane)
+      val topSplitPane =
+        new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topLeftPane, topRightPane)
       topSplitPane.setResizeWeight(0.5)
 
-      jTree.setBorder(BorderFactory.createEmptyBorder(
-              borderSize, borderSize, borderSize, borderSize))
+      jTree.setBorder(
+          BorderFactory
+            .createEmptyBorder(borderSize, borderSize, borderSize, borderSize))
       topLeftPane.add(new JScrollPane(jTree), BorderLayout.CENTER)
       topRightPane.add(new JScrollPane(infoPanel), BorderLayout.CENTER)
       bottomPane.add(new JScrollPane(textArea), BorderLayout.CENTER)
       textArea.setFont(new Font("monospaced", Font.PLAIN, 14))
       textArea.setEditable(false)
 
-      splitPane = new JSplitPane(
-          JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomPane)
+      splitPane =
+        new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomPane)
       frame.getContentPane().add(splitPane)
       frame.pack()
       frame.setVisible(true)
@@ -244,8 +245,9 @@ abstract class TreeBrowsers {
       val jmiCancel = new JMenuItem(
           new AbstractAction("Cancel Compilation") {
             putValue(Action.ACCELERATOR_KEY,
-                     KeyStroke.getKeyStroke(
-                         KeyEvent.VK_Q, menuKey + shiftKey, false))
+                     KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+                                            menuKey + shiftKey,
+                                            false))
             override def actionPerformed(e: ActionEvent) {
               closeWindow()
               global.currentRun.cancel()
@@ -297,8 +299,8 @@ abstract class TreeBrowsers {
   class TextInfoPanel extends JTextArea(20, 50) {
 
     setBorder(
-        BorderFactory.createEmptyBorder(
-            borderSize, borderSize, borderSize, borderSize))
+        BorderFactory
+          .createEmptyBorder(borderSize, borderSize, borderSize, borderSize))
     setEditable(false)
     setFont(new Font("monospaced", Font.PLAIN, 12))
 
@@ -316,12 +318,14 @@ abstract class TreeBrowsers {
           str.append("\nSymbol: ").append(TreeInfo.symbolText(t))
           str
             .append("\nSymbol owner: ")
-            .append(if ((t.symbol ne null) && t.symbol != NoSymbol)
+            .append(
+                if ((t.symbol ne null) && t.symbol != NoSymbol)
                   t.symbol.owner.toString
                 else "NoSymbol has no owner")
           if ((t.symbol ne null) && t.symbol.isType) {
-            str.append("\ntermSymbol: " + t.symbol.tpe.termSymbol +
-                "\ntypeSymbol: " + t.symbol.tpe.typeSymbol)
+            str.append(
+                "\ntermSymbol: " + t.symbol.tpe.termSymbol +
+                  "\ntypeSymbol: " + t.symbol.tpe.typeSymbol)
             if (t.symbol.isTypeSkolem)
               str.append("\nSkolem of: " + t.symbol.deSkolemize)
           }
@@ -385,10 +389,10 @@ abstract class TreeBrowsers {
         List(definition)
 
       case ClassDef(mods, name, tparams, impl) => {
-          var children: List[Tree] = List()
-          children = tparams ::: children
-          mods.annotations ::: impl :: children
-        }
+        var children: List[Tree] = List()
+        children = tparams ::: children
+        mods.annotations ::: impl :: children
+      }
 
       case PackageDef(pid, stats) =>
         stats
@@ -540,9 +544,10 @@ abstract class TreeBrowsers {
         var str = s.flagString
         if (s.isStaticMember) str = str + " isStatic "
         (str + " annotations: " + s.annotations.mkString("", " ", "") +
-            (if (s.isTypeSkolem)
-               "\ndeSkolemized annotations: " +
-               s.deSkolemize.annotations.mkString("", " ", "") else ""))
+          (if (s.isTypeSkolem)
+             "\ndeSkolemized annotations: " +
+               s.deSkolemize.annotations.mkString("", " ", "")
+           else ""))
       } else ""
     }
   }
@@ -560,7 +565,8 @@ abstract class TreeBrowsers {
       case Nil => DocNil
       case s :: Nil => Document.group(toDocument(s))
       case _ =>
-        Document.group(syms.tail.foldLeft(toDocument(syms.head) :: ", ")(
+        Document.group(
+            syms.tail.foldLeft(toDocument(syms.head) :: ", ")(
                 (d: Document, s2: Symbol) => toDocument(s2) :: ", " :/: d))
     }
 
@@ -568,7 +574,8 @@ abstract class TreeBrowsers {
       case Nil => DocNil
       case t :: Nil => Document.group(toDocument(t))
       case _ =>
-        Document.group(ts.tail.foldLeft(toDocument(ts.head) :: ", ")(
+        Document.group(
+            ts.tail.foldLeft(toDocument(ts.head) :: ", ")(
                 (d: Document, t2: Type) => toDocument(t2) :: ", " :/: d))
     }
 
@@ -594,15 +601,17 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "TypeRef(" :/: toDocument(pre) :: ", " :/: sym.name.toString +
-                sym.idString :: ", " :/: "[ " :: toDocument(args) :: "]" :: ")")
+                  sym.idString :: ", " :/: "[ " :: toDocument(args) :: "]" :: ")")
         )
 
       case TypeBounds(lo, hi) =>
-        Document.group(
-            Document.nest(
-                4,
-                "TypeBounds(" :/: toDocument(lo) :: ", " :/: toDocument(hi) :: ")")
-        )
+        Document
+          .group(
+              Document
+                .nest(4,
+                      "TypeBounds(" :/: toDocument(lo) :: ", " :/: toDocument(
+                          hi) :: ")")
+          )
 
       case RefinedType(parents, defs) =>
         Document.group(
@@ -614,7 +623,7 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "ClassInfoType(" :/: toDocument(parents) :: ", " :/: clazz.name.toString +
-                clazz.idString :: ")")
+                  clazz.idString :: ")")
         )
 
       case MethodType(params, result) =>
@@ -628,8 +637,8 @@ abstract class TreeBrowsers {
 
       case NullaryMethodType(result) =>
         Document.group(
-            Document.nest(
-                4, "NullaryMethodType(" :/: toDocument(result) :: ")")
+            Document.nest(4,
+                          "NullaryMethodType(" :/: toDocument(result) :: ")")
         )
 
       case PolyType(tparams, result) =>
@@ -645,8 +654,8 @@ abstract class TreeBrowsers {
         Document.group(
             Document.nest(
                 4,
-                "AnnotatedType(" :/: annots.mkString("[", ",", "]") :/: "," :/: toDocument(
-                    tp) :: ")")
+                "AnnotatedType(" :/: annots
+                  .mkString("[", ",", "]") :/: "," :/: toDocument(tp) :: ")")
         )
 
       case ExistentialType(tparams, result) =>
@@ -654,7 +663,7 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "ExistentialType(" :/: Document.group("(" :/: symsToDocument(
-                        tparams) :/: "), ") :/: toDocument(result) :: ")"))
+                    tparams) :/: "), ") :/: toDocument(result) :: ")"))
 
       case ImportType(expr) =>
         "ImportType(" + expr.toString + ")"

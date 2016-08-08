@@ -5,7 +5,10 @@ import com.twitter.finagle.mux
 import com.twitter.finagle.service.{ReqRep, ResponseClassifier, ResponseClass}
 import com.twitter.finagle.service.ResponseClass._
 import com.twitter.finagle.thrift.DeserializeCtx
-import com.twitter.finagle.thriftmux.thriftscala.{InvalidQueryException, TestService}
+import com.twitter.finagle.thriftmux.thriftscala.{
+  InvalidQueryException,
+  TestService
+}
 import com.twitter.io.{Buf, Charsets}
 import com.twitter.util.{Throw, Return}
 import org.junit.runner.RunWith
@@ -47,8 +50,8 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
       Contexts.local.let(DeserializeCtx.Key, ctx) {
         val rep = mux.Response(Buf.Utf8(in))
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
-        assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+        assert(expectedClass == classifier
+          .applyOrElse(ReqRep(in, Return(rep)), ResponseClassifier.Default))
       }
     }
     testApplyOrElse("yep", Success)
@@ -67,8 +70,9 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
       val rep = mux.Response(Buf.Utf8(input))
 
       assert(!classifier.isDefinedAt(ReqRep(input, Return(rep))))
-      assert(Success == classifier.applyOrElse(ReqRep(input, Return(rep)),
-                                               ResponseClassifier.Default))
+      assert(
+          Success == classifier.applyOrElse(ReqRep(input, Return(rep)),
+                                            ResponseClassifier.Default))
     }
   }
 
@@ -85,7 +89,10 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
   }
 
   test("ThriftExceptionsAsFailures") {
-    import ThriftMuxResponseClassifier.{ThriftExceptionsAsFailures, usingDeserializeCtx}
+    import ThriftMuxResponseClassifier.{
+      ThriftExceptionsAsFailures,
+      usingDeserializeCtx
+    }
 
     val classifier = usingDeserializeCtx(ThriftExceptionsAsFailures)
     assert(
@@ -105,8 +112,8 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
       Contexts.local.let(DeserializeCtx.Key, ctx) {
         val rep = mux.Response(Buf.Utf8(in))
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
-        assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+        assert(expectedClass == classifier
+          .applyOrElse(ReqRep(in, Return(rep)), ResponseClassifier.Default))
       }
     }
 

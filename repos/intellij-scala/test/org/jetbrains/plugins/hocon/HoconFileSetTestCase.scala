@@ -70,7 +70,7 @@ abstract class HoconFileSetTestCase(subpath: String)
     val caretOffset = fileText.indexOf(CaretMarker)
     if (caretOffset >= 0)
       (fileText.substring(0, caretOffset) +
-       fileText.substring(caretOffset + CaretMarker.length),
+         fileText.substring(caretOffset + CaretMarker.length),
        caretOffset)
     else (fileText, -1)
   }

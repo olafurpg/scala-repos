@@ -58,7 +58,8 @@ private[sql] trait SQLTestData { self =>
     val df = sqlContext.sparkContext
       .parallelize(
           TestData2(1, 1) :: TestData2(1, 2) :: TestData2(2, 1) :: TestData2(
-              2, 2) :: TestData2(3, 1) :: TestData2(3, 2) :: Nil,
+              2,
+              2) :: TestData2(3, 1) :: TestData2(3, 2) :: Nil,
           2)
       .toDF()
     df.registerTempTable("testData2")
@@ -84,10 +85,12 @@ private[sql] trait SQLTestData { self =>
   protected lazy val largeAndSmallInts: DataFrame = {
     val df =
       sqlContext.sparkContext
-        .parallelize(LargeAndSmallInts(2147483644, 1) :: LargeAndSmallInts(
-                1, 2) :: LargeAndSmallInts(2147483645, 1) :: LargeAndSmallInts(
-                2, 2) :: LargeAndSmallInts(2147483646, 1) :: LargeAndSmallInts(
-                3, 2) :: Nil)
+        .parallelize(
+            LargeAndSmallInts(2147483644, 1) :: LargeAndSmallInts(1, 2) :: LargeAndSmallInts(
+                2147483645,
+                1) :: LargeAndSmallInts(2, 2) :: LargeAndSmallInts(
+                2147483646,
+                1) :: LargeAndSmallInts(3, 2) :: Nil)
         .toDF()
     df.registerTempTable("largeAndSmallInts")
     df
@@ -96,9 +99,10 @@ private[sql] trait SQLTestData { self =>
   protected lazy val decimalData: DataFrame = {
     val df =
       sqlContext.sparkContext
-        .parallelize(DecimalData(1, 1) :: DecimalData(1, 2) :: DecimalData(
-                2, 1) :: DecimalData(2, 2) :: DecimalData(3, 1) :: DecimalData(
-                3, 2) :: Nil)
+        .parallelize(
+            DecimalData(1, 1) :: DecimalData(1, 2) :: DecimalData(2, 1) :: DecimalData(
+                2,
+                2) :: DecimalData(3, 1) :: DecimalData(3, 2) :: Nil)
         .toDF()
     df.registerTempTable("decimalData")
     df
@@ -108,10 +112,10 @@ private[sql] trait SQLTestData { self =>
     val df = sqlContext.sparkContext
       .parallelize(
           BinaryData("12".getBytes(StandardCharsets.UTF_8), 1) :: BinaryData(
-              "22".getBytes(StandardCharsets.UTF_8), 5) :: BinaryData(
-              "122".getBytes(StandardCharsets.UTF_8), 3) :: BinaryData(
-              "121".getBytes(StandardCharsets.UTF_8), 2) :: BinaryData(
-              "123".getBytes(StandardCharsets.UTF_8), 4) :: Nil)
+              "22".getBytes(StandardCharsets.UTF_8),
+              5) :: BinaryData("122".getBytes(StandardCharsets.UTF_8), 3) :: BinaryData(
+              "121".getBytes(StandardCharsets.UTF_8),
+              2) :: BinaryData("123".getBytes(StandardCharsets.UTF_8), 4) :: Nil)
       .toDF()
     df.registerTempTable("binaryData")
     df
@@ -121,8 +125,10 @@ private[sql] trait SQLTestData { self =>
     val df = sqlContext.sparkContext
       .parallelize(
           UpperCaseData(1, "A") :: UpperCaseData(2, "B") :: UpperCaseData(
-              3, "C") :: UpperCaseData(4, "D") :: UpperCaseData(5, "E") :: UpperCaseData(
-              6, "F") :: Nil)
+              3,
+              "C") :: UpperCaseData(4, "D") :: UpperCaseData(5, "E") :: UpperCaseData(
+              6,
+              "F") :: Nil)
       .toDF()
     df.registerTempTable("upperCaseData")
     df
@@ -132,7 +138,8 @@ private[sql] trait SQLTestData { self =>
     val df = sqlContext.sparkContext
       .parallelize(
           LowerCaseData(1, "a") :: LowerCaseData(2, "b") :: LowerCaseData(
-              3, "c") :: LowerCaseData(4, "d") :: Nil)
+              3,
+              "c") :: LowerCaseData(4, "d") :: Nil)
       .toDF()
     df.registerTempTable("lowerCaseData")
     df
@@ -141,7 +148,8 @@ private[sql] trait SQLTestData { self =>
   protected lazy val arrayData: RDD[ArrayData] = {
     val rdd = sqlContext.sparkContext.parallelize(
         ArrayData(Seq(1, 2, 3), Seq(Seq(1, 2, 3))) :: ArrayData(
-            Seq(2, 3, 4), Seq(Seq(2, 3, 4))) :: Nil)
+            Seq(2, 3, 4),
+            Seq(Seq(2, 3, 4))) :: Nil)
     rdd.toDF().registerTempTable("arrayData")
     rdd
   }
@@ -153,9 +161,9 @@ private[sql] trait SQLTestData { self =>
                                                       3 -> "c1",
                                                       4 -> "d1",
                                                       5 -> "e1")) :: MapData(
-              Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
-              Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
-              Map(1 -> "a4", 2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
+          Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
+          Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
+          Map(1 -> "a4", 2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
     rdd.toDF().registerTempTable("mapData")
     rdd
   }
@@ -198,7 +206,8 @@ private[sql] trait SQLTestData { self =>
     val df = sqlContext.sparkContext
       .parallelize(
           NullStrings(1, "abc") :: NullStrings(2, "ABC") :: NullStrings(
-              3, null) :: Nil)
+              3,
+              null) :: Nil)
       .toDF()
     df.registerTempTable("nullStrings")
     df
@@ -244,8 +253,10 @@ private[sql] trait SQLTestData { self =>
       .parallelize(ComplexData(Map("1" -> 1),
                                TestData(1, "1"),
                                Seq(1, 1, 1),
-                               true) :: ComplexData(
-              Map("2" -> 2), TestData(2, "2"), Seq(2, 2, 2), false) :: Nil)
+                               true) :: ComplexData(Map("2" -> 2),
+                                                    TestData(2, "2"),
+                                                    Seq(2, 2, 2),
+                                                    false) :: Nil)
       .toDF()
     df.registerTempTable("complexData")
     df
@@ -253,7 +264,8 @@ private[sql] trait SQLTestData { self =>
 
   protected lazy val courseSales: DataFrame = {
     val df = sqlContext.sparkContext
-      .parallelize(CourseSales("dotNET", 2012, 10000) :: CourseSales(
+      .parallelize(
+          CourseSales("dotNET", 2012, 10000) :: CourseSales(
               "Java",
               2012,
               20000) :: CourseSales("dotNET", 2012, 5000) :: CourseSales(
@@ -319,7 +331,9 @@ private[sql] object SQLTestData {
   case class TableName(tableName: String)
   case class Person(id: Int, name: String, age: Int)
   case class Salary(personId: Int, salary: Double)
-  case class ComplexData(
-      m: Map[String, Int], s: TestData, a: Seq[Int], b: Boolean)
+  case class ComplexData(m: Map[String, Int],
+                         s: TestData,
+                         a: Seq[Int],
+                         b: Boolean)
   case class CourseSales(course: String, year: Int, earnings: Double)
 }

@@ -39,10 +39,12 @@ object GCounter {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class GCounter private[akka](
+final class GCounter private[akka] (
     private[akka] val state: Map[UniqueAddress, BigInt] = Map.empty)
-    extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning with FastMerge {
+    extends ReplicatedData
+    with ReplicatedDataSerialization
+    with RemovedNodePruning
+    with FastMerge {
 
   import GCounter.Zero
 
@@ -109,8 +111,8 @@ final class GCounter private[akka](
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     state.contains(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): GCounter =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): GCounter =
     state.get(removedNode) match {
       case Some(value) ⇒
         new GCounter(state - removedNode).increment(collapseInto, value)
@@ -138,4 +140,5 @@ object GCounterKey {
 
 @SerialVersionUID(1L)
 final case class GCounterKey(_id: String)
-    extends Key[GCounter](_id) with ReplicatedDataSerialization
+    extends Key[GCounter](_id)
+    with ReplicatedDataSerialization

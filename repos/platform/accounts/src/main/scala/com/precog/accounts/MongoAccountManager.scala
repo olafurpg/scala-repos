@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -64,9 +64,10 @@ trait ZKAccountIdSource extends AccountManager[Future] {
       zkc.createPersistent(settings.zkAccountIdPath, true)
     }
 
-    val createdPath = zkc.createPersistentSequential(
-        settings.zkAccountIdPath, Array.empty[Byte])
-    createdPath.substring(createdPath.length - 10) //last 10 characters are a sequential int
+    val createdPath = zkc.createPersistentSequential(settings.zkAccountIdPath,
+                                                     Array.empty[Byte])
+    createdPath
+      .substring(createdPath.length - 10) //last 10 characters are a sequential int
   }
 }
 
@@ -80,8 +81,9 @@ trait MongoAccountManagerSettings {
 }
 
 abstract class MongoAccountManager(
-    mongo: Mongo, database: Database, settings: MongoAccountManagerSettings)(
-    implicit val M: Monad[Future])
+    mongo: Mongo,
+    database: Database,
+    settings: MongoAccountManagerSettings)(implicit val M: Monad[Future])
     extends AccountManager[Future] {
   import Account._
 
@@ -126,7 +128,8 @@ abstract class MongoAccountManager(
                                Some(creationDate),
                                profile)
 
-        database(insert(account0.serialize.asInstanceOf[JObject])
+        database(
+            insert(account0.serialize.asInstanceOf[JObject])
               .into(settings.accounts)) map { _ =>
           account0
         }
@@ -134,8 +137,9 @@ abstract class MongoAccountManager(
     } yield account
   }
 
-  private def findOneMatching[A](
-      keyName: String, keyValue: String, collection: String)(
+  private def findOneMatching[A](keyName: String,
+                                 keyValue: String,
+                                 collection: String)(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
     database(selectOne().from(collection).where(keyName === keyValue)) map {
       _.map(_.deserialize(extractor))
@@ -143,15 +147,16 @@ abstract class MongoAccountManager(
   }
 
   private def findAllMatching[A](
-      keyName: String, keyValue: String, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: String,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database(selectAll.from(collection).where(keyName === keyValue)) map {
       _.map(_.deserialize(extractor)).toSet
     }
   }
 
-  private def findAll[A](
-      collection: String)(implicit extract: Extractor[A]): Future[Seq[A]] =
+  private def findAll[A](collection: String)(
+      implicit extract: Extractor[A]): Future[Seq[A]] =
     database(selectAll.from(collection)) map {
       _.map(_.deserialize(extract)).toSeq
     }
@@ -161,15 +166,16 @@ abstract class MongoAccountManager(
         account,
         (new DateTime).plusMinutes(settings.resetTokenExpirationMinutes))
 
-  def generateResetToken(
-      account: Account, expiration: DateTime): Future[ResetTokenId] = {
+  def generateResetToken(account: Account,
+                         expiration: DateTime): Future[ResetTokenId] = {
     val tokenId = java.util.UUID.randomUUID.toString.replace("-", "")
 
-    val token = ResetToken(
-        tokenId, account.accountId, account.email, expiration)
+    val token =
+      ResetToken(tokenId, account.accountId, account.email, expiration)
 
     logger.debug("Saving new reset token " + token)
-    database(insert(token.serialize.asInstanceOf[JObject])
+    database(
+        insert(token.serialize.asInstanceOf[JObject])
           .into(settings.resetTokens)).map { _ =>
       logger.debug("Save complete on reset token " + token)
       tokenId
@@ -178,7 +184,8 @@ abstract class MongoAccountManager(
 
   def markResetTokenUsed(tokenId: ResetTokenId): Future[PrecogUnit] = {
     logger.debug("Marking reset token %s as used".format(tokenId))
-    database(update(settings.resetTokens)
+    database(
+        update(settings.resetTokens)
           .set("usedAt" set (new DateTime).serialize)
           .where("tokenId" === tokenId)).map { _ =>
       logger.debug("Reset token %s marked as used".format(tokenId)); PrecogUnit
@@ -220,10 +227,13 @@ abstract class MongoAccountManager(
     findAccountById(accountId).flatMap {
       case ot @ Some(account) =>
         for {
-          _ <- database(insert(account.serialize.asInstanceOf[JObject])
-                .into(settings.deletedAccounts))
           _ <- database(
-              remove.from(settings.accounts).where("accountId" === accountId))
+                  insert(account.serialize.asInstanceOf[JObject])
+                    .into(settings.deletedAccounts))
+          _ <- database(
+                  remove
+                    .from(settings.accounts)
+                    .where("accountId" === accountId))
         } yield { ot }
       case None =>
         M.point(None)

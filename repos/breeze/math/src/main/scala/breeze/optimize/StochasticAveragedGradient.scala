@@ -32,17 +32,19 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
             0)
   }
 
-  protected def chooseDescentDirection(
-      state: State, f: BatchDiffFunction[T]): T = {
+  protected def chooseDescentDirection(state: State,
+                                       f: BatchDiffFunction[T]): T = {
     state.history.currentSum * (-1.0 / f.fullRange.size)
   }
 
-  protected def determineStepSize(
-      state: State, f: BatchDiffFunction[T], direction: T): Double =
+  protected def determineStepSize(state: State,
+                                  f: BatchDiffFunction[T],
+                                  direction: T): Double =
     state.history.stepSize
 
-  override protected def calculateObjective(
-      f: BatchDiffFunction[T], x: T, history: History): (Double, T) = {
+  override protected def calculateObjective(f: BatchDiffFunction[T],
+                                            x: T,
+                                            history: History): (Double, T) = {
     f.calculate(x, IndexedSeq(history.nextPos))
   }
 
@@ -69,9 +71,9 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
       if (tuneStepFrequency > 0 && (oldState.iter % tuneStepFrequency) == 0) {
         val xdiff = newX - oldState.x
         if ((f.valueAt(newX, IndexedSeq(nextPos)) +
-                l2Regularization / 2 * norm(newX) - oldState.adjustedValue) >
-            (oldState.adjustedGradient dot xdiff) + (xdiff dot xdiff) /
-            (2 * stepSize)) {
+              l2Regularization / 2 * norm(newX) - oldState.adjustedValue) >
+              (oldState.adjustedGradient dot xdiff) + (xdiff dot xdiff) /
+                (2 * stepSize)) {
           stepSize / 2
         } else {
           stepSize * 1.5

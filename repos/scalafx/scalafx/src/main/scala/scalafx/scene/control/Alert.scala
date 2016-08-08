@@ -33,7 +33,11 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.scene.control.Alert.AlertType
 
 object Alert {
@@ -149,7 +153,8 @@ object Alert {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Alert(override val delegate: jfxsc.Alert)
-    extends Dialog[jfxsc.ButtonType](delegate) with SFXDelegate[jfxsc.Alert] {
+    extends Dialog[jfxsc.ButtonType](delegate)
+    with SFXDelegate[jfxsc.Alert] {
 
   /**
     * Creates an alert with the given AlertType (refer to the `AlertType`

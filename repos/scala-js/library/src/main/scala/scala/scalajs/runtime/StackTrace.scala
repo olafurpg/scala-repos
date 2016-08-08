@@ -124,8 +124,11 @@ object StackTrace {
           val mtch2 = NormalizedFrameLine.exec(line)
           if (mtch2 ne null) {
             val (className, methodName) = extractClassMethod(mtch2(1).get)
-            trace.push(JSStackTraceElem(
-                    className, methodName, mtch2(2).get, mtch2(3).get.toInt))
+            trace.push(
+                JSStackTraceElem(className,
+                                 methodName,
+                                 mtch2(2).get,
+                                 mtch2(3).get.toInt))
           } else {
             // just in case
             trace.push(JSStackTraceElem("<jscode>", line, null, -1))
@@ -445,7 +448,8 @@ object StackTrace {
     while (i < len) {
       val mtch = lineRE.exec(lines(i))
       if (mtch ne null) {
-        result.push("{anonymous}()@" + mtch(2).get + ":" + mtch(1).get
+        result.push(
+            "{anonymous}()@" + mtch(2).get + ":" + mtch(1).get
             /* + " -- " + lines(i+1).replace("""^\s+""".re, "") */ )
       }
       i += 2
@@ -468,7 +472,8 @@ object StackTrace {
       val mtch = lineRE.exec(lines(i))
       if (mtch ne null) {
         val fnName = mtch(3).getOrElse("{anonymous}")
-        result.push(fnName + "()@" + mtch(2).get + ":" + mtch(1).get
+        result.push(
+            fnName + "()@" + mtch(2).get + ":" + mtch(1).get
             /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
       }
       i += 2
@@ -514,7 +519,8 @@ object StackTrace {
         val fnName = fnName0
           .jsReplace("""<anonymous function: (\S+)>""".re, "$1")
           .jsReplace("""<anonymous function>""".re, "{anonymous}")
-        result.push(fnName + "@" + location
+        result.push(
+            fnName + "@" + location
             /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
       }
       i += 2

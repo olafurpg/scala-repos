@@ -25,7 +25,10 @@ import kafka.integration.KafkaServerTestHarness
 import kafka.server.{KafkaConfig, KafkaServer}
 import kafka.utils._
 import org.apache.kafka.common.metrics.Metrics
-import org.apache.kafka.common.requests.{AbstractRequestResponse, AbstractRequest}
+import org.apache.kafka.common.requests.{
+  AbstractRequestResponse,
+  AbstractRequest
+}
 import org.apache.kafka.common.utils.SystemTime
 import org.apache.log4j.{Level, Logger}
 import org.junit.{After, Before, Test}
@@ -92,7 +95,8 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
         controller.kafkaController.config,
         metrics)
     channelManager.startup()
-    controller.kafkaController.controllerContext.controllerChannelManager = channelManager
+    controller.kafkaController.controllerContext.controllerChannelManager =
+      channelManager
     channelManager.shrinkBlockingQueue(0)
     channelManager.stopSendThread(0)
     // Spawn a new thread to block on the outgoing channel
@@ -100,18 +104,20 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
     val thread = new Thread(new Runnable {
       def run() {
         try {
-          controller.kafkaController.sendUpdateMetadataRequest(
-              Seq(0), Set(topicPartition))
-          log.info("Queue state %d %d".format(channelManager.queueCapacity(0),
-                                              channelManager.queueSize(0)))
-          controller.kafkaController.sendUpdateMetadataRequest(
-              Seq(0), Set(topicPartition))
-          log.info("Queue state %d %d".format(channelManager.queueCapacity(0),
-                                              channelManager.queueSize(0)))
+          controller.kafkaController
+            .sendUpdateMetadataRequest(Seq(0), Set(topicPartition))
+          log.info(
+              "Queue state %d %d".format(channelManager.queueCapacity(0),
+                                         channelManager.queueSize(0)))
+          controller.kafkaController
+            .sendUpdateMetadataRequest(Seq(0), Set(topicPartition))
+          log.info(
+              "Queue state %d %d".format(channelManager.queueCapacity(0),
+                                         channelManager.queueSize(0)))
         } catch {
           case e: Exception => {
-              log.info("Thread interrupted")
-            }
+            log.info("Thread interrupted")
+          }
         }
       }
     })
@@ -134,8 +140,8 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
           case Some(epoch) =>
             epoch
           case None =>
-            val msg = String.format(
-                "Missing element in epoch map %s", epochMap.mkString(", "))
+            val msg = String.format("Missing element in epoch map %s",
+                                    epochMap.mkString(", "))
             throw new IllegalStateException(msg)
         }
 
@@ -152,12 +158,12 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
     }
     // Give it a shot to make sure that sending isn't blocking
     try {
-      controller.kafkaController.sendUpdateMetadataRequest(
-          Seq(0), Set(topicPartition))
+      controller.kafkaController
+        .sendUpdateMetadataRequest(Seq(0), Set(topicPartition))
     } catch {
       case e: Throwable => {
-          fail(e)
-        }
+        fail(e)
+      }
     }
   }
 }
@@ -165,8 +171,10 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
 class MockChannelManager(private val controllerContext: ControllerContext,
                          config: KafkaConfig,
                          metrics: Metrics)
-    extends ControllerChannelManager(
-        controllerContext, config, new SystemTime, metrics) {
+    extends ControllerChannelManager(controllerContext,
+                                     config,
+                                     new SystemTime,
+                                     metrics) {
 
   def stopSendThread(brokerId: Int) {
     val requestThread = brokerStateInfo(brokerId).requestSendThread

@@ -36,11 +36,11 @@ class ALSModel(override val rank: Int,
 
   override def toString = {
     s"userFeatures: [${userFeatures.count()}]" +
-    s"(${userFeatures.take(2).toList}...)" +
-    s" productFeatures: [${productFeatures.count()}]" +
-    s"(${productFeatures.take(2).toList}...)" + s" users: [${users.size}]" +
-    s"(${users.take(2)}...)" + s" items: [${items.size}]" +
-    s"(${items.take(2)}...)"
+      s"(${userFeatures.take(2).toList}...)" +
+      s" productFeatures: [${productFeatures.count()}]" +
+      s"(${productFeatures.take(2).toList}...)" + s" users: [${users.size}]" +
+      s"(${users.take(2)}...)" + s" items: [${items.size}]" +
+      s"(${items.take(2)}...)"
   }
 }
 

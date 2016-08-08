@@ -84,35 +84,53 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
   booleanLogicTest(
       "AND",
       And,
-      (true, true, true) :: (true, false, false) :: (true, null, null) :: (
-          false,
-          true,
-          false) :: (false, false, false) :: (false, null, false) :: (
-          null,
-          true,
-          null) :: (null, false, false) :: (null, null, null) :: Nil)
+      (true, true, true) :: (true, false, false) :: (true, null, null) :: (false,
+                                                                           true,
+                                                                           false) :: (false,
+                                                                                      false,
+                                                                                      false) :: (false,
+                                                                                                 null,
+                                                                                                 false) :: (null,
+                                                                                                            true,
+                                                                                                            null) :: (null,
+                                                                                                                      false,
+                                                                                                                      false) :: (null,
+                                                                                                                                 null,
+                                                                                                                                 null) :: Nil)
 
   booleanLogicTest(
       "OR",
       Or,
-      (true, true, true) :: (true, false, true) :: (true, null, true) :: (
-          false,
-          true,
-          true) :: (false, false, false) :: (false, null, null) :: (
-          null,
-          true,
-          true) :: (null, false, null) :: (null, null, null) :: Nil)
+      (true, true, true) :: (true, false, true) :: (true, null, true) :: (false,
+                                                                          true,
+                                                                          true) :: (false,
+                                                                                    false,
+                                                                                    false) :: (false,
+                                                                                               null,
+                                                                                               null) :: (null,
+                                                                                                         true,
+                                                                                                         true) :: (null,
+                                                                                                                   false,
+                                                                                                                   null) :: (null,
+                                                                                                                             null,
+                                                                                                                             null) :: Nil)
 
   booleanLogicTest(
       "=",
       EqualTo,
-      (true, true, true) :: (true, false, false) :: (true, null, null) :: (
-          false,
-          true,
-          false) :: (false, false, true) :: (false, null, null) :: (
-          null,
-          true,
-          null) :: (null, false, null) :: (null, null, null) :: Nil)
+      (true, true, true) :: (true, false, false) :: (true, null, null) :: (false,
+                                                                           true,
+                                                                           false) :: (false,
+                                                                                      false,
+                                                                                      true) :: (false,
+                                                                                                null,
+                                                                                                null) :: (null,
+                                                                                                          true,
+                                                                                                          null) :: (null,
+                                                                                                                    false,
+                                                                                                                    null) :: (null,
+                                                                                                                              null,
+                                                                                                                              null) :: Nil)
 
   test("IN") {
     checkEvaluation(
@@ -121,8 +139,8 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(In(Literal.create(null, IntegerType),
                        Seq(Literal.create(null, IntegerType))),
                     null)
-    checkEvaluation(
-        In(Literal(1), Seq(Literal.create(null, IntegerType))), null)
+    checkEvaluation(In(Literal(1), Seq(Literal.create(null, IntegerType))),
+                    null)
     checkEvaluation(
         In(Literal(1), Seq(Literal(1), Literal.create(null, IntegerType))),
         true)
@@ -141,10 +159,10 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(In(ns, Seq(ns)), null)
     checkEvaluation(In(Literal("a"), Seq(ns)), null)
     checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("^Ba*n"), ns)), true)
-    checkEvaluation(
-        In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))), true)
-    checkEvaluation(
-        In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))), false)
+    checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))),
+                    true)
+    checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))),
+                    false)
 
     val primitiveTypes = Seq(IntegerType,
                              FloatType,
@@ -281,10 +299,10 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("BinaryComparison: GreaterThanOrEqual") {
     for (i <- 0 until smallValues.length) {
-      checkEvaluation(
-          GreaterThanOrEqual(smallValues(i), largeValues(i)), false)
-      checkEvaluation(
-          GreaterThanOrEqual(equalValues1(i), equalValues2(i)), true)
+      checkEvaluation(GreaterThanOrEqual(smallValues(i), largeValues(i)),
+                      false)
+      checkEvaluation(GreaterThanOrEqual(equalValues1(i), equalValues2(i)),
+                      true)
       checkEvaluation(GreaterThanOrEqual(largeValues(i), smallValues(i)), true)
     }
   }

@@ -20,8 +20,8 @@ class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers {
     .toInt
 
   def createHeartbeatNodeRingOfSize(size: Int): HeartbeatNodeRing = {
-    val nodes = (1 to size).map(
-        n ⇒ UniqueAddress(Address("akka.tcp", "sys", "node-" + n, 2552), n))
+    val nodes = (1 to size).map(n ⇒
+      UniqueAddress(Address("akka.tcp", "sys", "node-" + n, 2552), n))
     val selfAddress = nodes(size / 2)
     HeartbeatNodeRing(selfAddress, nodes.toSet, Set.empty, 5)
   }
@@ -34,8 +34,10 @@ class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers {
     for (i ← 1 to times) thunk(ring)
 
   private def myReceivers(ring: HeartbeatNodeRing): Unit = {
-    val r = HeartbeatNodeRing(
-        ring.selfAddress, ring.nodes, Set.empty, ring.monitoredByNrOfMembers)
+    val r = HeartbeatNodeRing(ring.selfAddress,
+                              ring.nodes,
+                              Set.empty,
+                              ring.monitoredByNrOfMembers)
     r.myReceivers.isEmpty should ===(false)
   }
 

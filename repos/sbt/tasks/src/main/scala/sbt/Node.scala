@@ -13,7 +13,7 @@ import sbt.internal.util.Types._
   * @tparam T the type computed by this node
   */
 trait Node[A[_], T] {
-  type K [L[x]]
+  type K[L[x]]
   val in: K[A]
   val alist: AList[K]
 

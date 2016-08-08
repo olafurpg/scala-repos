@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class WeightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private var instances: RDD[Instance] = _
   private var instancesConstLabel: RDD[Instance] = _
@@ -90,8 +91,8 @@ class WeightedLeastSquaresSuite
             regParam = 0.0,
             standardizeFeatures = standardization,
             standardizeLabel = standardization).fit(instances)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -123,8 +124,8 @@ class WeightedLeastSquaresSuite
             regParam = 0.0,
             standardizeFeatures = standardization,
             standardizeLabel = standardization).fit(instancesConstLabel)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -188,8 +189,8 @@ class WeightedLeastSquaresSuite
 
     var idx = 0
     for (fitIntercept <- Seq(false, true);
-    regParam <- Seq(0.0, 0.1, 1.0);
-    standardizeFeatures <- Seq(false, true)) {
+         regParam <- Seq(0.0, 0.1, 1.0);
+         standardizeFeatures <- Seq(false, true)) {
       val wls =
         new WeightedLeastSquares(fitIntercept,
                                  regParam,

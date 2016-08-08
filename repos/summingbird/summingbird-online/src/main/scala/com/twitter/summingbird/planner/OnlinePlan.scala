@@ -90,7 +90,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
    */
   private def allTransDepsMergeableWithSource(p: Prod[_]): Boolean =
     mergableWithSource(p) &&
-    Producer.dependenciesOf(p).forall(allTransDepsMergeableWithSource)
+      Producer.dependenciesOf(p).forall(allTransDepsMergeableWithSource)
 
   /**
     * This is the main planning loop that goes bottom up planning into CNodes.
@@ -156,9 +156,8 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            * now
            */
           case _
-              if
-              (!noOpNode(activeBolt) &&
-                  dependsOnSummerProducer(currentProducer)) =>
+              if (!noOpNode(activeBolt) &&
+                dependsOnSummerProducer(currentProducer)) =>
             true
           /*
            * This should possibly be improved, but currently, we force a FlatMapNode just before a
@@ -167,16 +166,15 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            */
           case FlatMapNode(_)
               if hasSummerAsDependantProducer(currentProducer) &&
-              allTransDepsMergeableWithSource(dep) =>
+                allTransDepsMergeableWithSource(dep) =>
             true
           /*
            * if the current node can't be merged with a source, but the transitive deps can
            * then split now.
            */
           case _
-              if
-              ((!mergableWithSource(currentProducer)) &&
-                  allTransDepsMergeableWithSource(dep)) =>
+              if ((!mergableWithSource(currentProducer)) &&
+                allTransDepsMergeableWithSource(dep)) =>
             true
           case _ => false
         }
@@ -237,11 +235,12 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
           maybeSplitThenRecurse(dependantProducer, producer)
         // The following are special cases
         case Summer(producer, _, _) =>
-          maybeSplitThenRecurse(
-              dependantProducer, producer, currentBolt.toSummer)
+          maybeSplitThenRecurse(dependantProducer,
+                                producer,
+                                currentBolt.toSummer)
         case AlsoProducer(lProducer, rProducer) =>
-          val (updatedReg, updatedVisited) = maybeSplitThenRecurse(
-              dependantProducer, rProducer)
+          val (updatedReg, updatedVisited) =
+            maybeSplitThenRecurse(dependantProducer, rProducer)
           recurse(lProducer, FlatMapNode(), updatedReg, updatedVisited)
         case Source(spout) =>
           (distinctAddToList(nodeSet, currentBolt.toSource), visitedWithN)
@@ -250,8 +249,8 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
           if (l == r)
             throw new Exception(
                 "Online Planner doesn't support both the left and right sides of a join being the same node.")
-          val (otherMergeNodes, dependencies) = mergeCollapse(
-              dependantProducer, rootMerge = true)
+          val (otherMergeNodes, dependencies) =
+            mergeCollapse(dependantProducer, rootMerge = true)
           val newCurrentBolt = otherMergeNodes.foldLeft(currentBolt)(_.add(_))
           val visitedWithOther = otherMergeNodes.foldLeft(visitedWithN) {
             (visited, n) =>
@@ -267,8 +266,8 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       }
     }
 
-  val (nodeSet, _) = addWithDependencies(
-      tail, FlatMapNode(), List[CNode](), Set())
+  val (nodeSet, _) =
+    addWithDependencies(tail, FlatMapNode(), List[CNode](), Set())
   require(nodeSet.collect { case n @ SourceNode(_) => n }.size > 0,
           "Valid nodeSet should have at least one source node")
 }

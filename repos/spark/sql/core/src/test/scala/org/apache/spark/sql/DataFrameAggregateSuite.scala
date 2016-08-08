@@ -23,8 +23,11 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.DecimalType
 
-case class Fact(
-    date: Int, hour: Int, minute: Int, room_name: String, temp: Double)
+case class Fact(date: Int,
+                hour: Int,
+                minute: Int,
+                room_name: String,
+                temp: Double)
 
 class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
   import testImplicits._
@@ -68,7 +71,9 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
         courseSales.rollup("course", "year").sum("earnings"),
         Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
-            "Java", null, 50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
+            "Java",
+            null,
+            50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
             "dotNET",
             2013,
             48000.0) :: Row("dotNET", null, 63000.0) :: Row(null,
@@ -81,20 +86,25 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
         courseSales.cube("course", "year").sum("earnings"),
         Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
-            "Java", null, 50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
+            "Java",
+            null,
+            50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
             "dotNET",
             2013,
             48000.0) :: Row("dotNET", null, 63000.0) :: Row(null,
                                                             2012,
                                                             35000.0) :: Row(
-            null, 2013, 78000.0) :: Row(null, null, 113000.0) :: Nil
+            null,
+            2013,
+            78000.0) :: Row(null, null, 113000.0) :: Nil
     )
 
     val df0 = sqlContext.sparkContext
-      .parallelize(Seq(Fact(20151123, 18, 35, "room1", 18.6),
-                       Fact(20151123, 18, 35, "room2", 22.4),
-                       Fact(20151123, 18, 36, "room1", 17.4),
-                       Fact(20151123, 18, 36, "room2", 25.6)))
+      .parallelize(
+          Seq(Fact(20151123, 18, 35, "room1", 18.6),
+              Fact(20151123, 18, 35, "room2", 22.4),
+              Fact(20151123, 18, 36, "room1", 17.4),
+              Fact(20151123, 18, 36, "room2", 25.6)))
       .toDF()
 
     val cube0 =
@@ -110,13 +120,21 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                grouping("year"),
                grouping_id("course", "year")),
         Row("Java", 2012, 0, 0, 0) :: Row("Java", 2013, 0, 0, 0) :: Row(
-            "Java", null, 0, 1, 1) :: Row("dotNET", 2012, 0, 0, 0) :: Row(
-            "dotNET", 2013, 0, 0, 0) :: Row("dotNET", null, 0, 1, 1) :: Row(
-            null, 2012, 1, 0, 2) :: Row(null, 2013, 1, 0, 2) :: Row(null,
-                                                                    null,
-                                                                    1,
-                                                                    1,
-                                                                    3) :: Nil
+            "Java",
+            null,
+            0,
+            1,
+            1) :: Row("dotNET", 2012, 0, 0, 0) :: Row("dotNET", 2013, 0, 0, 0) :: Row(
+            "dotNET",
+            null,
+            0,
+            1,
+            1) :: Row(null, 2012, 1, 0, 2) :: Row(null, 2013, 1, 0, 2) :: Row(
+            null,
+            null,
+            1,
+            1,
+            3) :: Nil
     )
 
     intercept[AnalysisException] {
@@ -136,8 +154,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
           .agg(sum("earnings"),
                grouping_id("course", "year"),
                rank().over(Window
-                     .partitionBy(grouping_id("course", "year"))
-                     .orderBy(sum("earnings")))),
+                 .partitionBy(grouping_id("course", "year"))
+                 .orderBy(sum("earnings")))),
         Row("Java", 2012, 20000.0, 0, 2) :: Row("Java", 2013, 30000.0, 0, 3) :: Row(
             "Java",
             null,
@@ -173,7 +191,9 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             4,
             1,
             2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
-            4, null, 2) :: Row(5, null, 1) :: Row(null, null, 3) :: Nil
+            4,
+            null,
+            2) :: Row(5, null, 1) :: Row(null, null, 3) :: Nil
     )
 
     checkAnswer(
@@ -182,7 +202,9 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             3,
             1,
             1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
-            3, null, 3) :: Row(null, null, 9) :: Nil
+            3,
+            null,
+            3) :: Row(null, null, 9) :: Nil
     )
   }
 
@@ -193,8 +215,12 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             4,
             1,
             2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
-            4, null, 2) :: Row(5, null, 1) :: Row(null, 1, 3) :: Row(
-            null, 2, 0) :: Row(null, null, 3) :: Nil
+            4,
+            null,
+            2) :: Row(5, null, 1) :: Row(null, 1, 3) :: Row(null, 2, 0) :: Row(
+            null,
+            null,
+            3) :: Nil
     )
 
     checkAnswer(
@@ -203,9 +229,9 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             3,
             1,
             1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
-            3, null, 3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null,
-                                                                     null,
-                                                                     9) :: Nil
+            3,
+            null,
+            3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null, null, 9) :: Nil
     )
   }
 
@@ -303,7 +329,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
     )
 
     checkAnswer(
-        testData3.agg(count('b), countDistinct('b), sumDistinct('b)), // non-partial
+        testData3
+          .agg(count('b), countDistinct('b), sumDistinct('b)), // non-partial
         Row(1, 1, 2)
     )
   }

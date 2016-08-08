@@ -29,7 +29,8 @@ object IntegrationDocSpec {
   import TwitterStreamQuickstartDocSpec._
 
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
     #//#blocking-dispatcher-config
     blocking-dispatcher {
       executor = "thread-pool-executor"
@@ -144,10 +145,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
 
     //#send-emails
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
-      .mapAsync(4)(address =>
-            {
-          emailServer.send(
-              Email(to = address, title = "Akka", body = "I like your tweet"))
+      .mapAsync(4)(address => {
+        emailServer.send(
+            Email(to = address, title = "Akka", body = "I like your tweet"))
       })
       .to(Sink.ignore)
 
@@ -172,7 +172,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     import ActorAttributes.supervisionStrategy
     import Supervision.resumingDecider
 
-    val emailAddresses: Source[String, NotUsed] = authors.via(Flow[Author]
+    val emailAddresses: Source[String, NotUsed] = authors.via(
+        Flow[Author]
           .mapAsync(4)(author => addressSystem.lookupEmail(author.handle))
           .withAttributes(supervisionStrategy(resumingDecider)))
     //#email-addresses-mapAsync-supervision
@@ -192,10 +193,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       .collect { case Some(emailAddress) => emailAddress }
 
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
-      .mapAsyncUnordered(4)(address =>
-            {
-          emailServer.send(
-              Email(to = address, title = "Akka", body = "I like your tweet"))
+      .mapAsyncUnordered(4)(address => {
+        emailServer.send(
+            Email(to = address, title = "Akka", body = "I like your tweet"))
       })
       .to(Sink.ignore)
 
@@ -228,12 +228,10 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
 
     val sendTextMessages: RunnableGraph[NotUsed] = phoneNumbers
-      .mapAsync(4)(phoneNo =>
-            {
-          Future {
-            smsServer.send(
-                TextMessage(to = phoneNo, body = "I like your tweet"))
-          }(blockingExecutionContext)
+      .mapAsync(4)(phoneNo => {
+        Future {
+          smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
+        }(blockingExecutionContext)
       })
       .to(Sink.ignore)
 
@@ -316,8 +314,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                          maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })
@@ -348,8 +347,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                          maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })

@@ -12,11 +12,24 @@ import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
 import scala.reflect.classTag
 import akka.util.Timeout
-import org.jboss.netty.channel.{Channel, SimpleChannelUpstreamHandler, ChannelHandlerContext, ChannelStateEvent, MessageEvent, WriteCompletionEvent, ExceptionEvent}
+import org.jboss.netty.channel.{
+  Channel,
+  SimpleChannelUpstreamHandler,
+  ChannelHandlerContext,
+  ChannelStateEvent,
+  MessageEvent,
+  WriteCompletionEvent,
+  ExceptionEvent
+}
 import akka.pattern.{ask, AskTimeoutException}
 import akka.event.{LoggingAdapter, Logging}
 import java.net.{InetSocketAddress, ConnectException}
-import akka.remote.transport.ThrottlerTransportAdapter.{SetThrottle, TokenBucket, Blackhole, Unthrottled}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  SetThrottle,
+  TokenBucket,
+  Blackhole,
+  Unthrottled
+}
 import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 
 /**
@@ -25,8 +38,7 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   * the [[akka.remote.testconductor.Conductor]]’s [[akka.remote.testconductor.Controller]]
   * in order to participate in barriers and enable network failure injection.
   */
-trait Player {
-  this: TestConductorExt ⇒
+trait Player { this: TestConductorExt ⇒
 
   private var _client: ActorRef = _
   private def client = _client match {
@@ -46,38 +58,38 @@ trait Player {
     * this is a first barrier in itself). The number of expected participants is
     * set in [[akka.remote.testconductor.Conductor]]`.startController()`.
     */
-  def startClient(
-      name: RoleName, controllerAddr: InetSocketAddress): Future[Done] = {
+  def startClient(name: RoleName,
+                  controllerAddr: InetSocketAddress): Future[Done] = {
     import ClientFSM._
     import akka.actor.FSM._
     import Settings.BarrierTimeout
 
     if (_client ne null)
       throw new IllegalStateException("TestConductorClient already started")
-    _client = system.actorOf(
-        Props(classOf[ClientFSM], name, controllerAddr), "TestConductorClient")
-    val a = system.actorOf(Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
-      var waiting: ActorRef = _
-      def receive = {
-        case fsm: ActorRef ⇒
-          waiting = sender(); fsm ! SubscribeTransitionCallBack(self)
-        case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
-            if (f == Connecting && t == AwaitDone) ⇒
-        // step 1, not there yet // // SI-5900 workaround
-        case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
-            if (f == AwaitDone && t == Connected) ⇒ // SI-5900 workaround
-          waiting ! Done; context stop self
-        case t: Transition[_] ⇒
-          waiting ! Status.Failure(
-              new RuntimeException("unexpected transition: " + t));
-          context stop self
-        case CurrentState(_, s: ClientFSM.State) if (s == Connected) ⇒
-          // SI-5900 workaround
-          waiting ! Done; context stop self
-        case _: CurrentState[_] ⇒
-      }
-    }))
+    _client = system.actorOf(Props(classOf[ClientFSM], name, controllerAddr),
+                             "TestConductorClient")
+    val a = system.actorOf(Props(
+        new Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+          var waiting: ActorRef = _
+          def receive = {
+            case fsm: ActorRef ⇒
+              waiting = sender(); fsm ! SubscribeTransitionCallBack(self)
+            case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
+                if (f == Connecting && t == AwaitDone) ⇒
+            // step 1, not there yet // // SI-5900 workaround
+            case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
+                if (f == AwaitDone && t == Connected) ⇒ // SI-5900 workaround
+              waiting ! Done; context stop self
+            case t: Transition[_] ⇒
+              waiting ! Status.Failure(
+                  new RuntimeException("unexpected transition: " + t));
+              context stop self
+            case CurrentState(_, s: ClientFSM.State) if (s == Connected) ⇒
+              // SI-5900 workaround
+              waiting ! Done; context stop self
+            case _: CurrentState[_] ⇒
+          }
+        }))
 
     a ? client mapTo classTag[Done]
   }
@@ -139,13 +151,14 @@ private[akka] object ClientFSM {
   case object Connected extends State
   case object Failed extends State
 
-  final case class Data(
-      channel: Option[Channel], runningOp: Option[(String, ActorRef)])
+  final case class Data(channel: Option[Channel],
+                        runningOp: Option[(String, ActorRef)])
 
   final case class Connected(channel: Channel)
       extends NoSerializationVerificationNeeded
   final case class ConnectionFailure(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
   case object Disconnected
 }
 
@@ -163,9 +176,10 @@ private[akka] object ClientFSM {
   *
   * INTERNAL API.
   */
-private[akka] class ClientFSM(
-    name: RoleName, controllerAddr: InetSocketAddress)
-    extends Actor with LoggingFSM[ClientFSM.State, ClientFSM.Data]
+private[akka] class ClientFSM(name: RoleName,
+                              controllerAddr: InetSocketAddress)
+    extends Actor
+    with LoggingFSM[ClientFSM.State, ClientFSM.Data]
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ClientFSM._
 
@@ -238,8 +252,9 @@ private[akka] class ClientFSM(
             case Some((barrier, requester)) ⇒
               val response =
                 if (b != barrier)
-                  Status.Failure(new RuntimeException("wrong barrier " + b +
-                          " received while waiting for " + barrier))
+                  Status.Failure(
+                      new RuntimeException("wrong barrier " + b +
+                        " received while waiting for " + barrier))
                 else if (!success)
                   Status.Failure(new RuntimeException("barrier failed: " + b))
                 else b
@@ -275,7 +290,7 @@ private[akka] class ClientFSM(
             case _ ⇒
               throw new RuntimeException(
                   "Throttle was requested from the TestConductor, but no transport " +
-                  "adapters available that support throttling. Specify `testTransport(on = true)` in your MultiNodeConfig")
+                    "adapters available that support throttling. Specify `testTransport(on = true)` in your MultiNodeConfig")
           }
           stay
         case d: DisconnectMsg ⇒
@@ -332,25 +347,25 @@ private[akka] class PlayerHandler(
 
   var nextAttempt: Deadline = _
 
-  override def channelOpen(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
+  override def channelOpen(ctx: ChannelHandlerContext,
+                           event: ChannelStateEvent) =
     log.debug("channel {} open", event.getChannel)
-  override def channelClosed(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
+  override def channelClosed(ctx: ChannelHandlerContext,
+                             event: ChannelStateEvent) =
     log.debug("channel {} closed", event.getChannel)
-  override def channelBound(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
+  override def channelBound(ctx: ChannelHandlerContext,
+                            event: ChannelStateEvent) =
     log.debug("channel {} bound", event.getChannel)
-  override def channelUnbound(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
+  override def channelUnbound(ctx: ChannelHandlerContext,
+                              event: ChannelStateEvent) =
     log.debug("channel {} unbound", event.getChannel)
-  override def writeComplete(
-      ctx: ChannelHandlerContext, event: WriteCompletionEvent) =
-    log.debug(
-        "channel {} written {}", event.getChannel, event.getWrittenAmount)
+  override def writeComplete(ctx: ChannelHandlerContext,
+                             event: WriteCompletionEvent) =
+    log
+      .debug("channel {} written {}", event.getChannel, event.getWrittenAmount)
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, event: ExceptionEvent) = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               event: ExceptionEvent) = {
     log.debug("channel {} exception {}", event.getChannel, event.getCause)
     event.getCause match {
       case c: ConnectException if reconnects > 0 ⇒
@@ -365,15 +380,15 @@ private[akka] class PlayerHandler(
     RemoteConnection(Client, server, poolSize, this)
   }
 
-  override def channelConnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+  override def channelConnected(ctx: ChannelHandlerContext,
+                                event: ChannelStateEvent) = {
     val ch = event.getChannel
     log.debug("connected to {}", getAddrString(ch))
     fsm ! Connected(ch)
   }
 
-  override def channelDisconnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+  override def channelDisconnected(ctx: ChannelHandlerContext,
+                                   event: ChannelStateEvent) = {
     val channel = event.getChannel
     log.debug("disconnected from {}", getAddrString(channel))
     fsm ! PoisonPill
@@ -382,8 +397,8 @@ private[akka] class PlayerHandler(
     }) // Must be shutdown outside of the Netty IO pool
   }
 
-  override def messageReceived(
-      ctx: ChannelHandlerContext, event: MessageEvent) = {
+  override def messageReceived(ctx: ChannelHandlerContext,
+                               event: MessageEvent) = {
     val channel = event.getChannel
     log.debug("message from {}: {}", getAddrString(channel), event.getMessage)
     event.getMessage match {

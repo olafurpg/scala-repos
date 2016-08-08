@@ -25,7 +25,8 @@ import generic._
 trait Seq[A]
     extends Iterable[A]
 //                with GenSeq[A]
-    with scala.collection.Seq[A] with GenericTraversableTemplate[A, Seq]
+    with scala.collection.Seq[A]
+    with GenericTraversableTemplate[A, Seq]
     with SeqLike[A, Seq[A]] {
   override def companion: GenericCompanion[Seq] = Seq
   override def seq: Seq[A] = this
@@ -44,4 +45,5 @@ object Seq extends SeqFactory[Seq] {
 
 /** Explicit instantiation of the `Seq` trait to reduce class file size in subclasses. */
 abstract class AbstractSeq[A]
-    extends scala.collection.AbstractSeq[A] with Seq[A]
+    extends scala.collection.AbstractSeq[A]
+    with Seq[A]

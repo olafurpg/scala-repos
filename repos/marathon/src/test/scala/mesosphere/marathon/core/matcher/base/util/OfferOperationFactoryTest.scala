@@ -1,14 +1,25 @@
 package mesosphere.marathon.core.matcher.base.util
 
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.state.{PathId, PersistentVolume, PersistentVolumeInfo}
+import mesosphere.marathon.state.{
+  PathId,
+  PersistentVolume,
+  PersistentVolumeInfo
+}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, WrongConfigurationException}
+import mesosphere.marathon.{
+  MarathonSpec,
+  MarathonTestHelper,
+  WrongConfigurationException
+}
 import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class OfferOperationFactoryTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("Launch operation succeeds even if principal/role are not set") {
     val f = new Fixture
@@ -69,8 +80,9 @@ class OfferOperationFactoryTest
     val task = MarathonTestHelper.makeOneCPUTask("123")
 
     When("We create a reserve operation")
-    val operation = factory.reserve(
-        f.frameworkId, Task.Id(task.getTaskId), task.getResourcesList.asScala)
+    val operation = factory.reserve(f.frameworkId,
+                                    Task.Id(task.getTaskId),
+                                    task.getResourcesList.asScala)
 
     Then("The operation is as expected")
     operation.getType shouldEqual Mesos.Offer.Operation.Type.RESERVE

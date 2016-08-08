@@ -28,12 +28,17 @@ import union._
 
 object LabelledGenericTestsAux {
   case class Book(author: String, title: String, id: Int, price: Double)
-  case class ExtendedBook(
-      author: String, title: String, id: Int, price: Double, inPrint: Boolean)
+  case class ExtendedBook(author: String,
+                          title: String,
+                          id: Int,
+                          price: Double,
+                          inPrint: Boolean)
   case class BookWithMultipleAuthors(title: String, id: Int, authors: String*)
 
-  val tapl = Book(
-      "Benjamin Pierce", "Types and Programming Languages", 262162091, 44.11)
+  val tapl = Book("Benjamin Pierce",
+                  "Types and Programming Languages",
+                  262162091,
+                  44.11)
   val tapl2 = Book("Benjamin Pierce",
                    "Types and Programming Languages (2nd Ed.)",
                    262162091,
@@ -54,21 +59,23 @@ object LabelledGenericTestsAux {
 
   val taplRecord =
     ('author ->> "Benjamin Pierce") ::
-    ('title ->> "Types and Programming Languages") :: ('id ->> 262162091) ::
-    ('price ->> 44.11) :: HNil
+      ('title ->> "Types and Programming Languages") :: ('id ->> 262162091) ::
+        ('price ->> 44.11) :: HNil
 
   val dpRecord =
     ('title ->> "Design Patterns") :: ('id ->> 201633612) ::
-    ('authors ->> Seq("Erich Gamma",
-                      "Richard Helm",
-                      "Ralph Johnson",
-                      "John Vlissides")) :: HNil
+      ('authors ->> Seq("Erich Gamma",
+                        "Richard Helm",
+                        "Ralph Johnson",
+                        "John Vlissides")) :: HNil
 
-  type BookRec = Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T
+  type BookRec =
+    Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T
   type BookKeys = Keys[BookRec]
   type BookValues = Values[BookRec]
 
-  type BookWithMultipleAuthorsRec = Record.`'title -> String, 'id -> Int, 'authors -> Seq[String]`.T
+  type BookWithMultipleAuthorsRec =
+    Record.`'title -> String, 'id -> Int, 'authors -> Seq[String]`.T
 
   sealed trait Tree
   case class Node(left: Tree, right: Tree) extends Tree
@@ -140,8 +147,8 @@ object ScalazTaggedAux {
           s"${key.value.name}: ${headTC.value()} :: ${tailTC.value()}"
       }
 
-    implicit def projectTC[F, G](
-        implicit lgen: LabelledGeneric.Aux[F, G], tc: Lazy[TC[G]]): TC[F] =
+    implicit def projectTC[F, G](implicit lgen: LabelledGeneric.Aux[F, G],
+                                 tc: Lazy[TC[G]]): TC[F] =
       new TC[F] {
         def apply() = s"Proj(${tc.value()})"
       }

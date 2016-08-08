@@ -4,7 +4,10 @@
 package akka.persistence
 
 import akka.actor._
-import akka.persistence.AtLeastOnceDelivery.{AtLeastOnceDeliverySnapshot, UnconfirmedWarning}
+import akka.persistence.AtLeastOnceDelivery.{
+  AtLeastOnceDeliverySnapshot,
+  UnconfirmedWarning
+}
 import akka.testkit._
 import com.typesafe.config._
 
@@ -54,7 +57,9 @@ object AtLeastOnceDeliverySpec {
                destinations: Map[String, ActorPath],
                async: Boolean,
                actorSelectionDelivery: Boolean)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+      extends PersistentActor
+      with AtLeastOnceDelivery
+      with ActorLogging {
 
     override def persistenceId: String = name
 
@@ -65,14 +70,14 @@ object AtLeastOnceDeliverySpec {
       case AcceptedReq(payload, destination) if actorSelectionDelivery ⇒
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
-            recoveryRunning)
-        deliver(context.actorSelection(destination))(
-            deliveryId ⇒ Action(deliveryId, payload))
+              recoveryRunning)
+        deliver(context.actorSelection(destination))(deliveryId ⇒
+          Action(deliveryId, payload))
 
       case AcceptedReq(payload, destination) ⇒
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
-            recoveryRunning)
+              recoveryRunning)
         deliver(destination)(deliveryId ⇒ Action(deliveryId, payload))
 
       case ReqDone(id) ⇒
@@ -145,8 +150,8 @@ object AtLeastOnceDeliverySpec {
       case a @ Action(id, payload) ⇒
         // discard duplicates (naive impl)
         if (!allReceived.contains(id)) {
-          log.debug(
-              "Destination got {}, all count {}", a, allReceived.size + 1)
+          log
+            .debug("Destination got {}, all count {}", a, allReceived.size + 1)
           testActor ! a
           allReceived += id
         }
@@ -158,7 +163,8 @@ object AtLeastOnceDeliverySpec {
     Props(new Unreliable(dropMod, target))
 
   class Unreliable(dropMod: Int, target: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor
+      with ActorLogging {
     var count = 0
     def receive = {
       case msg ⇒
@@ -173,13 +179,15 @@ object AtLeastOnceDeliverySpec {
   }
 
   class DeliverToStarSelection(name: String)
-      extends PersistentActor with AtLeastOnceDelivery {
+      extends PersistentActor
+      with AtLeastOnceDelivery {
     override def persistenceId = name
 
     override def receiveCommand = {
       case any ⇒
         // this is not supported currently, so expecting exception
-        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id") catch {
+        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id")
+        catch {
           case ex: Exception ⇒ sender() ! Failure(ex)
         }
     }
@@ -189,13 +197,14 @@ object AtLeastOnceDeliverySpec {
 }
 
 abstract class AtLeastOnceDeliverySpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import akka.persistence.AtLeastOnceDeliverySpec._
 
   "AtLeastOnceDelivery" must {
     List(true, false).foreach { deliverUsingActorSelection ⇒
       s"deliver messages in order when nothing is lost (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+        (TimingTest) in {
         val probe = TestProbe()
         val probeA = TestProbe()
         val destinations =
@@ -215,22 +224,22 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       }
 
       s"re-deliver lost messages (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+        (TimingTest) in {
         val probe = TestProbe()
         val probeA = TestProbe()
         val dst = system.actorOf(destinationProps(probeA.ref))
         val destinations =
           Map("A" -> system.actorOf(unreliableProps(3, dst)).path)
-        val snd = system.actorOf(
-            senderProps(probe.ref,
-                        name,
-                        1000.millis,
-                        5,
-                        1000,
-                        destinations,
-                        async = false,
-                        actorSelectionDelivery = deliverUsingActorSelection),
-            name)
+        val snd = system.actorOf(senderProps(probe.ref,
+                                             name,
+                                             1000.millis,
+                                             5,
+                                             1000,
+                                             destinations,
+                                             async = false,
+                                             actorSelectionDelivery =
+                                               deliverUsingActorSelection),
+                                 name)
         snd.tell(Req("a-1"), probe.ref)
         probe.expectMsg(ReqAck)
         probeA.expectMsg(Action(1, "a-1"))
@@ -299,7 +308,7 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
     }
 
     "re-send replayed deliveries with an 'initially in-order' strategy, before delivering fresh messages" taggedAs
-    (TimingTest) in {
+      (TimingTest) in {
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))
@@ -472,10 +481,14 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(2, dst)).path)
 
-      val snd = system.actorOf(
-          senderProps(
-              probe.ref, name, 1000.millis, 5, 2, destinations, async = true),
-          name)
+      val snd = system.actorOf(senderProps(probe.ref,
+                                           name,
+                                           1000.millis,
+                                           5,
+                                           2,
+                                           destinations,
+                                           async = true),
+                               name)
 
       val N = 10
       for (n ← 1 to N) {

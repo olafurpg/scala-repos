@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -118,8 +118,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     def columns = Seq.empty
   }
 
-  case class SingleDBColumn(
-      cref: ColumnRef, column: Column, extractor: (ResultSet, Int) => Unit)
+  case class SingleDBColumn(cref: ColumnRef,
+                            column: Column,
+                            extractor: (ResultSet, Int) => Unit)
       extends DBColumns {
     def extract(rs: ResultSet, rowId: Int) = extractor(rs, rowId)
     def columns = Seq(cref -> column)
@@ -292,7 +293,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
       case other =>
         logger.warn(
-            "Unsupported JDBC column type %d for %s".format(other, selector)); EmptyDBColumn
+            "Unsupported JDBC column type %d for %s".format(other, selector));
+        EmptyDBColumn
     }
   }
 
@@ -305,38 +307,40 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   }
 
   trait JDBCColumnarTableCompanion
-      extends BlockStoreColumnarTableCompanion with Logging {
+      extends BlockStoreColumnarTableCompanion
+      with Logging {
 
     /** Maps a given database name to a JDBC connection URL */
     def databaseMap: Map[String, String]
 
-    private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
-      case JArrayFixedT(elements) if current.nonEmpty =>
-        elements.map {
-          case (index, childType) =>
-            val newPaths = current.map { s =>
-              s + "[" + index + "]"
-            }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
-
-      case JObjectFixedT(fields) =>
-        fields.map {
-          case (name, childType) =>
-            val newPaths =
-              if (current.nonEmpty) {
-                current.map { s =>
-                  s + "." + name
-                }
-              } else {
-                Set(name)
+    private def jTypeToProperties(tpe: JType,
+                                  current: Set[String]): Set[String] =
+      tpe match {
+        case JArrayFixedT(elements) if current.nonEmpty =>
+          elements.map {
+            case (index, childType) =>
+              val newPaths = current.map { s =>
+                s + "[" + index + "]"
               }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+              jTypeToProperties(childType, newPaths)
+          }.toSet.flatten
 
-      case _ => current
-    }
+        case JObjectFixedT(fields) =>
+          fields.map {
+            case (name, childType) =>
+              val newPaths =
+                if (current.nonEmpty) {
+                  current.map { s =>
+                    s + "." + name
+                  }
+                } else {
+                  Set(name)
+                }
+              jTypeToProperties(childType, newPaths)
+          }.toSet.flatten
+
+        case _ => current
+      }
 
     case class Query(expr: String, limit: Int) {
       private val baseQuery =
@@ -370,10 +374,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
               case InLoad(connGen, query, skip, remaining) =>
                 M.point {
                   val (slice, nextSkip) = makeSlice(connGen, query, skip)
-                  Some((slice,
-                        nextSkip
-                          .map(InLoad(connGen, query, _, remaining))
-                          .getOrElse(InitialLoad(remaining))))
+                  Some(
+                      (slice,
+                       nextSkip
+                         .map(InLoad(connGen, query, _, remaining))
+                         .getOrElse(InitialLoad(remaining))))
                 }
 
               case InitialLoad(path :: xs) =>
@@ -422,7 +427,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                   case err =>
                     sys.error("JDBC path " + path.path +
-                        " does not have the form /dbName/tableName; rollups not yet supported.")
+                      " does not have the form /dbName/tableName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>

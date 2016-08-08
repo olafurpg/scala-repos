@@ -71,7 +71,9 @@ private[spark] class SparkUICssErrorHandler extends DefaultCssErrorHandler {
   * Selenium tests for the Spark Web UI.
   */
 class UISeleniumSuite
-    extends SparkFunSuite with WebBrowser with Matchers
+    extends SparkFunSuite
+    with WebBrowser
+    with Matchers
     with BeforeAndAfterAll {
 
   implicit var webDriver: WebDriver = _
@@ -283,8 +285,11 @@ class UISeleniumSuite
           val mapId = 0
           val reduceId = taskContext.partitionId()
           val message = "Simulated fetch failure"
-          throw new FetchFailedException(
-              bmAddress, shuffleId, mapId, reduceId, message)
+          throw new FetchFailedException(bmAddress,
+                                         shuffleId,
+                                         mapId,
+                                         reduceId,
+                                         message)
         } else {
           x
         }
@@ -464,8 +469,7 @@ class UISeleniumSuite
       val sparkUI = sc.ui.get
 
       val newTab = new WebUITab(sparkUI, "foo") {
-        attachPage(
-            new WebUIPage("") {
+        attachPage(new WebUIPage("") {
           def render(request: HttpServletRequest): Seq[Node] = {
             <b>"html magic"</b>
           }
@@ -478,7 +482,7 @@ class UISeleniumSuite
         find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="environment"]""")) should not be
-        (None)
+          (None)
         find(cssSelector("""ul li a[href*="foo"]""")) should not be (None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -493,7 +497,7 @@ class UISeleniumSuite
         find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="environment"]""")) should not be
-        (None)
+          (None)
         find(cssSelector("""ul li a[href*="foo"]""")) should be(None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -522,7 +526,7 @@ class UISeleniumSuite
         .countAsync()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         val url = new URL(sc.ui.get.appUIAddress.stripSuffix("/") +
-            "/stages/stage/kill/?id=0&terminate=true")
+          "/stages/stage/kill/?id=0&terminate=true")
         // SPARK-6846: should be POST only but YARN AM doesn't proxy POST
         getResponseCode(url, "GET") should be(200)
         getResponseCode(url, "POST") should be(200)
@@ -699,39 +703,48 @@ class UISeleniumSuite
 
       val stage0 = Source
         .fromURL(sc.ui.get.appUIAddress +
-            "/stages/stage/?id=0&attempt=0&expandDagViz=true")
+          "/stages/stage/?id=0&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage0.contains("digraph G {\n  subgraph clusterstage_0 {\n    " +
-              "label=&quot;Stage 0&quot;;\n    subgraph "))
+      assert(
+          stage0.contains("digraph G {\n  subgraph clusterstage_0 {\n    " +
+            "label=&quot;Stage 0&quot;;\n    subgraph "))
       assert(
           stage0.contains("{\n      label=&quot;parallelize&quot;;\n      " +
-              "0 [label=&quot;ParallelCollectionRDD [0]"))
-      assert(stage0.contains("{\n      label=&quot;map&quot;;\n      " +
-              "1 [label=&quot;MapPartitionsRDD [1]"))
-      assert(stage0.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "2 [label=&quot;MapPartitionsRDD [2]"))
+            "0 [label=&quot;ParallelCollectionRDD [0]"))
+      assert(
+          stage0.contains("{\n      label=&quot;map&quot;;\n      " +
+            "1 [label=&quot;MapPartitionsRDD [1]"))
+      assert(
+          stage0.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+            "2 [label=&quot;MapPartitionsRDD [2]"))
 
       val stage1 = Source
         .fromURL(sc.ui.get.appUIAddress +
-            "/stages/stage/?id=1&attempt=0&expandDagViz=true")
+          "/stages/stage/?id=1&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage1.contains("digraph G {\n  subgraph clusterstage_1 {\n    " +
-              "label=&quot;Stage 1&quot;;\n    subgraph "))
-      assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "3 [label=&quot;ShuffledRDD [3]"))
-      assert(stage1.contains("{\n      label=&quot;map&quot;;\n      " +
-              "4 [label=&quot;MapPartitionsRDD [4]"))
-      assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "5 [label=&quot;MapPartitionsRDD [5]"))
+      assert(
+          stage1.contains("digraph G {\n  subgraph clusterstage_1 {\n    " +
+            "label=&quot;Stage 1&quot;;\n    subgraph "))
+      assert(
+          stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+            "3 [label=&quot;ShuffledRDD [3]"))
+      assert(
+          stage1.contains("{\n      label=&quot;map&quot;;\n      " +
+            "4 [label=&quot;MapPartitionsRDD [4]"))
+      assert(
+          stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+            "5 [label=&quot;MapPartitionsRDD [5]"))
 
       val stage2 = Source
         .fromURL(sc.ui.get.appUIAddress +
-            "/stages/stage/?id=2&attempt=0&expandDagViz=true")
+          "/stages/stage/?id=2&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage2.contains("digraph G {\n  subgraph clusterstage_2 {\n    " +
-              "label=&quot;Stage 2&quot;;\n    subgraph "))
-      assert(stage2.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "6 [label=&quot;ShuffledRDD [6]"))
+      assert(
+          stage2.contains("digraph G {\n  subgraph clusterstage_2 {\n    " +
+            "label=&quot;Stage 2&quot;;\n    subgraph "))
+      assert(
+          stage2.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+            "6 [label=&quot;ShuffledRDD [6]"))
     }
   }
 
@@ -754,6 +767,6 @@ class UISeleniumSuite
   def apiUrl(ui: SparkUI, path: String): URL = {
     new URL(
         ui.appUIAddress + "/api/v1/applications/" + ui.sc.get.applicationId +
-        "/" + path)
+          "/" + path)
   }
 }

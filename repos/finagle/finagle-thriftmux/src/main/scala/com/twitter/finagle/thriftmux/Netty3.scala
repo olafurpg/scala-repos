@@ -1,11 +1,20 @@
 package com.twitter.finagle.thriftmux
 
 import com.twitter.finagle.{Path, Failure, Dtab, ThriftMuxUtil}
-import com.twitter.finagle.mux.transport.{BadMessageException, Message, Netty3Framer}
+import com.twitter.finagle.mux.transport.{
+  BadMessageException,
+  Message,
+  Netty3Framer
+}
 import com.twitter.finagle.netty3.BufChannelBuffer
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.thrift._
-import com.twitter.finagle.thrift.thrift.{RequestContext, RequestHeader, ResponseHeader, UpgradeReply}
+import com.twitter.finagle.thrift.thrift.{
+  RequestContext,
+  RequestHeader,
+  ResponseHeader,
+  UpgradeReply
+}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.logging.Level
 import com.twitter.util.{Try, Return, Throw, NonFatal}
@@ -59,15 +68,15 @@ private[finagle] class PipelineFactory(
           2 + (if (header.contexts == null) 0 else header.contexts.size))
 
       contextBuf +=
-      (BufChannelBuffer(Trace.idCtx.marshalId) -> BufChannelBuffer(
-              Trace.idCtx.marshal(richHeader.traceId)))
+        (BufChannelBuffer(Trace.idCtx.marshalId) -> BufChannelBuffer(
+            Trace.idCtx.marshal(richHeader.traceId)))
 
       richHeader.clientId match {
         case Some(clientId) =>
           val clientIdBuf = ClientId.clientIdCtx.marshal(Some(clientId))
           contextBuf +=
-          (BufChannelBuffer(ClientId.clientIdCtx.marshalId) -> BufChannelBuffer(
-                  clientIdBuf))
+            (BufChannelBuffer(ClientId.clientIdCtx.marshalId) -> BufChannelBuffer(
+                clientIdBuf))
         case None =>
       }
 
@@ -87,8 +96,8 @@ private[finagle] class PipelineFactory(
                         requestBuf)
     }
 
-    override def messageReceived(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def messageReceived(ctx: ChannelHandlerContext,
+                                 e: MessageEvent): Unit = {
       val buf = e.getMessage.asInstanceOf[ChannelBuffer]
       super.messageReceived(
           ctx,
@@ -97,8 +106,8 @@ private[finagle] class PipelineFactory(
                                    e.getRemoteAddress))
     }
 
-    override def writeRequested(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def writeRequested(ctx: ChannelHandlerContext,
+                                e: MessageEvent): Unit = {
       Message.decode(e.getMessage.asInstanceOf[ChannelBuffer]) match {
         case Message.RdispatchOk(_, _, rep) =>
           super.writeRequested(
@@ -133,14 +142,15 @@ private[finagle] class PipelineFactory(
   }
 
   private class TFramedToMux extends SimpleChannelHandler {
-    override def writeRequested(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def writeRequested(ctx: ChannelHandlerContext,
+                                e: MessageEvent): Unit = {
       Message.decode(e.getMessage.asInstanceOf[ChannelBuffer]) match {
         case Message.RdispatchOk(_, _, rep) =>
-          super.writeRequested(
-              ctx,
-              new DownstreamMessageEvent(
-                  e.getChannel, e.getFuture, rep, e.getRemoteAddress))
+          super.writeRequested(ctx,
+                               new DownstreamMessageEvent(e.getChannel,
+                                                          e.getFuture,
+                                                          rep,
+                                                          e.getRemoteAddress))
 
         case Message.RdispatchNack(_, _) =>
           // The only mechanism for negative acknowledgement afforded by non-Mux
@@ -164,16 +174,19 @@ private[finagle] class PipelineFactory(
       }
     }
 
-    override def messageReceived(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def messageReceived(ctx: ChannelHandlerContext,
+                                 e: MessageEvent): Unit = {
       val buf = e.getMessage.asInstanceOf[ChannelBuffer]
       super.messageReceived(
           ctx,
-          new UpstreamMessageEvent(
-              e.getChannel,
-              Message.encode(Message.Tdispatch(
-                      Message.Tags.MinTag, Nil, Path.empty, Dtab.empty, buf)),
-              e.getRemoteAddress))
+          new UpstreamMessageEvent(e.getChannel,
+                                   Message.encode(
+                                       Message.Tdispatch(Message.Tags.MinTag,
+                                                         Nil,
+                                                         Path.empty,
+                                                         Dtab.empty,
+                                                         buf)),
+                                   e.getRemoteAddress))
     }
   }
 
@@ -185,14 +198,14 @@ private[finagle] class PipelineFactory(
     private[this] val q = new LinkedBlockingDeque[MessageEvent]
     private[this] val n = new AtomicInteger(pendingReqs)
 
-    override def messageReceived(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def messageReceived(ctx: ChannelHandlerContext,
+                                 e: MessageEvent): Unit = {
       if (n.incrementAndGet() > 1) q.offer(e)
       else super.messageReceived(ctx, e)
     }
 
-    override def writeRequested(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def writeRequested(ctx: ChannelHandlerContext,
+                                e: MessageEvent): Unit = {
       super.writeRequested(ctx, e)
       if (n.decrementAndGet() > 0) {
         // Need to call q.take() Since incrementing n and enqueueing the
@@ -205,8 +218,10 @@ private[finagle] class PipelineFactory(
   private object Upgrader {
     val upNegotiationAck = {
       val buffer = new OutputBuffer(protocolFactory)
-      buffer().writeMessageBegin(new TMessage(
-              ThriftTracing.CanTraceMethodName, TMessageType.REPLY, 0))
+      buffer().writeMessageBegin(
+          new TMessage(ThriftTracing.CanTraceMethodName,
+                       TMessageType.REPLY,
+                       0))
       val upgradeReply = new UpgradeReply
       upgradeReply.write(buffer())
       buffer().writeMessageEnd()
@@ -240,8 +255,8 @@ private[finagle] class PipelineFactory(
 
     private[this] def isTTwitterUpNegotiation(req: ChannelBuffer): Boolean = {
       try {
-        val buffer = new InputBuffer(
-            ThriftMuxUtil.bufferToArray(req), protocolFactory)
+        val buffer =
+          new InputBuffer(ThriftMuxUtil.bufferToArray(req), protocolFactory)
         val msg = buffer().readMessageBegin()
         msg.`type` == TMessageType.CALL &&
         msg.name == ThriftTracing.CanTraceMethodName
@@ -250,13 +265,13 @@ private[finagle] class PipelineFactory(
       }
     }
 
-    override def writeRequested(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def writeRequested(ctx: ChannelHandlerContext,
+                                e: MessageEvent): Unit = {
       if (!writeq.offer(e)) super.writeRequested(ctx, e)
     }
 
-    override def messageReceived(
-        ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    override def messageReceived(ctx: ChannelHandlerContext,
+                                 e: MessageEvent): Unit = {
       val buf = e.getMessage.asInstanceOf[ChannelBuffer]
       val pipeline = ctx.getPipeline
       Try { Message.decode(buf.duplicate()) } match {
@@ -291,8 +306,7 @@ private[finagle] class PipelineFactory(
           // decrement on channel closure.
           downgradedConnects.incr()
           downgradedConnectionCount.incrementAndGet()
-          ctx.getChannel.getCloseFuture.addListener(
-              new ChannelFutureListener {
+          ctx.getChannel.getCloseFuture.addListener(new ChannelFutureListener {
             override def operationComplete(f: ChannelFuture): Unit =
               if (!f.isCancelled) {
                 // on success or failure
@@ -302,12 +316,13 @@ private[finagle] class PipelineFactory(
 
           // Add a ChannelHandler to serialize the requests since we may
           // deal with a client that pipelines requests
-          pipeline.addBefore(
-              ctx.getName, "request_serializer", new RequestSerializer(1))
+          pipeline.addBefore(ctx.getName,
+                             "request_serializer",
+                             new RequestSerializer(1))
           if (isTTwitterUpNegotiation(buf)) {
             pipeline.replace(this, "twitter_thrift_to_mux", new TTwitterToMux)
-            Channels.write(
-                ctx, e.getFuture, upNegotiationAck, e.getRemoteAddress)
+            Channels
+              .write(ctx, e.getFuture, upNegotiationAck, e.getRemoteAddress)
           } else {
             pipeline.replace(this, "framed_thrift_to_mux", new TFramedToMux)
             super.messageReceived(
@@ -328,8 +343,7 @@ private[finagle] class PipelineFactory(
           // decrement on channel closure.
           thriftmuxConnects.incr()
           thriftMuxConnectionCount.incrementAndGet()
-          ctx.getChannel.getCloseFuture.addListener(
-              new ChannelFutureListener {
+          ctx.getChannel.getCloseFuture.addListener(new ChannelFutureListener {
             override def operationComplete(f: ChannelFuture): Unit =
               if (!f.isCancelled) {
                 // on success or failure

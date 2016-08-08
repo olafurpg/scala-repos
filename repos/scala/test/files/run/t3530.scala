@@ -1,7 +1,6 @@
 object Test {
   def f(x: Any) =
-    println(
-        x match {
+    println(x match {
       case List(_, _) => "two"
       case List(_, _, _) => "three"
       case xs @ List(_ *) => "list: " + xs.length
@@ -9,8 +8,7 @@ object Test {
     })
 
   def f2[T](x: List[T]) =
-    println(
-        x match {
+    println(x match {
       case List(_, _) => "two"
       case List(_, _, _) => "three"
       case List(xs @ _ *) => "list: " + xs.length

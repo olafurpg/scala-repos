@@ -28,7 +28,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class BucketizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -131,7 +132,9 @@ class BucketizerSuite
       "Binary search correctness in contrast with linear search, on random data") {
     val data = Array.fill(100)(Random.nextDouble())
     val splits: Array[Double] =
-      Double.NegativeInfinity +: Array.fill(10)(Random.nextDouble()).sorted :+ Double.PositiveInfinity
+      Double.NegativeInfinity +: Array
+        .fill(10)(Random.nextDouble())
+        .sorted :+ Double.PositiveInfinity
     val bsResult = Vectors.dense(
         data.map(x => Bucketizer.binarySearchForBuckets(splits, x)))
     val lsResult = Vectors.dense(
@@ -167,9 +170,10 @@ private object BucketizerSuite extends SparkFunSuite {
   def checkBinarySearch(splits: Array[Double]): Unit = {
     def testFeature(feature: Double, expectedBucket: Double): Unit = {
       assert(
-          Bucketizer.binarySearchForBuckets(splits, feature) === expectedBucket,
+          Bucketizer
+            .binarySearchForBuckets(splits, feature) === expectedBucket,
           s"Expected feature value $feature to be in bucket $expectedBucket with splits:" +
-          s" ${splits.mkString(", ")}")
+            s" ${splits.mkString(", ")}")
     }
     var i = 0
     val n = splits.length - 1

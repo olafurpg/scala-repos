@@ -82,8 +82,8 @@ private[hive] case class HiveTableScan(
   addColumnMetadataToConf(hiveExtraConf)
 
   @transient
-  private[this] val hadoopReader = new HadoopTableReader(
-      attributes, relation, context, hiveExtraConf)
+  private[this] val hadoopReader =
+    new HadoopTableReader(attributes, relation, context, hiveExtraConf)
 
   private[this] def castFromString(value: String, dataType: DataType) = {
     Cast(Literal(value), dataType).eval(null)
@@ -94,8 +94,8 @@ private[hive] case class HiveTableScan(
     val neededColumnIDs =
       attributes.flatMap(relation.columnOrdinals.get).map(o => o: Integer)
 
-    HiveShim.appendReadColumns(
-        hiveConf, neededColumnIDs, attributes.map(_.name))
+    HiveShim
+      .appendReadColumns(hiveConf, neededColumnIDs, attributes.map(_.name))
 
     val tableDesc = relation.tableDesc
     val deserializer = tableDesc.getDeserializerClass.newInstance
@@ -103,8 +103,8 @@ private[hive] case class HiveTableScan(
 
     // Specifies types and object inspectors of columns to be scanned.
     val structOI = ObjectInspectorUtils
-      .getStandardObjectInspector(
-          deserializer.getObjectInspector, ObjectInspectorCopyOption.JAVA)
+      .getStandardObjectInspector(deserializer.getObjectInspector,
+                                  ObjectInspectorCopyOption.JAVA)
       .asInstanceOf[StructObjectInspector]
 
     val columnTypeNames = structOI.getAllStructFieldRefs.asScala
@@ -151,7 +151,8 @@ private[hive] case class HiveTableScan(
         }
       } else {
         Utils.withDummyCallSite(sqlContext.sparkContext) {
-          hadoopReader.makeRDDForPartitionedTable(prunePartitions(
+          hadoopReader.makeRDDForPartitionedTable(
+              prunePartitions(
                   relation.getHiveQlPartitions(partitionPruningPred)))
         }
       }

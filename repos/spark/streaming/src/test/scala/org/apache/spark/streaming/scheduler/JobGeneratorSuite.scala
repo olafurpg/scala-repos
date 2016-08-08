@@ -60,8 +60,8 @@ class JobGeneratorSuite extends TestSuiteBase {
     import JobGeneratorSuite._
     val checkpointDir = Utils.createTempDir()
     val testConf = conf
-    testConf.set(
-        "spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
+    testConf.set("spark.streaming.clock",
+                 "org.apache.spark.streaming.util.ManualClock")
     testConf.set("spark.streaming.receiver.writeAheadLog.rollingInterval", "1")
 
     withStreamingContext(new StreamingContext(testConf, batchDuration)) {
@@ -74,14 +74,12 @@ class JobGeneratorSuite extends TestSuiteBase {
         val testTimeout = timeout(10 seconds)
         val inputStream = ssc.receiverStream(new TestReceiver)
 
-        inputStream.foreachRDD(
-            (rdd: RDD[Int], time: Time) =>
-              {
-            if (time.milliseconds == longBatchTime) {
-              while (waitLatch.getCount() > 0) {
-                waitLatch.await()
-              }
+        inputStream.foreachRDD((rdd: RDD[Int], time: Time) => {
+          if (time.milliseconds == longBatchTime) {
+            while (waitLatch.getCount() > 0) {
+              waitLatch.await()
             }
+          }
         })
 
         val batchCounter = new BatchCounter(ssc)

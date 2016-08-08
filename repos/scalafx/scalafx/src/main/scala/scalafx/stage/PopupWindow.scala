@@ -31,7 +31,11 @@ import javafx.{event => jfxe, stage => jfxs}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 import scalafx.scene.Node._
 import scalafx.stage.Window._
@@ -44,8 +48,8 @@ object PopupWindow {
     * Wraps [[http://download.java.net/jdk8/jfxdocs/javafx/stage/PopupWindow.AnchorLocation.html AnchorLocation]]
     */
   object AnchorLocation
-      extends SFXEnumDelegateCompanion[
-          jfxs.PopupWindow.AnchorLocation, AnchorLocation] {
+      extends SFXEnumDelegateCompanion[jfxs.PopupWindow.AnchorLocation,
+                                       AnchorLocation] {
 
     /** Represents bottom left content corner. */
     val ContentBottomLeft = new AnchorLocation(
@@ -131,7 +135,8 @@ object PopupWindow {
 }
 
 abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
-    extends Window(delegate) with SFXDelegate[jfxs.PopupWindow] {
+    extends Window(delegate)
+    with SFXDelegate[jfxs.PopupWindow] {
 
   /** Specifies the popup anchor point which is used in popup positioning. */
   def anchorLocation: ObjectProperty[jfxs.PopupWindow.AnchorLocation] =

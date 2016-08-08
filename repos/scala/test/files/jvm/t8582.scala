@@ -33,11 +33,10 @@ object Test extends BytecodeTest {
   def nprintln(s: String) = println("\n" + s)
   def printInner(cname: String): Unit = {
     val cnode = loadClassNode(cname)
-    println(
-        cnode.innerClasses.asScala.toList
-          .map(i =>
-                s"className[${i.name}] outerClassName[${i.outerName}] innerName[${i.innerName}] access[${i.access}]")
-          .mkString(" ", "\n ", ""))
+    println(cnode.innerClasses.asScala.toList
+      .map(i =>
+        s"className[${i.name}] outerClassName[${i.outerName}] innerName[${i.innerName}] access[${i.access}]")
+      .mkString(" ", "\n ", ""))
   }
 
   def show() {
@@ -73,7 +72,7 @@ object Test extends BytecodeTest {
     printInner("A1$B1")
     println(
         "C1 is a nested class, so it has an InnerClass attribute for itself.\n" +
-        "Because that attribute leads to an entry for B1 in the constant pool, C1 needs an InnerClass attribute for B1.")
+          "Because that attribute leads to an entry for B1 in the constant pool, C1 needs an InnerClass attribute for B1.")
     printInner("A1$B1$C1")
 
     nprintln(

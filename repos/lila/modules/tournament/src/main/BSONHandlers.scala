@@ -12,7 +12,8 @@ object BSONHandlers {
   private implicit val startingPositionBSONHandler =
     new BSONHandler[BSONString, StartingPosition] {
       def read(bsonStr: BSONString): StartingPosition =
-        StartingPosition.byEco(bsonStr.value) err s"No such starting position: ${bsonStr.value}"
+        StartingPosition
+          .byEco(bsonStr.value) err s"No such starting position: ${bsonStr.value}"
       def write(x: StartingPosition) = BSONString(x.eco)
     }
 
@@ -41,15 +42,15 @@ object BSONHandlers {
       val variant =
         r.intO("variant").fold[Variant](Variant.default)(Variant.orDefault)
       val position =
-        r.strO("eco").flatMap(StartingPosition.byEco) | StartingPosition.initial
+        r.strO("eco")
+          .flatMap(StartingPosition.byEco) | StartingPosition.initial
       val startsAt = r date "startsAt"
       Tournament(
           id = r str "_id",
           name = r str "name",
           status = r.get[Status]("status"),
-          system = r
-              .intO("system")
-              .fold[System](System.default)(System.orDefault),
+          system =
+            r.intO("system").fold[System](System.default)(System.orDefault),
           clock = r.get[TournamentClock]("clock"),
           minutes = r int "minutes",
           variant = variant,

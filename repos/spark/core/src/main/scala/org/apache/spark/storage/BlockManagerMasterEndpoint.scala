@@ -26,7 +26,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.apache.spark.SparkConf
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.internal.Logging
-import org.apache.spark.rpc.{RpcCallContext, RpcEndpointRef, RpcEnv, ThreadSafeRpcEndpoint}
+import org.apache.spark.rpc.{
+  RpcCallContext,
+  RpcEndpointRef,
+  RpcEnv,
+  ThreadSafeRpcEndpoint
+}
 import org.apache.spark.scheduler._
 import org.apache.spark.storage.BlockManagerMessages._
 import org.apache.spark.util.{ThreadUtils, Utils}
@@ -39,7 +44,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
                                                 val isLocal: Boolean,
                                                 conf: SparkConf,
                                                 listenerBus: LiveListenerBus)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   // Mapping from block manager id to the block manager's information.
   private val blockManagerInfo =
@@ -64,10 +70,17 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       register(blockManagerId, maxMemSize, slaveEndpoint)
       context.reply(true)
 
-    case _updateBlockInfo @ UpdateBlockInfo(
-        blockManagerId, blockId, storageLevel, deserializedSize, size) =>
-      context.reply(updateBlockInfo(
-              blockManagerId, blockId, storageLevel, deserializedSize, size))
+    case _updateBlockInfo @ UpdateBlockInfo(blockManagerId,
+                                            blockId,
+                                            storageLevel,
+                                            deserializedSize,
+                                            size) =>
+      context.reply(
+          updateBlockInfo(blockManagerId,
+                          blockId,
+                          storageLevel,
+                          deserializedSize,
+                          size))
       listenerBus.post(
           SparkListenerBlockUpdated(BlockUpdatedInfo(_updateBlockInfo)))
 
@@ -142,8 +155,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       blockLocations.asScala.keys.flatMap(_.asRDDId).filter(_.rddId == rddId)
     blocks.foreach { blockId =>
       val bms: mutable.HashSet[BlockManagerId] = blockLocations.get(blockId)
-      bms.foreach(
-          bm => blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
+      bms.foreach(bm =>
+        blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
       blockLocations.remove(blockId)
     }
 
@@ -172,8 +185,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     * of all broadcast blocks. If removeFromDriver is false, broadcast blocks are only removed
     * from the executors, but not from the driver.
     */
-  private def removeBroadcast(
-      broadcastId: Long, removeFromDriver: Boolean): Future[Seq[Int]] = {
+  private def removeBroadcast(broadcastId: Long,
+                              removeFromDriver: Boolean): Future[Seq[Int]] = {
     val removeMsg = RemoveBroadcast(broadcastId, removeFromDriver)
     val requiredBlockManagers = blockManagerInfo.values.filter { info =>
       removeFromDriver || !info.blockManagerId.isDriver
@@ -202,8 +215,9 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
         blockLocations.remove(blockId)
       }
     }
-    listenerBus.post(SparkListenerBlockManagerRemoved(
-            System.currentTimeMillis(), blockManagerId))
+    listenerBus.post(
+        SparkListenerBlockManagerRemoved(System.currentTimeMillis(),
+                                         blockManagerId))
     logInfo(s"Removing block manager $blockManagerId")
   }
 
@@ -294,8 +308,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     * statuses. This is useful when the master is not informed of the given block by all block
     * managers.
     */
-  private def getMatchingBlockIds(
-      filter: BlockId => Boolean, askSlaves: Boolean): Future[Seq[BlockId]] = {
+  private def getMatchingBlockIds(filter: BlockId => Boolean,
+                                  askSlaves: Boolean): Future[Seq[BlockId]] = {
     val getMatchingBlockIds = GetMatchingBlockIds(filter)
     Future
       .sequence(
@@ -312,8 +326,9 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       .map(_.flatten.toSeq)
   }
 
-  private def register(
-      id: BlockManagerId, maxMemSize: Long, slaveEndpoint: RpcEndpointRef) {
+  private def register(id: BlockManagerId,
+                       maxMemSize: Long,
+                       slaveEndpoint: RpcEndpointRef) {
     val time = System.currentTimeMillis()
     if (!blockManagerInfo.contains(id)) {
       blockManagerIdByExecutor.get(id.executorId) match {
@@ -321,17 +336,20 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
           // A block manager of the same executor already exists, so remove it (assumed dead)
           logError(
               "Got two different block manager registrations on same executor - " +
-              s" will replace old one $oldId with new one $id")
+                s" will replace old one $oldId with new one $id")
           removeExecutor(id.executorId)
         case None =>
       }
-      logInfo("Registering block manager %s with %s RAM, %s".format(
-              id.hostPort, Utils.bytesToString(maxMemSize), id))
+      logInfo(
+          "Registering block manager %s with %s RAM, %s"
+            .format(id.hostPort, Utils.bytesToString(maxMemSize), id))
 
       blockManagerIdByExecutor(id.executorId) = id
 
-      blockManagerInfo(id) = new BlockManagerInfo(
-          id, System.currentTimeMillis(), maxMemSize, slaveEndpoint)
+      blockManagerInfo(id) = new BlockManagerInfo(id,
+                                                  System.currentTimeMillis(),
+                                                  maxMemSize,
+                                                  slaveEndpoint)
     }
     listenerBus.post(SparkListenerBlockManagerAdded(time, id, maxMemSize))
   }
@@ -357,8 +375,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       return true
     }
 
-    blockManagerInfo(blockManagerId).updateBlockInfo(
-        blockId, storageLevel, memSize, diskSize)
+    blockManagerInfo(blockManagerId)
+      .updateBlockInfo(blockId, storageLevel, memSize, diskSize)
 
     var locations: mutable.HashSet[BlockManagerId] = null
     if (blockLocations.containsKey(blockId)) {
@@ -409,7 +427,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
   private def getExecutorEndpointRef(
       executorId: String): Option[RpcEndpointRef] = {
     for (blockManagerId <- blockManagerIdByExecutor.get(executorId);
-    info <- blockManagerInfo.get(blockManagerId)) yield {
+         info <- blockManagerInfo.get(blockManagerId)) yield {
       info.slaveEndpoint
     }
   }
@@ -420,8 +438,9 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
 }
 
 @DeveloperApi
-case class BlockStatus(
-    storageLevel: StorageLevel, memSize: Long, diskSize: Long) {
+case class BlockStatus(storageLevel: StorageLevel,
+                       memSize: Long,
+                       diskSize: Long) {
   def isCached: Boolean = memSize + diskSize > 0
 }
 
@@ -480,8 +499,8 @@ private[spark] class BlockManagerInfo(val blockManagerId: BlockManagerId,
        * Therefore, a safe way to set BlockStatus is to set its info in accurate modes. */
       var blockStatus: BlockStatus = null
       if (storageLevel.useMemory) {
-        blockStatus = BlockStatus(
-            storageLevel, memSize = memSize, diskSize = 0)
+        blockStatus =
+          BlockStatus(storageLevel, memSize = memSize, diskSize = 0)
         _blocks.put(blockId, blockStatus)
         _remainingMem -= memSize
         logInfo(
@@ -492,8 +511,8 @@ private[spark] class BlockManagerInfo(val blockManagerId: BlockManagerId,
                 Utils.bytesToString(_remainingMem)))
       }
       if (storageLevel.useDisk) {
-        blockStatus = BlockStatus(
-            storageLevel, memSize = 0, diskSize = diskSize)
+        blockStatus =
+          BlockStatus(storageLevel, memSize = 0, diskSize = diskSize)
         _blocks.put(blockId, blockStatus)
         logInfo(
             "Added %s on disk on %s (size: %s)".format(

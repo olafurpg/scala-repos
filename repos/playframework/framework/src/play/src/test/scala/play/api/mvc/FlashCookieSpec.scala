@@ -96,7 +96,7 @@ object FlashCookieSpec extends Specification {
     "put disallows null values" in {
       val c = Flash(Map("foo" -> "bar"))
       c + (("x", null)) must throwA(new IllegalArgumentException(
-              "requirement failed: Cookie values cannot be null"))
+          "requirement failed: Cookie values cannot be null"))
     }
     "be insecure by default" in {
       Flash.encodeAsCookie(Flash()).secure must beFalse

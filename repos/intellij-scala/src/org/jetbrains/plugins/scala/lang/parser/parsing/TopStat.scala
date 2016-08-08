@@ -8,7 +8,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.base.Import
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.TmplDef
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.template.TemplateStat
-import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
+import org.jetbrains.plugins.scala.lang.parser.util.{
+  ParserPatcher,
+  ParserUtils
+}
 
 import scala.annotation.tailrec
 

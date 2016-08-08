@@ -5,8 +5,8 @@ import scala.annotation.tailrec
 import java.nio._
 import java.nio.charset._
 
-class OutputStreamWriter(
-    private[this] var out: OutputStream, private[this] var enc: CharsetEncoder)
+class OutputStreamWriter(private[this] var out: OutputStream,
+                         private[this] var enc: CharsetEncoder)
     extends Writer {
 
   private[this] var closed: Boolean = false
@@ -93,8 +93,8 @@ class OutputStreamWriter(
         assert(
             !cbuf.hasRemaining,
             "CharsetEncoder.encode() should not have returned UNDERFLOW when " +
-            "both endOfInput and inBuf.hasRemaining are true. It should have " +
-            "returned a MalformedInput error instead.")
+              "both endOfInput and inBuf.hasRemaining are true. It should have " +
+              "returned a MalformedInput error instead.")
       } else if (result.isOverflow) {
         makeRoomInOutBuf()
         loopEncode()

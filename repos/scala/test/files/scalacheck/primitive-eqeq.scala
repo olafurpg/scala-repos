@@ -36,9 +36,9 @@ object Test extends Properties("==") {
 
       val result =
         (((anyvals, anyvals).zipped forall equalObjectsEqualHashcodes) &&
-            ((shortAndLarger, shortAndLarger).zipped forall (_ == _)) &&
-            ((shortAndLarger, shortAndLarger).zipped forall
-                ((x, y) => (x: Any) == (y: Any))))
+          ((shortAndLarger, shortAndLarger).zipped forall (_ == _)) &&
+          ((shortAndLarger, shortAndLarger).zipped forall
+            ((x, y) => (x: Any) == (y: Any))))
       result
     }
   }

@@ -27,7 +27,7 @@ class Counter {
 }
 
 object TestCodec {
-  def apply[A : Manifest](firstStage: Stage, encoder: Encoder[A]) = {
+  def apply[A: Manifest](firstStage: Stage, encoder: Encoder[A]) = {
     val counter = new Counter()
     val codec = new Codec(firstStage, encoder, { n =>
       counter.readBytes += n
@@ -99,7 +99,8 @@ class TestCodec[A](val codec: Codec[A]) {
   def apply(buffer: ChannelBuffer) = {
     upstreamOutput.clear()
     codec.messageReceived(
-        context, new UpstreamMessageEvent(pipeline.getChannel, buffer, null))
+        context,
+        new UpstreamMessageEvent(pipeline.getChannel, buffer, null))
     upstreamOutput.toList
   }
 

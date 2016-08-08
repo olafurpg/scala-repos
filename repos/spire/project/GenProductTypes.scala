@@ -1,8 +1,9 @@
 object GenProductTypes {
   val spec = "@spec(Int,Long,Float,Double) "
 
-  case class ProductType(
-      structure: String, parentStructure: Option[String], arity: Int) {
+  case class ProductType(structure: String,
+                         parentStructure: Option[String],
+                         arity: Int) {
     val prefix = "structure"
     def typeName(i: Int): String = (64 + i).toChar.toString
     val types = (1 to arity) map (typeName(_)) mkString ", "
@@ -29,12 +30,12 @@ object GenProductTypes {
 
     val parents =
       ("%s[(%s)]" format (structure, types)) +
-      (parentStructure map { p =>
-            " with %sProduct%d[%s]" format (p, arity, types)
-          } getOrElse "")
+        (parentStructure map { p =>
+          " with %sProduct%d[%s]" format (p, arity, types)
+        } getOrElse "")
 
     "private[spire] trait %s[%s] extends %s {" format
-    (name, specTypes, parents)
+      (name, specTypes, parents)
   }
 
   val members: Block = { tpe =>
@@ -72,13 +73,13 @@ object GenProductTypes {
         val call =
           (1 to arity) map { j =>
             "%s%d.%s(%s)" format
-            (prefix, j, methodName, args.zipWithIndex map {
-                  case (DelegateArg, i) => "x%d._%d" format (i, j)
-                  case (FixedArg(_), i) => "x" + i
-                } mkString ", ")
+              (prefix, j, methodName, args.zipWithIndex map {
+                case (DelegateArg, i) => "x%d._%d" format (i, j)
+                case (FixedArg(_), i) => "x" + i
+              } mkString ", ")
           } mkString ("(", ", ", ")")
         "  %sdef %s(%s): (%s) = { %s }" format
-        (over, methodName, arglist, types, call)
+          (over, methodName, arglist, types, call)
     }
   }
 
@@ -107,12 +108,12 @@ object GenProductTypes {
       |%s
       |    }
       |  }""".stripMargin format
-    (name, specTypes, implicits, structure, types, name, types, members)
+      (name, specTypes, implicits, structure, types, name, types, members)
   }
 
   def productTrait(blocks0: List[Block]): Block = { tpe =>
     val blocks = beginTrait :: members :: (blocks0 :+ endTrait)
-    blocks map (_ (tpe)) mkString "\n"
+    blocks map (_(tpe)) mkString "\n"
   }
 
   def implicitsTrait(start: Int, end: Int): Definition => String = { defn =>
@@ -148,9 +149,9 @@ object GenProductTypes {
 
   def unifiedTrait(defns: Seq[Definition], start: Int, end: Int): String = {
     "trait ProductInstances extends " +
-    (defns map { defn =>
-          defn.structure + "ProductInstances"
-        } mkString " with ")
+      (defns map { defn =>
+        defn.structure + "ProductInstances"
+      } mkString " with ")
   }
 
   def renderAll(pkg: String,
@@ -199,7 +200,7 @@ object ProductTypes {
   private val overrideEqv: Block = { tpe =>
     import tpe._
     "  override def eqv(x0: (%s), x1: (%s)): Boolean = compare(x0, x1) == 0" format
-    (types, types)
+      (types, types)
   }
 
   private val compare: Block = { tpe =>
@@ -212,7 +213,7 @@ object ProductTypes {
             |%s  if (cmp != 0) cmp else {
             |%s
             |%s  }""".stripMargin format
-        (indent, prefix, i, i, i, indent, gen(i + 1), indent)
+          (indent, prefix, i, i, i, indent, gen(i + 1), indent)
       } else {
         indent + "  0"
       }
@@ -227,8 +228,16 @@ object ProductTypes {
   val eq = Definition("Eq")(eqv :: Nil)
   val order = Definition("Order", Some("Eq"))(compare :: overrideEqv :: Nil)
 
-  val algebra = List(
-      semigroup, monoid, group, abGroup, semiring, rng, rig, ring, eq, order)
+  val algebra = List(semigroup,
+                     monoid,
+                     group,
+                     abGroup,
+                     semiring,
+                     rng,
+                     rig,
+                     ring,
+                     eq,
+                     order)
 
   def algebraProductTypes: String =
     renderAll("spire.std", "spire.algebra._" :: Nil, 2, 22)(algebra)

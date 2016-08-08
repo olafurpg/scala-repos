@@ -459,7 +459,7 @@ trait Mirrors { self: Universe =>
       */
     // we need a ClassTag here to preserve boxity of primitives
     // the class tag lets us tell apart `mirror.reflect(2)` and `mirror.reflect(new Integer(2))`
-    def reflect[T : ClassTag](obj: T): InstanceMirror
+    def reflect[T: ClassTag](obj: T): InstanceMirror
 
     /** Reflects against a static class symbol and returns a mirror
       *  that can be used to create instances of the class, inspect its companion object or perform further reflections.

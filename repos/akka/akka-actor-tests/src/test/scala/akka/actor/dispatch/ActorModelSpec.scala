@@ -85,43 +85,44 @@ object ActorModelSpec {
     def receive = {
       case AwaitLatch(latch) ⇒ { ack(); latch.await(); busy.switchOff(()) }
       case Meet(sign, wait) ⇒ {
-          ack(); sign.countDown(); wait.await(); busy.switchOff(())
-        }
+        ack(); sign.countDown(); wait.await(); busy.switchOff(())
+      }
       case Wait(time) ⇒ { ack(); Thread.sleep(time); busy.switchOff(()) }
       case WaitAck(time, l) ⇒ {
-          ack(); Thread.sleep(time); l.countDown(); busy.switchOff(())
-        }
+        ack(); Thread.sleep(time); l.countDown(); busy.switchOff(())
+      }
       case Reply(msg) ⇒ { ack(); sender() ! msg; busy.switchOff(()) }
       case TryReply(msg) ⇒ {
-          ack(); sender().tell(msg, null); busy.switchOff(())
-        }
+        ack(); sender().tell(msg, null); busy.switchOff(())
+      }
       case Forward(to, msg) ⇒ { ack(); to.forward(msg); busy.switchOff(()) }
       case CountDown(latch) ⇒ { ack(); latch.countDown(); busy.switchOff(()) }
       case Increment(count) ⇒ {
-          ack(); count.incrementAndGet(); busy.switchOff(())
-        }
+        ack(); count.incrementAndGet(); busy.switchOff(())
+      }
       case CountDownNStop(l) ⇒ {
-          ack(); l.countDown(); context.stop(self); busy.switchOff(())
-        }
+        ack(); l.countDown(); context.stop(self); busy.switchOff(())
+      }
       case Restart ⇒ {
-          ack(); busy.switchOff(()); throw new Exception("Restart requested")
-        }
+        ack(); busy.switchOff(()); throw new Exception("Restart requested")
+      }
       case Interrupt ⇒ {
-          ack();
-          sender() ! Status.Failure(new ActorInterruptedException(
-                  new InterruptedException("Ping!"))); busy.switchOff(());
-          throw new InterruptedException("Ping!")
-        }
+        ack();
+        sender() ! Status.Failure(
+            new ActorInterruptedException(new InterruptedException("Ping!")));
+        busy.switchOff(());
+        throw new InterruptedException("Ping!")
+      }
       case InterruptNicely(msg) ⇒ {
-          ack(); sender() ! msg; busy.switchOff(());
-          Thread.currentThread().interrupt()
-        }
+        ack(); sender() ! msg; busy.switchOff(());
+        Thread.currentThread().interrupt()
+      }
       case ThrowException(e: Throwable) ⇒ {
-          ack(); busy.switchOff(()); throw e
-        }
+        ack(); busy.switchOff(()); throw e
+      }
       case DoubleStop ⇒ {
-          ack(); context.stop(self); context.stop(self); busy.switchOff
-        }
+        ack(); context.stop(self); context.stop(self); busy.switchOff
+      }
     }
   }
 
@@ -135,8 +136,8 @@ object ActorModelSpec {
     val restarts = new AtomicLong(0)
     override def toString =
       "InterceptorStats(susp=" + suspensions + ",res=" + resumes + ",reg=" +
-      registers + ",unreg=" + unregisters + ",recv=" + msgsReceived +
-      ",proc=" + msgsProcessed + ",restart=" + restarts
+        registers + ",unreg=" + unregisters + ",recv=" + msgsReceived +
+        ",proc=" + msgsProcessed + ",restart=" + restarts
   }
 
   trait MessageDispatcherInterceptor extends MessageDispatcher {
@@ -171,8 +172,8 @@ object ActorModelSpec {
       super.unregister(actor)
     }
 
-    protected[akka] abstract override def dispatch(
-        receiver: ActorCell, invocation: Envelope) {
+    protected[akka] abstract override def dispatch(receiver: ActorCell,
+                                                   invocation: Envelope) {
       val stats = getStats(receiver.self)
       stats.msgsReceived.incrementAndGet()
       super.dispatch(receiver, invocation)
@@ -197,15 +198,16 @@ object ActorModelSpec {
                   dispatcher.toString,
                   dispatcher.getClass,
                   "actual: stops=" + dispatcher.stops.get +
-                  " required: stops=" + stops))
+                    " required: stops=" + stops))
         throw e
     }
   }
 
   def assertCountDown(latch: CountDownLatch, wait: Long, hint: String) {
     if (!latch.await(wait, TimeUnit.MILLISECONDS))
-      fail("Failed to count down within " + wait + " millis (count at " +
-          latch.getCount + "). " + hint)
+      fail(
+          "Failed to count down within " + wait + " millis (count at " +
+            latch.getCount + "). " + hint)
   }
 
   def assertNoCountDown(latch: CountDownLatch, wait: Long, hint: String) {
@@ -216,8 +218,8 @@ object ActorModelSpec {
   def statsFor(actorRef: ActorRef, dispatcher: MessageDispatcher = null) =
     dispatcher.asInstanceOf[MessageDispatcherInterceptor].getStats(actorRef)
 
-  def assertRefDefaultZero(
-      actorRef: ActorRef, dispatcher: MessageDispatcher = null)(
+  def assertRefDefaultZero(actorRef: ActorRef,
+                           dispatcher: MessageDispatcher = null)(
       suspensions: Long = 0,
       resumes: Long = 0,
       registers: Long = 0,
@@ -266,9 +268,9 @@ object ActorModelSpec {
                   Option(dispatcher).toString,
                   (Option(dispatcher) getOrElse this).getClass,
                   "actual: " + stats + ", required: InterceptorStats(susp=" +
-                  suspensions + ",res=" + resumes + ",reg=" + registers +
-                  ",unreg=" + unregisters + ",recv=" + msgsReceived +
-                  ",proc=" + msgsProcessed + ",restart=" + restarts))
+                    suspensions + ",res=" + resumes + ",reg=" + registers +
+                    ",unreg=" + unregisters + ",recv=" + msgsReceived +
+                    ",proc=" + msgsProcessed + ",restart=" + restarts))
         throw e
     }
   }
@@ -287,7 +289,8 @@ object ActorModelSpec {
 }
 
 abstract class ActorModelSpec(config: String)
-    extends AkkaSpec(config) with DefaultTimeout {
+    extends AkkaSpec(config)
+    with DefaultTimeout {
 
   import ActorModelSpec._
 
@@ -321,10 +324,11 @@ abstract class ActorModelSpec(config: String)
                                msgsProcessed = 0,
                                restarts = 0)
 
-      val futures = for (i ← 1 to 10) yield
-        Future {
-          i
-        }
+      val futures = for (i ← 1 to 10)
+        yield
+          Future {
+            i
+          }
       assertDispatcher(dispatcher)(stops = 2)
 
       val a2 = newTestActor(dispatcher.id)
@@ -346,8 +350,9 @@ abstract class ActorModelSpec(config: String)
       assertCountDown(start,
                       3.seconds.dilated.toMillis,
                       "Should process first message within 3 seconds")
-      assertRefDefaultZero(a)(
-          registers = 1, msgsReceived = 1, msgsProcessed = 1)
+      assertRefDefaultZero(a)(registers = 1,
+                              msgsReceived = 1,
+                              msgsProcessed = 1)
 
       a ! Wait(1000)
       a ! CountDown(oneAtATime)
@@ -355,12 +360,15 @@ abstract class ActorModelSpec(config: String)
       assertCountDown(oneAtATime,
                       (1.5 seconds).dilated.toMillis,
                       "Processed message when allowed")
-      assertRefDefaultZero(a)(
-          registers = 1, msgsReceived = 3, msgsProcessed = 3)
+      assertRefDefaultZero(a)(registers = 1,
+                              msgsReceived = 3,
+                              msgsProcessed = 3)
 
       system.stop(a)
-      assertRefDefaultZero(a)(
-          registers = 1, unregisters = 1, msgsReceived = 3, msgsProcessed = 3)
+      assertRefDefaultZero(a)(registers = 1,
+                              unregisters = 1,
+                              msgsReceived = 3,
+                              msgsProcessed = 3)
     }
 
     "handle queueing from multiple threads" in {
@@ -375,10 +383,12 @@ abstract class ActorModelSpec(config: String)
           }
         }
       }
-      assertCountDown(
-          counter, 3.seconds.dilated.toMillis, "Should process 200 messages")
-      assertRefDefaultZero(a)(
-          registers = 1, msgsReceived = 200, msgsProcessed = 200)
+      assertCountDown(counter,
+                      3.seconds.dilated.toMillis,
+                      "Should process 200 messages")
+      assertRefDefaultZero(a)(registers = 1,
+                              msgsReceived = 200,
+                              msgsProcessed = 200)
 
       system.stop(a)
     }
@@ -386,7 +396,8 @@ abstract class ActorModelSpec(config: String)
     def spawn(f: ⇒ Unit) {
       (new Thread {
         override def run(): Unit =
-          try f catch {
+          try f
+          catch {
             case e: Throwable ⇒
               system.eventStream.publish(
                   Error(e, "spawn", this.getClass, "error in spawned thread"))
@@ -401,8 +412,9 @@ abstract class ActorModelSpec(config: String)
       val done = new CountDownLatch(1)
       a.suspend
       a ! CountDown(done)
-      assertNoCountDown(
-          done, 1000, "Should not process messages while suspended")
+      assertNoCountDown(done,
+                        1000,
+                        "Should not process messages while suspended")
       assertRefDefaultZero(a)(registers = 1, msgsReceived = 1, suspensions = 1)
 
       a.resume(causedByFailure = null)
@@ -433,11 +445,11 @@ abstract class ActorModelSpec(config: String)
         val stopLatch = new CountDownLatch(num)
         val keepAliveLatch = new CountDownLatch(1)
         val waitTime = (20 seconds).dilated.toMillis
-        val boss = system.actorOf(
-            Props(new Actor {
+        val boss = system.actorOf(Props(new Actor {
           def receive = {
             case "run" ⇒
-              for (_ ← 1 to num)(context.watch(context.actorOf(props))) ! cachedMessage
+              for (_ ← 1 to num)(context
+                .watch(context.actorOf(props))) ! cachedMessage
             case Terminated(child) ⇒ stopLatch.countDown()
           }
         }).withDispatcher("boss"))
@@ -445,8 +457,7 @@ abstract class ActorModelSpec(config: String)
           // this future is meant to keep the dispatcher alive until the end of the test run even if
           // the boss doesn't create children fast enough to keep the dispatcher from becoming empty
           // and it needs to be on a separate thread to not deadlock the calling thread dispatcher
-          new Thread(
-              new Runnable {
+          new Thread(new Runnable {
             def run() =
               Future {
                 keepAliveLatch.await(waitTime, TimeUnit.MILLISECONDS)
@@ -454,8 +465,9 @@ abstract class ActorModelSpec(config: String)
           }).start()
           boss ! "run"
           try {
-            assertCountDown(
-                cachedMessage.latch, waitTime, "Counting down from " + num)
+            assertCountDown(cachedMessage.latch,
+                            waitTime,
+                            "Counting down from " + num)
           } catch {
             case e: Throwable ⇒
               dispatcher match {
@@ -463,8 +475,8 @@ abstract class ActorModelSpec(config: String)
                   val team = dispatcher.team
                   val mq = dispatcher.messageQueue
 
-                  System.err.println(
-                      "Teammates left: " + team.size + " stopLatch: " +
+                  System.err
+                    .println("Teammates left: " + team.size + " stopLatch: " +
                       stopLatch.getCount + " inhab:" + dispatcher.inhabitants)
                   team.toArray sorted new Ordering[AnyRef] {
                     def compare(l: AnyRef, r: AnyRef) = (l, r) match {
@@ -475,15 +487,16 @@ abstract class ActorModelSpec(config: String)
                     case cell: ActorCell ⇒
                       System.err.println(
                           " - " + cell.self.path + " " + cell.isTerminated +
-                          " " + cell.mailbox.currentStatus + " " +
-                          cell.mailbox.numberOfMessages + " " + cell.mailbox
+                            " " + cell.mailbox.currentStatus + " " +
+                            cell.mailbox.numberOfMessages + " " + cell.mailbox
                             .systemDrain(SystemMessageList.LNil)
                             .size)
                   }
 
                   System.err.println(
                       "Mailbox: " + mq.numberOfMessages + " " + mq.hasMessages)
-                  Iterator.continually(mq.dequeue) takeWhile (_ ne null) foreach System.err.println
+                  Iterator
+                    .continually(mq.dequeue) takeWhile (_ ne null) foreach System.err.println
                 case _ ⇒
               }
 
@@ -527,11 +540,11 @@ abstract class ActorModelSpec(config: String)
         assert(Await.result(f1, timeout.duration) === "foo")
         assert(Await.result(f2, timeout.duration) === "bar")
         assert(Await.result(f4, timeout.duration) === "foo2")
-        assert(intercept[ActorInterruptedException](Await.result(
-                    f3, timeout.duration)).getCause.getMessage === "Ping!")
+        assert(intercept[ActorInterruptedException](Await
+          .result(f3, timeout.duration)).getCause.getMessage === "Ping!")
         assert(Await.result(f6, timeout.duration) === "bar2")
-        assert(intercept[ActorInterruptedException](Await.result(
-                    f5, timeout.duration)).getCause.getMessage === "Ping!")
+        assert(intercept[ActorInterruptedException](Await
+          .result(f5, timeout.duration)).getCause.getMessage === "Ping!")
         c.cancel()
         Thread.sleep(300) // give the EventFilters a chance of catching all messages
       }
@@ -603,16 +616,18 @@ object DispatcherModelSpec {
         type = PinnedDispatcher
       }
     """ +
-    // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
-    (for (n ← 1 to 30) yield
-      """
+      // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
+      (for (n ← 1 to 30)
+        yield
+          """
         test-dispatcher-%s {
           type = "akka.actor.dispatch.DispatcherModelSpec$MessageDispatcherInterceptorConfigurator"
         }""".format(n)).mkString
   }
 
   class MessageDispatcherInterceptorConfigurator(
-      config: Config, prerequisites: DispatcherPrerequisites)
+      config: Config,
+      prerequisites: DispatcherPrerequisites)
       extends MessageDispatcherConfigurator(config, prerequisites) {
 
     import akka.util.Helpers.ConfigOps
@@ -668,10 +683,14 @@ class DispatcherModelSpec extends ActorModelSpec(DispatcherModelSpec.config) {
 
       while (!a.isTerminated && !b.isTerminated) {} //Busy wait for termination
 
-      assertRefDefaultZero(a)(
-          registers = 1, unregisters = 1, msgsReceived = 1, msgsProcessed = 1)
-      assertRefDefaultZero(b)(
-          registers = 1, unregisters = 1, msgsReceived = 1, msgsProcessed = 1)
+      assertRefDefaultZero(a)(registers = 1,
+                              unregisters = 1,
+                              msgsReceived = 1,
+                              msgsProcessed = 1)
+      assertRefDefaultZero(b)(registers = 1,
+                              unregisters = 1,
+                              msgsReceived = 1,
+                              msgsProcessed = 1)
     }
   }
 }
@@ -687,9 +706,10 @@ object BalancingDispatcherModelSpec {
         type = PinnedDispatcher
       }
     """ +
-    // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
-    (for (n ← 1 to 30) yield
-      """
+      // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
+      (for (n ← 1 to 30)
+        yield
+          """
         test-balancing-dispatcher-%s {
           type = "akka.actor.dispatch.BalancingDispatcherModelSpec$BalancingMessageDispatcherInterceptorConfigurator"
           throughput=1
@@ -697,7 +717,8 @@ object BalancingDispatcherModelSpec {
   }
 
   class BalancingMessageDispatcherInterceptorConfigurator(
-      config: Config, prerequisites: DispatcherPrerequisites)
+      config: Config,
+      prerequisites: DispatcherPrerequisites)
       extends BalancingDispatcherConfigurator(config, prerequisites) {
 
     import akka.util.Helpers.ConfigOps
@@ -756,10 +777,14 @@ class BalancingDispatcherModelSpec
 
       while (!a.isTerminated && !b.isTerminated) {} //Busy wait for termination
 
-      assertRefDefaultZero(a)(
-          registers = 1, unregisters = 1, msgsReceived = 1, msgsProcessed = 1)
-      assertRefDefaultZero(b)(
-          registers = 1, unregisters = 1, msgsReceived = 1, msgsProcessed = 1)
+      assertRefDefaultZero(a)(registers = 1,
+                              unregisters = 1,
+                              msgsReceived = 1,
+                              msgsProcessed = 1)
+      assertRefDefaultZero(b)(registers = 1,
+                              unregisters = 1,
+                              msgsReceived = 1,
+                              msgsProcessed = 1)
     }
   }
 }

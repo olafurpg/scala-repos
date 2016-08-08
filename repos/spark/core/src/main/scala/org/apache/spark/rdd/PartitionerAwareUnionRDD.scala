@@ -21,7 +21,12 @@ import java.io.{IOException, ObjectOutputStream}
 
 import scala.reflect.ClassTag
 
-import org.apache.spark.{OneToOneDependency, Partition, SparkContext, TaskContext}
+import org.apache.spark.{
+  OneToOneDependency,
+  Partition,
+  SparkContext,
+  TaskContext
+}
 import org.apache.spark.util.Utils
 
 /**
@@ -31,8 +36,7 @@ import org.apache.spark.util.Utils
 private[spark] class PartitionerAwareUnionRDDPartition(
     @transient val rdds: Seq[RDD[_]],
     val idx: Int
-)
-    extends Partition {
+) extends Partition {
   var parents = rdds.map(_.partitions(idx)).toArray
 
   override val index = idx
@@ -55,25 +59,23 @@ private[spark] class PartitionerAwareUnionRDDPartition(
   * of the corresponding partitions of the parent RDDs. For example, location of partition 0
   * of the unified RDD will be where most of partition 0 of the parent RDDs are located.
   */
-private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
+private[spark] class PartitionerAwareUnionRDD[T: ClassTag](
     sc: SparkContext,
     var rdds: Seq[RDD[T]]
-)
-    extends RDD[T](sc, rdds.map(x => new OneToOneDependency(x))) {
+) extends RDD[T](sc, rdds.map(x => new OneToOneDependency(x))) {
   require(rdds.length > 0)
   require(rdds.forall(_.partitioner.isDefined))
   require(rdds.flatMap(_.partitioner).toSet.size == 1,
           "Parent RDDs have different partitioners: " +
-          rdds.flatMap(_.partitioner))
+            rdds.flatMap(_.partitioner))
 
   override val partitioner = rdds.head.partitioner
 
   override def getPartitions: Array[Partition] = {
     val numPartitions = partitioner.get.numPartitions
     (0 until numPartitions)
-      .map(index =>
-            {
-          new PartitionerAwareUnionRDDPartition(rdds, index)
+      .map(index => {
+        new PartitionerAwareUnionRDDPartition(rdds, index)
       })
       .toArray
   }
@@ -86,11 +88,11 @@ private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
       s.asInstanceOf[PartitionerAwareUnionRDDPartition].parents
     val locations = rdds.zip(parentPartitions).flatMap {
       case (rdd, part) => {
-          val parentLocations = currPrefLocs(rdd, part)
-          logDebug("Location of " + rdd + " partition " +
-              part.index + " = " + parentLocations)
-          parentLocations
-        }
+        val parentLocations = currPrefLocs(rdd, part)
+        logDebug("Location of " + rdd + " partition " +
+          part.index + " = " + parentLocations)
+        parentLocations
+      }
     }
     val location =
       if (locations.isEmpty) {
@@ -101,7 +103,7 @@ private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
       }
     logDebug(
         "Selected location for " + this + ", partition " + s.index + " = " +
-        location)
+          location)
     location.toSeq
   }
 

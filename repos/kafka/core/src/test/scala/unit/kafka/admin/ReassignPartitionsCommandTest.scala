@@ -21,7 +21,9 @@ import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 
 class ReassignPartitionsCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness
+    with Logging
+    with RackAwareTest {
 
   @Test
   def testRackAwareReassign() {
@@ -59,7 +61,10 @@ class ReassignPartitionsCommandTest
         case (topicPartition, replicas) =>
           (topicPartition.partition, replicas)
       }
-    checkReplicaDistribution(
-        assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
+    checkReplicaDistribution(assignment,
+                             rackInfo,
+                             rackInfo.size,
+                             numPartitions,
+                             replicationFactor)
   }
 }

@@ -65,7 +65,9 @@ case class GroupCoordinatorRequest(
                            request: RequestChannel.Request): Unit = {
     // return ConsumerCoordinatorNotAvailable for all uncaught errors
     val errorResponse = GroupCoordinatorResponse(
-        None, Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code, correlationId)
+        None,
+        Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code,
+        correlationId)
     requestChannel.sendResponse(
         new Response(
             request,

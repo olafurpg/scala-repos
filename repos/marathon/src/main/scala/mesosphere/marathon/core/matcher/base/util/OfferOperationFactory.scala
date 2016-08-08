@@ -56,7 +56,7 @@ class OfferOperationFactory(private val principalOpt: Option[String],
               .setPrincipal(principal)
               .setLabels(
                   TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
-          )
+        )
         .build()
     }
 
@@ -106,9 +106,9 @@ class OfferOperationFactory(private val principalOpt: Option[String],
         .setName("disk")
         .setType(Mesos.Value.Type.SCALAR)
         .setScalar(Mesos.Value.Scalar
-              .newBuilder()
-              .setValue(vol.persistentVolume.persistent.size.toDouble)
-              .build())
+          .newBuilder()
+          .setValue(vol.persistentVolume.persistent.size.toDouble)
+          .build())
         .setRole(role)
         .setReservation(reservation)
         .setDisk(disk)

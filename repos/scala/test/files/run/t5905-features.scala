@@ -19,8 +19,11 @@ object Test extends DirectTest {
       val feats =
         langf.declarations filter (s => isFeature(s)) map (_.name.decoded)
       val xmen =
-        langf.member(TermName("experimental")).typeSignature.declarations filter
-        (s => isFeature(s)) map (s => s"experimental.${s.name.decoded}")
+        langf
+          .member(TermName("experimental"))
+          .typeSignature
+          .declarations filter
+          (s => isFeature(s)) map (s => s"experimental.${s.name.decoded}")
       val all = (feats ++ xmen) mkString ","
 
       assert(feats.nonEmpty, "Test must find feature flags.")

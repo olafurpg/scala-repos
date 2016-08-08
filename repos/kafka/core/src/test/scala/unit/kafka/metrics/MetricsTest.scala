@@ -73,8 +73,9 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
       Metrics.defaultRegistry().allMetrics().keySet().size
 
     for (i <- 0 to 5) {
-      createAndShutdownStep(
-          "group" + i % 3, "consumer" + i % 2, "producer" + i % 2)
+      createAndShutdownStep("group" + i % 3,
+                            "consumer" + i % 2,
+                            "producer" + i % 2)
       assertEquals(countOfStaticMetrics,
                    Metrics.defaultRegistry().allMetrics().keySet().size)
     }
@@ -93,16 +94,19 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
   @deprecated(
       "This test has been deprecated and it will be removed in a future release",
       "0.10.0.0")
-  def createAndShutdownStep(
-      group: String, consumerId: String, producerId: String): Unit = {
+  def createAndShutdownStep(group: String,
+                            consumerId: String,
+                            producerId: String): Unit = {
     sendMessages(servers, topic, nMessages)
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumerId))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     getMessages(topicMessageStreams1, nMessages)
 
     zkConsumerConnector1.shutdown()

@@ -21,8 +21,10 @@ class MapParamMapTest extends FunSuite {
 
   test("iterator") {
     val paramMap = MapParamMap("a" -> "1", "b" -> "2", "a" -> "3")
-    assert(paramMap.iterator.toList.sorted == List(
-            ("a" -> "1"), ("a" -> "3"), ("b" -> "2")))
+    assert(
+        paramMap.iterator.toList.sorted == List(("a" -> "1"),
+                                                ("a" -> "3"),
+                                                ("b" -> "2")))
   }
 
   test("+") {

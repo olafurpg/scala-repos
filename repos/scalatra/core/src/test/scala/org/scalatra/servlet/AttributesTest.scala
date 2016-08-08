@@ -5,8 +5,7 @@ import org.scalatra.test.scalatest.ScalatraFunSuite
 
 import scala.collection.mutable.Map
 
-trait AttributesTest {
-  this: ScalatraFunSuite =>
+trait AttributesTest { this: ScalatraFunSuite =>
 
   trait AttributesServlet extends ScalatraServlet {
     def attributesMap: Map[String, Any]

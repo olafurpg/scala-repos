@@ -36,8 +36,8 @@ trait MultipartMarshallers {
     * The method used to create boundaries in `multipartMarshaller`. Can be overridden to create custom boundaries.
     */
   protected def randomBoundary(): String =
-    BodyPartRenderer.randomBoundary(
-        length = multipartBoundaryLength, random = multipartBoundaryRandom)
+    BodyPartRenderer.randomBoundary(length = multipartBoundaryLength,
+                                    random = multipartBoundaryRandom)
 }
 
 object MultipartMarshallers extends MultipartMarshallers

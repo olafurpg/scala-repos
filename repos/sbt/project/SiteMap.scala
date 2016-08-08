@@ -59,8 +59,10 @@ object SiteMap {
       relativize(subs) map { case (f, path) => indexEntryXML(f, path) }
     def siteMapIndex(dir: File, subs: Seq[File]): File = {
       val xml = indexEntriesXML(indexEntries(subs))
-      writeXMLgz(
-          dir / "sitemap_index.xml", dir / "sitemap_index.xml.gz", gzip, xml)
+      writeXMLgz(dir / "sitemap_index.xml",
+                 dir / "sitemap_index.xml.gz",
+                 gzip,
+                 xml)
     }
     def isSymlink(f: File) = f.getCanonicalFile != f.getAbsoluteFile
 
@@ -79,8 +81,10 @@ object SiteMap {
     formatter.format(new java.util.Date(f.lastModified))
   }
   // writes the provided XML node to `output` and then gzips it to `gzipped` if `gzip` is true
-  private[this] def writeXMLgz(
-      output: File, gzipped: File, gzip: Boolean, node: xml.Node): File = {
+  private[this] def writeXMLgz(output: File,
+                               gzipped: File,
+                               gzip: Boolean,
+                               node: xml.Node): File = {
     writeXML(output, node)
     if (gzip) {
       IO.gzip(output, gzipped)

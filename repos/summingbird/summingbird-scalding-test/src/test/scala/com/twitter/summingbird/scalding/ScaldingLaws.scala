@@ -37,7 +37,14 @@ import org.scalacheck.Properties
 import org.apache.hadoop.conf.Configuration
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ArrayBuffer, Buffer, HashMap => MutableHashMap, Map => MutableMap, SynchronizedBuffer, SynchronizedMap}
+import scala.collection.mutable.{
+  ArrayBuffer,
+  Buffer,
+  HashMap => MutableHashMap,
+  Map => MutableMap,
+  SynchronizedBuffer,
+  SynchronizedMap
+}
 import scala.util.{Try => ScalaTry}
 
 import cascading.scheme.local.{TextDelimited => CLTextDelimited}
@@ -60,7 +67,7 @@ class ScaldingLaws extends WordSpec {
 
   implicit def timeExtractor[T <: (Long, _)] = TestUtil.simpleTimeExtractor[T]
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   "The ScaldingPlatform" should {
 
@@ -89,7 +96,8 @@ class ScaldingLaws extends WordSpec {
       val (buffer, source) = TestSource(inWithTime)
 
       val summer = TestGraphs.singleStepJob[Scalding, (Long, Int), Int, Int](
-          source, testStore)(t => fn(t._2))
+          source,
+          testStore)(t => fn(t._2))
 
       val scald = Scalding("scalaCheckJob")
       val ws = new LoopState(intr)
@@ -99,8 +107,10 @@ class ScaldingLaws extends WordSpec {
       scald.run(ws, mode, scald.plan(summer))
       // Now check that the inMemory ==
 
-      assert(TestUtil.compareMaps(
-              original, Monoid.plus(initStore, inMemory), testStore) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStore, inMemory),
+                               testStore) == true)
     }
 
     "match scala single step pruned jobs" in {
@@ -133,12 +143,16 @@ class ScaldingLaws extends WordSpec {
         }
       }
 
-      val testStore = TestStore[Int, Int](
-          "test", batcher, initStore, inWithTime.size, pruner)
+      val testStore = TestStore[Int, Int]("test",
+                                          batcher,
+                                          initStore,
+                                          inWithTime.size,
+                                          pruner)
       val (buffer, source) = TestSource(inWithTime)
 
       val summer = TestGraphs.singleStepJob[Scalding, (Long, Int), Int, Int](
-          source, testStore)(t => fn(t._2))
+          source,
+          testStore)(t => fn(t._2))
 
       val scald = Scalding("scalaCheckJob")
       val ws = new LoopState(intr)
@@ -178,7 +192,8 @@ class ScaldingLaws extends WordSpec {
 
       val summer =
         TestGraphs.singleStepMapKeysJob[Scalding, (Long, Int), Int, Int, Int](
-            source, testStore)(t => fnA(t._2), fnB)
+            source,
+            testStore)(t => fnA(t._2), fnB)
 
       val scald = Scalding("scalaCheckJob")
       val ws = new LoopState(intr)
@@ -188,8 +203,10 @@ class ScaldingLaws extends WordSpec {
       scald.run(ws, mode, scald.plan(summer))
       // Now check that the inMemory ==
 
-      assert(TestUtil.compareMaps(
-              original, Monoid.plus(initStore, inMemory), testStore) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStore, inMemory),
+                               testStore) == true)
     }
 
     "match scala for multiple summer jobs" in {
@@ -223,25 +240,30 @@ class ScaldingLaws extends WordSpec {
 
       val tail = TestGraphs
         .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-          source, testStoreA, testStoreB)({ t =>
-        fnA(t._2)
-      }, fnB, fnC)
+            source,
+            testStoreA,
+            testStoreB)({ t =>
+          fnA(t._2)
+        }, fnB, fnC)
 
       val scald = Scalding("scalaCheckMultipleSumJob")
       val ws = new LoopState(intr)
-      val mode: Mode = TestMode(t =>
+      val mode: Mode = TestMode(
+          t =>
             (testStoreA.sourceToBuffer ++ testStoreB.sourceToBuffer ++ buffer)
               .get(t))
 
       scald.run(ws, mode, scald.plan(tail))
       // Now check that the inMemory ==
 
-      assert(TestUtil.compareMaps(original,
-                                  Monoid.plus(initStoreA, inMemoryA),
-                                  testStoreA) == true)
-      assert(TestUtil.compareMaps(original,
-                                  Monoid.plus(initStoreB, inMemoryB),
-                                  testStoreB) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStoreA, inMemoryA),
+                               testStoreA) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStoreB, inMemoryB),
+                               testStoreB) == true)
     }
 
     "match scala for leftJoin jobs" in {
@@ -296,28 +318,36 @@ class ScaldingLaws extends WordSpec {
       val batchedService = stream.map {
         case (time, v) => (Timestamp(time), v)
       }.groupBy { case (ts, _) => batcher.batchOf(ts) }
-      val testService = new TestService[Int, Int](
-          "srv", batcher, batcher.batchOf(Timestamp(0)).prev, batchedService)
+      val testService =
+        new TestService[Int, Int]("srv",
+                                  batcher,
+                                  batcher.batchOf(Timestamp(0)).prev,
+                                  batchedService)
 
       val (buffer, source) = TestSource(inWithTime)
 
       val summer =
         TestGraphs.leftJoinJob[Scalding, (Long, Int), Int, Int, Int, Int](
-            source, testService, testStore) { tup =>
+            source,
+            testService,
+            testStore) { tup =>
           prejoinMap(tup._2)
         }(postJoin)
 
       val scald = Scalding("scalaCheckleftJoinJob")
       val ws = new LoopState(intr)
-      val mode: Mode = TestMode(s =>
+      val mode: Mode = TestMode(
+          s =>
             (testStore.sourceToBuffer ++ buffer ++ testService.sourceToBuffer)
               .get(s))
 
       scald.run(ws, mode, summer)
       // Now check that the inMemory ==
 
-      assert(TestUtil.compareMaps(
-              original, Monoid.plus(initStore, inMemory), testStore) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStore, inMemory),
+                               testStore) == true)
     }
 
     "match scala for leftJoin  repeated tuple leftJoin jobs" in {
@@ -371,28 +401,36 @@ class ScaldingLaws extends WordSpec {
       val batchedService = stream.map {
         case (time, v) => (Timestamp(time), v)
       }.groupBy { case (ts, _) => batcher.batchOf(ts) }
-      val testService = new TestService[Int, Int](
-          "srv", batcher, batcher.batchOf(Timestamp(0)).prev, batchedService)
+      val testService =
+        new TestService[Int, Int]("srv",
+                                  batcher,
+                                  batcher.batchOf(Timestamp(0)).prev,
+                                  batchedService)
 
       val (buffer, source) = TestSource(inWithTime)
 
       val summer = TestGraphs
         .repeatedTupleLeftJoinJob[Scalding, (Long, Int), Int, Int, Int, Int](
-          source, testService, testStore) { tup =>
-        prejoinMap(tup._2)
-      }(postJoin)
+            source,
+            testService,
+            testStore) { tup =>
+          prejoinMap(tup._2)
+        }(postJoin)
 
       val scald = Scalding("scalaCheckleftJoinJob")
       val ws = new LoopState(intr)
-      val mode: Mode = TestMode(s =>
+      val mode: Mode = TestMode(
+          s =>
             (testStore.sourceToBuffer ++ buffer ++ testService.sourceToBuffer)
               .get(s))
 
       scald.run(ws, mode, summer)
       // Now check that the inMemory ==
 
-      assert(TestUtil.compareMaps(
-              original, Monoid.plus(initStore, inMemory), testStore) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStore, inMemory),
+                               testStore) == true)
     }
 
     "match scala for leftJoin with store (no dependency between the two) jobs" in {
@@ -437,13 +475,17 @@ class ScaldingLaws extends WordSpec {
           batchCoveredInput2)(fnAWithTime)(fnBWithTime)(postJoinWithTime)
 
       val storeAndServiceInit = sample[Map[Int, Int]]
-      val storeAndServiceStore = TestStore[Int, Int](
-          "storeAndService", batcher, storeAndServiceInit, inWithTime1.size)
+      val storeAndServiceStore = TestStore[Int, Int]("storeAndService",
+                                                     batcher,
+                                                     storeAndServiceInit,
+                                                     inWithTime1.size)
       val storeAndService = TestStoreService[Int, Int](storeAndServiceStore)
 
       val finalStoreInit = sample[Map[Int, Int]]
-      val finalStore = TestStore[Int, Int](
-          "finalStore", batcher, finalStoreInit, inWithTime1.size)
+      val finalStore = TestStore[Int, Int]("finalStore",
+                                           batcher,
+                                           finalStoreInit,
+                                           inWithTime1.size)
 
       // the end range needs to be multiple of batchsize
       val endTimeOfLastBatch1 = batcher
@@ -465,11 +507,11 @@ class ScaldingLaws extends WordSpec {
                                                    Int,
                                                    Int,
                                                    Int,
-                                                   Int](
-          source1,
-          source2,
-          storeAndService,
-          finalStore)(tup => fnA(tup._2))(tup => fnB(tup._2))(postJoin)
+                                                   Int](source1,
+                                                        source2,
+                                                        storeAndService,
+                                                        finalStore)(tup =>
+        fnA(tup._2))(tup => fnB(tup._2))(postJoin)
 
       val scald = Scalding("scalaCheckleftJoinWithStoreJob")
       val ws = new LoopState(intr)
@@ -480,12 +522,14 @@ class ScaldingLaws extends WordSpec {
       scald.run(ws, mode, summer)
 
       // Now check that the inMemory ==
-      assert(TestUtil.compareMaps(original1,
-                                  Monoid.plus(storeAndServiceInit, inMemoryA),
-                                  storeAndServiceStore) == true)
-      assert(TestUtil.compareMaps(original2,
-                                  Monoid.plus(finalStoreInit, inMemoryB),
-                                  finalStore) == true)
+      assert(
+          TestUtil.compareMaps(original1,
+                               Monoid.plus(storeAndServiceInit, inMemoryA),
+                               storeAndServiceStore) == true)
+      assert(
+          TestUtil.compareMaps(original2,
+                               Monoid.plus(finalStoreInit, inMemoryB),
+                               finalStore) == true)
     }
 
     "match scala for leftJoin with store (with dependency between store and join) jobs" in {
@@ -525,8 +569,10 @@ class ScaldingLaws extends WordSpec {
           batchCoveredInput)(fnAWithTime)(valuesFlatMapWithTime)
 
       val storeAndServiceInit = sample[Map[Int, Int]]
-      val storeAndServiceStore = TestStore[Int, Int](
-          "storeAndService", batcher, storeAndServiceInit, inWithTime.size)
+      val storeAndServiceStore = TestStore[Int, Int]("storeAndService",
+                                                     batcher,
+                                                     storeAndServiceInit,
+                                                     inWithTime.size)
       val storeAndService = TestStoreService[Int, Int](storeAndServiceStore)
 
       // the end range needs to be multiple of batchsize
@@ -595,8 +641,10 @@ class ScaldingLaws extends WordSpec {
             flatMapWithTime)
 
       val storeAndServiceInit = sample[Map[Int, Int]]
-      val storeAndServiceStore = TestStore[Int, Int](
-          "storeAndService", batcher, storeAndServiceInit, inWithTime.size)
+      val storeAndServiceStore = TestStore[Int, Int]("storeAndService",
+                                                     batcher,
+                                                     storeAndServiceInit,
+                                                     inWithTime.size)
       val storeAndService = TestStoreService[Int, Int](storeAndServiceStore)
 
       val fmStoreInit = sample[Map[Int, Int]]
@@ -611,16 +659,16 @@ class ScaldingLaws extends WordSpec {
         TestSource(inWithTime,
                    Some(DateRange(RichDate(0), RichDate(endTimeOfLastBatch))))
 
-      val summer = TestGraphs.leftJoinWithDependentStoreJoinFanoutJob[Scalding,
-                                                                      (Long,
-                                                                      Int),
-                                                                      Int,
-                                                                      Int,
-                                                                      Int,
-                                                                      Int](
-          source,
-          storeAndService,
-          fmStore)(tup => fnA(tup._2))(valuesFlatMap)(flatMapFn)
+      val summer =
+        TestGraphs.leftJoinWithDependentStoreJoinFanoutJob[Scalding,
+                                                           (Long, Int),
+                                                           Int,
+                                                           Int,
+                                                           Int,
+                                                           Int](
+            source,
+            storeAndService,
+            fmStore)(tup => fnA(tup._2))(valuesFlatMap)(flatMapFn)
 
       val scald = Scalding("scalaCheckleftJoinWithDependentJob")
       val ws = new LoopState(intr)
@@ -669,7 +717,9 @@ class ScaldingLaws extends WordSpec {
       val (buffer, source) = TestSource(inWithTime)
 
       val summer = TestGraphs.diamondJob[Scalding, (Long, Int), Int, Int](
-          source, testSink, testStore)(t => fn1(t._2))(t => fn2(t._2))
+          source,
+          testSink,
+          testStore)(t => fn1(t._2))(t => fn2(t._2))
 
       val scald = Scalding("scalding-diamond-Job")
       val ws = new LoopState(intr)
@@ -680,8 +730,10 @@ class ScaldingLaws extends WordSpec {
       // Now check that the inMemory ==
 
       val sinkOut = testSink.reset
-      assert(TestUtil.compareMaps(
-              original, Monoid.plus(initStore, inMemory), testStore) == true)
+      assert(
+          TestUtil.compareMaps(original,
+                               Monoid.plus(initStore, inMemory),
+                               testStore) == true)
       val wrongSink = sinkOut.map { _._2 }.toList != inWithTime
       assert(wrongSink == false)
       if (wrongSink) {
@@ -718,8 +770,11 @@ class ScaldingLaws extends WordSpec {
         TestStore[Int, Int]("testB", batcher, initStore, inWithTime.size)
       val (buffer, source) = TestSource(inWithTime)
 
-      val summer = TestGraphs.twoSumByKey[Scalding, Int, Int, Int](
-          source.map(_._2), testStoreA, keyExpand, testStoreB)
+      val summer =
+        TestGraphs.twoSumByKey[Scalding, Int, Int, Int](source.map(_._2),
+                                                        testStoreA,
+                                                        keyExpand,
+                                                        testStoreB)
 
       val scald = Scalding("scalding-diamond-Job")
       val ws = new LoopState(intr)
@@ -767,7 +822,9 @@ class ScaldingLaws extends WordSpec {
 
       val jobID: JobId = new JobId("scalding.job.testJobId")
       val summer = TestGraphs.jobWithStats[Scalding, (Long, Int), Int, Int](
-          jobID, source, testStore)(t => fn(t._2))
+          jobID,
+          source,
+          testStore)(t => fn(t._2))
       val scald = Scalding("scalaCheckJob").withConfigUpdater { sbconf =>
         sbconf.+("scalding.job.uniqueId", jobID.get)
       }

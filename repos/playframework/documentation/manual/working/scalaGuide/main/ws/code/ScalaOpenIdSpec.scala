@@ -37,7 +37,8 @@ object ScalaOpenIdSpec extends PlaySpecification {
   }
 
   def loginPost = Action.async { implicit request =>
-    Form(single(
+    Form(
+        single(
             "openid" -> nonEmptyText
         )).bindFromRequest.fold({ error =>
       Logger.info(s"bad request ${error.toString}")

@@ -9,8 +9,10 @@ import com.twitter.util.{Duration, Time, Timer}
   * every `period`. The estimated GC time is based on interpolating
   * the rate estimated by `estimator`.
   */
-class GcPredictor(
-    pool: Pool, period: Duration, timer: Timer, estimator: Estimator[Double]) {
+class GcPredictor(pool: Pool,
+                  period: Duration,
+                  timer: Timer,
+                  estimator: Estimator[Double]) {
   private[this] def loop() {
     for (bps <- pool.estimateAllocRate(period, timer)) {
       synchronized { estimator.measure(bps.toDouble) }

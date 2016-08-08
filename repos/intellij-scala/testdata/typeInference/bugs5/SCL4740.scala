@@ -21,8 +21,8 @@ object PhoneCode {
                                                          "bku",
                                                          "lop",
                                                          "ghz").zipWithIndex;
-        char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase)) yield
-        (char -> chars2Digit._2)).toMap
+                                    char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase))
+          yield (char -> chars2Digit._2)).toMap
         (word: String) =>
           word.map(mappingReversed).mkString
       }
@@ -36,35 +36,37 @@ object PhoneCode {
           List(
               copy(translated + " " + notMatched.head,
                    notMatched.tail,
-                   original)) else Nil
+                   original))
+        else Nil
       def format = original + ": " + translated.trim
       def ifFinished = if (remaining.isEmpty) Some(List(this)) else None
     }
     val result = phoneEntries
-      .flatMap(phoneNumber =>
-            {
-          // 16 lines
-          def collectPossibleTranslations(current: Step): Seq[Step] = {
-            current.ifFinished.getOrElse({
-              def allMatches(matchAgainst: String) = {
-                //collect all possible next translation steps of the remaining numbers
-                val matchingWords = (for (len <- 1 to matchAgainst.length;
-                opt <- dictEntriesDigified2Words.get(matchAgainst.take(len))) yield
-                  opt).flatten
-                if (matchingWords.nonEmpty) //spead the tree
-                  for ((translated, remaining) <- matchingWords.map(
-                      e => e -> matchAgainst.drop(e.count(_.isLetter)))) yield
-                    (current.copy(
-                        current.translated + " " + translated, remaining))
-                else current.asFallback(matchAgainst)
-              }
-              allMatches(current.remaining).flatMap(
-                  collectPossibleTranslations)
-            })
-          }
-          /*start*/
-          collectPossibleTranslations(
-              Step("", cleanString(phoneNumber), phoneNumber)) /*end*/
+      .flatMap(phoneNumber => {
+        // 16 lines
+        def collectPossibleTranslations(current: Step): Seq[Step] = {
+          current.ifFinished.getOrElse({
+            def allMatches(matchAgainst: String) = {
+              //collect all possible next translation steps of the remaining numbers
+              val matchingWords = (for (len <- 1 to matchAgainst.length;
+                                        opt <- dictEntriesDigified2Words.get(
+                                                  matchAgainst.take(len)))
+                yield opt).flatten
+              if (matchingWords.nonEmpty) //spead the tree
+                for ((translated, remaining) <- matchingWords.map(e =>
+                                                 e -> matchAgainst.drop(
+                                                     e.count(_.isLetter))))
+                  yield
+                    (current.copy(current.translated + " " + translated,
+                                  remaining))
+              else current.asFallback(matchAgainst)
+            }
+            allMatches(current.remaining).flatMap(collectPossibleTranslations)
+          })
+        }
+        /*start*/
+        collectPossibleTranslations(
+            Step("", cleanString(phoneNumber), phoneNumber)) /*end*/
       })
       .toSet
     //actual solution ends here, total non comment line code: 32 (+6 for package, import, main method)

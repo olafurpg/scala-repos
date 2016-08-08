@@ -24,7 +24,8 @@ trait Parsing { self: Positions with Reporting =>
         thunk: => T) = {
       val saved = incompleteHandler
       incompleteHandler = handler
-      try thunk finally incompleteHandler = saved
+      try thunk
+      finally incompleteHandler = saved
     }
 
     def incompleteHandled = incompleteHandler != null

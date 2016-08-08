@@ -26,7 +26,8 @@ object RestartNode2SpecMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+            """
       akka.cluster.auto-down-unreachable-after = 2s
       akka.cluster.retry-unsuccessful-join-after = 3s
       akka.remote.retry-gate-closed-for = 45s
@@ -40,7 +41,8 @@ class RestartNode2SpecMultiJvmNode2 extends RestartNode2SpecSpec
 
 abstract class RestartNode2SpecSpec
     extends MultiNodeSpec(RestartNode2SpecMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import RestartNode2SpecMultiJvmSpec._
 
@@ -53,15 +55,16 @@ abstract class RestartNode2SpecSpec
     Vector(seedNode1Address, seed2)
 
   // this is the node that will attempt to re-join, keep gate times low so it can retry quickly
-  lazy val restartedSeed1System = ActorSystem(
-      system.name, ConfigFactory.parseString(s"""
+  lazy val restartedSeed1System = ActorSystem(system.name,
+                                              ConfigFactory.parseString(s"""
       akka.remote.netty.tcp.port= ${seedNodes.head.port.get}
       #akka.remote.retry-gate-closed-for = 1s
     """).withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
     runOn(seed1) {
-      shutdown(if (seed1System.whenTerminated.isCompleted) restartedSeed1System
+      shutdown(
+          if (seed1System.whenTerminated.isCompleted) restartedSeed1System
           else seed1System)
     }
     super.afterAll()
@@ -87,7 +90,8 @@ abstract class RestartNode2SpecSpec
         enterBarrier("seed1-address-receiver-ready")
         seedNode1Address = Cluster(seed1System).selfAddress
         List(seed2) foreach { r ⇒
-          system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
+          system
+            .actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
           expectMsg(5.seconds, "ok")
         }
       }
@@ -121,7 +125,7 @@ abstract class RestartNode2SpecSpec
           awaitAssert(
               Cluster(restartedSeed1System).readView.members.size should be(2))
           awaitAssert(Cluster(restartedSeed1System).readView.members
-                .map(_.status) should be(Set(Up)))
+            .map(_.status) should be(Set(Up)))
         }
       }
       runOn(seed2) {

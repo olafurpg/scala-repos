@@ -12,8 +12,9 @@ sealed abstract class CapabilityFlag {
       .filter(_.getMethodName.startsWith("supports"))
       .find { el ⇒
         val clazz = Class.forName(el.getClassName)
-        clazz.getDeclaredMethod(el.getMethodName).getReturnType == classOf[
-            CapabilityFlag]
+        clazz
+          .getDeclaredMethod(el.getMethodName)
+          .getReturnType == classOf[CapabilityFlag]
       } map { _.getMethodName } getOrElse "[unknown]"
 
   def name: String = capturedStack

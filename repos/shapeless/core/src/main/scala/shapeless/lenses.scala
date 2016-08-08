@@ -20,7 +20,16 @@ import scala.language.dynamics
 
 import labelled.{FieldType, field}
 import ops.coproduct.{Inject, Selector => CSelector}
-import ops.hlist.{At, Init, Last, Prepend, Selector, ReplaceAt, Replacer, Tupler}
+import ops.hlist.{
+  At,
+  Init,
+  Last,
+  Prepend,
+  Selector,
+  ReplaceAt,
+  Replacer,
+  Tupler
+}
 import ops.record.{Selector => RSelector, Updater}
 import tag.@@
 
@@ -48,8 +57,11 @@ trait Lens[S, A] extends LPLens[S, A] { outer =>
     mkLens() compose this
 
   def selectDynamic(k: String)(
-      implicit mkLens: MkSelectDynamicOptic[
-          Lens[S, A], A, Symbol @@ k.type, Nothing]): mkLens.Out = mkLens(this)
+      implicit mkLens: MkSelectDynamicOptic[Lens[S, A],
+                                            A,
+                                            Symbol @@ k.type,
+                                            Nothing]): mkLens.Out =
+    mkLens(this)
 
   def apply[B](implicit mkPrism: MkCtorPrism[A, B]): Prism[S, B] =
     mkPrism() compose this
@@ -68,9 +80,12 @@ trait Lens[S, A] extends LPLens[S, A] { outer =>
 }
 
 trait LPLens[S, A] extends Dynamic with Serializable { self: Lens[S, A] =>
-  def selectDynamic[B](k: String)(implicit mkLens: MkSelectDynamicOptic[
-                                      Lens[S, A], A, Symbol @@ k.type, B],
-                                  dummy: DummyImplicit): mkLens.Out =
+  def selectDynamic[B](k: String)(
+      implicit mkLens: MkSelectDynamicOptic[Lens[S, A],
+                                            A,
+                                            Symbol @@ k.type,
+                                            B],
+      dummy: DummyImplicit): mkLens.Out =
     mkLens(this)
 }
 
@@ -91,8 +106,10 @@ trait Prism[S, A] extends LPPrism[S, A] { outer =>
   }
 
   def selectDynamic(k: String)(
-      implicit mkPrism: MkSelectDynamicOptic[
-          Prism[S, A], A, Symbol @@ k.type, Nothing]): mkPrism.Out =
+      implicit mkPrism: MkSelectDynamicOptic[Prism[S, A],
+                                             A,
+                                             Symbol @@ k.type,
+                                             Nothing]): mkPrism.Out =
     mkPrism(this)
 
   def apply[B](implicit mkPrism: MkCtorPrism[A, B]): Prism[S, B] =
@@ -118,9 +135,12 @@ trait Prism[S, A] extends LPPrism[S, A] { outer =>
 }
 
 trait LPPrism[S, A] extends Dynamic with Serializable { self: Prism[S, A] =>
-  def selectDynamic[B](k: String)(implicit mkPrism: MkSelectDynamicOptic[
-                                      Prism[S, A], A, Symbol @@ k.type, B],
-                                  dummy: DummyImplicit): mkPrism.Out =
+  def selectDynamic[B](k: String)(
+      implicit mkPrism: MkSelectDynamicOptic[Prism[S, A],
+                                             A,
+                                             Symbol @@ k.type,
+                                             B],
+      dummy: DummyImplicit): mkPrism.Out =
     mkPrism(this)
 }
 
@@ -500,14 +520,19 @@ trait LowPriorityMkPathOptic {
 
   type Aux1[S, P <: HList, Out0] = MkPathOptic[S, P] { type Out = Out0 }
 
-  implicit def mkCoselSelPathOptic[
-      S, P <: HList, K, A, C <: Coproduct, I, E, R](
-      implicit mkPrefix: Aux[S, P, R, A],
-      gen: Generic.Aux[A, C],
-      infer: InferProduct.Aux[C, K, I],
-      mkPrism: MkCtorPrism[A, I],
-      mkLens: MkFieldLens.Aux[I, K, E],
-      compose: OpticComposer[Prism[A, E], R])
+  implicit def mkCoselSelPathOptic[S,
+                                   P <: HList,
+                                   K,
+                                   A,
+                                   C <: Coproduct,
+                                   I,
+                                   E,
+                                   R](implicit mkPrefix: Aux[S, P, R, A],
+                                      gen: Generic.Aux[A, C],
+                                      infer: InferProduct.Aux[C, K, I],
+                                      mkPrism: MkCtorPrism[A, I],
+                                      mkLens: MkFieldLens.Aux[I, K, E],
+                                      compose: OpticComposer[Prism[A, E], R])
     : Aux[S, Select[K] :: P, compose.Out, E] =
     new MkPathOptic[S, Select[K] :: P] {
       type Out = compose.Out
@@ -560,16 +585,16 @@ trait LowPrioritySegment {
     type Out = Out0
   }
 
-  implicit def two[P, S, T <: HList]: Aux[
-      P, S, T, Coselect[S] :: Select[Symbol @@ P] :: T] =
+  implicit def two[P, S, T <: HList]
+    : Aux[P, S, T, Coselect[S] :: Select[Symbol @@ P] :: T] =
     new Segment[P, S, T] {
       type Out = Coselect[S] :: Select[Symbol @@ P] :: T
     }
 }
 
 object Segment extends LowPrioritySegment {
-  implicit def one[
-      P, T <: HList]: Aux[P, Nothing, T, Select[Symbol @@ P] :: T] =
+  implicit def one[P, T <: HList]
+    : Aux[P, Nothing, T, Select[Symbol @@ P] :: T] =
     new Segment[P, Nothing, T] {
       type Out = Select[Symbol @@ P] :: T
     }

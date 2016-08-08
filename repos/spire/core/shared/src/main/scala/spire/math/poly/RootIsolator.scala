@@ -53,8 +53,11 @@ object RootIsolator {
     val x = Polynomial.x[BigInt]
     val one = Polynomial.one[BigInt]
 
-    case class TransformedPoly(
-        p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt)
+    case class TransformedPoly(p: Polynomial[BigInt],
+                               a: BigInt,
+                               b: BigInt,
+                               c: BigInt,
+                               d: BigInt)
 
     // Find all roots recursively that are between (0, 1) and (1, infinity).
     def split1(p: Polynomial[BigInt],
@@ -100,7 +103,7 @@ object RootIsolator {
                 // We map the upper bound for p back to a bound for the initial
                 // polynomial by using the inverse Mobius transformation.
                 (Rational(d) * ub0 - Rational(b)) /
-                (Rational(-c) * ub0 + Rational(a))
+                  (Rational(-c) * ub0 + Rational(a))
               }
               val i0 = if (c == 0) ub else Rational(a, c)
               val i1 = if (d == 0) ub else Rational(b, d)

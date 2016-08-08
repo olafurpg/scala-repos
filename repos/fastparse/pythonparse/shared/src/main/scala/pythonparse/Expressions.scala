@@ -41,8 +41,9 @@ object Expressions {
     case Seq(x) => x
     case xs => Ast.expr.BoolOp(Ast.boolop.And, xs)
   }
-  val not_test: P[Ast.expr] = P(("not" ~ not_test).map(
-          Ast.expr.UnaryOp(Ast.unaryop.Not, _)) | comparison)
+  val not_test: P[Ast.expr] = P(
+      ("not" ~ not_test)
+        .map(Ast.expr.UnaryOp(Ast.unaryop.Not, _)) | comparison)
   val comparison: P[Ast.expr] = P(expr ~ (comp_op ~ expr).rep).map {
     case (lhs, Nil) => lhs
     case (lhs, chunks) =>
@@ -108,7 +109,7 @@ object Expressions {
     val empty_dict = ("{" ~ "}").map(_ => Ast.expr.Dict(Nil, Nil))
     P(
         empty_tuple | empty_list | empty_dict | "(" ~ (yield_expr | generator | tuple) ~ ")" | "[" ~
-        (list_comp | list) ~ "]" | "{" ~ dictorsetmaker ~ "}" | "`" ~ testlist1
+          (list_comp | list) ~ "]" | "{" ~ dictorsetmaker ~ "}" | "`" ~ testlist1
           .map(x => Ast.expr.Repr(Ast.expr.Tuple(x, Ast.expr_context.Load))) ~ "`" | STRING
           .rep(1)
           .map(_.mkString)
@@ -132,11 +133,9 @@ object Expressions {
           Ast.expr.Call(lhs, args, keywords, starargs, kwargs)
     }
     val slice = P("[" ~ subscriptlist ~ "]").map(args =>
-          (lhs: Ast.expr) =>
-            Ast.expr.Subscript(lhs, args, Ast.expr_context.Load))
+      (lhs: Ast.expr) => Ast.expr.Subscript(lhs, args, Ast.expr_context.Load))
     val attr = P("." ~ NAME).map(id =>
-          (lhs: Ast.expr) =>
-            Ast.expr.Attribute(lhs, id, Ast.expr_context.Load))
+      (lhs: Ast.expr) => Ast.expr.Attribute(lhs, id, Ast.expr_context.Load))
     P(call | slice | attr)
   }
   val subscriptlist = P(subscript.rep(1, ",") ~ ",".?).map {
@@ -151,8 +150,8 @@ object Expressions {
         Ast.slice.Slice(
             lower,
             upper,
-            step.map(_.getOrElse(Ast.expr.Name(Ast.identifier("None"),
-                                               Ast.expr_context.Load)))
+            step.map(_.getOrElse(
+                Ast.expr.Name(Ast.identifier("None"), Ast.expr_context.Load)))
         )
     }
     P(ellipses | multi | single)
@@ -179,8 +178,9 @@ object Expressions {
 
   val arglist = {
     val inits = P((plain_argument ~ !"=").rep(0, ","))
-    val later = P(named_argument.rep(0, ",") ~ ",".? ~ ("*" ~ test).? ~ ",".? ~
-        ("**" ~ test).?)
+    val later = P(
+        named_argument.rep(0, ",") ~ ",".? ~ ("*" ~ test).? ~ ",".? ~
+          ("**" ~ test).?)
     P(inits ~ ",".? ~ later)
   }
 
@@ -207,8 +207,9 @@ object Expressions {
 
   val varargslist: P[Ast.arguments] = {
     val named_arg = P(fpdef ~ ("=" ~ test).?)
-    val x = P(named_arg.rep(sep = ",") ~ ",".? ~ ("*" ~ NAME).? ~ ",".? ~
-        ("**" ~ NAME).?).map {
+    val x = P(
+        named_arg.rep(sep = ",") ~ ",".? ~ ("*" ~ NAME).? ~ ",".? ~
+          ("**" ~ NAME).?).map {
       case (normal_args, starargs, kwargs) =>
         val (args, defaults) = normal_args.unzip
         Ast.arguments(args, starargs, kwargs, defaults.flatten)

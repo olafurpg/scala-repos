@@ -7,7 +7,12 @@ import akka.actor._
 import akka.actor.{ActorRef, Props, ActorLogging, Actor}
 import akka.io.Tcp
 import akka.util.ByteString
-import org.ensime.api.{RpcRequestEnvelope, EnsimeServerError, RpcResponseEnvelope, EnsimeEvent}
+import org.ensime.api.{
+  RpcRequestEnvelope,
+  EnsimeServerError,
+  RpcResponseEnvelope,
+  EnsimeEvent
+}
 import org.ensime.core.{Broadcaster, Canonised, Protocol}
 import org.ensime.server.RequestHandler
 
@@ -19,8 +24,9 @@ class TCPConnectionActor(
     protocol: Protocol,
     project: ActorRef,
     broadcaster: ActorRef
-)
-    extends Actor with Stash with ActorLogging {
+) extends Actor
+    with Stash
+    with ActorLogging {
 
   case object Ack extends Tcp.Event
 
@@ -112,8 +118,8 @@ class TCPConnectionActor(
     envelopeOpt match {
       case Some(rawEnvelope: RpcRequestEnvelope) =>
         val envelope = Canonised(rawEnvelope)
-        context.actorOf(
-            RequestHandler(envelope, project, self), s"${envelope.callId}")
+        context.actorOf(RequestHandler(envelope, project, self),
+                        s"${envelope.callId}")
         repeatedDecode()
       case None =>
     }

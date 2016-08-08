@@ -45,18 +45,16 @@ object FetchRequest {
     val maxWait = buffer.getInt
     val minBytes = buffer.getInt
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            val offset = buffer.getLong
-            val fetchSize = buffer.getInt
-            (TopicAndPartition(topic, partitionId),
-             PartitionFetchInfo(offset, fetchSize))
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        val offset = buffer.getLong
+        val fetchSize = buffer.getInt
+        (TopicAndPartition(topic, partitionId),
+         PartitionFetchInfo(offset, fetchSize))
+      })
     })
     FetchRequest(versionId,
                  correlationId,
@@ -129,15 +127,14 @@ case class FetchRequest(
     4 + /* maxWait */
     4 + /* minBytes */
     4 + /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
-        val (topic, partitionFetchInfos) = currTopic
-        foldedTopics + shortStringLength(topic) + 4 + /* partition count */
-        partitionFetchInfos.size *
+    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) => {
+      val (topic, partitionFetchInfos) = currTopic
+      foldedTopics + shortStringLength(topic) + 4 + /* partition count */
+      partitionFetchInfos.size *
         (4 + /* partition id */
-            8 + /* offset */
-            4 /* fetch size */
-            )
+        8 + /* offset */
+        4 /* fetch size */
+        )
     })
   }
 
@@ -159,14 +156,17 @@ case class FetchRequest(
     val fetchResponsePartitionData = requestInfo.map {
       case (topicAndPartition, data) =>
         (topicAndPartition,
-         FetchResponsePartitionData(
-             Errors.forException(e).code, -1, MessageSet.Empty))
+         FetchResponsePartitionData(Errors.forException(e).code,
+                                    -1,
+                                    MessageSet.Empty))
     }
     val fetchRequest = request.requestObj.asInstanceOf[FetchRequest]
-    val errorResponse = FetchResponse(
-        correlationId, fetchResponsePartitionData, fetchRequest.versionId)
+    val errorResponse = FetchResponse(correlationId,
+                                      fetchResponsePartitionData,
+                                      fetchRequest.versionId)
     // Magic value does not matter here because the message set is empty
-    requestChannel.sendResponse(new RequestChannel.Response(
+    requestChannel.sendResponse(
+        new RequestChannel.Response(
             request,
             new FetchResponseSend(request.connectionId, errorResponse)))
   }

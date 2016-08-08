@@ -213,12 +213,15 @@ object UnitTests extends TestSuite {
             "from x import y"
         )
         'import4 - stmt(
-            Seq(ImportFrom(
-                    Some(identifier("x.y")), Seq(alias('y, Some('z))), None)),
+            Seq(
+                ImportFrom(Some(identifier("x.y")),
+                           Seq(alias('y, Some('z))),
+                           None)),
             "from x.y import y as z"
         )
         'import5 - stmt(
-            Seq(ImportFrom(Some(identifier("x.y")),
+            Seq(
+                ImportFrom(Some(identifier("x.y")),
                            Seq(alias('y, Some('z))),
                            Some(1))),
             "from .x.y import y as z"
@@ -268,7 +271,8 @@ object UnitTests extends TestSuite {
             |""".stripMargin
         )
         'for - stmt(
-            Seq(For(Tuple(Seq('x, 'y), Load),
+            Seq(
+                For(Tuple(Seq('x, 'y), Load),
                     Call('range, Seq(Num(10)), Nil, None, None),
                     Seq(Print(None, Seq('x), true)),
                     Nil)),
@@ -279,19 +283,21 @@ object UnitTests extends TestSuite {
             Seq(
                 If(
                     'a,
-                    Seq(If(
+                    Seq(
+                        If(
                             'b,
                             Seq(Pass),
                             Seq(Print(None, Seq(Num(1)), true))
                         )),
-                    Seq(If(
+                    Seq(
+                        If(
                             'c,
                             Seq(Pass),
                             Seq(If(
-                                    'd,
-                                    Seq(Pass),
-                                    Seq(Pass)
-                                ))
+                                'd,
+                                Seq(Pass),
+                                Seq(Pass)
+                            ))
                         ))
                 )),
             """if a:
@@ -307,7 +313,8 @@ object UnitTests extends TestSuite {
         )
 
         'forelse - stmt(
-            Seq(For(Name('w, Load),
+            Seq(
+                For(Name('w, Load),
                     Tuple(Seq('x, 'y, 'z), Load),
                     Seq(For(Tuple(Seq('a, 'b), Load), 'c, Seq(Pass), Nil)),
                     Seq(Pass))),
@@ -340,7 +347,8 @@ object UnitTests extends TestSuite {
           """.stripMargin
         )
         'function - stmt(
-            Seq(FunctionDef('foo,
+            Seq(
+                FunctionDef('foo,
                             arguments(Seq(Name('x, Param)), None, None, Nil),
                             Seq(Return(Some('x))),
                             Nil)),
@@ -369,7 +377,8 @@ object UnitTests extends TestSuite {
             "with x as y: return y"
         )
         'with2 - stmt(
-            Seq(With('x,
+            Seq(
+                With('x,
                      Some(Name('y, Load)),
                      Seq(With('a,
                               Some(Name('b, Load)),

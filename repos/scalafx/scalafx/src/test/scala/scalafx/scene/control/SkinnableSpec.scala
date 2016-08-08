@@ -41,7 +41,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SkinnableSpec
     extends SimpleSFXDelegateSpec[jfxsc.Skinnable, Skinnable](
-        classOf[jfxsc.Skinnable], classOf[Skinnable]) {
+        classOf[jfxsc.Skinnable],
+        classOf[Skinnable]) {
 
   override protected def getScalaClassInstance = new Skinnable {
     override val delegate = getJavaClassInstance

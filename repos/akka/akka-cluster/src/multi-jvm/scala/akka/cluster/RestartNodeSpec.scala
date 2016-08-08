@@ -27,7 +27,7 @@ object RestartNodeMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                "akka.cluster.auto-down-unreachable-after = 5s"))
+            "akka.cluster.auto-down-unreachable-after = 5s"))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
@@ -36,7 +36,8 @@ class RestartNodeMultiJvmNode2 extends RestartNodeSpec
 class RestartNodeMultiJvmNode3 extends RestartNodeSpec
 
 abstract class RestartNodeSpec
-    extends MultiNodeSpec(RestartNodeMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(RestartNodeMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import RestartNodeMultiJvmSpec._
@@ -53,7 +54,7 @@ abstract class RestartNodeSpec
       system.name,
       ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" +
-            secondUniqueAddress.address.port.get)
+          secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
@@ -85,7 +86,8 @@ abstract class RestartNodeSpec
         enterBarrier("second-address-receiver-ready")
         secondUniqueAddress = Cluster(secondSystem).selfUniqueAddress
         List(first, third) foreach { r ⇒
-          system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
+          system
+            .actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
           expectMsg(5 seconds, "ok")
         }
       }
@@ -117,7 +119,7 @@ abstract class RestartNodeSpec
         awaitAssert(
             Cluster(restartedSecondSystem).readView.members.size should ===(3))
         awaitAssert(Cluster(restartedSecondSystem).readView.members
-              .map(_.status) should ===(Set(Up)))
+          .map(_.status) should ===(Set(Up)))
       }
       runOn(first, third) {
         awaitAssert {

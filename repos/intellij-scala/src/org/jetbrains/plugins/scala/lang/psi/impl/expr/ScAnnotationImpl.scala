@@ -24,9 +24,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-class ScAnnotationImpl private (
-    stub: StubElement[ScAnnotation], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScAnnotation
+class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
+                                nodeType: IElementType,
+                                node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScAnnotation
     with PsiAnnotationParameterList {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScAnnotationStub) = {
@@ -43,7 +45,8 @@ class ScAnnotationImpl private (
   def getParameterList: PsiAnnotationParameterList = this
 
   private def getClazz: Option[PsiClass] =
-    ScType.extractClass(annotationExpr.constr.typeElement
+    ScType.extractClass(
+        annotationExpr.constr.typeElement
           .getType(TypingContext.empty)
           .getOrAny)
 
@@ -66,7 +69,7 @@ class ScAnnotationImpl private (
       case Some(args) =>
         args.exprs
           .map(expr =>
-                expr match {
+            expr match {
               case ass: ScAssignStmt =>
                 ass.getLExpression match {
                   case ref: ScReferenceExpression
@@ -114,7 +117,8 @@ class ScAnnotationImpl private (
   def getOwner: PsiAnnotationOwner = null
 
   def setDeclaredAttributeValue[T <: PsiAnnotationMemberValue](
-      attributeName: String, value: T): T = {
+      attributeName: String,
+      value: T): T = {
     val existing: PsiAnnotationMemberValue = findDeclaredAttributeValue(
         attributeName)
     if (value == null) {
@@ -126,8 +130,9 @@ class ScAnnotationImpl private (
           case arg: ScArgumentExprList =>
             var prev = elem.getPrevSibling
             while (prev != null &&
-            (ScalaPsiUtil.isLineTerminator(prev) ||
-                prev.isInstanceOf[PsiWhiteSpace])) prev = prev.getPrevSibling
+                   (ScalaPsiUtil.isLineTerminator(prev) ||
+                   prev.isInstanceOf[PsiWhiteSpace])) prev =
+              prev.getPrevSibling
             if (prev != null &&
                 prev.getNode.getElementType == ScalaTokenTypes.tCOMMA) {
               elem.delete()
@@ -135,8 +140,9 @@ class ScAnnotationImpl private (
             } else {
               var next = elem.getNextSibling
               while (next != null &&
-              (ScalaPsiUtil.isLineTerminator(next) ||
-                  next.isInstanceOf[PsiWhiteSpace])) next = next.getNextSibling
+                     (ScalaPsiUtil.isLineTerminator(next) ||
+                     next.isInstanceOf[PsiWhiteSpace])) next =
+                next.getNextSibling
               if (next != null &&
                   next.getNode.getElementType == ScalaTokenTypes.tCOMMA) {
                 elem.delete()
@@ -163,14 +169,16 @@ class ScAnnotationImpl private (
         }
         val params: Seq[ScExpression] = args.flatMap(arg => arg.exprs)
         if (params.length == 1 && !params(0).isInstanceOf[ScAssignStmt]) {
-          params(0).replace(ScalaPsiElementFactory.createExpressionFromText(
+          params(0).replace(
+              ScalaPsiElementFactory.createExpressionFromText(
                   PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME +
-                  " = " + params(0).getText,
+                    " = " + params(0).getText,
                   params(0).getManager))
         }
         var allowNoName: Boolean =
           params.length == 0 &&
-          (PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME.equals(attributeName) ||
+            (PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME
+              .equals(attributeName) ||
               null == attributeName)
         var namePrefix: String = null
         if (allowNoName) {
@@ -180,7 +188,8 @@ class ScAnnotationImpl private (
         }
 
         args(0).addBefore(ScalaPsiElementFactory.createExpressionFromText(
-                              namePrefix + value.getText, value.getManager),
+                              namePrefix + value.getText,
+                              value.getManager),
                           null)
       }
     }

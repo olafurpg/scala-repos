@@ -58,10 +58,10 @@ class InterpolatedStringTypingTest
   def testMultiLineStringBraceTyped() {
     val text =
       "class A { val a = f\"\"\"blah blah $" + CARET_MARKER +
-      " blah blah\"\"\"}"
+        " blah blah\"\"\"}"
     val assumedStub =
       "class A { val a = f\"\"\"blah blah ${" + CARET_MARKER +
-      "} blah blah\"\"\"}"
+        "} blah blah\"\"\"}"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '{')
   }

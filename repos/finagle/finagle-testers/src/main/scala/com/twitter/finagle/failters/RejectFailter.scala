@@ -12,12 +12,13 @@ import java.util.concurrent.RejectedExecutionException
   * @param rejectWith A class to reject with. Must have a no-arguments constructor.
   * @param seed A random seed, otherwise a deterministic seed is used.
   */
-case class RejectFailter[Req, Rep](
-    probability: Var[Double],
-    rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
-    seed: Long = Failter.DefaultSeed,
-    stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+case class RejectFailter[Req, Rep](probability: Var[Double],
+                                   rejectWith: (() => Throwable) =
+                                     (() => new RejectedExecutionException()),
+                                   seed: Long = Failter.DefaultSeed,
+                                   stats: StatsReceiver = NullStatsReceiver)
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     if (prob == 0.0 || rand.nextDouble() >= prob) {
@@ -38,7 +39,8 @@ case class ByzantineRejectFailter[Req, Rep](
     rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     service(req).transform { result =>

@@ -16,7 +16,8 @@ final class DonationApi(coll: Coll,
   private val minAmount = 200
 
   private val donorCache = lila.memo.AsyncCache[String, Boolean](
-      userId => donatedByUser(userId).map(_ >= minAmount), maxCapacity = 5000)
+      userId => donatedByUser(userId).map(_ >= minAmount),
+      maxCapacity = 5000)
 
   // in $ cents
   private def donatedByUser(userId: String): Fu[Int] =
@@ -55,8 +56,8 @@ final class DonationApi(coll: Coll,
     else donorCache(userId)
 
   def create(donation: Donation) = {
-    coll insert donation recover lila.db.recoverDuplicateKey(
-        e => println(e.getMessage)) void
+    coll insert donation recover lila.db.recoverDuplicateKey(e =>
+      println(e.getMessage)) void
   } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
     bus.publish(lila.hub.actorApi.DonationEvent(
                     userId = donation.userId,
@@ -74,9 +75,9 @@ final class DonationApi(coll: Coll,
     coll
       .find(
           BSONDocument("date" -> BSONDocument(
-                  "$gte" -> from,
-                  "$lt" -> to
-              )),
+              "$gte" -> from,
+              "$lt" -> to
+          )),
           BSONDocument("net" -> true, "_id" -> false)
       )
       .cursor[BSONDocument]()

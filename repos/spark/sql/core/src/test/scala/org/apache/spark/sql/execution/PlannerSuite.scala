@@ -20,13 +20,27 @@ package org.apache.spark.sql.execution
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{execution, Row}
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, Literal, SortOrder}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending,
+  Attribute,
+  Literal,
+  SortOrder
+}
 import org.apache.spark.sql.catalyst.plans.Inner
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Repartition}
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.execution.columnar.InMemoryRelation
-import org.apache.spark.sql.execution.exchange.{EnsureRequirements, ReusedExchange, ReuseExchange, ShuffleExchange}
-import org.apache.spark.sql.execution.joins.{BroadcastHashJoin, ShuffledHashJoin, SortMergeJoin}
+import org.apache.spark.sql.execution.exchange.{
+  EnsureRequirements,
+  ReusedExchange,
+  ReuseExchange,
+  ShuffleExchange
+}
+import org.apache.spark.sql.execution.joins.{
+  BroadcastHashJoin,
+  ShuffledHashJoin,
+  SortMergeJoin
+}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
@@ -41,8 +55,8 @@ class PlannerSuite extends SharedSQLContext {
     val planner = sqlContext.sessionState.planner
     import planner._
     val plannedOption = Aggregation(query).headOption
-    val planned = plannedOption.getOrElse(
-        fail(s"Could query play aggregation query $query. Is it an aggregation query?"))
+    val planned = plannedOption.getOrElse(fail(
+        s"Could query play aggregation query $query. Is it an aggregation query?"))
     val aggregations = planned.collect {
       case n if n.nodeName contains "Aggregate" => n
     }
@@ -118,9 +132,9 @@ class PlannerSuite extends SharedSQLContext {
 
     val complexTypes =
       ArrayType(DoubleType, true) :: ArrayType(StringType, false) :: MapType(
-          IntegerType, StringType, true) :: MapType(IntegerType,
-                                                    ArrayType(DoubleType),
-                                                    false) :: StructType(
+          IntegerType,
+          StringType,
+          true) :: MapType(IntegerType, ArrayType(DoubleType), false) :: StructType(
           Seq(StructField("a", IntegerType, nullable = true),
               StructField("b", ArrayType(DoubleType), nullable = false),
               StructField("c", DoubleType, nullable = false))) :: Nil
@@ -166,7 +180,7 @@ class PlannerSuite extends SharedSQLContext {
         val exp =
           sql("select * from testPushed where key = 15").queryExecution.sparkPlan
         assert(exp.toString.contains(
-                "PushedFilters: [IsNotNull(key), EqualTo(key,15)]"))
+            "PushedFilters: [IsNotNull(key), EqualTo(key,15)]"))
       }
     }
   }
@@ -306,9 +320,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(!rightPartitioning.compatibleWith(leftPartitioning))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = leftPartitioning),
-              DummySparkPlan(outputPartitioning = rightPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = leftPartitioning),
+            DummySparkPlan(outputPartitioning = rightPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -328,11 +342,11 @@ class PlannerSuite extends SharedSQLContext {
     val distribution = ClusteredDistribution(clustering)
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(
-                  outputPartitioning = HashPartitioning(clustering, 1)),
-              DummySparkPlan(
-                  outputPartitioning = HashPartitioning(clustering, 2))
-          ),
+            DummySparkPlan(
+                outputPartitioning = HashPartitioning(clustering, 1)),
+            DummySparkPlan(
+                outputPartitioning = HashPartitioning(clustering, 2))
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -350,9 +364,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = childPartitioning),
-              DummySparkPlan(outputPartitioning = childPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = childPartitioning),
+            DummySparkPlan(outputPartitioning = childPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -372,9 +386,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(childPartitioning.satisfies(distribution))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = childPartitioning),
-              DummySparkPlan(outputPartitioning = childPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = childPartitioning),
+            DummySparkPlan(outputPartitioning = childPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -397,9 +411,9 @@ class PlannerSuite extends SharedSQLContext {
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = SinglePartition),
-              DummySparkPlan(outputPartitioning = SinglePartition)
-          ),
+            DummySparkPlan(outputPartitioning = SinglePartition),
+            DummySparkPlan(outputPartitioning = SinglePartition)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(outputOrdering, outputOrdering)
     )
@@ -568,8 +582,7 @@ private case class DummySparkPlan(
     override val outputPartitioning: Partitioning = UnknownPartitioning(0),
     override val requiredChildDistribution: Seq[Distribution] = Nil,
     override val requiredChildOrdering: Seq[Seq[SortOrder]] = Nil
-)
-    extends SparkPlan {
+) extends SparkPlan {
   override protected def doExecute(): RDD[InternalRow] =
     throw new NotImplementedError
   override def output: Seq[Attribute] = Seq.empty

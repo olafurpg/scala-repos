@@ -81,8 +81,10 @@ case class ShuffleExchange(var newPartitioning: Partitioning,
     */
   private[sql] def prepareShuffleDependency(
       ): ShuffleDependency[Int, InternalRow, InternalRow] = {
-    ShuffleExchange.prepareShuffleDependency(
-        child.execute(), child.output, newPartitioning, serializer)
+    ShuffleExchange.prepareShuffleDependency(child.execute(),
+                                             child.output,
+                                             newPartitioning,
+                                             serializer)
   }
 
   /**
@@ -155,7 +157,8 @@ object ShuffleExchange {
     * @return true if rows should be copied before being shuffled, false otherwise
     */
   private def needToCopyObjectsBeforeShuffle(
-      partitioner: Partitioner, serializer: Serializer): Boolean = {
+      partitioner: Partitioner,
+      serializer: Serializer): Boolean = {
     // Note: even though we only use the partitioner's `numPartitions` field, we require it to be
     // passed instead of directly passing the number of partitions in order to guard against
     // corner-cases where a partitioner constructed with `numPartitions` partitions may output
@@ -225,8 +228,8 @@ object ShuffleExchange {
           val mutablePair = new MutablePair[InternalRow, Null]()
           iter.map(row => mutablePair.update(row.copy(), null))
         }
-        implicit val ordering = new LazilyGeneratedOrdering(
-            sortingExpressions, outputAttributes)
+        implicit val ordering =
+          new LazilyGeneratedOrdering(sortingExpressions, outputAttributes)
         new RangePartitioner(numPartitions, rddForSampling, ascending = true)
       case SinglePartition =>
         new Partitioner {
@@ -248,12 +251,12 @@ object ShuffleExchange {
               position += 1
               position
             }
-          case h: HashPartitioning =>
-          val projection = UnsafeProjection.create(
-              h.partitionIdExpression :: Nil, outputAttributes)
+        case h: HashPartitioning =>
+          val projection = UnsafeProjection
+            .create(h.partitionIdExpression :: Nil, outputAttributes)
           row =>
             projection(row).getInt(0)
-          case RangePartitioning(_, _) | SinglePartition => identity
+        case RangePartitioning(_, _) | SinglePartition => identity
         case _ => sys.error(s"Exchange not implemented for $newPartitioning")
       }
     val rddWithPartitionIds: RDD[Product2[Int, InternalRow]] = {

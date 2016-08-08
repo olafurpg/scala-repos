@@ -22,8 +22,8 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
   def toSpan(d: Duration): Span = Span(d.inNanoseconds, Nanoseconds)
 
-  implicit val patienceConfig = PatienceConfig(
-      timeout = toSpan(1.second), interval = toSpan(zkTimeout))
+  implicit val patienceConfig =
+    PatienceConfig(timeout = toSpan(1.second), interval = toSpan(zkTimeout))
 
   /* This can be useful if you want to retain ZK logging output for debugging.
   val app = new org.apache.log4j.ConsoleAppender
@@ -63,8 +63,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
         session1 flatMap { session1 =>
           session1.state
         }
-      state.changes.register(
-          Witness({ ws =>
+      state.changes.register(Witness({ ws =>
         ws match {
           case WatchState.SessionState(s) => states = s +: states
           case _ =>
@@ -113,8 +112,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
       val varZkState = varZkSession flatMap { _.state }
 
       @volatile var zkStates = Seq[(SessionState, Duration)]()
-      varZkState.changes.register(
-          Witness({ ws =>
+      varZkState.changes.register(Witness({ ws =>
         ws match {
           case WatchState.SessionState(state) =>
             zkStates = (state, watch()) +: zkStates
@@ -129,7 +127,8 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
       // Wait for the initial connect.
       eventually {
-        assert(Var.sample(varZkState) == WatchState.SessionState(
+        assert(
+            Var.sample(varZkState) == WatchState.SessionState(
                 SessionState.SyncConnected))
         assert(sessions.size == 1)
       }
@@ -151,8 +150,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
       val connected = new Promise[Unit]
       val closed = new Promise[Unit]
-      session2.state.changes.register(
-          Witness({ ws =>
+      session2.state.changes.register(Witness({ ws =>
         ws match {
           case WatchState.SessionState(SessionState.SyncConnected) =>
             connected.setDone()

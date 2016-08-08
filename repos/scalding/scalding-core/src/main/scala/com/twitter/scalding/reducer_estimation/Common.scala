@@ -107,12 +107,12 @@ trait HistoryReducerEstimator extends ReducerEstimator {
     }
   }
 
-  protected def estimateReducers(
-      info: FlowStrategyInfo, history: Seq[FlowStepHistory]): Option[Int]
+  protected def estimateReducers(info: FlowStrategyInfo,
+                                 history: Seq[FlowStepHistory]): Option[Int]
 }
 
-case class FallbackEstimator(
-    first: ReducerEstimator, fallback: ReducerEstimator)
+case class FallbackEstimator(first: ReducerEstimator,
+                             fallback: ReducerEstimator)
     extends ReducerEstimator {
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
@@ -133,8 +133,8 @@ object ReducerEstimatorStepStrategy extends FlowStepStrategy[JobConf] {
         override def estimateReducers(info: FlowStrategyInfo) = None
       }
 
-      override def plus(
-          l: ReducerEstimator, r: ReducerEstimator): ReducerEstimator =
+      override def plus(l: ReducerEstimator,
+                        r: ReducerEstimator): ReducerEstimator =
         FallbackEstimator(l, r)
     }
 
@@ -193,8 +193,8 @@ object ReducerEstimatorStepStrategy extends FlowStepStrategy[JobConf] {
       val numReducers = combinedEstimator.estimateReducers(info)
 
       // save the estimate in the JobConf which should be saved by hRaven
-      conf.setInt(
-          EstimatorConfig.estimatedNumReducers, numReducers.getOrElse(-1))
+      conf.setInt(EstimatorConfig.estimatedNumReducers,
+                  numReducers.getOrElse(-1))
 
       // set number of reducers
       if (!setExplicitly || overrideExplicit) {
@@ -235,13 +235,15 @@ final case class FlowStepKeys(jobName: String,
                               version: String,
                               queue: String)
 
-final case class Task(
-    taskType: String, status: String, startTime: Long, finishTime: Long)
+final case class Task(taskType: String,
+                      status: String,
+                      startTime: Long,
+                      finishTime: Long)
 
 /**
   * Provider of information about prior runs.
   */
 trait HistoryService {
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]]
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]]
 }

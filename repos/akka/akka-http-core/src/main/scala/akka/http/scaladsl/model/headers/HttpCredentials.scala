@@ -10,7 +10,8 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed abstract class HttpCredentials
-    extends jm.headers.HttpCredentials with ValueRenderable {
+    extends jm.headers.HttpCredentials
+    with ValueRenderable {
   def scheme: String
   def token: String
   def params: Map[String, String]
@@ -75,7 +76,7 @@ final case class GenericHttpCredentials(
 }
 
 object GenericHttpCredentials {
-  def apply(
-      scheme: String, params: Map[String, String]): GenericHttpCredentials =
+  def apply(scheme: String,
+            params: Map[String, String]): GenericHttpCredentials =
     apply(scheme, "", params)
 }

@@ -99,7 +99,7 @@ class LazilyEvictingCacheTest extends FunSuite with MockitoSugar {
                 }
               }
           )
-      )
+    )
     val fCache = new LazilyEvictingCache(cache)
 
     assert(fCache.getOrElseUpdate("key")(p).poll == p.poll)
@@ -133,7 +133,7 @@ class LazilyEvictingCacheTest extends FunSuite with MockitoSugar {
                 }
               }
           )
-      )
+    )
     val fCache = new LazilyEvictingCache(cache)
 
     assert(fCache.getOrElseUpdate("key")(p).poll == p.poll)

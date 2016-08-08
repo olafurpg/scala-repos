@@ -36,8 +36,8 @@ class DeadlineFailureDetector(
     * Expecting config properties named `acceptable-heartbeat-pause`.
     */
   def this(config: Config, ev: EventStream) =
-    this(acceptableHeartbeatPause = config.getMillisDuration(
-               "acceptable-heartbeat-pause"),
+    this(acceptableHeartbeatPause =
+           config.getMillisDuration("acceptable-heartbeat-pause"),
          heartbeatInterval = config.getMillisDuration("heartbeat-interval"))
 
   // for backwards compatibility with 2.3.x

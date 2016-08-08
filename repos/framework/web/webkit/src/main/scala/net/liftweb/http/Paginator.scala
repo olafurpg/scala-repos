@@ -24,7 +24,7 @@ import Helpers._
 import S.?
 
 /**
-  * Base class for things that require pagination. Implements a contract 
+  * Base class for things that require pagination. Implements a contract
   * for supplying the correct number of browsable pages etc
   *
   * @tparam T the type of item being paginated
@@ -69,16 +69,17 @@ trait Paginator[T] extends Loggable {
     */
   def zoomedPages =
     (List(curPage - 1020, curPage - 120, curPage - 20) ++
-        (curPage - 10 to curPage + 10) ++ List(
-            curPage + 20, curPage + 120, curPage + 1020)) filter { n =>
+      (curPage - 10 to curPage + 10) ++ List(curPage + 20,
+                                             curPage + 120,
+                                             curPage + 1020)) filter { n =>
       n >= 0 && n < numPages
     }
 }
 
 /**
-  * In many situations you'll want to sort things in your paginated view. 
+  * In many situations you'll want to sort things in your paginated view.
   * <code>SortedPaginator</code> is a specialized paginator for doing such tasks.
-  * 
+  *
   * T: The type of the elements, accessed via def page within the listing snippet
   * C: The type of the columns, used to specify sorting
   *
@@ -129,7 +130,7 @@ trait SortedPaginator[T, C] extends Paginator[T] {
 /**
   * This is the paginator snippet. It provides page
   * navigation and column sorting links.
-  * View XHTML is as follows: 
+  * View XHTML is as follows:
   * nav prefix (prefix is configurable by overriding def navPrefix)
   *  - &lt;nav:first/&gt; - a link to the first page
   *  - &lt;nav:prev/&gt; - a link to the previous page
@@ -183,7 +184,8 @@ trait PaginatorSnippet[T] extends Paginator[T] {
     else
       Text(
           S.?("paginator.displayingrecords",
-              Array(recordsFrom, recordsTo, count).map(_.asInstanceOf[AnyRef]): _*))
+              Array(recordsFrom, recordsTo, count)
+                .map(_.asInstanceOf[AnyRef]): _*))
 
   /**
     * The template prefix for general navigation components
@@ -279,7 +281,8 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   * &lt;th&gt;&lt;sort:name/&gt;&lt;/th&gt;&lt;th&gt;&lt;sort:email/&gt;&lt;/th&gt; etc.
   */
 trait SortedPaginatorSnippet[T, C]
-    extends SortedPaginator[T, C] with PaginatorSnippet[T] {
+    extends SortedPaginator[T, C]
+    with PaginatorSnippet[T] {
 
   /**
     * The prefix to bind the sorting column headers
@@ -350,8 +353,8 @@ trait SortedPaginatorSnippet[T, C]
 }
 
 /**
-  * Sort your paginated views by using lifts functions mapping. 
-  * The only down side with this style is that your links are session 
+  * Sort your paginated views by using lifts functions mapping.
+  * The only down side with this style is that your links are session
   * specific and non-bookmarkable.
   * If you mix this trait in to a StatefulSnippet, it should work out the box.
   * Otherwise, implement 'registerThisSnippet.'

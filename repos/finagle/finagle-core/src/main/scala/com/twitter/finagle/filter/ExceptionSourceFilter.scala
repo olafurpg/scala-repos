@@ -1,6 +1,15 @@
 package com.twitter.finagle.filter
 
-import com.twitter.finagle.{param, SimpleFilter, Service, ServiceFactory, SourcedException, Stack, Stackable, Failure}
+import com.twitter.finagle.{
+  param,
+  SimpleFilter,
+  Service,
+  ServiceFactory,
+  SourcedException,
+  Stack,
+  Stackable,
+  Failure
+}
 import com.twitter.util.Future
 
 private[finagle] object ExceptionSourceFilter {

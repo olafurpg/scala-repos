@@ -10,7 +10,7 @@ trait ComonadTests[F[_]] extends CoflatMapTests[F] {
 
   def laws: ComonadLaws[F]
 
-  def comonad[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def comonad[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       EqFA: Eq[F[A]],
       EqFFA: Eq[F[F[A]]],

@@ -28,7 +28,7 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     //OPT this method is public so we can do `manual inlining`
     def undoTo(limit: UndoPairs) {
       assertCorrectThread()
-      while ( (log ne limit) && log.nonEmpty) {
+      while ((log ne limit) && log.nonEmpty) {
         val UndoPair(tv, constr) = log.head
         tv.constr = constr
         log = log.tail
@@ -52,7 +52,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     // `block` should not affect constraints on typevars
     def undo[T](block: => T): T = {
       val before = log
-      try block finally undoTo(before)
+      try block
+      finally undoTo(before)
     }
   }
 
@@ -60,8 +61,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     *  in every TypeConstraint, I lifted them out.
     */
   private lazy val numericLoBound = IntTpe
-  private lazy val numericHiBound = intersectionType(
-      List(ByteTpe, CharTpe), ScalaPackageClass)
+  private lazy val numericHiBound =
+    intersectionType(List(ByteTpe, CharTpe), ScalaPackageClass)
 
   /** A class expressing upper and lower bounds constraints of type variables,
     * as well as their instantiations.
@@ -145,8 +146,10 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
 
     def instWithinBounds = instValid && isWithinBounds(inst)
 
-    def isWithinBounds(tp: Type): Boolean = (lobounds.forall(_ <:< tp) &&
-        hibounds.forall(tp <:< _) && (numlo == NoType || (numlo weak_<:< tp)) &&
+    def isWithinBounds(tp: Type): Boolean =
+      (lobounds.forall(_ <:< tp) &&
+        hibounds
+          .forall(tp <:< _) && (numlo == NoType || (numlo weak_<:< tp)) &&
         (numhi == NoType || (tp weak_<:< numhi)))
 
     var inst: Type = NoType // @M reduce visibility?
@@ -154,8 +157,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     def instValid = (inst ne null) && (inst ne NoType)
 
     def cloneInternal = {
-      val tc = new TypeConstraint(
-          lobounds, hibounds, numlo, numhi, avoidWidening)
+      val tc =
+        new TypeConstraint(lobounds, hibounds, numlo, numhi, avoidWidening)
       tc.inst = inst
       tc
     }
@@ -201,17 +204,16 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
           if (up) tparam.info.bounds.hi else tparam.info.bounds.lo
         //Console.println("solveOne0(tv, tp, v, b)="+(tvar, tparam, variance, bound))
         var cyclic = bound contains tparam
-        foreach3(tvars, tparams, variances)((tvar2, tparam2, variance2) =>
-              {
-            val ok =
-              (tparam2 != tparam) &&
+        foreach3(tvars, tparams, variances)((tvar2, tparam2, variance2) => {
+          val ok =
+            (tparam2 != tparam) &&
               ((bound contains tparam2) ||
-                  up && (tparam2.info.bounds.lo =:= tparam.tpeHK) || !up &&
-                  (tparam2.info.bounds.hi =:= tparam.tpeHK))
-            if (ok) {
-              if (tvar2.constr.inst eq null) cyclic = true
-              solveOne(tvar2, tparam2, variance2)
-            }
+                up && (tparam2.info.bounds.lo =:= tparam.tpeHK) || !up &&
+                (tparam2.info.bounds.hi =:= tparam.tpeHK))
+          if (ok) {
+            if (tvar2.constr.inst eq null) cyclic = true
+            solveOne(tvar2, tparam2, variance2)
+          }
         })
         if (!cyclic) {
           if (up) {
@@ -224,8 +226,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
               case TypeRef(_, `tparam`, _) =>
                 debuglog(
                     s"$tvar addHiBound $tparam2.tpeHK.instantiateTypeParams($tparams, $tvars)")
-                tvar addHiBound tparam2.tpeHK.instantiateTypeParams(
-                    tparams, tvars)
+                tvar addHiBound tparam2.tpeHK
+                  .instantiateTypeParams(tparams, tvars)
               case _ =>
             }
           } else {
@@ -239,8 +241,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
               case TypeRef(_, `tparam`, _) =>
                 debuglog(
                     s"$tvar addLoBound $tparam2.tpeHK.instantiateTypeParams($tparams, $tvars)")
-                tvar addLoBound tparam2.tpeHK.instantiateTypeParams(
-                    tparams, tvars)
+                tvar addLoBound tparam2.tpeHK
+                  .instantiateTypeParams(tparams, tvars)
               case _ =>
             }
           }
@@ -281,5 +283,6 @@ private[internal] object TypeConstraints {
   // UndoPair is declared in companion object to not hold an outer pointer reference
   final case class UndoPair[TypeVar <: SymbolTable#TypeVar,
                             TypeConstraint <: TypeConstraints#TypeConstraint](
-      tv: TypeVar, tConstraint: TypeConstraint)
+      tv: TypeVar,
+      tConstraint: TypeConstraint)
 }

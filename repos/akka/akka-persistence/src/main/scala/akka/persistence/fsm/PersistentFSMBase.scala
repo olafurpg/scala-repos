@@ -93,7 +93,9 @@ import scala.concurrent.duration.FiniteDuration
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 trait PersistentFSMBase[S, D, E]
-    extends Actor with Listeners with ActorLogging {
+    extends Actor
+    with Listeners
+    with ActorLogging {
 
   import akka.persistence.fsm.PersistentFSM._
 
@@ -149,8 +151,9 @@ trait PersistentFSMBase[S, D, E]
     * @param stateData initial state data
     * @param timeout state timeout for the initial state, overriding the default timeout for that state
     */
-  final def startWith(
-      stateName: S, stateData: D, timeout: Timeout = None): Unit =
+  final def startWith(stateName: S,
+                      stateData: D,
+                      timeout: Timeout = None): Unit =
     currentState = PersistentFSM.State(stateName, stateData, timeout)()
 
   /**
@@ -176,7 +179,8 @@ trait PersistentFSMBase[S, D, E]
     * @return descriptor for staying in current state
     */
   final def stay(): State =
-    goto(currentState.stateName).withNotification(false) // cannot directly use currentState because of the timeout field
+    goto(currentState.stateName)
+      .withNotification(false) // cannot directly use currentState because of the timeout field
 
   /**
     * Produce change descriptor to stop this FSM actor with reason "Normal".
@@ -216,8 +220,9 @@ trait PersistentFSMBase[S, D, E]
                      timeout: FiniteDuration,
                      repeat: Boolean = false): Unit = {
     if (debugEvent)
-      log.debug("setting " + (if (repeat) "repeating " else "") + "timer '" +
-          name + "'/" + timeout + ": " + msg)
+      log.debug(
+          "setting " + (if (repeat) "repeating " else "") + "timer '" +
+            name + "'/" + timeout + ": " + msg)
     if (timers contains name) {
       timers(name).cancel
     }
@@ -377,8 +382,9 @@ trait PersistentFSMBase[S, D, E]
   private val stateFunctions = mutable.Map[S, StateFunction]()
   private val stateTimeouts = mutable.Map[S, Timeout]()
 
-  private def register(
-      name: S, function: StateFunction, timeout: Timeout): Unit = {
+  private def register(name: S,
+                       function: StateFunction,
+                       timeout: Timeout): Unit = {
     if (stateFunctions contains name) {
       stateFunctions(name) = stateFunctions(name) orElse function
       stateTimeouts(name) = timeout orElse stateTimeouts(name)
@@ -438,14 +444,16 @@ trait PersistentFSMBase[S, D, E]
       // TODO Use context.watch(actor) and receive Terminated(actor) to clean up list
       listeners.add(actorRef)
       // send current state back as reference point
-      actorRef ! CurrentState(
-          self, currentState.stateName, currentState.timeout)
+      actorRef ! CurrentState(self,
+                              currentState.stateName,
+                              currentState.timeout)
     case Listen(actorRef) ⇒
       // TODO Use context.watch(actor) and receive Terminated(actor) to clean up list
       listeners.add(actorRef)
       // send current state back as reference point
-      actorRef ! CurrentState(
-          self, currentState.stateName, currentState.timeout)
+      actorRef ! CurrentState(self,
+                              currentState.stateName,
+                              currentState.timeout)
     case UnsubscribeTransitionCallBack(actorRef) ⇒
       listeners.remove(actorRef)
     case Deafen(actorRef) ⇒
@@ -516,7 +524,8 @@ trait PersistentFSMBase[S, D, E]
         val t = timeout.get
         if (t.isFinite && t.length >= 0) {
           import context.dispatcher
-          timeoutFuture = Some(context.system.scheduler
+          timeoutFuture = Some(
+              context.system.scheduler
                 .scheduleOnce(t, self, TimeoutMarker(generation)))
         }
       }
@@ -548,8 +557,8 @@ trait PersistentFSMBase[S, D, E]
       timers.clear()
       currentState = nextState
 
-      val stopEvent = StopEvent(
-          reason, currentState.stateName, currentState.stateData)
+      val stopEvent =
+        StopEvent(reason, currentState.stateName, currentState.stateData)
       if (terminateEvent.isDefinedAt(stopEvent)) terminateEvent(stopEvent)
     }
   }
@@ -595,8 +604,8 @@ trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
     }
   }
 
-  private[akka] abstract override def processEvent(
-      event: Event, source: AnyRef): Unit = {
+  private[akka] abstract override def processEvent(event: Event,
+                                                   source: AnyRef): Unit = {
     if (debugEvent) {
       val srcstr = source match {
         case s: String ⇒ s
@@ -629,7 +638,7 @@ trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
   protected def getLog: IndexedSeq[LogEntry[S, D]] = {
     val log =
       events zip states filter (_._1 ne null) map
-      (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
+        (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
     if (full) {
       IndexedSeq() ++ log.drop(pos) ++ log.take(pos)
     } else {
@@ -729,8 +738,9 @@ abstract class AbstractPersistentFSMBase[S, D, E]
     * @param stateData initial state data
     * @param timeout state timeout for the initial state, overriding the default timeout for that state
     */
-  final def startWith(
-      stateName: S, stateData: D, timeout: FiniteDuration): Unit =
+  final def startWith(stateName: S,
+                      stateData: D,
+                      timeout: FiniteDuration): Unit =
     startWith(stateName, stateData, Option(timeout))
 
   /**
@@ -966,8 +976,8 @@ abstract class AbstractPersistentFSMBase[S, D, E]
     * @param apply  an action to apply to the event and state data if there is a match
     * @return the builder with the case statement added
     */
-  final def matchStop(
-      reason: Reason, apply: UnitApply2[S, D]): FSMStopBuilder[S, D] =
+  final def matchStop(reason: Reason,
+                      apply: UnitApply2[S, D]): FSMStopBuilder[S, D] =
     new FSMStopBuilder[S, D]().stop(reason, apply)
 
   /**
@@ -1007,8 +1017,8 @@ abstract class AbstractPersistentFSMBase[S, D, E]
     * @param apply  an action to apply to the argument if the type matches
     * @return a builder with the case statement added
     */
-  final def matchData[DT <: D](
-      dataType: Class[DT], apply: UnitApply[DT]): UnitPFBuilder[D] =
+  final def matchData[DT <: D](dataType: Class[DT],
+                               apply: UnitApply[DT]): UnitPFBuilder[D] =
     UnitMatch.`match`(dataType, apply)
 
   /**

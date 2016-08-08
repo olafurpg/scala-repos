@@ -167,9 +167,8 @@ trait TaskExtra {
       def andFinally(fin: => Unit): Task[S] =
         mapR(x => Result.tryValue[S]({ fin; x }))
       def doFinally(t: Task[Unit]): Task[S] =
-        flatMapR(
-            x =>
-              t.mapR { tx =>
+        flatMapR(x =>
+          t.mapR { tx =>
             Result.tryValues[S](tx :: Nil, x)
         })
       def ||[T >: S](alt: Task[T]): Task[T] = flatMapR {
@@ -185,9 +184,9 @@ trait TaskExtra {
       def named(s: String): Task[S] = in.copy(info = in.info.setName(s))
     }
 
-  final implicit def pipeToProcess[Key](
-      t: Task[_])(implicit streams: Task[TaskStreams[Key]],
-                  key: Task[_] => Key): ProcessPipe = new ProcessPipe {
+  final implicit def pipeToProcess[Key](t: Task[_])(
+      implicit streams: Task[TaskStreams[Key]],
+      key: Task[_] => Key): ProcessPipe = new ProcessPipe {
     def #|(p: ProcessBuilder): Task[Int] = pipe0(None, p)
     def pipe(sid: String)(p: ProcessBuilder): Task[Int] = pipe0(Some(sid), p)
     private def pipe0(sid: Option[String], p: ProcessBuilder): Task[Int] =
@@ -196,13 +195,13 @@ trait TaskExtra {
         val pio = TaskExtra
           .processIO(s)
           .withInput(out => { BasicIO.transferFully(in, out); out.close() })
-          (p run pio).exitValue
+        (p run pio).exitValue
       }
   }
 
-  final implicit def binaryPipeTask[Key](
-      in: Task[_])(implicit streams: Task[TaskStreams[Key]],
-                   key: Task[_] => Key): BinaryPipe = new BinaryPipe {
+  final implicit def binaryPipeTask[Key](in: Task[_])(
+      implicit streams: Task[TaskStreams[Key]],
+      key: Task[_] => Key): BinaryPipe = new BinaryPipe {
     def binary[T](f: BufferedInputStream => T): Task[T] = pipe0(None, f)
     def binary[T](sid: String)(f: BufferedInputStream => T): Task[T] =
       pipe0(Some(sid), f)
@@ -210,30 +209,30 @@ trait TaskExtra {
     def #>(f: File): Task[Unit] = pipe0(None, toFile(f))
     def #>(sid: String, f: File): Task[Unit] = pipe0(Some(sid), toFile(f))
 
-    private def pipe0[T](
-        sid: Option[String], f: BufferedInputStream => T): Task[T] =
+    private def pipe0[T](sid: Option[String],
+                         f: BufferedInputStream => T): Task[T] =
       streams map { s =>
         f(s.readBinary(key(in), sid))
       }
 
     private def toFile(f: File) = (in: InputStream) => IO.transfer(in, f)
   }
-  final implicit def textPipeTask[Key](
-      in: Task[_])(implicit streams: Task[TaskStreams[Key]],
-                   key: Task[_] => Key): TextPipe = new TextPipe {
+  final implicit def textPipeTask[Key](in: Task[_])(
+      implicit streams: Task[TaskStreams[Key]],
+      key: Task[_] => Key): TextPipe = new TextPipe {
     def text[T](f: BufferedReader => T): Task[T] = pipe0(None, f)
     def text[T](sid: String)(f: BufferedReader => T): Task[T] =
       pipe0(Some(sid), f)
 
-    private def pipe0[T](
-        sid: Option[String], f: BufferedReader => T): Task[T] =
+    private def pipe0[T](sid: Option[String],
+                         f: BufferedReader => T): Task[T] =
       streams map { s =>
         f(s.readText(key(in), sid))
       }
   }
-  final implicit def linesTask[Key](
-      in: Task[_])(implicit streams: Task[TaskStreams[Key]],
-                   key: Task[_] => Key): TaskLines = new TaskLines {
+  final implicit def linesTask[Key](in: Task[_])(
+      implicit streams: Task[TaskStreams[Key]],
+      key: Task[_] => Key): TaskLines = new TaskLines {
     def lines: Task[List[String]] = lines0(None)
     def lines(sid: String): Task[List[String]] = lines0(Some(sid))
 
@@ -269,10 +268,9 @@ object TaskExtra extends TaskExtra {
         AList.tuple2[S, S]) map f.tupled
 
   def anyFailM[K[L[x]]](implicit a: AList[K]): K[Result] => Seq[Incomplete] =
-    in =>
-      {
-        val incs = failuresM(a)(in)
-        if (incs.isEmpty) expectedFailure else incs
+    in => {
+      val incs = failuresM(a)(in)
+      if (incs.isEmpty) expectedFailure else incs
     }
   def failM[T]: Result[T] => Incomplete = {
     case Inc(i) => i; case x => expectedFailure
@@ -285,11 +283,10 @@ object TaskExtra extends TaskExtra {
     case Inc(i) => throw i; case Value(t) => t
   }
   def allM[K[L[x]]](implicit a: AList[K]): K[Result] => K[Id] =
-    in =>
-      {
-        val incs = failuresM(a)(in)
-        if (incs.isEmpty) a.transform(in, Result.tryValue)
-        else throw incompleteDeps(incs)
+    in => {
+      val incs = failuresM(a)(in)
+      if (incs.isEmpty) a.transform(in, Result.tryValue)
+      else throw incompleteDeps(incs)
     }
   def failuresM[K[L[x]]](implicit a: AList[K]): K[Result] => Seq[Incomplete] =
     x => failures[Any](a.toList(x))

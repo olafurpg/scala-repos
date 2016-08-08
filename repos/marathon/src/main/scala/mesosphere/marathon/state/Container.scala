@@ -8,10 +8,10 @@ import scala.collection.immutable.Seq
 
 // TODO: trait Container and specializations?
 // Current implementation with type defaulting to DOCKER and docker to NONE makes no sense
-case class Container(
-    `type`: Mesos.ContainerInfo.Type = Mesos.ContainerInfo.Type.DOCKER,
-    volumes: Seq[Volume] = Nil,
-    docker: Option[Container.Docker] = None)
+case class Container(`type`: Mesos.ContainerInfo.Type =
+                       Mesos.ContainerInfo.Type.DOCKER,
+                     volumes: Seq[Volume] = Nil,
+                     docker: Option[Container.Docker] = None)
 
 object Container {
 
@@ -20,13 +20,13 @@ object Container {
   /**
     * Docker-specific container parameters.
     */
-  case class Docker(
-      image: String = "",
-      network: Option[Mesos.ContainerInfo.DockerInfo.Network] = None,
-      portMappings: Option[Seq[Docker.PortMapping]] = None,
-      privileged: Boolean = false,
-      parameters: Seq[Parameter] = Nil,
-      forcePullImage: Boolean = false)
+  case class Docker(image: String = "",
+                    network: Option[Mesos.ContainerInfo.DockerInfo.Network] =
+                      None,
+                    portMappings: Option[Seq[Docker.PortMapping]] = None,
+                    privileged: Boolean = false,
+                    parameters: Seq[Parameter] = Nil,
+                    forcePullImage: Boolean = false)
 
   object Docker {
 
@@ -39,13 +39,13 @@ object Container {
       * @param labels        This can be used to decorate the message with metadata to be
       *                      interpreted by external applications such as firewalls.
       */
-    case class PortMapping(
-        containerPort: Int = 0,
-        hostPort: Int = 0,
-        servicePort: Int = 0,
-        protocol: String = "tcp",
-        name: Option[String] = None,
-        labels: Map[String, String] = Map.empty[String, String]) {
+    case class PortMapping(containerPort: Int = 0,
+                           hostPort: Int = 0,
+                           servicePort: Int = 0,
+                           protocol: String = "tcp",
+                           name: Option[String] = None,
+                           labels: Map[String, String] =
+                             Map.empty[String, String]) {
 
       require(protocol == "tcp" || protocol == "udp",
               "protocol can only be 'tcp' or 'udp'")

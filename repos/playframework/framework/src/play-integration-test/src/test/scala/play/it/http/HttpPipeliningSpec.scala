@@ -16,12 +16,15 @@ import akka.pattern.after
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object NettyHttpPipeliningSpec
-    extends HttpPipeliningSpec with NettyIntegrationSpecification
+    extends HttpPipeliningSpec
+    with NettyIntegrationSpecification
 object AkkaHttpHttpPipeliningSpec
-    extends HttpPipeliningSpec with AkkaHttpIntegrationSpecification
+    extends HttpPipeliningSpec
+    with AkkaHttpIntegrationSpecification
 
 trait HttpPipeliningSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   val actorSystem = akka.actor.ActorSystem()
 
@@ -38,14 +41,14 @@ trait HttpPipeliningSpec
 
     "wait for the first response to return before returning the second" in withServer(
         EssentialAction { req =>
-      req.path match {
-        case "/long" =>
-          Accumulator.done(after(100.milliseconds, actorSystem.scheduler)(
+          req.path match {
+            case "/long" =>
+              Accumulator.done(after(100.milliseconds, actorSystem.scheduler)(
                   Future(Results.Ok("long"))))
-        case "/short" => Accumulator.done(Results.Ok("short"))
-        case _ => Accumulator.done(Results.NotFound)
-      }
-    }) { port =>
+            case "/short" => Accumulator.done(Results.Ok("short"))
+            case _ => Accumulator.done(Results.NotFound)
+          }
+        }) { port =>
       val responses = BasicHttpClient.pipelineRequests(
           port,
           BasicRequest("GET", "/long", "HTTP/1.1", Map(), ""),
@@ -58,19 +61,20 @@ trait HttpPipeliningSpec
 
     "wait for the first response body to return before returning the second" in withServer(
         EssentialAction { req =>
-      req.path match {
-        case "/long" =>
-          Accumulator.done(
-              Results.Ok.chunked(Source
-                    .tick(initialDelay = 50.milliseconds,
-                          interval = 50.milliseconds,
-                          tick = "chunk")
-                    .take(3))
-            )
-        case "/short" => Accumulator.done(Results.Ok("short"))
-        case _ => Accumulator.done(Results.NotFound)
-      }
-    }) { port =>
+          req.path match {
+            case "/long" =>
+              Accumulator.done(
+                  Results.Ok.chunked(
+                      Source
+                        .tick(initialDelay = 50.milliseconds,
+                              interval = 50.milliseconds,
+                              tick = "chunk")
+                        .take(3))
+              )
+            case "/short" => Accumulator.done(Results.Ok("short"))
+            case _ => Accumulator.done(Results.NotFound)
+          }
+        }) { port =>
       val responses = BasicHttpClient.pipelineRequests(
           port,
           BasicRequest("GET", "/long", "HTTP/1.1", Map(), ""),

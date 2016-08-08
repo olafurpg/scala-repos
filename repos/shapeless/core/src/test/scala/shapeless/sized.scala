@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,10 +139,10 @@ class SizedTests {
 
     val p = cl.get match {
       case Sized(a, b, _ *) => {
-          typed[Int](a)
-          typed[Int](b)
-          (a - b, a + b)
-        }
+        typed[Int](a)
+        typed[Int](b)
+        (a - b, a + b)
+      }
       case _ => (9, 10)
     }
     typed[(Int, Int)](p)

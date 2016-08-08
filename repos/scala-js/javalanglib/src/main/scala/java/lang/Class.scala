@@ -23,7 +23,7 @@ final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
 
   override def toString(): String = {
     (if (isInterface()) "interface " else if (isPrimitive()) "" else "class ") +
-    getName()
+      getName()
   }
 
   def isInstance(obj: Object): scala.Boolean =
@@ -81,7 +81,7 @@ final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
   def cast(obj: Object): A = {
     scala.scalajs.runtime.SemanticsUtils.asInstanceOfCheck(
         (this eq classOf[Nothing]) ||
-        (obj != null && !isRawJSType && !isInstance(obj)),
+          (obj != null && !isRawJSType && !isInstance(obj)),
         new ClassCastException(obj + " is not an instance of " + getName))
     obj.asInstanceOf[A]
   }

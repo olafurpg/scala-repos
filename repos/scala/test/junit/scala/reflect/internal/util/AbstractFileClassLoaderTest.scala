@@ -17,8 +17,8 @@ class AbstractFileClassLoaderTest {
   implicit def `we love utf8` = UTF8
   implicit class `abs file ops`(f: AbstractFile) {
     def writeContent(s: String): Unit =
-      Streamable.closing(f.bufferedOutput)(
-          os => os write s.getBytes(UTF8.charSet))
+      Streamable.closing(f.bufferedOutput)(os =>
+        os write s.getBytes(UTF8.charSet))
   }
   implicit class `url slurp`(url: URL) {
     def slurp(): String = Streamable.slurp(url)

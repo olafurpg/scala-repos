@@ -37,8 +37,9 @@ object ApplicationBuild extends Build {
 
   def checkLogContains(msg: String): Task[Boolean] = task {
     if (!bufferLogger.messages.exists(_.contains(msg))) {
-      sys.error("Did not find log message:\n    '" + msg + "'\nin output:\n" +
-          bufferLogger.messages.reverse.mkString("    ", "\n    ", ""))
+      sys.error(
+          "Did not find log message:\n    '" + msg + "'\nin output:\n" +
+            bufferLogger.messages.reverse.mkString("    ", "\n    ", ""))
     }
     true
   }

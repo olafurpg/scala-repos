@@ -48,8 +48,8 @@ object Connection extends App {
   };
   {
     //#forURL
-    val db = Database.forURL(
-        "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+    val db = Database
+      .forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     //#forURL
     db.close
   };
@@ -63,7 +63,7 @@ object Connection extends App {
     db.close
   }
   val db = Database.forURL("jdbc:h2:mem:test2;INIT=" +
-                           coffees.schema.createStatements.mkString("\\;"),
+                             coffees.schema.createStatements.mkString("\\;"),
                            driver = "org.h2.Driver")
   try {
     val lines = new ArrayBuffer[Any]()
@@ -121,9 +121,9 @@ object Connection extends App {
       val countAction = coffees.length.result
 
       val rollbackAction = (coffees ++= Seq(
-              ("Cold_Drip", new SerialBlob(Array[Byte](101))),
-              ("Dutch_Coffee", new SerialBlob(Array[Byte](49)))
-          )).flatMap { _ =>
+          ("Cold_Drip", new SerialBlob(Array[Byte](101))),
+          ("Dutch_Coffee", new SerialBlob(Array[Byte](49)))
+      )).flatMap { _ =>
         DBIO.failed(new Exception("Roll it back"))
       }.transactionally
 

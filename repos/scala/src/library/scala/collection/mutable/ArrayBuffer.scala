@@ -44,11 +44,14 @@ import parallel.mutable.ParArray
   */
 @SerialVersionUID(1529165946227428979L)
 class ArrayBuffer[A](override protected val initialSize: Int)
-    extends AbstractBuffer[A] with Buffer[A]
+    extends AbstractBuffer[A]
+    with Buffer[A]
     with GenericTraversableTemplate[A, ArrayBuffer]
     with BufferLike[A, ArrayBuffer[A]]
-    with IndexedSeqOptimized[A, ArrayBuffer[A]] with Builder[A, ArrayBuffer[A]]
-    with ResizableArray[A] with CustomParallelizable[A, ParArray[A]]
+    with IndexedSeqOptimized[A, ArrayBuffer[A]]
+    with Builder[A, ArrayBuffer[A]]
+    with ResizableArray[A]
+    with CustomParallelizable[A, ParArray[A]]
     with Serializable {
 
   override def companion: GenericCompanion[ArrayBuffer] = ArrayBuffer

@@ -1,7 +1,13 @@
 package lila.challenge
 
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument,
+  BSONInteger,
+  BSONRegex,
+  BSONArray,
+  BSONBoolean
+}
 import scala.concurrent.duration._
 
 import lila.db.BSON.BSONJodaDateTimeHandler
@@ -43,7 +49,9 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
 
   def removeByUserId(userId: String): Funit =
     coll
-      .remove(BSONDocument("$or" -> BSONArray(
+      .remove(
+          BSONDocument(
+              "$or" -> BSONArray(
                   BSONDocument("challenger.id" -> userId),
                   BSONDocument("destUser.id" -> userId)
               )))
@@ -62,10 +70,11 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
   private[challenge] def countCreatedByDestId(userId: String): Fu[Int] =
     coll.count(Some(selectCreated ++ BSONDocument("destUser.id" -> userId)))
 
-  private[challenge] def realTimeUnseenSince(
-      date: DateTime, max: Int): Fu[List[Challenge]] =
+  private[challenge] def realTimeUnseenSince(date: DateTime,
+                                             max: Int): Fu[List[Challenge]] =
     coll
-      .find(selectCreated ++ selectClock ++ BSONDocument(
+      .find(
+          selectCreated ++ selectClock ++ BSONDocument(
               "seenAt" -> BSONDocument("$lt" -> date)
           ))
       .cursor[Challenge]()
@@ -81,9 +90,10 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     coll
       .update(
           selectId(id),
-          BSONDocument("$set" -> BSONDocument("status" -> Status.Created.id,
-                                              "seenAt" -> DateTime.now,
-                                              "expiresAt" -> inTwoWeeks))
+          BSONDocument(
+              "$set" -> BSONDocument("status" -> Status.Created.id,
+                                     "seenAt" -> DateTime.now,
+                                     "expiresAt" -> inTwoWeeks))
       )
       .void
 
@@ -123,8 +133,8 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
               "$set" -> BSONDocument(
                   "status" -> status.id,
                   "expiresAt" -> expiresAt.fold(inTwoWeeks) {
-                _ (DateTime.now)
-              }
+                    _(DateTime.now)
+                  }
               ))
       )
       .void

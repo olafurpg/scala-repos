@@ -16,7 +16,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory
 import io.netty.handler.codec.http._
 import io.netty.handler.ssl.SslHandler
 import play.api.{Application, Logger}
-import play.api.http.{DefaultHttpErrorHandler, HttpErrorHandler, Status, HeaderNames}
+import play.api.http.{
+  DefaultHttpErrorHandler,
+  HttpErrorHandler,
+  Status,
+  HeaderNames
+}
 import play.api.libs.streams.Accumulator
 import play.api.mvc.{RequestHeader, Results, WebSocket, EssentialAction}
 import play.core.server.NettyServer
@@ -76,7 +81,9 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           Option(channel.pipeline().get(classOf[SslHandler])))
       val result =
         errorHandler(server.applicationProvider.current).onClientError(
-            requestHeader, statusCode, if (message == null) "" else message)
+            requestHeader,
+            statusCode,
+            if (message == null) "" else message)
       // If there's a problem in parsing the request, then we should close the connection, once done with it
       requestHeader -> Left(
           result.map(_.withHeaders(HeaderNames.CONNECTION -> "close")))
@@ -123,8 +130,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           .getBytes("play.websocket.buffer.limit")
           .getOrElse(65536L)
           .asInstanceOf[Int]
-        val factory = new WebSocketServerHandshakerFactory(
-            wsUrl, "*", true, bufferLimit)
+        val factory =
+          new WebSocketServerHandshakerFactory(wsUrl, "*", true, bufferLimit)
 
         val executed = Future(ws(requestHeader))(
             play.api.libs.concurrent.Execution.defaultContext)
@@ -169,7 +176,7 @@ private[play] class PlayRequestHandler(val server: NettyServer)
                         HeaderNames.UPGRADE -> "websocket",
                         HeaderNames.CONNECTION -> HeaderNames.UPGRADE
                     )
-              ))
+            ))
         handleAction(action, requestHeader, request, Some(app))
 
       case Left(e) =>
@@ -231,8 +238,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
     }
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               cause: Throwable): Unit = {
     cause match {
       // IO exceptions happen all the time, it usually just means that the client has closed the connection before fully
       // sending/receiving the response.
@@ -294,8 +301,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           ServerResultUtils.cleanFlashCookie(requestHeader, result)
         val validated =
           ServerResultUtils.validateResult(requestHeader, cleanedResult)
-        modelConversion.convertResult(
-            validated, requestHeader, request.getProtocolVersion)
+        modelConversion
+          .convertResult(validated, requestHeader, request.getProtocolVersion)
     }
   }
 

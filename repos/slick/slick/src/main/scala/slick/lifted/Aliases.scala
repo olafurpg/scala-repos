@@ -32,22 +32,26 @@ trait Aliases {
   val TupleMethods = util.TupleMethods
   type Tag = lifted.Tag
   type Shape[Level <: ShapeLevel, -M, U, P] = lifted.Shape[Level, M, U, P]
-  type MappedProductShape[Level <: ShapeLevel, C, M <: C, U <: C, P <: C] = lifted.MappedProductShape[
-      Level, C, M, U, P]
-  type MappedScalaProductShape[
-      Level <: ShapeLevel,
-      C <: Product,
-      M <: C,
-      U <: C,
-      P <: C] = lifted.MappedScalaProductShape[Level, C, M, U, P]
+  type MappedProductShape[Level <: ShapeLevel, C, M <: C, U <: C, P <: C] =
+    lifted.MappedProductShape[Level, C, M, U, P]
+  type MappedScalaProductShape[Level <: ShapeLevel,
+                               C <: Product,
+                               M <: C,
+                               U <: C,
+                               P <: C] =
+    lifted.MappedScalaProductShape[Level, C, M, U, P]
   type CaseClassShape[P <: Product,
                       LiftedTuple,
                       LiftedCaseClass <: P,
                       PlainTuple,
-                      PlainCaseClass <: P] = lifted.CaseClassShape[
-      P, LiftedTuple, LiftedCaseClass, PlainTuple, PlainCaseClass]
-  type ProductClassShape[E <: Product, C <: Product] = lifted.ProductClassShape[
-      E, C]
+                      PlainCaseClass <: P] =
+    lifted.CaseClassShape[P,
+                          LiftedTuple,
+                          LiftedCaseClass,
+                          PlainTuple,
+                          PlainCaseClass]
+  type ProductClassShape[E <: Product, C <: Product] =
+    lifted.ProductClassShape[E, C]
   type ShapeLevel = lifted.ShapeLevel
   type NestedShapeLevel = lifted.NestedShapeLevel
   type FlatShapeLevel = lifted.FlatShapeLevel
@@ -59,8 +63,8 @@ trait Aliases {
 
   type DBIO[+R] = dbio.DBIO[R]
   type StreamingDBIO[+R, +T] = dbio.StreamingDBIO[R, T]
-  type DBIOAction[+R, +S <: dbio.NoStream, -E <: dbio.Effect] = dbio.DBIOAction[
-      R, S, E]
+  type DBIOAction[+R, +S <: dbio.NoStream, -E <: dbio.Effect] =
+    dbio.DBIOAction[R, S, E]
   val DBIO = dbio.DBIO
   type Effect = dbio.Effect
   val Effect = dbio.Effect

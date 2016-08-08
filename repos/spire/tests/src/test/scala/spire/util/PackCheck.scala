@@ -9,7 +9,9 @@ import prop._
 import java.nio.ByteBuffer
 
 class PackCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   import Pack.{intToByte, longToByte}
 
   property("int <=> bytes") {
@@ -17,8 +19,10 @@ class PackCheck
       val bs0 = Pack.intToBytes(n)
       val Array(b0, b1, b2, b3) = bs0
 
-      val bs1 = Array(
-          intToByte(n)(0), intToByte(n)(1), intToByte(n)(2), intToByte(n)(3))
+      val bs1 = Array(intToByte(n)(0),
+                      intToByte(n)(1),
+                      intToByte(n)(2),
+                      intToByte(n)(3))
 
       val i = 0
       val bs2 = Array(intToByte(n)(i + 0),

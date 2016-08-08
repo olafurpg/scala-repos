@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse1` */
-final class Traverse1Ops[F[_], A] private[syntax](val self: F[A])(
+final class Traverse1Ops[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Traverse1[F])
     extends Ops[F[A]] {
   ////
@@ -37,7 +37,9 @@ sealed trait ToTraverse1Ops0 {
 }
 
 trait ToTraverse1Ops
-    extends ToTraverse1Ops0 with ToTraverseOps with ToFoldable1Ops {
+    extends ToTraverse1Ops0
+    with ToTraverseOps
+    with ToFoldable1Ops {
   implicit def ToTraverse1Ops[F[_], A](v: F[A])(implicit F0: Traverse1[F]) =
     new Traverse1Ops[F, A](v)
 

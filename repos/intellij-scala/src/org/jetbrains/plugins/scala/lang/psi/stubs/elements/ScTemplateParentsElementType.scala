@@ -6,9 +6,17 @@ package elements
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScTemplateParents}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents,
+  ScTemplateParents
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTemplateParentsStubImpl
 
 import scala.collection.mutable.ArrayBuffer
@@ -43,12 +51,12 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
     new ScTemplateParentsStubImpl(parentStub,
                                   this,
                                   constr.map(StringRef.fromString),
-                                  psi.typeElementsWithoutConstructor.map(
-                                      te => StringRef.fromString(te.getText)))
+                                  psi.typeElementsWithoutConstructor.map(te =>
+                                    StringRef.fromString(te.getText)))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTemplateParentsStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTemplateParentsStub = {
     val length = dataStream.readInt
     if (length >= 0) {
       val res = new ArrayBuffer[StringRef]
@@ -58,7 +66,10 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
         case false => None
       }
       new ScTemplateParentsStubImpl(
-          parentStub.asInstanceOf[StubElement[PsiElement]], this, constr, res)
+          parentStub.asInstanceOf[StubElement[PsiElement]],
+          this,
+          constr,
+          res)
     } else {
       ScTemplateParentsElementType.LOG.error(
           "Negative byte deserialized for array")

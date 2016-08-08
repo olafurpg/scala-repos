@@ -7,11 +7,25 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentLinkedQueue}
 
 import com.typesafe.config.Config
 
-import akka.actor.{ActorContext, ActorRef, ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
-import akka.dispatch.{Envelope, MailboxType, MessageQueue, UnboundedQueueBasedMessageQueue}
+import akka.actor.{
+  ActorContext,
+  ActorRef,
+  ActorSystem,
+  ExtendedActorSystem,
+  Extension,
+  ExtensionId,
+  ExtensionIdProvider
+}
+import akka.dispatch.{
+  Envelope,
+  MailboxType,
+  MessageQueue,
+  UnboundedQueueBasedMessageQueue
+}
 
 object PeekMailboxExtension
-    extends ExtensionId[PeekMailboxExtension] with ExtensionIdProvider {
+    extends ExtensionId[PeekMailboxExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new PeekMailboxExtension(s)
 

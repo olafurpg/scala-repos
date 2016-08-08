@@ -11,7 +11,13 @@ import scala.collection._
 
 /** This trait extracts all required information for documentation from compilation units */
 trait ModelFactoryTypeSupport {
-  thisFactory: ModelFactory with ModelFactoryImplicitSupport with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with TreeFactory with MemberLookup =>
+  thisFactory: ModelFactory
+    with ModelFactoryImplicitSupport
+    with ModelFactoryTypeSupport
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory
+    with MemberLookup =>
 
   import global._
   import definitions.{ObjectClass, AnyClass, AnyRefClass}
@@ -164,7 +170,7 @@ trait ModelFactoryTypeSupport {
         case RefinedType(parents, defs) =>
           val ignoreParents = Set[Symbol](AnyClass, ObjectClass)
           val filtParents = parents filterNot
-          (x => ignoreParents(x.typeSymbol)) match {
+            (x => ignoreParents(x.typeSymbol)) match {
             case Nil => parents
             case ps => ps
           }
@@ -178,7 +184,7 @@ trait ModelFactoryTypeSupport {
             case x :: Nil => nameBuffer append (" { " + x.defString + " }")
             case xs =>
               nameBuffer append
-              (" { ... /* %d definitions in type refinement */ }" format xs.size)
+                (" { ... /* %d definitions in type refinement */ }" format xs.size)
           }
         /* Eval-by-name types */
         case NullaryMethodType(result) =>
@@ -193,7 +199,7 @@ trait ModelFactoryTypeSupport {
             else
               tps.map { tparam =>
                 tparam.varianceString + tparam.name +
-                typeParamsToString(tparam.typeParams)
+                  typeParamsToString(tparam.typeParams)
               }.mkString("[", ", ", "]")
           nameBuffer append typeParamsToString(tparams)
           appendType0(result)

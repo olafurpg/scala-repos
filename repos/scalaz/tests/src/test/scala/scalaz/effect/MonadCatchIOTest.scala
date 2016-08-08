@@ -63,8 +63,8 @@ object MonadCatchIOTest extends SpecLite {
   }
 
   "MonadCatchIO.catchSomeLeft" should {
-    val test = mkTest[Int, String \/ Int](
-        _.catchSomeLeft(_)(catch1), _.catchSomeLeft(catch1))
+    val test = mkTest[Int, String \/ Int](_.catchSomeLeft(_)(catch1),
+                                          _.catchSomeLeft(catch1))
     "do nothing if nothing thrown" in {
       test(ok(3))(_.run(1).unsafePerformIO == \/-(3))
     }

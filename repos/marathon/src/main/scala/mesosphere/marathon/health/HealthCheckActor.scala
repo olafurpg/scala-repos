@@ -16,7 +16,8 @@ class HealthCheckActor(
     healthCheck: HealthCheck,
     taskTracker: TaskTracker,
     eventBus: EventStream)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import context.dispatcher
   import mesosphere.marathon.health.HealthCheckActor.{GetTaskHealth, _}

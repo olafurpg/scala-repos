@@ -18,31 +18,33 @@ import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSea
   * User: Jason Zaugg
   */
 class RenameScalaTypeAliasProcessor
-    extends RenameJavaMemberProcessor with ScalaRenameProcessor {
+    extends RenameJavaMemberProcessor
+    with ScalaRenameProcessor {
   override def canProcessElement(element: PsiElement): Boolean =
     element.isInstanceOf[ScTypeAlias]
 
   override def findReferences(element: PsiElement) =
     ScalaRenameUtil.findReferences(element)
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor): PsiElement = {
     RenameSuperMembersUtil.chooseSuper(element.asInstanceOf[ScNamedElement])
   }
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement]) {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor,
+                                         renameCallback: Pass[PsiElement]) {
     val named = element match {
       case named: ScNamedElement => named
       case _ => return
     }
-    RenameSuperMembersUtil.chooseAndProcessSuper(
-        named, new PsiElementProcessor[PsiNamedElement] {
-      def execute(named: PsiNamedElement): Boolean = {
-        renameCallback.pass(named)
-        false
-      }
-    }, editor)
+    RenameSuperMembersUtil
+      .chooseAndProcessSuper(named, new PsiElementProcessor[PsiNamedElement] {
+        def execute(named: PsiNamedElement): Boolean = {
+          renameCallback.pass(named)
+          false
+        }
+      }, editor)
   }
 
   override def prepareRenaming(element: PsiElement,
@@ -53,7 +55,8 @@ class RenameScalaTypeAliasProcessor
       case _ => return
     }
 
-    for (elem <- ScalaOverridingMemberSearcher.search(typeAlias, deep = true)) {
+    for (elem <- ScalaOverridingMemberSearcher
+                  .search(typeAlias, deep = true)) {
       allRenames.put(elem, newName)
     }
 

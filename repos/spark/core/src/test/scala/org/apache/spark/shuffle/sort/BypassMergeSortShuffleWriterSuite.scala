@@ -39,7 +39,8 @@ import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
 class BypassMergeSortShuffleWriterSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   @Mock(answer = RETURNS_SMART_NULLS)
   private var blockManager: BlockManager = _
@@ -87,8 +88,10 @@ class BypassMergeSortShuffleWriterSuite
         null
       }
     }).when(blockResolver)
-      .writeIndexFileAndCommit(
-          anyInt, anyInt, any(classOf[Array[Long]]), any(classOf[File]))
+      .writeIndexFileAndCommit(anyInt,
+                               anyInt,
+                               any(classOf[Array[Long]]),
+                               any(classOf[File]))
     when(blockManager.diskBlockManager).thenReturn(diskBlockManager)
     when(
         blockManager.getDiskWriter(
@@ -114,17 +117,16 @@ class BypassMergeSortShuffleWriterSuite
     })
     when(diskBlockManager.createTempShuffleBlock())
       .thenAnswer(new Answer[(TempShuffleBlockId, File)] {
-      override def answer(
-          invocation: InvocationOnMock): (TempShuffleBlockId, File) = {
-        val blockId = new TempShuffleBlockId(UUID.randomUUID)
-        val file = new File(tempDir, blockId.name)
-        blockIdToFileMap.put(blockId, file)
-        temporaryFilesCreated.append(file)
-        (blockId, file)
-      }
-    })
-    when(diskBlockManager.getFile(any[BlockId])).thenAnswer(
-        new Answer[File] {
+        override def answer(
+            invocation: InvocationOnMock): (TempShuffleBlockId, File) = {
+          val blockId = new TempShuffleBlockId(UUID.randomUUID)
+          val file = new File(tempDir, blockId.name)
+          blockIdToFileMap.put(blockId, file)
+          temporaryFilesCreated.append(file)
+          (blockId, file)
+        }
+      })
+    when(diskBlockManager.getFile(any[BlockId])).thenAnswer(new Answer[File] {
       override def answer(invocation: InvocationOnMock): File = {
         blockIdToFileMap
           .get(invocation.getArguments.head.asInstanceOf[BlockId])
@@ -233,13 +235,11 @@ class BypassMergeSortShuffleWriterSuite
         conf
     )
     intercept[SparkException] {
-      writer.write(
-          (0 until 100000).iterator.map(i =>
-                {
-          if (i == 99990) {
-            throw new SparkException("Intentional failure")
-          }
-          (i, i)
+      writer.write((0 until 100000).iterator.map(i => {
+        if (i == 99990) {
+          throw new SparkException("Intentional failure")
+        }
+        (i, i)
       }))
     }
     assert(temporaryFilesCreated.nonEmpty)

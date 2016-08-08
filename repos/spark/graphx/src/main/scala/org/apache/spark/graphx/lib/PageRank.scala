@@ -76,7 +76,7 @@ object PageRank extends Logging {
     * @return the graph containing with each vertex containing the PageRank and each edge
     *         containing the normalized weight.
     */
-  def run[VD : ClassTag, ED : ClassTag](
+  def run[VD: ClassTag, ED: ClassTag](
       graph: Graph[VD, ED],
       numIter: Int,
       resetProb: Double = 0.15): Graph[Double, Double] = {
@@ -100,17 +100,17 @@ object PageRank extends Logging {
     *         containing the normalized weight.
     *
     */
-  def runWithOptions[VD : ClassTag, ED : ClassTag](
+  def runWithOptions[VD: ClassTag, ED: ClassTag](
       graph: Graph[VD, ED],
       numIter: Int,
       resetProb: Double = 0.15,
       srcId: Option[VertexId] = None): Graph[Double, Double] = {
     require(numIter > 0,
             s"Number of iterations must be greater than 0," +
-            s" but got ${numIter}")
+              s" but got ${numIter}")
     require(resetProb >= 0 && resetProb <= 1,
             s"Random reset probability must belong" +
-            s" to [0, 1], but got ${resetProb}")
+              s" to [0, 1], but got ${resetProb}")
 
     val personalized = srcId isDefined
     val src: VertexId = srcId.getOrElse(-1L)
@@ -162,7 +162,8 @@ object PageRank extends Logging {
         }
         .cache()
 
-      rankGraph.edges.foreachPartition(x => {}) // also materializes rankGraph.vertices
+      rankGraph.edges
+        .foreachPartition(x => {}) // also materializes rankGraph.vertices
       logInfo(s"PageRank finished iteration $iteration.")
       prevRankGraph.vertices.unpersist(false)
       prevRankGraph.edges.unpersist(false)
@@ -187,7 +188,7 @@ object PageRank extends Logging {
     * @return the graph containing with each vertex containing the PageRank and each edge
     *         containing the normalized weight.
     */
-  def runUntilConvergence[VD : ClassTag, ED : ClassTag](
+  def runUntilConvergence[VD: ClassTag, ED: ClassTag](
       graph: Graph[VD, ED],
       tol: Double,
       resetProb: Double = 0.15): Graph[Double, Double] = {
@@ -209,7 +210,7 @@ object PageRank extends Logging {
     * @return the graph containing with each vertex containing the PageRank and each edge
     *         containing the normalized weight.
     */
-  def runUntilConvergenceWithOptions[VD : ClassTag, ED : ClassTag](
+  def runUntilConvergenceWithOptions[VD: ClassTag, ED: ClassTag](
       graph: Graph[VD, ED],
       tol: Double,
       resetProb: Double = 0.15,
@@ -217,7 +218,7 @@ object PageRank extends Logging {
     require(tol >= 0, s"Tolerance must be no less than 0, but got ${tol}")
     require(resetProb >= 0 && resetProb <= 1,
             s"Random reset probability must belong" +
-            s" to [0, 1], but got ${resetProb}")
+              s" to [0, 1], but got ${resetProb}")
 
     val personalized = srcId.isDefined
     val src: VertexId = srcId.getOrElse(-1L)
@@ -285,6 +286,8 @@ object PageRank extends Logging {
       }
 
     Pregel(pagerankGraph, initialMessage, activeDirection = EdgeDirection.Out)(
-        vp, sendMessage, messageCombiner).mapVertices((vid, attr) => attr._1)
+        vp,
+        sendMessage,
+        messageCombiner).mapVertices((vid, attr) => attr._1)
   } // end of deltaPageRank
 }

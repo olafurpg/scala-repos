@@ -28,8 +28,8 @@ object MetricsReporterService {
 }
 
 //scalastyle:off magic.number
-class MetricsReporterService @Inject()(
-    config: MetricsReporterConf, registry: MetricRegistry)
+class MetricsReporterService @Inject()(config: MetricsReporterConf,
+                                       registry: MetricRegistry)
     extends AbstractIdleService {
 
   private val log = Logger.getLogger(getClass.getName)
@@ -150,8 +150,8 @@ class MetricsReporterService @Inject()(
       .withHost(InetAddress.getLocalHost.getHostName)
       .withPrefix(prefix)
       .withExpansions(util.EnumSet.copyOf(expansions
-                .flatMap(e => Expansion.values().find(_.toString == e))
-                .asJava))
+        .flatMap(e => Expansion.values().find(_.toString == e))
+        .asJava))
       .withTags(tags.asJava)
       .build()
 

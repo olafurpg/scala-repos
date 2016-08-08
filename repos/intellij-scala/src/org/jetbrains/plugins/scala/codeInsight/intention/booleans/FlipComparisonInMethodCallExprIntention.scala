@@ -28,8 +28,9 @@ class FlipComparisonInMethodCallExprIntention
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -113,20 +114,20 @@ class FlipComparisonInMethodCallExprIntention
     }
 
     val newQualExpr: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          newQual, element.getManager)
+      ScalaPsiElementFactory
+        .createExpressionFromText(newQual, element.getManager)
 
     expr
       .append(methodCallExpr.args.getText)
       .append(".")
       .append(replaceOper(methodCallExpr.getInvokedExpr
-                .asInstanceOf[ScReferenceExpression]
-                .nameId
-                .getText))
+        .asInstanceOf[ScReferenceExpression]
+        .nameId
+        .getText))
       .append(newArgs)
 
-    val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+    val newMethodCallExpr = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
 
     newMethodCallExpr
       .asInstanceOf[ScMethodCall]
@@ -146,8 +147,8 @@ class FlipComparisonInMethodCallExprIntention
         .getStartOffset - newMethodCallExpr.getTextRange.getStartOffset
 
     inWriteAction {
-      methodCallExpr.replaceExpression(
-          newMethodCallExpr, removeParenthesis = true)
+      methodCallExpr.replaceExpression(newMethodCallExpr,
+                                       removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)

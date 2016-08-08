@@ -48,9 +48,10 @@ import immutable.Stream
   *  @define coll iterable collection
   */
 trait IterableLike[+A, +Repr]
-    extends Any with Equals with TraversableLike[A, Repr]
-    with GenIterableLike[A, Repr] {
-  self =>
+    extends Any
+    with Equals
+    with TraversableLike[A, Repr]
+    with GenIterableLike[A, Repr] { self =>
 
   override protected[this] def thisCollection: Iterable[A] =
     this.asInstanceOf[Iterable[A]]
@@ -250,8 +251,9 @@ trait IterableLike[+A, +Repr]
     b.result()
   }
 
-  override /*TraversableLike*/ def copyToArray[B >: A](
-      xs: Array[B], start: Int, len: Int) {
+  override /*TraversableLike*/ def copyToArray[B >: A](xs: Array[B],
+                                                       start: Int,
+                                                       len: Int) {
     var i = start
     val end = (start + len) min xs.length
     val it = iterator
@@ -271,8 +273,9 @@ trait IterableLike[+A, +Repr]
   }
 
   def zipAll[B, A1 >: A, That](
-      that: GenIterable[B], thisElem: A1, thatElem: B)(
-      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That = {
+      that: GenIterable[B],
+      thisElem: A1,
+      thatElem: B)(implicit bf: CanBuildFrom[Repr, (A1, B), That]): That = {
     val b = bf(repr)
     val these = this.iterator
     val those = that.iterator

@@ -140,8 +140,9 @@ object CharUtils {
     * The characters are placed into the given buffer *before* the given `endIndex` (exclusively).
     * CAUTION: This algorithm cannot deal with `Long.MinValue`, you'll need to special case this value!
     */
-  def getSignedDecimalChars(
-      long: Long, endIndex: Int, buf: Array[Char]): Unit = {
+  def getSignedDecimalChars(long: Long,
+                            endIndex: Int,
+                            buf: Array[Char]): Unit = {
     def div10(i: Int) = {
       var q = (i << 3) + (i << 2)
       q += (q << 12) + (q << 8) + (q << 4) + i
@@ -153,7 +154,7 @@ object CharUtils {
 
     phase1(math.abs(long), endIndex)
 
-    // for large numbers we bite the bullet of performing one division every two digits 
+    // for large numbers we bite the bullet of performing one division every two digits
     @tailrec def phase1(l: Long, ix: Int): Unit =
       if (l > 65535L) {
         val q = l / 100

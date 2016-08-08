@@ -11,10 +11,16 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiUtil
 import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.TypeToImport
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor,
+  ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScStableCodeReferenceElementImpl
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiElementFactory}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl,
+  ScalaPsiElementFactory
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.lang.resolve.StdKinds._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
@@ -50,22 +56,23 @@ class ScDocResolvableCodeReferenceImpl(node: ASTNode)
     stableImportSelector
 
   override def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport) =
+      useFullQualifiedName: Boolean,
+      clazz: TypeToImport) =
     if (is2_10plus) super.createReplacingElementWithClassName(true, clazz)
     else
-      ScalaPsiElementFactory.createDocLinkValue(
-          clazz.qualifiedName, clazz.element.getManager)
+      ScalaPsiElementFactory
+        .createDocLinkValue(clazz.qualifiedName, clazz.element.getManager)
 
-  override protected def processQualifier(
-      ref: ScStableCodeReferenceElement, processor: BaseProcessor) {
+  override protected def processQualifier(ref: ScStableCodeReferenceElement,
+                                          processor: BaseProcessor) {
     if (is2_10plus) super.processQualifier(ref, processor)
     else
       pathQualifier match {
         case None =>
           val defaultPackage = ScPackageImpl(
               JavaPsiFacade.getInstance(getProject).findPackage(""))
-          defaultPackage.processDeclarations(
-              processor, ResolveState.initial(), null, ref)
+          defaultPackage
+            .processDeclarations(processor, ResolveState.initial(), null, ref)
         case Some(q: ScDocResolvableCodeReference) =>
           q.multiResolve(true)
             .foreach(processQualifierResolveResult(_, processor, ref))

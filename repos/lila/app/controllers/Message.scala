@@ -34,11 +34,12 @@ object Message extends LilaController {
     NotForKids {
       OptionFuOk(api.thread(id, me)) { thread =>
         relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
-          html.message.thread(thread,
-                              forms.post,
-                              blocked,
-                              answerable = !Env.message.LichessSenders
-                                  .contains(thread.creatorId))
+          html.message.thread(
+              thread,
+              forms.post,
+              blocked,
+              answerable =
+                !Env.message.LichessSenders.contains(thread.creatorId))
         }
       } map NoCache
     }
@@ -52,12 +53,12 @@ object Message extends LilaController {
             relationApi.fetchBlocks(thread otherUserId me, me.id) map {
               blocked =>
                 BadRequest(
-                    html.message.thread(
-                        thread,
-                        err,
-                        blocked,
-                        answerable = !Env.message.LichessSenders
-                            .contains(thread.creatorId)))
+                    html.message.thread(thread,
+                                        err,
+                                        blocked,
+                                        answerable =
+                                          !Env.message.LichessSenders
+                                            .contains(thread.creatorId)))
           },
           text =>
             api.makePost(thread, text, me) inject Redirect(
@@ -87,8 +88,9 @@ object Message extends LilaController {
   }
 
   private def renderForm(
-      me: UserModel, title: Option[String], f: Form[_] => Form[_])(
-      implicit ctx: Context): Fu[Html] =
+      me: UserModel,
+      title: Option[String],
+      f: Form[_] => Form[_])(implicit ctx: Context): Fu[Html] =
     get("user") ?? UserRepo.named flatMap { user =>
       user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)) map {
         canMessage =>
@@ -96,7 +98,7 @@ object Message extends LilaController {
                             user,
                             title,
                             canMessage = canMessage ||
-                              Granter(_.MessageAnyone)(me))
+                                Granter(_.MessageAnyone)(me))
       }
     }
 

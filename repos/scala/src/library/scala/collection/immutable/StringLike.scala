@@ -41,9 +41,9 @@ import StringLike._
   *  @define willNotTerminateInf
   */
 trait StringLike[+Repr]
-    extends Any with scala.collection.IndexedSeqOptimized[Char, Repr]
-    with Ordered[String] {
-  self =>
+    extends Any
+    with scala.collection.IndexedSeqOptimized[Char, Repr]
+    with Ordered[String] { self =>
 
   /** Creates a string builder buffer as builder for this class */
   protected[this] def newBuilder: Builder[Char, Repr]
@@ -95,7 +95,8 @@ trait StringLike[+Repr]
       if (isLineBreak(last))
         toString.substring(0,
                            if (last == LF && len >= 2 && apply(len - 2) == CR)
-                             len - 2 else len - 1)
+                             len - 2
+                           else len - 1)
       else toString
     }
   }
@@ -194,8 +195,9 @@ trait StringLike[+Repr]
       var index = 0
       while (index < len && line.charAt(index) <= ' ') index += 1
       buf append
-      (if (index < len && line.charAt(index) == marginChar)
-         line.substring(index + 1) else line)
+        (if (index < len && line.charAt(index) == marginChar)
+           line.substring(index + 1)
+         else line)
     }
     buf.toString
   }
@@ -331,7 +333,7 @@ trait StringLike[+Repr]
           throw new IllegalArgumentException("For input string: \"" + s + "\"")
       } else throw new IllegalArgumentException("For input string: \"null\"")
 
-  override def toArray[B >: Char : ClassTag]: Array[B] =
+  override def toArray[B >: Char: ClassTag]: Array[B] =
     toString.toCharArray.asInstanceOf[Array[B]]
 
   private def unwrapArg(arg: Any): AnyRef = arg match {

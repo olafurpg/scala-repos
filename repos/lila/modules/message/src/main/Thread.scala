@@ -72,10 +72,10 @@ object Thread {
            createdAt = DateTime.now,
            updatedAt = DateTime.now,
            posts = List(
-                 Post.make(
-                     text = text,
-                     isByCreator = true
-                 )),
+               Post.make(
+                   text = text,
+                   isByCreator = true
+               )),
            creatorId = creatorId,
            invitedId = invitedId,
            visibleByUserIds = List(creatorId, invitedId))
@@ -90,7 +90,8 @@ object Thread {
           (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
             .reads[Thread],
           Json.writes[Thread] andThen
-          (__.json update (writeDate('createdAt) andThen writeDate('updatedAt)))
+            (__.json update (writeDate('createdAt) andThen writeDate(
+                'updatedAt)))
       )
     }
 }

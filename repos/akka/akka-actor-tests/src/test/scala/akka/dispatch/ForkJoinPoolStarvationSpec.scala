@@ -6,7 +6,8 @@ import com.typesafe.config.ConfigFactory
 
 object ForkJoinPoolStarvationSpec {
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
       |actorhang {
       |
       |  task-dispatcher {
@@ -40,7 +41,8 @@ object ForkJoinPoolStarvationSpec {
 }
 
 class ForkJoinPoolStarvationSpec
-    extends AkkaSpec(ForkJoinPoolStarvationSpec.config) with ImplicitSender {
+    extends AkkaSpec(ForkJoinPoolStarvationSpec.config)
+    with ImplicitSender {
   import ForkJoinPoolStarvationSpec._
 
   val Iterations = 1000

@@ -40,8 +40,7 @@ private[spark] class RollingFileAppender(
     val rollingPolicy: RollingPolicy,
     conf: SparkConf,
     bufferSize: Int = RollingFileAppender.DEFAULT_BUFFER_SIZE
-)
-    extends FileAppender(inputStream, activeFile, bufferSize) {
+) extends FileAppender(inputStream, activeFile, bufferSize) {
 
   import RollingFileAppender._
 
@@ -104,7 +103,7 @@ private[spark] class RollingFileAppender(
 
         logWarning(
             s"Rollover file $rolloverFile already exists, " +
-            s"rolled over $activeFile to file $altRolloverFile")
+              s"rolled over $activeFile to file $altRolloverFile")
         Files.move(activeFile, altRolloverFile)
       }
     } else {
@@ -131,7 +130,7 @@ private[spark] class RollingFileAppender(
     } catch {
       case e: Exception =>
         logError("Error cleaning logs in directory " +
-                 activeFile.getParentFile.getAbsolutePath,
+                   activeFile.getParentFile.getAbsolutePath,
                  e)
     }
   }
@@ -157,8 +156,8 @@ private[spark] object RollingFileAppender {
     * name has the latest logs. So it sorts all the rolled over logs (that are
     * prefixed with `activeFileName`) and appends the active file
     */
-  def getSortedRolledOverFiles(
-      directory: String, activeFileName: String): Seq[File] = {
+  def getSortedRolledOverFiles(directory: String,
+                               activeFileName: String): Seq[File] = {
     val rolledOverFiles =
       new File(directory).getAbsoluteFile.listFiles.filter { file =>
         val fileName = file.getName

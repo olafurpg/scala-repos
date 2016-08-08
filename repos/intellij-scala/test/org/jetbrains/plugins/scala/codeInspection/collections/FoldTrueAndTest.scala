@@ -55,7 +55,8 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |    z + y % 2 == 1
          |  }
          |}$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
          |List(0).foldLeft(true) {(x, y) =>
          |  x && {
          |    var z = 1
@@ -63,7 +64,8 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |    z + y % 2 == 1
          |  }
          |}
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |List(0).forall(y => {
         |  var z = 1
         |  z += 1

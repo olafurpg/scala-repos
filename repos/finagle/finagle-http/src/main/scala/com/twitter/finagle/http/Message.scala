@@ -4,13 +4,26 @@ import com.twitter.io.{Buf, Reader => BufReader, Writer => BufWriter}
 import com.twitter.finagle.netty3.{ChannelBufferBuf, BufChannelBuffer}
 import com.twitter.finagle.http.netty.{HttpMessageProxy, Bijections}
 import com.twitter.util.{Await, Duration, Closable}
-import java.io.{InputStream, InputStreamReader, OutputStream, OutputStreamWriter, Reader, Writer}
+import java.io.{
+  InputStream,
+  InputStreamReader,
+  OutputStream,
+  OutputStreamWriter,
+  Reader,
+  Writer
+}
 import java.util.{Iterator => JIterator}
 import java.nio.charset.Charset
 import java.util.{Date, TimeZone}
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.time.FastDateFormat
-import org.jboss.netty.buffer.{ChannelBufferInputStream, DynamicChannelBuffer, ChannelBuffer, ChannelBufferOutputStream, ChannelBuffers}
+import org.jboss.netty.buffer.{
+  ChannelBufferInputStream,
+  DynamicChannelBuffer,
+  ChannelBuffer,
+  ChannelBufferOutputStream,
+  ChannelBuffers
+}
 import scala.collection.JavaConverters._
 
 import Bijections._
@@ -464,9 +477,8 @@ object Message {
   val ContentTypeJavascript = MediaType.Javascript + ";" + CharsetUtf8
   val ContentTypeWwwFrom = MediaType.WwwForm + ";" + CharsetUtf8
 
-  private val HttpDateFormat = FastDateFormat.getInstance(
-      "EEE, dd MMM yyyy HH:mm:ss",
-      TimeZone.getTimeZone("GMT"))
+  private val HttpDateFormat = FastDateFormat
+    .getInstance("EEE, dd MMM yyyy HH:mm:ss", TimeZone.getTimeZone("GMT"))
   def httpDateFormat(date: Date): String =
     HttpDateFormat.format(date) + " GMT"
 }

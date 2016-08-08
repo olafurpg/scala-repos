@@ -24,7 +24,9 @@ import scala.collection.mutable
   * @author Tobias Schlatter
   */
 abstract class PrepJSInterop
-    extends plugins.PluginComponent with PrepJSExports with transform.Transform
+    extends plugins.PluginComponent
+    with PrepJSExports
+    with transform.Transform
     with PluginComponent210Compat {
   import PrepJSInterop._
 
@@ -144,7 +146,7 @@ abstract class PrepJSInterop
         case idef: ImplDef if enclosingOwner is OwnerKind.JSNativeClass =>
           reporter.error(idef.pos,
                          "Native JS traits and classes " +
-                         "may not have inner traits, classes or objects")
+                           "may not have inner traits, classes or objects")
           super.transform(tree)
 
         // Handle js.Anys
@@ -158,7 +160,7 @@ abstract class PrepJSInterop
          */
         case modDef: ModuleDef
             if (enclosingOwner is OwnerKind.JSNativeMod) &&
-            modDef.symbol.isSynthetic =>
+              modDef.symbol.isSynthetic =>
           super.transform(tree)
 
         // In native JS objects, only js.Any stuff is allowed
@@ -166,7 +168,7 @@ abstract class PrepJSInterop
           reporter.error(
               idef.pos,
               "Native JS objects cannot contain inner " +
-              "Scala traits, classes or objects (i.e., not extending js.Any)")
+                "Scala traits, classes or objects (i.e., not extending js.Any)")
           super.transform(tree)
 
         // @ScalaJSDefined is only valid on a js.Any
@@ -195,7 +197,7 @@ abstract class PrepJSInterop
           if (sym.hasAnnotation(JSNativeAnnotation)) {
             reporter.error(cldef.pos,
                            "Traits and classes not extending js.Any " +
-                           "may not have a @js.native annotation")
+                             "may not have a @js.native annotation")
           }
 
           if (shouldPrepareExports && sym.isTrait) {
@@ -214,7 +216,7 @@ abstract class PrepJSInterop
           if (sym.hasAnnotation(JSNativeAnnotation)) {
             reporter.error(modDef.pos,
                            "Objects not extending js.Any may not " +
-                           "have a @js.native annotation")
+                             "have a @js.native annotation")
           }
 
           if (shouldPrepareExports) registerModuleExports(sym.moduleClass)
@@ -392,8 +394,8 @@ abstract class PrepJSInterop
             }
           }
         } else {
-          reporter.error(
-              tpeArg.pos, s"non-trait class type required but $tpe found")
+          reporter
+            .error(tpeArg.pos, s"non-trait class type required but $tpe found")
           EmptyTree
         }
       } else {
@@ -422,8 +424,8 @@ abstract class PrepJSInterop
               val base = "You may not export a local definition"
               if (sym.owner.isPrimaryConstructor)
                 base + ". To export a (case) class field, use the " +
-                "meta-annotation scala.annotation.meta.field like this: " +
-                "@(JSExport @field)."
+                  "meta-annotation scala.annotation.meta.field like this: " +
+                  "@(JSExport @field)."
               else base
             }
             reporter.error(exp.pos, msg)
@@ -460,7 +462,7 @@ abstract class PrepJSInterop
            * and similar constructs. This causes the unsoundness filed as #1385.
            */
           !(t <:< JSAnyClass.tpe || t =:= AnyRefClass.tpe ||
-              t =:= DynamicClass.tpe)
+            t =:= DynamicClass.tpe)
         }
 
       def isNativeJSTraitType(tpe: Type): Boolean = {
@@ -480,15 +482,15 @@ abstract class PrepJSInterop
         reporter.warning(
             implDef.pos,
             "Package objects inheriting from js.Any are deprecated. " +
-            "Use a normal object instead.")
+              "Use a normal object instead.")
       } else if (isJSNative && !isJSAnonFun &&
                  !sym.hasAnnotation(JSNativeAnnotation)) {
         reporter.warning(
             implDef.pos,
             "Classes, traits and objects inheriting from js.Any should be " +
-            "annotated with @js.native, unless they have @ScalaJSDefined. " +
-            "The default will switch to Scala.js-defined in the next major " +
-            "version of Scala.js.")
+              "annotated with @js.native, unless they have @ScalaJSDefined. " +
+              "The default will switch to Scala.js-defined in the next major " +
+              "version of Scala.js.")
       } else if (!isJSNative && sym.hasAnnotation(JSNativeAnnotation)) {
         reporter.error(
             implDef.pos,
@@ -504,7 +506,7 @@ abstract class PrepJSInterop
       if (implDef.mods.hasFlag(Flag.CASE)) {
         reporter.error(implDef.pos,
                        "Classes and objects extending " +
-                       "js.Any may not have a case modifier")
+                         "js.Any may not have a case modifier")
       }
 
       // Check that we do not extend a trait that does not extends js.Any
@@ -512,7 +514,7 @@ abstract class PrepJSInterop
         val badName = badParent.get.typeSymbol.fullName
         reporter.error(implDef.pos,
                        s"${sym.nameString} extends ${badName} " +
-                       "which does not extend js.Any.")
+                         "which does not extend js.Any.")
       }
 
       // Checks for Scala.js-defined JS stuff
@@ -522,7 +524,7 @@ abstract class PrepJSInterop
           reporter.error(
               implDef.pos,
               "Native JS objects cannot contain inner Scala.js-defined JS " +
-              "classes or objects")
+                "classes or objects")
         }
 
         // Unless it is a trait, it cannot inherit directly from AnyRef
@@ -530,7 +532,7 @@ abstract class PrepJSInterop
           reporter.error(
               implDef.pos,
               s"A Scala.js-defined JS $strKind cannot directly extend AnyRef. " +
-              "It must extend a JS class (native or not).")
+                "It must extend a JS class (native or not).")
         }
 
         // Check that we do not inherit directly from a native JS trait
@@ -538,7 +540,7 @@ abstract class PrepJSInterop
           reporter.error(
               implDef.pos,
               s"A Scala.js-defined JS $strKind cannot directly extend a " +
-              "native JS trait.")
+                "native JS trait.")
         }
       }
 
@@ -552,11 +554,11 @@ abstract class PrepJSInterop
           reporter.error(
               implDef.pos,
               "Traits and classes " +
-              "may not have inner native JS traits, classes or objects")
+                "may not have inner native JS traits, classes or objects")
         } else if (enclosingOwner is OwnerKind.JSMod) {
           reporter.error(implDef.pos,
                          "Scala.js-defined JS objects " +
-                         "may not have inner native JS classes or objects")
+                           "may not have inner native JS classes or objects")
         } else if (!sym.isTrait && (enclosingOwner is OwnerKind.JSNativeMod)) {
           /* Store the fully qualified JS name in an explicit @JSFullName
            * annotation, before `flatten` destroys the name and (in 2.10) the
@@ -565,22 +567,22 @@ abstract class PrepJSInterop
           val ownerFullJSName = jsInterop.fullJSNameOf(sym.owner)
           val jsName = jsInterop.jsNameOf(sym)
           val fullJSName = ownerFullJSName + "." + jsName
-          sym.addAnnotation(
-              JSFullNameAnnotation, typer.typed(Literal(Constant(fullJSName))))
+          sym.addAnnotation(JSFullNameAnnotation,
+                            typer.typed(Literal(Constant(fullJSName))))
         } else if (!sym.isTrait && !sym.hasAnnotation(JSNameAnnotation)) {
           if (enclosingOwner is OwnerKind.ScalaMod) {
             if (sym.isModuleClass) {
               reporter.error(
                   implDef.pos,
                   "Native JS objects inside " +
-                  "non-native objects must have an @JSName annotation")
+                    "non-native objects must have an @JSName annotation")
             } else {
               // This should be an error, but we erroneously allowed that before
               reporter.warning(
                   implDef.pos,
                   "Native JS classes inside " +
-                  "non-native objects should have an @JSName annotation. " +
-                  "This will be enforced in 1.0.")
+                    "non-native objects should have an @JSName annotation. " +
+                    "This will be enforced in 1.0.")
             }
           }
         }
@@ -589,8 +591,8 @@ abstract class PrepJSInterop
       // Check that only native objects extend js.GlobalScope
       if (isJSGlobalScope(implDef) && implDef.symbol != JSGlobalScopeClass &&
           (!sym.isModuleClass || !isJSNative)) {
-        reporter.error(
-            implDef.pos, "Only native objects may extend js.GlobalScope")
+        reporter
+          .error(implDef.pos, "Only native objects may extend js.GlobalScope")
       }
 
       if (shouldPrepareExports) {
@@ -606,8 +608,8 @@ abstract class PrepJSInterop
           for {
             exp <- exportsOf(sym) if !exp.ignoreInvalid
           } {
-            reporter.error(
-                exp.pos, "You may not export a native JS class or object")
+            reporter
+              .error(exp.pos, "You may not export a native JS class or object")
           }
         } else {
           if (sym.isModuleClass) registerModuleExports(sym)
@@ -631,12 +633,12 @@ abstract class PrepJSInterop
           val msg = {
             def memberDefString(membSym: Symbol) = {
               membSym.defStringSeenAs(sym.thisType.memberType(membSym)) +
-              membSym.locationString + " with JSName '" +
-              jsInterop.jsNameOf(membSym) + '\''
+                membSym.locationString + " with JSName '" +
+                jsInterop.jsNameOf(membSym) + '\''
             }
             "A member of a JS class is overriding another member with a different JS name.\n\n" +
-            memberDefString(low) + "\n" + "    is conflicting with\n" +
-            memberDefString(high) + "\n"
+              memberDefString(low) + "\n" + "    is conflicting with\n" +
+              memberDefString(high) + "\n"
           }
 
           reporter.warning(pos, msg)
@@ -709,13 +711,13 @@ abstract class PrepJSInterop
           reporter.error(
               sym.pos,
               s"A member named apply represents function " +
-              "application in JavaScript. A parameterless member should be " +
-              "exported as a property. You must add @JSName(\"apply\")")
+                "application in JavaScript. A parameterless member should be " +
+                "exported as a property. You must add @JSName(\"apply\")")
         } else if (enclosingOwner is OwnerKind.JSNonNative) {
           reporter.error(
               sym.pos,
               "A Scala.js-defined JavaScript class cannot declare a method " +
-              "named `apply` without `@JSName`")
+                "named `apply` without `@JSName`")
         }
       }
 
@@ -743,7 +745,7 @@ abstract class PrepJSInterop
             case _ =>
               reporter.error(tree.pos,
                              "@JSBracketCall methods must have at " +
-                             "least one non-repeated parameter")
+                               "least one non-repeated parameter")
           }
         }
       }
@@ -763,7 +765,7 @@ abstract class PrepJSInterop
             reporter.error(
                 tree.pos,
                 "Private methods in Scala.js-defined JS classes cannot be " +
-                "overloaded. Use different names instead.")
+                  "overloaded. Use different names instead.")
           }
         }
 
@@ -773,7 +775,7 @@ abstract class PrepJSInterop
           reporter.error(
               tree.pos,
               "Qualified private members in Scala.js-defined JS classes " +
-              "must be final")
+                "must be final")
         }
 
         // Traits must be pure interfaces
@@ -820,13 +822,13 @@ abstract class PrepJSInterop
         tree.rhs match {
           case Block(List(Apply(trg, _)), Literal(Constant(())))
               if trg.symbol.isPrimaryConstructor &&
-              trg.symbol.owner == sym.owner =>
+                trg.symbol.owner == sym.owner =>
           // everything is fine here
           case _ =>
             reporter.error(
                 tree.pos,
                 "A secondary constructor of a class " +
-                "extending js.Any may only call the primary constructor")
+                  "extending js.Any may only call the primary constructor")
         }
       } else {
         // Check that the tree's body is either empty or calls js.native
@@ -837,8 +839,8 @@ abstract class PrepJSInterop
             reporter.warning(
                 pos,
                 "Members of traits, classes and objects " +
-                "extending js.Any may only contain members that call js.native. " +
-                "This will be enforced in 1.0.")
+                  "extending js.Any may only contain members that call js.native. " +
+                  "This will be enforced in 1.0.")
         }
 
         if (sym.tpe.resultType.typeSymbol == NothingClass &&
@@ -848,8 +850,8 @@ abstract class PrepJSInterop
           reporter.warning(
               tree.pos,
               s"The type of $name got inferred " +
-              "as Nothing. To suppress this warning, explicitly ascribe " +
-              "the type.")
+                "as Nothing. To suppress this warning, explicitly ascribe " +
+                "the type.")
         }
       }
 
@@ -864,8 +866,9 @@ abstract class PrepJSInterop
     *
     *  Reports error messages otherwise.
     */
-  def checkSetterSignature(
-      sym: Symbol, pos: Position, exported: Boolean): Unit = {
+  def checkSetterSignature(sym: Symbol,
+                           pos: Position,
+                           exported: Boolean): Unit = {
     val typeStr = if (exported) "Exported" else "Raw JS"
 
     // Forbid setters with non-unit return type
@@ -899,7 +902,7 @@ abstract class PrepJSInterop
 
   private def isJSLambda(sym: Symbol) =
     sym.isAnonymousClass &&
-    AllJSFunctionClasses.exists(sym.tpe.typeSymbol isSubClass _)
+      AllJSFunctionClasses.exists(sym.tpe.typeSymbol isSubClass _)
 
   private def isScalaEnum(implDef: ImplDef) =
     implDef.symbol.tpe.typeSymbol isSubClass ScalaEnumClass
@@ -918,10 +921,10 @@ abstract class PrepJSInterop
   private def checkJSNameLiteral(sym: Symbol): Unit = {
     for {
       annot <- sym.getAnnotation(JSNameAnnotation)
-                  if annot.stringArg(0).isEmpty
+      if annot.stringArg(0).isEmpty
     } {
-      reporter.error(
-          annot.pos, "The argument to JSName must be a literal string")
+      reporter
+        .error(annot.pos, "The argument to JSName must be a literal string")
     }
   }
 
@@ -991,8 +994,9 @@ abstract class PrepJSInterop
     * @param intParam Optional tree with Int passed to Value
     * @return Typed tree with appropriate call to Value
     */
-  private def ScalaEnumValName(
-      thisSym: Symbol, nameOrig: Symbol, intParam: Option[Tree]) = {
+  private def ScalaEnumValName(thisSym: Symbol,
+                               nameOrig: Symbol,
+                               intParam: Option[Tree]) = {
 
     val defaultName = nameOrig.asTerm.getterName.encoded
 
@@ -1004,8 +1008,8 @@ abstract class PrepJSInterop
     //     <defaultName>
     //
     val nextNameTree = Select(This(thisSym), jsnme.nextName)
-    val nullCompTree = Apply(
-        Select(nextNameTree, nme.NE), Literal(Constant(null)) :: Nil)
+    val nullCompTree =
+      Apply(Select(nextNameTree, nme.NE), Literal(Constant(null)) :: Nil)
     val hasNextTree = Select(nextNameTree, jsnme.hasNext)
     val condTree = Apply(Select(nullCompTree, nme.ZAND), hasNextTree :: Nil)
     val nameTree = If(condTree,
@@ -1047,7 +1051,7 @@ abstract class PrepJSInterop
     val needsFix = {
       sym.isPrivate &&
       (wasPublicBeforeTyper(sym) ||
-          (sym.isAccessor && wasPublicBeforeTyper(sym.accessed)))
+      (sym.isAccessor && wasPublicBeforeTyper(sym.accessed)))
     }
     if (needsFix) {
       sym.resetFlag(Flag.PRIVATE)
@@ -1070,7 +1074,7 @@ object PrepJSInterop {
 
     @inline def isBaseKind: Boolean =
       Integer.lowestOneBit(baseKinds) == baseKinds &&
-      baseKinds != 0 // exactly 1 bit on
+        baseKinds != 0 // exactly 1 bit on
 
     @inline def |(that: OwnerKind): OwnerKind =
       new OwnerKind(this.baseKinds | that.baseKinds)

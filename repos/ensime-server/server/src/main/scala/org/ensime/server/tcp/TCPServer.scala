@@ -19,8 +19,8 @@ class TCPServer(
     broadcaster: ActorRef,
     shutdownOnLastDisconnect: Boolean,
     preferredPort: Option[Int]
-)
-    extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
 
   import Tcp._
   import context.system
@@ -30,7 +30,8 @@ class TCPServer(
   var activeConnections = 0
 
   IO(Tcp) ! Bind(
-      self, new InetSocketAddress("127.0.0.1", preferredPort.getOrElse(0)))
+      self,
+      new InetSocketAddress("127.0.0.1", preferredPort.getOrElse(0)))
 
   def receive = {
     case b @ Bound(localAddress) =>
@@ -39,7 +40,8 @@ class TCPServer(
       PortUtil.writePort(cacheDir, boundPort, "port")
     case CommandFailed(_: Bind) =>
       context.parent ! ShutdownRequest(
-          s"TCP protocol failed to bind ($preferredPort)", isError = true)
+          s"TCP protocol failed to bind ($preferredPort)",
+          isError = true)
 
     case ClientConnectionClosed =>
       activeConnections -= 1

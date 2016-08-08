@@ -9,7 +9,15 @@ import scala.concurrent.duration.DurationInt
 
 import com.typesafe.config.ConfigFactory
 
-import akka.actor.{Actor, ActorDSL, ActorLogging, ActorRef, ActorSystem, Props, SupervisorStrategy}
+import akka.actor.{
+  Actor,
+  ActorDSL,
+  ActorLogging,
+  ActorRef,
+  ActorSystem,
+  Props,
+  SupervisorStrategy
+}
 import akka.actor.ActorDSL.inbox
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
@@ -20,17 +28,20 @@ object EchoServer extends App {
   implicit val system = ActorSystem("EchoServer", config)
 
   // make sure to stop the system so that the application stops
-  try run() finally system.terminate()
+  try run()
+  finally system.terminate()
 
   def run(): Unit = {
     import ActorDSL._
 
     // create two EchoManager and stop the application once one dies
     val watcher = inbox()
-    watcher.watch(system.actorOf(
-            Props(classOf[EchoManager], classOf[EchoHandler]), "echo"))
-    watcher.watch(system.actorOf(
-            Props(classOf[EchoManager], classOf[SimpleEchoHandler]), "simple"))
+    watcher.watch(
+        system.actorOf(Props(classOf[EchoManager], classOf[EchoHandler]),
+                       "echo"))
+    watcher.watch(
+        system.actorOf(Props(classOf[EchoManager], classOf[SimpleEchoHandler]),
+                       "simple"))
     watcher.receive(10.minutes)
   }
 }
@@ -77,7 +88,8 @@ object EchoHandler {
 }
 
 class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import Tcp._
   import EchoHandler._
@@ -221,7 +233,8 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
 
 //#simple-echo-handler
 class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import Tcp._
 

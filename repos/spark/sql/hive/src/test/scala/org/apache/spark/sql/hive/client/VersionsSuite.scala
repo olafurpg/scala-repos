@@ -26,7 +26,12 @@ import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.catalog._
-import org.apache.spark.sql.catalyst.expressions.{AttributeReference, EqualTo, Literal, NamedExpression}
+import org.apache.spark.sql.catalyst.expressions.{
+  AttributeReference,
+  EqualTo,
+  Literal,
+  NamedExpression
+}
 import org.apache.spark.sql.catalyst.util.quietly
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.types.IntegerType
@@ -49,8 +54,8 @@ class VersionsSuite extends SparkFunSuite with Logging {
   private val ivyPath: Option[String] = {
     sys.env
       .get("SPARK_VERSIONS_SUITE_IVY_PATH")
-      .orElse(
-          Some(new File(sys.props("java.io.tmpdir"), "hive-ivy-cache").getAbsolutePath))
+      .orElse(Some(
+          new File(sys.props("java.io.tmpdir"), "hive-ivy-cache").getAbsolutePath))
   }
 
   private def buildConf() = {
@@ -156,17 +161,18 @@ class VersionsSuite extends SparkFunSuite with Logging {
           tableType = CatalogTableType.MANAGED_TABLE,
           schema = Seq(CatalogColumn("key", "int")),
           storage = CatalogStorageFormat(
-                locationUri = None,
-                inputFormat = Some(classOf[
-                          org.apache.hadoop.mapred.TextInputFormat].getName),
-                outputFormat = Some(
-                      classOf[org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat[
-                              _, _]].getName),
-                serde = Some(classOf[
-                          org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe]
-                        .getName()),
-                serdeProperties = Map.empty
-            ))
+              locationUri = None,
+              inputFormat = Some(
+                  classOf[org.apache.hadoop.mapred.TextInputFormat].getName),
+              outputFormat = Some(classOf[
+                  org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat[
+                      _,
+                      _]].getName),
+              serde = Some(
+                  classOf[org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe]
+                    .getName()),
+              serdeProperties = Map.empty
+          ))
 
       client.createTable(table, ignoreIfExists = false)
     }
@@ -208,7 +214,8 @@ class VersionsSuite extends SparkFunSuite with Logging {
     test(s"$version: getPartitionsByFilter") {
       client.getPartitionsByFilter(
           client.getTable("default", "src_part"),
-          Seq(EqualTo(AttributeReference("key", IntegerType, false)(
+          Seq(
+              EqualTo(AttributeReference("key", IntegerType, false)(
                           NamedExpression.newExprId),
                       Literal(1))))
     }
@@ -240,7 +247,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
     test(s"$version: create index and reset") {
       client.runSqlHive("CREATE TABLE indexed_table (key INT)")
       client.runSqlHive("CREATE INDEX index_1 ON TABLE indexed_table(key) " +
-          "as 'COMPACT' WITH DEFERRED REBUILD")
+        "as 'COMPACT' WITH DEFERRED REBUILD")
       client.reset()
     }
   }

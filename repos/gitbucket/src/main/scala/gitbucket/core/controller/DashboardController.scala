@@ -1,17 +1,30 @@
 package gitbucket.core.controller
 
 import gitbucket.core.dashboard.html
-import gitbucket.core.service.{RepositoryService, PullRequestService, AccountService, IssuesService}
+import gitbucket.core.service.{
+  RepositoryService,
+  PullRequestService,
+  AccountService,
+  IssuesService
+}
 import gitbucket.core.util.{StringUtil, Keys, UsersAuthenticator}
 import gitbucket.core.util.Implicits._
 import gitbucket.core.service.IssuesService._
 
 class DashboardController
-    extends DashboardControllerBase with IssuesService with PullRequestService
-    with RepositoryService with AccountService with UsersAuthenticator
+    extends DashboardControllerBase
+    with IssuesService
+    with PullRequestService
+    with RepositoryService
+    with AccountService
+    with UsersAuthenticator
 
 trait DashboardControllerBase extends ControllerBase {
-  self: IssuesService with PullRequestService with RepositoryService with AccountService with UsersAuthenticator =>
+  self: IssuesService
+    with PullRequestService
+    with RepositoryService
+    with AccountService
+    with UsersAuthenticator =>
 
   get("/dashboard/issues")(usersOnly {
     val q = request.getParameter("q")
@@ -81,8 +94,9 @@ trait DashboardControllerBase extends ControllerBase {
     searchPullRequests("mentioned")
   })
 
-  private def getOrCreateCondition(
-      key: String, filter: String, userName: String) = {
+  private def getOrCreateCondition(key: String,
+                                   filter: String,
+                                   userName: String) = {
     val condition = session.putAndGet(
         key,
         if (request.hasQueryString) {
@@ -99,14 +113,14 @@ trait DashboardControllerBase extends ControllerBase {
 
     filter match {
       case "assigned" =>
-        condition.copy(
-            assigned = Some(userName), author = None, mentioned = None)
+        condition
+          .copy(assigned = Some(userName), author = None, mentioned = None)
       case "mentioned" =>
-        condition.copy(
-            assigned = None, author = None, mentioned = Some(userName))
+        condition
+          .copy(assigned = None, author = None, mentioned = Some(userName))
       case _ =>
-        condition.copy(
-            assigned = None, author = Some(userName), mentioned = None)
+        condition
+          .copy(assigned = None, author = Some(userName), mentioned = None)
     }
   }
 
@@ -114,8 +128,8 @@ trait DashboardControllerBase extends ControllerBase {
     import IssuesService._
 
     val userName = context.loginAccount.get.userName
-    val condition = getOrCreateCondition(
-        Keys.Session.DashboardIssues, filter, userName)
+    val condition =
+      getOrCreateCondition(Keys.Session.DashboardIssues, filter, userName)
     val userRepos =
       getUserRepositories(userName, true).map(repo => repo.owner -> repo.name)
     val page = IssueSearchCondition.page(request)
@@ -143,8 +157,8 @@ trait DashboardControllerBase extends ControllerBase {
     import PullRequestService._
 
     val userName = context.loginAccount.get.userName
-    val condition = getOrCreateCondition(
-        Keys.Session.DashboardPulls, filter, userName)
+    val condition =
+      getOrCreateCondition(Keys.Session.DashboardPulls, filter, userName)
     val allRepos = getAllRepositories(userName)
     val page = IssueSearchCondition.page(request)
 

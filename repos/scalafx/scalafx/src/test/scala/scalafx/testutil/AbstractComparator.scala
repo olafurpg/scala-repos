@@ -72,7 +72,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     private def findMethodWithManyArgs(argTypes: List[Class[_]])(
         scalaMethod: Method): Boolean =
       (scalaMethod.getParameterTypes.length == argTypes.size) &&
-      (scalaMethod.getParameterTypes.toList == argTypes)
+        (scalaMethod.getParameterTypes.toList == argTypes)
 
     /**
       *
@@ -80,8 +80,8 @@ private[testutil] trait AbstractComparator extends Assertions {
     private def findMethodWithManyArgsVarargs(
         argTypesExceptLast: List[Class[_]])(method: Method): Boolean =
       (method.getParameterTypes.length == argTypesExceptLast.size + 1) &&
-      (method.getParameterTypes.init.toList == argTypesExceptLast) &&
-      lastArgumentIsVararg(method)
+        (method.getParameterTypes.init.toList == argTypesExceptLast) &&
+        lastArgumentIsVararg(method)
 
     def getFinderMethod(javaMethod: Method) =
       (javaMethod.getParameterTypes.size, javaMethod.isVarArgs) match {
@@ -121,8 +121,8 @@ private[testutil] trait AbstractComparator extends Assertions {
                         parametersLength: Int,
                         returnEvaluator: Class[_] => Boolean) =
       m.getName.matches(pattern) &&
-      (m.getParameterTypes.length == parametersLength) &&
-      returnEvaluator(m.getReturnType)
+        (m.getParameterTypes.length == parametersLength) &&
+        returnEvaluator(m.getReturnType)
 
     private def isSetter(m: Method): Boolean =
       isValid(m, setterPattern, 1, (_ == JVoid))
@@ -161,8 +161,8 @@ private[testutil] trait AbstractComparator extends Assertions {
     */
   private def methodToString(m: Method) = {
 
-    def classParameterToString(
-        classParameter: Class[_], isVarargs: Boolean = false) = {
+    def classParameterToString(classParameter: Class[_],
+                               isVarargs: Boolean = false) = {
       (classParameter.isArray,
        classParameter.getName.matches("""^\[.$"""),
        isVarargs) match {
@@ -183,13 +183,14 @@ private[testutil] trait AbstractComparator extends Assertions {
         m.getParameterTypes.init
           .map(classParameterToString(_))
           .mkString("", ", ", ", ") + classParameterToString(
-            m.getParameterTypes.last, true)
+            m.getParameterTypes.last,
+            true)
       case (_, false) =>
         m.getParameterTypes.map(classParameterToString(_)).mkString(", ")
     }
 
     classParameterToString(m.getReturnType) + " " + m.getName + "(" +
-    strParameters + ")"
+      strParameters + ")"
   }
 
   private val nameComparator: (Method, Method) => Boolean = (m1, m2) =>
@@ -205,10 +206,11 @@ private[testutil] trait AbstractComparator extends Assertions {
   private def groupMethods(cls: Class[_], useStatic: Boolean) = {
     val staticIndicator: Boolean => Boolean =
       if (useStatic) (b => b) else (b => !b)
-    val isAcceptable: Method => Boolean = (m =>
-      isPublicMethod(m) &&
-      staticIndicator(Modifier.isStatic(m.getModifiers)) &&
-      !isSpecialMethodName(m.getName))
+    val isAcceptable: Method => Boolean =
+      (m =>
+         isPublicMethod(m) &&
+           staticIndicator(Modifier.isStatic(m.getModifiers)) &&
+           !isSpecialMethodName(m.getName))
 
     cls.getDeclaredMethods.filter(isAcceptable).sortWith(nameComparator).toList
   }
@@ -229,17 +231,17 @@ private[testutil] trait AbstractComparator extends Assertions {
     javaMethods match {
       case Nil => javaMethodsNotMirrored
       case javaMethod :: otherMethods => {
-          val finderMethod = MethodsComparators.getFinderMethod(javaMethod)
-          val desirableName = getDesirableMethodName(javaMethod)
-          val scalaHasMethod = scalaMethods
-            .filter(MethodsComparators.sameName(desirableName, _))
-            .exists(finderMethod)
-          val javaMethods =
-            if (scalaHasMethod) javaMethodsNotMirrored
-            else javaMethod :: javaMethodsNotMirrored
+        val finderMethod = MethodsComparators.getFinderMethod(javaMethod)
+        val desirableName = getDesirableMethodName(javaMethod)
+        val scalaHasMethod = scalaMethods
+          .filter(MethodsComparators.sameName(desirableName, _))
+          .exists(finderMethod)
+        val javaMethods =
+          if (scalaHasMethod) javaMethodsNotMirrored
+          else javaMethod :: javaMethodsNotMirrored
 
-          compare(otherMethods, scalaMethods, javaMethods)
-        }
+        compare(otherMethods, scalaMethods, javaMethods)
+      }
     }
   }
 
@@ -251,8 +253,9 @@ private[testutil] trait AbstractComparator extends Assertions {
     * @param scalaClass Scala Class, that presumably must have the same public methods as javaClass
     * @param useStatic If it will be compared only static methods (`true`) or only declared methods (`false`).
     */
-  private def compareMethods(
-      javaClass: Class[_], scalaClass: Class[_], useStatic: Boolean) {
+  private def compareMethods(javaClass: Class[_],
+                             scalaClass: Class[_],
+                             useStatic: Boolean) {
     val javaMethods = groupMethods(javaClass, useStatic)
     val scalaMethods = groupMethods(scalaClass, useStatic)
 
@@ -261,11 +264,11 @@ private[testutil] trait AbstractComparator extends Assertions {
     assert(methodsNotFound.isEmpty,
            "Missing %s Methods: ".format(
                if (useStatic) "Static" else "Declared") +
-           methodsNotFound.map(methodToString).mkString(", "))
+             methodsNotFound.map(methodToString).mkString(", "))
   }
 
   //////////////////
-  // HELPER METHODS 
+  // HELPER METHODS
   //////////////////
 
   /**
@@ -283,7 +286,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     Modifier.isPublic(method.getModifiers)
 
   ////////////////////
-  // ABSTRACT METHODS 
+  // ABSTRACT METHODS
   ////////////////////
 
   /**
@@ -301,7 +304,7 @@ private[testutil] trait AbstractComparator extends Assertions {
   protected def getDesirableMethodName(javaMethod: Method): String
 
   //////////////////
-  // PUBLIC METHODS 
+  // PUBLIC METHODS
   //////////////////
 
   /**

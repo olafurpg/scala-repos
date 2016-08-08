@@ -66,7 +66,7 @@ object Puzzle extends LilaController {
 
   private def puzzleJson(puzzle: PuzzleModel)(implicit ctx: Context) =
     (env userInfos ctx.me) zip
-    (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) map {
+      (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) map {
       case (infos, asPlay) =>
         JsData(puzzle,
                infos,
@@ -81,7 +81,7 @@ object Puzzle extends LilaController {
             fuccess { Ok(views.html.puzzle.history(ui)) }
           },
           api = _ =>
-              fuccess {
+            fuccess {
               Ok(JsData history ui)
           }
       )
@@ -95,10 +95,11 @@ object Puzzle extends LilaController {
     XhrOnly {
       selectPuzzle(ctx.me) zip (env userInfos ctx.me) map {
         case (Some(puzzle), infos) =>
-          Ok(JsData(puzzle,
-                    infos,
-                    ctx.isAuth.fold("play", "try"),
-                    animationDuration = env.AnimationDuration)) as JSON
+          Ok(
+              JsData(puzzle,
+                     infos,
+                     ctx.isAuth.fold("play", "try"),
+                     animationDuration = env.AnimationDuration)) as JSON
         case (None, _) => NotFound(noMorePuzzleJson)
       } map (_ as JSON)
     }
@@ -113,17 +114,15 @@ object Puzzle extends LilaController {
               me,
               (p: lila.pref.Pref) => p.copy(puzzleDifficulty = value),
               notifyChange = false) >> {
-            reqToCtx(ctx.req) flatMap {
-              newCtx =>
-                selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
-                  case (Some(puzzle), infos) =>
-                    Ok(JsData(
-                            puzzle,
+            reqToCtx(ctx.req) flatMap { newCtx =>
+              selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
+                case (Some(puzzle), infos) =>
+                  Ok(JsData(puzzle,
                             infos,
                             ctx.isAuth.fold("play", "try"),
                             animationDuration = env.AnimationDuration)(newCtx))
-                  case (None, _) => NotFound(noMorePuzzleJson)
-                }
+                case (None, _) => NotFound(noMorePuzzleJson)
+              }
             }
         }
     ) map (_ as JSON)
@@ -144,38 +143,39 @@ object Puzzle extends LilaController {
               case Some(me) =>
                 env.finisher(puzzle, me, data) flatMap {
                   case (newAttempt, None) =>
-                    UserRepo byId me.id map (_ | me) flatMap {
-                      me2 =>
-                        env.api.puzzle find id zip (env userInfos me2.some) zip
+                    UserRepo byId me.id map (_ | me) flatMap { me2 =>
+                      env.api.puzzle find id zip (env userInfos me2.some) zip
                         (env.api.attempt hasVoted me2) map {
-                          case ((p2, infos), voted) =>
-                            Ok {
-                              JsData(p2 | puzzle,
-                                     infos,
-                                     "view",
-                                     attempt = newAttempt.some,
-                                     voted = voted.some,
-                                     animationDuration = env.AnimationDuration)
-                            }
-                        }
+                        case ((p2, infos), voted) =>
+                          Ok {
+                            JsData(p2 | puzzle,
+                                   infos,
+                                   "view",
+                                   attempt = newAttempt.some,
+                                   voted = voted.some,
+                                   animationDuration = env.AnimationDuration)
+                          }
+                      }
                     }
                   case (oldAttempt, Some(win)) =>
                     env userInfos me.some map { infos =>
-                      Ok(JsData(puzzle,
-                                infos,
-                                "view",
-                                attempt = oldAttempt.some,
-                                win = win.some,
-                                animationDuration = env.AnimationDuration))
+                      Ok(
+                          JsData(puzzle,
+                                 infos,
+                                 "view",
+                                 attempt = oldAttempt.some,
+                                 win = win.some,
+                                 animationDuration = env.AnimationDuration))
                     }
                 }
               case None =>
                 fuccess {
-                  Ok(JsData(puzzle,
-                            none,
-                            "view",
-                            win = data.isWin.some,
-                            animationDuration = env.AnimationDuration))
+                  Ok(
+                      JsData(puzzle,
+                             none,
+                             "view",
+                             win = data.isWin.some,
+                             animationDuration = env.AnimationDuration))
                 }
           }
       ) map (_ as JSON)

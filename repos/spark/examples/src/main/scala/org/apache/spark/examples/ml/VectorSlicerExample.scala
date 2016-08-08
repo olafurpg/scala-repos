@@ -20,7 +20,11 @@ package org.apache.spark.examples.ml
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.ml.attribute.{Attribute, AttributeGroup, NumericAttribute}
+import org.apache.spark.ml.attribute.{
+  Attribute,
+  AttributeGroup,
+  NumericAttribute
+}
 import org.apache.spark.ml.feature.VectorSlicer
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql.Row
@@ -39,12 +43,12 @@ object VectorSlicerExample {
 
     val defaultAttr = NumericAttribute.defaultAttr
     val attrs = Array("f1", "f2", "f3").map(defaultAttr.withName)
-    val attrGroup = new AttributeGroup(
-        "userFeatures", attrs.asInstanceOf[Array[Attribute]])
+    val attrGroup =
+      new AttributeGroup("userFeatures", attrs.asInstanceOf[Array[Attribute]])
 
     val dataRDD = sc.parallelize(data)
-    val dataset = sqlContext.createDataFrame(
-        dataRDD, StructType(Array(attrGroup.toStructField())))
+    val dataset = sqlContext
+      .createDataFrame(dataRDD, StructType(Array(attrGroup.toStructField())))
 
     val slicer =
       new VectorSlicer().setInputCol("userFeatures").setOutputCol("features")

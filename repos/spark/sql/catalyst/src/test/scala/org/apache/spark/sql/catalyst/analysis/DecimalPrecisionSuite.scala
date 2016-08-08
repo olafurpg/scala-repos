@@ -23,9 +23,16 @@ import org.apache.spark.sql.catalyst.{SimpleCatalystConf, TableIdentifier}
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
-import org.apache.spark.sql.catalyst.expressions.Literal.{FalseLiteral, TrueLiteral}
+import org.apache.spark.sql.catalyst.expressions.Literal.{
+  FalseLiteral,
+  TrueLiteral
+}
 import org.apache.spark.sql.catalyst.plans.PlanTest
-import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, Project, Union}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LocalRelation,
+  Project,
+  Union
+}
 import org.apache.spark.sql.types._
 
 class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
@@ -58,8 +65,8 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     assert(analyzer.execute(plan).schema.fields(0).dataType === expectedType)
   }
 
-  private def checkComparison(
-      expression: Expression, expectedType: DataType): Unit = {
+  private def checkComparison(expression: Expression,
+                              expectedType: DataType): Unit = {
     val plan = Project(Alias(expression, "c")() :: Nil, relation)
     val comparison = analyzer
       .execute(plan)
@@ -71,8 +78,9 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     assert(comparison.right.dataType === expectedType)
   }
 
-  private def checkUnion(
-      left: Expression, right: Expression, expectedType: DataType): Unit = {
+  private def checkUnion(left: Expression,
+                         right: Expression,
+                         expectedType: DataType): Unit = {
     val plan = Union(Project(Seq(Alias(left, "l")()), relation),
                      Project(Seq(Alias(right, "r")()), relation))
     val (l, r) = analyzer

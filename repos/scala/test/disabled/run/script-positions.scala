@@ -43,9 +43,8 @@ object Test {
   settings.nocompdaemon.value = true
 
   def runScript(code: String): String =
-    stringFromStream(
-        stream =>
-          Console.withOut(stream) {
+    stringFromStream(stream =>
+      Console.withOut(stream) {
         Console.withErr(stream) {
           ScriptRunner.runCommand(settings, code, Nil)
         }
@@ -75,7 +74,7 @@ object Test {
       assert(
           success,
           "Output doesn't match expected:\n" + "Expected:\n" + expected +
-          "Actual:\n" + out.mkString("\n")
+            "Actual:\n" + out.mkString("\n")
       )
     }
   }

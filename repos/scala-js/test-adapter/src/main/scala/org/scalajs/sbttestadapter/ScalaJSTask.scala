@@ -26,8 +26,7 @@ final class ScalaJSTask private (
     val taskDef: TaskDef,
     val tags: Array[String],
     serializedTask: String
-)
-    extends Task {
+) extends Task {
 
   def execute(handler: EventHandler, loggers: Array[Logger]): Array[Task] = {
     val slave = runner.getSlave()
@@ -53,7 +52,7 @@ final class ScalaJSTask private (
 
     val handlerChain =
       (eventHandler(handler) orElse loggerHandler(logBuffer) orElse runner
-            .msgHandler(slave) orElse doneHandler)
+        .msgHandler(slave) orElse doneHandler)
 
     // Wait for result
     val taskInfos = ComUtils.receiveLoop(slave)(handlerChain)
@@ -108,12 +107,13 @@ final class ScalaJSTask private (
 }
 
 object ScalaJSTask {
-  private final class LogElement[T](
-      index: Int, log: Logger => (T => Unit), data: T) {
+  private final class LogElement[T](index: Int,
+                                    log: Logger => (T => Unit),
+                                    data: T) {
     def call(arr: Array[Logger]): Unit = log(arr(index))(data)
   }
 
-  private[testadapter] def fromInfo(
-      runner: ScalaJSRunner, info: TaskInfo): ScalaJSTask =
+  private[testadapter] def fromInfo(runner: ScalaJSRunner,
+                                    info: TaskInfo): ScalaJSTask =
     new ScalaJSTask(runner, info.taskDef, info.tags, info.serializedTask)
 }

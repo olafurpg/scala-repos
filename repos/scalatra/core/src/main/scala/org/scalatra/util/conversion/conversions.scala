@@ -29,7 +29,7 @@ trait TypeConverterSupport {
 object TypeConverterSupport extends TypeConverterSupport
 
 trait LowestPriorityImplicitConversions extends TypeConverterSupport {
-  implicit def lowestPriorityAny2T[T : Manifest]: TypeConverter[Any, T] =
+  implicit def lowestPriorityAny2T[T: Manifest]: TypeConverter[Any, T] =
     safe {
       case a if manifest[T].erasure.isAssignableFrom(a.getClass) =>
         a.asInstanceOf[T]
@@ -158,7 +158,7 @@ trait DefaultImplicitConversions extends LowPriorityImplicitConversions {
       mf: Manifest[T]): TypeConverter[String, Seq[T]] =
     stringToSeq[T](elementConverter)
 
-  def stringToSeq[T : Manifest](
+  def stringToSeq[T: Manifest](
       elementConverter: TypeConverter[String, T],
       separator: String = ","): TypeConverter[String, Seq[T]] =
     safe(s => s.split(separator).toSeq.flatMap(e => elementConverter(e.trim)))
@@ -177,7 +177,7 @@ object Conversions extends DefaultImplicitConversions {
 
   private type StringTypeConverter[T] = TypeConverter[String, T]
   class ValConversion(source: String) {
-    def as[T : StringTypeConverter]: Option[T] =
+    def as[T: StringTypeConverter]: Option[T] =
       implicitly[TypeConverter[String, T]].apply(source)
   }
 

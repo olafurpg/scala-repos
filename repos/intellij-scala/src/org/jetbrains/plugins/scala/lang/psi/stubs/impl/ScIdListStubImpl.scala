@@ -14,6 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScIdList
   */
 class ScIdListStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScIdList](parent, elemType) with ScIdListStub
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
+    extends StubBaseWrapper[ScIdList](parent, elemType)
+    with ScIdListStub

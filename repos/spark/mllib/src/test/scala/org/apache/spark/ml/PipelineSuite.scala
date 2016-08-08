@@ -35,7 +35,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class PipelineSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   abstract class MyModel extends Model[MyModel]
@@ -141,8 +142,9 @@ class PipelineSuite
 
   test("PipelineModel read/write") {
     val writableStage = new WritableStage("writableStage").setIntParam(56)
-    val pipeline = new PipelineModel(
-        "pipeline_89329327", Array(writableStage.asInstanceOf[Transformer]))
+    val pipeline =
+      new PipelineModel("pipeline_89329327",
+                        Array(writableStage.asInstanceOf[Transformer]))
 
     val pipeline2 = testDefaultReadWrite(pipeline, testParams = false)
     assert(pipeline2.stages.length === 1)
@@ -154,8 +156,9 @@ class PipelineSuite
   test("PipelineModel read/write: getStagePath") {
     val stageUid = "myStage"
     val stagesDir = new Path("pipeline", "stages").toString
-    def testStage(
-        stageIdx: Int, numStages: Int, expectedPrefix: String): Unit = {
+    def testStage(stageIdx: Int,
+                  numStages: Int,
+                  expectedPrefix: String): Unit = {
       val path =
         SharedReadWrite.getStagePath(stageUid, stageIdx, numStages, stagesDir)
       val expected =
@@ -171,8 +174,9 @@ class PipelineSuite
 
   test("PipelineModel read/write with non-Writable stage") {
     val unWritableStage = new UnWritableStage("unwritableStage")
-    val unWritablePipeline = new PipelineModel(
-        "pipeline_328957", Array(unWritableStage.asInstanceOf[Transformer]))
+    val unWritablePipeline =
+      new PipelineModel("pipeline_328957",
+                        Array(unWritableStage.asInstanceOf[Transformer]))
     withClue(
         "PipelineModel.write should fail when PipelineModel contains non-Writable stage") {
       intercept[UnsupportedOperationException] {
@@ -205,7 +209,8 @@ class PipelineSuite
 
 /** Used to test [[Pipeline]] with [[MLWritable]] stages */
 class WritableStage(override val uid: String)
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   final val intParam: IntParam = new IntParam(this, "intParam", "doc")
 

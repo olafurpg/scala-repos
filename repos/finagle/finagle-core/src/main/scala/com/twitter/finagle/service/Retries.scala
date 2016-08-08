@@ -51,9 +51,9 @@ object Retries {
     * @note requeueBackoffs only apply to automatic retries and not to
     *       requests using a [[RetryPolicy]]
     */
-  case class Budget(
-      retryBudget: RetryBudget,
-      requeueBackoffs: Stream[Duration] = Budget.emptyBackoffSchedule) {
+  case class Budget(retryBudget: RetryBudget,
+                    requeueBackoffs: Stream[Duration] =
+                      Budget.emptyBackoffSchedule) {
     def this(retryBudget: RetryBudget) =
       this(retryBudget, Budget.emptyBackoffSchedule)
 
@@ -94,8 +94,8 @@ object Retries {
     * Retries failures that are guaranteed to be safe to retry
     * (see [[RetryPolicy.RetryableWriteException]]).
     */
-  private[finagle] def moduleRequeueable[Req, Rep]: Stackable[ServiceFactory[
-          Req, Rep]] =
+  private[finagle] def moduleRequeueable[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module3[Stats, Budget, HighResTimer, ServiceFactory[Req, Rep]] {
       def role: Stack.Role = Retries.Role
 
@@ -138,8 +138,8 @@ object Retries {
     *       level failures. This is particularly important for codecs that
     *       include exceptions, such as `Thrift`.
     */
-  private[finagle] def moduleWithRetryPolicy[Req, Rep]: Stackable[
-      ServiceFactory[Req, Rep]] =
+  private[finagle] def moduleWithRetryPolicy[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module4[
         Stats,
         Budget,
@@ -151,7 +151,7 @@ object Retries {
 
       def description: String =
         "Retries requests, at the service application level, that have been rejected " +
-        "or meet the application-configured retry policy for transport level failures."
+          "or meet the application-configured retry policy for transport level failures."
 
       def make(
           statsP: param.Stats,
@@ -175,8 +175,10 @@ object Retries {
                              timerP.timer,
                              next)
           } else {
-            val retryFilter = new RetryExceptionsFilter[Req, Rep](
-                retryPolicy, timerP.timer, statsRecv, retryBudget)
+            val retryFilter = new RetryExceptionsFilter[Req, Rep](retryPolicy,
+                                                                  timerP.timer,
+                                                                  statsRecv,
+                                                                  retryBudget)
             // note that we wrap the budget, since the retry filter wraps this
             val requeueFilter = newRequeueFilter(
                 retryBudget,
@@ -239,8 +241,8 @@ object Retries {
         * requeue a subset of exceptions (currently only `RetryableWriteExceptions`) as
         * some exceptions to acquire a service are considered fatal.
         */
-      private[this] def applySelf(
-          conn: ClientConnection, n: Int): Future[Service[Req, Rep]] =
+      private[this] def applySelf(conn: ClientConnection,
+                                  n: Int): Future[Service[Req, Rep]] =
         self(conn).rescue {
           case e @ RetryPolicy.RetryableWriteException(_) if n > 0 =>
             if (status == Status.Open) {

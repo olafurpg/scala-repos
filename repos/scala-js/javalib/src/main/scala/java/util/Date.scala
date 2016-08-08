@@ -7,7 +7,10 @@ package java.util
 import scalajs.js
 
 class Date private (private val date: js.Date)
-    extends Object with Serializable with Cloneable with Comparable[Date] {
+    extends Object
+    with Serializable
+    with Cloneable
+    with Comparable[Date] {
 
   import Date._
 
@@ -98,14 +101,14 @@ class Date private (private val date: js.Date)
   @Deprecated
   def toGMTString(): String = {
     date.getUTCDate() + " " + Months(date.getUTCMonth()) + " " +
-    date.getUTCFullYear() + " " + pad0(date.getUTCHours()) + ":" +
-    pad0(date.getUTCMinutes()) + ":" + pad0(date.getUTCSeconds()) + " GMT"
+      date.getUTCFullYear() + " " + pad0(date.getUTCHours()) + ":" +
+      pad0(date.getUTCMinutes()) + ":" + pad0(date.getUTCSeconds()) + " GMT"
   }
 
   @Deprecated
   def toLocaleString(): String = {
     date.getDate() + "-" + Months(date.getMonth()) + "-" + date.getFullYear() +
-    "-" + pad0(date.getHours()) + ":" + pad0(date.getMinutes()) + ":" + pad0(
+      "-" + pad0(date.getHours()) + ":" + pad0(date.getMinutes()) + ":" + pad0(
         date.getSeconds())
   }
 
@@ -115,9 +118,9 @@ class Date private (private val date: js.Date)
     val hours = pad0(Math.abs(offset) / 60)
     val mins = pad0(Math.abs(offset) % 60)
     Days(date.getDay()) + " " + Months(date.getMonth()) + " " +
-    pad0(date.getHours()) + ":" + pad0(date.getMinutes()) + ":" +
-    pad0(date.getSeconds()) + " GMT" + sign + hours + mins + " " +
-    date.getFullYear()
+      pad0(date.getHours()) + ":" + pad0(date.getMinutes()) + ":" +
+      pad0(date.getSeconds()) + " GMT" + sign + hours + mins + " " +
+      date.getFullYear()
   }
 }
 
@@ -143,8 +146,12 @@ object Date {
   }
 
   @Deprecated
-  def UTC(
-      year: Int, month: Int, date: Int, hrs: Int, min: Int, sec: Int): Long =
+  def UTC(year: Int,
+          month: Int,
+          date: Int,
+          hrs: Int,
+          min: Int,
+          sec: Int): Long =
     js.Date.UTC(year + 1900, month, date, hrs, min, sec).toLong
 
   @Deprecated

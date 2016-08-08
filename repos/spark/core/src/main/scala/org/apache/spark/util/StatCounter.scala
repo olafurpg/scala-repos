@@ -138,8 +138,8 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   def sampleStdev: Double = math.sqrt(sampleVariance)
 
   override def toString: String = {
-    "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)".format(
-        count, mean, stdev, max, min)
+    "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)"
+      .format(count, mean, stdev, max, min)
   }
 }
 

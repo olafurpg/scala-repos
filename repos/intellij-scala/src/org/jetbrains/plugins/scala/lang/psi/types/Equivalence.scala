@@ -22,10 +22,10 @@ object Equivalence {
     override def initialValue(): Boolean = false
   }
 
-  val cache: ConcurrentWeakHashMap[
-      (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)] =
-    new ConcurrentWeakHashMap[
-        (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)]()
+  val cache: ConcurrentWeakHashMap[(ScType, ScType, Boolean),
+                                   (Boolean, ScUndefinedSubstitutor)] =
+    new ConcurrentWeakHashMap[(ScType, ScType, Boolean),
+                              (Boolean, ScUndefinedSubstitutor)]()
 
   /**
     * @param falseUndef use false to consider undef type equals to any type
@@ -106,9 +106,11 @@ object Equivalence {
       }
     }
     val res = guard.doPreventingRecursion(
-        key, false, new Computable[(Boolean, ScUndefinedSubstitutor)] {
-      def compute(): (Boolean, ScUndefinedSubstitutor) = comp()
-    })
+        key,
+        false,
+        new Computable[(Boolean, ScUndefinedSubstitutor)] {
+          def compute(): (Boolean, ScUndefinedSubstitutor) = comp()
+        })
     if (res == null) return (false, new ScUndefinedSubstitutor())
     if (!nowEval) {
       try {

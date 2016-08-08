@@ -28,10 +28,10 @@ case class Query(user1: Option[String] = None,
 
   def nonEmpty =
     user1.nonEmpty || user2.nonEmpty || winner.nonEmpty ||
-    winnerColor.nonEmpty || perf.nonEmpty || source.nonEmpty ||
-    status.nonEmpty || turns.nonEmpty || averageRating.nonEmpty ||
-    hasAi.nonEmpty || aiLevel.nonEmpty || rated.nonEmpty || date.nonEmpty ||
-    duration.nonEmpty || clock.nonEmpty || analysed.nonEmpty
+      winnerColor.nonEmpty || perf.nonEmpty || source.nonEmpty ||
+      status.nonEmpty || turns.nonEmpty || averageRating.nonEmpty ||
+      hasAi.nonEmpty || aiLevel.nonEmpty || rated.nonEmpty || date.nonEmpty ||
+      duration.nonEmpty || clock.nonEmpty || analysed.nonEmpty
 }
 
 object Query {
@@ -45,21 +45,15 @@ object Query {
   implicit val jsonWriter = Json.writes[Query]
 
   val durations = {
-    ((30, "30 seconds") :: options(List(60,
-                                        60 * 2,
-                                        60 * 3,
-                                        60 * 5,
-                                        60 * 10,
-                                        60 * 15,
-                                        60 * 20,
-                                        60 * 30),
-                                   _ / 60,
-                                   "%d minute{s}").toList) :+
-    (60 * 60 * 1, "One hour") :+ (60 * 60 * 3, "Three hours") :+
-    (60 * 60 * 24, "One day") :+ (60 * 60 * 24 * 3, "Three days") :+
-    (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+
-    (60 * 60 * 24 * 30, "One month") :+ (60 * 60 * 24 * 30 * 3, "Three months") :+
-    (60 * 60 * 24 * 30 * 6, "6 months") :+ (60 * 60 * 24 * 365, "One year")
+    ((30, "30 seconds") :: options(
+        List(60, 60 * 2, 60 * 3, 60 * 5, 60 * 10, 60 * 15, 60 * 20, 60 * 30),
+        _ / 60,
+        "%d minute{s}").toList) :+
+      (60 * 60 * 1, "One hour") :+ (60 * 60 * 3, "Three hours") :+
+      (60 * 60 * 24, "One day") :+ (60 * 60 * 24 * 3, "Three days") :+
+      (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+
+      (60 * 60 * 24 * 30, "One month") :+ (60 * 60 * 24 * 30 * 3, "Three months") :+
+      (60 * 60 * 24 * 30 * 6, "6 months") :+ (60 * 60 * 24 * 365, "One year")
   }
 
   val clockInits =
@@ -125,8 +119,9 @@ object Query {
         1 to 6,
         "d",
         "%d day{s} ago") ++ options(1 to 3, "w", "%d week{s} ago") ++ options(
-        1 to 6, "m", "%d month{s} ago") ++ options(
-        1 to 5, "y", "%d year{s} ago")
+        1 to 6,
+        "m",
+        "%d month{s} ago") ++ options(1 to 5, "y", "%d year{s} ago")
 
   val statuses = Status.finishedNotCheated.map {
     case s if s.is(_.Timeout) => none

@@ -126,8 +126,8 @@ object JsonAST {
       }
     }
 
-    private def findDirectByName(
-        xs: List[JValue], name: String): List[JValue] = xs.flatMap {
+    private def findDirectByName(xs: List[JValue],
+                                 name: String): List[JValue] = xs.flatMap {
       case JObject(l) =>
         l.collect {
           case JField(n, value) if n == name => value
@@ -136,8 +136,8 @@ object JsonAST {
       case _ => Nil
     }
 
-    private def findDirect(
-        xs: List[JValue], p: JValue => Boolean): List[JValue] = xs.flatMap {
+    private def findDirect(xs: List[JValue],
+                           p: JValue => Boolean): List[JValue] = xs.flatMap {
       case JObject(l) =>
         l.collect {
           case JField(n, x) if p(x) => x
@@ -393,8 +393,7 @@ object JsonAST {
     def map(f: JValue => JValue): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          f(
-              JObject(l.map { field =>
+          f(JObject(l.map { field =>
             field.copy(value = rec(field.value))
           }))
         case JArray(l) => f(JArray(l.map(rec)))
@@ -421,8 +420,7 @@ object JsonAST {
     def mapField(f: JField => JField): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          JObject(
-              l.map { field =>
+          JObject(l.map { field =>
             f(field.copy(value = rec(field.value)))
           })
         case JArray(l) => JArray(l.map(rec))
@@ -725,8 +723,8 @@ object JsonAST {
       * res0: Person("joe")
       * }}}
       */
-    def extract[A](
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): A =
+    def extract[A](implicit formats: Formats,
+                   mf: scala.reflect.Manifest[A]): A =
       Extraction.extract(this)(formats, mf)
 
     /**
@@ -754,8 +752,8 @@ object JsonAST {
       * res1: Option[Person] = Some(Person(joe))
       * }}}
       */
-    def extractOpt[A](
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): Option[A] =
+    def extractOpt[A](implicit formats: Formats,
+                      mf: scala.reflect.Manifest[A]): Option[A] =
       Extraction.extractOpt(this)(formats, mf)
 
     /**
@@ -776,8 +774,8 @@ object JsonAST {
       * res0: Person("joe")
       * }}}
       */
-    def extractOrElse[A](default: => A)(
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): A =
+    def extractOrElse[A](default: => A)(implicit formats: Formats,
+                                        mf: scala.reflect.Manifest[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
     def toOpt: Option[JValue] = this match {
@@ -845,8 +843,9 @@ object JsonAST {
     buf.toString
   }
 
-  private def appendEscapedString(
-      buf: Appendable, s: String, settings: RenderSettings) {
+  private def appendEscapedString(buf: Appendable,
+                                  s: String,
+                                  settings: RenderSettings) {
     for (i <- 0 until s.length) {
       val c = s.charAt(i)
       val strReplacement = c match {
@@ -859,7 +858,7 @@ object JsonAST {
         case '\t' => "\\t"
         case c
             if ((c >= '\u0000' && c < '\u0020')) ||
-            settings.escapeChars.contains(c) =>
+              settings.escapeChars.contains(c) =>
           "\\u%04x".format(c: Int)
 
         case _ => ""
@@ -1087,8 +1086,9 @@ object JsonAST {
     buf
   }
 
-  private def bufQuote(
-      s: String, buf: Appendable, settings: RenderSettings): Appendable = {
+  private def bufQuote(s: String,
+                       buf: Appendable,
+                       settings: RenderSettings): Appendable = {
     buf.append('"') //open quote
     appendEscapedString(buf, s, settings)
     buf.append('"') //close quote
@@ -1123,8 +1123,7 @@ trait Implicits {
 object JsonDSL extends JsonDSL
 trait JsonDSL extends Implicits {
   implicit def seq2jvalue[A <% JValue](s: Traversable[A]) =
-    JArray(
-        s.toList.map { a =>
+    JArray(s.toList.map { a =>
       val v: JValue = a; v
     })
 

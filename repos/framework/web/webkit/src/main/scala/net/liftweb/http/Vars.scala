@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
 
 /**
   * The bridge between Scala *Vars implementations and
-  * the 
+  * the
   */
 class VarsJBridge {
   def vendSessionVar[T](default: T, e: Exception): SessionVar[T] = {
@@ -66,7 +66,8 @@ class VarsJBridge {
   * requesting a value to be returned from the container
   */
 abstract class SessionVar[T](dflt: => T)
-    extends AnyVar[T, SessionVar[T]](dflt) with LazyLoggable {
+    extends AnyVar[T, SessionVar[T]](dflt)
+    with LazyLoggable {
   override protected def findFunc(name: String): Box[T] = S.session match {
     case Full(s) => s.get(name)
     case _ =>
@@ -76,7 +77,8 @@ abstract class SessionVar[T](dflt: => T)
       }
 
       if (showWarningWhenAccessedOutOfSessionScope_?)
-        logger.warn("Getting a SessionVar " + name + " outside session scope") // added warning per issue 188
+        logger
+          .warn("Getting a SessionVar " + name + " outside session scope") // added warning per issue 188
 
       Empty
   }
@@ -96,7 +98,7 @@ abstract class SessionVar[T](dflt: => T)
           if !magicSessionVar_? && !s.stateful_? && !settingDefault_? =>
         throw new StateInStatelessException(
             "setting a SessionVar in a " + "stateless session: " +
-            getClass.getName)
+              getClass.getName)
 
       case Full(s) => s.set(name, value)
       case _ =>
@@ -106,8 +108,9 @@ abstract class SessionVar[T](dflt: => T)
         }
 
         if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Setting a SessionVar " + name + " to " + value +
-              " outside session scope") // added warning per issue 188
+          logger.warn(
+              "Setting a SessionVar " + name + " to " + value +
+                " outside session scope") // added warning per issue 188
     }
 
   /**
@@ -191,23 +194,25 @@ private[http] trait HasLogUnreadVal {
   */
 abstract class ContainerVar[T](dflt: => T)(
     implicit containerSerializer: ContainerSerializer[T])
-    extends AnyVar[T, ContainerVar[T]](dflt) with LazyLoggable {
+    extends AnyVar[T, ContainerVar[T]](dflt)
+    with LazyLoggable {
 
   override protected def findFunc(name: String): Box[T] = S.session match {
     case Full(session) => {
-        localGet(session, name) match {
-          case Full(array: Array[Byte]) =>
-            Full(containerSerializer.deserialize(array))
-          case _ => Empty
-        }
+      localGet(session, name) match {
+        case Full(array: Array[Byte]) =>
+          Full(containerSerializer.deserialize(array))
+        case _ => Empty
       }
+    }
     case _ => {
-        if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Getting a SessionVar " + name +
+      if (showWarningWhenAccessedOutOfSessionScope_?)
+        logger.warn(
+            "Getting a SessionVar " + name +
               " outside session scope") // added warning per issue 188
 
-        Empty
-      }
+      Empty
+    }
   }
 
   private def localSet(session: LiftSession, name: String, value: Any): Unit = {
@@ -230,16 +235,17 @@ abstract class ContainerVar[T](dflt: => T)(
           if !s.allowContainerState_? && !s.stateful_? && !settingDefault_? =>
         throw new StateInStatelessException(
             "setting a SessionVar in a " + "stateless session: " +
-            getClass.getName)
+              getClass.getName)
 
       case Full(session) => {
-          localSet(session, name, containerSerializer.serialize(value))
-        }
+        localSet(session, name, containerSerializer.serialize(value))
+      }
 
       case _ =>
         if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Setting a ContainerVar " + name + " to " + value +
-              " outside session scope") // added warning per issue 188
+          logger.warn(
+              "Setting a ContainerVar " + name + " to " + value +
+                " outside session scope") // added warning per issue 188
     }
 
   /**
@@ -261,9 +267,8 @@ abstract class ContainerVar[T](dflt: => T)(
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
     val old: Boolean =
-      S.session.flatMap(
-          s =>
-            localGet(s, bn) match {
+      S.session.flatMap(s =>
+        localGet(s, bn) match {
           case Full(b: Boolean) => Full(b)
           case _ => Empty
       }) openOr false
@@ -274,10 +279,10 @@ abstract class ContainerVar[T](dflt: => T)(
   override protected def testWasSet(name: String, bn: String): Boolean = {
     S.session.flatMap(s => localGet(s, name)).isDefined ||
     (S.session.flatMap(s =>
-              localGet(s, bn) match {
-            case Full(b: Boolean) => Full(b)
-            case _ => Empty
-        }) openOr false)
+      localGet(s, bn) match {
+        case Full(b: Boolean) => Full(b)
+        case _ => Empty
+    }) openOr false)
   }
 
   protected override def registerCleanupFunc(in: LiftSession => Unit): Unit =
@@ -356,8 +361,8 @@ trait RequestVarSnapshotGroup
   * This subclass of RequestVars that allow the specification of a RequestVarSnapshotGroup.
   * You can create a snapshot of all the members of this group in RequestVar.snapshot
   */
-abstract class SnapshotRequestVar[T](
-    val group: RequestVarSnapshotGroup, d: => T)
+abstract class SnapshotRequestVar[T](val group: RequestVarSnapshotGroup,
+                                     d: => T)
     extends RequestVar[T](d) {
 
   /**
@@ -414,7 +419,8 @@ object RequestVar {
   * requesting a value to be returned from the container
   */
 abstract class RequestVar[T](dflt: => T)
-    extends AnyVar[T, RequestVar[T]](dflt) with HasLogUnreadVal {
+    extends AnyVar[T, RequestVar[T]](dflt)
+    with HasLogUnreadVal {
   type CleanUpParam = Box[LiftSession]
 
   /**
@@ -498,7 +504,8 @@ abstract class RequestVar[T](dflt: => T)
   * requesting a value to be returned from the container
   */
 abstract class TransientRequestVar[T](dflt: => T)
-    extends AnyVar[T, TransientRequestVar[T]](dflt) with HasLogUnreadVal {
+    extends AnyVar[T, TransientRequestVar[T]](dflt)
+    with HasLogUnreadVal {
   type CleanUpParam = Box[LiftSession]
 
   override protected def findFunc(name: String): Box[T] =
@@ -568,8 +575,8 @@ private[http] trait CoreRequestVarHandler {
 
   private val logger = Logger(classOf[CoreRequestVarHandler])
   // This maps from the RV name to (RV instance, value, set-but-not-read flag)
-  private val vals: ThreadGlobal[ConcurrentHashMap[
-          String, (MyType, Any, Boolean)]] = new ThreadGlobal
+  private val vals: ThreadGlobal[
+      ConcurrentHashMap[String, (MyType, Any, Boolean)]] = new ThreadGlobal
   private val cleanup: ThreadGlobal[ListBuffer[Box[LiftSession] => Unit]] =
     new ThreadGlobal
   private val isIn: ThreadGlobal[String] = new ThreadGlobal
@@ -590,8 +597,8 @@ private[http] trait CoreRequestVarHandler {
                 sessionThing.doWith(mySessionThing) {
                   val ret: T = f()
 
-                  cleanup.value.toList
-                    .foreach(clean => Helpers.tryo(clean(sessionThing.value)))
+                  cleanup.value.toList.foreach(clean =>
+                    Helpers.tryo(clean(sessionThing.value)))
 
                   ret
                 }
@@ -600,8 +607,8 @@ private[http] trait CoreRequestVarHandler {
       )
   }
 
-  protected def backingStore: Box[ConcurrentHashMap[
-          String, (MyType, Any, Boolean)]] =
+  protected def backingStore: Box[
+      ConcurrentHashMap[String, (MyType, Any, Boolean)]] =
     vals.value match {
       case null =>
         if (LiftRules.throwOnOutOfScopeVarAccess) {
@@ -655,20 +662,19 @@ private[http] trait CoreRequestVarHandler {
                 sessionThing.doWith(session) {
                   val ret: T = f
 
-                  cleanup.value.toList
-                    .foreach(clean => Helpers.tryo(clean(sessionThing.value)))
+                  cleanup.value.toList.foreach(clean =>
+                    Helpers.tryo(clean(sessionThing.value)))
 
                   if (Props.devMode && LiftRules.logUnreadRequestVars) {
                     vals.value.keys
                       .filter(!_.startsWith(
-                              VarConstants.varPrefix + "net.liftweb"))
+                          VarConstants.varPrefix + "net.liftweb"))
                       .filter(!_.endsWith(VarConstants.initedSuffix))
                       .foreach(key =>
-                            vals.value(key) match {
+                        vals.value(key) match {
                           case (rv, _, true) if rv.logUnreadVal =>
-                            logger.warn(
-                                "RequestVar %s was set but not read".format(
-                                    key.replace(VarConstants.varPrefix, "")))
+                            logger.warn("RequestVar %s was set but not read"
+                              .format(key.replace(VarConstants.varPrefix, "")))
                           case _ =>
                       })
                   }

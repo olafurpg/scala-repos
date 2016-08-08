@@ -22,7 +22,11 @@ import java.io.IOException
 import org.apache.hadoop.fs.FSDataInputStream
 import org.apache.hadoop.io.{BytesWritable, LongWritable}
 import org.apache.hadoop.io.compress.CompressionCodecFactory
-import org.apache.hadoop.mapreduce.{InputSplit, RecordReader, TaskAttemptContext}
+import org.apache.hadoop.mapreduce.{
+  InputSplit,
+  RecordReader,
+  TaskAttemptContext
+}
 import org.apache.hadoop.mapreduce.lib.input.FileSplit
 
 /**
@@ -67,15 +71,15 @@ private[spark] class FixedLengthBinaryRecordReader
         Math
           .min(
               ((currentPosition -
-                      splitStart) / (splitEnd - splitStart)).toFloat,
+                splitStart) / (splitEnd - splitStart)).toFloat,
               1.0
           )
           .toFloat
     }
   }
 
-  override def initialize(
-      inputSplit: InputSplit, context: TaskAttemptContext) {
+  override def initialize(inputSplit: InputSplit,
+                          context: TaskAttemptContext) {
     // the file input
     val fileSplit = inputSplit.asInstanceOf[FileSplit]
 

@@ -9,7 +9,7 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
     addFileToProject(
         testName + ".scala",
         "import org.specs2.mutable.Specification\n\n" + "class " + testName +
-        " extends Specification {" + """
+          " extends Specification {" + """
             | "Special characters test" should {
             |
             |   "Comma , test" in {

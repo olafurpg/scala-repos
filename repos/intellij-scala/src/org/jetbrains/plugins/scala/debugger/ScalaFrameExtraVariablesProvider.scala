@@ -4,28 +4,54 @@ import java.util
 import java.util.Collections
 
 import com.intellij.debugger.SourcePosition
-import com.intellij.debugger.engine.evaluation.{EvaluationContext, TextWithImports, TextWithImportsImpl}
-import com.intellij.debugger.engine.{DebuggerUtils, FrameExtraVariablesProvider}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluationContext,
+  TextWithImports,
+  TextWithImportsImpl
+}
+import com.intellij.debugger.engine.{
+  DebuggerUtils,
+  FrameExtraVariablesProvider
+}
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.psi.impl.search.PsiSearchHelperImpl
-import com.intellij.psi.search.{LocalSearchScope, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  LocalSearchScope,
+  TextOccurenceProcessor,
+  UsageSearchContext
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiFile, PsiNamedElement, ResolveState}
 import com.intellij.xdebugger.impl.breakpoints.XExpressionImpl
 import org.jetbrains.plugins.scala.ScalaLanguage
 import org.jetbrains.plugins.scala.codeInsight.template.util.VariablesCompletionProcessor
-import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{ScalaCompilingExpressionEvaluator, ScalaCompilingEvaluator}
-import org.jetbrains.plugins.scala.debugger.evaluation.{EvaluationException, ScalaCodeFragmentFactory, ScalaEvaluatorBuilder, ScalaEvaluatorBuilderUtil}
+import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{
+  ScalaCompilingExpressionEvaluator,
+  ScalaCompilingEvaluator
+}
+import org.jetbrains.plugins.scala.debugger.evaluation.{
+  EvaluationException,
+  ScalaCodeFragmentFactory,
+  ScalaEvaluatorBuilder,
+  ScalaEvaluatorBuilderUtil
+}
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.debugger.ui.ScalaParameterNameAdjuster
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScTypedPattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScTypedPattern,
+  ScWildcardPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
 
@@ -70,18 +96,19 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
                                   alreadyCollected: util.Set[String]) = {
     val initialCandidates = inReadAction {
       val completionProcessor = new CollectingProcessor(elem)
-      PsiTreeUtil.treeWalkUp(
-          completionProcessor, elem, null, ResolveState.initial)
+      PsiTreeUtil
+        .treeWalkUp(completionProcessor, elem, null, ResolveState.initial)
       completionProcessor.candidates
         .filter(srr =>
-              !alreadyCollected.asScala
-                .map(ScalaParameterNameAdjuster.fixName)
-                .contains(srr.name))
+          !alreadyCollected.asScala
+            .map(ScalaParameterNameAdjuster.fixName)
+            .contains(srr.name))
         .filter(canEvaluate(_, elem))
     }
     val candidates =
       initialCandidates.filter(canEvaluateLong(_, elem, evaluationContext))
-    val sorted = mutable.SortedSet()(Ordering.by[ScalaResolveResult, Int](
+    val sorted = mutable.SortedSet()(
+        Ordering.by[ScalaResolveResult, Int](
             _.getElement.getTextRange.getStartOffset))
     inReadAction {
       candidates.foreach(sorted += _)
@@ -105,8 +132,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
         }
         val funDef =
           PsiTreeUtil.getParentOfType(place, classOf[ScFunctionDefinition])
-        val lazyVal = PsiTreeUtil.getParentOfType(
-            place, classOf[ScPatternDefinition]) match {
+        val lazyVal = PsiTreeUtil
+          .getParentOfType(place, classOf[ScPatternDefinition]) match {
           case null => null
           case LazyVal(lzy) => lzy
           case _ => null
@@ -164,8 +191,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
     }
   }
 
-  private def notUsedInCurrentClass(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
+  private def notUsedInCurrentClass(named: PsiNamedElement,
+                                    place: PsiElement): Boolean = {
     inReadAction {
       val contextClass =
         ScalaEvaluatorBuilderUtil.getContextClass(place, strict = false)
@@ -173,18 +200,21 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
       if (contextClass == containingClass) return false
 
       val placesToSearch = ArrayBuffer[PsiElement]()
-      contextClass.accept(new ScalaRecursiveElementVisitor() {
-        override def visitFunctionDefinition(fun: ScFunctionDefinition): Unit = {
-          placesToSearch += fun
-        }
+      contextClass.accept(
+          new ScalaRecursiveElementVisitor() {
+            override def visitFunctionDefinition(
+                fun: ScFunctionDefinition): Unit = {
+              placesToSearch += fun
+            }
 
-        override def visitPatternDefinition(pat: ScPatternDefinition): Unit = {
-          pat match {
-            case LazyVal(_) => placesToSearch += pat
-            case _ =>
-          }
-        }
-      })
+            override def visitPatternDefinition(
+                pat: ScPatternDefinition): Unit = {
+              pat match {
+                case LazyVal(_) => placesToSearch += pat
+                case _ =>
+              }
+            }
+          })
       if (placesToSearch.isEmpty) true
       else {
         val scopes = placesToSearch.map(new LocalSearchScope(_))
@@ -192,8 +222,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
           new PsiSearchHelperImpl(place.getManager.asInstanceOf[PsiManagerEx])
         var used = false
         val processor = new TextOccurenceProcessor {
-          override def execute(
-              element: PsiElement, offsetInElement: Int): Boolean = {
+          override def execute(element: PsiElement,
+                               offsetInElement: Int): Boolean = {
             used = true
             false
           }
@@ -210,8 +240,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
     }
   }
 
-  private def generatorNotFromBody(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
+  private def generatorNotFromBody(named: PsiNamedElement,
+                                   place: PsiElement): Boolean = {
     inReadAction {
       val forStmt = ScalaPsiUtil.nameContext(named) match {
         case nc @ (_: ScEnumerator | _: ScGenerator) =>

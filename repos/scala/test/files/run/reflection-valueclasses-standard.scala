@@ -3,7 +3,7 @@ import scala.reflect.runtime.{currentMirror => cm}
 import scala.reflect.{ClassTag, classTag}
 
 object Test extends App {
-  def test[T : ClassTag : TypeTag](x: T) = {
+  def test[T: ClassTag: TypeTag](x: T) = {
     println(s"========${classTag[T].runtimeClass}========")
     println(
         cm.reflect(x)

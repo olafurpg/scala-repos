@@ -5,12 +5,19 @@ import java.awt.event.{ActionEvent, ActionListener}
 import java.util
 import javax.swing.table.AbstractTableModel
 
-import com.intellij.openapi.roots.ui.configuration.{ModuleConfigurationState, ModuleElementsEditor}
+import com.intellij.openapi.roots.ui.configuration.{
+  ModuleConfigurationState,
+  ModuleElementsEditor
+}
 import com.intellij.ui.CollectionListModel
 import com.intellij.util.text.DateFormatUtil
 import org.jetbrains.plugins.scala.util.JListCompatibility
 import org.jetbrains.plugins.scala.util.JListCompatibility.CollectionListModelWrapper
-import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndex, SbtResolverIndexesManager}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolver,
+  SbtResolverIndex,
+  SbtResolverIndexesManager
+}
 import org.jetbrains.sbt.settings.SbtSystemSettings
 
 import scala.collection.JavaConverters._
@@ -35,8 +42,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
   def createComponentImpl() = {
     myForm.sbtImportsList.setEmptyText(
         SbtBundle("sbt.settings.noImplicitImportsFound"))
-    JListCompatibility.setModel(
-        myForm.sbtImportsList, modelWrapper.getModelRaw)
+    JListCompatibility
+      .setModel(myForm.sbtImportsList, modelWrapper.getModelRaw)
 
     myForm.updateButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -53,7 +60,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     val moduleSettings = SbtSystemSettings
       .getInstance(state.getProject)
       .getLinkedProjectSettings(getModel.getModule)
-    myForm.sbtVersionTextField.setText(moduleSettings
+    myForm.sbtVersionTextField.setText(
+        moduleSettings
           .map(_.sbtVersion)
           .getOrElse(SbtBundle("sbt.settings.sbtVersionNotDetected")))
 

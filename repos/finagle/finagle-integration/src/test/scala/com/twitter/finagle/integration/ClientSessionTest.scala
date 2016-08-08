@@ -44,8 +44,11 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
   testSessionStatus[mux.transport.Message, mux.transport.Message](
       "mux-transport", {
         tr: Transport[mux.transport.Message, mux.transport.Message] =>
-          val session: mux.ClientSession = new mux.ClientSession(
-              tr, mux.FailureDetector.NullConfig, "test", NullStatsReceiver)
+          val session: mux.ClientSession =
+            new mux.ClientSession(tr,
+                                  mux.FailureDetector.NullConfig,
+                                  "test",
+                                  NullStatsReceiver)
           () =>
             session.status
       }
@@ -85,7 +88,8 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
 
   testSessionStatus(
       "memcached-dispatcher", {
-        tr: Transport[memcached.protocol.Command, memcached.protocol.Response] =>
+        tr: Transport[memcached.protocol.Command,
+                      memcached.protocol.Response] =>
           val cl: MyClient = new MyClient
           val svc = cl.newDisp(tr)
           () =>

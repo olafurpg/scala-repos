@@ -4,7 +4,12 @@
 package akka.actor
 
 import java.io.Closeable
-import java.util.concurrent.{ConcurrentHashMap, ThreadFactory, CountDownLatch, RejectedExecutionException}
+import java.util.concurrent.{
+  ConcurrentHashMap,
+  ThreadFactory,
+  CountDownLatch,
+  RejectedExecutionException
+}
 import java.util.concurrent.atomic.{AtomicReference}
 import com.typesafe.config.{Config, ConfigFactory}
 import akka.event._
@@ -15,7 +20,13 @@ import akka.util._
 import scala.annotation.tailrec
 import scala.collection.immutable
 import scala.concurrent.duration.{Duration}
-import scala.concurrent.{Await, Future, Promise, ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{
+  Await,
+  Future,
+  Promise,
+  ExecutionContext,
+  ExecutionContextExecutor
+}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.{NonFatal, ControlThrowable}
 import java.util.Locale
@@ -69,8 +80,9 @@ object ActorSystem {
     *
     * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
     */
-  def create(
-      name: String, config: Config, classLoader: ClassLoader): ActorSystem =
+  def create(name: String,
+             config: Config,
+             classLoader: ClassLoader): ActorSystem =
     apply(name, config, classLoader)
 
   /**
@@ -131,8 +143,9 @@ object ActorSystem {
     *
     * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
     */
-  def apply(
-      name: String, config: Config, classLoader: ClassLoader): ActorSystem =
+  def apply(name: String,
+            config: Config,
+            classLoader: ClassLoader): ActorSystem =
     apply(name, Option(config), Option(classLoader), None)
 
   /**
@@ -243,9 +256,10 @@ object ActorSystem {
         "akka.actor.deployment.default.virtual-nodes-factor")
 
     if (ConfigVersion != Version)
-      throw new akka.ConfigurationException("Akka JAR version [" + Version +
-          "] does not match the provided config version [" + ConfigVersion +
-          "]")
+      throw new akka.ConfigurationException(
+          "Akka JAR version [" + Version +
+            "] does not match the provided config version [" + ConfigVersion +
+            "]")
 
     /**
       * Returns the String representation of the Config that this Settings is backed by
@@ -262,16 +276,16 @@ object ActorSystem {
         c ⇒
           c != null &&
           (c.getName.startsWith("akka.actor.ActorSystem") ||
-              c.getName.startsWith("scala.Option") ||
-              c.getName.startsWith("scala.collection.Iterator") ||
-              c.getName.startsWith("akka.util.Reflect"))
+          c.getName.startsWith("scala.Option") ||
+          c.getName.startsWith("scala.collection.Iterator") ||
+          c.getName.startsWith("akka.util.Reflect"))
       } next () match {
         case null ⇒ getClass.getClassLoader
         case c ⇒ c.getClassLoader
       }
 
     Option(Thread.currentThread.getContextClassLoader) orElse
-    (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
+      (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
   }
 }
 
@@ -569,13 +583,13 @@ private[akka] class ActorSystemImpl(
 
   if (!name.matches("""^[a-zA-Z0-9][a-zA-Z0-9-_]*$"""))
     throw new IllegalArgumentException("invalid ActorSystem name [" + name +
-        "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
+      "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
 
   import ActorSystem._
 
   @volatile private var logDeadLetterListener: Option[ActorRef] = None
-  final val settings: Settings = new Settings(
-      classLoader, applicationConfig, name)
+  final val settings: Settings =
+    new Settings(classLoader, applicationConfig, name)
 
   protected def uncaughtExceptionHandler: Thread.UncaughtExceptionHandler =
     new Thread.UncaughtExceptionHandler() {
@@ -670,8 +684,8 @@ private[akka] class ActorSystemImpl(
   eventStream.startStdoutLogger(settings)
 
   val logFilter: LoggingFilter = {
-    val arguments = Vector(
-        classOf[Settings] -> settings, classOf[EventStream] -> eventStream)
+    val arguments = Vector(classOf[Settings] -> settings,
+                           classOf[EventStream] -> eventStream)
     dynamicAccess
       .createInstanceFor[LoggingFilter](LoggingFilter, arguments)
       .get
@@ -701,8 +715,8 @@ private[akka] class ActorSystemImpl(
 
   def deadLetters: ActorRef = provider.deadLetters
 
-  val mailboxes: Mailboxes = new Mailboxes(
-      settings, eventStream, dynamicAccess, deadLetters)
+  val mailboxes: Mailboxes =
+    new Mailboxes(settings, eventStream, dynamicAccess, deadLetters)
 
   val dispatchers: Dispatchers = new Dispatchers(
       settings,
@@ -753,7 +767,8 @@ private[akka] class ActorSystemImpl(
     this
   } catch {
     case NonFatal(e) ⇒
-      try terminate() catch { case NonFatal(_) ⇒ Try(stopScheduler()) }
+      try terminate()
+      catch { case NonFatal(_) ⇒ Try(stopScheduler()) }
       throw e
   }
 
@@ -833,7 +848,8 @@ private[akka] class ActorSystemImpl(
         c.await(); findExtension(ext) //Registration in process, await completion and retry
       case t: Throwable ⇒ throw t //Initialization failed, throw same again
       case other ⇒
-        other.asInstanceOf[T] //could be a T or null, in which case we return the null as T
+        other
+          .asInstanceOf[T] //could be a T or null, in which case we return the null as T
     }
 
   @tailrec
@@ -851,14 +867,16 @@ private[akka] class ActorSystemImpl(
                 case null ⇒
                   throw new IllegalStateException(
                       "Extension instance created as 'null' for extension [" +
-                      ext + "]")
+                        ext + "]")
                 case instance ⇒
-                  extensions.replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
+                  extensions
+                    .replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
                   instance //Profit!
               }
             } catch {
               case t: Throwable ⇒
-                extensions.replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
+                extensions
+                  .replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
                 throw t //Escalate to caller
             } finally {
               inProcessOfRegistration.countDown //Always notify listeners of the inProcess signal
@@ -909,36 +927,36 @@ private[akka] class ActorSystemImpl(
         case wc: ActorRefWithCell ⇒
           val cell = wc.underlying
           (if (indent.isEmpty) "-> " else indent.dropRight(1) + "⌊-> ") +
-          node.path.name + " " + Logging.simpleName(node) + " " +
-          (cell match {
-                case real: ActorCell ⇒
-                  if (real.actor ne null) real.actor.getClass else "null"
-                case _ ⇒ Logging.simpleName(cell)
-              }) +
-          (cell match {
-                case real: ActorCell ⇒ " status=" + real.mailbox.currentStatus
-                case _ ⇒ ""
-              }) + " " +
-          (cell.childrenRefs match {
-                case ChildrenContainer.TerminatingChildrenContainer(
-                    _, toDie, reason) ⇒
-                  "Terminating(" + reason + ")" +
+            node.path.name + " " + Logging.simpleName(node) + " " +
+            (cell match {
+              case real: ActorCell ⇒
+                if (real.actor ne null) real.actor.getClass else "null"
+              case _ ⇒ Logging.simpleName(cell)
+            }) +
+            (cell match {
+              case real: ActorCell ⇒ " status=" + real.mailbox.currentStatus
+              case _ ⇒ ""
+            }) + " " +
+            (cell.childrenRefs match {
+              case ChildrenContainer
+                    .TerminatingChildrenContainer(_, toDie, reason) ⇒
+                "Terminating(" + reason + ")" +
                   (toDie.toSeq.sorted mkString
-                      ("\n" + indent + "   |    toDie: ",
-                          "\n" + indent + "   |           ", ""))
-                case x @ (ChildrenContainer.TerminatedChildrenContainer |
-                    ChildrenContainer.EmptyChildrenContainer) ⇒
-                  x.toString
-                case n: ChildrenContainer.NormalChildrenContainer ⇒
-                  n.c.size + " children"
-                case x ⇒ Logging.simpleName(x)
-              }) + (if (cell.childrenRefs.children.isEmpty) "" else "\n") +
-          ({
-            val children = cell.childrenRefs.children.toSeq.sorted
-            val bulk =
-              children.dropRight(1) map (printNode(_, indent + "   |"))
-            bulk ++ (children.lastOption map (printNode(_, indent + "    ")))
-          } mkString ("\n"))
+                    ("\n" + indent + "   |    toDie: ",
+                    "\n" + indent + "   |           ", ""))
+              case x @ (ChildrenContainer.TerminatedChildrenContainer |
+                  ChildrenContainer.EmptyChildrenContainer) ⇒
+                x.toString
+              case n: ChildrenContainer.NormalChildrenContainer ⇒
+                n.c.size + " children"
+              case x ⇒ Logging.simpleName(x)
+            }) + (if (cell.childrenRefs.children.isEmpty) "" else "\n") +
+            ({
+              val children = cell.childrenRefs.children.toSeq.sorted
+              val bulk =
+                children.dropRight(1) map (printNode(_, indent + "   |"))
+              bulk ++ (children.lastOption map (printNode(_, indent + "    ")))
+            } mkString ("\n"))
         case _ ⇒
           indent + node.path.name + " " + Logging.simpleName(node)
       }

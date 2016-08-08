@@ -25,12 +25,13 @@ trait RequestBuilding extends TransformerPipelineSupport {
     def apply(uri: String): HttpRequest =
       apply(uri, HttpEntity.Empty)
 
-    def apply[T](uri: String, content: T)(
-        implicit m: ToEntityMarshaller[T], ec: ExecutionContext): HttpRequest =
+    def apply[T](uri: String, content: T)(implicit m: ToEntityMarshaller[T],
+                                          ec: ExecutionContext): HttpRequest =
       apply(uri, Some(content))
 
     def apply[T](uri: String, content: Option[T])(
-        implicit m: ToEntityMarshaller[T], ec: ExecutionContext): HttpRequest =
+        implicit m: ToEntityMarshaller[T],
+        ec: ExecutionContext): HttpRequest =
       apply(Uri(uri), content)
 
     def apply(uri: String, entity: RequestEntity): HttpRequest =
@@ -39,14 +40,14 @@ trait RequestBuilding extends TransformerPipelineSupport {
     def apply(uri: Uri): HttpRequest =
       apply(uri, HttpEntity.Empty)
 
-    def apply[T](uri: Uri, content: T)(
-        implicit m: ToEntityMarshaller[T], ec: ExecutionContext): HttpRequest =
+    def apply[T](uri: Uri, content: T)(implicit m: ToEntityMarshaller[T],
+                                       ec: ExecutionContext): HttpRequest =
       apply(uri, Some(content))
 
-    def apply[T](
-        uri: Uri, content: Option[T])(implicit m: ToEntityMarshaller[T],
-                                      timeout: Timeout = Timeout(1.second),
-                                      ec: ExecutionContext): HttpRequest =
+    def apply[T](uri: Uri, content: Option[T])(
+        implicit m: ToEntityMarshaller[T],
+        timeout: Timeout = Timeout(1.second),
+        ec: ExecutionContext): HttpRequest =
       content match {
         case None ⇒ apply(uri, HttpEntity.Empty)
         case Some(value) ⇒
@@ -89,7 +90,7 @@ trait RequestBuilding extends TransformerPipelineSupport {
   def removeHeader(headerName: String): RequestTransformer =
     _ mapHeaders (_ filterNot (_.name equalsIgnoreCase headerName))
 
-  def removeHeader[T <: HttpHeader : ClassTag]: RequestTransformer =
+  def removeHeader[T <: HttpHeader: ClassTag]: RequestTransformer =
     removeHeader(implicitly[ClassTag[T]].runtimeClass)
 
   def removeHeader(clazz: Class[_]): RequestTransformer =
@@ -97,13 +98,13 @@ trait RequestBuilding extends TransformerPipelineSupport {
 
   def removeHeaders(names: String*): RequestTransformer =
     _ mapHeaders
-    (_ filterNot (header ⇒ names exists (_ equalsIgnoreCase header.name)))
+      (_ filterNot (header ⇒ names exists (_ equalsIgnoreCase header.name)))
 
   def addCredentials(credentials: HttpCredentials) =
     addHeader(headers.Authorization(credentials))
 
-  def logRequest(
-      log: LoggingAdapter, level: Logging.LogLevel = Logging.DebugLevel) =
+  def logRequest(log: LoggingAdapter,
+                 level: Logging.LogLevel = Logging.DebugLevel) =
     logValue[HttpRequest](log, level)
 
   def logRequest(logFun: HttpRequest ⇒ Unit) = logValue[HttpRequest](logFun)

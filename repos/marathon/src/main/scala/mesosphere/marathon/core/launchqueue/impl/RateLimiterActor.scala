@@ -2,7 +2,15 @@ package mesosphere.marathon.core.launchqueue.impl
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Cancellable, Props}
 import akka.event.LoggingReceive
-import mesosphere.marathon.core.launchqueue.impl.RateLimiterActor.{AddDelay, CleanupOverdueDelays, DecreaseDelay, DelayUpdate, GetDelay, ResetDelay, ResetDelayResponse}
+import mesosphere.marathon.core.launchqueue.impl.RateLimiterActor.{
+  AddDelay,
+  CleanupOverdueDelays,
+  DecreaseDelay,
+  DelayUpdate,
+  GetDelay,
+  ResetDelay,
+  ResetDelayResponse
+}
 import mesosphere.marathon.state.{AppDefinition, AppRepository, Timestamp}
 
 import scala.concurrent.duration._
@@ -33,7 +41,8 @@ private[launchqueue] object RateLimiterActor {
 private class RateLimiterActor private (rateLimiter: RateLimiter,
                                         appRepository: AppRepository,
                                         launchQueueRef: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var cleanup: Cancellable = _
 
   override def preStart(): Unit = {

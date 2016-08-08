@@ -40,9 +40,8 @@ trait Typers { self: Context =>
       callsiteTyper.silent(
           _.typed(universe.duplicateAndKeepPositions(tree), mode, pt),
           reportAmbiguousErrors = false)
-    withWrapping(tree)(
-        wrappedTree =>
-          withContext(typecheckInternal(wrappedTree) match {
+    withWrapping(tree)(wrappedTree =>
+      withContext(typecheckInternal(wrappedTree) match {
         case universe.analyzer.SilentResultValue(result) =>
           macroLogVerbose(result)
           result
@@ -59,17 +58,17 @@ trait Typers { self: Context =>
                          withMacrosDisabled: Boolean = false,
                          pos: Position = enclosingPosition): Tree = {
     macroLogVerbose(
-        "inferring implicit value of type %s, macros = %s".format(
-            pt, !withMacrosDisabled))
-    universe.analyzer.inferImplicit(universe.EmptyTree,
-                                    pt,
-                                    false,
-                                    callsiteTyper.context,
-                                    silent,
-                                    withMacrosDisabled,
-                                    pos,
-                                    (pos,
-                                    msg) => throw TypecheckException(pos, msg))
+        "inferring implicit value of type %s, macros = %s"
+          .format(pt, !withMacrosDisabled))
+    universe.analyzer.inferImplicit(
+        universe.EmptyTree,
+        pt,
+        false,
+        callsiteTyper.context,
+        silent,
+        withMacrosDisabled,
+        pos,
+        (pos, msg) => throw TypecheckException(pos, msg))
   }
 
   def inferImplicitView(tree: Tree,
@@ -79,20 +78,20 @@ trait Typers { self: Context =>
                         withMacrosDisabled: Boolean = false,
                         pos: Position = enclosingPosition): Tree = {
     macroLogVerbose(
-        "inferring implicit view from %s to %s for %s, macros = %s".format(
-            from, to, tree, !withMacrosDisabled))
+        "inferring implicit view from %s to %s for %s, macros = %s"
+          .format(from, to, tree, !withMacrosDisabled))
     val viewTpe = universe.appliedType(
         universe.definitions.FunctionClass(1).toTypeConstructor,
         List(from, to))
-    universe.analyzer.inferImplicit(tree,
-                                    viewTpe,
-                                    true,
-                                    callsiteTyper.context,
-                                    silent,
-                                    withMacrosDisabled,
-                                    pos,
-                                    (pos,
-                                    msg) => throw TypecheckException(pos, msg))
+    universe.analyzer.inferImplicit(
+        tree,
+        viewTpe,
+        true,
+        callsiteTyper.context,
+        silent,
+        withMacrosDisabled,
+        pos,
+        (pos, msg) => throw TypecheckException(pos, msg))
   }
 
   def resetLocalAttrs(tree: Tree): Tree =

@@ -13,7 +13,7 @@ import scala.concurrent.Await
 object AkkaProtocolStressTest {
   val configA: Config =
     ConfigFactory parseString
-    ("""
+      ("""
     akka {
       #loglevel = DEBUG
       actor.serialize-messages = off
@@ -89,7 +89,9 @@ object AkkaProtocolStressTest {
 }
 
 class AkkaProtocolStressTest
-    extends AkkaSpec(configA) with ImplicitSender with DefaultTimeout {
+    extends AkkaSpec(configA)
+    with ImplicitSender
+    with DefaultTimeout {
 
   val systemB = ActorSystem("systemB", system.settings.config)
   val remote = systemB.actorOf(Props(new Actor {
@@ -128,17 +130,17 @@ class AkkaProtocolStressTest
   override def beforeTermination() {
     system.eventStream.publish(
         TestEvent.Mute(
-            EventFilter.warning(
-                source = "akka://AkkaProtocolStressTest/user/$a",
-                start = "received dead letter"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+            EventFilter.warning(source =
+                                  "akka://AkkaProtocolStressTest/user/$a",
+                                start = "received dead letter"),
+            EventFilter.warning(pattern =
+              "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(
         TestEvent.Mute(
             EventFilter[EndpointException](),
             EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+            EventFilter.warning(pattern =
+              "received dead letter.*(InboundPayload|Disassociate)")))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)

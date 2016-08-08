@@ -95,7 +95,7 @@ case class FetchFailed(
   override def toErrorString: String = {
     val bmAddressString = if (bmAddress == null) "null" else bmAddress.toString
     s"FetchFailed($bmAddressString, shuffleId=$shuffleId, mapId=$mapId, reduceId=$reduceId, " +
-    s"message=\n$message\n)"
+      s"message=\n$message\n)"
   }
 }
 
@@ -190,7 +190,8 @@ case class ExceptionFailure(
   * but the stacktrace and message will be preserved correctly in SparkException.
   */
 private[spark] class ThrowableSerializationWrapper(var exception: Throwable)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
   private def writeObject(out: ObjectOutputStream): Unit = {
     out.writeObject(exception)
   }
@@ -233,7 +234,7 @@ case class TaskCommitDenied(jobID: Int, partitionID: Int, attemptNumber: Int)
     extends TaskFailedReason {
   override def toErrorString: String =
     s"TaskCommitDenied (Driver denied task commit)" +
-    s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
+      s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
 
   /**
     * If a task failed because its attempt to commit was denied, do not count this failure
@@ -261,9 +262,9 @@ case class ExecutorLostFailure(execId: String,
         "unrelated to the running tasks"
       }
     s"ExecutorLostFailure (executor ${execId} exited ${exitBehavior})" +
-    reason.map { r =>
-      s" Reason: $r"
-    }.getOrElse("")
+      reason.map { r =>
+        s" Reason: $r"
+      }.getOrElse("")
   }
 
   override def countTowardsTaskFailures: Boolean = exitCausedByApp

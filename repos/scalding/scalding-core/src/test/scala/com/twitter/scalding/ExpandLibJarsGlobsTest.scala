@@ -81,15 +81,15 @@ class ExpandLibJarsGlobsTest extends WordSpec with Matchers {
 
       // Using wildcards for both
       val resultingLibJars1 = ExpandLibJarsGlobs(Array(
-              "-libjars",
-              s"${tmpRoot1.getAbsolutePath}/*.jar,${tmpRoot2.getAbsolutePath}/*.jar"))(
+          "-libjars",
+          s"${tmpRoot1.getAbsolutePath}/*.jar,${tmpRoot2.getAbsolutePath}/*.jar"))(
           1).split(",")
       assert(resultingLibJars1.sorted.toList == (jars1 ++ jars2).sorted.toList)
 
       // No wildcards for second dir
       val resultingLibJars2 = ExpandLibJarsGlobs(Array(
-              "-libjars",
-              s"${tmpRoot1.getAbsolutePath}/*.jar,${tmpRoot2.getAbsolutePath}/myF_0.jar"))(
+          "-libjars",
+          s"${tmpRoot1.getAbsolutePath}/*.jar,${tmpRoot2.getAbsolutePath}/myF_0.jar"))(
           1).split(",")
       assert(resultingLibJars2.sorted.toList == (jars1 ++ jars2).sorted.toList)
     }

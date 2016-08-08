@@ -23,13 +23,28 @@ import scala.util.Random
 import org.apache.hadoop.conf.Configuration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
-import org.apache.spark.{SparkConf, SparkContext, SparkException, SparkFunSuite}
-import org.apache.spark.storage.{BlockId, BlockManager, StorageLevel, StreamBlockId}
-import org.apache.spark.streaming.util.{FileBasedWriteAheadLogSegment, FileBasedWriteAheadLogWriter}
+import org.apache.spark.{
+  SparkConf,
+  SparkContext,
+  SparkException,
+  SparkFunSuite
+}
+import org.apache.spark.storage.{
+  BlockId,
+  BlockManager,
+  StorageLevel,
+  StreamBlockId
+}
+import org.apache.spark.streaming.util.{
+  FileBasedWriteAheadLogSegment,
+  FileBasedWriteAheadLogWriter
+}
 import org.apache.spark.util.Utils
 
 class WriteAheadLogBackedBlockRDDSuite
-    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
 
   val conf = new SparkConf()
     .setMaster("local[2]")
@@ -157,8 +172,8 @@ class WriteAheadLogBackedBlockRDDSuite
         StreamBlockId(Random.nextInt(), Random.nextInt()))
     data.zip(blockIds).take(numPartitionsInBM).foreach {
       case (block, blockId) =>
-        blockManager.putIterator(
-            blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
+        blockManager
+          .putIterator(blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
     }
 
     // Generate write ahead log record handles
@@ -194,11 +209,11 @@ class WriteAheadLogBackedBlockRDDSuite
     )
 
     // Create the RDD and verify whether the returned data is correct
-    val rdd = new WriteAheadLogBackedBlockRDD[String](
-        sparkContext,
-        blockIds.toArray,
-        recordHandles.toArray,
-        storeInBlockManager = false)
+    val rdd = new WriteAheadLogBackedBlockRDD[String](sparkContext,
+                                                      blockIds.toArray,
+                                                      recordHandles.toArray,
+                                                      storeInBlockManager =
+                                                        false)
     assert(rdd.collect() === data.flatten)
 
     // Verify that the block fetching is skipped when isBlockValid is set to false.
@@ -251,7 +266,8 @@ class WriteAheadLogBackedBlockRDDSuite
   ): Seq[FileBasedWriteAheadLogSegment] = {
     require(blockData.size === blockIds.size)
     val writer = new FileBasedWriteAheadLogWriter(
-        new File(dir, "logFile").toString, hadoopConf)
+        new File(dir, "logFile").toString,
+        hadoopConf)
     val segments = blockData.zip(blockIds).map {
       case (data, id) =>
         writer.write(

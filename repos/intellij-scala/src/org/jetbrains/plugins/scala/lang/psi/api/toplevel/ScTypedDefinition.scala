@@ -10,10 +10,17 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, PsiTypedDefinitionWrapper, StaticPsiTypedDefinitionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper,
+  PsiTypedDefinitionWrapper,
+  StaticPsiTypedDefinitionWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypingContext, TypingContextOwner}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypingContext,
+  TypingContextOwner
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 /**

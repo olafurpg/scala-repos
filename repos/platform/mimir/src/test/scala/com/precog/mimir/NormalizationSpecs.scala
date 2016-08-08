@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -27,9 +27,9 @@ import com.precog.yggdrasil._
 import scalaz._
 
 trait NormalizationSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import dag._
   import instructions._
@@ -58,39 +58,39 @@ trait NormalizationSpecs[M[+ _]]
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids must haveSize(0)
-            obj.keySet mustEqual Set("model1")
+          ids must haveSize(0)
+          obj.keySet mustEqual Set("model1")
 
-            obj("model1") must beLike {
-              case SObject(summary) =>
-                summary.keySet mustEqual Set("count",
-                                             "stdDev",
-                                             "min",
-                                             "max",
-                                             "mean")
+          obj("model1") must beLike {
+            case SObject(summary) =>
+              summary.keySet mustEqual Set("count",
+                                           "stdDev",
+                                           "min",
+                                           "max",
+                                           "mean")
 
-                summary("count") must beLike {
-                  case SDecimal(d) =>
-                    d.toDouble mustEqual (13)
-                }
-                summary("mean") must beLike {
-                  case SDecimal(d) =>
-                    d.toDouble mustEqual (-37940.51855769231)
-                }
-                summary("stdDev") must beLike {
-                  case SDecimal(d) =>
-                    d.toDouble mustEqual (133416.18997644997)
-                }
-                summary("min") must beLike {
-                  case SDecimal(d) =>
-                    d.toDouble mustEqual (-500000)
-                }
-                summary("max") must beLike {
-                  case SDecimal(d) =>
-                    d.toDouble mustEqual (9999)
-                }
-            }
+              summary("count") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (13)
+              }
+              summary("mean") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (-37940.51855769231)
+              }
+              summary("stdDev") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (133416.18997644997)
+              }
+              summary("min") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (-500000)
+              }
+              summary("max") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (9999)
+              }
           }
+        }
 
         case _ => ko
       }
@@ -143,4 +143,5 @@ trait NormalizationSpecs[M[+ _]]
 }
 
 object NormalizationSpecs
-    extends NormalizationSpecs[test.YId] with test.YIdInstances
+    extends NormalizationSpecs[test.YId]
+    with test.YIdInstances

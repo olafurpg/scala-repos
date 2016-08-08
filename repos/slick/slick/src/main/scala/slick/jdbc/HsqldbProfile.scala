@@ -37,7 +37,7 @@ trait HsqldbProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - SqlCapabilities.sequenceCurr -
-        JdbcCapabilities.insertOrUpdate)
+      JdbcCapabilities.insertOrUpdate)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -51,8 +51,8 @@ trait HsqldbProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -62,10 +62,11 @@ trait HsqldbProfile extends JdbcProfile {
 
   override protected def computeQueryCompiler =
     super.computeQueryCompiler.replace(Phase.resolveZipJoinsRownumStyle) +
-    Phase.specializeParameters - Phase.fixRowNumberOrdering
+      Phase.specializeParameters - Phase.fixRowNumberOrdering
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
   override def createSequenceDDLBuilder(
@@ -130,13 +131,14 @@ trait HsqldbProfile extends JdbcProfile {
       }
     }
 
-    override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
-      case (Some(t), Some(d)) => b"\nlimit $t offset $d"
-      case (Some(t), None) => b"\nlimit $t"
-      case (None, Some(d)) => b"\noffset $d"
-      case _ =>
-    }
+    override protected def buildFetchOffsetClause(fetch: Option[Node],
+                                                  offset: Option[Node]) =
+      (fetch, offset) match {
+        case (Some(t), Some(d)) => b"\nlimit $t offset $d"
+        case (Some(t), None) => b"\nlimit $t"
+        case (None, Some(d)) => b"\noffset $d"
+        case _ =>
+      }
   }
 
   class JdbcTypes extends super.JdbcTypes {

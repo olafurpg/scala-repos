@@ -22,7 +22,10 @@ import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.ml.param.{IntParam, Param, ParamMap, Params}
 import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util.{Identifiable, SchemaUtils}
-import org.apache.spark.mllib.clustering.{BisectingKMeans => MLlibBisectingKMeans, BisectingKMeansModel => MLlibBisectingKMeansModel}
+import org.apache.spark.mllib.clustering.{
+  BisectingKMeans => MLlibBisectingKMeans,
+  BisectingKMeansModel => MLlibBisectingKMeansModel
+}
 import org.apache.spark.mllib.linalg.{Vector, VectorUDT}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.{col, udf}
@@ -32,7 +35,10 @@ import org.apache.spark.sql.types.{IntegerType, StructType}
   * Common params for BisectingKMeans and BisectingKMeansModel
   */
 private[clustering] trait BisectingKMeansParams
-    extends Params with HasMaxIter with HasFeaturesCol with HasSeed
+    extends Params
+    with HasMaxIter
+    with HasFeaturesCol
+    with HasSeed
     with HasPredictionCol {
 
   /**
@@ -40,8 +46,8 @@ private[clustering] trait BisectingKMeansParams
     * @group param
     */
   @Since("2.0.0")
-  final val k = new IntParam(
-      this, "k", "number of clusters to create", (x: Int) => x > 1)
+  final val k =
+    new IntParam(this, "k", "number of clusters to create", (x: Int) => x > 1)
 
   /** @group getParam */
   @Since("2.0.0")
@@ -78,11 +84,11 @@ private[clustering] trait BisectingKMeansParams
   */
 @Since("2.0.0")
 @Experimental
-class BisectingKMeansModel private[ml](
+class BisectingKMeansModel private[ml] (
     @Since("2.0.0") override val uid: String,
     private val parentModel: MLlibBisectingKMeansModel
-)
-    extends Model[BisectingKMeansModel] with BisectingKMeansParams {
+) extends Model[BisectingKMeansModel]
+    with BisectingKMeansParams {
 
   @Since("2.0.0")
   override def copy(extra: ParamMap): BisectingKMeansModel = {
@@ -140,7 +146,8 @@ class BisectingKMeansModel private[ml](
 @Since("2.0.0")
 @Experimental
 class BisectingKMeans @Since("2.0.0")(@Since("2.0.0") override val uid: String)
-    extends Estimator[BisectingKMeansModel] with BisectingKMeansParams {
+    extends Estimator[BisectingKMeansModel]
+    with BisectingKMeansParams {
 
   setDefault(k -> 4, maxIter -> 20, minDivisibleClusterSize -> 1.0)
 

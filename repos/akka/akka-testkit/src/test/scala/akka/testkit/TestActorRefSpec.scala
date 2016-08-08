@@ -39,10 +39,10 @@ object TestActorRefSpec {
 
     def receiveT = {
       case "complexRequest" ⇒ {
-          replyTo = sender()
-          val worker = TestActorRef(Props[WorkerActor])
-          worker ! "work"
-        }
+        replyTo = sender()
+        val worker = TestActorRef(Props[WorkerActor])
+        worker ! "work"
+      }
       case "complexRequest2" ⇒
         val worker = TestActorRef(Props[WorkerActor])
         worker ! sender()
@@ -72,11 +72,11 @@ object TestActorRefSpec {
       case "complex2" ⇒ replyActor ! "complexRequest2"
       case "simple" ⇒ replyActor ! "simpleRequest"
       case "complexReply" ⇒ {
-          counter -= 1
-        }
+        counter -= 1
+      }
       case "simpleReply" ⇒ {
-          counter -= 1
-        }
+        counter -= 1
+      }
     }
   }
 
@@ -106,7 +106,8 @@ object TestActorRefSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TestActorRefSpec
-    extends AkkaSpec("disp1.type=Dispatcher") with BeforeAndAfterEach
+    extends AkkaSpec("disp1.type=Dispatcher")
+    with BeforeAndAfterEach
     with DefaultTimeout {
 
   import TestActorRefSpec._
@@ -175,8 +176,7 @@ class TestActorRefSpec
     "stop when sent a poison pill" in {
       EventFilter[ActorKilledException]() intercept {
         val a = TestActorRef(Props[WorkerActor])
-        val forwarder = system.actorOf(
-            Props(new Actor {
+        val forwarder = system.actorOf(Props(new Actor {
           context.watch(a)
           def receive = {
             case t: Terminated ⇒ testActor forward WrappedTerminated(t)
@@ -324,8 +324,9 @@ class TestActorRefSpec
 
     "allow creation of a TestActorRef with a specified supervisor and specified name with Props" in {
       val parent = TestActorRef[ReplyActor]
-      val ref = TestActorRef[WorkerActor](
-          Props[WorkerActor], parent, "specificSupervisedPropsActor")
+      val ref = TestActorRef[WorkerActor](Props[WorkerActor],
+                                          parent,
+                                          "specificSupervisedPropsActor")
       ref.underlyingActor.name should be("specificSupervisedPropsActor")
       ref.underlyingActor.supervisor should be(parent)
     }

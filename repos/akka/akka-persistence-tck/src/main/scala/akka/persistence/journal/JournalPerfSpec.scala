@@ -12,9 +12,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.Config
 
 object JournalPerfSpec {
-  class BenchActor(
-      override val persistenceId: String, replyTo: ActorRef, replyAfter: Int)
-      extends PersistentActor with ActorLogging {
+  class BenchActor(override val persistenceId: String,
+                   replyTo: ActorRef,
+                   replyAfter: Int)
+      extends PersistentActor
+      with ActorLogging {
 
     var counter = 0
 
@@ -87,8 +89,9 @@ abstract class JournalPerfSpec(config: Config) extends JournalSpec(config) {
   def benchActor(replyAfter: Int): ActorRef =
     system.actorOf(Props(classOf[BenchActor], pid, testProbe.ref, replyAfter))
 
-  def feedAndExpectLast(
-      actor: ActorRef, mode: String, cmnds: immutable.Seq[Int]): Unit = {
+  def feedAndExpectLast(actor: ActorRef,
+                        mode: String,
+                        cmnds: immutable.Seq[Int]): Unit = {
     cmnds foreach { c ⇒
       actor ! Cmd(mode, c)
     }

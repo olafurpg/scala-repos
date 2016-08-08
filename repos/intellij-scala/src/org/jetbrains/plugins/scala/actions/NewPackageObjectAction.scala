@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala
 package actions
 
 import com.intellij.ide.fileTemplates.FileTemplateManager
-import com.intellij.ide.fileTemplates.actions.{AttributesDefaults, CreateFromTemplateAction}
+import com.intellij.ide.fileTemplates.actions.{
+  AttributesDefaults,
+  CreateFromTemplateAction
+}
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
@@ -17,7 +20,8 @@ class NewPackageObjectAction
     extends CreateFromTemplateAction(
         FileTemplateManager
           .getDefaultInstance()
-          .getInternalTemplate("Package Object")) with DumbAware {
+          .getInternalTemplate("Package Object"))
+    with DumbAware {
 
   override def update(e: AnActionEvent) {
     super.update(e)

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -24,12 +24,20 @@ import com.precog.common.security._
 
 import blueeyes.json._
 import blueeyes.json.serialization.{Decomposer, Extractor}
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeExtractor => _,
+  DateTimeDecomposer => _,
+  _
+}
 import blueeyes.json.serialization.IsoSerialization._
 import blueeyes.json.serialization.Versioned._
 
 import blueeyes.json.{serialization => _, _}
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeExtractor => _,
+  DateTimeDecomposer => _,
+  _
+}
 
 import org.joda.time.DateTime
 
@@ -91,15 +99,14 @@ object Status {
   def fromMessage(message: Message): Option[Status] = {
     (message.channel == channels.Status) option {
       ((message.value \ "message").validated[String] |@|
-          (message.value \ "progress").validated[BigDecimal] |@|
-          (message.value \ "unit").validated[String]) {
-        (msg, progress, unit) =>
-          Status(message.job,
-                 message.id,
-                 msg,
-                 progress,
-                 unit,
-                 message.value \? "info")
+        (message.value \ "progress").validated[BigDecimal] |@|
+        (message.value \ "unit").validated[String]) { (msg, progress, unit) =>
+        Status(message.job,
+               message.id,
+               msg,
+               progress,
+               unit,
+               message.value \? "info")
       }
     } flatMap {
       _.toOption
@@ -107,14 +114,14 @@ object Status {
   }
 
   def toMessage(status: Status): Message = {
-    Message(
-        status.job,
-        status.id,
-        channels.Status,
-        JObject(
-            jfield("message", status.message) :: jfield(
-                "progress", status.progress) :: jfield("unit", status.unit) ::
-            (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
-        ))
+    Message(status.job,
+            status.id,
+            channels.Status,
+            JObject(
+                jfield("message", status.message) :: jfield(
+                    "progress",
+                    status.progress) :: jfield("unit", status.unit) ::
+                  (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
+            ))
   }
 }

@@ -93,8 +93,8 @@ object Keys {
 case class Move(key: ChannelBuffer, db: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.MOVE
-  RequireClientProtocol(
-      db != null && db.readableBytes > 0, "Database must be specified")
+  RequireClientProtocol(db != null && db.readableBytes > 0,
+                        "Database must be specified")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.MOVE, key, db))
 }
@@ -179,8 +179,8 @@ case class Randomkey() extends Command {
 case class Rename(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAME
-  RequireClientProtocol(
-      newkey != null && newkey.readableBytes > 0, "New key must not be empty")
+  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
+                        "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAME, key, newkey))
 }
@@ -195,8 +195,8 @@ object Rename {
 case class RenameNx(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAMENX
-  RequireClientProtocol(
-      newkey != null && newkey.readableBytes > 0, "New key must not be empty")
+  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
+                        "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAMENX, key, newkey))
 }

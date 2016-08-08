@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.catalyst.plans.logical
 
-import org.apache.spark.sql.catalyst.expressions.{Attribute, Expression, SortOrder}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  Expression,
+  SortOrder
+}
 
 /**
   * Performs a physical redistribution of the data.  Used when the consumer of the query

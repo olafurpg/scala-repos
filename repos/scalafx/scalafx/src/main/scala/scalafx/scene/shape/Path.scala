@@ -43,7 +43,8 @@ object Path {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Path.html]].
   */
 class Path(override val delegate: jfxss.Path = new jfxss.Path())
-    extends Shape(delegate) with SFXDelegate[jfxss.Path] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Path] {
 
   /**
     * The filling rule constant for determining the interior of the path.

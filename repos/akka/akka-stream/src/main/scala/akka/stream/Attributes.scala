@@ -79,7 +79,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
     * Scala API: get all attributes of a given type (or subtypes thereof).
     */
-  def filtered[T <: Attribute : ClassTag]: List[T] = {
+  def filtered[T <: Attribute: ClassTag]: List[T] = {
     val c = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
     attributeList.collect {
       case attr if c.isAssignableFrom(attr.getClass) ⇒ c.cast(attr)
@@ -90,20 +90,20 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
     * If no such attribute exists the `default` value is returned.
     */
-  def get[T <: Attribute : ClassTag](default: T): T =
+  def get[T <: Attribute: ClassTag](default: T): T =
     getAttribute(classTag[T].runtimeClass.asInstanceOf[Class[T]], default)
 
   /**
     * Scala API: Get the first (least specific) attribute of a given type parameter T `Class` or subclass thereof.
     * If no such attribute exists the `default` value is returned.
     */
-  def getFirst[T <: Attribute : ClassTag](default: T): T =
+  def getFirst[T <: Attribute: ClassTag](default: T): T =
     getAttribute(classTag[T].runtimeClass.asInstanceOf[Class[T]], default)
 
   /**
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def get[T <: Attribute : ClassTag]: Option[T] = {
+  def get[T <: Attribute: ClassTag]: Option[T] = {
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
     attributeList.reverseIterator.collectFirst[T] {
       case attr if c.isInstance(attr) => c.cast(attr)
@@ -113,7 +113,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
     * Scala API: Get the first (least specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def getFirst[T <: Attribute : ClassTag]: Option[T] = {
+  def getFirst[T <: Attribute: ClassTag]: Option[T] = {
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
     attributeList.collectFirst {
       case attr if c.isInstance(attr) => c.cast(attr)
@@ -150,8 +150,9 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   private[akka] def nameOrDefault(
       default: String = "unknown-operation"): String = {
     @tailrec
-    def concatNames(
-        i: Iterator[Attribute], first: String, buf: StringBuilder): String =
+    def concatNames(i: Iterator[Attribute],
+                    first: String,
+                    buf: StringBuilder): String =
       if (i.hasNext)
         i.next() match {
           case Name(n) ⇒

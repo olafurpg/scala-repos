@@ -5,7 +5,9 @@ import scala.reflect.runtime.universe._, Flag._,
 internal.reificationSupport.setSymbol
 
 class QuasiquoteProperties(name: String)
-    extends Properties(name) with ArbitraryTreesAndNames with Helpers
+    extends Properties(name)
+    with ArbitraryTreesAndNames
+    with Helpers
 
 trait Helpers {
 
@@ -29,7 +31,8 @@ trait Helpers {
           case FreshName(prefix) =>
             Some(
                 (if (name.isTermName)
-                   TermName(prefix) else TypeName(prefix)).asInstanceOf[T])
+                   TermName(prefix)
+                 else TypeName(prefix)).asInstanceOf[T])
         }
     }
 
@@ -52,13 +55,13 @@ trait Helpers {
   implicit class TestSimilarListTree(lst: List[Tree]) {
     def ≈(other: List[Tree]) =
       (lst.length == other.length) &&
-      lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
+        lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
   }
 
   implicit class TestSimilarListListTree(lst: List[List[Tree]]) {
     def ≈(other: List[List[Tree]]) =
       (lst.length == other.length) &&
-      lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
+        lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
   }
 
   implicit class TestSimilarName(name: Name) {
@@ -68,7 +71,7 @@ trait Helpers {
   implicit class TestSimilarMods(mods: Modifiers) {
     def ≈(other: Modifiers) =
       (mods.flags == other.flags) && (mods.privateWithin ≈ other.privateWithin) &&
-      (mods.annotations ≈ other.annotations)
+        (mods.annotations ≈ other.annotations)
   }
 
   def assertThrows[T <: AnyRef](f: => Any)(

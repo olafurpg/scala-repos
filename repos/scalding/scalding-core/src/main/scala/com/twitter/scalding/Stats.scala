@@ -63,15 +63,15 @@ sealed private[scalding] trait CounterImpl {
   def increment(amount: Long): Unit
 }
 
-private[scalding] case class GenericFlowPCounterImpl(
-    fp: FlowProcess[_], statKey: StatKey)
+private[scalding] case class GenericFlowPCounterImpl(fp: FlowProcess[_],
+                                                     statKey: StatKey)
     extends CounterImpl {
   override def increment(amount: Long): Unit =
     fp.increment(statKey.group, statKey.counter, amount)
 }
 
-private[scalding] case class HadoopFlowPCounterImpl(
-    fp: HadoopFlowProcess, statKey: StatKey)
+private[scalding] case class HadoopFlowPCounterImpl(fp: HadoopFlowProcess,
+                                                    statKey: StatKey)
     extends CounterImpl {
   private[this] val cntr =
     fp.getReporter().getCounter(statKey.group, statKey.counter)
@@ -82,8 +82,8 @@ object Stat {
 
   def apply(k: StatKey)(implicit uid: UniqueID): Stat = new Stat {
     // This is materialized on the mappers, and will throw an exception if users incBy before then
-    private[this] lazy val cntr = CounterImpl(
-        RuntimeStats.getFlowProcessForUniqueId(uid), k)
+    private[this] lazy val cntr =
+      CounterImpl(RuntimeStats.getFlowProcessForUniqueId(uid), k)
 
     def incBy(amount: Long): Unit = cntr.increment(amount)
     def key: StatKey = k
@@ -148,8 +148,8 @@ object RuntimeStats extends java.io.Serializable {
   @transient private lazy val logger: Logger =
     LoggerFactory.getLogger(this.getClass)
 
-  private val flowMappingStore: mutable.Map[
-      String, WeakReference[FlowProcess[_]]] = {
+  private val flowMappingStore: mutable.Map[String,
+                                            WeakReference[FlowProcess[_]]] = {
     (new ConcurrentHashMap[String, WeakReference[FlowProcess[_]]]).asScala
   }
 
@@ -214,8 +214,8 @@ class StatsFlowListener(f: Map[StatKey, Long] => Try[Unit])
   override def onCompleted(flow: Flow[_]): Unit = {
     if (success) {
       val stats = flow.getFlowStats
-      val keys = stats.getCounterGroups.asScala
-        .flatMap(g => stats.getCountersFor(g).asScala.map(c => StatKey(c, g)))
+      val keys = stats.getCounterGroups.asScala.flatMap(g =>
+        stats.getCountersFor(g).asScala.map(c => StatKey(c, g)))
       val values =
         keys.map(k => (k, stats.getCounterValue(k.group, k.counter))).toMap
       f(values).get

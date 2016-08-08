@@ -62,9 +62,9 @@ object Templates {
           val syncTemplateDirValue: File = syncTemplateDir.value
           val mappings: Seq[(File, File)] = preparedTemplates.flatMap {
             template =>
-              (template.***.filter(!_.isDirectory) x relativeTo(template)).map {
-                f =>
-                  (f._1, syncTemplateDirValue / template.getName / f._2)
+              (template.***
+                .filter(!_.isDirectory) x relativeTo(template)).map { f =>
+                (f._1, syncTemplateDirValue / template.getName / f._2)
               }
           }
 
@@ -87,7 +87,7 @@ object Templates {
           val outDir: File = target.value / "prepared-templates"
 
           streams.value.log.info("Preparing templates for Play " + params(
-                  "PLAY_VERSION") + " with Scala " + params("SCALA_VERSION"))
+              "PLAY_VERSION") + " with Scala " + params("SCALA_VERSION"))
 
           // Don't sync directories or .gitkeep files. We can remove
           // .gitkeep files. These files are only there to make sure we preserve
@@ -99,8 +99,8 @@ object Templates {
           val mappings: Seq[(File, File)] = templateSourcesList.flatMap {
             case templateSources: TemplateSources =>
               val relativeMappings: Seq[(File, String)] =
-                templateSources.sourceDirs.flatMap(
-                    dir => dir.***.filter(fileFilter(_)) x relativeTo(dir))
+                templateSources.sourceDirs.flatMap(dir =>
+                  dir.***.filter(fileFilter(_)) x relativeTo(dir))
               // Rebase the files onto the target directory, also filtering out ignored files
               relativeMappings.collect {
                 case (orig, targ) if !ignore.contains(orig.getName) =>
@@ -123,7 +123,7 @@ object Templates {
                   if (f.getParent == null) f else topDir(parent)
                 }
                 val rebasedFile = (file relativeTo outDir).getOrElse(sys.error(
-                        s"Can't rebase prepared template $file to dir $outDir"))
+                    s"Can't rebase prepared template $file to dir $outDir"))
                 val templateName: String = topDir(rebasedFile).getName
                 val templateSources: TemplateSources = templateSourcesList
                   .find(_.name == templateName)
@@ -250,8 +250,9 @@ object Templates {
               val status: Future[TemplateStatus] = for {
                 _ <- timeout(2.seconds)
                 resp <- clientCall(statusUrl)
-                  .withHeaders("Accept" -> "application/json,text/html;q=0.9")
-                  .get()
+                         .withHeaders(
+                             "Accept" -> "application/json,text/html;q=0.9")
+                         .get()
               } yield {
                 resp.header("Content-Type") match {
                   case Some(json) if json.startsWith("application/json") =>
@@ -309,7 +310,7 @@ object Templates {
                         val statusUrl = (for {
                           links <- (js \ "_links").asOpt[JsObject]
                           status <- (links \ "activator/templates/status")
-                            .asOpt[JsObject]
+                                     .asOpt[JsObject]
                           url <- (status \ "href").asOpt[String]
                         } yield
                           url).getOrElse(s"/activator/template/status/$uuid")
@@ -320,18 +321,17 @@ object Templates {
 
             val results = Await.result(Future.sequence(futures), 1.hour)
 
-            results.foldLeft(true) {
-              (overall, result) =>
-                result match {
-                  case (name, key, Left(error)) =>
-                    logger.error("Error publishing template " + name)
-                    logger.error(error)
-                    false
-                  case (name, key, Right(uuid)) =>
-                    logger.info("Template " + name +
-                        " published successfully with uuid: " + uuid)
-                    overall
-                }
+            results.foldLeft(true) { (overall, result) =>
+              result match {
+                case (name, key, Left(error)) =>
+                  logger.error("Error publishing template " + name)
+                  logger.error(error)
+                  false
+                case (name, key, Right(uuid)) =>
+                  logger.info("Template " + name +
+                    " published successfully with uuid: " + uuid)
+                  overall
+              }
             }
           } finally {
             timer.cancel()
@@ -367,8 +367,9 @@ object Templates {
       def createSetCommand(dirs: Seq[TemplateSources]): String = {
         dirs
           .map("file(\"" + _.mainDir.getAbsolutePath + "\")")
-          .mkString(
-              "set play.sbt.activator.Templates.templates := Seq(", ",", ")")
+          .mkString("set play.sbt.activator.Templates.templates := Seq(",
+                    ",",
+                    ")")
       }
 
       val setCommand = createSetCommand(templateDirs)
@@ -385,22 +386,24 @@ object Templates {
     import Parsers._
     val templateSourcesList: Seq[TemplateSources] =
       Project.extract(state).get(Templates.templates)
-    val templateParser = Parsers.OpOrID
-      .examples(templateSourcesList.map(_.name): _*)
-      .flatMap { name =>
-        templateSourcesList.find(_.name == name) match {
-          case Some(templateSources) => success(templateSources)
-          case None => failure("No template with name " + name)
-        }
+    val templateParser =
+      Parsers.OpOrID.examples(templateSourcesList.map(_.name): _*).flatMap {
+        name =>
+          templateSourcesList.find(_.name == name) match {
+            case Some(templateSources) => success(templateSources)
+            case None => failure("No template with name " + name)
+          }
       }
-      (Space ~> rep1sep(templateParser, Space)) ~
-    (token(Space ~> matched(state.combinedParser)) ?? "")
+    (Space ~> rep1sep(templateParser, Space)) ~
+      (token(Space ~> matched(state.combinedParser)) ?? "")
   }
 
   private class TemplateBuildFailed(template: String)
-      extends RuntimeException(template) with FeedbackProvidedException
+      extends RuntimeException(template)
+      with FeedbackProvidedException
   private class TemplatePublishFailed
-      extends RuntimeException with FeedbackProvidedException
+      extends RuntimeException
+      with FeedbackProvidedException
 
   private object StdOutLogger {
     def apply(log: String => Unit) = new ProcessLogger {

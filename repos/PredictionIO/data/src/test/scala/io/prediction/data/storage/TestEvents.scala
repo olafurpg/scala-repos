@@ -119,8 +119,8 @@ trait TestEvents {
 
   val u3e3 = u3e1.copy(
       event = "$set",
-      properties = DataMap(
-            """{"b" : "value10", "f": "new12", "d" : [1, 3, 2]}"""),
+      properties =
+        DataMap("""{"b" : "value10", "f": "new12", "d" : [1, 3, 2]}"""),
       eventTime = u3BaseTime.plusDays(2)
   )
 
@@ -135,7 +135,7 @@ trait TestEvents {
       targetEntityType = Some("my_target_entity_type"),
       targetEntityId = Some("my_target_entity_id"),
       properties = DataMap(
-            """{
+          """{
         "prop1" : 1,
         "prop2" : "value2",
         "prop3" : [1, 2, 3],
@@ -143,7 +143,7 @@ trait TestEvents {
         "prop5" : ["a", "b", "c"],
         "prop6" : 4.56
       }"""
-        ),
+      ),
       eventTime = DateTime.now,
       prId = Some("my_prid")
   )
@@ -159,11 +159,11 @@ trait TestEvents {
       targetEntityType = Some("my_target_entity_type"),
       targetEntityId = Some("my_target_entity_id"),
       properties = DataMap(
-            """{
+          """{
         "propA" : 1.2345,
         "propB" : "valueB",
       }"""
-        ),
+      ),
       prId = Some("my_prid")
   )
   val r4 = Event(
@@ -189,7 +189,7 @@ trait TestEvents {
       targetEntityType = Some("my_target_entity_type5"),
       targetEntityId = Some("my_target_entity_id5"),
       properties = DataMap(
-            """{
+          """{
         "prop1" : 1,
         "prop2" : "value2",
         "prop3" : [1, 2, 3],
@@ -197,7 +197,7 @@ trait TestEvents {
         "prop5" : ["a", "b", "c"],
         "prop6" : 4.56
       }"""
-        ),
+      ),
       eventTime = DateTime.now
   )
   val r6 = Event(
@@ -207,7 +207,7 @@ trait TestEvents {
       targetEntityType = Some("my_target_entity_type6"),
       targetEntityId = Some("my_target_entity_id6"),
       properties = DataMap(
-            """{
+          """{
         "prop1" : 6,
         "prop2" : "value2",
         "prop3" : [6, 7, 8],
@@ -215,7 +215,7 @@ trait TestEvents {
         "prop5" : ["a", "b", "c"],
         "prop6" : 4.56
       }"""
-        ),
+      ),
       eventTime = DateTime.now
   )
 
@@ -227,7 +227,7 @@ trait TestEvents {
       targetEntityType = Some("my_target_entity_type"),
       targetEntityId = Some("my_target_entity_id"),
       properties = DataMap(
-            """{
+          """{
         "prop1" : 1,
         "prop2" : "value2",
         "prop3" : [1, 2, 3],
@@ -235,7 +235,7 @@ trait TestEvents {
         "prop5" : ["a", "b", "c"],
         "prop6" : 4.56
       }"""
-        ),
+      ),
       eventTime = new DateTime(12345678, DateTimeZone.forID("-08:00")),
       prId = Some("my_prid")
   )

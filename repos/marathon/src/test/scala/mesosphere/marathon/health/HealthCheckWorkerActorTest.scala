@@ -16,7 +16,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class HealthCheckWorkerActorTest
-    extends MarathonActorSupport with ImplicitSender with MarathonSpec
+    extends MarathonActorSupport
+    with ImplicitSender
+    with MarathonSpec
     with Matchers {
 
   import HealthCheckWorker._

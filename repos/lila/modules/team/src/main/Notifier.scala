@@ -6,8 +6,9 @@ import akka.pattern.ask
 import lila.hub.actorApi.message.LichessThread
 import lila.hub.actorApi.router._
 
-private[team] final class Notifier(
-    sender: String, messenger: ActorSelection, router: ActorSelection) {
+private[team] final class Notifier(sender: String,
+                                   messenger: ActorSelection,
+                                   router: ActorSelection) {
 
   import makeTimeout.large
 

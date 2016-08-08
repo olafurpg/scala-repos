@@ -14,13 +14,14 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
 
   "extractClientIP-example" in {
     val route = extractClientIP { ip =>
-      complete("Client's ip is " +
-          ip.toOption.map(_.getHostAddress).getOrElse("unknown"))
+      complete(
+          "Client's ip is " +
+            ip.toOption.map(_.getHostAddress).getOrElse("unknown"))
     }
 
     // tests:
     Get("/").withHeaders(`Remote-Address`(RemoteAddress(
-                InetAddress.getByName("192.168.3.12")))) ~> route ~> check {
+        InetAddress.getByName("192.168.3.12")))) ~> route ~> check {
       responseAs[String] shouldEqual "Client's ip is 192.168.3.12"
     }
   }
@@ -93,7 +94,8 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
     }
     Get("/abcdefghijkl") ~> route ~> check {
       rejection shouldEqual ValidationRejection(
-          "Path too long: '/abcdefghijkl'", None)
+          "Path too long: '/abcdefghijkl'",
+          None)
     }
   }
 }

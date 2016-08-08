@@ -19,7 +19,8 @@ final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean)
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
@@ -47,7 +48,8 @@ class LeaderElectionWithAccrualFailureDetectorMultiJvmNode5
 
 abstract class LeaderElectionSpec(
     multiNodeConfig: LeaderElectionMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(LeaderElectionMultiNodeConfig(failureDetectorPuppet))
@@ -109,7 +111,7 @@ abstract class LeaderElectionSpec(
           // removed
           awaitAssert(
               clusterView.unreachableMembers.map(_.address) should not contain
-              (leaderAddress))
+                (leaderAddress))
           enterBarrier("after-down" + n, "completed" + n)
 
         case _ if remainingRoles.contains(myself) ⇒

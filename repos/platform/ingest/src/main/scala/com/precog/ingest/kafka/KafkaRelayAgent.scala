@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -74,8 +74,8 @@ object KafkaRelayAgent extends Logging {
 
     val consumerHost = localConfig[String]("broker.host", "localhost")
     val consumerPort = localConfig[String]("broker.port", "9082").toInt
-    val consumer = new SimpleConsumer(
-        consumerHost, consumerPort, 5000, 64 * 1024)
+    val consumer =
+      new SimpleConsumer(consumerHost, consumerPort, 5000, 64 * 1024)
 
     val relayAgent = new KafkaRelayAgent(permissionsFinder,
                                          eventIdSeq,
@@ -107,7 +107,8 @@ final class KafkaRelayAgent(
     retryDelay: Long = 5000L,
     maxDelay: Double = 100.0,
     waitCountFactor: Int = 25)(implicit executor: ExecutionContext)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
 
   logger.info("Allocating KafkaRelayAgent, hash = " + hashCode)
 
@@ -136,22 +137,24 @@ final class KafkaRelayAgent(
                           retries: Int = 5): Unit = {
     if (runnable) {
       if (batch % 100 == 0)
-        logger.debug("Processing kafka consumer batch %d [%s]".format(
-                batch, if (waitCount > 0) "IDLE" else "ACTIVE"))
+        logger.debug(
+            "Processing kafka consumer batch %d [%s]"
+              .format(batch, if (waitCount > 0) "IDLE" else "ACTIVE"))
       val fetchRequest = new FetchRequest(localTopic, 0, offset, bufferSize)
 
       val ingestStep = for {
         messages <- Future(consumer.fetch(fetchRequest)) // try/catch is for this line. Okay to wrap in a future & flatMap instead?
         _ <- forwardAll(messages.toList)
       } yield {
-        val newDelay = delayStrategy(
-            messages.sizeInBytes.toInt, delay, waitCount)
+        val newDelay =
+          delayStrategy(messages.sizeInBytes.toInt, delay, waitCount)
 
         val (newOffset, newWaitCount) =
           if (messages.size > 0) {
             val o: Long = messages.last.offset
-            logger.debug("Kafka consumer batch size: %d offset: %d)".format(
-                    messages.size, o))
+            logger.debug(
+                "Kafka consumer batch size: %d offset: %d)"
+                  .format(messages.size, o))
             (o, 0L)
           } else {
             (offset, waitCount + 1)
@@ -187,8 +190,9 @@ final class KafkaRelayAgent(
     }
   }
 
-  private def delayStrategy(
-      messageBytes: Int, currentDelay: Long, waitCount: Long): Long = {
+  private def delayStrategy(messageBytes: Int,
+                            currentDelay: Long,
+                            waitCount: Long): Long = {
     if (messageBytes == 0) {
       val boundedWaitCount =
         if (waitCount > waitCountFactor) waitCountFactor else waitCount
@@ -198,8 +202,9 @@ final class KafkaRelayAgent(
     }
   }
 
-  private case class Authorized(
-      event: Event, offset: Long, authorities: Option[Authorities])
+  private case class Authorized(event: Event,
+                                offset: Long,
+                                authorities: Option[Authorities])
 
   private def forwardAll(messages: List[MessageAndOffset]) = {
     val outgoing: List[Validation[Error, Future[Authorized]]] =
@@ -239,34 +244,37 @@ final class KafkaRelayAgent(
 
             val ingestRecords =
               data map { IngestRecord(eventIdSeq.next(offset), _) }
-            encodeIngestMessages(List(IngestMessage(apiKey,
-                                                    path,
-                                                    authorities,
-                                                    ingestRecords,
-                                                    jobId,
-                                                    timestamp,
-                                                    storeMode)))
+            encodeIngestMessages(
+                List(
+                    IngestMessage(apiKey,
+                                  path,
+                                  authorities,
+                                  ingestRecords,
+                                  jobId,
+                                  timestamp,
+                                  storeMode)))
 
           case Authorized(event: Ingest, _, None) =>
             // cannot relay event without a resolved owner account ID; fail loudly.
             // this will abort the future, ensuring that state doesn't get corrupted
             sys.error(
                 "Unable to establish owner account ID for ingest of event " +
-                event)
+                  event)
 
           case Authorized(archive @ Archive(apiKey, path, jobId, timestamp),
                           offset,
                           _) =>
-            List(centralCodec.toMessage(ArchiveMessage(apiKey,
-                                                       path,
-                                                       jobId,
-                                                       eventIdSeq.next(offset),
-                                                       timestamp)))
+            List(
+                centralCodec.toMessage(ArchiveMessage(apiKey,
+                                                      path,
+                                                      jobId,
+                                                      eventIdSeq.next(offset),
+                                                      timestamp)))
 
-          case Authorized(StoreFile(
-                          apiKey, path, _, jobId, content, timestamp, stream),
-                          offset,
-                          Some(authorities)) =>
+          case Authorized(
+              StoreFile(apiKey, path, _, jobId, content, timestamp, stream),
+              offset,
+              Some(authorities)) =>
             List(
                 centralCodec.toMessage(
                     StoreFileMessage(apiKey,
@@ -281,7 +289,7 @@ final class KafkaRelayAgent(
           case Authorized(s: StoreFile, _, None) =>
             sys.error(
                 "Unable to establish owner account ID for storage of file " +
-                s)
+                  s)
         }
 
         producer.send {
@@ -300,7 +308,7 @@ final class KafkaRelayAgent(
       Promise successful {
         logger.error(
             "Deserialization errors occurred reading events from Kafka: " +
-            error.message)
+              error.message)
       }
     }
   }
@@ -310,14 +318,14 @@ final class KafkaRelayAgent(
       case Ingest(apiKey, path, writeAs, _, _, timestamp, _) =>
         if (writeAs.isDefined) Promise.successful(writeAs)
         else
-          permissionsFinder.inferWriteAuthorities(
-              apiKey, path, Some(timestamp))
+          permissionsFinder
+            .inferWriteAuthorities(apiKey, path, Some(timestamp))
 
       case StoreFile(apiKey, path, writeAs, _, _, timestamp, _) =>
         if (writeAs.isDefined) Promise successful writeAs
         else
-          permissionsFinder.inferWriteAuthorities(
-              apiKey, path, Some(timestamp))
+          permissionsFinder
+            .inferWriteAuthorities(apiKey, path, Some(timestamp))
 
       case _ => Promise.successful(None)
     }

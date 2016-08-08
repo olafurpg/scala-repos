@@ -21,7 +21,8 @@ object ClusterRouterSupervisorSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ClusterRouterSupervisorSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+        """
   akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
   akka.remote.netty.tcp.port = 0
 """) {
@@ -34,12 +35,12 @@ class ClusterRouterSupervisorSpec
       val router = system.actorOf(
           ClusterRouterPool(
               RoundRobinPool(nrOfInstances = 1,
-                             supervisorStrategy = OneForOneStrategy(
-                                   loggingEnabled = false) {
-                               case _ ⇒
-                                 testActor ! "supervised"
-                                 SupervisorStrategy.Stop
-                             }),
+                             supervisorStrategy =
+                               OneForOneStrategy(loggingEnabled = false) {
+                                 case _ ⇒
+                                   testActor ! "supervised"
+                                   SupervisorStrategy.Stop
+                               }),
               ClusterRouterPoolSettings(totalInstances = 1,
                                         maxInstancesPerNode = 1,
                                         allowLocalRoutees = true,

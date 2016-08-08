@@ -2,9 +2,17 @@ package mesosphere.marathon.core.launcher.impl
 
 import akka.pattern.AskTimeoutException
 import mesosphere.marathon.core.base.Clock
-import mesosphere.marathon.core.launcher.{TaskOp, OfferProcessor, OfferProcessorConfig, TaskLauncher}
+import mesosphere.marathon.core.launcher.{
+  TaskOp,
+  OfferProcessor,
+  OfferProcessorConfig,
+  TaskLauncher
+}
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps,
+  TaskOpWithSource
+}
 import mesosphere.marathon.core.task.tracker.TaskCreationHandler
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import mesosphere.marathon.state.Timestamp
@@ -81,8 +89,8 @@ private[launcher] class OfferProcessorImpl(
     }
   }
 
-  private[this] def declineOffer(
-      offerId: OfferID, resendThisOffer: Boolean): Future[Unit] = {
+  private[this] def declineOffer(offerId: OfferID,
+                                 resendThisOffer: Boolean): Future[Unit] = {
     //if the offer should be resent, than we ignore the configured decline offer duration
     val duration: Option[Long] =
       if (resendThisOffer) None else conf.declineOfferDuration.get
@@ -138,7 +146,7 @@ private[launcher] class OfferProcessorImpl(
         case Some(newTask) =>
           log.info(
               s"Save ${taskOpWithSource.taskId} " +
-              s"after applying the effects of ${taskOpWithSource.op.getClass.getSimpleName}"
+                s"after applying the effects of ${taskOpWithSource.op.getClass.getSimpleName}"
           )
           taskCreationHandler.created(newTask)
         case None =>
@@ -172,7 +180,7 @@ private[launcher] class OfferProcessorImpl(
             nextTask.reject("saving timeout reached")
             log.info(
                 s"Timeout reached, skipping launch and save for ${nextTask.op.taskId}. " +
-                s"You can reconfigure this with --${conf.saveTasksToLaunchTimeout.name}.")
+                  s"You can reconfigure this with --${conf.saveTasksToLaunchTimeout.name}.")
             Future.successful(savedTasks)
           } else {
             val saveTaskFuture = saveTask(nextTask)

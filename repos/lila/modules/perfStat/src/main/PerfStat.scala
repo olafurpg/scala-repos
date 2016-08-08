@@ -27,7 +27,7 @@ case class PerfStat(_id: String, // userId/perfId
           lowest = thisYear.fold(RatingAt.agg(lowest, pov, -1), lowest),
           bestWins = (~pov.win).fold(bestWins.agg(pov, -1), bestWins),
           worstLosses = (thisYear &&
-                ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
+            ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
           count = count(pov),
           resultStreak = resultStreak agg pov,
           playStreak = playStreak agg pov
@@ -49,8 +49,8 @@ object PerfStat {
       worstLosses = Results(Nil),
       count = Count.init,
       resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
-      playStreak = PlayStreak(
-            nb = Streaks.init, time = Streaks.init, lastDate = none)
+      playStreak =
+        PlayStreak(nb = Streaks.init, time = Streaks.init, lastDate = none)
   )
 }
 
@@ -125,10 +125,10 @@ case class Count(all: Int,
          berserk = berserk + pov.player.berserk.fold(1, 0),
          opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
          seconds = seconds +
-           (pov.game.durationSeconds match {
-               case s if s > 3 * 60 * 60 => 0
-               case s => s
-             }),
+             (pov.game.durationSeconds match {
+             case s if s > 3 * 60 * 60 => 0
+             case s => s
+           }),
          disconnects = disconnects + {
            ~pov.loss && pov.game.status == chess.Status.Timeout
          }.fold(1, 0))
@@ -169,11 +169,11 @@ case class Results(results: List[Result]) {
     pov.opponent.rating.ifTrue(pov.game.rated).fold(this) { opInt =>
       copy(
           results = (Result(
-                    opInt,
-                    UserId(~pov.opponent.userId),
-                    pov.game.updatedAtOrCreatedAt,
-                    pov.game.id
-                ) :: results).sortBy(_.opInt * comp) take Results.nb)
+                opInt,
+                UserId(~pov.opponent.userId),
+                pov.game.updatedAtOrCreatedAt,
+                pov.game.id
+            ) :: results).sortBy(_.opInt * comp) take Results.nb)
     }
 }
 object Results {

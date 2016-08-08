@@ -20,7 +20,9 @@ import org.scalatest.{Matchers, FlatSpec}
 import scala.language.reflectiveCalls
 
 class CategoricalNaiveBayesTest
-    extends FlatSpec with Matchers with SharedSparkContext
+    extends FlatSpec
+    with Matchers
+    with SharedSparkContext
     with NaiveBayesFixture {
   val Tolerance = .0001
   val labeledPoints = fruit.labeledPoints
@@ -73,8 +75,9 @@ class CategoricalNaiveBayesTest
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
-    val score = model.logScore(LabeledPoint(
-            fruit.Banana, Array(fruit.Long, fruit.NotSweet, fruit.NotYellow)))
+    val score = model.logScore(
+        LabeledPoint(fruit.Banana,
+                     Array(fruit.Long, fruit.NotSweet, fruit.NotYellow)))
 
     score should not be None
     score.get should be(-4.2304 +- Tolerance)
@@ -84,8 +87,9 @@ class CategoricalNaiveBayesTest
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
-    val score = model.logScore(LabeledPoint(
-            fruit.Banana, Array(fruit.Long, fruit.NotSweet, "Not Exist")))
+    val score = model.logScore(
+        LabeledPoint(fruit.Banana,
+                     Array(fruit.Long, fruit.NotSweet, "Not Exist")))
 
     score should not be None
     score.get should be(Double.NegativeInfinity)
@@ -95,8 +99,9 @@ class CategoricalNaiveBayesTest
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
-    val score = model.logScore(LabeledPoint(
-            "Not Exist", Array(fruit.Long, fruit.NotSweet, fruit.Yellow)))
+    val score = model.logScore(
+        LabeledPoint("Not Exist",
+                     Array(fruit.Long, fruit.NotSweet, fruit.Yellow)))
 
     score should be(None)
   }

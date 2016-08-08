@@ -134,7 +134,7 @@ object Sink {
         scaladsl.Sink
           .headOption[In]
           .mapMaterializedValue(_.map(_.asJava)(
-                  ExecutionContexts.sameThreadExecutionContext).toJava))
+              ExecutionContexts.sameThreadExecutionContext).toJava))
 
   /**
     * A `Sink` that materializes into a `CompletionStage` of the last value received.
@@ -158,7 +158,7 @@ object Sink {
         scaladsl.Sink
           .lastOption[In]
           .mapMaterializedValue(_.map(_.asJava)(
-                  ExecutionContexts.sameThreadExecutionContext).toJava))
+              ExecutionContexts.sameThreadExecutionContext).toJava))
 
   /**
     * A `Sink` that keeps on collecting incoming elements until upstream terminates.
@@ -172,14 +172,12 @@ object Sink {
     */
   def seq[In]: Sink[In, CompletionStage[java.util.List[In]]] = {
     import scala.collection.JavaConverters._
-    new Sink(
-        scaladsl.Sink
-          .seq[In]
-          .mapMaterializedValue(fut ⇒
-                fut
-                  .map(sq ⇒ sq.asJava)(
-                      ExecutionContexts.sameThreadExecutionContext)
-                  .toJava))
+    new Sink(scaladsl.Sink
+      .seq[In]
+      .mapMaterializedValue(fut ⇒
+        fut
+          .map(sq ⇒ sq.asJava)(ExecutionContexts.sameThreadExecutionContext)
+          .toJava))
   }
 
   /**
@@ -252,14 +250,14 @@ object Sink {
       output1: Sink[U, _],
       output2: Sink[U, _],
       rest: java.util.List[Sink[U, _]],
-      strategy: function.Function[
-          java.lang.Integer, Graph[UniformFanOutShape[T, U], NotUsed]])
+      strategy: function.Function[java.lang.Integer,
+                                  Graph[UniformFanOutShape[T, U], NotUsed]])
     : Sink[T, NotUsed] = {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Sink(
-        scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(
-            num ⇒ strategy.apply(num)))
+        scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(num ⇒
+          strategy.apply(num)))
   }
 
   /**
@@ -304,8 +302,8 @@ final class Sink[-In, +Mat](delegate: scaladsl.Sink[In, Mat])
   /**
     * Connect this `Sink` to a `Source` and run it.
     */
-  def runWith[M](
-      source: Graph[SourceShape[In], M], materializer: Materializer): M =
+  def runWith[M](source: Graph[SourceShape[In], M],
+                 materializer: Materializer): M =
     asScala.runWith(source)(materializer)
 
   /**

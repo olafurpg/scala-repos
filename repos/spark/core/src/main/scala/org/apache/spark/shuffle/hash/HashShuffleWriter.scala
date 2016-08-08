@@ -30,7 +30,8 @@ private[spark] class HashShuffleWriter[K, V](
     handle: BaseShuffleHandle[K, V, _],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V]
+    with Logging {
 
   private val dep = handle.dependency
   private val numOutputSplits = dep.partitioner.numPartitions
@@ -44,8 +45,11 @@ private[spark] class HashShuffleWriter[K, V](
   private val writeMetrics = metrics.registerShuffleWriteMetrics()
 
   private val blockManager = SparkEnv.get.blockManager
-  private val shuffle = shuffleBlockResolver.forMapTask(
-      dep.shuffleId, mapId, numOutputSplits, dep.serializer, writeMetrics)
+  private val shuffle = shuffleBlockResolver.forMapTask(dep.shuffleId,
+                                                        mapId,
+                                                        numOutputSplits,
+                                                        dep.serializer,
+                                                        writeMetrics)
 
   /** Write a bunch of records to this task's output */
   override def write(records: Iterator[Product2[K, V]]): Unit = {

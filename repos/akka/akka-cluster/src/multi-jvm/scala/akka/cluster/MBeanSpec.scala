@@ -35,7 +35,8 @@ class MBeanMultiJvmNode3 extends MBeanSpec
 class MBeanMultiJvmNode4 extends MBeanSpec
 
 abstract class MBeanSpec
-    extends MultiNodeSpec(MBeanMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(MBeanMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import MBeanMultiJvmSpec._
   import ClusterEvent._
@@ -66,10 +67,12 @@ abstract class MBeanSpec
 
     "change attributes after startup" taggedAs LongRunningTest in {
       runOn(first) {
-        mbeanServer.getAttribute(mbeanName, "Available").asInstanceOf[Boolean] should ===(
-            false)
-        mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-            false)
+        mbeanServer
+          .getAttribute(mbeanName, "Available")
+          .asInstanceOf[Boolean] should ===(false)
+        mbeanServer
+          .getAttribute(mbeanName, "Singleton")
+          .asInstanceOf[Boolean] should ===(false)
         mbeanServer.getAttribute(mbeanName, "Leader") should ===("")
         mbeanServer.getAttribute(mbeanName, "Members") should ===("")
         mbeanServer.getAttribute(mbeanName, "Unreachable") should ===("")
@@ -82,14 +85,16 @@ abstract class MBeanSpec
             mbeanServer.getAttribute(mbeanName, "MemberStatus") should ===(
                 "Up"))
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Leader") should ===(
-                address(first).toString))
-        mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-            true)
+            address(first).toString))
+        mbeanServer
+          .getAttribute(mbeanName, "Singleton")
+          .asInstanceOf[Boolean] should ===(true)
         mbeanServer.getAttribute(mbeanName, "Members") should ===(
             address(first).toString)
         mbeanServer.getAttribute(mbeanName, "Unreachable") should ===("")
-        mbeanServer.getAttribute(mbeanName, "Available").asInstanceOf[Boolean] should ===(
-            true)
+        mbeanServer
+          .getAttribute(mbeanName, "Available")
+          .asInstanceOf[Boolean] should ===(true)
       }
       enterBarrier("after-3")
     }
@@ -108,13 +113,16 @@ abstract class MBeanSpec
       awaitAssert(
           mbeanServer.getAttribute(mbeanName, "MemberStatus") should ===("Up"))
       val expectedMembers = roles.sorted.map(address(_)).mkString(",")
-      awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
+      awaitAssert(
+          mbeanServer.getAttribute(mbeanName, "Members") should ===(
               expectedMembers))
       val expectedLeader = address(roleOfLeader())
-      awaitAssert(mbeanServer.getAttribute(mbeanName, "Leader") should ===(
+      awaitAssert(
+          mbeanServer.getAttribute(mbeanName, "Leader") should ===(
               expectedLeader.toString))
-      mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-          false)
+      mbeanServer
+        .getAttribute(mbeanName, "Singleton")
+        .asInstanceOf[Boolean] should ===(false)
 
       enterBarrier("after-4")
     }
@@ -136,7 +144,7 @@ abstract class MBeanSpec
           .map(address(_))
           .mkString(",")
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
-                expectedMembers))
+            expectedMembers))
       }
       enterBarrier("fourth-unreachable")
 
@@ -192,9 +200,8 @@ abstract class MBeanSpec
 
         // awaitAssert to make sure that all nodes detects unreachable
         within(15.seconds) {
-          awaitAssert(
-              mbeanServer.getAttribute(mbeanName, "ClusterStatus") should ===(
-                  expectedJson))
+          awaitAssert(mbeanServer
+            .getAttribute(mbeanName, "ClusterStatus") should ===(expectedJson))
         }
       }
 
@@ -237,7 +244,7 @@ abstract class MBeanSpec
         val expectedMembers =
           Seq(first, second).sorted.map(address(_)).mkString(",")
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
-                expectedMembers))
+            expectedMembers))
       }
       runOn(third) {
         awaitCond(cluster.isTerminated)

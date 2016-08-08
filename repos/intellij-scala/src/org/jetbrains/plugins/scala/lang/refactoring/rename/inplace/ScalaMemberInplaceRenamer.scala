@@ -12,10 +12,16 @@ import com.intellij.psi._
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
-import com.intellij.refactoring.rename.inplace.{MemberInplaceRenamer, VariableInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  MemberInplaceRenamer,
+  VariableInplaceRenamer
+}
 import com.intellij.refactoring.{RefactoringActionHandler, RefactoringBundle}
 import org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScalaNamesUtil, ScalaRefactoringUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScalaNamesUtil,
+  ScalaRefactoringUtil
+}
 
 /**
   * Nikolay.Tropin
@@ -26,8 +32,11 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
                                 editor: Editor,
                                 initialName: String,
                                 oldName: String)
-    extends MemberInplaceRenamer(
-        elementToRename, substituted, editor, initialName, oldName) {
+    extends MemberInplaceRenamer(elementToRename,
+                                 substituted,
+                                 editor,
+                                 initialName,
+                                 oldName) {
 
   private def this(t: (PsiNamedElement, PsiElement, Editor, String, String)) =
     this(t._1, t._2, t._3, t._4, t._5)
@@ -71,15 +80,15 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
   override def beforeTemplateStart() {
     super.beforeTemplateStart()
 
-    val revertInfo = ScalaRefactoringUtil.RevertInfo(
-        editor.getDocument.getText, editor.getCaretModel.getOffset)
+    val revertInfo = ScalaRefactoringUtil
+      .RevertInfo(editor.getDocument.getText, editor.getCaretModel.getOffset)
     editor.putUserData(ScalaMemberInplaceRenamer.REVERT_INFO, revertInfo)
 
     val file = PsiDocumentManager
       .getInstance(myProject)
       .getPsiFile(myEditor.getDocument)
-    val offset = TargetElementUtil.adjustOffset(
-        file, editor.getDocument, editor.getCaretModel.getOffset)
+    val offset = TargetElementUtil
+      .adjustOffset(file, editor.getDocument, editor.getCaretModel.getOffset)
     val range = file.findElementAt(offset).getTextRange
     myCaretRangeMarker = myEditor.getDocument.createRangeMarker(range)
     myCaretRangeMarker.setGreedyToLeft(true)
@@ -96,8 +105,9 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
         val document = myEditor.getDocument
         if (revertInfo != null) {
           extensions.inWriteAction {
-            document.replaceString(
-                0, document.getTextLength, revertInfo.fileText)
+            document.replaceString(0,
+                                   document.getTextLength,
+                                   revertInfo.fileText)
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
           }
           val offset = revertInfo.caretOffset
@@ -161,21 +171,25 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
       variable: PsiNamedElement,
       editor: Editor,
       initialName: String): VariableInplaceRenamer =
-    new ScalaMemberInplaceRenamer(
-        variable, getSubstituted, editor, initialName, oldName)
+    new ScalaMemberInplaceRenamer(variable,
+                                  getSubstituted,
+                                  editor,
+                                  initialName,
+                                  oldName)
 
   override def performInplaceRename(): Boolean = {
     val names = new util.LinkedHashSet[String]()
     names.add(initialName)
-    try performInplaceRefactoring(names) catch {
+    try performInplaceRefactoring(names)
+    catch {
       case t: Throwable =>
         val element = getVariable
         val subst = getSubstituted
         val offset = editor.getCaretModel.getOffset
         val text = editor.getDocument.getText
         val aroundCaret =
-          text.substring(offset - 50, offset) + "<caret>" + text.substring(
-              offset, offset + 50)
+          text.substring(offset - 50, offset) + "<caret>" + text
+            .substring(offset, offset + 50)
         val message = s"""Could not perform inplace rename:
              |element to rename: $element ${element.getName}
              |substituted: $subst
@@ -193,8 +207,8 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
     case _ => super.getNameIdentifier
   }
 
-  override def startsOnTheSameElement(
-      handler: RefactoringActionHandler, element: PsiElement): Boolean = {
+  override def startsOnTheSameElement(handler: RefactoringActionHandler,
+                                      element: PsiElement): Boolean = {
     handler match {
       case _: ScalaMemberInplaceRenameHandler =>
         val caretOffset = editor.getCaretModel.getOffset

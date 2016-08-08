@@ -117,7 +117,9 @@ final class PrefixAndTail[T](n: Int)
   override def initialAttributes = DefaultAttributes.prefixAndTail
 
   private final class PrefixAndTailLogic(_shape: Shape)
-      extends TimerGraphStageLogic(_shape) with OutHandler with InHandler {
+      extends TimerGraphStageLogic(_shape)
+      with OutHandler
+      with InHandler {
 
     private var left = if (n < 0) 0 else n
     private var builder = Vector.newBuilder[T]
@@ -153,8 +155,7 @@ final class PrefixAndTail[T](n: Int)
         setKeepGoing(false)
         cancelTimer(SubscriptionTimer)
         pull(in)
-        tailSource.setHandler(
-            new OutHandler {
+        tailSource.setHandler(new OutHandler {
           override def onPull(): Unit = pull(in)
         })
       }
@@ -241,8 +242,8 @@ object Split {
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitBefore, p, substreamCancelStrategy)
 
-  def after[T](
-      p: T ⇒ Boolean, substreamCancelStrategy: SubstreamCancelStrategy)
+  def after[T](p: T ⇒ Boolean,
+               substreamCancelStrategy: SubstreamCancelStrategy)
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitAfter, p, substreamCancelStrategy)
 }
@@ -345,8 +346,8 @@ final class Split[T](decision: Split.SplitDecision,
         private var willCompleteAfterInitialElement = false
 
         // Substreams are always assumed to be pushable position when we enter this method
-        private def closeThis(
-            handler: SubstreamHandler, currentElem: T): Unit = {
+        private def closeThis(handler: SubstreamHandler,
+                              currentElem: T): Unit = {
           decision match {
             case SplitAfter ⇒
               if (!substreamCancelled) {
@@ -425,8 +426,8 @@ object SubSink {
 /**
   * INTERNAL API
   */
-final class SubSink[T](
-    name: String, externalCallback: ActorSubscriberMessage ⇒ Unit)
+final class SubSink[T](name: String,
+                       externalCallback: ActorSubscriberMessage ⇒ Unit)
     extends GraphStage[SinkShape[T]] {
   import SubSink._
 
@@ -473,7 +474,8 @@ final class SubSink[T](
             completeStage()
             if (!status.compareAndSet(Cancel, cb)) setCB(cb)
           case _: AsyncCallback[_] ⇒
-            failStage(new IllegalStateException(
+            failStage(
+                new IllegalStateException(
                     "Substream Source cannot be materialized more than once"))
         }
       }
@@ -561,7 +563,8 @@ final class SubSource[T](
   def timeout(d: FiniteDuration): Boolean =
     status.compareAndSet(
         null,
-        ActorSubscriberMessage.OnError(new SubscriptionTimeoutException(
+        ActorSubscriberMessage.OnError(
+            new SubscriptionTimeoutException(
                 s"Substream Source has not been materialized in $d")))
 
   override def createLogic(inheritedAttributes: Attributes) =
@@ -575,7 +578,8 @@ final class SubSource[T](
           case ActorSubscriberMessage.OnComplete ⇒ completeStage()
           case ActorSubscriberMessage.OnError(ex) ⇒ failStage(ex)
           case _: AsyncCallback[_] ⇒
-            failStage(new IllegalStateException(
+            failStage(
+                new IllegalStateException(
                     "Substream Source cannot be materialized more than once"))
         }
       }

@@ -34,8 +34,8 @@ object FlowGroupBySpec {
 class FlowGroupBySpec extends AkkaSpec {
   import FlowGroupBySpec._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -52,8 +52,9 @@ class FlowGroupBySpec extends AkkaSpec {
     def cancel(): Unit = subscription.cancel()
   }
 
-  class SubstreamsSupport(
-      groupCount: Int = 2, elementCount: Int = 6, maxSubstreams: Int = -1) {
+  class SubstreamsSupport(groupCount: Int = 2,
+                          elementCount: Int = 6,
+                          maxSubstreams: Int = -1) {
     val source = Source(1 to elementCount).runWith(Sink.asPublisher(false))
     val max = if (maxSubstreams > 0) maxSubstreams else groupCount
     val groupStream = Source

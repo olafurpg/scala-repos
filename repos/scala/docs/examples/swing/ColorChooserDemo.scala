@@ -9,7 +9,7 @@ import BorderPanel._
 /**
   * Demo for ColorChooser.
   * Based on http://download.oracle.com/javase/tutorial/uiswing/components/colorchooser.html
-  * 
+  *
   * @author andy@hicks.net
   */
 object ColorChooserDemo extends SimpleSwingApplication {
@@ -43,7 +43,7 @@ object ColorChooserDemo extends SimpleSwingApplication {
       border = TitledBorder(EtchedBorder, "Banner")
     }
 
-    // Display a color selection dialog when button pressed 
+    // Display a color selection dialog when button pressed
     val selectColor = new Button("Choose Background Color") {
       reactions += {
         case ButtonClicked(_) =>

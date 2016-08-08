@@ -28,19 +28,19 @@ class ScalaAnnotatedMacro extends Macro {
         val scope = GlobalSearchScope.allScope(project)
         Option(params.head.calculateResult(context))
           .flatMap(res =>
-                ScalaPsiManager
-                  .instance(project)
-                  .getCachedClass(scope, res.toString))
+            ScalaPsiManager
+              .instance(project)
+              .getCachedClass(scope, res.toString))
           .map(AnnotatedMembersSearch.search(_, scope))
           .getOrElse(EmptyQuery.getEmptyQuery[PsiMember])
     }
   }
 
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     Option(getAnnotatedMembers(params, context).findFirst())
       .map(member =>
-            new TextResult(member match {
+        new TextResult(member match {
           case psiClass: PsiClass => psiClass.getQualifiedName
           case _ => member.getName
         }))
@@ -52,8 +52,8 @@ class ScalaAnnotatedMacro extends Macro {
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + "annotated(\"annotation qname\")"
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result =
     calculateResult(params, context)
 
   override def calculateLookupItems(

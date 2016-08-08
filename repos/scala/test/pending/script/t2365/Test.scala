@@ -13,8 +13,9 @@ class B extends Function0[Int] {
 object Test {
   type StructF0 = { def apply(): Int }
   def main(args: Array[String]) {
-    for (i <- 0 until 150) println(
-        i + " " + test(A.apply) + " " + test(A2.apply) + " " + test(A3.apply) +
+    for (i <- 0 until 150)
+      println(i + " " + test(A.apply) + " " + test(A2.apply) + " " + test(
+          A3.apply) +
         " " + test(A3.apply))
   }
 

@@ -12,7 +12,8 @@ class KeyStoreSpec extends Specification with Mockito {
 
     "create several certificate" in {
       val builder =
-        new StringBasedKeyStoreBuilder("""-----BEGIN CERTIFICATE-----
+        new StringBasedKeyStoreBuilder(
+            """-----BEGIN CERTIFICATE-----
         |MIIDIDCCAomgAwIBAgIENd70zzANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJV
         |UzEQMA4GA1UEChMHRXF1aWZheDEtMCsGA1UECxMkRXF1aWZheCBTZWN1cmUgQ2Vy
         |dGlmaWNhdGUgQXV0aG9yaXR5MB4XDTk4MDgyMjE2NDE1MVoXDTE4MDgyMjE2NDE1

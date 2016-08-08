@@ -62,8 +62,8 @@ object ConfiguredLocalRoutingSpec {
   }
 
   final case class MyRoutingLogic(config: Config) extends RoutingLogic {
-    override def select(
-        message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+    override def select(message: Any,
+                        routees: immutable.IndexedSeq[Routee]): Routee =
       MyRoutee(config.getString(message.toString))
   }
 
@@ -86,7 +86,8 @@ object ConfiguredLocalRoutingSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ConfiguredLocalRoutingSpec
-    extends AkkaSpec(ConfiguredLocalRoutingSpec.config) with DefaultTimeout
+    extends AkkaSpec(ConfiguredLocalRoutingSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
   import ConfiguredLocalRoutingSpec._
 
@@ -111,15 +112,17 @@ class ConfiguredLocalRoutingSpec
 
     "be overridable in config" in {
       val actor = system.actorOf(
-          RoundRobinPool(12).props(routeeProps = Props[EchoProps]), "config")
+          RoundRobinPool(12).props(routeeProps = Props[EchoProps]),
+          "config")
       routerConfig(actor) should ===(
           RandomPool(nrOfInstances = 4, usePoolDispatcher = true))
       Await.result(gracefulStop(actor, 3 seconds), 3 seconds)
     }
 
     "use routees.paths from config" in {
-      val actor = system.actorOf(
-          RandomPool(12).props(routeeProps = Props[EchoProps]), "paths")
+      val actor =
+        system.actorOf(RandomPool(12).props(routeeProps = Props[EchoProps]),
+                       "paths")
       routerConfig(actor) should ===(
           RandomGroup(List("/user/service1", "/user/service2")))
       Await.result(gracefulStop(actor, 3 seconds), 3 seconds)

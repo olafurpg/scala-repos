@@ -12,11 +12,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScTypePolymorphicType,
+  TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult
+}
 import org.jetbrains.plugins.scala.lang.resolve.StdKinds
 import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 
@@ -27,7 +37,8 @@ import scala.collection.Seq
   * Date: 22.02.2008
   */
 class ScSelfInvocationImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScSelfInvocation {
+    extends ScalaPsiElementImpl(node)
+    with ScSelfInvocation {
   override def toString: String = "SelfInvocation"
 
   def bind: Option[PsiElement] = bindInternal(shapeResolve = false)
@@ -60,7 +71,7 @@ class ScSelfInvocationImpl(node: ASTNode)
                                           enableTupling = true,
                                           selfConstructorResolve = true)
     for (constr <- clazz.secondaryConstructors.filter(_ != method)
-                      if constr != method) {
+         if constr != method) {
       proc.execute(constr, ResolveState.initial)
     }
     clazz.constructor match {
@@ -70,15 +81,15 @@ class ScSelfInvocationImpl(node: ASTNode)
     proc.candidates.toSeq.map(_.element)
   }
 
-  private def workWithBindInternal(
-      bindInternal: Option[PsiElement], i: Int): TypeResult[ScType] = {
+  private def workWithBindInternal(bindInternal: Option[PsiElement],
+                                   i: Int): TypeResult[ScType] = {
     val (res: ScType, clazz: ScTemplateDefinition) = bindInternal match {
       case Some(c: ScMethodLike) =>
         val methodType = ScType
           .nested(c.methodType, i)
           .getOrElse(
               return Failure("Not enough parameter sections", Some(this)))
-          (methodType, c.containingClass)
+        (methodType, c.containingClass)
       case _ =>
         return Failure("Cannot shape resolve self invocation", Some(this))
     }
@@ -97,13 +108,13 @@ class ScSelfInvocationImpl(node: ASTNode)
   }
 
   def shapeMultiType(i: Int): Seq[TypeResult[ScType]] = {
-    bindMultiInternal(shapeResolve = true)
-      .map(pe => workWithBindInternal(Some(pe), i))
+    bindMultiInternal(shapeResolve = true).map(pe =>
+      workWithBindInternal(Some(pe), i))
   }
 
   def multiType(i: Int): Seq[TypeResult[ScType]] = {
-    bindMultiInternal(shapeResolve = false)
-      .map(pe => workWithBindInternal(Some(pe), i))
+    bindMultiInternal(shapeResolve = false).map(pe =>
+      workWithBindInternal(Some(pe), i))
   }
 
   override def accept(visitor: ScalaElementVisitor) {

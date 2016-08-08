@@ -26,8 +26,10 @@ class BroadcastedTest extends FunSuite {
     val dm = DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
 
     dm(1 to 2, *) := DenseVector(3.0, 4.0)
-    assert(dm === DenseMatrix(
-            (-1.0, -2.0, -3.0), (3.0, 3.0, 3.0), (4.0, 4.0, 4.0)))
+    assert(
+        dm === DenseMatrix((-1.0, -2.0, -3.0),
+                           (3.0, 3.0, 3.0),
+                           (4.0, 4.0, 4.0)))
   }
 
   test("mean") {
@@ -70,8 +72,10 @@ class BroadcastedTest extends FunSuite {
       DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0)).t
 
     dm(*, 1 to 2) := DenseVector(3.0, 4.0)
-    assert(dm === DenseMatrix(
-            (-1.0, -2.0, -3.0), (3.0, 3.0, 3.0), (4.0, 4.0, 4.0)).t)
+    assert(
+        dm === DenseMatrix((-1.0, -2.0, -3.0),
+                           (3.0, 3.0, 3.0),
+                           (4.0, 4.0, 4.0)).t)
   }
 
   test("dot product for DM/FV") {
@@ -91,18 +95,18 @@ class BroadcastedTest extends FunSuite {
   test("foreach") {
     val dm = DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     var sum = 0.0
-    dm(*, ::).foreach(sum += _ (1))
+    dm(*, ::).foreach(sum += _(1))
     assert(sum == 5)
 
     sum = 0.0
-    dm(::, *).foreach(sum += _ (1))
+    dm(::, *).foreach(sum += _(1))
     assert(sum == 6)
   }
 
   test("fold") {
     val dm = DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
-    assert(dm(*, ::).foldLeft(0.0)(_ + _ (1)) == 5)
-    assert(dm(::, *).foldLeft(0.0)(_ + _ (1)) == 6)
+    assert(dm(*, ::).foldLeft(0.0)(_ + _(1)) == 5)
+    assert(dm(::, *).foldLeft(0.0)(_ + _(1)) == 6)
   }
 
   test("broadcasted toIndexedSeq") {

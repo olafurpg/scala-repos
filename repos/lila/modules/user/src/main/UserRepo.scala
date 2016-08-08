@@ -22,7 +22,14 @@ object UserRepo {
   import User.{BSONFields => F}
 
   private val coll = userTube.coll
-  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Match, Project, Group, GroupField, SumField, SumValue}
+  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+    Match,
+    Project,
+    Group,
+    GroupField,
+    SumField,
+    SumValue
+  }
 
   val normalize = User normalize _
 
@@ -234,8 +241,10 @@ object UserRepo {
   def authenticateByEmail(email: String, password: String): Fu[Option[User]] =
     checkPasswordByEmail(email, password) flatMap { _ ?? byEmail(email) }
 
-  private case class AuthData(
-      password: String, salt: String, enabled: Boolean, sha512: Boolean) {
+  private case class AuthData(password: String,
+                              salt: String,
+                              enabled: Boolean,
+                              sha512: Boolean) {
     def compare(p: String) =
       password == sha512.fold(hash512(p, salt), hash(p, salt))
   }
@@ -258,9 +267,10 @@ object UserRepo {
     checkPassword(Json.obj(F.email -> email), password)
 
   private def checkPassword(select: JsObject, password: String): Fu[Boolean] =
-    $projection.one(
-        select, Seq("password", "salt", "enabled", "sha512", "email")) { obj =>
-      (AuthData.reader reads obj).asOpt
+    $projection.one(select,
+                    Seq("password", "salt", "enabled", "sha512", "email")) {
+      obj =>
+        (AuthData.reader reads obj).asOpt
     } map {
       _ ?? (data => data.enabled && data.compare(password))
     }
@@ -275,9 +285,11 @@ object UserRepo {
              mobileApiVersion: Option[Int]): Fu[Option[User]] =
     !nameExists(username) flatMap {
       _ ?? {
-        $insert.bson(newUser(
-                username, password, email, blind, mobileApiVersion)) >> named(
-            normalize(username))
+        $insert.bson(newUser(username,
+                             password,
+                             email,
+                             blind,
+                             mobileApiVersion)) >> named(normalize(username))
       }
     }
 
@@ -289,8 +301,8 @@ object UserRepo {
 
   def usernamesLike(username: String, max: Int = 10): Fu[List[String]] = {
     import java.util.regex.Matcher.quoteReplacement
-    val escaped = """^([\w-]*).*$""".r.replaceAllIn(
-        normalize(username), m => quoteReplacement(m group 1))
+    val escaped = """^([\w-]*).*$""".r
+      .replaceAllIn(normalize(username), m => quoteReplacement(m group 1))
     val regex = "^" + escaped + ".*$"
     $primitive(
         $select.byId($regex(regex)) ++ enabledSelect,
@@ -330,9 +342,9 @@ object UserRepo {
       $select(user.id),
       BSONDocument("$set" -> BSONDocument("enabled" -> false)) ++ user.lameOrTroll
         .fold(
-          BSONDocument(),
-          BSONDocument("$unset" -> BSONDocument("email" -> true))
-      )
+            BSONDocument(),
+            BSONDocument("$unset" -> BSONDocument("email" -> true))
+        )
   )
 
   def passwd(id: ID, password: String): Funit =
@@ -421,7 +433,7 @@ object UserRepo {
                  F.username -> username,
                  F.email -> email,
                  F.mustConfirmEmail ->
-                 (email.isDefined &&
+                   (email.isDefined &&
                      mobileApiVersion.isEmpty).option(DateTime.now),
                  "password" -> hash(password, salt),
                  "salt" -> salt,

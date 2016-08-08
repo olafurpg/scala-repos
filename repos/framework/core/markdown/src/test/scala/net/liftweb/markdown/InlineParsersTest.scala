@@ -29,7 +29,9 @@ import org.scalatest.junit.JUnitRunner
   */
 @RunWith(classOf[JUnitRunner])
 class InlineParsersTest
-    extends FlatSpec with ShouldMatchers with InlineParsers {
+    extends FlatSpec
+    with ShouldMatchers
+    with InlineParsers {
 
   ///////////////////////////////////////////////////////////////
   // Inline parsing Tests                                      //
@@ -46,8 +48,7 @@ class InlineParsersTest
   }
 
   def runExceptionParsingTests(p: Parser[String], l: List[String]) {
-    for (s <- l) evaluating { apply(p, s) } should produce[
-        IllegalArgumentException]
+    for (s <- l) evaluating { apply(p, s) } should produce[IllegalArgumentException]
   }
 
   val italicTests: List[(String, String)] = List(
@@ -131,13 +132,11 @@ class InlineParsersTest
   val xmlStartTagTests = List(
       ("<foo>", "<foo>"),
       ("""<foo attr="bar">""", """<foo attr="bar">"""),
-      ("""<foo attr="bar" attr2="baz">""",
-       """<foo attr="bar" attr2="baz">"""),
+      ("""<foo attr="bar" attr2="baz">""", """<foo attr="bar" attr2="baz">"""),
       ("""<a href="http://www.example.com?p1=a&p2=b">""",
        """<a href="http://www.example.com?p1=a&amp;p2=b">"""),
       ("""<foo attr='bar'>""", """<foo attr='bar'>"""),
-      ("""<foo attr="bar" attr2='baz'>""",
-       """<foo attr="bar" attr2='baz'>"""),
+      ("""<foo attr="bar" attr2='baz'>""", """<foo attr="bar" attr2='baz'>"""),
       ("""<a href='http://www.example.com?p1=a&p2=b'>""",
        """<a href='http://www.example.com?p1=a&amp;p2=b'>""")
   )
@@ -237,8 +236,8 @@ class InlineParsersTest
   }
 
   val ld1 = new LinkDefinition("id", "http://www.example.com", Some("Title"))
-  val ld2 = new LinkDefinition(
-      "id 2", "http://other.example.com", Some("Title 2"))
+  val ld2 =
+    new LinkDefinition("id 2", "http://other.example.com", Some("Title 2"))
   val ld3 = new LinkDefinition("id 3", "http://none.example.com", None)
   val map = Map(ld1.id -> ld1, ld2.id -> ld2, ld3.id -> ld3)
   val ctx = new InlineContext(map)
@@ -302,9 +301,9 @@ class InlineParsersTest
   it should "handle all inline cases with the inline replacer" in {
     runSucceedingParsingTests(inline(Map()), allInlineTests)
     val concatTests = for ((a1, a2) <- allInlineTests;
-    (b1, b2) <- allInlineTests;
-    (c1, c2) <- allInlineTests) yield
-      (a1 + " " + b1 + " " + c1, a2 + " " + b2 + " " + c2);
+                           (b1, b2) <- allInlineTests;
+                           (c1, c2) <- allInlineTests)
+      yield (a1 + " " + b1 + " " + c1, a2 + " " + b2 + " " + c2);
 
     runSucceedingParsingTests(inline(Map()), concatTests)
   }

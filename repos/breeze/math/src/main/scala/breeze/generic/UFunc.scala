@@ -122,8 +122,7 @@ trait VariableUFunc[U <: UFunc, T <: VariableUFunc[U, T]] { self: T =>
   }
 }
 
-trait MappingUFunc extends MappingUFuncLowPrio {
-  this: UFunc =>
+trait MappingUFunc extends MappingUFuncLowPrio { this: UFunc =>
   implicit def fromLowOrderCanMapValues[T, V, V2, U](
       implicit handhold: ScalarOf[T, V],
       impl: Impl[V, V2],
@@ -143,8 +142,7 @@ trait MappingUFunc extends MappingUFuncLowPrio {
   }
 }
 
-sealed trait MappingUFuncLowPrio {
-  this: UFunc =>
+sealed trait MappingUFuncLowPrio { this: UFunc =>
   implicit def canMapV2Values[T, V1, V2, VR, U](
       implicit handhold: ScalarOf[T, V2],
       impl: Impl2[V1, V2, VR],
@@ -297,8 +295,8 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
     }
   }
 
-  implicit def simpleApply2[A1, A2, R]: Impl3[
-      WrappedUFunc2[A1, A2, R], A1, A2, R] = {
+  implicit def simpleApply2[A1, A2, R]
+    : Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] = {
     new Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] {
       override def apply(v: WrappedUFunc2[A1, A2, R], v2: A1, v3: A2): R =
         v.f(v2, v3)
@@ -331,8 +329,7 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
   }
 }
 
-trait WrappedUFuncLowPrio {
-  this: WrappedUFunc.type =>
+trait WrappedUFuncLowPrio { this: WrappedUFunc.type =>
   implicit def apply2b[V, A1, A2, R, V2](
       implicit cmv: CanMapValues[V, A2, R, V2])
     : Impl3[WrappedUFunc2[A1, A2, R], A1, V, V2] = {

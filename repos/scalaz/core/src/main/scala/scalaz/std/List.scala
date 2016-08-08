@@ -14,8 +14,8 @@ trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[
       List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[
       List] = new Traverse[List] with MonadPlus[List] with BindRec[List]
-  with Zip[List]
-  with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
+  with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List]
+  with Cobind[List] {
     override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
     override def findRight[A](fa: List[A])(f: A => Boolean) = {
       @tailrec def loop(a: List[A], x: Option[A]): Option[A] =
@@ -77,15 +77,13 @@ trait ListInstances extends ListInstances0 {
 
     override def traverseS[S, A, B](l: List[A])(
         f: A => State[S, B]): State[S, List[B]] = {
-      State(
-          (s: S) =>
-            {
-          val buf = new collection.mutable.ListBuffer[B]
-          var cur = s
-          l.foreach { a =>
-            val bs = f(a)(cur); buf += bs._2; cur = bs._1
-          }
-          (cur, buf.toList)
+      State((s: S) => {
+        val buf = new collection.mutable.ListBuffer[B]
+        var cur = s
+        l.foreach { a =>
+          val bs = f(a)(cur); buf += bs._2; cur = bs._1
+        }
+        (cur, buf.toList)
       })
     }
 
@@ -151,7 +149,7 @@ trait ListInstances extends ListInstances0 {
     def zero: List[A] = Nil
   }
 
-  implicit def listShow[A : Show]: Show[List[A]] = new Show[List[A]] {
+  implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
     override def show(as: List[A]) = {
       def commaSep(rest: List[A], acc: Cord): Cord =
         rest match {
@@ -159,10 +157,10 @@ trait ListInstances extends ListInstances0 {
           case x :: xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
         }
       "[" +:
-      (as match {
-            case Nil => Cord()
-            case x :: xs => commaSep(xs, Show[A].show(x))
-          }) :+ "]"
+        (as match {
+          case Nil => Cord()
+          case x :: xs => commaSep(xs, Show[A].show(x))
+        }) :+ "]"
     }
   }
 
@@ -207,7 +205,7 @@ trait ListFunctions {
   /**
     * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
     */
-  final def <^>[A, B : Monoid](as: List[A])(f: NonEmptyList[A] => B): B =
+  final def <^>[A, B: Monoid](as: List[A])(f: NonEmptyList[A] => B): B =
     as match {
       case Nil => Monoid[B].zero
       case h :: t => f(NonEmptyList.nel(h, IList.fromList(t)))
@@ -221,8 +219,8 @@ trait ListFunctions {
     case Nil => Monad[M].point(Nil)
     case h :: t =>
       Monad[M].bind(p(h))(b =>
-            if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt)
-            else Monad[M].point(Nil))
+        if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt)
+        else Monad[M].point(Nil))
   }
 
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
@@ -243,8 +241,8 @@ trait ListFunctions {
       p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil => Monad[M].point(None: Option[A])
     case h :: t =>
-      Monad[M].bind(p(h))(
-          b => if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
+      Monad[M].bind(p(h))(b =>
+        if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
   }
 
   final def powerset[A](as: List[A]): List[List[A]] = {
@@ -258,9 +256,8 @@ trait ListFunctions {
       implicit F: Applicative[M]): M[(List[A], List[A])] = as match {
     case Nil => F.point(Nil: List[A], Nil: List[A])
     case h :: t =>
-      F.ap(partitionM(t)(p))(F.map(p(h))(b =>
-                {
-          case (x, y) => if (b) (h :: x, y) else (x, h :: y)
+      F.ap(partitionM(t)(p))(F.map(p(h))(b => {
+        case (x, y) => if (b) (h :: x, y) else (x, h :: y)
       }))
   }
 
@@ -270,10 +267,11 @@ trait ListFunctions {
       p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil => Monad[M].point(Nil, Nil)
     case h :: t =>
-      Monad[M].bind(p(h))(b =>
+      Monad[M].bind(p(h))(
+          b =>
             if (b)
-              Monad[M]
-                .map(spanM(t)(p))((k: (List[A], List[A])) => (h :: k._1, k._2))
+              Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) =>
+                (h :: k._1, k._2))
             else Monad[M].point(Nil, as))
   }
 
@@ -291,8 +289,8 @@ trait ListFunctions {
         StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
       Monad[M].bind(spanM[A, StateT[M, A, ?]](t)(stateP).eval(h)) {
         case (x, y) =>
-          Monad[M].map(groupWhenM(y)(p))(
-              g => NonEmptyList.nel(h, IList.fromList(x)) :: g)
+          Monad[M].map(groupWhenM(y)(p))(g =>
+            NonEmptyList.nel(h, IList.fromList(x)) :: g)
       }
   }
 
@@ -322,8 +320,8 @@ trait ListFunctions {
     go(as, Nil)
   }
 
-  private[this] def mapAccum[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) =
+  private[this] def mapAccum[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
     as.foldLeft((c, Nil: List[B])) {
       case ((c, bs), a) =>
         val (c0, b) = f(c, a)
@@ -332,16 +330,16 @@ trait ListFunctions {
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) = {
+  final def mapAccumLeft[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = {
     val (c0, list) = mapAccum(as)(c, f)
     (c0, list.reverse)
   }
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
-  final def mapAccumRight[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) =
+  final def mapAccumRight[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
     mapAccum(as.reverse)(c, f)
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */

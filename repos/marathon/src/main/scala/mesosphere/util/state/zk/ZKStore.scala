@@ -10,18 +10,27 @@ import mesosphere.marathon.io.IO
 import mesosphere.marathon.{Protos, StoreCommandFailedException}
 import mesosphere.util.ThreadPoolContext
 import mesosphere.util.state.zk.ZKStore._
-import mesosphere.util.state.{PersistentEntity, PersistentStore, PersistentStoreManagement}
+import mesosphere.util.state.{
+  PersistentEntity,
+  PersistentStore,
+  PersistentStoreManagement
+}
 import org.apache.zookeeper.KeeperException
-import org.apache.zookeeper.KeeperException.{NoNodeException, NodeExistsException}
+import org.apache.zookeeper.KeeperException.{
+  NoNodeException,
+  NodeExistsException
+}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 case class CompressionConf(enabled: Boolean, sizeLimit: Long)
 
-class ZKStore(
-    val client: ZkClient, root: ZNode, compressionConf: CompressionConf)
-    extends PersistentStore with PersistentStoreManagement {
+class ZKStore(val client: ZkClient,
+              root: ZNode,
+              compressionConf: CompressionConf)
+    extends PersistentStore
+    with PersistentStoreManagement {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] implicit val ec = ExecutionContext.Implicits.global
@@ -151,8 +160,9 @@ case class ZKEntity(node: ZNode, data: ZKData, version: Option[Int] = None)
   override def bytes: IndexedSeq[Byte] = data.bytes
 }
 
-case class ZKData(
-    name: String, uuid: UUID, bytes: IndexedSeq[Byte] = Vector.empty) {
+case class ZKData(name: String,
+                  uuid: UUID,
+                  bytes: IndexedSeq[Byte] = Vector.empty) {
   def toProto(compression: CompressionConf): Protos.ZKStoreEntry = {
     val (data, compressed) =
       if (compression.enabled && bytes.length > compression.sizeLimit)
@@ -175,12 +185,14 @@ object ZKData {
       val content =
         if (proto.getCompressed) uncompress(proto.getValue.toByteArray)
         else proto.getValue.toByteArray
-      new ZKData(
-          proto.getName, UUIDUtil.uuid(proto.getUuid.toByteArray), content)
+      new ZKData(proto.getName,
+                 UUIDUtil.uuid(proto.getUuid.toByteArray),
+                 content)
     } catch {
       case ex: InvalidProtocolBufferException =>
         throw new StoreCommandFailedException(
-            s"Can not deserialize Protobuf from ${bytes.length}", ex)
+            s"Can not deserialize Protobuf from ${bytes.length}",
+            ex)
     }
   }
 }

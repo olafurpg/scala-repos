@@ -7,7 +7,11 @@ import mesosphere.marathon.Protos.Constraint.Operator
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.api.v2.json.AppUpdate
 import mesosphere.marathon.health.HealthCheck
-import mesosphere.marathon.integration.facades.{ITDeployment, ITQueueItem, MarathonFacade}
+import mesosphere.marathon.integration.facades.{
+  ITDeployment,
+  ITQueueItem,
+  MarathonFacade
+}
 import MarathonFacade._
 import mesosphere.marathon.integration.setup._
 import mesosphere.marathon.state._
@@ -19,8 +23,11 @@ import scala.util.control.NonFatal
 import org.apache.mesos.{Protos => MesosProtos}
 
 class AppDeployIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -67,8 +74,10 @@ class AppDeployIntegrationTest
     val app: AppDefinition = createAFailingAppResultingInBackOff()
 
     When("we force deploy a working configuration")
-    val deployment2 = marathon.updateApp(
-        app.id, AppUpdate(cmd = Some("sleep 120; true")), force = true)
+    val deployment2 =
+      marathon.updateApp(app.id,
+                         AppUpdate(cmd = Some("sleep 120; true")),
+                         force = true)
 
     Then("The app deployment is created")
     deployment2.code should be(200) //Created
@@ -155,7 +164,9 @@ class AppDeployIntegrationTest
       appProxy(testBasePath / "app", "v1", instances = 1, withHealth = false)
 
     var appCount =
-      (marathon.metrics().entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
+      (marathon
+        .metrics()
+        .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
         .as[Int]
     appCount should be(0)
 
@@ -164,8 +175,9 @@ class AppDeployIntegrationTest
 
     Then("The app count metric should increase")
     result.code should be(201) // Created
-    appCount =
-    (marathon.metrics().entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
+    appCount = (marathon
+      .metrics()
+      .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
       .as[Int]
     appCount should be(1)
   }
@@ -231,8 +243,10 @@ class AppDeployIntegrationTest
 
   test("create a simple app with tcp health checks") {
     Given("a new app")
-    val app = appProxy(
-        testBasePath / "tcp-app", "v1", instances = 1, withHealth = false)
+    val app = appProxy(testBasePath / "tcp-app",
+                       "v1",
+                       instances = 1,
+                       withHealth = false)
       .copy(healthChecks = Set(healthCheck.copy(protocol = Protocol.TCP)))
 
     When("The app is deployed")
@@ -299,7 +313,7 @@ class AppDeployIntegrationTest
       waitForEventMatching("failed_health_check_event or deployment_success")(
           callbackEvent =>
             callbackEvent.eventType == "deployment_success" ||
-            callbackEvent.eventType == "failed_health_check_event")
+              callbackEvent.eventType == "failed_health_check_event")
 
     for (event <- Iterator.continually(interestingEvent()).take(10)) {
       event.eventType should be("failed_health_check_event")
@@ -352,8 +366,8 @@ class AppDeployIntegrationTest
 
     Then("Tasks are killed")
     scaleDown.code should be(200) //OK
-    waitForEventWith(
-        "status_update_event", _.info("taskStatus") == "TASK_KILLED")
+    waitForEventWith("status_update_event",
+                     _.info("taskStatus") == "TASK_KILLED")
     waitForTasks(app.id, 1)
   }
 
@@ -431,8 +445,8 @@ class AppDeployIntegrationTest
     When("a task of an app is killed")
     marathon.killTask(app.id, taskId).code should be(200)
 
-    waitForEventWith(
-        "status_update_event", _.info("taskStatus") == "TASK_KILLED")
+    waitForEventWith("status_update_event",
+                     _.info("taskStatus") == "TASK_KILLED")
 
     Then("All instances of the app get restarted")
     waitForTasks(app.id, 1)
@@ -449,8 +463,8 @@ class AppDeployIntegrationTest
 
     When("a task of an app is killed and scaled")
     marathon.killTask(app.id, taskId, scale = true).code should be(200)
-    waitForEventWith(
-        "status_update_event", _.info("taskStatus") == "TASK_KILLED")
+    waitForEventWith("status_update_event",
+                     _.info("taskStatus") == "TASK_KILLED")
 
     Then("All instances of the app get restarted")
     waitForTasks(app.id, 1)
@@ -466,10 +480,10 @@ class AppDeployIntegrationTest
 
     When("all task of an app are killed")
     marathon.killAllTasks(app.id).code should be(200)
-    waitForEventWith(
-        "status_update_event", _.info("taskStatus") == "TASK_KILLED")
-    waitForEventWith(
-        "status_update_event", _.info("taskStatus") == "TASK_KILLED")
+    waitForEventWith("status_update_event",
+                     _.info("taskStatus") == "TASK_KILLED")
+    waitForEventWith("status_update_event",
+                     _.info("taskStatus") == "TASK_KILLED")
 
     Then("All instances of the app get restarted")
     waitForTasks(app.id, 2)
@@ -477,8 +491,10 @@ class AppDeployIntegrationTest
 
   test("kill all tasks of an App with scaling") {
     Given("a new app with multiple tasks")
-    val app = appProxy(
-        testBasePath / "tokill", "v1", instances = 2, withHealth = false)
+    val app = appProxy(testBasePath / "tokill",
+                       "v1",
+                       instances = 2,
+                       withHealth = false)
     marathon.createAppV2(app).code should be(201)
     waitForEvent("deployment_success")
     marathon.app(app.id).value.app.instances should be(2)
@@ -653,9 +669,10 @@ class AppDeployIntegrationTest
         id = appId,
         cmd = Some("sleep 1"),
         instances = 0,
-        container = Some(Container(
-                  `type` = MesosProtos.ContainerInfo.Type.MESOS
-              ))
+        container = Some(
+            Container(
+                `type` = MesosProtos.ContainerInfo.Type.MESOS
+            ))
     )
 
     app.container should not be empty

@@ -42,9 +42,10 @@ object ORMultiMap {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class ORMultiMap[A] private[akka](
+final class ORMultiMap[A] private[akka] (
     private[akka] val underlying: ORMap[ORSet[A]])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   override type T = ORMultiMap[A]
@@ -117,8 +118,9 @@ final class ORMultiMap[A] private[akka](
   /**
     * INTERNAL API
     */
-  private[akka] def put(
-      node: UniqueAddress, key: String, value: Set[A]): ORMultiMap[A] = {
+  private[akka] def put(node: UniqueAddress,
+                        key: String,
+                        value: Set[A]): ORMultiMap[A] = {
     val newUnderlying = underlying.updated(node, key, ORSet.empty[A]) {
       existing ⇒
         value.foldLeft(existing.clear(node)) { (s, element) ⇒
@@ -163,8 +165,9 @@ final class ORMultiMap[A] private[akka](
   /**
     * INTERNAL API
     */
-  private[akka] def addBinding(
-      node: UniqueAddress, key: String, element: A): ORMultiMap[A] = {
+  private[akka] def addBinding(node: UniqueAddress,
+                               key: String,
+                               element: A): ORMultiMap[A] = {
     val newUnderlying =
       underlying.updated(node, key, ORSet.empty[A])(_.add(node, element))
     new ORMultiMap(newUnderlying)
@@ -188,8 +191,9 @@ final class ORMultiMap[A] private[akka](
   /**
     * INTERNAL API
     */
-  private[akka] def removeBinding(
-      node: UniqueAddress, key: String, element: A): ORMultiMap[A] = {
+  private[akka] def removeBinding(node: UniqueAddress,
+                                  key: String,
+                                  element: A): ORMultiMap[A] = {
     val newUnderlying = {
       val u =
         underlying.updated(node, key, ORSet.empty[A])(_.remove(node, element))
@@ -227,8 +231,8 @@ final class ORMultiMap[A] private[akka](
   override def pruningCleanup(removedNode: UniqueAddress): T =
     new ORMultiMap(underlying.pruningCleanup(removedNode))
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): T =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): T =
     new ORMultiMap(underlying.prune(removedNode, collapseInto))
 
   // this class cannot be a `case class` because we need different `unapply`
@@ -249,4 +253,5 @@ object ORMultiMapKey {
 
 @SerialVersionUID(1L)
 final case class ORMultiMapKey[A](_id: String)
-    extends Key[ORMultiMap[A]](_id) with ReplicatedDataSerialization
+    extends Key[ORMultiMap[A]](_id)
+    with ReplicatedDataSerialization

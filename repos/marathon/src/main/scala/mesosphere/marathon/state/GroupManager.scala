@@ -7,7 +7,11 @@ import akka.event.EventStream
 import com.google.inject.Singleton
 import mesosphere.marathon.api.v2.Validation._
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.event.{EventModule, GroupChangeFailed, GroupChangeSuccess}
+import mesosphere.marathon.event.{
+  EventModule,
+  GroupChangeFailed,
+  GroupChangeSuccess
+}
 import mesosphere.marathon.io.PathFun
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.upgrade._
@@ -161,9 +165,10 @@ class GroupManager @Singleton @Inject()(
     val deployment = for {
       from <- rootGroup()
       (toUnversioned, resolve) <- resolveStoreUrls(
-          assignDynamicServicePorts(from, change(from)))
-      to = GroupVersioningUtil.updateVersionInfoForChangedApps(
-          version, from, toUnversioned)
+                                     assignDynamicServicePorts(from,
+                                                               change(from)))
+      to = GroupVersioningUtil
+        .updateVersionInfoForChangedApps(version, from, toUnversioned)
       _ = validateOrThrow(to)(Group.validGroupWithConfig(config.maxApps.get))
       plan = DeploymentPlan(from, to, resolve, version, toKill)
       _ = validateOrThrow(plan)
@@ -234,7 +239,8 @@ class GroupManager @Singleton @Inject()(
     def nextGlobalFreePort: Int = synchronized {
       val port = portRange
         .find(!taken.contains(_))
-        .getOrElse(throw new PortRangeExhaustedException(
+        .getOrElse(
+            throw new PortRangeExhaustedException(
                 config.localPortMin(),
                 config.localPortMax()
             ))
@@ -244,7 +250,8 @@ class GroupManager @Singleton @Inject()(
     }
 
     def mergeServicePortsAndPortDefinitions(
-        portDefinitions: Seq[PortDefinition], servicePorts: Seq[Int]) = {
+        portDefinitions: Seq[PortDefinition],
+        servicePorts: Seq[Int]) = {
       portDefinitions
         .zipAll(servicePorts,
                 AppDefinition.RandomPortDefinition,
@@ -263,7 +270,7 @@ class GroupManager @Singleton @Inject()(
           from
             .app(app.id)
             .map(_.portNumbers.filter(p =>
-                      portRange.contains(p) && !app.servicePorts.contains(p)))
+              portRange.contains(p) && !app.servicePorts.contains(p)))
             .getOrElse(Nil): _*
       )
 
@@ -290,8 +297,9 @@ class GroupManager @Singleton @Inject()(
       }
 
       app.copy(
-          portDefinitions = mergeServicePortsAndPortDefinitions(
-                app.portDefinitions, servicePorts),
+          portDefinitions =
+            mergeServicePortsAndPortDefinitions(app.portDefinitions,
+                                                servicePorts),
           container = newContainer.orElse(app.container)
       )
     }
@@ -301,8 +309,9 @@ class GroupManager @Singleton @Inject()(
       case app: AppDefinition =>
         // Always set the ports to service ports, even if we do not have dynamic ports in our port mappings
         app.copy(
-            portDefinitions = mergeServicePortsAndPortDefinitions(
-                  app.portDefinitions, app.servicePorts)
+            portDefinitions =
+              mergeServicePortsAndPortDefinitions(app.portDefinitions,
+                                                  app.servicePorts)
         )
     }
 

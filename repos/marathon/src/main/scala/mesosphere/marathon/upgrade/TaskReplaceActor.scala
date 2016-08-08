@@ -22,7 +22,8 @@ class TaskReplaceActor(driver: SchedulerDriver,
                        eventBus: EventStream,
                        app: AppDefinition,
                        promise: Promise[Unit])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.dispatcher
 
   val tasksToKill = taskTracker.appTasksLaunchedSync(app.id)
@@ -34,7 +35,7 @@ class TaskReplaceActor(driver: SchedulerDriver,
   var oldTaskIds = tasksToKill.map(_.taskId).toSet
   val toKill = oldTaskIds.to[mutable.Queue]
   var maxCapacity = (app.instances *
-      (1 + app.upgradeStrategy.maximumOverCapacity)).toInt
+    (1 + app.upgradeStrategy.maximumOverCapacity)).toInt
   var outstandingKills = Set.empty[Task.Id]
   val periodicalRetryKills: Cancellable =
     context.system.scheduler.schedule(15.seconds, 15.seconds, self, RetryKills)
@@ -53,7 +54,7 @@ class TaskReplaceActor(driver: SchedulerDriver,
 
     log.info(
         s"For minimumHealthCapacity ${app.upgradeStrategy.minimumHealthCapacity} of ${app.id.toString} leave " +
-        s"$minHealthy tasks running, maximum capacity $maxCapacity, killing $nrToKillImmediately tasks immediately")
+          s"$minHealthy tasks running, maximum capacity $maxCapacity, killing $nrToKillImmediately tasks immediately")
 
     for (_ <- 0 until nrToKillImmediately) {
       killNextOldTask()
@@ -69,7 +70,8 @@ class TaskReplaceActor(driver: SchedulerDriver,
     eventBus.unsubscribe(self)
     periodicalRetryKills.cancel()
     if (!promise.isCompleted)
-      promise.tryFailure(new TaskUpgradeCanceledException(
+      promise.tryFailure(
+          new TaskUpgradeCanceledException(
               "The task upgrade has been cancelled"))
   }
 
@@ -122,8 +124,17 @@ class TaskReplaceActor(driver: SchedulerDriver,
       taskQueue.add(app)
 
     // Old task successfully killed
-    case MesosStatusUpdateEvent(
-        slaveId, taskId, KillComplete(_), _, `appId`, _, _, _, _, _, _)
+    case MesosStatusUpdateEvent(slaveId,
+                                taskId,
+                                KillComplete(_),
+                                _,
+                                `appId`,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _)
         if oldTaskIds(taskId) => // scalastyle:ignore line.size.limit
       oldTaskIds -= taskId
       outstandingKills -= taskId
@@ -181,7 +192,7 @@ class TaskReplaceActor(driver: SchedulerDriver,
     } else if (log.isDebugEnabled) {
       log.debug(
           s"For app: [${app.id}] there are [${healthy.size}] healthy new instances and " +
-          s"[${oldTaskIds.size}] old instances.")
+            s"[${oldTaskIds.size}] old instances.")
     }
   }
 

@@ -10,13 +10,17 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * @author Alexander.Podkhalyuzin
   */
 class ScWhileStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScWhileStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScWhileStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -30,7 +34,8 @@ class ScWhileStmtImpl(node: ASTNode)
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
     val c =
       if (rpar != null)
-        PsiTreeUtil.getPrevSiblingOfType(rpar, classOf[ScExpression]) else null
+        PsiTreeUtil.getPrevSiblingOfType(rpar, classOf[ScExpression])
+      else null
     if (c == null) None else Some(c)
   }
 
@@ -38,7 +43,8 @@ class ScWhileStmtImpl(node: ASTNode)
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
     val c =
       if (rpar != null)
-        PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression]) else null
+        PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression])
+      else null
     if (c == null) None else Some(c)
   }
 

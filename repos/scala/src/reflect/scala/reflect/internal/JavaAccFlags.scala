@@ -7,7 +7,12 @@ package reflect
 package internal
 
 import java.lang.{Class => jClass}
-import java.lang.reflect.{Member => jMember, Constructor => jConstructor, Field => jField, Method => jMethod}
+import java.lang.reflect.{
+  Member => jMember,
+  Constructor => jConstructor,
+  Field => jField,
+  Method => jMethod
+}
 import JavaAccFlags._
 import ClassfileConstants._
 

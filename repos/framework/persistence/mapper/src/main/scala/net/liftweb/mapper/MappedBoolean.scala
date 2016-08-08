@@ -136,17 +136,17 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
                           columnName: String): (T, AnyRef) => Unit = {
     inst match {
       case null => { (inst: T, v: AnyRef) =>
-          {
-            val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
-            tv.data = Full(false)
-          }
+        {
+          val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
+          tv.data = Full(false)
         }
+      }
       case _ => { (inst: T, v: AnyRef) =>
-          {
-            val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
-            tv.data = Full(toBoolean(v))
-          }
+        {
+          val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
+          tv.data = Full(toBoolean(v))
         }
+      }
     }
   }
 
@@ -155,32 +155,32 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
     this.orgData = in
   }
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case tv: MappedBoolean[T] =>
           tv.allSet(if (isNull) Empty else Full(v != 0L))
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case tv: MappedBoolean[T] =>
           tv.allSet(if (v == null) Empty else Full(toBoolean(v)))
       })
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case tv: MappedBoolean[T] =>
           tv.allSet(if (v == null) Empty else Full(true))
       })
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case tv: MappedBoolean[T] => tv.allSet(if (isNull) Empty else Full(v))

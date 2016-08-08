@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -70,8 +70,8 @@ sealed trait CPath { self =>
   }
 
   def dropPrefix(p: CPath): Option[CPath] = {
-    def remainder(
-        nodes: List[CPathNode], toDrop: List[CPathNode]): Option[CPath] = {
+    def remainder(nodes: List[CPathNode],
+                  toDrop: List[CPathNode]): Option[CPath] = {
       nodes match {
         case x :: xs =>
           toDrop match {
@@ -122,20 +122,20 @@ sealed trait CPath { self =>
           case x @ CPathIndex(index) =>
             expand0(current :+ x, tail, jvalue(index))
           case x @ CPathField(name) if (isRegex(name)) => {
-              val R = name.r
-              jvalue match {
-                case JObject(fields) =>
-                  fields.toList.flatMap {
-                    case (R(name), value) =>
-                      val expandedNode = CPathField(name)
-                      expand0(current :+ expandedNode, tail, value)
+            val R = name.r
+            jvalue match {
+              case JObject(fields) =>
+                fields.toList.flatMap {
+                  case (R(name), value) =>
+                    val expandedNode = CPathField(name)
+                    expand0(current :+ expandedNode, tail, value)
 
-                    case _ => Nil
-                  }
+                  case _ => Nil
+                }
 
-                case _ => Nil
-              }
+              case _ => Nil
             }
+          }
 
           case x @ CPathField(name) =>
             expand0(current :+ x, tail, jvalue \ name)
@@ -283,8 +283,7 @@ object CPath {
           filtered groupBy { case PathWithLeaf(path, _) => path.head }
 
         def recurse[A](paths: Seq[PathWithLeaf[A]]) =
-          inner(
-              paths map {
+          inner(paths map {
             case PathWithLeaf(path, v) => PathWithLeaf(path.tail, v)
           })
 

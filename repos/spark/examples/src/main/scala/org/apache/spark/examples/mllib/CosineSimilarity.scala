@@ -59,7 +59,8 @@ object CosineSimilarity {
         .required()
         .text(s"input file, one row per line, space-separated")
         .action((x, c) => c.copy(inputFile = x))
-      note("""
+      note(
+          """
           |For example, the following command runs this app on a dataset:
           |
           | ./bin/spark-submit  --class org.apache.spark.examples.mllib.CosineSimilarity \

@@ -21,7 +21,7 @@ import kafka.utils.VerifiableProperties
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
+      "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 class SyncProducerConfig private (val props: VerifiableProperties)
     extends SyncProducerConfigShared {
@@ -39,7 +39,7 @@ class SyncProducerConfig private (val props: VerifiableProperties)
 
 @deprecated(
     "This trait has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
+      "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 trait SyncProducerConfigShared {
   val props: VerifiableProperties
@@ -60,7 +60,9 @@ trait SyncProducerConfigShared {
    */
 
   val requestRequiredAcks = props.getShortInRange(
-      "request.required.acks", SyncProducerConfig.DefaultRequiredAcks, (-1, 1))
+      "request.required.acks",
+      SyncProducerConfig.DefaultRequiredAcks,
+      (-1, 1))
 
   /*
    * The ack timeout of the producer requests. Value must be non-negative and non-zero
@@ -73,7 +75,7 @@ trait SyncProducerConfigShared {
 
 @deprecated(
     "This object has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
+      "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 object SyncProducerConfig {
   val DefaultClientId = ""

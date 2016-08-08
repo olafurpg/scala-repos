@@ -36,15 +36,16 @@ import org.apache.hive.service.server.HiveServer2
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.hive.thriftserver.ReflectionUtils._
 
-private[hive] class SparkSQLCLIService(
-    hiveServer: HiveServer2, hiveContext: HiveContext)
-    extends CLIService(hiveServer) with ReflectedCompositeService {
+private[hive] class SparkSQLCLIService(hiveServer: HiveServer2,
+                                       hiveContext: HiveContext)
+    extends CLIService(hiveServer)
+    with ReflectedCompositeService {
 
   override def init(hiveConf: HiveConf) {
     setSuperField(this, "hiveConf", hiveConf)
 
-    val sparkSqlSessionManager = new SparkSQLSessionManager(
-        hiveServer, hiveContext)
+    val sparkSqlSessionManager =
+      new SparkSQLSessionManager(hiveServer, hiveContext)
     setSuperField(this, "sessionManager", sparkSqlSessionManager)
     addService(sparkSqlSessionManager)
     var sparkServiceUGI: UserGroupInformation = null
@@ -57,15 +58,16 @@ private[hive] class SparkSQLCLIService(
       } catch {
         case e @ (_: IOException | _: LoginException) =>
           throw new ServiceException(
-              "Unable to login to kerberos with given principal/keytab", e)
+              "Unable to login to kerberos with given principal/keytab",
+              e)
       }
     }
 
     initCompositeService(hiveConf)
   }
 
-  override def getInfo(
-      sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue = {
+  override def getInfo(sessionHandle: SessionHandle,
+                       getInfoType: GetInfoType): GetInfoValue = {
     getInfoType match {
       case GetInfoType.CLI_SERVER_NAME => new GetInfoValue("Spark SQL")
       case GetInfoType.CLI_DBMS_NAME => new GetInfoValue("Spark SQL")

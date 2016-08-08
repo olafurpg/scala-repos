@@ -32,7 +32,13 @@ import javafx.{scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  StringProperty
+}
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 import scalafx.scene.shape.Shape
 import scalafx.scene.text.Font.sfxFont2jfx
@@ -43,7 +49,8 @@ object Text {
 }
 
 class Text(override val delegate: jfxst.Text = new jfxst.Text)
-    extends Shape(delegate) with PositionDelegate[jfxst.Text]
+    extends Shape(delegate)
+    with PositionDelegate[jfxst.Text]
     with SFXDelegate[jfxst.Text] {
 
   /**

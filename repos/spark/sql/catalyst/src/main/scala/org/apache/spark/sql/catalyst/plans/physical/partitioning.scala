@@ -54,8 +54,8 @@ case class ClusteredDistribution(clustering: Seq[Expression])
   require(
       clustering != Nil,
       "The clustering expressions of a ClusteredDistribution should not be Nil. " +
-      "An AllTuples should be used to represent a distribution that only has " +
-      "a single partition.")
+        "An AllTuples should be used to represent a distribution that only has " +
+        "a single partition.")
 }
 
 /**
@@ -69,8 +69,8 @@ case class OrderedDistribution(ordering: Seq[SortOrder]) extends Distribution {
   require(
       ordering != Nil,
       "The ordering expressions of a OrderedDistribution should not be Nil. " +
-      "An AllTuples should be used to represent a distribution that only has " +
-      "a single partition.")
+        "An AllTuples should be used to represent a distribution that only has " +
+        "a single partition.")
 
   // TODO: This is not really valid...
   def clustering: Set[Expression] = ordering.map(_.child).toSet
@@ -242,7 +242,9 @@ case object SinglePartition extends Partitioning {
   * in the same partition.
   */
 case class HashPartitioning(expressions: Seq[Expression], numPartitions: Int)
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   override def children: Seq[Expression] = expressions
   override def nullable: Boolean = false
@@ -286,7 +288,9 @@ case class HashPartitioning(expressions: Seq[Expression], numPartitions: Int)
   * into its child.
   */
 case class RangePartitioning(ordering: Seq[SortOrder], numPartitions: Int)
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   override def children: Seq[SortOrder] = ordering
   override def nullable: Boolean = false
@@ -329,7 +333,9 @@ case class RangePartitioning(ordering: Seq[SortOrder], numPartitions: Int)
   * Outer Join operators.
   */
 case class PartitioningCollection(partitionings: Seq[Partitioning])
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   require(
       partitionings.map(_.numPartitions).distinct.length == 1,

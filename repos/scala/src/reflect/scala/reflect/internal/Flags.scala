@@ -337,8 +337,8 @@ class Flags extends ModifierFlags {
   /** These flags are pickled */
   final val PickledFlags =
     ((InitialFlags & ~FlagsNotPickled) | notPRIVATE // for value class constructors (SI-6601), and private members referenced
-        // in @inline-marked methods publicized in SuperAccessors (see SI-6608, e6b4204604)
-        )
+    // in @inline-marked methods publicized in SuperAccessors (see SI-6608, e6b4204604)
+    )
 
   /** If we have a top-level class or module
     *  and someone asks us for a flag not in TopLevelPickledFlags,
@@ -352,8 +352,8 @@ class Flags extends ModifierFlags {
 
   def getterFlags(fieldFlags: Long): Long =
     ACCESSOR +
-    (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
-     else fieldFlags & ~PRESUPER | STABLE)
+      (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
+       else fieldFlags & ~PRESUPER | STABLE)
 
   def setterFlags(fieldFlags: Long): Long =
     getterFlags(fieldFlags) & ~STABLE & ~CASEACCESSOR
@@ -416,10 +416,10 @@ class Flags extends ModifierFlags {
     }
   }
 
-  val rawToPickledFlags: Long => Long = new MapFlags(
-      mappedRawFlags, mappedPickledFlags)
-  val pickledToRawFlags: Long => Long = new MapFlags(
-      mappedPickledFlags, mappedRawFlags)
+  val rawToPickledFlags: Long => Long =
+    new MapFlags(mappedRawFlags, mappedPickledFlags)
+  val pickledToRawFlags: Long => Long =
+    new MapFlags(mappedPickledFlags, mappedRawFlags)
 
   // ------ displaying flags --------------------------------------------------------
 
@@ -504,8 +504,8 @@ class Flags extends ModifierFlags {
      else "private[" + privateWithin + "]")
 
   @deprecated("Use flagString on the flag-carrying member", "2.10.0")
-  private[scala] def flagsToString(
-      flags: Long, privateWithin: String): String = {
+  private[scala] def flagsToString(flags: Long,
+                                   privateWithin: String): String = {
     val access = accessString(flags, privateWithin)
     val nonAccess = flagsToString(flags & ~AccessFlags)
 

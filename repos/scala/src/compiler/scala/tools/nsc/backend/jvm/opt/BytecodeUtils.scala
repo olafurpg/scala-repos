@@ -118,8 +118,8 @@ object BytecodeUtils {
 
   def hasCallerSensitiveAnnotation(methodNode: MethodNode) =
     methodNode.visibleAnnotations != null &&
-    methodNode.visibleAnnotations.asScala
-      .exists(_.desc == "Lsun/reflect/CallerSensitive;")
+      methodNode.visibleAnnotations.asScala
+        .exists(_.desc == "Lsun/reflect/CallerSensitive;")
 
   def isFinalClass(classNode: ClassNode): Boolean =
     (classNode.access & ACC_FINAL) != 0
@@ -134,8 +134,8 @@ object BytecodeUtils {
     t.getSort == Type.OBJECT || t.getSort == Type.ARRAY
 
   @tailrec
-  def nextExecutableInstruction(
-      insn: AbstractInsnNode, alsoKeep: AbstractInsnNode => Boolean = Set())
+  def nextExecutableInstruction(insn: AbstractInsnNode,
+                                alsoKeep: AbstractInsnNode => Boolean = Set())
     : Option[AbstractInsnNode] = {
     val next = insn.getNext
     if (next == null || isExecutable(next) || alsoKeep(next)) Option(next)
@@ -151,8 +151,8 @@ object BytecodeUtils {
     else nextExecutableInstructionOrLabel(next)
   }
 
-  def sameTargetExecutableInstruction(
-      a: JumpInsnNode, b: JumpInsnNode): Boolean = {
+  def sameTargetExecutableInstruction(a: JumpInsnNode,
+                                      b: JumpInsnNode): Boolean = {
     // Compare next executable instead of the labels. Identifies a, b as the same target:
     //   LabelNode(a)
     //   LabelNode(b)
@@ -242,7 +242,7 @@ object BytecodeUtils {
     */
   def parametersSize(methodNode: MethodNode): Int = {
     (Type.getArgumentsAndReturnSizes(methodNode.desc) >> 2) -
-    (if (isStaticMethod(methodNode)) 1 else 0)
+      (if (isStaticMethod(methodNode)) 1 else 0)
   }
 
   def labelReferences(method: MethodNode): Map[LabelNode, Set[AnyRef]] = {
@@ -275,8 +275,9 @@ object BytecodeUtils {
     res.toMap
   }
 
-  def substituteLabel(
-      reference: AnyRef, from: LabelNode, to: LabelNode): Unit = {
+  def substituteLabel(reference: AnyRef,
+                      from: LabelNode,
+                      to: LabelNode): Unit = {
     def substList(list: java.util.List[LabelNode]) = {
       foreachWithIndex(list.asScala.toList) {
         case (l, i) =>
@@ -313,7 +314,7 @@ object BytecodeUtils {
     }
 
     (roughUpperBound(caller) +
-        roughUpperBound(callee) > maxMethodSizeAfterInline) &&
+      roughUpperBound(callee) > maxMethodSizeAfterInline) &&
     (maxSize(caller) + maxSize(callee) > maxMethodSizeAfterInline)
   }
 
@@ -383,7 +384,8 @@ object BytecodeUtils {
     methodNode.tryCatchBlocks
       .iterator()
       .asScala
-      .map(tryCatch =>
+      .map(
+          tryCatch =>
             new TryCatchBlockNode(
                 labelMap(tryCatch.start),
                 labelMap(tryCatch.end),
@@ -418,8 +420,8 @@ object BytecodeUtils {
 
   implicit class AnalyzerExtensions[V <: Value](val analyzer: Analyzer[V])
       extends AnyVal {
-    def frameAt(
-        instruction: AbstractInsnNode, methodNode: MethodNode): Frame[V] =
+    def frameAt(instruction: AbstractInsnNode,
+                methodNode: MethodNode): Frame[V] =
       analyzer.getFrames()(methodNode.instructions.indexOf(instruction))
   }
 

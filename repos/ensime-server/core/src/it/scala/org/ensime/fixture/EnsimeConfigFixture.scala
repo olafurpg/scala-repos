@@ -43,7 +43,7 @@ object EnsimeConfigFixture {
   if (!dotEnsime.exists) {
     System.err.println(
         "The .ensime file must exist to run the integration tests." +
-        " Type 'sbt gen-ensime' to create it"
+          " Type 'sbt gen-ensime' to create it"
     )
     System.err.flush()
     sys.exit(1)
@@ -56,40 +56,40 @@ object EnsimeConfigFixture {
 
   // not completely empty, has a reference to the scala-library jar
   lazy val EmptyTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingEmpty"),
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingEmpty"),
       javaLibs = Nil
   )
   lazy val SimpleTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingSimple")
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingSimple")
   )
   lazy val SimpleJarTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingSimpleJar"),
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingSimpleJar"),
       javaLibs = Nil
   )
   lazy val ImplicitsTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingImplicits"),
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingImplicits"),
       javaLibs = Nil
   )
   lazy val TimingTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingTiming"),
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingTiming"),
       javaLibs = Nil
   )
   lazy val DebugTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingDebug")
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingDebug")
   )
   lazy val DocsTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingDocs")
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingDocs")
   )
   lazy val JavaTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingJava")
+      subprojects =
+        EnsimeTestProject.subprojects.filter(_.name == "testingJava")
   )
 
   // generates an empty single module project in a temporary directory
@@ -178,7 +178,9 @@ trait IsolatedEnsimeConfigFixture extends Suite with EnsimeConfigFixture {
   * a project that is cloned once for the test suite.
   */
 trait SharedEnsimeConfigFixture
-    extends Suite with EnsimeConfigFixture with BeforeAndAfterAll {
+    extends Suite
+    with EnsimeConfigFixture
+    with BeforeAndAfterAll {
   import EnsimeConfigFixture._
 
   private val tmpDir = Files.createTempDir()

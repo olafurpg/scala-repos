@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,8 +30,12 @@ import java.io.File
 import scala.io.Source
 
 object ProvenanceComputationSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with StaticLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with StaticLibrarySpec {
 
   import ast._
   import library._
@@ -86,30 +90,30 @@ object ProvenanceComputationSpecs
         } else {
           f.idPolicy match {
             case IdentityPolicy.Product(left, right) => {
-                tree.provenance must beLike {
-                  case ProductProvenance(DynamicProvenance(_),
-                                         StaticProvenance("/clicks")) =>
-                    ok
-                }
-                tree.errors filterNot isWarning must beEmpty
+              tree.provenance must beLike {
+                case ProductProvenance(DynamicProvenance(_),
+                                       StaticProvenance("/clicks")) =>
+                  ok
               }
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case _: IdentityPolicy.Retain => {
-                tree.provenance mustEqual StaticProvenance("/clicks")
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual StaticProvenance("/clicks")
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case IdentityPolicy.Synthesize => {
-                tree.provenance must beLike {
-                  case DynamicProvenance(_) => ok
-                }
-                tree.errors filterNot isWarning must beEmpty
+              tree.provenance must beLike {
+                case DynamicProvenance(_) => ok
               }
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case IdentityPolicy.Strip => {
-                tree.provenance mustEqual ValueProvenance
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual ValueProvenance
+              tree.errors filterNot isWarning must beEmpty
+            }
           }
         }
       }
@@ -124,43 +128,43 @@ object ProvenanceComputationSpecs
 
         f.idPolicy match {
           case IdentityPolicy.Product(left, right) => {
-              tree.provenance must beLike {
-                case ProductProvenance(DynamicProvenance(_),
-                                       StaticProvenance("/clicks")) =>
-                  ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            tree.provenance must beLike {
+              case ProductProvenance(DynamicProvenance(_),
+                                     StaticProvenance("/clicks")) =>
+                ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Right => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Left => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Merge => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Cross => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Synthesize => {
-              tree.provenance must beLike {
-                case DynamicProvenance(_) => ok
-              }
+            tree.provenance must beLike {
+              case DynamicProvenance(_) => ok
             }
+          }
 
           case IdentityPolicy.Strip => {
-              tree.provenance mustEqual ValueProvenance
-            }
+            tree.provenance mustEqual ValueProvenance
+          }
         }
 
         tree.errors filterNot isWarning must beEmpty
@@ -666,30 +670,30 @@ object ProvenanceComputationSpecs
         } else {
           f.idPolicy match {
             case IdentityPolicy.Product(left, right) => {
-                tree.provenance must beLike {
-                  case ProductProvenance(DynamicProvenance(_),
-                                         StaticProvenance("/foo")) =>
-                    ok
-                }
-                tree.errors filterNot isWarning must beEmpty
+              tree.provenance must beLike {
+                case ProductProvenance(DynamicProvenance(_),
+                                       StaticProvenance("/foo")) =>
+                  ok
               }
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case _: IdentityPolicy.Retain => {
-                tree.provenance mustEqual StaticProvenance("/foo")
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual StaticProvenance("/foo")
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case IdentityPolicy.Synthesize => {
-                tree.provenance must beLike {
-                  case DynamicProvenance(_) => ok
-                }
-                tree.errors filterNot isWarning must beEmpty
+              tree.provenance must beLike {
+                case DynamicProvenance(_) => ok
               }
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case IdentityPolicy.Strip => {
-                tree.provenance mustEqual ValueProvenance
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual ValueProvenance
+              tree.errors filterNot isWarning must beEmpty
+            }
           }
         }
       }
@@ -709,45 +713,45 @@ object ProvenanceComputationSpecs
 
         f.idPolicy match {
           case IdentityPolicy.Product(left, right) => {
-              tree.provenance must beLike {
-                case ProductProvenance(DynamicProvenance(_),
-                                       StaticProvenance("/foo")) =>
-                  ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            tree.provenance must beLike {
+              case ProductProvenance(DynamicProvenance(_),
+                                     StaticProvenance("/foo")) =>
+                ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Right => {
-              tree.provenance mustEqual ValueProvenance
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual ValueProvenance
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Left => {
-              tree.provenance mustEqual StaticProvenance("/foo")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/foo")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Merge => {
-              tree.provenance mustEqual StaticProvenance("/foo")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/foo")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Cross => {
-              tree.provenance mustEqual StaticProvenance("/foo")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/foo")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Synthesize => {
-              tree.provenance must beLike {
-                case DynamicProvenance(_) => ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            tree.provenance must beLike {
+              case DynamicProvenance(_) => ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Strip => {
-              tree.provenance mustEqual ValueProvenance
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual ValueProvenance
+            tree.errors filterNot isWarning must beEmpty
+          }
         }
 
         tree.errors filterNot isWarning must beEmpty
@@ -761,49 +765,49 @@ object ProvenanceComputationSpecs
 
         f.idPolicy match {
           case IdentityPolicy.Product(left, right) => {
-              val prov = ProductProvenance(StaticProvenance("/foo"),
-                                           StaticProvenance("/bar"))
-              tree.provenance must beLike {
-                case ProductProvenance(DynamicProvenance(_), prov) => ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            val prov = ProductProvenance(StaticProvenance("/foo"),
+                                         StaticProvenance("/bar"))
+            tree.provenance must beLike {
+              case ProductProvenance(DynamicProvenance(_), prov) => ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Right => {
-              tree.provenance mustEqual StaticProvenance("/bar")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/bar")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Left => {
-              tree.provenance mustEqual StaticProvenance("/foo")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/foo")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Merge => {
-              val prov = ProductProvenance(StaticProvenance("/foo"),
-                                           StaticProvenance("/bar"))
-              tree.provenance mustEqual prov
-              tree.errors filterNot isWarning must beEmpty
-            }
+            val prov = ProductProvenance(StaticProvenance("/foo"),
+                                         StaticProvenance("/bar"))
+            tree.provenance mustEqual prov
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Cross => {
-              val prov = ProductProvenance(StaticProvenance("/foo"),
-                                           StaticProvenance("/bar"))
-              tree.provenance mustEqual prov
-              tree.errors filterNot isWarning must beEmpty
-            }
+            val prov = ProductProvenance(StaticProvenance("/foo"),
+                                         StaticProvenance("/bar"))
+            tree.provenance mustEqual prov
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Synthesize => {
-              tree.provenance must beLike {
-                case DynamicProvenance(_) => ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            tree.provenance must beLike {
+              case DynamicProvenance(_) => ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Strip => {
-              tree.provenance mustEqual ValueProvenance
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual ValueProvenance
+            tree.errors filterNot isWarning must beEmpty
+          }
         }
 
         tree.errors filterNot isWarning must beEmpty
@@ -1245,7 +1249,8 @@ object ProvenanceComputationSpecs
       "Solve" >> {
         {
           val tree =
-            compileSingle("""
+            compileSingle(
+                """
             | foo := //foo
             | foobar := solve 'a {a: 'a, bar: count(foo where foo.a = 'a)}
             | foobaz := solve 'b {b: 'b, baz: count(foo where foo.b = 'b)}
@@ -1437,33 +1442,33 @@ object ProvenanceComputationSpecs
             } else {
               f.idPolicy match {
                 case IdentityPolicy.Product(left, right) => {
-                    tree.provenance mustEqual NullProvenance
-                    tree.errors mustEqual Set(UnionProvenanceDifferentLength)
-                  }
+                  tree.provenance mustEqual NullProvenance
+                  tree.errors mustEqual Set(UnionProvenanceDifferentLength)
+                }
 
                 case _: IdentityPolicy.Retain => {
-                    tree.provenance must beLike {
-                      case CoproductProvenance(StaticProvenance("/bar"),
-                                               StaticProvenance("/baz")) =>
-                        ok
-                    }
-                    tree.errors filterNot isWarning must beEmpty
+                  tree.provenance must beLike {
+                    case CoproductProvenance(StaticProvenance("/bar"),
+                                             StaticProvenance("/baz")) =>
+                      ok
                   }
+                  tree.errors filterNot isWarning must beEmpty
+                }
 
                 case IdentityPolicy.Synthesize => {
-                    tree.provenance must beLike {
-                      case CoproductProvenance(DynamicProvenance(_),
-                                               StaticProvenance("/baz")) =>
-                        ok
-                    }
-                    tree.errors filterNot isWarning must beEmpty
+                  tree.provenance must beLike {
+                    case CoproductProvenance(DynamicProvenance(_),
+                                             StaticProvenance("/baz")) =>
+                      ok
                   }
+                  tree.errors filterNot isWarning must beEmpty
+                }
 
                 case IdentityPolicy.Strip => {
-                    tree.provenance mustEqual NullProvenance
-                    tree.errors filterNot isWarning mustEqual Set(
-                        UnionProvenanceDifferentLength)
-                  }
+                  tree.provenance mustEqual NullProvenance
+                  tree.errors filterNot isWarning mustEqual Set(
+                      UnionProvenanceDifferentLength)
+                }
               }
             }
           }
@@ -1475,57 +1480,57 @@ object ProvenanceComputationSpecs
 
             f.idPolicy match {
               case IdentityPolicy.Product(left, right) => {
-                  tree.provenance mustEqual NullProvenance
-                  tree.errors filterNot isWarning mustEqual Set(
-                      UnionProvenanceDifferentLength)
-                }
+                tree.provenance mustEqual NullProvenance
+                tree.errors filterNot isWarning mustEqual Set(
+                    UnionProvenanceDifferentLength)
+              }
 
               case IdentityPolicy.Retain.Right => {
-                  val prov = CoproductProvenance(StaticProvenance("/bar"),
-                                                 StaticProvenance("/baz"))
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                val prov = CoproductProvenance(StaticProvenance("/bar"),
+                                               StaticProvenance("/baz"))
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Left => {
-                  val prov = CoproductProvenance(StaticProvenance("/bar"),
-                                                 StaticProvenance("/baz"))
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                val prov = CoproductProvenance(StaticProvenance("/bar"),
+                                               StaticProvenance("/baz"))
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Merge => {
-                  tree.provenance must beLike {
-                    case CoproductProvenance(StaticProvenance("/bar"),
-                                             StaticProvenance("/baz")) =>
-                      ok
-                  }
-                  tree.errors filterNot isWarning must beEmpty
+                tree.provenance must beLike {
+                  case CoproductProvenance(StaticProvenance("/bar"),
+                                           StaticProvenance("/baz")) =>
+                    ok
                 }
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Cross => {
-                  tree.provenance must beLike {
-                    case CoproductProvenance(StaticProvenance("/bar"),
-                                             StaticProvenance("/baz")) =>
-                      ok
-                  }
-                  tree.errors filterNot isWarning must beEmpty
+                tree.provenance must beLike {
+                  case CoproductProvenance(StaticProvenance("/bar"),
+                                           StaticProvenance("/baz")) =>
+                    ok
                 }
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Synthesize => {
-                  tree.provenance must beLike {
-                    case CoproductProvenance(DynamicProvenance(_),
-                                             StaticProvenance("/baz")) =>
-                      ok
-                  }
-                  tree.errors filterNot isWarning must beEmpty
+                tree.provenance must beLike {
+                  case CoproductProvenance(DynamicProvenance(_),
+                                           StaticProvenance("/baz")) =>
+                    ok
                 }
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Strip => {
-                  tree.provenance mustEqual NullProvenance
-                  tree.errors filterNot isWarning mustEqual Set(
-                      UnionProvenanceDifferentLength)
-                }
+                tree.provenance mustEqual NullProvenance
+                tree.errors filterNot isWarning mustEqual Set(
+                    UnionProvenanceDifferentLength)
+              }
             }
           }
         }
@@ -1536,58 +1541,58 @@ object ProvenanceComputationSpecs
 
             f.idPolicy match {
               case IdentityPolicy.Product(left, right) => {
-                  val product = ProductProvenance(StaticProvenance("/foo"),
-                                                  StaticProvenance("/bar"))
-                  tree.provenance must beLike {
-                    case ProductProvenance(DynamicProvenance(_), product) => ok
-                  }
-                  tree.errors filterNot isWarning must beEmpty
+                val product = ProductProvenance(StaticProvenance("/foo"),
+                                                StaticProvenance("/bar"))
+                tree.provenance must beLike {
+                  case ProductProvenance(DynamicProvenance(_), product) => ok
                 }
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Right => {
-                  val prov = StaticProvenance("/foo")
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                val prov = StaticProvenance("/foo")
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Left => {
-                  val prov = ProductProvenance(StaticProvenance("/foo"),
-                                               StaticProvenance("/bar"))
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                val prov = ProductProvenance(StaticProvenance("/foo"),
+                                             StaticProvenance("/bar"))
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Merge => {
-                  //note provenance is not canonicalize here, hence the two `ProductProvenance`
-                  val product = ProductProvenance(StaticProvenance("/bar"),
-                                                  StaticProvenance("/foo"))
-                  val prov =
-                    ProductProvenance(StaticProvenance("/foo"), product)
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                //note provenance is not canonicalize here, hence the two `ProductProvenance`
+                val product = ProductProvenance(StaticProvenance("/bar"),
+                                                StaticProvenance("/foo"))
+                val prov =
+                  ProductProvenance(StaticProvenance("/foo"), product)
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Retain.Cross => {
-                  //note provenance is not canonicalize here, hence the two `ProductProvenance`
-                  val product = ProductProvenance(StaticProvenance("/bar"),
-                                                  StaticProvenance("/foo"))
-                  val prov =
-                    ProductProvenance(StaticProvenance("/foo"), product)
-                  tree.provenance mustEqual prov
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                //note provenance is not canonicalize here, hence the two `ProductProvenance`
+                val product = ProductProvenance(StaticProvenance("/bar"),
+                                                StaticProvenance("/foo"))
+                val prov =
+                  ProductProvenance(StaticProvenance("/foo"), product)
+                tree.provenance mustEqual prov
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Synthesize => {
-                  tree.provenance must beLike {
-                    case DynamicProvenance(_) => ok
-                  }
-                  tree.errors filterNot isWarning must beEmpty
+                tree.provenance must beLike {
+                  case DynamicProvenance(_) => ok
                 }
+                tree.errors filterNot isWarning must beEmpty
+              }
 
               case IdentityPolicy.Strip => {
-                  tree.provenance mustEqual ValueProvenance
-                  tree.errors filterNot isWarning must beEmpty
-                }
+                tree.provenance mustEqual ValueProvenance
+                tree.errors filterNot isWarning must beEmpty
+              }
             }
           }
         }
@@ -1696,7 +1701,8 @@ object ProvenanceComputationSpecs
         {
           val tree = compileSingle("if true then //bar else //baz")
           tree.provenance mustEqual CoproductProvenance(
-              StaticProvenance("/bar"), StaticProvenance("/baz"))
+              StaticProvenance("/bar"),
+              StaticProvenance("/baz"))
           tree.errors must beEmpty
         }
         {
@@ -1718,7 +1724,8 @@ object ProvenanceComputationSpecs
         }
         {
           val tree =
-            compileSingle("""
+            compileSingle(
+                """
             //foo ~ //bar ~ //baz 
             ({a: //baz - //foo} where true) union //foo + //bar""")
           tree.provenance must beLike {
@@ -1895,7 +1902,8 @@ object ProvenanceComputationSpecs
         }
         {
           val tree =
-            compileSingle("""
+            compileSingle(
+                """
             | foo := //foo
             | foobar := solve 'a {a: 'a, bar: count(foo where foo.a = 'a)}
             | foobar union 5
@@ -1915,7 +1923,8 @@ object ProvenanceComputationSpecs
 
           tree.provenance must beLike {
             case CoproductProvenance(
-                CoproductProvenance(StaticProvenance("/billing"), _), _) =>
+                CoproductProvenance(StaticProvenance("/billing"), _),
+                _) =>
               ok
           }
           tree.errors must beEmpty
@@ -1923,7 +1932,8 @@ object ProvenanceComputationSpecs
         // Regression test for Pivotal #37558157
         {
           val tree =
-            compileSingle("""
+            compileSingle(
+                """
             | athletes := //summer_games/athletes
             | 
             | firstHalf := athletes.Name where athletes.Population < 1000
@@ -2035,10 +2045,10 @@ object ProvenanceComputationSpecs
         val tree =
           compileSingle("foo(x) := //baz union x union //qux foo(//bar)")
         tree.provenance must beLike {
-          case CoproductProvenance(
-              CoproductProvenance(StaticProvenance("/baz"),
-                                  StaticProvenance("/bar")),
-              StaticProvenance("/qux")) =>
+          case CoproductProvenance(CoproductProvenance(
+                                   StaticProvenance("/baz"),
+                                   StaticProvenance("/bar")),
+                                   StaticProvenance("/qux")) =>
             ok
         }
         tree.errors must beEmpty
@@ -2750,28 +2760,28 @@ object ProvenanceComputationSpecs
           f.idPolicy match {
             case IdentityPolicy.Product(IdentityPolicy.Synthesize,
                                         IdentityPolicy.Retain.Merge) => {
-                tree.provenance must beLike {
-                  case ProductProvenance(DynamicProvenance(_),
-                                         StaticProvenance("/clicks")) =>
-                    ok
-                }
-                tree.errors filterNot isWarning must beEmpty
+              tree.provenance must beLike {
+                case ProductProvenance(DynamicProvenance(_),
+                                       StaticProvenance("/clicks")) =>
+                  ok
               }
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case _: IdentityPolicy.Retain => {
-                tree.provenance mustEqual StaticProvenance("/clicks")
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual StaticProvenance("/clicks")
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case IdentityPolicy.Synthesize => {
-                tree.provenance mustEqual NullProvenance
-                tree.errors mustEqual Set(OperationOnUnrelatedSets)
-              }
+              tree.provenance mustEqual NullProvenance
+              tree.errors mustEqual Set(OperationOnUnrelatedSets)
+            }
 
             case IdentityPolicy.Strip => {
-                tree.provenance mustEqual StaticProvenance("/clicks")
-                tree.errors filterNot isWarning must beEmpty
-              }
+              tree.provenance mustEqual StaticProvenance("/clicks")
+              tree.errors filterNot isWarning must beEmpty
+            }
 
             case _ => ko //need to add a new case for a new IdentityPolicy
           }
@@ -2791,43 +2801,43 @@ object ProvenanceComputationSpecs
         f.idPolicy match {
           case IdentityPolicy.Product(IdentityPolicy.Synthesize,
                                       IdentityPolicy.Retain.Merge) => {
-              tree.provenance must beLike {
-                case ProductProvenance(DynamicProvenance(_),
-                                       StaticProvenance("/clicks")) =>
-                  ok
-              }
-              tree.errors filterNot isWarning must beEmpty
+            tree.provenance must beLike {
+              case ProductProvenance(DynamicProvenance(_),
+                                     StaticProvenance("/clicks")) =>
+                ok
             }
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Right => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Left => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Merge => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Retain.Cross => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case IdentityPolicy.Synthesize => {
-              tree.provenance mustEqual NullProvenance
-              tree.errors mustEqual Set(OperationOnUnrelatedSets)
-            }
+            tree.provenance mustEqual NullProvenance
+            tree.errors mustEqual Set(OperationOnUnrelatedSets)
+          }
 
           case IdentityPolicy.Strip => {
-              tree.provenance mustEqual StaticProvenance("/clicks")
-              tree.errors filterNot isWarning must beEmpty
-            }
+            tree.provenance mustEqual StaticProvenance("/clicks")
+            tree.errors filterNot isWarning must beEmpty
+          }
 
           case _ => ko //need to add a new case for a new IdentityPolicy
         }

@@ -68,8 +68,8 @@ object Comet {
   def string(callbackName: String): Flow[String, ByteString, NotUsed] = {
     Flow[String]
       .map(str =>
-            ByteString.fromString(
-                "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
+        ByteString.fromString(
+            "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
       .via(flow(callbackName))
   }
 
@@ -109,8 +109,8 @@ object Comet {
       .prepend(Source.single(initialChunk))
   }
 
-  private def formatted(
-      callbackName: ByteString, javascriptMessage: ByteString): ByteString = {
+  private def formatted(callbackName: ByteString,
+                        javascriptMessage: ByteString): ByteString = {
     val b: ByteStringBuilder = new ByteStringBuilder
     b.append(ByteString.fromString("""<script type="text/javascript">"""))
     b.append(callbackName)

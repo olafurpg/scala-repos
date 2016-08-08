@@ -30,8 +30,9 @@ import org.apache.spark.util.ThreadUtils
 /**
   * A set of asynchronous RDD actions available through an implicit conversion.
   */
-class AsyncRDDActions[T : ClassTag](self: RDD[T])
-    extends Serializable with Logging {
+class AsyncRDDActions[T: ClassTag](self: RDD[T])
+    extends Serializable
+    with Logging {
 
   /**
     * Returns a future for counting the number of elements in the RDD.
@@ -39,18 +40,17 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
   def countAsync(): FutureAction[Long] = self.withScope {
     val totalCount = new AtomicLong
     self.context.submitJob(self,
-                           (iter: Iterator[T]) =>
-                             {
-                               var result = 0L
-                               while (iter.hasNext) {
-                                 result += 1L
-                                 iter.next()
-                               }
-                               result
+                           (iter: Iterator[T]) => {
+                             var result = 0L
+                             while (iter.hasNext) {
+                               result += 1L
+                               iter.next()
+                             }
+                             result
                            },
                            Range(0, self.partitions.length),
                            (index: Int,
-                           data: Long) => totalCount.addAndGet(data),
+                            data: Long) => totalCount.addAndGet(data),
                            totalCount.get())
   }
 
@@ -114,12 +114,13 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
         val buf = new Array[Array[T]](p.size)
         self.context.setCallSite(callSite)
         self.context.setLocalProperties(localProperties)
-        val job = jobSubmitter.submitJob(
-            self,
-            (it: Iterator[T]) => it.take(left).toArray,
-            p,
-            (index: Int, data: Array[T]) => buf(index) = data,
-            Unit)
+        val job =
+          jobSubmitter.submitJob(self,
+                                 (it: Iterator[T]) => it.take(left).toArray,
+                                 p,
+                                 (index: Int,
+                                  data: Array[T]) => buf(index) = data,
+                                 Unit)
         job.flatMap { _ =>
           buf.foreach(results ++= _.take(num - results.size))
           continue(partsScanned + p.size)

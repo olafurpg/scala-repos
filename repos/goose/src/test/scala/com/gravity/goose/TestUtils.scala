@@ -146,8 +146,9 @@ object TestUtils {
     if (expectedKeywords != null) {
       val keywords: String = article.metaDescription
       assertNotNull("Meta Keywords was NULL!", keywords)
-      assertEquals(
-          "Meta Keywords was not as expected!", expectedKeywords, keywords)
+      assertEquals("Meta Keywords was not as expected!",
+                   expectedKeywords,
+                   keywords)
     }
   }
 

@@ -90,8 +90,8 @@ trait SimplestGenericActor extends GenericActor[Any]
   */
 trait ForwardableActor[From, To] { self: TypedActor[From, To] =>
 
-  protected def forwardMessageTo(
-      msg: From, forwardTo: TypedActor[From, To]): Unit
+  protected def forwardMessageTo(msg: From,
+                                 forwardTo: TypedActor[From, To]): Unit
 
   protected def reply(msg: To): Unit
 }

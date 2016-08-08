@@ -1,5 +1,5 @@
 trait Flow[-In, +Out] {
-  type Repr [+O] <: Flow[In, O]
+  type Repr[+O] <: Flow[In, O]
   def map: Repr[String]
 }
 

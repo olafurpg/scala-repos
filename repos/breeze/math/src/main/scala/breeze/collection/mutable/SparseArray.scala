@@ -37,7 +37,9 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
     private var used: Int,
     val size: Int,
     val default: V)
-    extends ArrayLike[V] with Storage[V] with Serializable {
+    extends ArrayLike[V]
+    with Storage[V]
+    with Serializable {
 
   def this(size: Int, default: V)(implicit manElem: ClassTag[V]) = {
     this(Array.empty, Array.empty, 0, size, default)
@@ -88,7 +90,7 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
     * value, the result may be an efficiently dense (or almost dense) paired
     * array.
     */
-  def map[B : ClassTag : Zero](f: V => B): SparseArray[B] = {
+  def map[B: ClassTag: Zero](f: V => B): SparseArray[B] = {
     val newZero = implicitly[Zero[B]].zero
     if (used <= length && f(default) == newZero) {
       // some default values but f(default) is still default
@@ -159,7 +161,7 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
       // were filtered ...
       var ii = used - 1
       while (ii >= 0 && index(ii) > newIndex(o) &&
-      index(ii) == newLength - 1) {
+             index(ii) == newLength - 1) {
         ii -= 1
         newLength -= 1
       }
@@ -331,20 +333,32 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
         val newData = ArrayUtil.copyOf(data, newLength)
 
         // copy existing data into new arrays
-        System.arraycopy(
-            index, insertPos, newIndex, insertPos + 1, used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, newData, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(index,
+                         insertPos,
+                         newIndex,
+                         insertPos + 1,
+                         used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         newData,
+                         insertPos + 1,
+                         used - insertPos - 1)
 
         // update pointers
         index = newIndex
         data = newData
       } else if (used - insertPos > 1) {
         // need to make room for new element mid-array
-        System.arraycopy(
-            index, insertPos, index, insertPos + 1, used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, data, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(index,
+                         insertPos,
+                         index,
+                         insertPos + 1,
+                         used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         data,
+                         insertPos + 1,
+                         used - insertPos - 1)
       }
 
       // assign new value
@@ -417,10 +431,10 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
     if (this.default != that.default)
       throw new IllegalArgumentException("default values should be equal")
     new SparseArray((this.index.slice(0, this.used) union that.index
-                          .slice(0, that.used)
-                          .map(_ + this.size)).toArray,
-                    (this.data.slice(0, this.used) union that.data.slice(
-                            0, that.used)).toArray,
+                      .slice(0, that.used)
+                      .map(_ + this.size)).toArray,
+                    (this.data.slice(0, this.used) union that.data
+                      .slice(0, that.used)).toArray,
                     this.used + that.used,
                     this.size + that.size,
                     this.default)
@@ -428,7 +442,7 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
 }
 
 object SparseArray {
-  def apply[@specialized(Int, Float, Double) T : ClassTag : Zero](values: T*) = {
+  def apply[@specialized(Int, Float, Double) T: ClassTag: Zero](values: T*) = {
     val rv = new SparseArray[T](Array.range(0, values.length),
                                 values.toArray,
                                 values.length,
@@ -447,7 +461,7 @@ object SparseArray {
     *
     * @author dramage
     */
-  def fill[@specialized(Int, Float, Double) T : ClassTag : Zero](length: Int)(
+  def fill[@specialized(Int, Float, Double) T: ClassTag: Zero](length: Int)(
       value: => T): SparseArray[T] = {
     if (value != implicitly[Zero[T]].zero) {
       val rv = new SparseArray[T](size = length)
@@ -462,8 +476,8 @@ object SparseArray {
     }
   }
 
-  def create[@specialized(Int, Float, Double) T : ClassTag : Zero](
-      length: Int)(values: (Int, T)*) = {
+  def create[@specialized(Int, Float, Double) T: ClassTag: Zero](length: Int)(
+      values: (Int, T)*) = {
     val rv = new SparseArray[T](length)
     for ((k, v) <- values) {
       rv(k) = v
@@ -471,7 +485,7 @@ object SparseArray {
     rv
   }
 
-  def tabulate[@specialized(Int, Float, Double) T : ClassTag : Zero](
+  def tabulate[@specialized(Int, Float, Double) T: ClassTag: Zero](
       length: Int)(fn: (Int => T)) = {
     val rv = new SparseArray[T](length)
     var i = 0

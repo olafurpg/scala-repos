@@ -66,7 +66,9 @@ trait MixableMappedField extends BaseField {
   * (e.g., MappedPassword) in the database
   */
 trait BaseMappedField
-    extends SelectableField with Bindable with MixableMappedField
+    extends SelectableField
+    with Bindable
+    with MixableMappedField
     with Serializable {
 
   def dbDisplay_? = true
@@ -265,8 +267,10 @@ trait MappedNullableField[
   */
 trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     extends TypedField[FieldType]
-    with BaseOwnedMappedField[OwnerType] with FieldIdentifier
-    with PSettableValueHolder[FieldType] with scala.Equals {
+    with BaseOwnedMappedField[OwnerType]
+    with FieldIdentifier
+    with PSettableValueHolder[FieldType]
+    with scala.Equals {
 
   /**
     * Will be set to the type of the field
@@ -496,9 +500,9 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     */
   protected def appendFieldId(in: Elem): Elem = fieldId match {
     case Some(i) => {
-        import util.Helpers._
-        in % ("id" -> i)
-      }
+      import util.Helpers._
+      in % ("id" -> i)
+    }
     case _ => in
   }
 
@@ -521,8 +525,8 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     real_i_set_!(runFilters(value, setFilter))
   }
 
-  def runFilters(
-      in: FieldType, filter: List[FieldType => FieldType]): FieldType =
+  def runFilters(in: FieldType,
+                 filter: List[FieldType => FieldType]): FieldType =
     filter match {
       case Nil => in
       case x :: xs => runFilters(x(in), xs)
@@ -536,12 +540,12 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
   def buildSetActualValue(accessor: Method,
                           inst: AnyRef,
                           columnName: String): (OwnerType, AnyRef) => Unit
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (OwnerType, Long, Boolean) => Unit
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (OwnerType, String) => Unit
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (OwnerType, Date) => Unit
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (OwnerType, Long, Boolean) => Unit
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (OwnerType, String) => Unit
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (OwnerType, Date) => Unit
   def buildSetBooleanValue(
       accessor: Method,
       columnName: String): (OwnerType, Boolean, Boolean) => Unit
@@ -702,12 +706,12 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
       case _ => true
     }) &&
     (other match {
-          case mapped: MappedField[_, _] => this.i_is_! == mapped.i_is_!
-          case ov: AnyRef
-              if (ov ne null) && dbFieldClass.isAssignableFrom(ov.getClass) =>
-            this.get == runFilters(ov.asInstanceOf[FieldType], setFilter)
-          case ov => this.get == ov
-        })
+      case mapped: MappedField[_, _] => this.i_is_! == mapped.i_is_!
+      case ov: AnyRef
+          if (ov ne null) && dbFieldClass.isAssignableFrom(ov.getClass) =>
+        this.get == runFilters(ov.asInstanceOf[FieldType], setFilter)
+      case ov => this.get == ov
+    })
   }
 
   def canEqual(that: Any) = that match {

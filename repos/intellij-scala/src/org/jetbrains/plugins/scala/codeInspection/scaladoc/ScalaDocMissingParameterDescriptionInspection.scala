@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package codeInspection
 package scaladoc
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool,
+  ProblemHighlightType,
+  ProblemsHolder
+}
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
@@ -18,8 +22,8 @@ class ScalaDocMissingParameterDescriptionInspection
 
   override def getDisplayName: String = "Missing Parameter Description"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitTag(s: ScDocTag) {
         if (!ScalaDocMissingParameterDescriptionInspection.OurTags.contains(

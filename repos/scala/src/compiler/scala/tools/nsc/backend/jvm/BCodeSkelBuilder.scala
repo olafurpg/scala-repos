@@ -45,8 +45,12 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
    *   - `jumpDest` , `cleanups` , `labelDefsAtOrUnder`
    */
   abstract class PlainSkelBuilder(cunit: CompilationUnit)
-      extends BCClassGen with BCAnnotGen with BCInnerClassGen
-      with JAndroidBuilder with BCForwardersGen with BCPickles
+      extends BCClassGen
+      with BCAnnotGen
+      with BCInnerClassGen
+      with JAndroidBuilder
+      with BCForwardersGen
+      with BCPickles
       with BCJGenSigGen {
 
     // Strangely I can't find this in the asm code 255, but reserving 1 for "this"
@@ -111,8 +115,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
 
       val shouldAddLambdaDeserialize =
         (settings.target.value == "jvm-1.8" &&
-            settings.Ydelambdafy.value == "method" &&
-            indyLambdaHosts.contains(cnode.name))
+          settings.Ydelambdafy.value == "method" &&
+          indyLambdaHosts.contains(cnode.name))
 
       if (shouldAddLambdaDeserialize) backendUtils.addLambdaDeserialize(cnode)
 
@@ -148,8 +152,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
                   interfaceNames.toArray)
 
       if (emitSource) {
-        cnode.visitSource(
-            cunit.source.toString, null /* SourceDebugExtension */ )
+        cnode
+          .visitSource(cunit.source.toString, null /* SourceDebugExtension */ )
       }
 
       enclosingMethodAttribute(claszSymbol,
@@ -186,8 +190,10 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
             }
             if (isCandidateForForwarders) {
               log(s"Adding static forwarders from '$claszSymbol' to implementations in '$lmoc'")
-              addForwarders(
-                  isRemote(claszSymbol), cnode, thisName, lmoc.moduleClass)
+              addForwarders(isRemote(claszSymbol),
+                            cnode,
+                            thisName,
+                            lmoc.moduleClass)
             }
           }
         }
@@ -206,7 +212,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
           "L" + thisName + ";",
           null, // no java-generic-signature
           null // no initial value
-          )
+      )
 
       fv.visitEnd()
     }
@@ -366,7 +372,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
     object locals {
 
       private val slots =
-        mutable.Map.empty[Symbol, Local] // (local-or-param-sym -> Local(BType, name, idx, isSynth))
+        mutable.Map
+          .empty[Symbol, Local] // (local-or-param-sym -> Local(BType, name, idx, isSynth))
 
       private var nxtIdx = -1 // next available index for local-var
 
@@ -402,11 +409,11 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
       private def makeLocal(sym: Symbol, tk: BType): Local = {
         assert(!slots.contains(sym), "attempt to create duplicate local var.")
         assert(nxtIdx != -1, "not a valid start index")
-        val loc = Local(
-            tk, sym.javaSimpleName.toString, nxtIdx, sym.isSynthetic)
+        val loc =
+          Local(tk, sym.javaSimpleName.toString, nxtIdx, sym.isSynthetic)
         slots += (sym -> loc)
-        assert(
-            tk.size > 0, "makeLocal called for a symbol whose type is Unit.")
+        assert(tk.size > 0,
+               "makeLocal called for a symbol whose type is Unit.")
         nxtIdx += tk.size
         loc
       }
@@ -599,7 +606,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
           if (isAbstractMethod) asm.Opcodes.ACC_ABSTRACT else 0,
           if (methSymbol.isStrictFP) asm.Opcodes.ACC_STRICT else 0,
           if (isNative)
-            asm.Opcodes.ACC_NATIVE else 0 // native methods of objects are generated in mirror classes
+            asm.Opcodes.ACC_NATIVE
+          else 0 // native methods of objects are generated in mirror classes
       )
 
       initJMethod(flags, params.map(_.symbol))
@@ -615,8 +623,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
        * but the same vars (given by the LabelDef's params) can be reused,
        * because no LabelDef ends up nested within itself after such duplication.
        */
-      for (ld <- labelDefsAtOrUnder(dd.rhs); ldp <- ld.params; if !locals
-                                                     .contains(ldp.symbol)) {
+      for (ld <- labelDefsAtOrUnder(dd.rhs); ldp <- ld.params;
+           if !locals.contains(ldp.symbol)) {
         // the tail-calls xform results in symbols shared btw method-params and labelDef-params, thus the guard above.
         locals.makeLocal(ldp.symbol)
       }
@@ -628,16 +636,15 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
           genLoad(rhs, returnType)
 
           rhs match {
-            case Return(_) | Block(_, Return(_)) | Throw(_) | Block(
-                _, Throw(_)) =>
+            case Return(_) | Block(_, Return(_)) | Throw(_) |
+                Block(_, Throw(_)) =>
               ()
             case EmptyTree =>
-              globalError(
-                  "Concrete method has no definition: " + dd +
-                  (if (settings.debug)
-                     "(found: " +
+              globalError("Concrete method has no definition: " + dd +
+                (if (settings.debug)
+                   "(found: " +
                      methSymbol.owner.info.decls.toList.mkString(", ") + ")"
-                   else ""))
+                 else ""))
             case _ =>
               bc emitRETURN returnType
           }
@@ -715,8 +722,11 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
         val jname = callee.javaSimpleName.toString
         val jowner = internalName(callee.owner)
         val jtype = methodBTypeFromSymbol(callee).descriptor
-        insnModB = new asm.tree.MethodInsnNode(
-            asm.Opcodes.INVOKESPECIAL, jowner, jname, jtype, false)
+        insnModB = new asm.tree.MethodInsnNode(asm.Opcodes.INVOKESPECIAL,
+                                               jowner,
+                                               jname,
+                                               jtype,
+                                               false)
       }
 
       var insnParcA: asm.tree.AbstractInsnNode = null
@@ -739,11 +749,16 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
         val jowner = internalName(callee.owner)
         val jname = callee.javaSimpleName.toString
         val jtype = methodBTypeFromSymbol(callee).descriptor
-        insnParcA = new asm.tree.MethodInsnNode(
-            asm.Opcodes.INVOKESTATIC, jowner, jname, jtype, false)
+        insnParcA = new asm.tree.MethodInsnNode(asm.Opcodes.INVOKESTATIC,
+                                                jowner,
+                                                jname,
+                                                jtype,
+                                                false)
         // PUTSTATIC `thisName`.CREATOR;
-        insnParcB = new asm.tree.FieldInsnNode(
-            asm.Opcodes.PUTSTATIC, thisName, "CREATOR", andrFieldDescr)
+        insnParcB = new asm.tree.FieldInsnNode(asm.Opcodes.PUTSTATIC,
+                                               thisName,
+                                               "CREATOR",
+                                               andrFieldDescr)
       }
 
       // insert a few instructions for initialization before each return instruction

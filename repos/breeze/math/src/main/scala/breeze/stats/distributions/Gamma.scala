@@ -31,7 +31,9 @@ import scala.math.pow
   * @author dlwh
   */
 case class Gamma(shape: Double, scale: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf
     with HasInverseCdf {
   if (shape <= 0.0 || scale <= 0.0)
     throw new IllegalArgumentException("Shape and scale must be positive")

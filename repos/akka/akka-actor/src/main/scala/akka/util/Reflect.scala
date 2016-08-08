@@ -30,11 +30,9 @@ private[akka] object Reflect {
     try {
       val c = Class.forName("sun.reflect.Reflection")
       val m = c.getMethod("getCallerClass", Array(classOf[Int]): _*)
-      Some(
-          (i: Int) ⇒
-            m.invoke(
-                  null, Array[AnyRef](i.asInstanceOf[java.lang.Integer]): _*)
-              .asInstanceOf[Class[_]])
+      Some((i: Int) ⇒
+        m.invoke(null, Array[AnyRef](i.asInstanceOf[java.lang.Integer]): _*)
+          .asInstanceOf[Class[_]])
     } catch {
       case NonFatal(e) ⇒ None
     }
@@ -46,7 +44,8 @@ private[akka] object Reflect {
     * @return a new instance from the default constructor of the given class
     */
   private[akka] def instantiate[T](clazz: Class[T]): T =
-    try clazz.newInstance catch {
+    try clazz.newInstance
+    catch {
       case iae: IllegalAccessException ⇒
         val ctor = clazz.getDeclaredConstructor()
         ctor.setAccessible(true)
@@ -57,8 +56,8 @@ private[akka] object Reflect {
     * INTERNAL API
     * Calls findConstructor and invokes it with the given arguments.
     */
-  private[akka] def instantiate[T](
-      clazz: Class[T], args: immutable.Seq[Any]): T = {
+  private[akka] def instantiate[T](clazz: Class[T],
+                                   args: immutable.Seq[Any]): T = {
     instantiate(findConstructor(clazz, args), args)
   }
 
@@ -66,10 +65,11 @@ private[akka] object Reflect {
     * INTERNAL API
     * Invokes the constructor with the given arguments.
     */
-  private[akka] def instantiate[T](
-      constructor: Constructor[T], args: immutable.Seq[Any]): T = {
+  private[akka] def instantiate[T](constructor: Constructor[T],
+                                   args: immutable.Seq[Any]): T = {
     constructor.setAccessible(true)
-    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*) catch {
+    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*)
+    catch {
       case e: IllegalArgumentException ⇒
         val argString = args map safeGetClass mkString ("[", ", ", "]")
         throw new IllegalArgumentException(
@@ -84,7 +84,8 @@ private[akka] object Reflect {
     * right constructor.
     */
   private[akka] def findConstructor[T](
-      clazz: Class[T], args: immutable.Seq[Any]): Constructor[T] = {
+      clazz: Class[T],
+      args: immutable.Seq[Any]): Constructor[T] = {
     def error(msg: String): Nothing = {
       val argClasses = args map safeGetClass mkString ", "
       throw new IllegalArgumentException(
@@ -102,11 +103,11 @@ private[akka] object Reflect {
             val parameterTypes = c.getParameterTypes
             parameterTypes.length == length &&
             (parameterTypes.iterator zip args.iterator forall {
-                  case (found, required) ⇒
-                    found.isInstance(required) ||
-                    BoxedType(found).isInstance(required) ||
-                    (required == null && !found.isPrimitive)
-                })
+              case (found, required) ⇒
+                found.isInstance(required) ||
+                  BoxedType(found).isInstance(required) ||
+                  (required == null && !found.isPrimitive)
+            })
           }
         if (candidates.hasNext) {
           val cstrtr = candidates.next()
@@ -158,8 +159,10 @@ private[akka] object Reflect {
     * INTERNAL API
     * Set a val inside a class.
     */
-  @tailrec protected[akka] final def lookupAndSetField(
-      clazz: Class[_], instance: AnyRef, name: String, value: Any): Boolean = {
+  @tailrec protected[akka] final def lookupAndSetField(clazz: Class[_],
+                                                       instance: AnyRef,
+                                                       name: String,
+                                                       value: Any): Boolean = {
     @tailrec
     def clearFirst(fields: Array[java.lang.reflect.Field], idx: Int): Boolean =
       if (idx < fields.length) {

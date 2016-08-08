@@ -51,7 +51,9 @@ class HiveMetastoreCatalogSuite extends SparkFunSuite with TestHiveSingleton {
 }
 
 class DataSourceWithHiveMetastoreCatalogSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import testImplicits._
 
@@ -64,13 +66,13 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
   Seq(
       "parquet" ->
-      ("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-          "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-          "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"),
+        ("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+        "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+        "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"),
       "orc" ->
-      ("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
-          "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
-          "org.apache.hadoop.hive.ql.io.orc.OrcSerde")
+        ("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
+        "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
+        "org.apache.hadoop.hive.ql.io.orc.OrcSerde")
   ).foreach {
     case (provider, (inputFormat, outputFormat, serde)) =>
       test(
@@ -122,7 +124,7 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
             assert(hiveTable.tableType === CatalogTableType.EXTERNAL_TABLE)
             assert(hiveTable.storage.locationUri === Some(
-                    path.toURI.toString.stripSuffix(File.separator)))
+                path.toURI.toString.stripSuffix(File.separator)))
 
             val columns = hiveTable.schema
             assert(columns.map(_.name) === Seq("d1", "d2"))

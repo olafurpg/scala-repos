@@ -12,7 +12,8 @@ import scala.concurrent.duration._
 
 object TypedActorRemoteDeploySpec {
   val conf =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
       akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       akka.remote.netty.tcp.port = 0
                                                             """)

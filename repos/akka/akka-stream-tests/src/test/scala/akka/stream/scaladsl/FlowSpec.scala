@@ -32,12 +32,13 @@ object FlowSpec {
 }
 
 class FlowSpec
-    extends AkkaSpec(ConfigFactory.parseString(
+    extends AkkaSpec(
+        ConfigFactory.parseString(
             "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
   import FlowSpec._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -46,8 +47,8 @@ class FlowSpec
   val identity2: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
     identity(in)
 
-  class BrokenActorInterpreter(
-      _shell: GraphInterpreterShell, brokenMessage: Any)
+  class BrokenActorInterpreter(_shell: GraphInterpreterShell,
+                               brokenMessage: Any)
       extends ActorGraphInterpreter(_shell) {
 
     override protected[akka] def aroundReceive(receive: Receive, msg: Any) = {
@@ -103,17 +104,18 @@ class FlowSpec
 
       impl ! ActorGraphInterpreter.ExposedPublisher(shell, 0, publisher)
 
-      Flow.fromSinkAndSource(
-          Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
+      Flow.fromSinkAndSource(Sink.fromSubscriber(subscriber),
+                             Source.fromPublisher(publisher))
     })
 
-  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] = (f,
-  m) ⇒ f.runWith(Sink.asPublisher(false))(m)
+  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] =
+    (f, m) ⇒ f.runWith(Sink.asPublisher(false))(m)
 
   def toFanoutPublisher[In, Out](
       elasticity: Int): (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out] =
     (f, m) ⇒
-      f.runWith(Sink
+      f.runWith(
+          Sink
             .asPublisher(true)
             .withAttributes(Attributes.inputBuffer(elasticity, elasticity)))(m)
 
@@ -125,7 +127,7 @@ class FlowSpec
   "A Flow" must {
 
     for ((name, op) ← List("identity" -> identity, "identity2" -> identity2);
-    n ← List(1, 2, 4)) {
+         n ← List(1, 2, 4)) {
       s"request initial elements from upstream ($name, $n)" in {
         new ChainSetup(op,
                        settings.withInputBuffer(initialSize = n, maxSize = n),
@@ -377,7 +379,8 @@ class FlowSpec
         val downstream2Subscription = downstream2.expectSubscription()
 
         downstreamSubscription.request(5)
-        upstream.expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
+        upstream
+          .expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
 
         upstreamSubscription.sendNext("firstElement")
         downstream.expectNext("firstElement")
@@ -406,7 +409,8 @@ class FlowSpec
 
         downstreamSubscription.request(5)
 
-        upstream.expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
+        upstream
+          .expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
         upstreamSubscription.sendNext("element1")
         downstream.expectNext("element1")
         upstreamSubscription.expectRequest(1)
@@ -463,7 +467,8 @@ class FlowSpec
 
         upstreamSubscription.sendNext("a3")
         downstream.expectNext("a3")
-        downstream2.expectNoMsg(100.millis.dilated) // as nothing was requested yet, fanOutBox needs to cache element in this case
+        downstream2
+          .expectNoMsg(100.millis.dilated) // as nothing was requested yet, fanOutBox needs to cache element in this case
 
         downstream2Subscription.request(1)
         downstream2.expectNext("a3")
@@ -472,7 +477,8 @@ class FlowSpec
         // d2 now has 0 outstanding
         // buffer should be empty so we should be requesting one new element
 
-        upstream.expectRequest(upstreamSubscription, 1) // because of buffer size 1
+        upstream
+          .expectRequest(upstreamSubscription, 1) // because of buffer size 1
       }
     }
 
@@ -541,7 +547,8 @@ class FlowSpec
         downstream.expectNext("a3")
         downstream.expectComplete()
 
-        downstream2.expectNoMsg(100.millis.dilated) // as nothing was requested yet, fanOutBox needs to cache element in this case
+        downstream2
+          .expectNoMsg(100.millis.dilated) // as nothing was requested yet, fanOutBox needs to cache element in this case
 
         downstream2Subscription.request(1)
         downstream2.expectNext("a3")

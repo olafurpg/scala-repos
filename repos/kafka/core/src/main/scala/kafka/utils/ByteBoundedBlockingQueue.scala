@@ -42,8 +42,9 @@ class ByteBoundedBlockingQueue[E](val queueNumMessageCapacity: Int,
     * @throws NullPointerException if element is null
     * @throws InterruptedException if interrupted during waiting
     */
-  def offer(
-      e: E, timeout: Long, unit: TimeUnit = TimeUnit.MICROSECONDS): Boolean = {
+  def offer(e: E,
+            timeout: Long,
+            unit: TimeUnit = TimeUnit.MICROSECONDS): Boolean = {
     if (e == null)
       throw new NullPointerException("Putting null element into queue.")
     val startTime = SystemTime.nanoseconds
@@ -181,7 +182,8 @@ class ByteBoundedBlockingQueue[E](val queueNumMessageCapacity: Int,
         throw new IllegalStateException(
             "Iterator does not have a current element.")
       iter.remove()
-      if (currentByteSize.addAndGet(-sizeFunction.get(curr)) < queueByteCapacity)
+      if (currentByteSize
+            .addAndGet(-sizeFunction.get(curr)) < queueByteCapacity)
         putLock.synchronized(putLock.notify())
     }
   }

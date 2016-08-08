@@ -35,8 +35,8 @@ private[stream] object OutputStreamSourceStage {
 
 final private[stream] class OutputStreamSourceStage(
     writeTimeout: FiniteDuration)
-    extends GraphStageWithMaterializedValue[
-        SourceShape[ByteString], OutputStream] {
+    extends GraphStageWithMaterializedValue[SourceShape[ByteString],
+                                            OutputStream] {
   val out = Outlet[ByteString]("OutputStreamSource.out")
   override def initialAttributes = DefaultAttributes.outputStreamSource
   override val shape: SourceShape[ByteString] = SourceShape.of(out)
@@ -61,9 +61,9 @@ final private[stream] class OutputStreamSourceStage(
           case Failure(ex) ⇒ failStage(ex)
         }
 
-      private val upstreamCallback: AsyncCallback[
-          (AdapterToStageMessage, Promise[Unit])] = getAsyncCallback(
-          onAsyncMessage)
+      private val upstreamCallback: AsyncCallback[(AdapterToStageMessage,
+                                                   Promise[Unit])] =
+        getAsyncCallback(onAsyncMessage)
 
       override def wakeUp(msg: AdapterToStageMessage): Future[Unit] = {
         val p = Promise[Unit]()
@@ -128,8 +128,10 @@ final private[stream] class OutputStreamSourceStage(
       })
     }
     (logic,
-     new OutputStreamAdapter(
-         dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
+     new OutputStreamAdapter(dataQueue,
+                             downstreamStatus,
+                             logic.wakeUp,
+                             writeTimeout))
   }
 }
 
@@ -155,24 +157,21 @@ private[akka] class OutputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   private[this] def sendData(data: ByteString): Unit =
-    send(
-        () ⇒
-          {
-        try {
-          dataQueue.put(data)
-        } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
-        if (downstreamStatus.get() == Canceled) {
-          isPublisherAlive = false
-          throw publisherClosedException
-        }
+    send(() ⇒ {
+      try {
+        dataQueue.put(data)
+      } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
+      if (downstreamStatus.get() == Canceled) {
+        isPublisherAlive = false
+        throw publisherClosedException
+      }
     })
 
   @scala.throws(classOf[IOException])
-  private[this] def sendMessage(
-      message: AdapterToStageMessage, handleCancelled: Boolean = true) =
-    send(
-        () ⇒
-          try {
+  private[this] def sendMessage(message: AdapterToStageMessage,
+                                handleCancelled: Boolean = true) =
+    send(() ⇒
+      try {
         Await.ready(sendToStage(message), writeTimeout)
         if (downstreamStatus.get() == Canceled && handleCancelled) {
           //Publisher considered to be terminated at earliest convenience to minimize messages sending back and forth

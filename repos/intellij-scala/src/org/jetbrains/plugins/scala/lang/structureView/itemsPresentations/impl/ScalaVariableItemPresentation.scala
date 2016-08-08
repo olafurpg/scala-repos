@@ -6,7 +6,10 @@ package impl
 
 import javax.swing._
 
-import com.intellij.openapi.editor.colors.{CodeInsightColors, TextAttributesKey}
+import com.intellij.openapi.editor.colors.{
+  CodeInsightColors,
+  TextAttributesKey
+}
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.icons.Icons
 
@@ -14,8 +17,8 @@ import org.jetbrains.plugins.scala.icons.Icons
   * @author Alexander Podkhalyuzin
   * Date: 05.05.2008
   */
-class ScalaVariableItemPresentation(
-    private val element: PsiElement, isInherited: Boolean)
+class ScalaVariableItemPresentation(private val element: PsiElement,
+                                    isInherited: Boolean)
     extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getPresentableText(myElement)

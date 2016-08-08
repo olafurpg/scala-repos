@@ -9,7 +9,9 @@ import prop._
 import scala.util.Try
 
 class NaturalTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   import spire.std.bigInt._
   import ArbitrarySupport._
@@ -53,7 +55,7 @@ class NaturalTest
   property("x /% y") {
     forAll { (x: N, y: Positive[BigInt]) =>
       (Natural(x.num) /% Natural(y.num)) shouldBe
-      ((Natural(x.num / y.num), Natural(x.num % y.num)))
+        ((Natural(x.num / y.num), Natural(x.num % y.num)))
     }
   }
 

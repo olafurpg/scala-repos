@@ -20,8 +20,17 @@ import java.util.{Arrays, Date, List => JList}
 import javax.ws.rs.{GET, Produces, QueryParam}
 import javax.ws.rs.core.MediaType
 
-import org.apache.spark.executor.{InputMetrics => InternalInputMetrics, OutputMetrics => InternalOutputMetrics, ShuffleReadMetrics => InternalShuffleReadMetrics, ShuffleWriteMetrics => InternalShuffleWriteMetrics, TaskMetrics => InternalTaskMetrics}
-import org.apache.spark.scheduler.{AccumulableInfo => InternalAccumulableInfo, StageInfo}
+import org.apache.spark.executor.{
+  InputMetrics => InternalInputMetrics,
+  OutputMetrics => InternalOutputMetrics,
+  ShuffleReadMetrics => InternalShuffleReadMetrics,
+  ShuffleWriteMetrics => InternalShuffleWriteMetrics,
+  TaskMetrics => InternalTaskMetrics
+}
+import org.apache.spark.scheduler.{
+  AccumulableInfo => InternalAccumulableInfo,
+  StageInfo
+}
 import org.apache.spark.ui.SparkUI
 import org.apache.spark.ui.jobs.UIData.{StageUIData, TaskUIData}
 import org.apache.spark.util.Distribution
@@ -45,11 +54,15 @@ private[v1] class AllStagesResource(ui: SparkUI) {
       (status, stageList) <- stageAndStatus
       stageInfo: StageInfo <- stageList if adjStatuses.contains(status)
       stageUiData: StageUIData <- listener.synchronized {
-        listener.stageIdToData.get((stageInfo.stageId, stageInfo.attemptId))
-      }
+                                   listener.stageIdToData.get(
+                                       (stageInfo.stageId,
+                                        stageInfo.attemptId))
+                                 }
     } yield {
-      AllStagesResource.stageUiToStageData(
-          status, stageInfo, stageUiData, includeDetails = false)
+      AllStagesResource.stageUiToStageData(status,
+                                           stageInfo,
+                                           stageUiData,
+                                           includeDetails = false)
     }
   }
 }
@@ -182,7 +195,8 @@ private[v1] object AllStagesResource {
 
     val inputMetrics: Option[InputMetricDistributions] =
       new MetricHelper[InternalInputMetrics, InputMetricDistributions](
-          rawMetrics, quantiles) {
+          rawMetrics,
+          quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalInputMetrics] = {
           raw.inputMetrics
@@ -196,7 +210,8 @@ private[v1] object AllStagesResource {
 
     val outputMetrics: Option[OutputMetricDistributions] =
       new MetricHelper[InternalOutputMetrics, OutputMetricDistributions](
-          rawMetrics, quantiles) {
+          rawMetrics,
+          quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalOutputMetrics] = {
           raw.outputMetrics
@@ -228,8 +243,8 @@ private[v1] object AllStagesResource {
 
     val shuffleWriteMetrics: Option[ShuffleWriteMetricDistributions] =
       new MetricHelper[
-          InternalShuffleWriteMetrics, ShuffleWriteMetricDistributions](
-          rawMetrics, quantiles) {
+          InternalShuffleWriteMetrics,
+          ShuffleWriteMetricDistributions](rawMetrics, quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalShuffleWriteMetrics] = {
           raw.shuffleWriteMetrics
@@ -330,7 +345,8 @@ private[v1] object AllStagesResource {
   * metric.  After creating an instance, call metricOption to get the result type.
   */
 private[v1] abstract class MetricHelper[I, O](
-    rawMetrics: Seq[InternalTaskMetrics], quantiles: Array[Double]) {
+    rawMetrics: Seq[InternalTaskMetrics],
+    quantiles: Array[Double]) {
 
   def getSubmetrics(raw: InternalTaskMetrics): Option[I]
 

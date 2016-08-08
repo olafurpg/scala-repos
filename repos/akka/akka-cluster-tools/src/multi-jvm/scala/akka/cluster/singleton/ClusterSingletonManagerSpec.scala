@@ -38,7 +38,9 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
   val fifth = role("fifth")
   val sixth = role("sixth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -119,7 +121,8 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
     * The Singleton actor
     */
   class Consumer(queue: ActorRef, delegateTo: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor
+      with ActorLogging {
 
     import Consumer._
     import PointToPointChannel._
@@ -167,7 +170,8 @@ class ClusterSingletonManagerMultiJvmNode7 extends ClusterSingletonManagerSpec
 class ClusterSingletonManagerMultiJvmNode8 extends ClusterSingletonManagerSpec
 
 class ClusterSingletonManagerSpec
-    extends MultiNodeSpec(ClusterSingletonManagerSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterSingletonManagerSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import ClusterSingletonManagerSpec._
@@ -207,8 +211,10 @@ class ClusterSingletonManagerSpec
 
   def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
     runOn(nodes.filterNot(_ == nodes.head): _*) {
-      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
-          node(nodes.head).address)
+      memberProbe
+        .expectMsgType[MemberUp](15.seconds)
+        .member
+        .address should ===(node(nodes.head).address)
     }
     runOn(nodes.head) {
       memberProbe
@@ -225,8 +231,8 @@ class ClusterSingletonManagerSpec
         ClusterSingletonManager.props(
             singletonProps = Props(classOf[Consumer], queue, testActor),
             terminationMessage = End,
-            settings = ClusterSingletonManagerSettings(system).withRole(
-                  "worker")),
+            settings =
+              ClusterSingletonManagerSettings(system).withRole("worker")),
         name = "consumer")
     //#create-singleton-manager
   }
@@ -236,7 +242,7 @@ class ClusterSingletonManagerSpec
     system.actorOf(
         ClusterSingletonProxy.props(singletonManagerPath = "/user/consumer",
                                     settings = ClusterSingletonProxySettings(
-                                          system).withRole("worker")),
+                                        system).withRole("worker")),
         name = "consumerProxy")
     //#create-singleton-proxy
   }
@@ -292,8 +298,8 @@ class ClusterSingletonManagerSpec
     runOn(oldest) {
       expectMsg(5.seconds, msg)
     }
-    runOn(
-        roles.filterNot(r ⇒ r == oldest || r == controller || r == observer): _*) {
+    runOn(roles
+      .filterNot(r ⇒ r == oldest || r == controller || r == observer): _*) {
       expectNoMsg(1 second)
     }
     enterBarrier("after-" + msg + "-verified")
@@ -355,8 +361,14 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(first, fifth, msg = msg())
 
       join(sixth, first)
-      awaitMemberUp(
-          memberProbe, sixth, fifth, fourth, third, second, observer, first)
+      awaitMemberUp(memberProbe,
+                    sixth,
+                    fifth,
+                    fourth,
+                    third,
+                    second,
+                    observer,
+                    first)
       verifyMsg(first, msg = msg())
       verifyProxyMsg(first, sixth, msg = msg())
 

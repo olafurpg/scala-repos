@@ -17,7 +17,12 @@
 
 package org.apache.spark.rpc.netty
 
-import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  ConcurrentHashMap,
+  LinkedBlockingQueue,
+  ThreadPoolExecutor,
+  TimeUnit
+}
 import javax.annotation.concurrent.GuardedBy
 
 import scala.collection.JavaConverters._
@@ -54,8 +59,8 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   @GuardedBy("this")
   private var stopped = false
 
-  def registerRpcEndpoint(
-      name: String, endpoint: RpcEndpoint): NettyRpcEndpointRef = {
+  def registerRpcEndpoint(name: String,
+                          endpoint: RpcEndpoint): NettyRpcEndpointRef = {
     val addr = RpcEndpointAddress(nettyEnv.address, name)
     val endpointRef = new NettyRpcEndpointRef(nettyEnv.conf, addr, nettyEnv)
     synchronized {
@@ -63,7 +68,8 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
         throw new IllegalStateException("RpcEnv has been stopped")
       }
       if (endpoints.putIfAbsent(
-              name, new EndpointData(name, endpoint, endpointRef)) != null) {
+              name,
+              new EndpointData(name, endpoint, endpointRef)) != null) {
         throw new IllegalArgumentException(
             s"There is already an RpcEndpoint called $name")
       }
@@ -119,21 +125,22 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   }
 
   /** Posts a message sent by a remote endpoint. */
-  def postRemoteMessage(
-      message: RequestMessage, callback: RpcResponseCallback): Unit = {
-    val rpcCallContext = new RemoteNettyRpcCallContext(
-        nettyEnv, callback, message.senderAddress)
-    val rpcMessage = RpcMessage(
-        message.senderAddress, message.content, rpcCallContext)
-    postMessage(
-        message.receiver.name, rpcMessage, (e) => callback.onFailure(e))
+  def postRemoteMessage(message: RequestMessage,
+                        callback: RpcResponseCallback): Unit = {
+    val rpcCallContext =
+      new RemoteNettyRpcCallContext(nettyEnv, callback, message.senderAddress)
+    val rpcMessage =
+      RpcMessage(message.senderAddress, message.content, rpcCallContext)
+    postMessage(message.receiver.name,
+                rpcMessage,
+                (e) => callback.onFailure(e))
   }
 
   /** Posts a message sent by a local endpoint. */
   def postLocalMessage(message: RequestMessage, p: Promise[Any]): Unit = {
     val rpcCallContext = new LocalNettyRpcCallContext(message.senderAddress, p)
-    val rpcMessage = RpcMessage(
-        message.senderAddress, message.content, rpcCallContext)
+    val rpcMessage =
+      RpcMessage(message.senderAddress, message.content, rpcCallContext)
     postMessage(message.receiver.name, rpcMessage, (e) => p.tryFailure(e))
   }
 

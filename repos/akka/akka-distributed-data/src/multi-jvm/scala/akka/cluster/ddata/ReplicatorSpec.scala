@@ -18,7 +18,9 @@ object ReplicatorSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -32,7 +34,8 @@ class ReplicatorSpecMultiJvmNode2 extends ReplicatorSpec
 class ReplicatorSpecMultiJvmNode3 extends ReplicatorSpec
 
 class ReplicatorSpec
-    extends MultiNodeSpec(ReplicatorSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatorSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatorSpec._
   import Replicator._
@@ -40,7 +43,8 @@ class ReplicatorSpec
   override def initialParticipants = roles.size
 
   implicit val cluster = Cluster(system)
-  val replicator = system.actorOf(Replicator.props(ReplicatorSettings(system)
+  val replicator = system.actorOf(Replicator.props(
+                                      ReplicatorSettings(system)
                                         .withGossipInterval(1.second)
                                         .withMaxDeltaElements(10)),
                                   "replicator")
@@ -164,8 +168,8 @@ class ReplicatorSpec
       // in case user is not using the passed in existing value
       replicator ! Update(KeyJ, GSet(), WriteLocal)(_ + "a" + "b")
       expectMsg(UpdateSuccess(KeyJ, None))
-      replicator ! Update(KeyJ, GSet(), WriteLocal)(
-          _ ⇒ GSet.empty[String] + "c") // normal usage would be `_ + "c"`
+      replicator ! Update(KeyJ, GSet(), WriteLocal)(_ ⇒
+        GSet.empty[String] + "c") // normal usage would be `_ + "c"`
       expectMsg(UpdateSuccess(KeyJ, None))
       replicator ! Get(KeyJ, ReadLocal)
       val s = expectMsgPF() { case g @ GetSuccess(KeyJ, _) ⇒ g.get(KeyJ) }
@@ -551,7 +555,7 @@ class ReplicatorSpec
     runOn(second) {
       replicator ! Subscribe(KeyH, changedProbe.ref)
       replicator ! Update(KeyH, ORMap.empty[Flag], writeTwo)(_ +
-          ("a" -> Flag(enabled = false)))
+        ("a" -> Flag(enabled = false)))
       changedProbe.expectMsgPF() {
         case c @ Changed(KeyH) ⇒ c.get(KeyH).entries
       } should be(Map("a" -> Flag(enabled = false)))
@@ -561,7 +565,7 @@ class ReplicatorSpec
 
     runOn(first) {
       replicator ! Update(KeyH, ORMap.empty[Flag], writeTwo)(_ +
-          ("a" -> Flag(enabled = true)))
+        ("a" -> Flag(enabled = true)))
     }
 
     runOn(second) {
@@ -570,7 +574,7 @@ class ReplicatorSpec
       } should be(Map("a" -> Flag(enabled = true)))
 
       replicator ! Update(KeyH, ORMap.empty[Flag], writeTwo)(_ +
-          ("b" -> Flag(enabled = true)))
+        ("b" -> Flag(enabled = true)))
       changedProbe.expectMsgPF() {
         case c @ Changed(KeyH) ⇒ c.get(KeyH).entries
       } should be(

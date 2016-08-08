@@ -35,8 +35,10 @@ class ScTraitParentsImpl private (stub: StubElement[ScTemplateParents],
   def superTypes: Seq[ScType] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
-        .map(_.getType(TypingContext.empty).getOrAny)
+      return stub
+        .asInstanceOf[ScTemplateParentsStub]
+        .getTemplateParentsTypes ++ syntheticTypeElements.map(
+          _.getType(TypingContext.empty).getOrAny)
     }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)
   }

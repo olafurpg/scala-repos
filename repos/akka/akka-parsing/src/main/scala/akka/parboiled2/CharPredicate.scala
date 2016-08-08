@@ -55,28 +55,32 @@ sealed abstract class CharPredicate extends (Char ⇒ Boolean) {
   def matchesAny(string: String): Boolean = {
     @tailrec def rec(ix: Int): Boolean =
       if (ix == string.length) false
-      else if (this(string charAt ix)) true else rec(ix + 1)
+      else if (this(string charAt ix)) true
+      else rec(ix + 1)
     rec(0)
   }
 
   def matchesAll(string: String): Boolean = {
     @tailrec def rec(ix: Int): Boolean =
       if (ix == string.length) true
-      else if (!this(string charAt ix)) false else rec(ix + 1)
+      else if (!this(string charAt ix)) false
+      else rec(ix + 1)
     rec(0)
   }
 
   def indexOfFirstMatch(string: String): Int = {
     @tailrec def rec(ix: Int): Int =
       if (ix == string.length) -1
-      else if (this(string charAt ix)) ix else rec(ix + 1)
+      else if (this(string charAt ix)) ix
+      else rec(ix + 1)
     rec(0)
   }
 
   def indexOfFirstMismatch(string: String): Int = {
     @tailrec def rec(ix: Int): Int =
       if (ix == string.length) -1
-      else if (this(string charAt ix)) rec(ix + 1) else ix
+      else if (this(string charAt ix)) rec(ix + 1)
+      else ix
     rec(0)
   }
 
@@ -152,7 +156,7 @@ object CharPredicate {
   private def unmaskable(c: Char) = c >= 128
 
   // efficient handling of 7bit-ASCII chars
-  case class MaskBased private[CharPredicate](lowMask: Long, highMask: Long)
+  case class MaskBased private[CharPredicate] (lowMask: Long, highMask: Long)
       extends CharPredicate {
     def apply(c: Char): Boolean = {
       val mask = if (c < 64) lowMask else highMask
@@ -232,7 +236,7 @@ object CharPredicate {
       "CharPredicate.MaskBased(" + new String(toArray) + ')'
   }
 
-  class RangeBased private[CharPredicate](
+  class RangeBased private[CharPredicate] (
       private val range: NumericRange[Char])
       extends CharPredicate {
     def apply(c: Char): Boolean = range contains c
@@ -260,10 +264,10 @@ object CharPredicate {
 
     override def toString(): String =
       s"CharPredicate.RangeBased(start = ${range.start}, end = ${range.end}, " +
-      s"step = ${range.step.toInt}, inclusive = ${range.isInclusive})"
+        s"step = ${range.step.toInt}, inclusive = ${range.isInclusive})"
   }
 
-  class ArrayBased private[CharPredicate](private val chars: Array[Char])
+  class ArrayBased private[CharPredicate] (private val chars: Array[Char])
       extends CharPredicate {
     import java.util.Arrays._
     sort(chars)
@@ -304,7 +308,7 @@ object CharPredicate {
       "CharPredicate.ArrayBased(" + new String(chars) + ')'
   }
 
-  case class General private[CharPredicate](predicate: Char ⇒ Boolean)
+  case class General private[CharPredicate] (predicate: Char ⇒ Boolean)
       extends CharPredicate {
     def apply(c: Char) = predicate(c)
 

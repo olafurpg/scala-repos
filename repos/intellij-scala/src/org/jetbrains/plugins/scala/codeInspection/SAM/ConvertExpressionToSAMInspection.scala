@@ -5,7 +5,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.codeInspection.SAM.ConvertExpressionToSAMInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
@@ -49,8 +53,8 @@ class ConvertExpressionToSAMInspection
                   res.append(funBody.getText)
                   res.toString()
                 }
-                val fix = new ReplaceExpressionWithSAMQuickFix(
-                    definition, replacement)
+                val fix =
+                  new ReplaceExpressionWithSAMQuickFix(definition, replacement)
                 val extendsBlock = definition.extendsBlock
                 val lBraceInParent = extendsBlock.templateBody.map(
                     _.startOffsetInParent + extendsBlock.startOffsetInParent)
@@ -81,15 +85,16 @@ class ConvertExpressionToSAMInspection
   }
 }
 
-class ReplaceExpressionWithSAMQuickFix(
-    elem: PsiElement, replacement: => String)
+class ReplaceExpressionWithSAMQuickFix(elem: PsiElement,
+                                       replacement: => String)
     extends AbstractFixOnPsiElement(inspectionName, elem) {
 
   override def doApplyFix(project: Project): Unit = {
     val element = getElement
     if (!element.isValid) return
-    element.replace(ScalaPsiElementFactory.createExpressionFromText(
-            replacement, element.getManager))
+    element.replace(
+        ScalaPsiElementFactory.createExpressionFromText(replacement,
+                                                        element.getManager))
   }
 }
 

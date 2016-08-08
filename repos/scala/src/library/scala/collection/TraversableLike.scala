@@ -67,10 +67,12 @@ import scala.language.higherKinds
   *  @define coll traversable collection
   */
 trait TraversableLike[+A, +Repr]
-    extends Any with HasNewBuilder[A, Repr] with FilterMonadic[A, Repr]
-    with TraversableOnce[A] with GenTraversableLike[A, Repr]
-    with Parallelizable[A, ParIterable[A]] {
-  self =>
+    extends Any
+    with HasNewBuilder[A, Repr]
+    with FilterMonadic[A, Repr]
+    with TraversableOnce[A]
+    with GenTraversableLike[A, Repr]
+    with Parallelizable[A, ParIterable[A]] { self =>
 
   import Traversable.breaks._
 
@@ -479,8 +481,9 @@ trait TraversableLike[+A, +Repr]
     sliceWithKnownBound(scala.math.max(from, 0), until)
 
   // Precondition: from >= 0, until > 0, builder already configured for building.
-  private[this] def sliceInternal(
-      from: Int, until: Int, b: Builder[A, Repr]): Repr = {
+  private[this] def sliceInternal(from: Int,
+                                  until: Int,
+                                  b: Builder[A, Repr]): Repr = {
     var i = 0
     breakable {
       for (x <- this) {
@@ -492,8 +495,9 @@ trait TraversableLike[+A, +Repr]
     b.result
   }
   // Precondition: from >= 0
-  private[scala] def sliceWithKnownDelta(
-      from: Int, until: Int, delta: Int): Repr = {
+  private[scala] def sliceWithKnownDelta(from: Int,
+                                         until: Int,
+                                         delta: Int): Repr = {
     val b = newBuilder
     if (until <= from) b.result
     else {

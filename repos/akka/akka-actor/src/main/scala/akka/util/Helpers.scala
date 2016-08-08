@@ -15,7 +15,10 @@ import java.util.Locale
 object Helpers {
 
   val isWindows: Boolean =
-    System.getProperty("os.name", "").toLowerCase(Locale.ROOT).indexOf("win") >= 0
+    System
+      .getProperty("os.name", "")
+      .toLowerCase(Locale.ROOT)
+      .indexOf("win") >= 0
 
   def makePattern(s: String): Pattern =
     Pattern.compile(
@@ -29,7 +32,7 @@ object Helpers {
      */
     val diff =
       ((System.identityHashCode(a) & 0xffffffffL) -
-          (System.identityHashCode(b) & 0xffffffffL))
+        (System.identityHashCode(b) & 0xffffffffL))
     if (diff > 0) 1 else if (diff < 0) -1 else 0
   }
 
@@ -70,8 +73,8 @@ object Helpers {
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+~"
 
   @tailrec
-  def base64(
-      l: Long, sb: java.lang.StringBuilder = new java.lang.StringBuilder("$"))
+  def base64(l: Long,
+             sb: java.lang.StringBuilder = new java.lang.StringBuilder("$"))
     : String = {
     sb append base64chars.charAt(l.toInt & 63)
     val next = l >>> 6

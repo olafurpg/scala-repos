@@ -12,8 +12,9 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
     Json.obj("in" -> a.in.map(apply(Direction.In.some)),
              "out" -> a.out.map(apply(Direction.Out.some)))
 
-  def show(
-      challenge: Challenge, socketVersion: Int, direction: Option[Direction]) =
+  def show(challenge: Challenge,
+           socketVersion: Int,
+           direction: Option[Direction]) =
     Json.obj("challenge" -> apply(direction)(challenge),
              "socketVersion" -> socketVersion)
 
@@ -30,16 +31,16 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
         "initialFen" -> c.initialFen,
         "rated" -> c.mode.rated,
         "timeControl" ->
-        (c.timeControl match {
-              case c @ TimeControl.Clock(l, i) =>
-                Json.obj("type" -> "clock",
-                         "limit" -> l,
-                         "increment" -> i,
-                         "show" -> c.show)
-              case TimeControl.Correspondence(d) =>
-                Json.obj("type" -> "correspondence", "daysPerTurn" -> d)
-              case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
-            }),
+          (c.timeControl match {
+            case c @ TimeControl.Clock(l, i) =>
+              Json.obj("type" -> "clock",
+                       "limit" -> l,
+                       "increment" -> i,
+                       "show" -> c.show)
+            case TimeControl.Correspondence(d) =>
+              Json.obj("type" -> "correspondence", "daysPerTurn" -> d)
+            case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
+          }),
         "color" -> c.colorChoice.toString.toLowerCase,
         "perf" -> Json.obj("icon" -> iconChar(c).toString,
                            "name" -> c.perfType.name)

@@ -13,14 +13,15 @@ import Predef.{any2stringadd => _, _}
 import sbt.io.IO
 
 object SettingGraph {
-  def apply(structure: BuildStructure,
-            basedir: File,
-            scoped: ScopedKey[_],
-            generation: Int)(
-      implicit display: Show[ScopedKey[_]]): SettingGraph = {
+  def apply(
+      structure: BuildStructure,
+      basedir: File,
+      scoped: ScopedKey[_],
+      generation: Int)(implicit display: Show[ScopedKey[_]]): SettingGraph = {
     val cMap = flattenLocals(
-        compiled(structure.settings, false)(
-            structure.delegates, structure.scopeLocal, display))
+        compiled(structure.settings, false)(structure.delegates,
+                                            structure.scopeLocal,
+                                            display))
     def loop(scoped: ScopedKey[_], generation: Int): SettingGraph = {
       val key = scoped.key
       val scope = scoped.scope
@@ -66,7 +67,7 @@ case class SettingGraph(name: String,
                   (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
                   (x: SettingGraph) =>
                     "%s = %s" format
-                    (x.definedIn getOrElse { "" }, x.dataString))
+                      (x.definedIn getOrElse { "" }, x.dataString))
 }
 
 object Graph {
@@ -88,10 +89,10 @@ object Graph {
     def insertBar(s: String, at: Int): String =
       if (at < s.length)
         s.slice(0, at) +
-        (s(at).toString match {
-              case " " => "|"
-              case x => x
-            }) + s.slice(at + 1, s.length)
+          (s(at).toString match {
+            case " " => "|"
+            case x => x
+          }) + s.slice(at + 1, s.length)
       else s
     def toAsciiLines(node: A, level: Int): Vector[String] = {
       val line = limitLine(

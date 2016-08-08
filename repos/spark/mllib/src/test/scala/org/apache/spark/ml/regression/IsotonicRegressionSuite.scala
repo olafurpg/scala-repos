@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{DataFrame, Row}
 
 class IsotonicRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   private def generateIsotonicInput(labels: Seq[Double]): DataFrame = {
@@ -61,8 +62,9 @@ class IsotonicRegressionSuite
     assert(predictions === Array(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
 
     assert(model.boundaries === Vectors.dense(0, 1, 3, 4, 5, 6, 7, 8))
-    assert(model.predictions === Vectors.dense(
-            1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
+    assert(
+        model.predictions === Vectors
+          .dense(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
     assert(model.getIsotonic)
   }
 
@@ -163,9 +165,10 @@ class IsotonicRegressionSuite
 
   test("vector features column with feature index") {
     val dataset = sqlContext
-      .createDataFrame(Seq((4.0, Vectors.dense(0.0, 1.0)),
-                           (3.0, Vectors.dense(0.0, 2.0)),
-                           (5.0, Vectors.sparse(2, Array(1), Array(3.0)))))
+      .createDataFrame(
+          Seq((4.0, Vectors.dense(0.0, 1.0)),
+              (3.0, Vectors.dense(0.0, 2.0)),
+              (5.0, Vectors.sparse(2, Array(1), Array(3.0)))))
       .toDF("label", "features")
 
     val ir = new IsotonicRegression().setFeatureIndex(1)
@@ -197,8 +200,10 @@ class IsotonicRegressionSuite
     }
 
     val ir = new IsotonicRegression()
-    testEstimatorAndModelReadWrite(
-        ir, dataset, IsotonicRegressionSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(ir,
+                                   dataset,
+                                   IsotonicRegressionSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 

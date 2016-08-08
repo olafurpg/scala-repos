@@ -5,7 +5,10 @@ import com.intellij.codeInsight.CodeInsightUtilCore
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.codeInsight.template._
-import com.intellij.codeInsight.template.impl.{TemplateManagerImpl, TemplateState}
+import com.intellij.codeInsight.template.impl.{
+  TemplateManagerImpl,
+  TemplateState
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.{EditorColors, EditorColorsManager}
@@ -42,8 +45,9 @@ class IntroduceExplicitParameterIntention
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, _element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  _element: PsiElement): Boolean = {
     findExpression(_element, editor) match {
       case Some(x) => true
       case None => false
@@ -86,10 +90,14 @@ class IntroduceExplicitParameterIntention
 
       val names = NameSuggester.suggestNames(
           u,
-          new ScalaVariableValidator(
-              null, project, u, false, expr.getContext, expr.getContext) {
-            override def validateName(
-                name: String, increaseNumber: Boolean): String = {
+          new ScalaVariableValidator(null,
+                                     project,
+                                     u,
+                                     false,
+                                     expr.getContext,
+                                     expr.getContext) {
+            override def validateName(name: String,
+                                      increaseNumber: Boolean): String = {
               var res = super.validateName(name, increaseNumber)
               var index = 1
 
@@ -149,8 +157,8 @@ class IntroduceExplicitParameterIntention
     val diff = buf.length
     buf.append(expr.getText)
 
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        buf.toString(), element.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(buf.toString(), element.getManager)
 
     inWriteAction {
       val document = editor.getDocument
@@ -174,15 +182,23 @@ class IntroduceExplicitParameterIntention
       parent match {
         case f: ScFunctionExpr =>
           for (parameter <- f.parameters) {
-            val lookupExpr = new MyLookupExpression(
-                parameter.name, null, parameter, f, false, null)
-            builder.replaceElement(
-                parameter.nameId, parameter.name, lookupExpr, true)
+            val lookupExpr = new MyLookupExpression(parameter.name,
+                                                    null,
+                                                    parameter,
+                                                    f,
+                                                    false,
+                                                    null)
+            builder.replaceElement(parameter.nameId,
+                                   parameter.name,
+                                   lookupExpr,
+                                   true)
 
             val dependantParam =
               file.findElementAt(offsets(parameter.name) + diff)
-            builder.replaceElement(
-                dependantParam, parameter.name + "_1", parameter.name, false)
+            builder.replaceElement(dependantParam,
+                                   parameter.name + "_1",
+                                   parameter.name,
+                                   false)
 
             params.put(index, parameter.name)
             depends.put(index, parameter.name + "_1")
@@ -287,8 +303,8 @@ class IntroduceExplicitParameterIntention
     }
   }
 
-  private def findExpression(
-      _element: PsiElement, editor: Editor): Option[ScExpression] = {
+  private def findExpression(_element: PsiElement,
+                             editor: Editor): Option[ScExpression] = {
     var element: PsiElement = _element
     if (!element.getParent.isInstanceOf[ScUnderscoreSection]) {
       if (element.getTextRange.getStartOffset == editor.getCaretModel.getOffset) {

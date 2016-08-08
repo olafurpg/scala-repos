@@ -94,8 +94,8 @@ sealed abstract class InputInstances {
           el = x => Applicative[G].map(f(x))(b => elInput(b)),
           eof = Applicative[G].point(eofInput[B])
       )
-      override def foldRight[A, B](
-          fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
+      override def foldRight[A, B](fa: Input[A], z: => B)(
+          f: (A, => B) => B): B = fa.fold(
           empty = z,
           el = a => f(a, z),
           eof = z
@@ -114,16 +114,16 @@ sealed abstract class InputInstances {
     new Semigroup[Input[A]] {
       def append(a1: Input[A], a2: => Input[A]): Input[A] = a1.fold(
           empty = a2.fold(
-                empty = emptyInput,
-                el = elInput,
-                eof = eofInput
-            ),
+              empty = emptyInput,
+              el = elInput,
+              eof = eofInput
+          ),
           el = xa =>
-              a2.fold(
-                  empty = elInput(xa),
-                  el = ya => elInput(A.append(xa, ya)),
-                  eof = eofInput
-            ),
+            a2.fold(
+                empty = elInput(xa),
+                el = ya => elInput(A.append(xa, ya)),
+                eof = eofInput
+          ),
           eof = eofInput
       )
     }

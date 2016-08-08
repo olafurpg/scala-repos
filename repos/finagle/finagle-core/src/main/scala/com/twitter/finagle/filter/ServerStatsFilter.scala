@@ -3,7 +3,14 @@ package com.twitter.finagle.filter
 import com.twitter.finagle.Deadline
 import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.stats.StatsReceiver
-import com.twitter.finagle.{param, Service, ServiceFactory, SimpleFilter, Stack, Stackable}
+import com.twitter.finagle.{
+  param,
+  Service,
+  ServiceFactory,
+  SimpleFilter,
+  Stack,
+  Stackable
+}
 import com.twitter.util.{Future, Stopwatch, Time, Duration}
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +45,8 @@ private[finagle] object ServerStatsFilter {
   *       to return the `Future`.
   */
 private[finagle] class ServerStatsFilter[Req, Rep](
-    statsReceiver: StatsReceiver, nowNanos: () => Long)
+    statsReceiver: StatsReceiver,
+    nowNanos: () => Long)
     extends SimpleFilter[Req, Rep] {
   def this(statsReceiver: StatsReceiver) =
     this(statsReceiver, Stopwatch.systemNanos)
@@ -47,7 +55,8 @@ private[finagle] class ServerStatsFilter[Req, Rep](
 
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
     val startAt = nowNanos()
-    try service(request) finally {
+    try service(request)
+    finally {
       val elapsedNs = nowNanos() - startAt
       handletime.add(
           TimeUnit.MICROSECONDS.convert(elapsedNs, TimeUnit.NANOSECONDS))

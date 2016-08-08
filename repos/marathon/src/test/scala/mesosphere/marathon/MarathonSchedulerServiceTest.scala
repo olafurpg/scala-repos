@@ -71,7 +71,9 @@ object MarathonSchedulerServiceTest {
 }
 
 class MarathonSchedulerServiceTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
     with Matchers {
   import MarathonSchedulerServiceTest._
 
@@ -229,8 +231,10 @@ class MarathonSchedulerServiceTest
     val mockTimer = mock[Timer]
 
     val metrics = new Metrics(new MetricRegistry)
-    val store = new MarathonStore[FrameworkId](
-        new InMemoryStore, metrics, () => new FrameworkId(""), "frameworkId:")
+    val store = new MarathonStore[FrameworkId](new InMemoryStore,
+                                               metrics,
+                                               () => new FrameworkId(""),
+                                               "frameworkId:")
     frameworkIdUtil = new FrameworkIdUtil(store, Duration.Inf)
 
     val schedulerService = new MarathonSchedulerService(

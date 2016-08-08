@@ -59,7 +59,8 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
       val dataSchemaWithPartition = StructType(
           dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
 
-      checkQueries(hiveContext.read
+      checkQueries(
+          hiveContext.read
             .format(dataSourceName)
             .option("dataSchema", dataSchemaWithPartition.json)
             .load(file.getCanonicalPath))
@@ -182,8 +183,10 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         // The schema consists of the leading columns of the first part-file
         // in the lexicographic order.
         assert(
-            sqlContext.read.parquet(dir.getCanonicalPath).schema.map(_.name) === Seq(
-                "a", "b", "c", "d", "part"))
+            sqlContext.read
+              .parquet(dir.getCanonicalPath)
+              .schema
+              .map(_.name) === Seq("a", "b", "c", "d", "part"))
       }
     }
   }

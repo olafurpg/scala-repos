@@ -4,7 +4,7 @@ class UseCaseInheritance {
 
   /**
     * The base comment. And another sentence...
-    * 
+    *
     * @param arg1 The T term comment
     * @param arg2 The string comment
     * @tparam T The type parameter

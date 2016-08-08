@@ -8,7 +8,12 @@ import com.intellij.ProjectTopics
 import com.intellij.compiler.CompilerTestUtil
 import com.intellij.compiler.server.BuildManager
 import com.intellij.openapi.application.ex.ApplicationManagerEx
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager, CompilerMessageCategory}
+import com.intellij.openapi.compiler.{
+  CompileContext,
+  CompileStatusNotification,
+  CompilerManager,
+  CompilerMessageCategory
+}
 import com.intellij.openapi.projectRoots._
 import com.intellij.openapi.roots._
 import com.intellij.openapi.util.text.StringUtil
@@ -183,8 +188,9 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
   }
 
   protected def addFileToProject(relativePath: String, text: String) {
-    VfsTestUtil.createFile(
-        getSourceRootDir, relativePath, StringUtil.convertLineSeparators(text))
+    VfsTestUtil.createFile(getSourceRootDir,
+                           relativePath,
+                           StringUtil.convertLineSeparators(text))
   }
 
   protected def getSourceRootDir: VirtualFile = {

@@ -2,22 +2,34 @@ package org.jetbrains.plugins.scala.debugger.friendlyCollections
 
 import java.util
 
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException,
+  EvaluationContextImpl
+}
 import com.intellij.debugger.settings.NodeRendererSettings
 import com.intellij.debugger.ui.impl.ThreadsDebuggerTree
 import com.intellij.debugger.ui.impl.watch._
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptorFactory, NodeManager, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode,
+  NodeDescriptorFactory,
+  NodeManager,
+  ValueDescriptor
+}
 import com.intellij.openapi.util.Disposer
 import org.jetbrains.plugins.scala.debugger.ui.ScalaCollectionRenderer
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 9/5/12
   */
 class ScalaCollectionRendererTest
-    extends ScalaDebuggerTestCase with ScalaVersion_2_11 {
+    extends ScalaDebuggerTestCase
+    with ScalaVersion_2_11 {
   private val COMMON_FILE_NAME = "dummy.scala"
   private val UNIQUE_ID = "uniqueID"
 
@@ -34,8 +46,8 @@ class ScalaCollectionRendererTest
       val testVariable = localVar(frameTree, context, variableName)
       val renderer = testVariable.getRenderer(getDebugProcess)
       testVariable.setRenderer(renderer)
-      testVariable.updateRepresentation(
-          context, DescriptorLabelListener.DUMMY_LISTENER)
+      testVariable.updateRepresentation(context,
+                                        DescriptorLabelListener.DUMMY_LISTENER)
       val value = testVariable.calcValue(context)
       renderer.buildChildren(value, new ChildrenBuilder {
         def setChildren(children: util.List[DebuggerTreeNode]) {
@@ -68,12 +80,12 @@ class ScalaCollectionRendererTest
 
     //<magic>
     evalResult(variableName)
-    //</magic> 
+    //</magic>
 
     managed {
       (testVariable.getLabel, (testVariableChildren map {
-            _.getDescriptor.getLabel
-          }).toList)
+        _.getDescriptor.getLabel
+      }).toList)
     }
   }
 
@@ -83,7 +95,8 @@ class ScalaCollectionRendererTest
     try {
       val frameProxy = evaluationContext.getFrameProxy
       val local = frameTree.getNodeFactory.getLocalVariableDescriptor(
-          null, frameProxy visibleVariableByName name)
+          null,
+          frameProxy visibleVariableByName name)
       local setContext evaluationContext
       local
     } catch {
@@ -129,8 +142,9 @@ class ScalaCollectionRendererTest
        |}
       """.replace("\r", "").stripMargin.trim)
   def testShortList() {
-    testScalaCollectionRenderer(
-        "lst", 6, "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer("lst",
+                                6,
+                                "scala.collection.immutable.$colon$colon")
   }
 
   addFileWithBreakpoints("Stack.scala",
@@ -157,8 +171,9 @@ class ScalaCollectionRendererTest
        |}
     """.stripMargin.replace("\r", "").trim)
   def testMutableList() {
-    testScalaCollectionRenderer(
-        "mutableList", 5, "scala.collection.mutable.MutableList")
+    testScalaCollectionRenderer("mutableList",
+                                5,
+                                "scala.collection.mutable.MutableList")
   }
 
   addFileWithBreakpoints("Queue.scala",
@@ -184,7 +199,8 @@ class ScalaCollectionRendererTest
        |}
       """.stripMargin.replace("\r", "").trim)
   def testLongList() {
-    testScalaCollectionRenderer(
-        "longList", 50, "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer("longList",
+                                50,
+                                "scala.collection.immutable.$colon$colon")
   }
 }

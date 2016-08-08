@@ -3,9 +3,21 @@ package org.jetbrains.plugins.scala.lang.completion.statistician
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScClassParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScVariable, ScValue, ScTypeAlias, ScFunction}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTrait, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScClassParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScVariable,
+  ScValue,
+  ScTypeAlias,
+  ScFunction
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTrait,
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 object ScalaStatisticManager {
@@ -14,7 +26,7 @@ object ScalaStatisticManager {
       case f: ScFunction =>
         s"function#${f.name}" + f.parameters
           .map(p =>
-                "#" + p.getType(TypingContext.empty).getOrAny.presentableText)
+            "#" + p.getType(TypingContext.empty).getOrAny.presentableText)
           .mkString
       case o: ScObject => s"object#${o.qualifiedName}"
       case c: ScClass => s"class#${c.qualifiedName}"

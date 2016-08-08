@@ -99,7 +99,8 @@ class ModeledCustomHeaderSpec extends RoutingSpec {
         responseAs[String] should ===("extracted> apiKey: TheKey")
       }
 
-      Get().withHeaders(RawHeader("somethingElse", "TheKey")) ~> routes ~> check {
+      Get()
+        .withHeaders(RawHeader("somethingElse", "TheKey")) ~> routes ~> check {
         status should ===(StatusCodes.OK)
         responseAs[String] should ===("raw> somethingElse: TheKey")
       }

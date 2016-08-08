@@ -18,7 +18,8 @@ final case class ClientDowningNodeThatIsUnreachableMultiNodeConfig(
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
@@ -50,7 +51,8 @@ class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode4
 
 abstract class ClientDowningNodeThatIsUnreachableSpec(
     multiNodeConfig: ClientDowningNodeThatIsUnreachableMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(

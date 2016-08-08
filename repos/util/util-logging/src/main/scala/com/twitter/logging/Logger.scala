@@ -40,8 +40,8 @@ object Level {
   case object TRACE extends Level("TRACE", 400)
   case object ALL extends Level("ALL", Int.MinValue)
 
-  private[logging] val AllLevels: Seq[Level] = Seq(
-      OFF, FATAL, CRITICAL, ERROR, WARNING, INFO, DEBUG, TRACE, ALL)
+  private[logging] val AllLevels: Seq[Level] =
+    Seq(OFF, FATAL, CRITICAL, ERROR, WARNING, INFO, DEBUG, TRACE, ALL)
 
   /**
     * Associate [[java.util.logging.Level]] and `Level` by their integer
@@ -108,8 +108,10 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
     * formatting is required.
     */
   @varargs
-  final def log(
-      level: Level, thrown: Throwable, message: String, items: Any*) {
+  final def log(level: Level,
+                thrown: Throwable,
+                message: String,
+                items: Any*) {
     val myLevel = getLevel
     if ((myLevel eq null) || (level.intValue >= myLevel.intValue)) {
 
@@ -128,8 +130,10 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
   final def apply(level: Level, message: String, items: Any*) =
     log(level, message, items: _*)
 
-  final def apply(
-      level: Level, thrown: Throwable, message: String, items: Any*) =
+  final def apply(level: Level,
+                  thrown: Throwable,
+                  message: String,
+                  items: Any*) =
     log(level, thrown, message, items)
 
   // convenience methods:
@@ -337,7 +341,7 @@ object Logger extends Iterable[Logger] {
     * handlers upon completion.
     */
   def withLoggers(loggerFactories: List[() => Logger])(f: => Unit): Unit =
-    withLazyLoggers(loggerFactories.map(_ ()))(f)
+    withLazyLoggers(loggerFactories.map(_()))(f)
 
   /**
     * Execute a block with a given set of handlers, reverting back to the original
@@ -354,7 +358,7 @@ object Logger extends Iterable[Logger] {
 
     reset()
     loggerFactoryCache = localLoggerFactoryCache
-    loggerFactoryCache.foreach { _ () }
+    loggerFactoryCache.foreach { _() }
   }
 
   /**
@@ -422,6 +426,6 @@ object Logger extends Iterable[Logger] {
     loggerFactoryCache = loggerFactories
 
     clearHandlers()
-    loggerFactories.foreach { _ () }
+    loggerFactories.foreach { _() }
   }
 }

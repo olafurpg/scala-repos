@@ -1,7 +1,13 @@
 package spire
 package macros
 
-import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
+import spire.macros.compat.{
+  termName,
+  freshTermName,
+  resetLocalAttrs,
+  Context,
+  setOrig
+}
 
 import scala.language.higherKinds
 
@@ -127,9 +133,9 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](c: Context)(
-      init: c.Expr[A])(test: c.Expr[A => Boolean], next: c.Expr[A => A])(
-      body: c.Expr[A => Unit]): c.Expr[Unit] = {
+  def cforMacro[A](c: Context)(init: c.Expr[A])(
+      test: c.Expr[A => Boolean],
+      next: c.Expr[A => A])(body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)

@@ -32,11 +32,11 @@ class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
     case ClientIdAllTopics(clientId) => Map("clientId" -> clientId)
   }
 
-  val messageRate = newMeter(
-      "MessagesPerSec", "messages", TimeUnit.SECONDS, tags)
+  val messageRate =
+    newMeter("MessagesPerSec", "messages", TimeUnit.SECONDS, tags)
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
-  val droppedMessageRate = newMeter(
-      "DroppedMessagesPerSec", "drops", TimeUnit.SECONDS, tags)
+  val droppedMessageRate =
+    newMeter("DroppedMessagesPerSec", "drops", TimeUnit.SECONDS, tags)
 }
 
 /**
@@ -51,7 +51,7 @@ class ProducerTopicStats(clientId: String) {
   private val stats =
     new Pool[ClientIdTopic, ProducerTopicMetrics](Some(valueFactory))
   private val allTopicsStats = new ProducerTopicMetrics(new ClientIdAllTopics(
-          clientId)) // to differentiate from a topic named AllTopics
+      clientId)) // to differentiate from a topic named AllTopics
 
   def getProducerAllTopicsStats(): ProducerTopicMetrics = allTopicsStats
 

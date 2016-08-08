@@ -36,10 +36,11 @@ trait BigInts {
 
       def zero: BigInt @@ Multiplication = Multiplication(1)
 
-      def order(
-          x: BigInt @@ Multiplication, y: BigInt @@ Multiplication): Ordering =
+      def order(x: BigInt @@ Multiplication,
+                y: BigInt @@ Multiplication): Ordering =
         if (Tag.unwrap(x) < Tag.unwrap(y)) Ordering.LT
-        else if (Tag.unwrap(x) == Tag.unwrap(y)) Ordering.EQ else Ordering.GT
+        else if (Tag.unwrap(x) == Tag.unwrap(y)) Ordering.EQ
+        else Ordering.GT
     }
 }
 

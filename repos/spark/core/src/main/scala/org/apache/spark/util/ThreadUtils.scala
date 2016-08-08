@@ -20,7 +20,10 @@ package org.apache.spark.util
 import java.util.concurrent._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import scala.concurrent.forkjoin.{ForkJoinPool => SForkJoinPool, ForkJoinWorkerThread => SForkJoinWorkerThread}
+import scala.concurrent.forkjoin.{
+  ForkJoinPool => SForkJoinPool,
+  ForkJoinWorkerThread => SForkJoinWorkerThread
+}
 import scala.util.control.NonFatal
 
 import com.google.common.util.concurrent.{MoreExecutors, ThreadFactoryBuilder}
@@ -82,8 +85,8 @@ private[spark] object ThreadUtils {
     * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
     * unique, sequentially assigned integer.
     */
-  def newDaemonFixedThreadPool(
-      nThreads: Int, prefix: String): ThreadPoolExecutor = {
+  def newDaemonFixedThreadPool(nThreads: Int,
+                               prefix: String): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
     Executors
       .newFixedThreadPool(nThreads, threadFactory)

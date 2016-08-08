@@ -7,7 +7,11 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScParenthesisedExpr, ScReturnStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScParenthesisedExpr,
+  ScReturnStmt
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
@@ -24,8 +28,9 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Expand boolean use to 'if else'"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val returnStmt: ScReturnStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScReturnStmt], false)
     if (returnStmt == null) return false
@@ -63,8 +68,8 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
     expr.append("{ return true } else { return false }")
 
     val newReturnStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+      ScalaPsiElementFactory
+        .createExpressionFromText(expr.toString(), element.getManager)
 
     inWriteAction {
       returnStmt.replaceExpression(newReturnStmt, true)

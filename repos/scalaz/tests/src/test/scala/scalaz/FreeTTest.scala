@@ -19,13 +19,12 @@ object FreeTListOption {
 
       def bind[A, B](fa: FreeTListOption[A])(
           f: A => FreeTListOption[B]): FreeTListOption[B] =
-        FreeTListOption(
-            Monad[FreeT[List, Option, ?]].bind(fa.f) { a =>
+        FreeTListOption(Monad[FreeT[List, Option, ?]].bind(fa.f) { a =>
           f(a).f
         })
 
-      def tailrecM[A, B](
-          f: A => FreeTListOption[A \/ B])(a: A): FreeTListOption[B] =
+      def tailrecM[A, B](f: A => FreeTListOption[A \/ B])(
+          a: A): FreeTListOption[B] =
         FreeTListOption(
             BindRec[FreeT[List, Option, ?]].tailrecM((x: A) => f(x).f)(a))
 
@@ -43,7 +42,7 @@ object FreeTListOption {
       override def map[A, B](fa: FreeTListOption[A])(f: A => B) =
         FreeTListOption(Monad[FreeT[List, Option, ?]].map(fa.f)(f))
 
-      override def foldMap[A, B : Monoid](fa: FreeTListOption[A])(f: A => B) =
+      override def foldMap[A, B: Monoid](fa: FreeTListOption[A])(f: A => B) =
         Foldable[FreeT[List, Option, ?]].foldMap(fa.f)(f)
     }
 
@@ -56,7 +55,7 @@ object FreeTListOption {
                 .choose(0, 2)
                 .flatMap(
                     Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f)))
-            )
+          )
           .map(FreeTListOption.apply))
 
   implicit def freeTListOptionEq[A](
@@ -68,10 +67,10 @@ object FreeTListOption {
 }
 
 object FreeTTest extends SpecLite {
-  def freeTGen[F[_], G[_], A](
-      g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F],
-                                 G: Applicative[G],
-                                 A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
+  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(
+      implicit F: Functor[F],
+      G: Applicative[G],
+      A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
         (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
         (1,
@@ -79,14 +78,15 @@ object FreeTTest extends SpecLite {
            .map(Arbitrary(g))(
                FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x))
            .arbitrary)
-      )
+    )
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
 
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
-      val result = BindRec[FreeTListOption].tailrecM((i: Int) =>
+      val result = BindRec[FreeTListOption].tailrecM(
+          (i: Int) =>
             if (i < 50000)
               Applicative[FreeTListOption].point(\/.left[Int, Unit](i + 1))
             else
@@ -138,10 +138,9 @@ object FreeTTest extends SpecLite {
 
   object instances {
     def bind[S[_]: Functor, F[_]: Applicative] = Bind[FreeT[S, F, ?]]
-    def foldable[
-        S[_]: Foldable : Functor, F[_]: Foldable : Applicative : BindRec] =
+    def foldable[S[_]: Foldable: Functor, F[_]: Foldable: Applicative: BindRec] =
       Foldable[FreeT[S, F, ?]]
-    def traverse[S[_]: Traverse, F[_]: Traverse : Applicative : BindRec] =
+    def traverse[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] =
       Traverse[FreeT[S, F, ?]]
     def monad[S[_]: Functor, F[_]: Applicative] = Monad[FreeT[S, F, ?]]
     def monadError[S[_]: Functor, F[_]: BindRec, E](
@@ -152,20 +151,20 @@ object FreeTTest extends SpecLite {
       MonadReader[FreeT[S, F, ?], E]
     def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) =
       MonadTell[FreeT[S, F, ?], E]
-    def plus[S[_]: Functor, F[_]: Applicative : BindRec : Plus] =
+    def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] =
       Plus[FreeT[S, F, ?]]
-    def monadPlus[S[_]: Functor, F[_]: ApplicativePlus : BindRec] =
+    def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] =
       MonadPlus[FreeT[S, F, ?]]
     def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, ?[_], ?]]
 
     // checking absence of ambiguity
-    def functor[S[_]: Traverse, F[_]: Traverse : Applicative : BindRec] =
+    def functor[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] =
       Functor[FreeT[S, F, ?]]
-    def foldable[S[_]: Traverse, F[_]: Traverse : Applicative : BindRec] =
+    def foldable[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] =
       Foldable[FreeT[S, F, ?]]
-    def monad[S[_]: Functor, F[_]: ApplicativePlus : BindRec] =
+    def monad[S[_]: Functor, F[_]: ApplicativePlus: BindRec] =
       Monad[FreeT[S, F, ?]]
-    def plus[S[_]: Functor, F[_]: ApplicativePlus : BindRec] =
+    def plus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] =
       Plus[FreeT[S, F, ?]]
   }
 }

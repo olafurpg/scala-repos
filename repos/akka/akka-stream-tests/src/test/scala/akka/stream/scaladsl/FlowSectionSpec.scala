@@ -37,8 +37,8 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
       Source
         .single(1)
         .via(Flow[Int]
-              .map(sendThreadNameTo(testActor))
-              .withAttributes(dispatcher("my-dispatcher1")))
+          .map(sendThreadNameTo(testActor))
+          .withAttributes(dispatcher("my-dispatcher1")))
         .to(Sink.ignore)
         .run()
 

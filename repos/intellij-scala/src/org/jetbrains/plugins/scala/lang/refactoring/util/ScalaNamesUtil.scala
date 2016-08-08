@@ -23,8 +23,8 @@ object ScalaNamesUtil {
     override def initialValue(): ScalaLexer = new ScalaLexer()
   }
 
-  private def checkGeneric(
-      text: String, predicate: ScalaLexer => Boolean): Boolean = {
+  private def checkGeneric(text: String,
+                           predicate: ScalaLexer => Boolean): Boolean = {
 //    ApplicationManager.getApplication.assertReadAccessAllowed() - looks like we don't need it
     if (text == null || text == "") return false
 
@@ -42,13 +42,13 @@ object ScalaNamesUtil {
         true
       case ch =>
         Character.getType(ch) == Character.MATH_SYMBOL.toInt ||
-        Character.getType(ch) == Character.OTHER_SYMBOL.toInt
+          Character.getType(ch) == Character.OTHER_SYMBOL.toInt
     }
   }
 
   def isIdentifier(text: String): Boolean = {
-    checkGeneric(
-        text, lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
+    checkGeneric(text,
+                 lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
   }
 
   def isKeyword(text: String): Boolean = keywordNames.contains(text)

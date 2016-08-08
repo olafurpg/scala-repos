@@ -5,7 +5,11 @@ package akka.stream.impl.fusing
 
 import akka.event.{NoLogging}
 import akka.stream._
-import akka.stream.impl.fusing.GraphInterpreter.{GraphAssembly, DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  GraphAssembly,
+  DownstreamBoundaryStageLogic,
+  UpstreamBoundaryStageLogic
+}
 import akka.stream.stage.AbstractStage.PushPullGraphStage
 import akka.stream.stage._
 import java.{util ⇒ ju}
@@ -42,7 +46,8 @@ private[akka] object IteratorInterpreter {
   }
 
   final case class IteratorDownstream[T]()
-      extends DownstreamBoundaryStageLogic[T] with Iterator[T] {
+      extends DownstreamBoundaryStageLogic[T]
+      with Iterator[T] {
     val in: Inlet[T] = Inlet[T]("IteratorDownstream.in")
     in.id = 0
 
@@ -100,7 +105,8 @@ private[akka] object IteratorInterpreter {
   * INTERNAL API
   */
 private[akka] class IteratorInterpreter[I, O](
-    val input: Iterator[I], val ops: Seq[PushPullStage[_, _]]) {
+    val input: Iterator[I],
+    val ops: Seq[PushPullStage[_, _]]) {
   import akka.stream.impl.fusing.IteratorInterpreter._
 
   private val upstream = IteratorUpstream(input)
@@ -135,11 +141,14 @@ private[akka] class IteratorInterpreter[I, O](
       outOwners(i + 1) = i
       i += 1
     }
-    val assembly = new GraphAssembly(
-        stages, attributes, ins, inOwners, outs, outOwners)
+    val assembly =
+      new GraphAssembly(stages, attributes, ins, inOwners, outs, outOwners)
 
     val (inHandlers, outHandlers, logics) = assembly.materialize(
-        Attributes.none, assembly.stages.map(_.module), new ju.HashMap, _ ⇒ ())
+        Attributes.none,
+        assembly.stages.map(_.module),
+        new ju.HashMap,
+        _ ⇒ ())
     val interpreter = new GraphInterpreter(
         assembly,
         NoMaterializer,

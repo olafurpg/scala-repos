@@ -76,10 +76,8 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
             assert(input.map { k =>
               (k, k)
-            }.sortBy(_._1).toString === outputBuffer
-                  .sortBy(_._1)
-                  .toList
-                  .toString)
+            }.sortBy(_._1)
+              .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run
@@ -97,10 +95,8 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
             assert(input.map { k =>
               (k, k)
-            }.sortBy(_._1).toString === outputBuffer
-                  .sortBy(_._1)
-                  .toList
-                  .toString)
+            }.sortBy(_._1)
+              .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run
@@ -129,8 +125,9 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
         the[InvalidSourceException] thrownBy {
           validateVersion(path, Some(103))
         }
-      assert(thrown.getMessage === "Version 103 does not exist. " +
-          "Currently available versions are: [102, 101, 100]")
+      assert(
+          thrown.getMessage === "Version 103 does not exist. " +
+            "Currently available versions are: [102, 101, 100]")
 
       // should not throw
       validateVersion(path, Some(101))

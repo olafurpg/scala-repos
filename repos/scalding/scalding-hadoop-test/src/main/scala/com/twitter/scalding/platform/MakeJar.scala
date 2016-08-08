@@ -16,7 +16,12 @@ limitations under the License.
 package com.twitter.scalding.platform
 
 import java.io.{BufferedInputStream, File, FileInputStream, FileOutputStream}
-import java.util.jar.{Attributes, JarEntry, JarOutputStream, Manifest => JarManifest}
+import java.util.jar.{
+  Attributes,
+  JarEntry,
+  JarOutputStream,
+  Manifest => JarManifest
+}
 
 import org.slf4j.LoggerFactory
 
@@ -30,8 +35,8 @@ object MakeJar {
     LOG.debug("Creating synthetic jar: " + syntheticJar.getAbsolutePath)
     val manifest = new JarManifest
     manifest.getMainAttributes.put(Attributes.Name.MANIFEST_VERSION, "1.0")
-    val target = new JarOutputStream(
-        new FileOutputStream(syntheticJar), manifest)
+    val target =
+      new JarOutputStream(new FileOutputStream(syntheticJar), manifest)
     add(classDir, classDir, target)
     target.close()
     new File(syntheticJar.getAbsolutePath)
@@ -74,19 +79,19 @@ object MakeJar {
       result: List[String] = List.empty): Option[File] =
     Option(source) match {
       case Some(src) => {
-          if (parent == src) {
-            result.foldLeft(None: Option[File]) { (cum, part) =>
-              Some(
-                  cum match {
-                case Some(p) => new File(p, part)
-                case None => new File(part)
-              })
-            }
-          } else {
-            getRelativeFileBetween(
-                parent, src.getParentFile, src.getName :: result)
+        if (parent == src) {
+          result.foldLeft(None: Option[File]) { (cum, part) =>
+            Some(cum match {
+              case Some(p) => new File(p, part)
+              case None => new File(part)
+            })
           }
+        } else {
+          getRelativeFileBetween(parent,
+                                 src.getParentFile,
+                                 src.getName :: result)
         }
+      }
       case None => None
     }
 }

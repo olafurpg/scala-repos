@@ -15,8 +15,9 @@ import org.jetbrains.plugins.scala.util.MultilineStringUtil
   * Date: 4/2/12
   */
 class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction {
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     if (element == null || element.getNode == null ||
         element.getNode.getElementType != ScalaTokenTypes.tMULTILINE_STRING ||
         !element.getText.contains("\n")) return false
@@ -32,8 +33,8 @@ class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction {
     val suffix = if (marginChar == "|") "" else "(\'" + marginChar + "\')"
 
     extensions.inWriteAction {
-      editor.getDocument.insertString(
-          element.getTextRange.getEndOffset, ".stripMargin" + suffix)
+      editor.getDocument.insertString(element.getTextRange.getEndOffset,
+                                      ".stripMargin" + suffix)
     }
   }
 

@@ -27,7 +27,7 @@ trait JavaReflectionRuntimes { self: scala.tools.nsc.typechecker.Analyzer =>
             if (isBundle) {
               def isMacroContext(clazz: Class[_]) =
                 clazz == classOf[BlackboxContext] ||
-                clazz == classOf[WhiteboxContext]
+                  clazz == classOf[WhiteboxContext]
               def isBundleCtor(ctor: jConstructor[_]) =
                 ctor.getParameterTypes match {
                   case Array(param) if isMacroContext(param) => true

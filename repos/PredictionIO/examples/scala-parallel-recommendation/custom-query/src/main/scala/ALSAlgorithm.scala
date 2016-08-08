@@ -27,12 +27,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def train(data: PreparedData): ALSModel = {
     require(!data.ratings.take(1).isEmpty,
             s"viewEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.items.take(1).isEmpty,
             s"items in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create item's String ID to integer index BiMap
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
     val userStringIntMap = BiMap.stringInt(data.ratings.map(_.user))
@@ -50,7 +50,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+          " to Int index.")
 
       (uindex -> iindex) -> 1
     }.filter { case ((u, i), v) => (i != -1) && (u != -1) }
@@ -60,7 +60,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
             s"mllibRatings cannot be empty." +
-            " Please check if your events contain valid user and item ID.")
+              " Please check if your events contain valid user and item ID.")
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)

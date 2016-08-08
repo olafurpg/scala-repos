@@ -60,8 +60,9 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
       case _ => Result.Continue
     }
 
-  override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result =
+  override def postProcessEnter(file: PsiFile,
+                                editor: Editor,
+                                dataContext: DataContext): Result =
     file match {
       case _: HoconPsiFile =>
         val caretModel = editor.getCaretModel
@@ -73,7 +74,7 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
           editor.getDocument.getLineNumber(psi.getTextRange.getStartOffset)
         def isHashComment(psi: PsiElement) =
           psi != null &&
-          psi.getNode.getElementType == HoconTokenType.HashComment
+            psi.getNode.getElementType == HoconTokenType.HashComment
 
         if (isHashComment(psiAtOffset) && isHashComment(prevPsi) &&
             lineNumber(psiAtOffset) == lineNumber(prevPsi) + 1 &&

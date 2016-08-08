@@ -28,7 +28,8 @@ package object reify {
   }
 
   private[reify] def mkDefaultMirrorRef(global: Global)(
-      universe: global.Tree, typer0: global.analyzer.Typer): global.Tree = {
+      universe: global.Tree,
+      typer0: global.analyzer.Typer): global.Tree = {
     import global._
     import definitions.JavaUniverseClass
 
@@ -38,13 +39,13 @@ package object reify {
       // If we're in the constructor of an object or others don't have easy access to `this`, we have no good way to grab
       // the class of that object.  Instead, we construct an anonymous class and grab his class file, assuming
       // this is enough to get the correct class loadeer for the class we *want* a mirror for, the object itself.
-      rClassTree orElse Apply(
-          Select(gen.mkAnonymousNew(Nil), sn.GetClass), Nil)
+      rClassTree orElse Apply(Select(gen.mkAnonymousNew(Nil), sn.GetClass),
+                              Nil)
     }
     // JavaUniverse is defined in scala-reflect.jar, so we must be very careful in case someone reifies stuff having only scala-library.jar on the classpath
     val isJavaUniverse =
       JavaUniverseClass != NoSymbol &&
-      universe.tpe <:< JavaUniverseClass.toTypeConstructor
+        universe.tpe <:< JavaUniverseClass.toTypeConstructor
     if (isJavaUniverse && !enclosingErasure.isEmpty)
       Apply(Select(universe, nme.runtimeMirror),
             List(Select(enclosingErasure, sn.GetClassLoader)))
@@ -79,7 +80,9 @@ package object reify {
 
     if (tpe.isSpliceable) {
       val classTagInScope = typer0.resolveClassTag(
-          enclosingMacroPosition, tpe, allowMaterialization = false)
+          enclosingMacroPosition,
+          tpe,
+          allowMaterialization = false)
       if (!classTagInScope.isEmpty)
         return Select(classTagInScope, nme.runtimeClass)
       if (concrete)
@@ -92,14 +95,14 @@ package object reify {
       case TypeRef(_, ArrayClass, componentTpe :: Nil) =>
         val componentErasure =
           reifyRuntimeClass(global)(typer0, componentTpe, concrete)
-        gen.mkMethodCall(
-            currentRun.runDefinitions.arrayClassMethod, List(componentErasure))
+        gen.mkMethodCall(currentRun.runDefinitions.arrayClassMethod,
+                         List(componentErasure))
       case _ =>
         var erasure = tpe.erasure
         if (tpe.typeSymbol.isDerivedValueClass &&
             global.phase.id < global.currentRun.erasurePhase.id) erasure = tpe
-        gen.mkNullaryCall(
-            currentRun.runDefinitions.Predef_classOf, List(erasure))
+        gen.mkNullaryCall(currentRun.runDefinitions.Predef_classOf,
+                          List(erasure))
     }
   }
 
@@ -110,7 +113,7 @@ package object reify {
     import global._
     def isThisInScope =
       typer0.context.enclosingContextChain exists
-      (_.tree.isInstanceOf[ImplDef])
+        (_.tree.isInstanceOf[ImplDef])
     if (isThisInScope) {
       val enclosingClasses =
         typer0.context.enclosingContextChain map (_.tree) collect {
@@ -128,8 +131,9 @@ package object reify {
         isInsideConstructorSuper && isInsideObject
       }
       if (!classInScope.isEmpty)
-        reifyRuntimeClass(global)(
-            typer0, classInScope.symbol.toTypeConstructor, concrete = true)
+        reifyRuntimeClass(global)(typer0,
+                                  classInScope.symbol.toTypeConstructor,
+                                  concrete = true)
       else if (!isUnsafeToUseThis) Select(This(tpnme.EMPTY), sn.GetClass)
       else EmptyTree
     } else EmptyTree

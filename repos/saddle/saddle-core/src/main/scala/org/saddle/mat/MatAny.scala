@@ -21,7 +21,7 @@ import org.saddle._
 /**
   * A Mat instance containing elements of type Any
   */
-class MatAny[T : ST](r: Int, c: Int, values: Array[T]) extends Mat[T] {
+class MatAny[T: ST](r: Int, c: Int, values: Array[T]) extends Mat[T] {
   def repr = this
 
   def numRows = r
@@ -32,7 +32,7 @@ class MatAny[T : ST](r: Int, c: Int, values: Array[T]) extends Mat[T] {
 
   def toVec = scalarTag.makeVec(toArray)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: (T) => B): Mat[B] =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: (T) => B): Mat[B] =
     MatImpl.map(this)(f)
 
   // Cache the transpose: it's much faster to transpose and slice a continuous
@@ -82,13 +82,13 @@ class MatAny[T : ST](r: Int, c: Int, values: Array[T]) extends Mat[T] {
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {
           eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
-              rv.scalarTag.isMissing(rv(i)))
+            (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+            rv.scalarTag.isMissing(rv(i)))
           i += 1
         }
         eq

@@ -52,8 +52,8 @@ class TracerTest extends FunSuite {
     DefaultTracer.self = ConsoleTracer
     assert(tracer != NullTracer,
            "Can't detect that tracer isn't NullTracer anymore")
-    assert(
-        tracer == ConsoleTracer, "Can't detect that tracer is ConsoleTracer")
+    assert(tracer == ConsoleTracer,
+           "Can't detect that tracer is ConsoleTracer")
 
     // Restore initial state
     DefaultTracer.self = previous

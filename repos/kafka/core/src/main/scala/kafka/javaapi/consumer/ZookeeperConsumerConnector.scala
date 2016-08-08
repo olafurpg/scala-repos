@@ -18,7 +18,11 @@ package kafka.javaapi.consumer
 
 import kafka.serializer._
 import kafka.consumer._
-import kafka.common.{OffsetAndMetadata, TopicAndPartition, MessageStreamsExistException}
+import kafka.common.{
+  OffsetAndMetadata,
+  TopicAndPartition,
+  MessageStreamsExistException
+}
 import scala.collection.{immutable, mutable, JavaConversions}
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection.JavaConverters._
@@ -79,13 +83,13 @@ private[kafka] class ZookeeperConsumerConnector(
     if (messageStreamCreated.getAndSet(true))
       throw new MessageStreamsExistException(
           this.getClass.getSimpleName +
-          " can create message streams at most once",
+            " can create message streams at most once",
           null)
     val scalaTopicCountMap: Map[String, Int] = {
       import JavaConversions._
       Map.empty[String, Int] ++
-      (topicCountMap.asInstanceOf[java.util.Map[String, Int]]: mutable.Map[
-              String, Int])
+        (topicCountMap
+          .asInstanceOf[java.util.Map[String, Int]]: mutable.Map[String, Int])
     }
     val scalaReturn =
       underlying.consume(scalaTopicCountMap, keyDecoder, valueDecoder)
@@ -99,27 +103,35 @@ private[kafka] class ZookeeperConsumerConnector(
   }
 
   def createMessageStreams(
-      topicCountMap: java.util.Map[String, java.lang.Integer]): java.util.Map[
-      String, java.util.List[KafkaStream[Array[Byte], Array[Byte]]]] =
-    createMessageStreams(
-        topicCountMap, new DefaultDecoder(), new DefaultDecoder())
+      topicCountMap: java.util.Map[String, java.lang.Integer])
+    : java.util.Map[String,
+                    java.util.List[KafkaStream[Array[Byte], Array[Byte]]]] =
+    createMessageStreams(topicCountMap,
+                         new DefaultDecoder(),
+                         new DefaultDecoder())
 
   def createMessageStreamsByFilter[K, V](topicFilter: TopicFilter,
                                          numStreams: Int,
                                          keyDecoder: Decoder[K],
                                          valueDecoder: Decoder[V]) = {
     import JavaConversions._
-    underlying.createMessageStreamsByFilter(
-        topicFilter, numStreams, keyDecoder, valueDecoder)
+    underlying.createMessageStreamsByFilter(topicFilter,
+                                            numStreams,
+                                            keyDecoder,
+                                            valueDecoder)
   }
 
   def createMessageStreamsByFilter(topicFilter: TopicFilter, numStreams: Int) =
-    createMessageStreamsByFilter(
-        topicFilter, numStreams, new DefaultDecoder(), new DefaultDecoder())
+    createMessageStreamsByFilter(topicFilter,
+                                 numStreams,
+                                 new DefaultDecoder(),
+                                 new DefaultDecoder())
 
   def createMessageStreamsByFilter(topicFilter: TopicFilter) =
-    createMessageStreamsByFilter(
-        topicFilter, 1, new DefaultDecoder(), new DefaultDecoder())
+    createMessageStreamsByFilter(topicFilter,
+                                 1,
+                                 new DefaultDecoder(),
+                                 new DefaultDecoder())
 
   def commitOffsets() {
     underlying.commitOffsets(true)

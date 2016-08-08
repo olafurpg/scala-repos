@@ -17,7 +17,7 @@ object MultiPublishTest extends Build {
 
   lazy val root =
     Project("root", file(".")) dependsOn (sub) aggregate (sub) settings
-    (mavenStyle, interProject, name := "Publish Test")
+      (mavenStyle, interProject, name := "Publish Test")
 
   lazy val sub =
     Project("sub", file("sub")) settings (mavenStyle, name := "Sub Project")
@@ -30,7 +30,7 @@ object MultiPublishTest extends Build {
   def interProject =
     projectDependencies <<=
       (publishMavenStyle, publishMavenStyle in sub, projectDependencies) map {
-      (style, subStyle, pd) =>
-        if (style == subStyle) pd else Nil
-    }
+        (style, subStyle, pd) =>
+          if (style == subStyle) pd else Nil
+      }
 }

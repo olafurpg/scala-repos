@@ -5,7 +5,10 @@ package akka.http.impl.settings
 
 import akka.http.impl.util.SettingsCompanion
 import akka.http.impl.util._
-import akka.http.scaladsl.settings.{ConnectionPoolSettings, ClientConnectionSettings}
+import akka.http.scaladsl.settings.{
+  ConnectionPoolSettings,
+  ClientConnectionSettings
+}
 import com.typesafe.config.Config
 import scala.concurrent.duration.Duration
 
@@ -39,7 +42,7 @@ object ConnectionPoolSettingsImpl
                                c getInt "max-open-requests",
                                c getInt "pipelining-limit",
                                c getPotentiallyInfiniteDuration "idle-timeout",
-                               ClientConnectionSettingsImpl.fromSubConfig(
-                                   root, c.getConfig("client")))
+                               ClientConnectionSettingsImpl
+                                 .fromSubConfig(root, c.getConfig("client")))
   }
 }

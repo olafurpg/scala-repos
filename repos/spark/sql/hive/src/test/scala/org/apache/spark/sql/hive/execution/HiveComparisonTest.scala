@@ -30,7 +30,10 @@ import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.command.{ExplainCommand, SetCommand}
 import org.apache.spark.sql.execution.datasources.DescribeCommand
-import org.apache.spark.sql.hive.{InsertIntoHiveTable => LogicalInsertIntoHiveTable, SQLBuilder}
+import org.apache.spark.sql.hive.{
+  InsertIntoHiveTable => LogicalInsertIntoHiveTable,
+  SQLBuilder
+}
 import org.apache.spark.sql.hive.test.TestHive
 
 /**
@@ -44,7 +47,9 @@ import org.apache.spark.sql.hive.test.TestHive
   * configured using system properties.
   */
 abstract class HiveComparisonTest
-    extends SparkFunSuite with BeforeAndAfterAll with GivenWhenThen {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with GivenWhenThen {
 
   /**
     * When set, any cache files that result in test failures will be deleted.  Used when the test
@@ -86,7 +91,7 @@ abstract class HiveComparisonTest
   /** The local directory with cached golden answer will be stored. */
   protected val answerCache = new File(
       "src" + File.separator + "test" + File.separator + "resources" +
-      File.separator + "golden")
+        File.separator + "golden")
   if (!answerCache.exists) {
     answerCache.mkdir()
   }
@@ -119,15 +124,14 @@ abstract class HiveComparisonTest
   }
 
   /** All directories that contain per-query output files */
-  val outputDirectories = Seq(passedDirectory,
-                              failedDirectory,
-                              wrongDirectory,
-                              hiveFailedDirectory)
+  val outputDirectories =
+    Seq(passedDirectory, failedDirectory, wrongDirectory, hiveFailedDirectory)
 
   protected val cacheDigest = java.security.MessageDigest.getInstance("MD5")
   protected def getMd5(str: String): String = {
     val digest = java.security.MessageDigest.getInstance("MD5")
-    digest.update(str
+    digest.update(
+        str
           .replaceAll(System.lineSeparator(), "\n")
           .getBytes(StandardCharsets.UTF_8))
     new java.math.BigInteger(1, digest.digest).toString(16)
@@ -250,7 +254,7 @@ abstract class HiveComparisonTest
     if (runOnlyDirectories.nonEmpty && runIndicators.isEmpty) {
       logDebug(
           s"Skipping test '$testCaseName' not found in ${runOnlyDirectories
-        .map(_.getCanonicalPath)}")
+            .map(_.getCanonicalPath)}")
       return
     }
 
@@ -356,7 +360,9 @@ abstract class HiveComparisonTest
                 try {
                   // Hooks often break the harness and don't really affect our test anyway, don't
                   // even try running them.
-                  if (installHooksCommand.findAllMatchIn(queryString).nonEmpty) {
+                  if (installHooksCommand
+                        .findAllMatchIn(queryString)
+                        .nonEmpty) {
                     sys.error("hive exec hooks not supported for tests.")
                   }
 
@@ -374,7 +380,7 @@ abstract class HiveComparisonTest
                   // from Seq("").
                   stringToFile(cachedAnswerFile,
                                answer.mkString("\n") +
-                               (if (answer.nonEmpty) "\n" else ""))
+                                 (if (answer.nonEmpty) "\n" else ""))
                   answer
                 } catch {
                   case e: Exception =>
@@ -422,7 +428,8 @@ abstract class HiveComparisonTest
                         |
                         |# Resolved query plan:
                         |${originalQuery.analyzed.treeString}
-                     """.stripMargin, e)
+                     """.stripMargin,
+                             e)
                     }
 
                     try {
@@ -443,7 +450,8 @@ abstract class HiveComparisonTest
                         |
                         |# Converted SQL query string:
                         |$convertedSQL
-                     """.stripMargin, e)
+                     """.stripMargin,
+                             e)
                     }
                   }
                 }
@@ -467,7 +475,7 @@ abstract class HiveComparisonTest
           }
           .toSeq
 
-          (queryList, hiveResults, catalystResults).zipped.foreach {
+        (queryList, hiveResults, catalystResults).zipped.foreach {
           case (query, hive, (hiveQuery, catalyst)) =>
             // Check that the results match unless its an EXPLAIN query.
             val preparedHive = prepareAnswer(hiveQuery, hive)
@@ -592,7 +600,7 @@ abstract class HiveComparisonTest
               case e: Exception =>
                 logError(
                     s"FATAL ERROR: Canary query threw $e This implies that the " +
-                    "testing environment has likely been corrupted.")
+                      "testing environment has likely been corrupted.")
                 // The testing setup traps exits so wait here for a long time so the developer
                 // can see when things started to go wrong.
                 Thread.sleep(1000000)

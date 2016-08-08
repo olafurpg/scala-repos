@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.lang.completion.postfix.templates
 
 import com.intellij.codeInsight.template.postfix.templates.SurroundPostfixTemplateBase
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{SelectorConditions, AncestorSelector, ScalaPostfixTemplatePsiInfo}
+import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{
+  SelectorConditions,
+  AncestorSelector,
+  ScalaPostfixTemplatePsiInfo
+}
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScInfixExpr
 import org.jetbrains.plugins.scala.lang.surroundWith.surrounders.expression.ScalaWithIfConditionSurrounder

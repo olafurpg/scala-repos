@@ -47,7 +47,7 @@ object TraverseTest extends SpecLite {
     "state traverse agrees with regular traverse" in {
       var N = 10
       List.range(0, N).traverseS(x => modify((x: Int) => x + 1))(0) must_===
-      (List.range(0, N).traverseU(x => modify((x: Int) => x + 1)).apply(0))
+        (List.range(0, N).traverseU(x => modify((x: Int) => x + 1)).apply(0))
     }
 
     "state traverse does not blow stack" in {
@@ -78,8 +78,8 @@ object TraverseTest extends SpecLite {
   "combos" should {
     "traverse with monadic join" in {
       val s: Writer[String, List[Int]] =
-        List(1, 2, 3).traverseM[Writer[String, ?], Int](
-            x => Writer(x.toString, List(x, x * 2)))
+        List(1, 2, 3).traverseM[Writer[String, ?], Int](x =>
+          Writer(x.toString, List(x, x * 2)))
       s.run must_=== (("123", List(1, 2, 2, 4, 3, 6)))
     }
   }

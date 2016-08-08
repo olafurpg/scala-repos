@@ -89,8 +89,9 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
           if (noMoreData) ReadFrameHeader
           else new ReadData(length - thisFrameData.length)
 
-        ParseResult(
-            Some(FrameStart(header, thisFrameData.compact)), nextState, true)
+        ParseResult(Some(FrameStart(header, thisFrameData.compact)),
+                    nextState,
+                    true)
       }
     }
 
@@ -100,8 +101,9 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
       override def parse(reader: ByteReader): ParseResult[FrameEvent] =
         if (reader.remainingSize < remaining) {
           remaining -= reader.remainingSize
-          ParseResult(
-              Some(FrameData(reader.takeAll(), lastPart = false)), this, true)
+          ParseResult(Some(FrameData(reader.takeAll(), lastPart = false)),
+                      this,
+                      true)
         } else {
           ParseResult(
               Some(FrameData(reader.take(remaining.toInt), lastPart = true)),

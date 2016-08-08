@@ -17,8 +17,10 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -67,10 +69,9 @@ class DataSource(val dsp: DataSourceParams)
         Rating(event.entityId, event.targetEntityId.get, ratingValue)
       } catch {
         case e: Exception => {
-            logger.error(
-                s"Cannot convert ${event} to Rating. Exception: ${e}.")
-            throw e
-          }
+          logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
+          throw e
+        }
       }
       rating
     }
@@ -100,11 +101,10 @@ class TrainingData(
     val users: EntityMap[User],
     val items: EntityMap[Item],
     val ratings: RDD[Rating]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"users: [${users.size} (${users.take(2).toString}...)]" +
-    s"items: [${items.size} (${items.take(2).toString}...)]" +
-    s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
+      s"items: [${items.size} (${items.take(2).toString}...)]" +
+      s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
   }
 }

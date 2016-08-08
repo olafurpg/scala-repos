@@ -5,7 +5,11 @@ import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
@@ -49,7 +53,7 @@ class VarianceTest extends SimpleTestCase {
 
   def testVariancePrivateThis() {
     assertMatches(messages(
-            "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
+        "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }
@@ -140,7 +144,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testSCL8803() {
-    assertMatches(messages("""object Main extends App {
+    assertMatches(
+        messages("""object Main extends App {
         |
         |  class Sum[+T](dummy: T, val sel: Int) {
         |    def this(d: T, value: List[Int]) = this(d, value.sum)
@@ -163,7 +168,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testUV() = {
-    assertMatches(messages("""
+    assertMatches(
+        messages("""
         |import scala.annotation.unchecked.{ uncheckedVariance => uV }
         |
         |class Test[+T] {

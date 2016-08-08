@@ -15,14 +15,16 @@ object ContentTypeOverrider {
   implicit def forEntity[T <: HttpEntity]: ContentTypeOverrider[T] =
     new ContentTypeOverrider[T] {
       def apply(value: T, newContentType: ContentType) =
-        value.withContentType(newContentType).asInstanceOf[T] // can't be expressed in types
+        value
+          .withContentType(newContentType)
+          .asInstanceOf[T] // can't be expressed in types
     }
 
-  implicit def forHeadersAndEntity[T <: HttpEntity]: ContentTypeOverrider[
-      (immutable.Seq[HttpHeader], T)] =
+  implicit def forHeadersAndEntity[T <: HttpEntity]
+    : ContentTypeOverrider[(immutable.Seq[HttpHeader], T)] =
     new ContentTypeOverrider[(immutable.Seq[HttpHeader], T)] {
-      def apply(
-          value: (immutable.Seq[HttpHeader], T), newContentType: ContentType) =
+      def apply(value: (immutable.Seq[HttpHeader], T),
+                newContentType: ContentType) =
         value._1 -> value._2.withContentType(newContentType).asInstanceOf[T]
     }
 

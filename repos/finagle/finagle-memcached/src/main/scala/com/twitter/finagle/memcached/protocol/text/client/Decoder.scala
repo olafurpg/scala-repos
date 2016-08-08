@@ -85,8 +85,8 @@ class Decoder extends AbstractDecoder with StateMachine {
     }
   }
 
-  final protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int): Unit = {
+  final protected[memcached] def awaitData(tokens: Seq[ChannelBuffer],
+                                           bytesNeeded: Int): Unit = {
     state match {
       case AwaitingResponse =>
         awaitData(Nil, tokens, bytesNeeded)

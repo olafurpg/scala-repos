@@ -8,8 +8,7 @@ final class MasterRunner(
     args: Array[String],
     remoteArgs: Array[String],
     testClassLoader: ClassLoader
-)
-    extends BaseRunner(args, remoteArgs, testClassLoader) {
+) extends BaseRunner(args, remoteArgs, testClassLoader) {
 
   /** Number of tasks registered in the whole system */
   private[this] val registeredCount = new AtomicInteger(0)

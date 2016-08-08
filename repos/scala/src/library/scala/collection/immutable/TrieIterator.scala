@@ -187,15 +187,16 @@ private[collection] abstract class TrieIterator[+T](elems: Array[Iterable[T]])
           // modify this - pop
           depth -= 1
           1 until arrayStack.length foreach
-          (i => arrayStack(i - 1) = arrayStack(i))
+            (i => arrayStack(i - 1) = arrayStack(i))
           arrayStack(arrayStack.length - 1) = Array[Iterable[T]](null)
           posStack = posStack.tail ++ Array[Int](0)
           // we know that `this` is not empty, since it had something on the arrayStack and arrayStack elements are always non-empty
           ((newIterator(snd), szsnd), this)
         } else {
           // 2b) more than a single entry left on top
-          val (fst, snd) = arrayStack(0).splitAt(arrayStack(0).length -
-              (arrayStack(0).length - posStack(0) + 1) / 2)
+          val (fst, snd) = arrayStack(0).splitAt(
+              arrayStack(0).length -
+                (arrayStack(0).length - posStack(0) + 1) / 2)
           arrayStack(0) = fst
           (iteratorWithSize(snd), this)
         }

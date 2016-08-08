@@ -5,13 +5,20 @@ import java.io._
 import java.security.MessageDigest
 import java.util
 
-import com.intellij.execution.application.{ApplicationConfiguration, ApplicationConfigurationType}
+import com.intellij.execution.application.{
+  ApplicationConfiguration,
+  ApplicationConfigurationType
+}
 import com.intellij.ide.highlighter.{ModuleFileType, ProjectFileType}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
-import com.intellij.testFramework.{PlatformTestCase, PsiTestUtil, UsefulTestCase}
+import com.intellij.testFramework.{
+  PlatformTestCase,
+  PsiTestUtil,
+  UsefulTestCase
+}
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.junit.Assert
@@ -42,8 +49,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
       if (testDataProjectPath.exists()) FileUtil.delete(testDataProjectPath)
     }
 
-    UsefulTestCase.edt(
-        new Runnable {
+    UsefulTestCase.edt(new Runnable {
 
       def run() {
         ScalaDebuggerTestBase. super.setUp()
@@ -59,8 +65,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     */
   protected def addOtherLibraries()
 
-  protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+  protected def addIvyCacheLibrary(libraryName: String,
+                                   libraryPath: String,
+                                   jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -98,7 +105,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
 
   protected def getRunProfile(module: Module, className: String) = {
     val configuration: ApplicationConfiguration = new ApplicationConfiguration(
-        "app", module.getProject, ApplicationConfigurationType.getInstance)
+        "app",
+        module.getProject,
+        ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
     configuration.setMainClassName(className)
     configuration
@@ -186,7 +195,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
           if (f.isDirectory) computeForDir(f)
           else {
             result +=
-            (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+              (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
           }
         }
     }

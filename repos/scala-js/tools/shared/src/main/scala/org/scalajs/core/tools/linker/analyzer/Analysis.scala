@@ -105,7 +105,7 @@ object Analysis {
           ir.Definitions.decodeMethodName(encodedName)
 
         simpleName + "(" + paramTypes.map(typeDisplayName).mkString(",") +
-        ")" + resultType.fold("")(typeDisplayName)
+          ")" + resultType.fold("")(typeDisplayName)
       }
     }
 
@@ -183,8 +183,8 @@ object Analysis {
   final case class MissingClass(info: ClassInfo, from: From) extends Error
   final case class NotAModule(info: ClassInfo, from: From) extends Error
   final case class MissingMethod(info: MethodInfo, from: From) extends Error
-  final case class ConflictingDefaultMethods(
-      infos: List[MethodInfo], from: From)
+  final case class ConflictingDefaultMethods(infos: List[MethodInfo],
+                                             from: From)
       extends Error
 
   sealed trait From
@@ -198,7 +198,7 @@ object Analysis {
         "Fatal error: java.lang.Object is missing"
       case CycleInInheritanceChain(cycle, _) =>
         ("Fatal error: cycle in inheritance chain involving " +
-            cycle.map(_.displayName).mkString(", "))
+          cycle.map(_.displayName).mkString(", "))
       case MissingClass(info, _) =>
         s"Referring to non-existent class ${info.displayName}"
       case NotAModule(info, _) =>
@@ -228,11 +228,13 @@ object Analysis {
 
     private def indented[A](body: => A): A = {
       indentation += "  "
-      try body finally indentation = indentation.substring(2)
+      try body
+      finally indentation = indentation.substring(2)
     }
 
-    private def logCallStackImpl(
-        level: Level, optFrom: Option[From], verb: String = "called"): Unit = {
+    private def logCallStackImpl(level: Level,
+                                 optFrom: Option[From],
+                                 verb: String = "called"): Unit = {
       val involvedClasses = new mutable.ListBuffer[ClassInfo]
 
       def onlyOnce(level: Level, info: AnyRef): Boolean = {

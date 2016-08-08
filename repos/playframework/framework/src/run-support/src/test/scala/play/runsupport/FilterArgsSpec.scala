@@ -18,8 +18,8 @@ object FilterArgsSpec extends Specification {
       httpAddress: String = defaultHttpAddress,
       devSettings: Seq[(String, String)] = Seq.empty): Result = {
 
-    val result = Reloader.filterArgs(
-        args, defaultHttpPort, defaultHttpAddress, devSettings)
+    val result = Reloader
+      .filterArgs(args, defaultHttpPort, defaultHttpAddress, devSettings)
     result must_== ((properties, httpPort, httpsPort, httpAddress))
   }
 
@@ -47,8 +47,10 @@ object FilterArgsSpec extends Specification {
     "support port property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.http.port" -> "1234")
-      val result = Reloader.filterArgs(
-          Seq.empty, defaultHttpPort, defaultHttpAddress, devSettings)
+      val result = Reloader.filterArgs(Seq.empty,
+                                       defaultHttpPort,
+                                       defaultHttpAddress,
+                                       devSettings)
       result must_== ((Seq.empty, Some(1234), None, defaultHttpAddress))
     }
 
@@ -77,8 +79,10 @@ object FilterArgsSpec extends Specification {
     "support https port property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.https.port" -> "1234")
-      val result = Reloader.filterArgs(
-          Seq.empty, defaultHttpPort, defaultHttpAddress, devSettings)
+      val result = Reloader.filterArgs(Seq.empty,
+                                       defaultHttpPort,
+                                       defaultHttpAddress,
+                                       devSettings)
       result must_== ((Seq.empty, Some(9000), Some(1234), defaultHttpAddress))
     }
 
@@ -100,8 +104,10 @@ object FilterArgsSpec extends Specification {
     "support address property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.http.address" -> "not-default-address")
-      val result = Reloader.filterArgs(
-          Seq.empty, defaultHttpPort, defaultHttpAddress, devSettings)
+      val result = Reloader.filterArgs(Seq.empty,
+                                       defaultHttpPort,
+                                       defaultHttpAddress,
+                                       devSettings)
       result must_== ((Seq.empty, Some(9000), None, "not-default-address"))
     }
 

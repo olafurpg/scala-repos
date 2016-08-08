@@ -65,9 +65,9 @@ object Test_multiset {
       def cardinality[A](zs: List[A], e: A): Int = zs count (e == _)
       val intersection = xs intersect ys
       xs forall
-      (e =>
-            cardinality(intersection, e) ==
-            (cardinality(xs, e) min cardinality(ys, e)))
+        (e =>
+           cardinality(intersection, e) ==
+             (cardinality(xs, e) min cardinality(ys, e)))
     }, "obey min cardinality")
     assert({
       val intersection = xs intersect ys

@@ -177,7 +177,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
         .range(N)
         .join(dim2,
               (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
-              (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
+                (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
         .count()
     }
 
@@ -188,7 +188,8 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     Join w 2 ints codegen=false              7159 / 7224         14.6          68.3       1.0X
     Join w 2 ints codegen=true               1135 / 1197         92.4          10.8       6.3X
       */
-    val dim3 = broadcast(sqlContext
+    val dim3 = broadcast(
+        sqlContext
           .range(M)
           .selectExpr("id as k1", "id as k2", "cast(id as string) as v"))
 
@@ -197,7 +198,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
         .range(N)
         .join(dim3,
               (col("id") bitwiseAND M) === col("k1") &&
-              (col("id") bitwiseAND M) === col("k2"))
+                (col("id") bitwiseAND M) === col("k2"))
         .count()
     }
 
@@ -324,8 +325,10 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       var s = 0
       while (i < N) {
         key.setInt(0, i % 1000)
-        val h = Murmur3_x86_32.hashUnsafeWords(
-            key.getBaseObject, key.getBaseOffset, key.getSizeInBytes, 42)
+        val h = Murmur3_x86_32.hashUnsafeWords(key.getBaseObject,
+                                               key.getBaseOffset,
+                                               key.getSizeInBytes,
+                                               42)
         s += h
         i += 1
       }

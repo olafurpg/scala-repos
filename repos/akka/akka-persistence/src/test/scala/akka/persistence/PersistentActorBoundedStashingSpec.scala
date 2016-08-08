@@ -51,8 +51,8 @@ object PersistentActorBoundedStashingSpec {
        |akka.persistence.internal-stash-overflow-strategy = "%s"
        |""".stripMargin
 
-  val throwConfig = String.format(
-      templateConfig, "akka.persistence.ThrowExceptionConfigurator")
+  val throwConfig = String
+    .format(templateConfig, "akka.persistence.ThrowExceptionConfigurator")
   val discardConfig =
     String.format(templateConfig, "akka.persistence.DiscardConfigurator")
   val replyToConfig = String.format(
@@ -65,14 +65,15 @@ class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
         SteppingInmemJournal
           .config("persistence-bounded-stash")
           .withFallback(PersistenceSpec.config(
-                  "stepping-inmem",
-                  "SteppingInMemPersistentActorBoundedStashingSpec",
-                  extraConfig = Some(strategyConfig)))) with BeforeAndAfterEach
+              "stepping-inmem",
+              "SteppingInMemPersistentActorBoundedStashingSpec",
+              extraConfig = Some(strategyConfig))))
+    with BeforeAndAfterEach
     with ImplicitSender {
 
   override def atStartup: Unit = {
-    system.eventStream.publish(Mute(EventFilter.warning(
-                pattern = ".*received dead letter from.*Cmd.*")))
+    system.eventStream.publish(Mute(
+        EventFilter.warning(pattern = ".*received dead letter from.*Cmd.*")))
   }
 
   override def beforeEach(): Unit =
@@ -103,10 +104,10 @@ class ThrowExceptionStrategyPersistentActorBoundedStashingSpec
       1 to (2 * capacity) foreach (persistentActor ! Cmd(_))
       //after PA stopped, all stashed messages forward to deadletters
       1 to capacity foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
       //non-stashed messages
       (capacity + 2) to (2 * capacity) foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
     }
   }
 }
@@ -132,7 +133,7 @@ class DiscardStrategyPersistentActorBoundedStashingSpec
       1 to (2 * capacity) foreach (persistentActor ! Cmd(_))
       //so, 11 to 20 discard to deadletter
       (1 + capacity) to (2 * capacity) foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
       //allow "a" and 1 to 10 write complete
       1 to (1 + capacity) foreach (i ⇒ SteppingInmemJournal.step(journal))
 

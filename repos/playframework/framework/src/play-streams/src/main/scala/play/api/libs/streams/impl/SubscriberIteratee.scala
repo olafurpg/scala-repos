@@ -51,9 +51,9 @@ private[streams] object SubscriberIteratee {
 import SubscriberIteratee._
 
 private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
-    extends StateMachine[State](NotSubscribed) with Subscription
-    with Iteratee[T, Unit] {
-  self =>
+    extends StateMachine[State](NotSubscribed)
+    with Subscription
+    with Iteratee[T, Unit] { self =>
 
   def fold[B](folder: (Step[T, Unit]) => Future[B])(
       implicit ec: ExecutionContext): Future[B] = {
@@ -93,8 +93,7 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
                         folder: (Step[T, Unit]) => Future[B],
                         ec: ExecutionContext): Unit = {
     Future {
-      promise.completeWith(
-          folder(Step.Cont[T, Unit] {
+      promise.completeWith(folder(Step.Cont[T, Unit] {
         case Input.EOF =>
           subscriber.onComplete()
           Done(())

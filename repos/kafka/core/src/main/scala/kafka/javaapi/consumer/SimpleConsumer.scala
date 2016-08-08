@@ -30,8 +30,11 @@ class SimpleConsumer(val host: String,
                      val bufferSize: Int,
                      val clientId: String) {
 
-  private val underlying = new kafka.consumer.SimpleConsumer(
-      host, port, soTimeout, bufferSize, clientId)
+  private val underlying = new kafka.consumer.SimpleConsumer(host,
+                                                             port,
+                                                             soTimeout,
+                                                             bufferSize,
+                                                             clientId)
 
   /**
     *  Fetch a set of messages from a topic. This version of the fetch method
@@ -59,7 +62,7 @@ class SimpleConsumer(val host: String,
 
   /**
     *  Fetch metadata for a sequence of topics.
-    *  
+    *
     *  @param request specifies the versionId, clientId, sequence of topics.
     *  @return metadata for each topic in the request.
     */

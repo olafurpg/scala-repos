@@ -81,7 +81,8 @@ object DragEvent {
 }
 
 class DragEvent(override val delegate: jfxsi.DragEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.DragEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.DragEvent] {
 
   /**
     * Accepts this DragEvent, choosing the transfer mode for the drop operation.

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -717,8 +717,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+             SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve with a generic where inside a function" in {
@@ -745,8 +745,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+             SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve the results of a set and a stdlib op1 function" in {
@@ -1581,10 +1581,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(1)
-            obj must haveKey("aa")
-          }
+          ids.length must_== 1
+          obj must haveSize(1)
+          obj must haveKey("aa")
+        }
       }
     }
 
@@ -1602,11 +1602,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 2
-            obj must haveSize(2)
-            obj must haveKey("aa")
-            obj must haveKey("bb")
-          }
+          ids.length must_== 2
+          obj must haveSize(2)
+          obj must haveKey("aa")
+          obj must haveKey("bb")
+        }
       }
     }
 
@@ -1626,9 +1626,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SBoolean(b)) => {
-            ids must haveSize(2)
-            b mustEqual true
-          }
+          ids must haveSize(2)
+          b mustEqual true
+        }
       }
     }
 
@@ -2068,10 +2068,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(5)
-            obj must contain("gender" -> SString("male"))
-          }
+          ids.length must_== 1
+          obj must haveSize(5)
+          obj must contain("gender" -> SString("male"))
+        }
       }
     }
 
@@ -2127,12 +2127,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(5)
-            obj must contain(
-                "ageRange" -> SArray(Vector(SDecimal(25), SDecimal(36))))
-            obj must contain("gender" -> SString("female"))
-          }
+          ids.length must_== 1
+          obj must haveSize(5)
+          obj must contain(
+              "ageRange" -> SArray(Vector(SDecimal(25), SDecimal(36))))
+          obj must contain("gender" -> SString("female"))
+        }
       }
     }
 
@@ -2266,9 +2266,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must contain(
           SObject(Map("timeZone" -> SString("+11:00"),
                       "ratio" -> SDecimal(BigDecimal("200.0")))))
-      results must contain(
-          SObject(Map("timeZone" -> SString("+12:00"),
-                      "ratio" -> SDecimal(BigDecimal("33.0"))))) //TODO: this should be 33.3333 - find out why precision is hosed
+      results must contain(SObject(
+          Map("timeZone" -> SString("+12:00"),
+              "ratio" -> SDecimal(BigDecimal("33.0"))))) //TODO: this should be 33.3333 - find out why precision is hosed
       results must contain(
           SObject(Map("timeZone" -> SString("+04:00"),
                       "ratio" -> SDecimal(BigDecimal("200.0")))))
@@ -2751,125 +2751,145 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329275667592")),
-                      "timeZone" -> SString("+14:00"),
-                      "timeString" -> SString("2012-02-15T17:14:27.592+14:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1001"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329275667592")),
+                  "timeZone" -> SString("+14:00"),
+                  "timeString" -> SString("2012-02-15T17:14:27.592+14:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1001"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329020233656")),
-                      "timeZone" -> SString("+14:00"),
-                      "timeString" -> SString("2012-02-12T18:17:13.656+14:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1017"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329020233656")),
+                  "timeZone" -> SString("+14:00"),
+                  "timeString" -> SString("2012-02-12T18:17:13.656+14:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1017"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329345853072")),
-                      "timeZone" -> SString("-02:00"),
-                      "timeString" -> SString("2012-02-15T20:44:13.072-02:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1014"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329345853072")),
+                  "timeZone" -> SString("-02:00"),
+                  "timeString" -> SString("2012-02-15T20:44:13.072-02:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1014"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329589296943")),
-                      "timeZone" -> SString("+03:00"),
-                      "timeString" -> SString("2012-02-18T21:21:36.943+03:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1006"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329589296943")),
+                  "timeZone" -> SString("+03:00"),
+                  "timeString" -> SString("2012-02-18T21:21:36.943+03:00"),
+                  "pageId" -> SString("page-3"),
+                  "userId" -> SString("user-1006"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328969812140")),
-                      "timeZone" -> SString("+01:00"),
-                      "timeString" -> SString("2012-02-11T15:16:52.140+01:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1019"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1328969812140")),
+                  "timeZone" -> SString("+01:00"),
+                  "timeString" -> SString("2012-02-11T15:16:52.140+01:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1019"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329211954428")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-14T22:32:34.428+13:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1020"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329211954428")),
+                  "timeZone" -> SString("+13:00"),
+                  "timeString" -> SString("2012-02-14T22:32:34.428+13:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1020"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329526464104")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-18T13:54:24.104+13:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1020"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329526464104")),
+                  "timeZone" -> SString("+13:00"),
+                  "timeString" -> SString("2012-02-18T13:54:24.104+13:00"),
+                  "pageId" -> SString("page-3"),
+                  "userId" -> SString("user-1020"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329190541217")),
-                      "timeZone" -> SString("-12:00"),
-                      "timeString" -> SString("2012-02-13T15:35:41.217-12:00"),
-                      "pageId" -> SString("page-2"),
-                      "userId" -> SString("user-1016"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329190541217")),
+                  "timeZone" -> SString("-12:00"),
+                  "timeString" -> SString("2012-02-13T15:35:41.217-12:00"),
+                  "pageId" -> SString("page-2"),
+                  "userId" -> SString("user-1016"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329094347814")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-13T12:52:27.814+12:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1015"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329094347814")),
+                  "timeZone" -> SString("+12:00"),
+                  "timeString" -> SString("2012-02-13T12:52:27.814+12:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1015"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328877415620")),
-                      "timeZone" -> SString("-12:00"),
-                      "timeString" -> SString("2012-02-10T00:36:55.620-12:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1018"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1328877415620")),
+                  "timeZone" -> SString("-12:00"),
+                  "timeString" -> SString("2012-02-10T00:36:55.620-12:00"),
+                  "pageId" -> SString("page-3"),
+                  "userId" -> SString("user-1018"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329456302829")),
-                      "timeZone" -> SString("-03:00"),
-                      "timeString" -> SString("2012-02-17T02:25:02.829-03:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1001"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329456302829")),
+                  "timeZone" -> SString("-03:00"),
+                  "timeString" -> SString("2012-02-17T02:25:02.829-03:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1001"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329137951622")),
-                      "timeZone" -> SString("+04:00"),
-                      "timeString" -> SString("2012-02-13T16:59:11.622+04:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1017"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329137951622")),
+                  "timeZone" -> SString("+04:00"),
+                  "timeString" -> SString("2012-02-13T16:59:11.622+04:00"),
+                  "pageId" -> SString("page-0"),
+                  "userId" -> SString("user-1017"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329360253555")),
-                      "timeZone" -> SString("+11:00"),
-                      "timeString" -> SString("2012-02-16T13:44:13.555+11:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1020"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329360253555")),
+                  "timeZone" -> SString("+11:00"),
+                  "timeString" -> SString("2012-02-16T13:44:13.555+11:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1020"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328887823569")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-11T03:30:23.569+12:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1007"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1328887823569")),
+                  "timeZone" -> SString("+12:00"),
+                  "timeString" -> SString("2012-02-11T03:30:23.569+12:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1007"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329076541429")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-13T07:55:41.429+12:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1016"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329076541429")),
+                  "timeZone" -> SString("+12:00"),
+                  "timeString" -> SString("2012-02-13T07:55:41.429+12:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1016"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329262444197")),
-                      "timeZone" -> SString("-06:00"),
-                      "timeString" -> SString("2012-02-14T17:34:04.197-06:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1019"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329262444197")),
+                  "timeZone" -> SString("-06:00"),
+                  "timeString" -> SString("2012-02-14T17:34:04.197-06:00"),
+                  "pageId" -> SString("page-0"),
+                  "userId" -> SString("user-1019"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329004284627")),
-                      "timeZone" -> SString("+01:00"),
-                      "timeString" -> SString("2012-02-12T00:51:24.627+01:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1011"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329004284627")),
+                  "timeZone" -> SString("+01:00"),
+                  "timeString" -> SString("2012-02-12T00:51:24.627+01:00"),
+                  "pageId" -> SString("page-1"),
+                  "userId" -> SString("user-1011"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329554034828")),
-                      "timeZone" -> SString("+06:00"),
-                      "timeString" -> SString("2012-02-18T14:33:54.828+06:00"),
-                      "pageId" -> SString("page-2"),
-                      "userId" -> SString("user-1016"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329554034828")),
+                  "timeZone" -> SString("+06:00"),
+                  "timeString" -> SString("2012-02-18T14:33:54.828+06:00"),
+                  "pageId" -> SString("page-2"),
+                  "userId" -> SString("user-1016"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329408502943")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-17T05:08:22.943+13:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1006"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329408502943")),
+                  "timeZone" -> SString("+13:00"),
+                  "timeString" -> SString("2012-02-17T05:08:22.943+13:00"),
+                  "pageId" -> SString("page-4"),
+                  "userId" -> SString("user-1006"))))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329629900716")),
-                      "timeZone" -> SString("-07:00"),
-                      "timeString" -> SString("2012-02-18T22:38:20.716-07:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1014"))))
+          SObject(
+              Map("time" -> SDecimal(BigDecimal("1329629900716")),
+                  "timeZone" -> SString("-07:00"),
+                  "timeString" -> SString("2012-02-18T22:38:20.716-07:00"),
+                  "pageId" -> SString("page-0"),
+                  "userId" -> SString("user-1014"))))
     }
 
     // Regression test for #39590007
@@ -3401,31 +3421,31 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //  val input = """
     //    | import std::stats::*
     //    | import std::time::*
-    //    | 
+    //    |
     //    | --locations := //devicelocations/2012/07/01
     //    | locations := //test
     //    | deviceTimes := [ locations.deviceId, locations.captureTimestamp ]
-    //    | 
+    //    |
     //    | order := denseRank(deviceTimes)
-    //    | 
+    //    |
     //    | locations' := locations with { rank : order }
     //    | --locations'
     //    | newLocations := new locations'
     //    | newLocations' := newLocations with { rank : newLocations.rank - 1 }
-    //    | 
+    //    |
     //    | joined := newLocations' ~ locations'
     //    |   { first : locations', second : newLocations' } where locations'.rank
     //    | = newLocations'.rank
-    //    | 
+    //    |
     //    | r := joined where joined.first.deviceId = joined.second.deviceId
-    //    | 
-    //    | r' := 
+    //    |
+    //    | r' :=
     //    |   {
     //    |   data: r.first,
     //    |   nextLocation: r.second.currentZone,
     //    |   dwellTime: getMillis(r.second.captureTimestamp) - getMillis(r.first.captureTimestamp)
     //    |   }
-    //    | 
+    //    |
     //    | markov := solve 'location, 'nextLocation
     //    |   r'' := r' where r'.data.currentZone = 'location & r'.nextLocation = 'nextLocation
     //    |   total := count(r'.data.currentZone where r'.data.currentZone = 'location)
@@ -3433,20 +3453,20 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //    |   matrix: ['location, 'nextLocation],
     //    |   prob: count(r''.nextLocation)/total
     //    |   }
-    //    | 
+    //    |
     //    | --markov
-    //    | 
+    //    |
     //    | --function for creating cumulative probability distribution and formatting intervals
-    //    | createModel(data) :=  
+    //    | createModel(data) :=
     //    |   predictedDistribution := data with {rank : indexedRank(data.prob) }
-    //    | 
+    //    |
     //    |   cumProb := solve 'rank = predictedDistribution.rank
     //    |     {
     //    |     location: predictedDistribution.matrix where  predictedDistribution.rank = 'rank,
     //    |     prob: sum(predictedDistribution.prob where predictedDistribution.rank <= 'rank),
     //    |     rank: 'rank
     //    |     }
-    //    | 
+    //    |
     //    |   buckets := solve 'rank = cumProb.rank
     //    |     minimum:= cumProb.prob where cumProb.rank = 'rank
     //    |     maximum:= min(cumProb.prob where cumProb.rank > 'rank)
@@ -3456,11 +3476,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //    |     }
     //    | buckets
     //    | --end createModel Function
-    //    | 
+    //    |
     //    | markov' := createModel(markov)
     //    | markov'
     //    | """.stripMargin
-    //    
+    //
     //  eval(input) must not(throwA[Throwable])
     //}
 
@@ -3527,13 +3547,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SArray(arr)) => {
-            ids must haveSize(2)
-            arr must haveSize(2)
+          ids must haveSize(2)
+          arr must haveSize(2)
 
-            arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
-            arr(1) mustEqual SArray(
-                Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
+          arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
+          arr(1) mustEqual SArray(
+              Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
+        }
         case _ => ko
       }
 
@@ -3560,13 +3580,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SArray(arr)) => {
-            ids must haveSize(2)
-            arr must haveSize(2)
+          ids must haveSize(2)
+          arr must haveSize(2)
 
-            arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
-            arr(1) mustEqual SArray(
-                Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
+          arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
+          arr(1) mustEqual SArray(
+              Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
+        }
         case _ => ko
       }
 
@@ -3600,14 +3620,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            // note that `ids` has size 1 because flatten retains the original ids
-            // and adds a new synth id, and in this case there are no original ids
-            ids must haveSize(1)
-            obj.keySet mustEqual Set("foo", "bar", "ack")
+          // note that `ids` has size 1 because flatten retains the original ids
+          // and adds a new synth id, and in this case there are no original ids
+          ids must haveSize(1)
+          obj.keySet mustEqual Set("foo", "bar", "ack")
 
-            if (obj("foo") == SDecimal(5)) obj("ack") mustEqual SDecimal(10000)
-            else obj("ack") mustEqual SDecimal(0)
-          }
+          if (obj("foo") == SDecimal(5)) obj("ack") mustEqual SDecimal(10000)
+          else obj("ack") mustEqual SDecimal(0)
+        }
         case _ => ko
       }
     }

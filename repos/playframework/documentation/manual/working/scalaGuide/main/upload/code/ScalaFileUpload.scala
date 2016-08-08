@@ -47,7 +47,8 @@ package scalaguide.upload.fileupload {
 
         val request = FakeRequest().withBody(
             MultipartFormData(Map.empty,
-                              Seq(FilePart("picture",
+                              Seq(
+                                  FilePart("picture",
                                            "formuploaded",
                                            None,
                                            TemporaryFile(tmpFile))),

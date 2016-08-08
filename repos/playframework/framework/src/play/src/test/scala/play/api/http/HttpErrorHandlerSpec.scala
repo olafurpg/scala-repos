@@ -41,8 +41,8 @@ object HttpErrorHandlerSpec extends Specification {
       }
       "render a server error" in {
         await(errorHandler.onServerError(
-                FakeRequest(),
-                new RuntimeException())).header.status must_== 500
+            FakeRequest(),
+            new RuntimeException())).header.status must_== 500
       }
     }
 
@@ -54,10 +54,12 @@ object HttpErrorHandlerSpec extends Specification {
     }
 
     "work if a java handler is defined" in {
-      "in dev mode" in sharedSpecs(handler(
-              classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Dev))
-      "in prod mode" in sharedSpecs(handler(
-              classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Prod))
+      "in dev mode" in sharedSpecs(
+          handler(classOf[play.http.DefaultHttpErrorHandler].getName,
+                  Mode.Dev))
+      "in prod mode" in sharedSpecs(
+          handler(classOf[play.http.DefaultHttpErrorHandler].getName,
+                  Mode.Prod))
     }
 
     "work with a custom scala handler" in {
@@ -90,16 +92,18 @@ object HttpErrorHandlerSpec extends Specification {
   }
 
   class CustomScalaErrorHandler extends HttpErrorHandler {
-    def onClientError(
-        request: RequestHeader, statusCode: Int, message: String) =
+    def onClientError(request: RequestHeader,
+                      statusCode: Int,
+                      message: String) =
       Future.successful(Results.Ok)
     def onServerError(request: RequestHeader, exception: Throwable) =
       Future.successful(Results.Ok)
   }
 
   class CustomJavaErrorHandler extends play.http.HttpErrorHandler {
-    def onClientError(
-        req: play.mvc.Http.RequestHeader, status: Int, msg: String) =
+    def onClientError(req: play.mvc.Http.RequestHeader,
+                      status: Int,
+                      msg: String) =
       CompletableFuture.completedFuture(play.mvc.Results.ok())
     def onServerError(req: play.mvc.Http.RequestHeader, exception: Throwable) =
       CompletableFuture.completedFuture(play.mvc.Results.ok())

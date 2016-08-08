@@ -26,14 +26,15 @@ trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
     new AsyncLoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitAsyncLoadedLibs
-      extends LinkingUnitLoadedLibs with AsyncLoadedLibs
+      extends LinkingUnitLoadedLibs
+      with AsyncLoadedLibs
       with LinkingUnitAsyncJSEnv {
     def asyncRunner(preLibs: Seq[ResolvedJSDependency],
                     linkingUnit: LinkingUnit,
                     postLibs: Seq[ResolvedJSDependency],
                     code: VirtualJSFile): AsyncJSRunner = {
-      LinkingUnitAsyncJSEnv.this.asyncRunner(
-          loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+      LinkingUnitAsyncJSEnv.this
+        .asyncRunner(loadedLibs ++ preLibs, linkingUnit, postLibs, code)
     }
   }
 

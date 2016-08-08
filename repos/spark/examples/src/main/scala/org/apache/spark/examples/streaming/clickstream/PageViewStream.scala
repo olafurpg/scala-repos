@@ -39,7 +39,7 @@ object PageViewStream {
       System.err.println("Usage: PageViewStream <metric> <host> <port>")
       System.err.println(
           "<metric> must be one of pageCounts, slidingPageCounts," +
-          " errorRatePerZipCode, activeUserCount, popularUsersSeen")
+            " errorRatePerZipCode, activeUserCount, popularUsersSeen")
       System.exit(1)
     }
     StreamingExamples.setStreamingLogLevels()
@@ -95,9 +95,8 @@ object PageViewStream {
       .map("Unique active users: " + _)
 
     // An external dataset we want to join to this stream
-    val userList = ssc.sparkContext.parallelize(Seq(1 -> "Patrick Wendell",
-                                                    2 -> "Reynold Xin",
-                                                    3 -> "Matei Zaharia"))
+    val userList = ssc.sparkContext.parallelize(
+        Seq(1 -> "Patrick Wendell", 2 -> "Reynold Xin", 3 -> "Matei Zaharia"))
 
     metric match {
       case "pageCounts" => pageCounts.print()
@@ -109,12 +108,11 @@ object PageViewStream {
         pageViews
           .map(view => (view.userID, 1))
           .foreachRDD((rdd, time) =>
-                rdd
-                  .join(userList)
-                  .map(_._2._2)
-                  .take(10)
-                  .foreach(u =>
-                        println("Saw user %s at time %s".format(u, time))))
+            rdd
+              .join(userList)
+              .map(_._2._2)
+              .take(10)
+              .foreach(u => println("Saw user %s at time %s".format(u, time))))
       case _ => println("Invalid metric entered: " + metric)
     }
 

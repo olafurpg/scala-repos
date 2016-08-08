@@ -18,9 +18,18 @@ package org.jetbrains.plugins.scala.lang.psi.api.macros.impl
 import com.intellij.psi.PsiNamedElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScPattern
-import org.jetbrains.plugins.scala.lang.psi.api.macros.{MacroContext, ScalaMacroTypeable}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScFunction}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.macros.{
+  MacroContext,
+  ScalaMacroTypeable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScFunction
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
 import org.jetbrains.plugins.scala.lang.psi.types._
@@ -31,12 +40,13 @@ import org.jetbrains.plugins.scala.lang.psi.types._
   */
 object ShapelessForProduct extends ScalaMacroTypeable {
 
-  override def checkMacro(
-      macros: ScFunction, context: MacroContext): Option[ScType] = {
+  override def checkMacro(macros: ScFunction,
+                          context: MacroContext): Option[ScType] = {
     if (!context.expectedType.isDefined) return None
     val manager = ScalaPsiManager.instance(context.place.getProject)
-    val clazz = manager.getCachedClass(
-        "shapeless.Generic", context.place.getResolveScope, ClassCategory.TYPE)
+    val clazz = manager.getCachedClass("shapeless.Generic",
+                                       context.place.getResolveScope,
+                                       ClassCategory.TYPE)
     clazz match {
       case c: ScTypeDefinition =>
         val tpt = c.typeParameters
@@ -67,8 +77,8 @@ object ShapelessForProduct extends ScalaMacroTypeable {
             if (hnil == null) return None
             val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
               case (part, resultType) =>
-                ScParameterizedType(
-                    ScDesignatorType(coloncolon), Seq(part, resultType))
+                ScParameterizedType(ScDesignatorType(coloncolon),
+                                    Seq(part, resultType))
             }
             ScalaPsiUtil.getCompanionModule(c) match {
               case Some(obj: ScObject) =>

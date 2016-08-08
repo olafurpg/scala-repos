@@ -212,8 +212,8 @@ object Test {
 
   case class Foo(i: Int, j: Char, c: Bar);
 
-  Console.println(
-      true // Foo(3,'a',Bar()).caseElement( -1 ) == null // throws Exception now
+  Console
+    .println(true // Foo(3,'a',Bar()).caseElement( -1 ) == null // throws Exception now
       && Foo(3, 'a', Bar()).productElement(0) == 3 &&
       Foo(3, 'a', Bar()).productElement(1) == 'a' &&
       Foo(3, 'a', Bar()).productElement(2) == Bar() &&

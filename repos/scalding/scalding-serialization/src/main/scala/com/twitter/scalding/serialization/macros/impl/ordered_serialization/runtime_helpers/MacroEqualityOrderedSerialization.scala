@@ -15,14 +15,18 @@
  */
 package com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers
 
-import com.twitter.scalding.serialization.{EquivSerialization, OrderedSerialization}
+import com.twitter.scalding.serialization.{
+  EquivSerialization,
+  OrderedSerialization
+}
 
 object MacroEqualityOrderedSerialization {
   private val seed = "MacroEqualityOrderedSerialization".hashCode
 }
 
 abstract class MacroEqualityOrderedSerialization[T]
-    extends OrderedSerialization[T] with EquivSerialization[T] {
+    extends OrderedSerialization[T]
+    with EquivSerialization[T] {
   def uniqueId: String
   override def hashCode =
     MacroEqualityOrderedSerialization.seed ^ uniqueId.hashCode

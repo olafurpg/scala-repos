@@ -80,8 +80,8 @@ class StorageLevel private (private var _useDisk: Boolean,
   override def equals(other: Any): Boolean = other match {
     case s: StorageLevel =>
       s.useDisk == useDisk && s.useMemory == useMemory &&
-      s.useOffHeap == useOffHeap && s.deserialized == deserialized &&
-      s.replication == replication
+        s.useOffHeap == useOffHeap && s.deserialized == deserialized &&
+        s.replication == replication
     case _ =>
       false
   }
@@ -192,8 +192,12 @@ object StorageLevel {
             useOffHeap: Boolean,
             deserialized: Boolean,
             replication: Int): StorageLevel = {
-    getCachedStorageLevel(new StorageLevel(
-            useDisk, useMemory, useOffHeap, deserialized, replication))
+    getCachedStorageLevel(
+        new StorageLevel(useDisk,
+                         useMemory,
+                         useOffHeap,
+                         deserialized,
+                         replication))
   }
 
   /**

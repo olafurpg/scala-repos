@@ -39,8 +39,8 @@ trait PositionDelegateSpec[D <: PositionDelegate[_]] extends FlatSpec {
 
   val positionDelegate: D
 
-  private def testDoublePropertyUpdate(
-      testedProperty: DoubleProperty, propertyName: String) {
+  private def testDoublePropertyUpdate(testedProperty: DoubleProperty,
+                                       propertyName: String) {
     var moved = false
     val observerDouble = new DoubleProperty(positionDelegate, propertyName)
 

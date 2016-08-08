@@ -32,8 +32,7 @@ trait HasCdfTestBase extends FunSuite with Checkers {
   implicit def arbDistr: Arbitrary[Distr]
 
   test("probability gets the same fraction of things as the sampler") {
-    check(
-        Prop.forAll { (distr: Distr) =>
+    check(Prop.forAll { (distr: Distr) =>
       val samples = distr.sample(10000)
       val (low, high) = {
         if (samples(0) < samples(1)) (samples(0), samples(1))
@@ -53,8 +52,7 @@ trait HasCdfTestBase extends FunSuite with Checkers {
   }
 
   test("cdf gets the same fraction of things as the sampler") {
-    check(
-        Prop.forAll { (distr: Distr) =>
+    check(Prop.forAll { (distr: Distr) =>
       val samples = distr.sample(10000)
       val high = samples(0)
 

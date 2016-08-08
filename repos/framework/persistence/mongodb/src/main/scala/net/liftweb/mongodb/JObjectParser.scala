@@ -71,8 +71,8 @@ object JObjectParser extends SimpleInjector {
             }
         )
       case x => {
-          JNothing
-        }
+        JNothing
+      }
     }
   }
 

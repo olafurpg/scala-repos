@@ -17,7 +17,11 @@ limitations under the License.
 package com.twitter.scalding.commons.source
 
 import com.twitter.elephantbird.mapreduce.io.BinaryConverter
-import com.twitter.scrooge.{BinaryThriftStructSerializer, ThriftStructCodec, ThriftStruct}
+import com.twitter.scrooge.{
+  BinaryThriftStructSerializer,
+  ThriftStructCodec,
+  ThriftStruct
+}
 import scala.reflect.ClassTag
 import scala.util.Try
 
@@ -49,7 +53,7 @@ object ScroogeBinaryConverter {
           .getField("MODULE$")
           .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
 
-  def apply[T <: ThriftStruct : ClassTag]: BinaryConverter[T] = {
+  def apply[T <: ThriftStruct: ClassTag]: BinaryConverter[T] = {
     val ct = implicitly[ClassTag[T]]
     new BinaryConverter[T] {
       val serializer = BinaryThriftStructSerializer[T] {

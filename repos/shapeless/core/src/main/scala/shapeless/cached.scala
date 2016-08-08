@@ -54,8 +54,8 @@ import scala.reflect.macros.whitebox
 case class Cached[+T](value: T) extends AnyVal
 
 object Cached {
-  implicit def materialize[I]: Cached[I] = macro CachedMacros
-    .materializeCached[I]
+  implicit def materialize[I]: Cached[I] =
+    macro CachedMacros.materializeCached[I]
 
   def implicitly[T](implicit cached: Cached[T]): T = cached.value
 }
@@ -67,10 +67,11 @@ object CachedMacros {
 
 @macrocompat.bundle
 class CachedMacros(override val c: whitebox.Context)
-    extends LazyMacros(c) with OpenImplicitMacros {
+    extends LazyMacros(c)
+    with OpenImplicitMacros {
   import c.universe._
 
-  def materializeCached[T : WeakTypeTag]: Tree = {
+  def materializeCached[T: WeakTypeTag]: Tree = {
     // Getting the actual type parameter T, using the same trick as Lazy/Strict
     val tpe = openImplicitTpeParam.getOrElse(weakTypeOf[T])
 
@@ -84,8 +85,8 @@ class CachedMacros(override val c: whitebox.Context)
       c.warning(
           c.enclosingPosition,
           s"Cached[$tpe] called from a Lazy/Strict, you might want to consider caching " +
-          "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
-          "is disabled here.")
+            "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
+            "is disabled here.")
 
     if (CachedMacros.deriving || concurrentLazy) {
       // Caching only the first (root) Cached, not subsequent ones as here
@@ -108,7 +109,7 @@ class CachedMacros(override val c: whitebox.Context)
           // https://github.com/fommil/spray-json-shapeless/issues/14.
           val tree = mkImpl[T](
               (tree,
-              actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
+               actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
               q"null.asInstanceOf[_root_.shapeless.Cached[_root_.scala.Nothing]]"
           )
 

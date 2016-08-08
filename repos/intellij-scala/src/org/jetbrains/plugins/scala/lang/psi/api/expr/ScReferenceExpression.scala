@@ -12,12 +12,14 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 trait ScReferenceExpression
-    extends ScalaPsiElement with ScExpression with ScReferenceElement {
+    extends ScalaPsiElement
+    with ScExpression
+    with ScReferenceElement {
   def isQualified = qualifier.isDefined
 
   def qualifier: Option[ScExpression] = getFirstChild match {
@@ -71,7 +73,8 @@ trait ScReferenceExpression
   def shapeType: TypeResult[ScType]
 
   override def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport) = {
+      useFullQualifiedName: Boolean,
+      clazz: TypeToImport) = {
     if (useFullQualifiedName) {
       super.createReplacingElementWithClassName(useFullQualifiedName, clazz)
     } else {
@@ -81,8 +84,8 @@ trait ScReferenceExpression
     }
   }
 
-  def bindToElement(
-      element: PsiElement, containingClass: Option[PsiClass]): PsiElement
+  def bindToElement(element: PsiElement,
+                    containingClass: Option[PsiClass]): PsiElement
 
   def getPrevTypeInfoParams: Seq[TypeParameter]
 

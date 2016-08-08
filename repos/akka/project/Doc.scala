@@ -5,7 +5,14 @@ package akka
 
 import sbt._
 import sbtunidoc.Plugin.UnidocKeys._
-import sbtunidoc.Plugin.{ScalaUnidoc, JavaUnidoc, Genjavadoc, scalaJavaUnidocSettings, genjavadocExtraSettings, scalaUnidocSettings}
+import sbtunidoc.Plugin.{
+  ScalaUnidoc,
+  JavaUnidoc,
+  Genjavadoc,
+  scalaJavaUnidocSettings,
+  genjavadocExtraSettings,
+  scalaUnidocSettings
+}
 import sbt.Keys._
 import sbt.File
 import scala.annotation.tailrec
@@ -31,10 +38,10 @@ object Scaladoc extends AutoPlugin {
             autoAPIMappings := CliOptions.scaladocAutoAPI.get
         )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
       .ifTrue(doc in Compile := {
-      val docs = (doc in Compile).value
-      if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
-      docs
-    })
+        val docs = (doc in Compile).value
+        if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
+        docs
+      })
   }
 
   def scaladocOptions(ver: String, base: File): List[String] = {
@@ -64,10 +71,12 @@ object Scaladoc extends AutoPlugin {
               val hd = try source
                 .getLines()
                 .exists(_.contains(
-                        "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">")) catch {
+                    "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">"))
+              catch {
                 case e: Exception =>
                   throw new IllegalStateException(
-                      "Scaladoc verification failed for file '" + f + "'", e)
+                      "Scaladoc verification failed for file '" + f + "'",
+                      e)
               } finally source.close()
               hd
             } else false
@@ -115,8 +124,8 @@ object UnidocRoot extends AutoPlugin {
             scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
             // FIXME: see #18056
             sources in (JavaUnidoc, unidoc) ~=
-            (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
+              (_.filterNot(_.getPath.contains(
+                  "Access$minusControl$minusAllow$minusOrigin")))
         ))
     .getOrElse(Nil)
 
@@ -164,8 +173,8 @@ object Unidoc extends AutoPlugin {
             unidocGenjavadocVersion in Global := "0.9",
             // FIXME: see #18056
             sources in (Genjavadoc, doc) ~=
-            (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
+              (_.filterNot(_.getPath.contains(
+                  "Access$minusControl$minusAllow$minusOrigin")))
         )
     )
     .getOrElse(Seq.empty)

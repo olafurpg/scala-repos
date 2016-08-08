@@ -1,6 +1,6 @@
 object SCL7544B {
   trait Relationsz {
-    type ZeroMany [T]
+    type ZeroMany[T]
 
     def ZeroMany[T](ts: T*): ZeroMany[T]
   }

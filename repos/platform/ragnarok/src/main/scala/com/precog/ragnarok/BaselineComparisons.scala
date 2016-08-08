@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,8 +36,8 @@ object PerfDelta {
 
   case object Missing extends PerfDelta
 
-  def apply(
-      baseline: Option[Statistics], stats: Option[Statistics]): PerfDelta =
+  def apply(baseline: Option[Statistics],
+            stats: Option[Statistics]): PerfDelta =
     (baseline, stats) match {
       case (Some(baseline), Some(stats)) =>
         val q1 = baseline.variance / baseline.count
@@ -87,8 +87,9 @@ trait BaselineComparisons {
             path: List[String]): Tree[(PerfTest, PerfDelta)] =
       results match {
         case Tree.Node((RunQuery(query), stats), _) =>
-          Tree.leaf(RunQuery(query) -> PerfDelta(
-                  baseline get ((path, Some(query))), stats))
+          Tree.leaf(
+              RunQuery(query) -> PerfDelta(baseline get ((path, Some(query))),
+                                           stats))
 
         case Tree.Node((Group(name), stats), kids) =>
           val newPath = path :+ name
@@ -121,16 +122,16 @@ trait BaselineComparisons {
               case Some(stats) =>
                 (for {
                   JArray(jpath) <- obj \? "path" flatMap
-                  (_ -->? classOf[JArray])
+                                    (_ -->? classOf[JArray])
                   JNum(mean) <- stats \? "mean" flatMap (_ -->? classOf[JNum])
                   JNum(variance) <- stats \? "variance" flatMap
-                  (_ -->? classOf[JNum])
+                                     (_ -->? classOf[JNum])
                   JNum(stdDev) <- stats \? "stdDev" flatMap
-                  (_ -->? classOf[JNum])
+                                   (_ -->? classOf[JNum])
                   JNum(min) <- stats \? "min" flatMap (_ -->? classOf[JNum])
                   JNum(max) <- stats \? "max" flatMap (_ -->? classOf[JNum])
                   JNum(count) <- stats \? "count" flatMap
-                  (_ -->? classOf[JNum])
+                                  (_ -->? classOf[JNum])
                 } yield {
                   val path =
                     (jpath collect { case JString(p) => p },
@@ -174,7 +175,8 @@ trait BaselineComparisons {
       test match {
         case Tree.Node((RunQuery(query), Some(stats)), _) =>
           JObject(JField("path", JArray(path)) :: JField(
-                  "query", JString(query)) :: statsJson(stats)) :: Nil
+              "query",
+              JString(query)) :: statsJson(stats)) :: Nil
 
         case Tree.Node((Group(name), Some(stats)), kids) =>
           val newPath = path :+ JString(name)

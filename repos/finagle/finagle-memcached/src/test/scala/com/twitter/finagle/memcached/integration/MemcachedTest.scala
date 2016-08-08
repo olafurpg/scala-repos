@@ -5,7 +5,11 @@ import com.twitter.finagle.{Name, Address}
 import com.twitter.finagle.builder.ClientBuilder
 import com.twitter.finagle.memcached.protocol.ClientError
 import com.twitter.finagle.Memcached
-import com.twitter.finagle.memcached.{KetamaClientBuilder, Client, PartitionedClient}
+import com.twitter.finagle.memcached.{
+  KetamaClientBuilder,
+  Client,
+  PartitionedClient
+}
 import com.twitter.finagle.param
 import com.twitter.finagle.Service
 import com.twitter.finagle.service.FailureAccrualFactory
@@ -158,8 +162,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
       Await.result(client.set("    ", Buf.Utf8("bar")))
     }
 
-    assert(
-        Await.result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
+    assert(Await
+      .result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
     intercept[ClientError] { Await.result(client.set("\r", Buf.Utf8("bar"))) }
     intercept[ClientError] { Await.result(client.set("\n", Buf.Utf8("bar"))) }
     intercept[ClientError] {
@@ -250,7 +254,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     val name = "not-pipelined"
     val expectedKey = Seq("client", "memcached", name, "is_pipelining")
     KetamaClientBuilder()
-      .clientBuilder(ClientBuilder()
+      .clientBuilder(
+          ClientBuilder()
             .hosts(Seq(server1.get.address))
             .name(name)
             .codec(new com.twitter.finagle.memcached.protocol.text.Memcached())
@@ -289,7 +294,7 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
       .configured(param.Stats(statsReceiver))
       .newRichClient(
           Name.bound(Address(
-                  cacheServer.boundAddress.asInstanceOf[InetSocketAddress])),
+              cacheServer.boundAddress.asInstanceOf[InetSocketAddress])),
           "cacheClient")
 
     Time.withCurrentTimeFrozen { timeControl =>

@@ -79,7 +79,8 @@ object Test {
   def ruleMemberDeclaring(c: Class[_]) = {
     if (c.isMemberClass)
       assert(
-          c.getDeclaringClass.getDeclaredClasses.toList.map(_.getName) contains c.getName)
+          c.getDeclaringClass.getDeclaredClasses.toList
+            .map(_.getName) contains c.getName)
   }
 
   def ruleScalaAnonClassIsLocal(c: Class[_]) = {
@@ -130,14 +131,13 @@ object Test {
         case s if !s.startsWith("Test") && s.endsWith(".class") =>
           s.substring(0, s.length - 6)
       })
-      .sortWith((a, b) =>
-            {
-          // sort such that first there are all anonymous functions, then all other classes.
-          // within those categories, sort lexically.
-          // this makes the check file smaller: it differs for anonymous functions between -Ydelambdafy:inline/method.
-          // the other classes are the same.
-          if (isAnonFunClassName(a)) !isAnonFunClassName(b) || a < b
-          else !isAnonFunClassName(b) && a < b
+      .sortWith((a, b) => {
+        // sort such that first there are all anonymous functions, then all other classes.
+        // within those categories, sort lexically.
+        // this makes the check file smaller: it differs for anonymous functions between -Ydelambdafy:inline/method.
+        // the other classes are the same.
+        if (isAnonFunClassName(a)) !isAnonFunClassName(b) || a < b
+        else !isAnonFunClassName(b) && a < b
       })
 
     classfiles foreach showClass

@@ -28,7 +28,8 @@ class TestExecutionContext(delegate: ExecutionContext)
 
   def preparable[A](body: => A): A = {
     local.set(true)
-    try body finally local.set(null)
+    try body
+    finally local.set(null)
   }
 
   def execute(runnable: Runnable): Unit = {

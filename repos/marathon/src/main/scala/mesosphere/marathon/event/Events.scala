@@ -139,13 +139,13 @@ case class FailedHealthCheck(appId: PathId,
                              timestamp: String = Timestamp.now().toString)
     extends MarathonHealthCheckEvent
 
-case class HealthStatusChanged(
-    appId: PathId,
-    taskId: Task.Id,
-    version: Timestamp,
-    alive: Boolean,
-    eventType: String = "health_status_changed_event",
-    timestamp: String = Timestamp.now().toString)
+case class HealthStatusChanged(appId: PathId,
+                               taskId: Task.Id,
+                               version: Timestamp,
+                               alive: Boolean,
+                               eventType: String =
+                                 "health_status_changed_event",
+                               timestamp: String = Timestamp.now().toString)
     extends MarathonHealthCheckEvent
 
 // upgrade messages

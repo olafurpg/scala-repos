@@ -1,7 +1,9 @@
 package java.lang
 
 class StringBuilder(private var content: String)
-    extends CharSequence with Appendable with java.io.Serializable {
+    extends CharSequence
+    with Appendable
+    with java.io.Serializable {
   def this() = this("")
   def this(initialCapacity: Int) = this("")
   def this(csq: CharSequence) = this(csq.toString)
@@ -171,8 +173,10 @@ class StringBuilder(private var content: String)
     if (ref == null) insert(index, null: String)
     else insert(index, ref.toString)
 
-  def insert(
-      index: Int, csq: CharSequence, start: Int, end: Int): StringBuilder =
+  def insert(index: Int,
+             csq: CharSequence,
+             start: Int,
+             end: Int): StringBuilder =
     if (csq == null) insert(index, "null", start, end)
     else insert(index, csq.subSequence(start, end).toString)
 
@@ -196,7 +200,7 @@ class StringBuilder(private var content: String)
     else if (index == thisLength) append(str)
     else
       content = content.substring(0, index) + Option(str).getOrElse("null") +
-      content.substring(index)
+          content.substring(index)
     this
   }
 }

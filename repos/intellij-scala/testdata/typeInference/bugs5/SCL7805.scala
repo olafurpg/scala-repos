@@ -30,8 +30,13 @@ object SCL7805 {
   }
 
   class Aux2 {
-    implicit def iter1[
-        L <: HList, T <: HList, TH, TT <: HList, R <: HList, RI <: HList, Out <: HList](
+    implicit def iter1[L <: HList,
+                       T <: HList,
+                       TH,
+                       TT <: HList,
+                       R <: HList,
+                       RI <: HList,
+                       Out <: HList](
         implicit next: Aux[L, HNil, T, TT, R, RI, Out])
       : Aux[L, HNil, T, TH :: TT, R, RI, Out] = ???
   }

@@ -38,7 +38,8 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
 
   def seq: IndexedSeq[A]
   override def hashCode() =
-    scala.util.hashing.MurmurHash3.seqHash(seq) // TODO - can we get faster via "indexedSeqHash" ?
+    scala.util.hashing.MurmurHash3
+      .seqHash(seq) // TODO - can we get faster via "indexedSeqHash" ?
 
   override protected[this] def thisCollection: IndexedSeq[A] =
     this.asInstanceOf[IndexedSeq[A]]
@@ -52,7 +53,9 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
   // pre: start >= 0, end <= self.length
   @SerialVersionUID(1756321872811029277L)
   protected class Elements(start: Int, end: Int)
-      extends AbstractIterator[A] with BufferedIterator[A] with Serializable {
+      extends AbstractIterator[A]
+      with BufferedIterator[A]
+      with Serializable {
     private var index = start
     private def available = (end - index) max 0
 

@@ -21,7 +21,8 @@ trait GameHelper {
     lila.app.ui.OpenGraph(
         image = cdnUrl(routes.Export.png(pov.game.id).url).some,
         title = titleGame(pov.game),
-        url = s"$netBaseUrl${routes.Round.watcher(pov.game.id, pov.color.name).url}",
+        url =
+          s"$netBaseUrl${routes.Round.watcher(pov.game.id, pov.color.name).url}",
         description = describePov(pov))
 
   def titleGame(g: Game) = {
@@ -43,7 +44,8 @@ trait GameHelper {
     val mode = game.mode.name
     val variant =
       if (game.variant == chess.variant.FromPosition) "position setup chess"
-      else if (game.variant.exotic) game.variant.name else "chess"
+      else if (game.variant.exotic) game.variant.name
+      else "chess"
     import chess.Status._
     val result = (game.winner, game.loser, game.status) match {
       case (Some(w), _, Mate) => s"${playerText(w)} won by checkmate"
@@ -99,20 +101,19 @@ trait GameHelper {
     case Mode.Rated => trans.rated.en()
   }
 
-  def playerUsername(
-      player: Player, withRating: Boolean = true, withTitle: Boolean = true) =
+  def playerUsername(player: Player,
+                     withRating: Boolean = true,
+                     withTitle: Boolean = true) =
     Namer.player(player, withRating, withTitle)(lightUser)
 
   def playerText(player: Player, withRating: Boolean = false) =
     player.aiLevel.fold(
-        player.userId
-          .flatMap(lightUser)
-          .fold(player.name | "Anon.") { u =>
-            player.rating.ifTrue(withRating).fold(u.titleName) { r =>
-              s"${u.titleName} ($r)"
-            }
+        player.userId.flatMap(lightUser).fold(player.name | "Anon.") { u =>
+          player.rating.ifTrue(withRating).fold(u.titleName) { r =>
+            s"${u.titleName} ($r)"
           }
-      ) { level =>
+        }
+    ) { level =>
       s"A.I. level $level"
     }
 
@@ -234,11 +235,11 @@ trait GameHelper {
                ownerLink: Boolean = false,
                tv: Boolean = false)(implicit ctx: UserContext): String = {
     val owner = ownerLink.fold(ctx.me flatMap game.player, none)
-    val url = tv.fold(
-        routes.Tv.index,
-        owner.fold(routes.Round.watcher(game.id, color.name)) { o =>
-          routes.Round.player(game fullIdOf o.color)
-        })
+    val url = tv.fold(routes.Tv.index,
+                      owner.fold(routes.Round.watcher(game.id, color.name)) {
+                        o =>
+                          routes.Round.player(game fullIdOf o.color)
+                      })
     url.toString
   }
 

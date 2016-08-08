@@ -191,12 +191,12 @@ class DataMapSpec extends Specification {
       val result = properties.extract[DataMapSpec.MultiLevelProperty]
       val expected = DataMapSpec.MultiLevelProperty(
           context = DataMapSpec.Context(
-                ip = "1.23.4.56",
-                prop1 = Some(2.345),
-                prop2 = Some("value1"),
-                prop3 = None,
-                prop4 = List(1, 2, 3)
-            ),
+              ip = "1.23.4.56",
+              prop1 = Some(2.345),
+              prop2 = Some("value1"),
+              prop3 = None,
+              prop4 = List(1, 2, 3)
+          ),
           anotherPropertyA = 4.567,
           anotherPropertyB = false
       )

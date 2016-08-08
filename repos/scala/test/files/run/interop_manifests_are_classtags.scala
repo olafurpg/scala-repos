@@ -2,7 +2,7 @@ import scala.reflect.{ClassTag, classTag}
 
 @deprecated("Suppress warnings", since = "2.11")
 object Test extends App {
-  def classManifestIsClassTag[T : ClassManifest] = {
+  def classManifestIsClassTag[T: ClassManifest] = {
     println(classTag[T])
     println(Array[T]().toList)
     println(new Array[T](5).toList)
@@ -12,7 +12,7 @@ object Test extends App {
   classManifestIsClassTag[String]
   classManifestIsClassTag[Array[Int]]
 
-  def manifestIsClassTag[T : Manifest] = {
+  def manifestIsClassTag[T: Manifest] = {
     println(classTag[T])
     println(Array[T]().toList)
     println(new Array[T](5).toList)

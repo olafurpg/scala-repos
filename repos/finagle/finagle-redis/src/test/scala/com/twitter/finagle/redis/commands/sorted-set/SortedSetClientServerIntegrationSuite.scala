@@ -39,15 +39,15 @@ final class SortedSetClientServerIntegrationSuite
 
   test("ZADD should work correctly", ClientServerTest, RedisTest) {
     withRedisClient { client =>
-      assert(
-          Await.result(client(ZAdd("zadd1", List(ZMember(1, "one"))))) == IntegerReply(
-              1))
-      assert(
-          Await.result(client(ZAdd("zadd1", List(ZMember(2, "two"))))) == IntegerReply(
-              1))
-      assert(
-          Await.result(client(ZAdd("zadd1", List(ZMember(3, "two"))))) == IntegerReply(
-              0))
+      assert(Await
+        .result(client(ZAdd("zadd1", List(ZMember(1, "one"))))) == IntegerReply(
+          1))
+      assert(Await
+        .result(client(ZAdd("zadd1", List(ZMember(2, "two"))))) == IntegerReply(
+          1))
+      assert(Await
+        .result(client(ZAdd("zadd1", List(ZMember(3, "two"))))) == IntegerReply(
+          0))
       val expected = List("one", "1", "two", "3")
       assertMBulkReply(client(ZRange("zadd1", 0, -1, WithScores)), expected)
       assertMBulkReply(client(ZRange("zadd1", 0, -1)), List("one", "two"))
@@ -67,12 +67,12 @@ final class SortedSetClientServerIntegrationSuite
   test("ZCOUNT should work correctly", ClientServerTest, RedisTest) {
     withRedisClient { client =>
       initialize(client)
-      assert(
-          Await.result(client(ZCount(ZKEY, ZInterval.MIN, ZInterval.MAX))) == IntegerReply(
-              3))
-      assert(Await.result(client(ZCount(ZKEY,
-                                        ZInterval.exclusive(1),
-                                        ZInterval(3)))) == IntegerReply(2))
+      assert(Await
+        .result(client(ZCount(ZKEY, ZInterval.MIN, ZInterval.MAX))) == IntegerReply(
+          3))
+      assert(Await.result(client(
+          ZCount(ZKEY, ZInterval.exclusive(1), ZInterval(3)))) == IntegerReply(
+          2))
     }
   }
 
@@ -98,15 +98,15 @@ final class SortedSetClientServerIntegrationSuite
            ZMember(2, "two"),
            ZMember(3, "three"))
 
-      assert(Await.result(client(ZInterStore(
-                      "out", List(key, key2), Weights(2, 3)))) == IntegerReply(
-              2))
+      assert(Await.result(client(
+          ZInterStore("out", List(key, key2), Weights(2, 3)))) == IntegerReply(
+          2))
       assertMBulkReply(client(ZRange("out", 0, -1, WithScores)),
                        List("one", "5", "two", "10"))
 
-      assert(Await.result(client(ZUnionStore(
-                      "out", List(key, key2), Weights(2, 3)))) == IntegerReply(
-              3))
+      assert(Await.result(client(
+          ZUnionStore("out", List(key, key2), Weights(2, 3)))) == IntegerReply(
+          3))
       assertMBulkReply(client(ZRange("out", 0, -1, WithScores)),
                        List("one", "5", "three", "9", "two", "10"))
     }
@@ -160,10 +160,11 @@ final class SortedSetClientServerIntegrationSuite
       assertMBulkReply(
           client(ZRangeByScore(key, ZInterval.exclusive(1f), ZInterval(2f))),
           List("two"))
-      assertMBulkReply(
-          client(ZRangeByScore(
-                  key, ZInterval.exclusive(1f), ZInterval.exclusive(2f))),
-          List())
+      assertMBulkReply(client(
+                           ZRangeByScore(key,
+                                         ZInterval.exclusive(1f),
+                                         ZInterval.exclusive(2f))),
+                       List())
       assertMBulkReply(
           client(
               ZRangeByScore(key, ZInterval.MIN, ZInterval.MAX, Limit(1, 5))),
@@ -179,10 +180,11 @@ final class SortedSetClientServerIntegrationSuite
           client(
               ZRevRangeByScore(key, ZInterval(2f), ZInterval.exclusive(1f))),
           List("two"))
-      assertMBulkReply(
-          client(ZRevRangeByScore(
-                  key, ZInterval.exclusive(2f), ZInterval.exclusive(1f))),
-          List())
+      assertMBulkReply(client(
+                           ZRevRangeByScore(key,
+                                            ZInterval.exclusive(2f),
+                                            ZInterval.exclusive(1f))),
+                       List())
     }
   }
 
@@ -210,9 +212,8 @@ final class SortedSetClientServerIntegrationSuite
            ZMember(2, "two"),
            ZMember(3, "three"))
       assert(Await.result(client(ZRem(key, List("two")))) == IntegerReply(1))
-      assert(
-          Await.result(client(ZRem(key, List("nosuchmember")))) == IntegerReply(
-              0))
+      assert(Await
+        .result(client(ZRem(key, List("nosuchmember")))) == IntegerReply(0))
       assertMBulkReply(client(ZRange(key, 0, -1, WithScores)),
                        List("one", "1", "three", "3"))
     }
@@ -241,10 +242,13 @@ final class SortedSetClientServerIntegrationSuite
            ZMember(1, "one"),
            ZMember(2, "two"),
            ZMember(3, "three"))
-      assert(Await.result(client(ZRemRangeByScore(
-                      key,
-                      ZInterval.MIN,
-                      ZInterval.exclusive(2)))) == IntegerReply(1))
+      assert(
+          Await.result(
+              client(
+                  ZRemRangeByScore(key,
+                                   ZInterval.MIN,
+                                   ZInterval.exclusive(2)))) == IntegerReply(
+              1))
       assertMBulkReply(client(ZRange(key, 0, -1, WithScores)),
                        List("two", "2", "three", "3"))
     }

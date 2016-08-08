@@ -7,7 +7,12 @@ import akka.stream.Materializer
 import java.util.concurrent.CompletionStage
 import java.util.function.{Function => JFunction}
 import org.specs2.mutable.Specification
-import play.api.http.{GlobalSettingsHttpRequestHandler, HttpRequestHandler, DefaultHttpErrorHandler, HttpErrorHandler}
+import play.api.http.{
+  GlobalSettingsHttpRequestHandler,
+  HttpRequestHandler,
+  DefaultHttpErrorHandler,
+  HttpErrorHandler
+}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.streams.Accumulator
 import play.api.libs.ws.WSClient
@@ -22,11 +27,14 @@ import scala.concurrent._
 import play.api.libs.concurrent.Execution.{defaultContext => ec}
 
 object NettyDefaultFiltersSpec
-    extends DefaultFiltersSpec with NettyIntegrationSpecification
+    extends DefaultFiltersSpec
+    with NettyIntegrationSpecification
 object NettyGlobalFiltersSpec
-    extends GlobalFiltersSpec with NettyIntegrationSpecification
+    extends GlobalFiltersSpec
+    with NettyIntegrationSpecification
 object AkkaDefaultHttpFiltersSpec
-    extends DefaultFiltersSpec with AkkaHttpIntegrationSpecification
+    extends DefaultFiltersSpec
+    with AkkaHttpIntegrationSpecification
 
 trait DefaultFiltersSpec extends FiltersSpec {
 
@@ -53,8 +61,10 @@ trait DefaultFiltersSpec extends FiltersSpec {
       override lazy val httpFilters: Seq[EssentialFilter] = makeFilters(
           materializer)
       override lazy val httpErrorHandler = errorHandler.getOrElse(
-          new DefaultHttpErrorHandler(
-              environment, configuration, sourceMapper, Some(router))
+          new DefaultHttpErrorHandler(environment,
+                                      configuration,
+                                      sourceMapper,
+                                      Some(router))
       )
     }.application
 
@@ -242,7 +252,8 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
     }
 
     "Filters work even if one of them does not call next" in withServer()(
-        ErrorHandlingFilter, SkipNextFilter) { ws =>
+        ErrorHandlingFilter,
+        SkipNextFilter) { ws =>
       val response = Await.result(ws.url("/ok").get(), Duration.Inf)
       response.status must_== 200
       response.body must_== SkipNextFilter.expectedText
@@ -270,17 +281,20 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
         next(request.copy(headers = addCustomHeader(request.headers)))
       }
       def addCustomHeader(originalHeaders: Headers): Headers = {
-        FakeHeaders(originalHeaders.headers :+
-            (filterAddedHeaderKey -> filterAddedHeaderVal))
+        FakeHeaders(
+            originalHeaders.headers :+
+              (filterAddedHeaderKey -> filterAddedHeaderVal))
       }
     }
 
     object CustomErrorHandler extends HttpErrorHandler {
-      def onClientError(
-          request: RequestHeader, statusCode: Int, message: String) = {
-        Future.successful(Results.NotFound(request.headers
-                  .get(filterAddedHeaderKey)
-                  .getOrElse("undefined header")))
+      def onClientError(request: RequestHeader,
+                        statusCode: Int,
+                        message: String) = {
+        Future.successful(
+            Results.NotFound(request.headers
+              .get(filterAddedHeaderKey)
+              .getOrElse("undefined header")))
       }
       def onServerError(request: RequestHeader, exception: Throwable) =
         Future.successful(Results.InternalServerError)

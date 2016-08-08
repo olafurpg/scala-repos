@@ -150,8 +150,8 @@ object CsvParser {
         // we're not in quoted field & we hit a separator
         if (curFld == locs(locIdx)) {
           // we want this field
-          callback(
-              String.valueOf(carr, curBeg, curEnd - curBeg - inQoff), locIdx)
+          callback(String.valueOf(carr, curBeg, curEnd - curBeg - inQoff),
+                   locIdx)
           locIdx += 1
         }
         inQoff = 0
@@ -177,15 +177,16 @@ object CsvParser {
 
     // if we didn't scan a field for all requested locations, throw an error
     if (locIdx < locs.length) {
-      throw new ArrayIndexOutOfBoundsException("""Unable to read column %d in line:
+      throw new ArrayIndexOutOfBoundsException(
+          """Unable to read column %d in line:
           | ------------
           | %s
           | ------------""".stripMargin.format(locs(locIdx), line))
     }
   }
 
-  private def extractAllFields(
-      line: String, params: CsvParams): Array[String] = {
+  private def extractAllFields(line: String,
+                               params: CsvParams): Array[String] = {
     val quote = params.quoteChar
     val sep = params.separChar
     val stripQuote = !params.withQuote

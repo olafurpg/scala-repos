@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -41,8 +41,8 @@ import scalaz.syntax.std.option._
 
 object PermissionsFinder {
   import Permission._
-  def canWriteAs(
-      permissions: Set[WritePermission], authorities: Authorities): Boolean = {
+  def canWriteAs(permissions: Set[WritePermission],
+                 authorities: Authorities): Boolean = {
     val permWriteAs = permissions.map(_.writeAs)
     permWriteAs.exists(_ == WriteAsAny) || {
       val writeAsAlls = permWriteAs.collect({
@@ -95,7 +95,9 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
           case WritePermission(_, WriteAsAny) =>
             left(accountWriter)
           case WritePermission(_, WriteAsAll(accountIds)) =>
-            (Authorities.ifPresent(accountIds).map(a => Some(a).point[M]) \/> accountWriter)
+            (Authorities
+              .ifPresent(accountIds)
+              .map(a => Some(a).point[M]) \/> accountWriter)
         })(collection.breakOut)
 
       // if it is possible to write as the account holder for the api key, then do so, otherwise,
@@ -116,22 +118,25 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
     apiKeyFinder.findAPIKey(apiKey, None) flatMap {
       _ map {
         (filterWritePermissions(_: v1.APIKeyDetails, path, at)) andThen
-        (selectWriter _)
+          (selectWriter _)
       } getOrElse { None.point[M] }
     }
   }
 
-  def writePermissions(
-      apiKey: APIKey, path: Path, at: Instant): M[Set[WritePermission]] = {
+  def writePermissions(apiKey: APIKey,
+                       path: Path,
+                       at: Instant): M[Set[WritePermission]] = {
     apiKeyFinder.findAPIKey(apiKey, None) map {
       case Some(details) =>
-        logger.debug("Filtering write grants from " + details + " for " +
-            path + " at " + at)
+        logger.debug(
+            "Filtering write grants from " + details + " for " +
+              path + " at " + at)
         filterWritePermissions(details, path, Some(at))
 
       case None =>
-        logger.warn("No API key details found for %s %s at %s".format(
-                apiKey, path.path, at.toString))
+        logger.warn(
+            "No API key details found for %s %s at %s"
+              .format(apiKey, path.path, at.toString))
         Set()
     }
   }
@@ -146,8 +151,8 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
   def findBrowsableChildren(apiKey: APIKey, path: Path): M[Set[Path]] = {
     for {
       permissions <- apiKeyFinder.findAPIKey(apiKey, None) map { details =>
-        details.toSet.flatMap(_.grants).flatMap(_.permissions)
-      }
+                      details.toSet.flatMap(_.grants).flatMap(_.permissions)
+                    }
       accountId <- accountFinder.findAccountByAPIKey(apiKey)
       accountPath <- accountId.traverse(accountFinder.findAccountDetailsById)
     } yield {

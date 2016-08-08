@@ -33,10 +33,14 @@ trait ParMapLike[
     V,
     +Repr <: ParMapLike[K, V, Repr, Sequential] with ParMap[K, V],
     +Sequential <: scala.collection.mutable.Map[K, V] with scala.collection.mutable.MapLike[
-        K, V, Sequential]]
+        K,
+        V,
+        Sequential]]
     extends scala.collection.GenMapLike[K, V, Repr]
     with scala.collection.parallel.ParMapLike[K, V, Repr, Sequential]
-    with Growable[(K, V)] with Shrinkable[K] with Cloneable[Repr] {
+    with Growable[(K, V)]
+    with Shrinkable[K]
+    with Cloneable[Repr] {
   // note: should not override toMap
 
   def put(key: K, value: V): Option[V]

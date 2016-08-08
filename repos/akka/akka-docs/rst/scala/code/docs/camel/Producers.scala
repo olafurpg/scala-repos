@@ -39,7 +39,8 @@ object Producers {
     }
 
     class Forwarder(uri: String, target: ActorRef)
-        extends Actor with Producer {
+        extends Actor
+        with Producer {
       def endpointUri = uri
 
       override def routeResponse(msg: Any) { target forward msg }
@@ -102,8 +103,8 @@ object Producers {
     val system = ActorSystem("some-system")
     val producer = system.actorOf(Props[Producer2])
 
-    producer ! CamelMessage(
-        "bar", Map(CamelMessage.MessageExchangeId -> "123"))
+    producer ! CamelMessage("bar",
+                            Map(CamelMessage.MessageExchangeId -> "123"))
     //#Correlate
   }
   object Sample6 {

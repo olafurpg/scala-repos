@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,11 +42,13 @@ import org.joda.time.DateTime
 import scalaz._
 
 trait TestJobService
-    extends BlueEyesServiceSpecification with JobService with AkkaDefaults {
+    extends BlueEyesServiceSpecification
+    with JobService
+    with AkkaDefaults {
   type JobResource = Unit
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      20, Duration(5, "seconds"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(20, Duration(5, "seconds"))
   val validAPIKey = "secret"
 
   lazy val executionContext = defaultFutureDispatch
@@ -70,7 +72,11 @@ trait TestJobService
 class JobServiceSpec extends TestJobService {
   import scalaz.syntax.comonad._
   import DefaultBijections._
-  import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
+  import blueeyes.json.serialization.DefaultSerialization.{
+    DateTimeDecomposer => _,
+    DateTimeExtractor => _,
+    _
+  }
   import JobState._
 
   val JSON = MimeTypes.application / MimeTypes.json
@@ -92,9 +98,9 @@ class JobServiceSpec extends TestJobService {
 
   def startJob(ts: Option[DateTime] = None): JValue = JObject(
       JField("state", JString("started")) ::
-      (ts map { dt =>
-            JField("timestamp", dt.serialize) :: Nil
-          } getOrElse Nil)
+        (ts map { dt =>
+          JField("timestamp", dt.serialize) :: Nil
+        } getOrElse Nil)
   )
 
   def postJob(job: JValue, apiKey: String = validAPIKey) =
@@ -153,8 +159,9 @@ class JobServiceSpec extends TestJobService {
     putStatusRaw(jobId, prev)(
         JObject(
             JField("message", JString(message)) :: JField(
-                "progress", JNum(progress)) :: JField("unit", JString(unit)) ::
-            (info map (JField("info", _) :: Nil) getOrElse Nil)
+                "progress",
+                JNum(progress)) :: JField("unit", JString(unit)) ::
+              (info map (JField("info", _) :: Nil) getOrElse Nil)
         ))
   }
 
@@ -238,7 +245,9 @@ class JobServiceSpec extends TestJobService {
         res <- postJob(simpleJob, validAPIKey)
         Some(JString(jobId)) = res.content map (_ \ "id")
         HttpResponse(HttpStatus(OK, _), _, Some(obj1), _) <- putState(
-            jobId, startJob(Some(dt)))
+                                                                jobId,
+                                                                startJob(
+                                                                    Some(dt)))
         HttpResponse(_, _, Some(obj2), _) <- getJob(jobId)
       } yield (obj1, obj2)).copoint
 
@@ -262,17 +271,21 @@ class JobServiceSpec extends TestJobService {
 
     val cancellation: JValue = JObject(
         JField("state", JString("cancelled")) :: JField(
-            "reason", JString("Because I said so.")) :: Nil)
+            "reason",
+            JString("Because I said so.")) :: Nil)
 
-    val abort: JValue = JObject(JField("state", JString("aborted")) :: JField(
-            "reason", JString("Yabba dabba doo!")) :: Nil)
+    val abort: JValue = JObject(
+        JField("state", JString("aborted")) :: JField(
+            "reason",
+            JString("Yabba dabba doo!")) :: Nil)
 
     "cancel started job with reason" in {
       val st = (for {
         jobId <- postJobAndGetId(simpleJob)
         _ <- putState(jobId, startJob())
         HttpResponse(HttpStatus(OK, _), _, Some(st), _) <- putState(
-            jobId, cancellation)
+                                                              jobId,
+                                                              cancellation)
       } yield st).copoint
 
       st.validated[JobState] must beLike {
@@ -474,10 +487,18 @@ class JobServiceSpec extends TestJobService {
     "allow status updates to be conditional" in {
       (for {
         jobId <- postJobAndGetId(simpleJob)
-        id1 <- putStatusAndGetId(
-            jobId, "Nearly there!", 99.999, "%", None, None)
-        id2 <- putStatusAndGetId(
-            jobId, "Very nearly there!", 99.99999, "%", None, Some(id1))
+        id1 <- putStatusAndGetId(jobId,
+                                 "Nearly there!",
+                                 99.999,
+                                 "%",
+                                 None,
+                                 None)
+        id2 <- putStatusAndGetId(jobId,
+                                 "Very nearly there!",
+                                 99.99999,
+                                 "%",
+                                 None,
+                                 Some(id1))
         res <- putStatus(jobId,
                          "Very nearly, almost there!",
                          99.9999999,
@@ -494,12 +515,24 @@ class JobServiceSpec extends TestJobService {
     "notify of conflicting status updates when conditional" in {
       (for {
         jobId <- postJobAndGetId(simpleJob)
-        id <- putStatusAndGetId(
-            jobId, "Nearly there!", 99.999, "%", None, None)
-        _ <- putStatusAndGetId(
-            jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
-        res <- putStatus(
-            jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
+        id <- putStatusAndGetId(jobId,
+                                "Nearly there!",
+                                99.999,
+                                "%",
+                                None,
+                                None)
+        _ <- putStatusAndGetId(jobId,
+                               "Very nearly there!",
+                               99.99999,
+                               "%",
+                               None,
+                               Some(id))
+        res <- putStatus(jobId,
+                         "Very nearly there!",
+                         99.99999,
+                         "%",
+                         None,
+                         Some(id))
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(Conflict, _), _, _, _) => ok
       }
@@ -510,14 +543,16 @@ class JobServiceSpec extends TestJobService {
         jobId <- postJobAndGetId(simpleJob)
         res1 <- putStatusRaw(jobId, None)(JObject(Nil))
         res2 <- putStatusRaw(jobId, None)(
-            JObject(JField("message", JString("a")) :: JField(
-                    "unit", JString("%")) :: Nil))
-        res3 <- putStatusRaw(jobId, None)(
-            JObject(JField("message", JString("a")) :: JField(
-                    "progress", JNum(99)) :: Nil))
+                   JObject(JField("message", JString("a")) :: JField(
+                       "unit",
+                       JString("%")) :: Nil))
+        res3 <- putStatusRaw(jobId, None)(JObject(
+                   JField("message", JString("a")) :: JField("progress",
+                                                             JNum(99)) :: Nil))
         res4 <- putStatusRaw(jobId, None)(
-            JObject(JField("progress", JNum(99)) :: JField(
-                    "unit", JString("%")) :: Nil))
+                   JObject(JField("progress", JNum(99)) :: JField(
+                       "unit",
+                       JString("%")) :: Nil))
       } yield (res1, res2, res3, res4)).copoint
 
       def mustBeBad(res: HttpResponse[JValue]) = res must beLike {

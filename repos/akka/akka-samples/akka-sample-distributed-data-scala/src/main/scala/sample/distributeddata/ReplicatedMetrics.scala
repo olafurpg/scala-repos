@@ -42,9 +42,10 @@ object ReplicatedMetrics {
     address.host.get + ":" + address.port.get
 }
 
-class ReplicatedMetrics(
-    measureInterval: FiniteDuration, cleanupInterval: FiniteDuration)
-    extends Actor with ActorLogging {
+class ReplicatedMetrics(measureInterval: FiniteDuration,
+                        cleanupInterval: FiniteDuration)
+    extends Actor
+    with ActorLogging {
   import akka.cluster.ddata.Replicator._
   import ReplicatedMetrics._
 
@@ -54,8 +55,9 @@ class ReplicatedMetrics(
 
   val tickTask = context.system.scheduler
     .schedule(measureInterval, measureInterval, self, Tick)(context.dispatcher)
-  val cleanupTask = context.system.scheduler.schedule(
-      cleanupInterval, cleanupInterval, self, Cleanup)(context.dispatcher)
+  val cleanupTask = context.system.scheduler
+    .schedule(cleanupInterval, cleanupInterval, self, Cleanup)(
+        context.dispatcher)
   val memoryMBean: MemoryMXBean = ManagementFactory.getMemoryMXBean
 
   val UsedHeapKey = LWWMapKey[Long]("usedHeap")
@@ -64,8 +66,10 @@ class ReplicatedMetrics(
   replicator ! Subscribe(UsedHeapKey, self)
   replicator ! Subscribe(MaxHeapKey, self)
 
-  cluster.subscribe(
-      self, InitialStateAsEvents, classOf[MemberUp], classOf[MemberRemoved])
+  cluster.subscribe(self,
+                    InitialStateAsEvents,
+                    classOf[MemberUp],
+                    classOf[MemberRemoved])
 
   override def postStop(): Unit = {
     tickTask.cancel()
@@ -94,13 +98,10 @@ class ReplicatedMetrics(
       maxHeap = c.get(MaxHeapKey).entries
 
     case c @ Changed(UsedHeapKey) ⇒
-      val usedHeapPercent = UsedHeap(
-          c.get(UsedHeapKey)
-            .entries
-            .collect {
-          case (key, value) if maxHeap.contains(key) ⇒
-            (key -> (value.toDouble / maxHeap(key)) * 100.0)
-        })
+      val usedHeapPercent = UsedHeap(c.get(UsedHeapKey).entries.collect {
+        case (key, value) if maxHeap.contains(key) ⇒
+          (key -> (value.toDouble / maxHeap(key)) * 100.0)
+      })
       log.debug("Node {} observed:\n{}", node, usedHeapPercent)
       context.system.eventStream.publish(usedHeapPercent)
 

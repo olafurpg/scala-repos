@@ -14,7 +14,11 @@ import scala.language.existentials
 
 import play.api.libs.iteratee.Execution.trampoline
 import play.api.mvc._
-import play.mvc.{Action => JAction, Result => JResult, BodyParser => JBodyParser}
+import play.mvc.{
+  Action => JAction,
+  Result => JResult,
+  BodyParser => JBodyParser
+}
 import play.mvc.Http.{Context => JContext}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -24,8 +28,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param controller The controller to be evaluated
   * @param method     The method to be evaluated
   */
-class JavaActionAnnotations(
-    val controller: Class[_], val method: java.lang.reflect.Method) {
+class JavaActionAnnotations(val controller: Class[_],
+                            val method: java.lang.reflect.Method) {
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 
@@ -67,7 +71,8 @@ class JavaActionAnnotations(
  * An action that's handling Java requests
  */
 abstract class JavaAction(components: JavaHandlerComponents)
-    extends Action[play.mvc.Http.RequestBody] with JavaHelpers {
+    extends Action[play.mvc.Http.RequestBody]
+    with JavaHelpers {
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 
@@ -91,8 +96,8 @@ abstract class JavaAction(components: JavaHandlerComponents)
       }
     }
 
-    val baseAction = components.actionCreator.createAction(
-        javaContext.request, annotations.method)
+    val baseAction = components.actionCreator
+      .createAction(javaContext.request, annotations.method)
 
     val endOfChainAction =
       if (config.executeActionCreatorActionFirst) {
@@ -115,11 +120,11 @@ abstract class JavaAction(components: JavaHandlerComponents)
 
     val finalAction = components.actionCreator.wrapAction(
         if (config.executeActionCreatorActionFirst) {
-      baseAction.delegate = finalUserDeclaredAction
-      baseAction
-    } else {
-      finalUserDeclaredAction
-    })
+          baseAction.delegate = finalUserDeclaredAction
+          baseAction
+        } else {
+          finalUserDeclaredAction
+        })
 
     val trampolineWithContext: ExecutionContext = {
       val javaClassLoader = Thread.currentThread.getContextClassLoader
@@ -161,7 +166,8 @@ trait JavaHandlerComponents {
   * The components necessary to handle a Java handler.
   */
 class DefaultJavaHandlerComponents @Inject()(
-    injector: Injector, val actionCreator: play.http.ActionCreator)
+    injector: Injector,
+    val actionCreator: play.http.ActionCreator)
     extends JavaHandlerComponents {
   def getBodyParser[A <: JBodyParser[_]](parserClass: Class[A]): A =
     injector.instanceOf(parserClass)

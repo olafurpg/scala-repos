@@ -3,7 +3,7 @@ import acyclic.file
 
 /**
   * Something which contains an operator precedence, which can be used
-  * to correctly wrap other things which contain lower precedences in 
+  * to correctly wrap other things which contain lower precedences in
   * parentheses when stringifying.
   */
 trait Precedence {

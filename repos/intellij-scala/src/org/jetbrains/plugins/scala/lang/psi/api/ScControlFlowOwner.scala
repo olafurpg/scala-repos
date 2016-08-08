@@ -3,8 +3,14 @@ package org.jetbrains.plugins.scala.lang.psi.api
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValueProvider.Result
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{AllVariablesControlFlowPolicy, ScalaControlFlowBuilder}
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{Instruction, ScControlFlowPolicy}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{
+  AllVariablesControlFlowPolicy,
+  ScalaControlFlowBuilder
+}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  Instruction,
+  ScControlFlowPolicy
+}
 
 import scala.collection.mutable
 
@@ -26,11 +32,10 @@ trait ScControlFlowOwner extends ScalaPsiElement {
     }
   }
 
-  def getControlFlow(
-      policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy)
-    : Seq[Instruction] = {
-    val provider = myControlFlowCache.getOrElseUpdate(
-        policy, new ControlFlowCacheProvider(policy))
+  def getControlFlow(policy: ScControlFlowPolicy =
+    AllVariablesControlFlowPolicy): Seq[Instruction] = {
+    val provider = myControlFlowCache
+      .getOrElseUpdate(policy, new ControlFlowCacheProvider(policy))
     provider.compute().getValue
   }
 

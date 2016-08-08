@@ -1,11 +1,18 @@
 import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, Transporter, StdStackClient}
-import com.twitter.finagle.dispatch.{SerialClientDispatcher, SerialServerDispatcher}
+import com.twitter.finagle.dispatch.{
+  SerialClientDispatcher,
+  SerialServerDispatcher
+}
 import com.twitter.finagle.filter.MaskCancelFilter
 import com.twitter.finagle.netty3.{Netty3Transporter, Netty3Listener}
 import com.twitter.finagle.server.{StackServer, Listener, StdStackServer}
-import com.twitter.finagle.service.{RetryExceptionsFilter, RetryPolicy, TimeoutFilter}
+import com.twitter.finagle.service.{
+  RetryExceptionsFilter,
+  RetryPolicy,
+  TimeoutFilter
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util.DefaultTimer
 import com.twitter.util.{Future, Await}
@@ -16,8 +23,7 @@ object Echo extends Client[String, String] with Server[String, String] {
   case class Client(
       stack: Stack[ServiceFactory[String, String]] = StackClient.newStack,
       params: Stack.Params = StackClient.defaultParams
-  )
-      extends StdStackClient[String, String, Client] {
+  ) extends StdStackClient[String, String, Client] {
     protected type In = String
     protected type Out = String
 
@@ -48,8 +54,7 @@ object Echo extends Client[String, String] with Server[String, String] {
   case class Server(
       stack: Stack[ServiceFactory[String, String]] = StackServer.newStack,
       params: Stack.Params = StackServer.defaultParams
-  )
-      extends StdStackServer[String, String, Server] {
+  ) extends StdStackServer[String, String, Server] {
     protected type In = String
     protected type Out = String
 
@@ -85,8 +90,8 @@ object SimpleListenerExample {
     }
     val serveTransport = (t: Transport[String, String]) =>
       new SerialServerDispatcher(t, service)
-    val listener = Netty3Listener[String, String](
-        StringServerPipeline, StackServer.defaultParams)
+    val listener = Netty3Listener[String, String](StringServerPipeline,
+                                                  StackServer.defaultParams)
     val server = listener.listen(address) { serveTransport(_) }
     //#simplelisten
 
@@ -110,7 +115,8 @@ object BasicClient {
   //#explicitbridge
   val addr = new java.net.InetSocketAddress("localhost", 8080)
   val transporter = Netty3Transporter[String, String](
-      StringClientPipeline, StackClient.defaultParams)
+      StringClientPipeline,
+      StackClient.defaultParams)
 
   val bridge: Future[Service[String, String]] =
     transporter(addr) map { transport =>

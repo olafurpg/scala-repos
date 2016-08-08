@@ -34,8 +34,8 @@ object ScalateSupport {
   private val templateEngineInstances: CMap[String, TemplateEngine] =
     new TrieMap[String, TemplateEngine]
 
-  def scalateTemplateEngine(
-      ctx: String, init: => TemplateEngine): TemplateEngine = {
+  def scalateTemplateEngine(ctx: String,
+                            init: => TemplateEngine): TemplateEngine = {
     templateEngineInstances.get(ctx).getOrElse {
       val engine = init
       engine.workingDirectory = new java.io.File(engine.workingDirectory, ctx)
@@ -102,8 +102,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
       case _ =>
         // Don't know how to convert your Config to something that
         // ServletTemplateEngine can accept, so fall back to a TemplateEngine
-        ScalateSupport.scalateTemplateEngine(
-            ctxKey, new TemplateEngine with ScalatraTemplateEngine)
+        ScalateSupport.scalateTemplateEngine(ctxKey,
+                                             new TemplateEngine
+                                             with ScalatraTemplateEngine)
     }
   }
 
@@ -113,8 +114,7 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * A ScalatraTemplateEngine looks for layouts in `/WEB-INF/templates/layouts` before
     * searching in `/WEB-INF/layouts` and `/WEB-INF/scalate/layouts`.
     */
-  trait ScalatraTemplateEngine {
-    this: TemplateEngine =>
+  trait ScalatraTemplateEngine { this: TemplateEngine =>
 
     /**
       * Delegates to the ServletBase's isDevelopmentMode flag.
@@ -150,10 +150,11 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * search is performed, and the layout strategy is circumvented.  Clients
     * are urged to consider layoutTemplate instead.
     */
-  @deprecated(
-      "not idiomatic Scalate; consider layoutTemplate instead", "2.0.0")
+  @deprecated("not idiomatic Scalate; consider layoutTemplate instead",
+              "2.0.0")
   def renderTemplate(path: String, attributes: (String, Any)*)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) =
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) =
     createRenderContext(response.writer).render(path, Map(attributes: _*))
 
   /**
@@ -164,8 +165,8 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     */
   protected def isScalateErrorPageEnabled = true
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse) {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse) {
     //    try {
     super.handle(req, res)
     //    }
@@ -175,7 +176,8 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
   }
 
   override protected def renderUncaughtException(e: Throwable)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) {
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) {
     if (isScalateErrorPageEnabled) renderScalateErrorPage(e)
     else super.renderUncaughtException(e)
   }
@@ -183,7 +185,8 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
   // Hack: Have to pass it the request and response, because we're outside the
   // scope of the super handler.
   private[this] def renderScalateErrorPage(e: Throwable)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) = {
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) = {
     response.setStatus(500)
     response.setContentType("text/html")
     val errorPage = templateEngine.load("/WEB-INF/scalate/errors/500.scaml")
@@ -272,8 +275,8 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * @param attributes Attributes to path to the render context.  Disable
     * layouts by passing `layout -> ""`.
     */
-  protected def layoutTemplateAs(
-      ext: Set[String])(path: String, attributes: (String, Any)*)(
+  protected def layoutTemplateAs(ext: Set[String])(path: String,
+                                                   attributes: (String, Any)*)(
       implicit request: HttpServletRequest,
       response: HttpServletResponse): String = {
     val uri = findTemplate(path, ext).getOrElse(path)
@@ -282,8 +285,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val context = createRenderContext(out)
     val attrs =
       templateAttributes ++
-      (defaultLayoutPath map (p => Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
-              attributes: _*))
+        (defaultLayoutPath map (p =>
+                                  Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
+            attributes: _*))
 
     attrs foreach {
       case (k, v) => context.attributes(k) = v
@@ -309,9 +313,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * Finds a template for a path.  Delegates to a TemplateFinder, and if
     * that fails, tries again with `/defaultIndexName` appended.
     */
-  protected def findTemplate(
-      path: String, extensionSet: Set[String] = templateEngine.extensions)
-    : Option[String] = {
+  protected def findTemplate(path: String,
+                             extensionSet: Set[String] =
+                               templateEngine.extensions): Option[String] = {
     val finder = new TemplateFinder(templateEngine) {
       override lazy val extensions = extensionSet
     }

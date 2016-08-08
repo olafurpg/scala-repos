@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.hocon.parser
 
 import com.intellij.psi.impl.DebugUtil
-import org.jetbrains.plugins.hocon.{HoconFileSetTestCase, HoconTestUtils, TestSuiteCompanion}
+import org.jetbrains.plugins.hocon.{
+  HoconFileSetTestCase,
+  HoconTestUtils,
+  TestSuiteCompanion
+}
 import org.junit.runner.RunWith
 import org.junit.runners.AllTests
 

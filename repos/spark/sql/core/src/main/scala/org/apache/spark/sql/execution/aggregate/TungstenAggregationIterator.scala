@@ -23,7 +23,10 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeRowJoiner
-import org.apache.spark.sql.execution.{UnsafeFixedWidthAggregationMap, UnsafeKVExternalSorter}
+import org.apache.spark.sql.execution.{
+  UnsafeFixedWidthAggregationMap,
+  UnsafeKVExternalSorter
+}
 import org.apache.spark.sql.execution.metric.LongSQLMetric
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.unsafe.KVIterator
@@ -83,7 +86,7 @@ class TungstenAggregationIterator(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => (() => MutableProjection),
+                           Seq[Attribute]) => (() => MutableProjection),
     originalInputAttributes: Seq[Attribute],
     inputIter: Iterator[InternalRow],
     testFallbackStartsAt: Option[Int],
@@ -96,7 +99,8 @@ class TungstenAggregationIterator(
                                 aggregateAttributes,
                                 initialInputBufferOffset,
                                 resultExpressions,
-                                newMutableProjection) with Logging {
+                                newMutableProjection)
+    with Logging {
 
   ///////////////////////////////////////////////////////////////////////////
   // Part 1: Initializing aggregate functions.
@@ -145,8 +149,8 @@ class TungstenAggregationIterator(
 
       (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
         {
-          unsafeRowJoiner.join(
-              currentGroupingKey, currentBuffer.asInstanceOf[UnsafeRow])
+          unsafeRowJoiner
+            .join(currentGroupingKey, currentBuffer.asInstanceOf[UnsafeRow])
         }
     } else {
       super.generateResultProjection()
@@ -231,8 +235,8 @@ class TungstenAggregationIterator(
 
   // The iterator created from hashMap. It is used to generate output rows when we
   // are using hash-based aggregation.
-  private[this] var aggregationBufferMapIterator: KVIterator[
-      UnsafeRow, UnsafeRow] = null
+  private[this] var aggregationBufferMapIterator: KVIterator[UnsafeRow,
+                                                             UnsafeRow] = null
 
   // Indicates if aggregationBufferMapIterator still has key-value pairs.
   private[this] var mapIteratorHasNext: Boolean = false
@@ -262,8 +266,8 @@ class TungstenAggregationIterator(
     }
     val newFunctions = initializeAggregateFunctions(newExpressions, 0)
     val newInputAttributes = newFunctions.flatMap(_.inputAggBufferAttributes)
-    sortBasedProcessRow = generateProcessRow(
-        newExpressions, newFunctions, newInputAttributes)
+    sortBasedProcessRow =
+      generateProcessRow(newExpressions, newFunctions, newInputAttributes)
 
     // Step 5: Get the sorted iterator from the externalSorter.
     sortedKVIterator = externalSorter.sortedIterator()
@@ -398,8 +402,8 @@ class TungstenAggregationIterator(
           // Process the current group.
           processCurrentSortedGroup()
           // Generate output row for the current group.
-          val outputRow = generateOutput(
-              currentGroupingKey, sortBasedAggregationBuffer)
+          val outputRow =
+            generateOutput(currentGroupingKey, sortBasedAggregationBuffer)
           // Initialize buffer values for the next group.
           sortBasedAggregationBuffer.copyFrom(initialAggregationBuffer)
 

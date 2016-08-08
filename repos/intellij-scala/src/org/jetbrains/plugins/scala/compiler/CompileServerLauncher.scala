@@ -4,7 +4,12 @@ package compiler
 import java.io.{File, IOException}
 import javax.swing.event.HyperlinkEvent
 
-import com.intellij.notification.{Notification, NotificationListener, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification,
+  NotificationListener,
+  NotificationType,
+  Notifications
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.project.Project
@@ -39,7 +44,8 @@ class CompileServerLauncher extends ApplicationComponent {
       val started = start(project)
       if (started) {
         try new RemoteServerRunner(project)
-          .send("addDisconnectListener", Seq.empty, null) catch {
+          .send("addDisconnectListener", Seq.empty, null)
+        catch {
           case e: Exception =>
         }
       }
@@ -60,8 +66,8 @@ class CompileServerLauncher extends ApplicationComponent {
           all.headOption
         }
 
-      choice.foreach(
-          sdk => applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
+      choice.foreach(sdk =>
+        applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
 
 //       val message = "JVM SDK is automatically selected: " + name +
 //               "\n(can be changed in Application Settings / Scala)"
@@ -96,7 +102,10 @@ class CompileServerLauncher extends ApplicationComponent {
   }
 
   private def start(project: Project, jdk: JDK): Either[String, Process] = {
-    import org.jetbrains.plugins.scala.compiler.CompileServerLauncher.{compilerJars, jvmParameters}
+    import org.jetbrains.plugins.scala.compiler.CompileServerLauncher.{
+      compilerJars,
+      jvmParameters
+    }
 
     compilerJars.partition(_.exists) match {
       case (presentFiles, Seq()) =>
@@ -107,7 +116,7 @@ class CompileServerLauncher extends ApplicationComponent {
           else
             Seq(
                 "-Xbootclasspath/a:" +
-                bootClassPathLibs.mkString(File.pathSeparator))
+                  bootClassPathLibs.mkString(File.pathSeparator))
         val classpath = (jdk.tools +: presentFiles)
           .map(_.canonicalPath)
           .mkString(File.pathSeparator)
@@ -145,10 +154,11 @@ class CompileServerLauncher extends ApplicationComponent {
           .right
           .map { process =>
             val watcher = new ProcessWatcher(process, "scalaCompileServer")
-            serverInstance = Some(ServerInstance(watcher,
-                                                 freePort,
-                                                 builder.directory(),
-                                                 withTimestamps(bootCp)))
+            serverInstance = Some(
+                ServerInstance(watcher,
+                               freePort,
+                               builder.directory(),
+                               withTimestamps(bootCp)))
             watcher.startNotify()
             process
           }
@@ -250,7 +260,8 @@ object CompileServerLauncher {
     val needMaxPermSize = settings.COMPILE_SERVER_SDK < "1.8"
     val maxPermSize =
       if (needMaxPermSize)
-        userMaxPermSize.headOption.orElse(defaultMaxPermSize) else None
+        userMaxPermSize.headOption.orElse(defaultMaxPermSize)
+      else None
 
     xmx ++ otherParams ++ maxPermSize
   }
@@ -273,7 +284,7 @@ object CompileServerLauncher {
           .USE_PROJECT_HOME_AS_WORKING_DIR
         val workingDirChanged =
           useProjectHome &&
-          projectHome(project) != serverInstance.map(_.workingDir)
+            projectHome(project) != serverInstance.map(_.workingDir)
         workingDirChanged ||
         instance.bootClasspath != withTimestamps(bootClasspath(project))
     }

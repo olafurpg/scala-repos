@@ -2,7 +2,10 @@ package mesosphere.marathon.core.matcher.base.util
 
 import mesosphere.marathon.MarathonTestHelper
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{TaskOpWithSource, MatchedTaskOps}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  TaskOpWithSource,
+  MatchedTaskOps
+}
 import mesosphere.marathon.state.Timestamp
 import mesosphere.marathon.test.Mockito
 import org.apache.mesos.Protos.Offer
@@ -14,7 +17,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class StopOnFirstMatchingOfferMatcherTest
-    extends FunSuite with Mockito with GivenWhenThen with Matchers
+    extends FunSuite
+    with Mockito
+    with GivenWhenThen
+    with Matchers
     with ScalaFutures {
   test("returns first match if non-empty") {
     Given("a sequence of matchers, the first matching")
@@ -52,10 +58,12 @@ class StopOnFirstMatchingOfferMatcherTest
     Given("a sequence of matchers, the second matching")
     val f = new Fixture {
       override lazy val matchers: Seq[OfferMatcher] = Seq(
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = true)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = false))
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = true)),
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = false))
       )
     }
 
@@ -71,10 +79,12 @@ class StopOnFirstMatchingOfferMatcherTest
     Given("a sequence of matchers, the second matching")
     val f = new Fixture {
       override lazy val matchers: Seq[OfferMatcher] = Seq(
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = false)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = true))
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = false)),
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = true))
       )
     }
 
@@ -101,8 +111,8 @@ class StopOnFirstMatchingOfferMatcherTest
 
     def offerMatcher(matching: OfferMatcher.MatchedTaskOps): OfferMatcher =
       new OfferMatcher {
-        override def matchOffer(
-            deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+        override def matchOffer(deadline: Timestamp,
+                                offer: Offer): Future[MatchedTaskOps] = {
           Future.successful(matching)
         }
       }

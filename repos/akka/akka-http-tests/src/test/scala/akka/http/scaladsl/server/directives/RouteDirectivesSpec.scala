@@ -29,7 +29,7 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       var i = 0
       Put() ~> {
         get { complete { i += 1; "get" } } ~ put { complete { i += 1; "put" } } ~
-        (post & complete { i += 1; "post" })
+          (post & complete { i += 1; "post" })
       } ~> check {
         responseAs[String] shouldEqual "put"
         i shouldEqual 1
@@ -56,7 +56,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
         }
       }
       "for futures failed with a RejectionError" in {
-        Get() ~> complete(Promise
+        Get() ~> complete(
+            Promise
               .failed[String](RejectionError(AuthorizationFailedRejection))
               .future) ~> check {
           rejection shouldEqual AuthorizationFailedRejection
@@ -102,7 +103,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       val route = get & complete(Data("Ida", 83))
 
       import akka.http.scaladsl.model.headers.Accept
-      Get().withHeaders(Accept(MediaTypes.`application/json`)) ~> route ~> check {
+      Get()
+        .withHeaders(Accept(MediaTypes.`application/json`)) ~> route ~> check {
         responseAs[String] shouldEqual """{
             |  "name": "Ida",
             |  "age": 83
@@ -111,7 +113,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       Get().withHeaders(Accept(MediaTypes.`text/xml`)) ~> route ~> check {
         responseAs[xml.NodeSeq] shouldEqual <data><name>Ida</name><age>83</age></data>
       }
-      Get().withHeaders(Accept(MediaTypes.`text/plain`)) ~> Route.seal(route) ~> check {
+      Get().withHeaders(Accept(MediaTypes.`text/plain`)) ~> Route
+        .seal(route) ~> check {
         status shouldEqual StatusCodes.NotAcceptable
       }
     }
@@ -125,8 +128,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
         response shouldEqual HttpResponse(
             status = 302,
             entity = HttpEntity(
-                  ContentTypes.`text/html(UTF-8)`,
-                  "The requested resource temporarily resides under <a href=\"/foo\">this URI</a>."),
+                ContentTypes.`text/html(UTF-8)`,
+                "The requested resource temporarily resides under <a href=\"/foo\">this URI</a>."),
             headers = Location("/foo") :: Nil)
       }
     }

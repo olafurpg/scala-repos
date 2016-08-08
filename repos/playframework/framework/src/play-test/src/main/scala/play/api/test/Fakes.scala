@@ -49,18 +49,18 @@ case class FakeRequest[A](
     clientCertificateChain: Option[Seq[X509Certificate]] = None)
     extends Request[A] {
 
-  def copyFakeRequest[B](
-      id: Long = this.id,
-      tags: Map[String, String] = this.tags,
-      uri: String = this.uri,
-      path: String = this.path,
-      method: String = this.method,
-      version: String = this.version,
-      headers: Headers = this.headers,
-      remoteAddress: String = this.remoteAddress,
-      secure: Boolean = this.secure,
-      clientCertificateChain: Option[Seq[X509Certificate]] = this.clientCertificateChain,
-      body: B = this.body): FakeRequest[B] = {
+  def copyFakeRequest[B](id: Long = this.id,
+                         tags: Map[String, String] = this.tags,
+                         uri: String = this.uri,
+                         path: String = this.path,
+                         method: String = this.method,
+                         version: String = this.version,
+                         headers: Headers = this.headers,
+                         remoteAddress: String = this.remoteAddress,
+                         secure: Boolean = this.secure,
+                         clientCertificateChain: Option[Seq[X509Certificate]] =
+                           this.clientCertificateChain,
+                         body: B = this.body): FakeRequest[B] = {
     new FakeRequest[B](
         method,
         uri,
@@ -117,11 +117,9 @@ case class FakeRequest[A](
     * Constructs a new request with additional session.
     */
   def withSession(newSessions: (String, String)*): FakeRequest[A] = {
-    withHeaders(
-        play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
-            headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
-            Seq(Session.encodeAsCookie(
-                    new Session(session.data ++ newSessions)))))
+    withHeaders(play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
+        headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
+        Seq(Session.encodeAsCookie(new Session(session.data ++ newSessions)))))
   }
 
   /**
@@ -131,7 +129,7 @@ case class FakeRequest[A](
       data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = {
     copyFakeRequest(
         body = AnyContentAsFormUrlEncoded(
-              play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
+            play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
   }
 
   def certs = Future.successful(IndexedSeq.empty)
@@ -199,8 +197,8 @@ object FakeRequest {
   /**
     * Constructs a new request.
     */
-  def apply(
-      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] = {
+  def apply(method: String,
+            path: String): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest(method, path, FakeHeaders(), AnyContentAsEmpty)
   }
 
@@ -222,11 +220,13 @@ import play.api.Application
 @deprecated("Use GuiceApplicationBuilder instead.", "2.5.0")
 case class FakeApplication(
     override val path: java.io.File = new java.io.File("."),
-    override val classloader: ClassLoader = classOf[FakeApplication].getClassLoader,
+    override val classloader: ClassLoader =
+      classOf[FakeApplication].getClassLoader,
     additionalConfiguration: Map[String, _ <: Any] = Map.empty,
     @deprecated("Use dependency injection", "2.5.0") withGlobal: Option[
         GlobalSettings] = None,
-    withRoutes: PartialFunction[(String, String), Handler] = PartialFunction.empty)
+    withRoutes: PartialFunction[(String, String), Handler] =
+      PartialFunction.empty)
     extends Application {
 
   private val app: Application = new GuiceApplicationBuilder()

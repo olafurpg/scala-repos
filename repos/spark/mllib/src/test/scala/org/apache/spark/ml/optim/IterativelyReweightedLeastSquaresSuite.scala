@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class IterativelyReweightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private var instances1: RDD[Instance] = _
   private var instances2: RDD[Instance] = _
@@ -101,8 +102,8 @@ class IterativelyReweightedLeastSquaresSuite
                                               regParam = 0.0,
                                               maxIter = 25,
                                               tol = 1e-8).fit(instances1)
-      val actual = Vectors.dense(
-          irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val actual = Vectors
+        .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }
@@ -146,8 +147,8 @@ class IterativelyReweightedLeastSquaresSuite
                                               regParam = 0.0,
                                               maxIter = 25,
                                               tol = 1e-8).fit(instances2)
-      val actual = Vectors.dense(
-          irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val actual = Vectors
+        .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }
@@ -187,8 +188,8 @@ class IterativelyReweightedLeastSquaresSuite
                                               regParam = 0.0,
                                               maxIter = 200,
                                               tol = 1e-7).fit(instances2)
-      val actual = Vectors.dense(
-          irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val actual = Vectors
+        .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }

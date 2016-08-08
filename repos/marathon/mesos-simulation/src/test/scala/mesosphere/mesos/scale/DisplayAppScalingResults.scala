@@ -12,8 +12,11 @@ object DisplayAppScalingResults {
     val appInfos: Seq[JsObject] =
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
-    val header = IndexedSeq(
-        "relative time (ms)", "staged", "running", "newRunning/s", "instances")
+    val header = IndexedSeq("relative time (ms)",
+                            "staged",
+                            "running",
+                            "newRunning/s",
+                            "instances")
     var lastTimestamp: Long = 0
     var lastRunning: Long = 0
     val rows = appInfos.map { jsObject: JsObject =>
@@ -93,7 +96,7 @@ object DisplayAppScalingResults {
                         units)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
@@ -133,7 +136,7 @@ object DisplayAppScalingResults {
                         d("stddev"))
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
@@ -195,7 +198,7 @@ object DisplayAppScalingResults {
                         rateUnits)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(

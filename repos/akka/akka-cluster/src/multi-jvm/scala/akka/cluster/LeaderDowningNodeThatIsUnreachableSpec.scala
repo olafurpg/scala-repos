@@ -21,12 +21,10 @@ final case class LeaderDowningNodeThatIsUnreachableMultiNodeConfig(
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString(
-                "akka.cluster.auto-down-unreachable-after = 2s"))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(debugConfig(on = false)
+    .withFallback(ConfigFactory.parseString(
+        "akka.cluster.auto-down-unreachable-after = 2s"))
+    .withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
 class LeaderDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode1
@@ -57,7 +55,8 @@ class LeaderDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode4
 
 abstract class LeaderDowningNodeThatIsUnreachableSpec(
     multiNodeConfig: LeaderDowningNodeThatIsUnreachableMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(

@@ -24,7 +24,10 @@ import scala.collection.mutable
 
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
-import org.apache.spark.sql.catalyst.expressions.Literal.{FalseLiteral, TrueLiteral}
+import org.apache.spark.sql.catalyst.expressions.Literal.{
+  FalseLiteral,
+  TrueLiteral
+}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.types._
@@ -87,9 +90,9 @@ object HiveTypeCoercion {
 
   /** Similar to [[findTightestCommonType]], but can promote all the way to StringType. */
   private def findTightestCommonTypeToString(
-      left: DataType, right: DataType): Option[DataType] = {
-    findTightestCommonTypeOfTwo(left, right).orElse(
-        (left, right) match {
+      left: DataType,
+      right: DataType): Option[DataType] = {
+    findTightestCommonTypeOfTwo(left, right).orElse((left, right) match {
       case (StringType, t2: AtomicType)
           if t2 != BinaryType && t2 != BooleanType =>
         Some(StringType)
@@ -106,9 +109,8 @@ object HiveTypeCoercion {
     */
   private def findTightestCommonTypeAndPromoteToString(
       types: Seq[DataType]): Option[DataType] = {
-    types.foldLeft[Option[DataType]](Some(NullType))(
-        (r, c) =>
-          r match {
+    types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
+      r match {
         case None => None
         case Some(d) =>
           findTightestCommonTypeToString(d, c)
@@ -121,7 +123,7 @@ object HiveTypeCoercion {
     */
   private def findTightestCommonType(types: Seq[DataType]): Option[DataType] = {
     types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
-          r match {
+      r match {
         case None => None
         case Some(d) => findTightestCommonTypeOfTwo(d, c)
     })
@@ -133,24 +135,25 @@ object HiveTypeCoercion {
     * i.e. the main difference with [[findTightestCommonTypeOfTwo]] is that here we allow some
     * loss of precision when widening decimal and double.
     */
-  private def findWiderTypeForTwo(
-      t1: DataType, t2: DataType): Option[DataType] = (t1, t2) match {
-    case (t1: DecimalType, t2: DecimalType) =>
-      Some(DecimalPrecision.widerDecimalType(t1, t2))
-    case (t: IntegralType, d: DecimalType) =>
-      Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
-    case (d: DecimalType, t: IntegralType) =>
-      Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
-    case (_: FractionalType, _: DecimalType) |
-        (_: DecimalType, _: FractionalType) =>
-      Some(DoubleType)
-    case _ =>
-      findTightestCommonTypeToString(t1, t2)
-  }
+  private def findWiderTypeForTwo(t1: DataType,
+                                  t2: DataType): Option[DataType] =
+    (t1, t2) match {
+      case (t1: DecimalType, t2: DecimalType) =>
+        Some(DecimalPrecision.widerDecimalType(t1, t2))
+      case (t: IntegralType, d: DecimalType) =>
+        Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
+      case (d: DecimalType, t: IntegralType) =>
+        Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
+      case (_: FractionalType, _: DecimalType) |
+          (_: DecimalType, _: FractionalType) =>
+        Some(DoubleType)
+      case _ =>
+        findTightestCommonTypeToString(t1, t2)
+    }
 
   private def findWiderCommonType(types: Seq[DataType]) = {
     types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
-          r match {
+      r match {
         case Some(d) => findWiderTypeForTwo(d, c)
         case None => None
     })
@@ -221,16 +224,16 @@ object HiveTypeCoercion {
 
       case s @ SetOperation(left, right)
           if s.childrenResolved && left.output.length == right.output.length &&
-          !s.resolved =>
+            !s.resolved =>
         val newChildren: Seq[LogicalPlan] =
           buildNewChildrenWithWiderTypes(left :: right :: Nil)
         assert(newChildren.length == 2)
         s.makeCopy(Array(newChildren.head, newChildren.last))
 
       case s: Union
-          if s.childrenResolved && s.children
-            .forall(_.output.length == s.children.head.output.length) &&
-          !s.resolved =>
+          if s.childrenResolved && s.children.forall(
+              _.output.length == s.children.head.output.length) &&
+            !s.resolved =>
         val newChildren: Seq[LogicalPlan] =
           buildNewChildrenWithWiderTypes(s.children)
         s.makeCopy(Array(newChildren))
@@ -243,8 +246,8 @@ object HiveTypeCoercion {
 
       // Get a sequence of data types, each of which is the widest type of this specific attribute
       // in all the children
-      val targetTypes: Seq[DataType] = getWidestTypes(
-          children, attrIndex = 0, mutable.Queue[DataType]())
+      val targetTypes: Seq[DataType] =
+        getWidestTypes(children, attrIndex = 0, mutable.Queue[DataType]())
 
       if (targetTypes.nonEmpty) {
         // Add an extra Project if the targetTypes are different from the original types.
@@ -275,8 +278,8 @@ object HiveTypeCoercion {
     }
 
     /** Given a plan, add an extra project on top to widen some columns' data types. */
-    private def widenTypes(
-        plan: LogicalPlan, targetTypes: Seq[DataType]): LogicalPlan = {
+    private def widenTypes(plan: LogicalPlan,
+                           targetTypes: Seq[DataType]): LogicalPlan = {
       val casted = plan.output.zip(targetTypes).map {
         case (e, dt) if e.dataType != dt => Alias(Cast(e, dt), e.name)()
         case (e, _) => e
@@ -293,11 +296,11 @@ object HiveTypeCoercion {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case a @ BinaryArithmetic(
-          left @ StringType(), right @ DecimalType.Expression(_, _)) =>
+      case a @ BinaryArithmetic(left @ StringType(),
+                                right @ DecimalType.Expression(_, _)) =>
         a.makeCopy(Array(Cast(left, DecimalType.SYSTEM_DEFAULT), right))
-      case a @ BinaryArithmetic(
-          left @ DecimalType.Expression(_, _), right @ StringType()) =>
+      case a @ BinaryArithmetic(left @ DecimalType.Expression(_, _),
+                                right @ StringType()) =>
         a.makeCopy(Array(left, Cast(right, DecimalType.SYSTEM_DEFAULT)))
 
       case a @ BinaryArithmetic(left @ StringType(), right) =>
@@ -319,11 +322,11 @@ object HiveTypeCoercion {
         p.makeCopy(Array(left, Cast(right, StringType)))
       case p @ BinaryComparison(left @ DateType(), right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
-      case p @ BinaryComparison(
-          left @ StringType(), right @ TimestampType()) =>
+      case p @ BinaryComparison(left @ StringType(),
+                                right @ TimestampType()) =>
         p.makeCopy(Array(left, Cast(right, StringType)))
-      case p @ BinaryComparison(
-          left @ TimestampType(), right @ StringType()) =>
+      case p @ BinaryComparison(left @ TimestampType(),
+                                right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
 
       // Comparisons between dates and timestamps.
@@ -679,8 +682,8 @@ object HiveTypeCoercion {
       * If the expression already fits the input type, we simply return the expression itself.
       * If the expression has an incompatible type that cannot be implicitly cast, return None.
       */
-    def implicitCast(
-        e: Expression, expectedType: AbstractDataType): Option[Expression] = {
+    def implicitCast(e: Expression,
+                     expectedType: AbstractDataType): Option[Expression] = {
       val inType = e.dataType
 
       // Note that ret is nullable to avoid typing a lot of Some(...) in this local scope.

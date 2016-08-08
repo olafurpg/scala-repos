@@ -22,7 +22,7 @@ trait IntegrationClient {
 
   val propFile = new File(
       System.getProperty("user.home") +
-      "/.finagle-mysql/integration-test.properties")
+        "/.finagle-mysql/integration-test.properties")
 
   val p = new Properties
   val propFileExists = try {
@@ -46,8 +46,8 @@ trait IntegrationClient {
 
   val client: Option[Client] =
     if (isAvailable) {
-      logger.log(
-          Level.INFO, "Attempting to connect to mysqld @ localhost:3306")
+      logger
+        .log(Level.INFO, "Attempting to connect to mysqld @ localhost:3306")
       val username = p.getProperty("username", "<user>")
       val password = p.getProperty("password", null)
       val db = p.getProperty("db", "test")

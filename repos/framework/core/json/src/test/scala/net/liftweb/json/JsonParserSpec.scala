@@ -45,8 +45,9 @@ object JsonParserSpec extends Specification with JValueGen with ScalaCheck {
 
   "Buffer size does not change parsing result" in {
     val bufSize = Gen.choose(2, 64)
-    val parsing = (x: JValue, s1: Int,
-    s2: Int) => { parseVal(x, s1) == parseVal(x, s2) }
+    val parsing = (x: JValue, s1: Int, s2: Int) => {
+      parseVal(x, s1) == parseVal(x, s2)
+    }
     forAll(genObject, bufSize, bufSize)(parsing)
   }
 
@@ -57,7 +58,7 @@ object JsonParserSpec extends Specification with JValueGen with ScalaCheck {
     val executor = Executors.newFixedThreadPool(100)
     val results = (0 to 100)
       .map(_ =>
-            executor.submit(new Callable[JValue] { def call = parse(json) }))
+        executor.submit(new Callable[JValue] { def call = parse(json) }))
       .toList
       .map(_.get)
     results.zip(results.tail).forall(pair => pair._1 == pair._2) mustEqual true

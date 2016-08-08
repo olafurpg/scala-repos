@@ -20,7 +20,8 @@ import scala.collection.generic.{CanBuildFrom, GenericCompanion, SeqFactory}
 final class WrappedArray[A](val array: Array[A])
     extends mutable.AbstractBuffer[A]
     with scala.collection.generic.GenericTraversableTemplate[A, WrappedArray]
-    with mutable.IndexedSeq[A] with mutable.BufferLike[A, WrappedArray[A]]
+    with mutable.IndexedSeq[A]
+    with mutable.BufferLike[A, WrappedArray[A]]
     with mutable.ArrayLike[A, WrappedArray[A]]
     with Builder[A, WrappedArray[A]] {
 
@@ -59,7 +60,8 @@ final class WrappedArray[A](val array: Array[A])
     this
   }
 
-  @inline def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit = {
+  @inline
+  def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit = {
     array.splice(n, 0, elems.toSeq: _*)
   }
 

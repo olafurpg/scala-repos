@@ -8,8 +8,8 @@ import scala.language.postfixOps
 object VerifyClass {
 
   // Returns the error if there's a failure
-  private def checkClass(
-      name: String, cl: ClassLoader): (String, Option[String]) = {
+  private def checkClass(name: String,
+                         cl: ClassLoader): (String, Option[String]) = {
     try {
       Class.forName(name, true, cl)
       (name, None)
@@ -39,11 +39,9 @@ object VerifyClass {
     val urls = args.map(Path.apply).map(_.toFile.toURI.toURL).toArray
     println("As urls: " + urls.mkString(","))
     val cl = URLClassLoader.newInstance(urls, null)
-    val results = args
-      .flatMap(n => checkClasses(n, cl))
-      .toMap
-      (for { (name, result) <- results } yield
-        (name, result.getOrElse(null))).asJava
+    val results = args.flatMap(n => checkClasses(n, cl)).toMap
+    (for { (name, result) <- results } yield
+      (name, result.getOrElse(null))).asJava
   }
 
   def main(args: Array[String]): Unit = {

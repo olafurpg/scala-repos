@@ -18,7 +18,11 @@
 package org.apache.spark
 
 import java.lang.ref.{ReferenceQueue, WeakReference}
-import java.util.concurrent.{ConcurrentLinkedQueue, ScheduledExecutorService, TimeUnit}
+import java.util.concurrent.{
+  ConcurrentLinkedQueue,
+  ScheduledExecutorService,
+  TimeUnit
+}
 
 import scala.collection.JavaConverters._
 
@@ -106,8 +110,8 @@ private[spark] class ContextCleaner(sc: SparkContext) extends Logging {
     * until the real RPC issue (referred to in the comment above `blockOnCleanupTasks`) is
     * resolved.
     */
-  private val blockOnShuffleCleanupTasks = sc.conf.getBoolean(
-      "spark.cleaner.referenceTracking.blocking.shuffle", false)
+  private val blockOnShuffleCleanupTasks = sc.conf
+    .getBoolean("spark.cleaner.referenceTracking.blocking.shuffle", false)
 
   @volatile private var stopped = false
 
@@ -154,8 +158,8 @@ private[spark] class ContextCleaner(sc: SparkContext) extends Logging {
   /** Register a ShuffleDependency for cleanup when it is garbage collected. */
   def registerShuffleForCleanup(
       shuffleDependency: ShuffleDependency[_, _, _]): Unit = {
-    registerForCleanup(
-        shuffleDependency, CleanShuffle(shuffleDependency.shuffleId))
+    registerForCleanup(shuffleDependency,
+                       CleanShuffle(shuffleDependency.shuffleId))
   }
 
   /** Register a Broadcast for cleanup when it is garbage collected. */
@@ -164,14 +168,14 @@ private[spark] class ContextCleaner(sc: SparkContext) extends Logging {
   }
 
   /** Register a RDDCheckpointData for cleanup when it is garbage collected. */
-  def registerRDDCheckpointDataForCleanup[T](
-      rdd: RDD[_], parentId: Int): Unit = {
+  def registerRDDCheckpointDataForCleanup[T](rdd: RDD[_],
+                                             parentId: Int): Unit = {
     registerForCleanup(rdd, CleanCheckpoint(parentId))
   }
 
   /** Register an object for cleanup. */
-  private def registerForCleanup(
-      objectForCleanup: AnyRef, task: CleanupTask): Unit = {
+  private def registerForCleanup(objectForCleanup: AnyRef,
+                                 task: CleanupTask): Unit = {
     referenceBuffer.add(
         new CleanupTaskWeakReference(task, objectForCleanup, referenceQueue))
   }

@@ -42,4 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class CellSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.Cell[T], Cell[T]](
-        classOf[jfxsc.Cell[T]], classOf[Cell[T]]) with RunOnApplicationThread
+        classOf[jfxsc.Cell[T]],
+        classOf[Cell[T]])
+    with RunOnApplicationThread

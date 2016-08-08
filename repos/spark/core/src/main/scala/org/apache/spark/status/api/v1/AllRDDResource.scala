@@ -31,8 +31,10 @@ private[v1] class AllRDDResource(ui: SparkUI) {
     val storageStatusList = ui.storageListener.activeStorageStatusList
     val rddInfos = ui.storageListener.rddInfoList
     rddInfos.map { rddInfo =>
-      AllRDDResource.getRDDStorageInfo(
-          rddInfo.id, rddInfo, storageStatusList, includeDetails = false)
+      AllRDDResource.getRDDStorageInfo(rddInfo.id,
+                                       rddInfo,
+                                       storageStatusList,
+                                       includeDetails = false)
     }
   }
 }
@@ -66,8 +68,7 @@ private[spark] object AllRDDResource {
 
     val dataDistribution =
       if (includeDetails) {
-        Some(
-            storageStatusList.map { status =>
+        Some(storageStatusList.map { status =>
           new RDDDataDistribution(
               address = status.blockManagerId.hostPort,
               memoryUsed = status.memUsedByRdd(rddId),

@@ -23,7 +23,7 @@ import org.saddle.index.IndexAny
 import org.saddle.locator.{Locator, LocatorAny}
 import org.saddle.array.Sorter
 
-class ScalarTagAny[T : CLM] extends ScalarTag[T] {
+class ScalarTagAny[T: CLM] extends ScalarTag[T] {
   def missing: T = null.asInstanceOf[T]
   def isMissing(v: T): Boolean = v == null
   def notMissing(v: T): Boolean = v != null

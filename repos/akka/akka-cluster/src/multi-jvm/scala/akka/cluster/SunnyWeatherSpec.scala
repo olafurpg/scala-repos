@@ -23,7 +23,9 @@ object SunnyWeatherMultiJvmSpec extends MultiNodeConfig {
 
   // Note that this test uses default configuration,
   // not MultiNodeClusterSpec.clusterConfig
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.loggers = ["akka.testkit.TestEventListener"]
     akka.loglevel = INFO
@@ -39,7 +41,8 @@ class SunnyWeatherMultiJvmNode4 extends SunnyWeatherSpec
 class SunnyWeatherMultiJvmNode5 extends SunnyWeatherSpec
 
 abstract class SunnyWeatherSpec
-    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import SunnyWeatherMultiJvmSpec._
   import ClusterEvent._

@@ -279,7 +279,7 @@ object Commands {
     commandMap
       .get(cmd.toUpperCase)
       .map {
-        _ (args)
+        _(args)
       }
       .getOrElse(throw ClientError("Unsupported command: " + cmd))
 
@@ -462,8 +462,8 @@ class CommandCodec extends UnifiedProtocolCodec {
   }
 
   def commandDecode(lines: List[Array[Byte]]): Command = {
-    RequireClientProtocol(
-        lines != null && lines.length > 0, "Invalid client command protocol")
+    RequireClientProtocol(lines != null && lines.length > 0,
+                          "Invalid client command protocol")
     val cmd = BytesToString(lines.head)
     val args = lines.tail
     try {
@@ -472,8 +472,8 @@ class CommandCodec extends UnifiedProtocolCodec {
       case e: ClientError => throw e
       case t: Throwable =>
         log.warning(t,
-                    "Unhandled exception %s(%s)".format(
-                        t.getClass.toString, t.getMessage))
+                    "Unhandled exception %s(%s)".format(t.getClass.toString,
+                                                        t.getMessage))
         throw new ClientError(t.getMessage)
     }
   }

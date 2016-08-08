@@ -5,7 +5,11 @@ import java.util.UUID
 
 import com.intellij.compiler.server.BuildManagerListener
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.compiler.{CompileContext, CompileTask, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext,
+  CompileTask,
+  CompilerManager
+}
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.module.{Module, ModuleManager}
 import com.intellij.openapi.project.Project
@@ -24,11 +28,12 @@ class ServerMediator(project: Project) extends ProjectComponent {
 
   private val connection = project.getMessageBus.connect
   private val serverLauncher = new BuildManagerListener {
-    override def beforeBuildProcessStarted(
-        project: Project, uuid: UUID): Unit = {}
+    override def beforeBuildProcessStarted(project: Project,
+                                           uuid: UUID): Unit = {}
 
-    override def buildStarted(
-        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {
+    override def buildStarted(project: Project,
+                              sessionId: UUID,
+                              isAutomake: Boolean): Unit = {
       if (settings.COMPILE_SERVER_ENABLED && isScalaProject) {
         invokeAndWait {
           CompileServerManager.instance(project).configureWidget()
@@ -46,8 +51,9 @@ class ServerMediator(project: Project) extends ProjectComponent {
       }
     }
 
-    override def buildFinished(
-        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {}
+    override def buildFinished(project: Project,
+                               sessionId: UUID,
+                               isAutomake: Boolean): Unit = {}
   }
 
   connection.subscribe(BuildManagerListener.TOPIC, serverLauncher)
@@ -82,7 +88,7 @@ class ServerMediator(project: Project) extends ProjectComponent {
             Messages.showYesNoDialog(
                 project,
                 "Production and test output paths are shared in: " +
-                modulesWithClashes.map(_.getName).mkString(" "),
+                  modulesWithClashes.map(_.getName).mkString(" "),
                 "Shared compile output paths in Scala module(s)",
                 "Split output path(s) automatically",
                 "Cancel compilation",
@@ -105,7 +111,8 @@ class ServerMediator(project: Project) extends ProjectComponent {
               }
               val nameForTests =
                 if (outputUrlParts.lastOption.contains("classes"))
-                  "test-classes" else "test"
+                  "test-classes"
+                else "test"
 
               extension.inheritCompilerOutputPath(false)
               extension.setCompilerOutputPathForTests(

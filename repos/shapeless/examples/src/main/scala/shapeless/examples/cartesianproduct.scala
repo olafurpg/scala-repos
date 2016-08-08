@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-14 Miles Sabin 
+ * Copyright (c) 2012-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,8 +104,10 @@ object CartesianProductExample extends App {
   val result = liftA2(tuple)(xs, ys)
 
   // The expected type of the Cartesian product.
-  type Result = (Int, Double) :: (Int, String) :: (Symbol, Double) :: (Symbol,
-  String) :: (Char, Double) :: (Char, String) :: HNil
+  type Result =
+    (Int, Double) :: (Int, String) :: (Symbol, Double) :: (Symbol, String) :: (Char,
+                                                                               Double) :: (Char,
+                                                                                           String) :: HNil
 
   // The expected value.
   val expected =

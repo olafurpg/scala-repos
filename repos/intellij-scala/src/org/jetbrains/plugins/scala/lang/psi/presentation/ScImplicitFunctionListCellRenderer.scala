@@ -49,8 +49,11 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     val item = tuple.getNewExpression
     val firstPart = tuple.getFirstPart
     val secondPart = tuple.getSecondPart
-    val comp = getSuperListCellRendererComponent(
-        containter.getList, item, index, isSelected, cellHasFocus)
+    val comp = getSuperListCellRendererComponent(containter.getList,
+                                                 item,
+                                                 index,
+                                                 isSelected,
+                                                 cellHasFocus)
     comp match {
       case container: Container =>
         val colored =
@@ -63,11 +66,15 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
         }
 
         if (firstPart.contains(item)) {
-          colored.setBackground(if (isSelected)
-                UIUtil.getListSelectionBackground else implicitFirstPart)
+          colored.setBackground(
+              if (isSelected)
+                UIUtil.getListSelectionBackground
+              else implicitFirstPart)
         } else if (secondPart.contains(item)) {
-          colored.setBackground(if (isSelected)
-                UIUtil.getListSelectionBackground else implicitSecondPart)
+          colored.setBackground(
+              if (isSelected)
+                UIUtil.getListSelectionBackground
+              else implicitSecondPart)
         } else {
           throw new RuntimeException(
               "Implicit conversions list contains unknown value: " + item)
@@ -107,8 +114,8 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     element match {
       case method: ScFunction =>
         method.name +
-        PresentationUtil.presentationString(method.paramClauses) + ": " +
-        PresentationUtil.presentationString(method.returnType.getOrAny)
+          PresentationUtil.presentationString(method.paramClauses) + ": " +
+          PresentationUtil.presentationString(method.returnType.getOrAny)
       case b: ScBindingPattern =>
         b.name + ": " + PresentationUtil.presentationString(
             b.getType(TypingContext.empty).getOrAny)

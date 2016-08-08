@@ -76,10 +76,10 @@ object SuiteResult {
                     count(TStatus.Canceled),
                     count(TStatus.Pending))
   }
-  val Error: SuiteResult = new SuiteResult(
-      TestResult.Error, 0, 0, 0, 0, 0, 0, 0)
-  val Empty: SuiteResult = new SuiteResult(
-      TestResult.Passed, 0, 0, 0, 0, 0, 0, 0)
+  val Error: SuiteResult =
+    new SuiteResult(TestResult.Error, 0, 0, 0, 0, 0, 0, 0)
+  val Empty: SuiteResult =
+    new SuiteResult(TestResult.Passed, 0, 0, 0, 0, 0, 0, 0)
 }
 
 abstract class TestEvent {
@@ -104,25 +104,26 @@ object TestEvent {
 }
 
 object TestLogger {
-  @deprecated(
-      "Doesn't provide for underlying resources to be released.", "0.13.1")
+  @deprecated("Doesn't provide for underlying resources to be released.",
+              "0.13.1")
   def apply(logger: sbt.util.Logger,
             logTest: TestDefinition => sbt.util.Logger,
             buffered: Boolean): TestLogger =
     new TestLogger(
-        new TestLogging(
-            wrap(logger), tdef => contentLogger(logTest(tdef), buffered)))
+        new TestLogging(wrap(logger),
+                        tdef => contentLogger(logTest(tdef), buffered)))
 
-  @deprecated(
-      "Doesn't provide for underlying resources to be released.", "0.13.1")
+  @deprecated("Doesn't provide for underlying resources to be released.",
+              "0.13.1")
   def contentLogger(log: sbt.util.Logger, buffered: Boolean): ContentLogger = {
     val blog = new BufferedLogger(FullLogger(log))
     if (buffered) blog.record()
     new ContentLogger(wrap(blog), () => blog.stopQuietly())
   }
 
-  final class PerTest private[sbt](
-      val log: sbt.util.Logger, val flush: () => Unit, val buffered: Boolean)
+  final class PerTest private[sbt] (val log: sbt.util.Logger,
+                                    val flush: () => Unit,
+                                    val buffered: Boolean)
 
   def make(global: sbt.util.Logger,
            perTest: TestDefinition => PerTest): TestLogger = {
@@ -147,8 +148,8 @@ object TestLogger {
       def ansiCodesSupported() = logger.ansiCodesSupported
     }
 }
-final class TestLogging(
-    val global: TLogger, val logTest: TestDefinition => ContentLogger)
+final class TestLogging(val global: TLogger,
+                        val logTest: TestDefinition => ContentLogger)
 final class ContentLogger(val log: TLogger, val flush: () => Unit)
 class TestLogger(val logging: TestLogging) extends TestsListener {
   import logging.{global => log, logTest}

@@ -6,7 +6,10 @@ package akka.http.javadsl.server
 package directives
 
 import akka.http.impl.server.RouteStructure
-import akka.http.impl.server.RouteStructure.{RedirectToNoTrailingSlashIfPresent, RedirectToTrailingSlashIfMissing}
+import akka.http.impl.server.RouteStructure.{
+  RedirectToNoTrailingSlashIfPresent,
+  RedirectToTrailingSlashIfMissing
+}
 import akka.http.javadsl.model.StatusCode
 import akka.http.javadsl.server.values.{PathMatchers, PathMatcher}
 
@@ -158,7 +161,8 @@ abstract class PathDirectives extends MiscDirectives {
                                        innerRoute: Route,
                                        moreInnerRoutes: Route*): Route =
     RedirectToTrailingSlashIfMissing(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   /**
     * If the request path ends with a slash, redirect to the same uri without trailing slash in the path.
@@ -170,7 +174,8 @@ abstract class PathDirectives extends MiscDirectives {
                                          innerRoute: Route,
                                          moreInnerRoutes: Route*): Route =
     RedirectToNoTrailingSlashIfPresent(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   private def RawPathPrefixForMatchers(
       matchers: immutable.Seq[PathMatcher[_]]): Directive =

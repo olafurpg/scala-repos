@@ -9,8 +9,8 @@ import lila.db.api.$count
 import lila.user.tube.userTube
 import lila.user.User
 
-final class DataForm(
-    val captcher: akka.actor.ActorSelection, emailAddress: EmailAddress)
+final class DataForm(val captcher: akka.actor.ActorSelection,
+                     emailAddress: EmailAddress)
     extends lila.hub.CaptchedForm {
 
   import DataForm._
@@ -40,10 +40,11 @@ final class DataForm(
           Constraints maxLength 20,
           Constraints.pattern(
               regex = """^[\w-]+$""".r,
-              error = "Invalid username. Please use only letters, numbers and dash"),
-          Constraints.pattern(
-              regex = """^[^\d].+$""".r,
-              error = "The username must not start with a number")
+              error =
+                "Invalid username. Please use only letters, numbers and dash"),
+          Constraints.pattern(regex = """^[^\d].+$""".r,
+                              error =
+                                "The username must not start with a number")
       )
       .verifying("This user already exists",
                  u => !$count.exists(u.toLowerCase) awaitSeconds 2)
@@ -122,8 +123,9 @@ object DataForm {
     def recaptchaResponse = `g-recaptcha-response`
   }
 
-  case class MobileSignupData(
-      username: String, password: String, email: Option[String])
+  case class MobileSignupData(username: String,
+                              password: String,
+                              email: Option[String])
 
   case class PasswordReset(email: String, gameId: String, move: String)
 

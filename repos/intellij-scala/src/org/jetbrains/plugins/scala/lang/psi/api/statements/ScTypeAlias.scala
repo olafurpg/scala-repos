@@ -11,8 +11,15 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScExistentialClause
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScPolymorphicElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScDocCommentOwner, ScMember, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.light.scala.{ScLightTypeAliasDeclaration, ScLightTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScDocCommentOwner,
+  ScMember,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.light.scala.{
+  ScLightTypeAliasDeclaration,
+  ScLightTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.TypeAliasSignature
 
 import scala.annotation.tailrec
@@ -23,15 +30,19 @@ import scala.annotation.tailrec
   * Time: 9:46:00
   */
 trait ScTypeAlias
-    extends ScPolymorphicElement with ScMember with ScAnnotationsHolder
-    with ScDocCommentOwner with ScCommentOwner {
+    extends ScPolymorphicElement
+    with ScMember
+    with ScAnnotationsHolder
+    with ScDocCommentOwner
+    with ScCommentOwner {
   override def getIcon(flags: Int): Icon = Icons.TYPE_ALIAS
 
-  override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean) = m match {
-    case t: ScTypeAlias => t.name == name
-    case _ => false
-  }
+  override protected def isSimilarMemberForNavigation(m: ScMember,
+                                                      isStrict: Boolean) =
+    m match {
+      case t: ScTypeAlias => t.name == name
+      case _ => false
+    }
 
   def isExistentialTypeAlias: Boolean = {
     getContext match {
@@ -42,7 +53,7 @@ trait ScTypeAlias
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   def getTypeToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kTYPE)
 

@@ -58,7 +58,8 @@ class SystemProperties
   }
 
   def wrapAccess[T](body: => T): Option[T] =
-    try Some(body) catch { case _: AccessControlException => None }
+    try Some(body)
+    catch { case _: AccessControlException => None }
 }
 
 /** The values in SystemProperties can be used to access and manipulate

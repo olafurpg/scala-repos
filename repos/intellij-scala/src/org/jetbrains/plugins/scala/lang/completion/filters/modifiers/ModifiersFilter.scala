@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */

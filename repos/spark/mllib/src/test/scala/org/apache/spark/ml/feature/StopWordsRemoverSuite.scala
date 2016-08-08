@@ -32,7 +32,8 @@ object StopWordsRemoverSuite extends SparkFunSuite {
 }
 
 class StopWordsRemoverSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import StopWordsRemoverSuite._
@@ -61,7 +62,8 @@ class StopWordsRemoverSuite
       .setOutputCol("filtered")
       .setCaseSensitive(true)
     val dataSet = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (Seq("A"), Seq("A")),
               (Seq("The", "the"), Seq("The"))
           ))
@@ -77,7 +79,8 @@ class StopWordsRemoverSuite
       .setOutputCol("filtered")
       .setStopWords(stopWords)
     val dataSet = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (Seq("python", "scala", "a"), Seq()),
               (Seq("Python", "Scala", "swift"), Seq("swift"))
           ))
@@ -100,7 +103,8 @@ class StopWordsRemoverSuite
     val remover =
       new StopWordsRemover().setInputCol("raw").setOutputCol(outputCol)
     val dataSet = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (Seq("The", "the", "swift"), Seq("swift"))
           ))
       .toDF("raw", outputCol)

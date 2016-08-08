@@ -7,7 +7,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScPattern, ScPatternArgumentList, ScConstructorPattern, ScCaseClause}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScPattern,
+  ScPatternArgumentList,
+  ScConstructorPattern,
+  ScCaseClause
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
@@ -31,8 +36,8 @@ class ScalaCaseClassParametersNameContributer
             PsiTreeUtil.getContextOfType(position, classOf[ScCaseClause])
           if (scope == null) return
 
-          val constructorPattern = PsiTreeUtil.getContextOfType(
-              position, classOf[ScConstructorPattern])
+          val constructorPattern = PsiTreeUtil
+            .getContextOfType(position, classOf[ScConstructorPattern])
           if (constructorPattern == null) return
 
           val classRef =
@@ -43,7 +48,7 @@ class ScalaCaseClassParametersNameContributer
               funcDef.syntheticCaseClass.get.parameters
             case fundef: ScFunctionDefinition
                 if fundef.getName == "unapply" ||
-                fundef.getName == "unapplySeq" =>
+                  fundef.getName == "unapplySeq" =>
               fundef.getParameterList.params
             case _ => return
           }
@@ -77,8 +82,8 @@ class ScalaCaseClassParametersNameContributer
           }
         }
 
-        def byClassParamCompletionsItems(
-            params: Seq[ScParameter], result: CompletionResultSet): Unit = {
+        def byClassParamCompletionsItems(params: Seq[ScParameter],
+                                         result: CompletionResultSet): Unit = {
           params
             .map(p => new ScalaLookupItem(p, p.name))
             .foreach(l => addLocalScalaLookUpItem(result, l))
@@ -129,8 +134,10 @@ class ScalaCaseClassParametersNameContributer
           val me = PsiTreeUtil.getContextOfType(position, classOf[ScPattern])
           if (me == null) return ParameterWithPosition(None, -1)
 
-          val patterns = Option(PsiTreeUtil.getContextOfType(
-                  position, classOf[ScPatternArgumentList])).map(_.patterns)
+          val patterns = Option(
+              PsiTreeUtil.getContextOfType(position,
+                                           classOf[ScPatternArgumentList]))
+            .map(_.patterns)
 
           if (patterns.isEmpty ||
               (patterns.isDefined && patterns.get.length > classParams.length))
@@ -139,12 +146,13 @@ class ScalaCaseClassParametersNameContributer
           val myPosition = patterns.get.indexOf(me)
           val coresponedParameter =
             if ((myPosition >= 0) && (myPosition != classParams.length))
-              Some(classParams.apply(myPosition)) else None
+              Some(classParams.apply(myPosition))
+            else None
 
           ParameterWithPosition(coresponedParameter, myPosition)
         }
 
-        case class ParameterWithPosition(
-            parameter: Option[ScParameter], position: Int)
+        case class ParameterWithPosition(parameter: Option[ScParameter],
+                                         position: Int)
       })
 }

@@ -8,7 +8,8 @@ object Flat extends Build {
       "root",
       file("."),
       settings = Defaults.defaultSettings ++ forConfig(Compile, "src") ++ forConfig(
-            Test, "test-src") ++ baseSettings)
+            Test,
+            "test-src") ++ baseSettings)
 
   def baseSettings = Seq(
       scalaVersion := "2.8.1",
@@ -23,7 +24,7 @@ object Flat extends Build {
   def unpackageSettings(name: String) = Seq(
       unmanagedSourceDirectories := (baseDirectory.value / name) :: Nil,
       excludeFilter in unmanagedResources :=
-      (includeFilter in unmanagedSources).value,
+        (includeFilter in unmanagedSources).value,
       unmanagedResourceDirectories := unmanagedSourceDirectories.value,
       unpackage :=
         IO.unzip(artifactPath in packageSrc value, baseDirectory.value / name)

@@ -57,7 +57,7 @@ object SimpleApp {
 
     // Remove kinesis from default build due to ASL license issue
     val foundKinesis = Try(Class.forName(
-            "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
+        "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
     if (foundKinesis) {
       println("Kinesis was loaded via spark-core")
       System.exit(-1)

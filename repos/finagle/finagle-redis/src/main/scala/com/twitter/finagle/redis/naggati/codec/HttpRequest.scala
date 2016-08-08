@@ -21,8 +21,9 @@ import Stages._
 
 case class RequestLine(method: String, resource: String, version: String)
 case class HeaderLine(name: String, value: String)
-case class HttpRequest(
-    request: RequestLine, headers: List[HeaderLine], body: Array[Byte])
+case class HttpRequest(request: RequestLine,
+                       headers: List[HeaderLine],
+                       body: Array[Byte])
 
 object HttpRequest {
   def codec(bytesReadCounter: Int => Unit, bytesWrittenCounter: Int => Unit) =

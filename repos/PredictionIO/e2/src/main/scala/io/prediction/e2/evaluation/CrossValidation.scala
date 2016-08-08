@@ -29,7 +29,7 @@ object CommonHelperFunctions {
     * @tparam Q Input query class.
     * @tparam A Actual value class.
     */
-  def splitData[D : ClassTag, TD, EI, Q, A](
+  def splitData[D: ClassTag, TD, EI, Q, A](
       evalK: Int,
       dataset: RDD[D],
       evaluatorInfo: EI,

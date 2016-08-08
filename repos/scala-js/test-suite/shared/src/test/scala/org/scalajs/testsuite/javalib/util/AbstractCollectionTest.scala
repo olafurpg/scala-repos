@@ -20,7 +20,7 @@ class AbstractCollectionFactory extends CollectionFactory {
   override def implementationName: String =
     "java.util.AbstractCollection"
 
-  override def empty[E : ClassTag]: ju.AbstractCollection[E] = {
+  override def empty[E: ClassTag]: ju.AbstractCollection[E] = {
     // inefficient but simple for debugging implementation of AbstractCollection
     new ju.AbstractCollection[E] {
 

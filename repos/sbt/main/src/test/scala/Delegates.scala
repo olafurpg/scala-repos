@@ -44,8 +44,8 @@ object Delegates extends Properties("delegates") {
       global forall { _ == Global }
     }
   }
-  property("Initial scope present with all combinations of Global axes") = allAxes(
-      globalCombinations)
+  property("Initial scope present with all combinations of Global axes") =
+    allAxes(globalCombinations)
 
   property("initial scope first") = forAll { (keys: Keys) =>
     allDelegates(keys) { (scope, ds) =>
@@ -68,21 +68,22 @@ object Delegates extends Properties("delegates") {
       }
     }
   def allDelegates(keys: Keys)(f: (Scope, Seq[Scope]) => Prop): Prop =
-    all(
-        keys.scopes map { scope =>
+    all(keys.scopes map { scope =>
       val delegates = keys.env.delegates(scope)
       ("Scope: " + Scope.display(scope, "_")) |:
-      ("Delegates:\n\t" + delegates
-            .map(scope => Scope.display(scope, "_"))
-            .mkString("\n\t")) |: f(scope, delegates)
+        ("Delegates:\n\t" + delegates
+          .map(scope => Scope.display(scope, "_"))
+          .mkString("\n\t")) |: f(scope, delegates)
     }: _*)
-  def alwaysGlobal(
-      s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[_]): Prop =
+  def alwaysGlobal(s: Scope,
+                   ds: Seq[Scope],
+                   axis: Scope => ScopeAxis[_]): Prop =
     (axis(s) != Global) || all(ds map { d =>
       (axis(d) == Global): Prop
     }: _*)
-  def globalCombinations(
-      s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[_]): Prop = {
+  def globalCombinations(s: Scope,
+                         ds: Seq[Scope],
+                         axis: Scope => ScopeAxis[_]): Prop = {
     val value = axis(s)
     val mods = List[Scope => Scope](_.copy(project = Global),
                                     _.copy(config = Global),

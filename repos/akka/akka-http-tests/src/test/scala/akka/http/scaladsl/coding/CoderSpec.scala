@@ -4,7 +4,12 @@
 
 package akka.http.scaladsl.coding
 
-import java.io.{OutputStream, InputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{
+  OutputStream,
+  InputStream,
+  ByteArrayInputStream,
+  ByteArrayOutputStream
+}
 import java.util
 import java.util.zip.DataFormatException
 import akka.NotUsed
@@ -24,7 +29,9 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.impl.util._
 
 abstract class CoderSpec
-    extends WordSpec with CodecSpecSupport with Inspectors {
+    extends WordSpec
+    with CodecSpecSupport
+    with Inspectors {
   protected def Coder: Coder with StreamDecoder
   protected def newDecodedInputStream(underlying: InputStream): InputStream
   protected def newEncodedOutputStream(underlying: OutputStream): OutputStream
@@ -76,8 +83,8 @@ abstract class CoderSpec
     if (corruptInputCheck) {
       "throw an error on corrupt input" in {
         (the[RuntimeException] thrownBy {
-              ourDecode(corruptContent)
-            }).getCause should be(a[DataFormatException])
+          ourDecode(corruptContent)
+        }).getCause should be(a[DataFormatException])
       }
     }
 
@@ -202,6 +209,6 @@ abstract class CoderSpec
     input.via(Coder.decoderFlow).join.awaitResult(3.seconds)
 
   def decodeFromIterator(iterator: () ⇒ Iterator[ByteString]): ByteString =
-    Await.result(
-        Source.fromIterator(iterator).via(Coder.decoderFlow).join, 3.seconds)
+    Await.result(Source.fromIterator(iterator).via(Coder.decoderFlow).join,
+                 3.seconds)
 }

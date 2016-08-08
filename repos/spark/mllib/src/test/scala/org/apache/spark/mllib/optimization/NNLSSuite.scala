@@ -34,8 +34,9 @@ class NNLSSuite extends SparkFunSuite {
   }
 
   /** Compute the objective value */
-  def computeObjectiveValue(
-      ata: BDM[Double], atb: BDV[Double], x: BDV[Double]): Double =
+  def computeObjectiveValue(ata: BDM[Double],
+                            atb: BDV[Double],
+                            x: BDV[Double]): Double =
     (x.t * ata * x) / 2.0 - atb.dot(x)
 
   test("NNLS: exact solution cases") {
@@ -55,7 +56,7 @@ class NNLSSuite extends SparkFunSuite {
       val answer = new BDV(Array.fill(n)(1.0))
       val solved =
         (breeze.linalg.norm(x - answer) < 0.01) && // L2 norm
-        ((x - answer).toArray.map(_.abs).max < 0.001) // inf norm
+          ((x - answer).toArray.map(_.abs).max < 0.001) // inf norm
       if (solved) {
         numSolved += 1
       }
@@ -132,8 +133,12 @@ class NNLSSuite extends SparkFunSuite {
                             247059.51049,
                             -253747.03819,
                             1310939.40814))
-    val atb = new BDV(Array(
-            -31755.05710, 13047.14813, -20191.24443, 25993.77580, 11963.55017))
+    val atb = new BDV(
+        Array(-31755.05710,
+              13047.14813,
+              -20191.24443,
+              25993.77580,
+              11963.55017))
 
     /** reference solution obtained from matlab function quadprog */
     val refx = new BDV(Array(34.90751, 103.96254, 0.00000, 27.82094, 58.79627))

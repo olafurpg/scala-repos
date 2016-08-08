@@ -44,7 +44,8 @@ object Group {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Group.html]].
   */
 class Group(override val delegate: jfxs.Group = new jfxs.Group())
-    extends Parent(delegate) with SFXDelegate[jfxs.Group] {
+    extends Parent(delegate)
+    with SFXDelegate[jfxs.Group] {
 
   /**
     * Constructs a group consisting of children.

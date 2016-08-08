@@ -26,8 +26,7 @@ import org.saddle.scalar._
   * These methods scan over the Vec and compute values over a specified historical
   * window.
   */
-class VecRollingStats[
-    @spec(Int, Long, Double) A : ST : Vec2Stats : AddOp : SubOp : NUM](
+class VecRollingStats[@spec(Int, Long, Double) A: ST: Vec2Stats: AddOp: SubOp: NUM](
     v: Vec[A]) {
 
   /**
@@ -62,7 +61,7 @@ class VecRollingStats[
     new RollingMedian[A](winSz, v).evaluate
 }
 
-class RollingCount[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
+class RollingCount[@spec(Int, Long, Double) A: ST: Vec2Stats: NUM]
     extends Function1[Vec[A], Int] {
   var i = 0
   var s = 0
@@ -83,8 +82,7 @@ class RollingCount[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
   }
 }
 
-class RollingSum[
-    @spec(Int, Long, Double) A : ST : AddOp : SubOp : Vec2Stats : NUM]
+class RollingSum[@spec(Int, Long, Double) A: ST: AddOp: SubOp: Vec2Stats: NUM]
     extends Function1[Vec[A], A] {
   var i = 0
   val sa = implicitly[ST[A]]
@@ -107,7 +105,7 @@ class RollingSum[
   }
 }
 
-class RollingMean[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
+class RollingMean[@spec(Int, Long, Double) A: ST: Vec2Stats: NUM]
     extends Function1[Vec[A], Double] {
   var i = 0
   var s = 0d
@@ -136,8 +134,9 @@ class RollingMean[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
   }
 }
 
-class RollingMedian[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM](
-    winSz: Int, origv: Vec[A]) {
+class RollingMedian[@spec(Int, Long, Double) A: ST: Vec2Stats: NUM](
+    winSz: Int,
+    origv: Vec[A]) {
   val sa = implicitly[ST[A]]
 
   val len = origv.length

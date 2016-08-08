@@ -36,7 +36,8 @@ class DDLScanSource extends RelationProvider {
 
 case class SimpleDDLScan(from: Int, to: Int, table: String)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+    extends BaseRelation
+    with TableScan {
 
   override def schema: StructType =
     StructType(
@@ -53,10 +54,12 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
             StructField("doubleType", DoubleType, nullable = false),
             StructField("bigintType", LongType, nullable = false),
             StructField("tinyintType", ByteType, nullable = false),
-            StructField(
-                "decimalType", DecimalType.USER_DEFAULT, nullable = false),
-            StructField(
-                "fixedDecimalType", DecimalType(5, 1), nullable = false),
+            StructField("decimalType",
+                        DecimalType.USER_DEFAULT,
+                        nullable = false),
+            StructField("fixedDecimalType",
+                        DecimalType(5, 1),
+                        nullable = false),
             StructField("binaryType", BinaryType, nullable = false),
             StructField("booleanType", BooleanType, nullable = false),
             StructField("smallIntType", ShortType, nullable = false),
@@ -66,7 +69,8 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
             StructField("structType",
                         StructType(
                             StructField("f1", StringType) :: StructField(
-                                "f2", IntegerType) :: Nil))
+                                "f2",
+                                IntegerType) :: Nil))
         ))
 
   override def needConversion: Boolean = false

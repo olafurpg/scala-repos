@@ -3,11 +3,20 @@ package resolvers
 
 import java.io.{IOException, File}
 
-import com.intellij.notification.{Notification, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification,
+  NotificationType,
+  Notifications
+}
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.progress.{ProcessCanceledException, ProgressIndicator, ProgressManager, Task}
+import com.intellij.openapi.progress.{
+  ProcessCanceledException,
+  ProgressIndicator,
+  ProgressManager,
+  Task
+}
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.PersistentEnumeratorBase
 import org.apache.lucene.store.LockReleaseFailedException
@@ -36,8 +45,8 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
   def add(resolver: SbtResolver) = find(resolver) match {
     case Some(index) => index
     case None =>
-      val newIndex = SbtResolverIndex.create(
-          resolver.kind, resolver.root, getIndexDirectory(resolver.root))
+      val newIndex = SbtResolverIndex
+        .create(resolver.kind, resolver.root, getIndexDirectory(resolver.root))
       indexes.add(newIndex)
       newIndex
   }

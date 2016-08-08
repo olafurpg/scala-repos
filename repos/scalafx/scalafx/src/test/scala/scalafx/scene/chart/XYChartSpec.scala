@@ -41,15 +41,16 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class XYChartSpec
-    extends SimpleSFXDelegateSpec[
-        jfxsc.XYChart[Number, Number], XYChart[Number, Number]](
+    extends SimpleSFXDelegateSpec[jfxsc.XYChart[Number, Number],
+                                  XYChart[Number, Number]](
         classOf[jfxsc.XYChart[Number, Number]],
-        classOf[XYChart[Number, Number]]) with RunOnApplicationThread {
+        classOf[XYChart[Number, Number]])
+    with RunOnApplicationThread {
 
   override def getScalaClassInstance =
     new XYChart[Number, Number](getJavaClassInstance) {}
 
   override def getJavaClassInstance =
-    new jfxsc.LineChart[Number, Number](
-        new jfxsc.NumberAxis, new jfxsc.NumberAxis)
+    new jfxsc.LineChart[Number, Number](new jfxsc.NumberAxis,
+                                        new jfxsc.NumberAxis)
 }

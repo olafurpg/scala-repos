@@ -10,14 +10,13 @@ trait UTestStaticStringTest extends UTestTestCase {
 
   protected def staticStringTestFileName = staticStringTestName + ".scala"
 
-  protected def checkTest(
-      lineNumber: Int, position: Int, expectedName: String) = {
-    assert(
-        checkConfigAndSettings(
-            createTestFromLocation(
-                lineNumber, position, staticStringTestFileName),
-            staticStringTestName,
-            "tests" + (if (expectedName.isEmpty) "" else "\\" + expectedName)))
+  protected def checkTest(lineNumber: Int,
+                          position: Int,
+                          expectedName: String) = {
+    assert(checkConfigAndSettings(
+        createTestFromLocation(lineNumber, position, staticStringTestFileName),
+        staticStringTestName,
+        "tests" + (if (expectedName.isEmpty) "" else "\\" + expectedName)))
   }
 
   protected def addTest(): Unit = {

@@ -13,7 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * @author Alexander Podkhalyuzin
   */
 class ScNameValuePairImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScNameValuePair {
+    extends ScalaPsiElementImpl(node)
+    with ScNameValuePair {
   override def toString: String = "NameValuePair: " + name
 
   def setValue(newValue: PsiAnnotationMemberValue): PsiAnnotationMemberValue =

@@ -33,8 +33,8 @@ class WrappedDictionaryTest {
     val dict = js.Dictionary[String]()
     val map: mutable.Map[String, String] = dict
 
-    assertArrayEquals(
-        Array[AnyRef](), js.Object.properties(dict).toArray[AnyRef])
+    assertArrayEquals(Array[AnyRef](),
+                      js.Object.properties(dict).toArray[AnyRef])
 
     map += "hello" -> "world"
     assertEquals("world", dict("hello"))
@@ -42,8 +42,8 @@ class WrappedDictionaryTest {
     assertEquals("bar", dict("foo"))
     map -= "hello"
     assertFalse(dict.get("hello").isDefined)
-    assertArrayEquals(
-        Array[AnyRef]("foo"), js.Object.properties(dict).toArray[AnyRef])
+    assertArrayEquals(Array[AnyRef]("foo"),
+                      js.Object.properties(dict).toArray[AnyRef])
   }
 
   @Test def iterator(): Unit = {
@@ -59,7 +59,7 @@ class WrappedDictionaryTest {
   // Some arbitrary methods to test the builders
 
   @Test def map(): Unit = {
-    def ct[A : ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
+    def ct[A: ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
     val dict = js.Dictionary[Int]()
     dict ++= Seq("one" -> 1, "two" -> 2, "three" -> 3)
 

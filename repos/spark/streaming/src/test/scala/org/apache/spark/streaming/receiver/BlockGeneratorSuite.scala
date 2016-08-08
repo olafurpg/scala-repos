@@ -94,7 +94,7 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
       }
     }
     listener.pushedData.asScala.toSeq should contain theSameElementsInOrderAs
-    (data1)
+      (data1)
     assert(listener.onAddDataCalled === false) // should be called only with addDataWithCallback()
 
     // Verify addDataWithCallback() add data+metadata and and callbacks are called correctly
@@ -105,9 +105,9 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
     }
     assert(listener.onAddDataCalled === true)
     listener.addedData.asScala.toSeq should contain theSameElementsInOrderAs
-    (data2)
+      (data2)
     listener.addedMetadata.asScala.toSeq should contain theSameElementsInOrderAs
-    (metadata2)
+      (metadata2)
     clock.advance(blockIntervalMs) // advance clock to generate blocks
     eventually(timeout(1 second)) {
       val combined = data1 ++ data2
@@ -120,12 +120,12 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
     blockGenerator.addMultipleDataWithCallback(data3.iterator, metadata3)
     val combinedMetadata = metadata2 :+ metadata3
     listener.addedMetadata.asScala.toSeq should contain theSameElementsInOrderAs
-    (combinedMetadata)
+      (combinedMetadata)
     clock.advance(blockIntervalMs) // advance clock to generate blocks
     eventually(timeout(1 second)) {
       val combinedData = data1 ++ data2 ++ data3
       listener.pushedData.asScala.toSeq should contain theSameElementsInOrderAs
-      (combinedData)
+        (combinedData)
     }
 
     // Stop the block generator by starting the stop on a different thread and
@@ -257,8 +257,8 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
     @volatile var onAddDataCalled = false
     @volatile var onPushBlockCalled = false
 
-    override def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+    override def onPushBlock(blockId: StreamBlockId,
+                             arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
       pushedData.addAll(arrayBuffer.asJava)
       onPushBlockCalled = true
     }

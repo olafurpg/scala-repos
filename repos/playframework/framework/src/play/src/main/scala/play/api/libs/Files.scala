@@ -4,7 +4,13 @@
 package play.api.libs
 
 import java.io._
-import java.nio.file.{FileAlreadyExistsException, StandardCopyOption, SimpleFileVisitor, Path, FileVisitResult}
+import java.nio.file.{
+  FileAlreadyExistsException,
+  StandardCopyOption,
+  SimpleFileVisitor,
+  Path,
+  FileVisitResult
+}
 import java.nio.file.attribute.BasicFileAttributes
 
 import javax.inject.{Inject, Singleton}
@@ -45,15 +51,15 @@ object Files {
     applicationLifecycle.addStopHook { () =>
       Future.successful(
           JFiles.walkFileTree(playTempFolder, new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-          JFiles.deleteIfExists(file)
-          FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(dir: Path, exc: IOException) = {
-          JFiles.deleteIfExists(dir)
-          FileVisitResult.CONTINUE
-        }
-      }))
+            override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+              JFiles.deleteIfExists(file)
+              FileVisitResult.CONTINUE
+            }
+            override def postVisitDirectory(dir: Path, exc: IOException) = {
+              JFiles.deleteIfExists(dir)
+              FileVisitResult.CONTINUE
+            }
+          }))
     }
 
     def create(prefix: String, suffix: String): File = {
@@ -91,8 +97,8 @@ object Files {
     def moveTo(to: File, replace: Boolean = false): File = {
       try {
         if (replace)
-          JFiles.move(
-              file.toPath, to.toPath, StandardCopyOption.REPLACE_EXISTING)
+          JFiles
+            .move(file.toPath, to.toPath, StandardCopyOption.REPLACE_EXISTING)
         else JFiles.move(file.toPath, to.toPath)
       } catch {
         case ex: FileAlreadyExistsException => to

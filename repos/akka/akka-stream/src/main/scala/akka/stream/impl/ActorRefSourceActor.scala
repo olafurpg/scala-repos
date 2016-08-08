@@ -7,7 +7,11 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import akka.actor.Status
 import akka.stream.OverflowStrategies._
-import akka.stream.{BufferOverflowException, OverflowStrategy, OverflowStrategies}
+import akka.stream.{
+  BufferOverflowException,
+  OverflowStrategy,
+  OverflowStrategies
+}
 import akka.stream.ActorMaterializerSettings
 
 /**
@@ -20,8 +24,10 @@ private[akka] object ActorRefSourceActor {
     require(overflowStrategy != OverflowStrategies.Backpressure,
             "Backpressure overflowStrategy not supported")
     val maxFixedBufferSize = settings.maxFixedBufferSize
-    Props(new ActorRefSourceActor(
-            bufferSize, overflowStrategy, maxFixedBufferSize))
+    Props(
+        new ActorRefSourceActor(bufferSize,
+                                overflowStrategy,
+                                maxFixedBufferSize))
   }
 }
 
@@ -31,7 +37,8 @@ private[akka] object ActorRefSourceActor {
 private[akka] class ActorRefSourceActor(bufferSize: Int,
                                         overflowStrategy: OverflowStrategy,
                                         maxFixedBufferSize: Int)
-    extends akka.stream.actor.ActorPublisher[Any] with ActorLogging {
+    extends akka.stream.actor.ActorPublisher[Any]
+    with ActorLogging {
   import akka.stream.actor.ActorPublisherMessage._
 
   // when bufferSize is 0 there the buffer is not used
@@ -120,7 +127,7 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
     case elem if isActive ⇒
       log.debug(
           "Dropping element because Status.Success received already, " +
-          "only draining already buffered elements: [{}] (pending: [{}])",
+            "only draining already buffered elements: [{}] (pending: [{}])",
           elem,
           buffer.used)
   }

@@ -214,8 +214,8 @@ object Messages {
     implicit def applicationMessagesApi(
         implicit application: Application): MessagesApi =
       messagesApiCache(application)
-    implicit def applicationMessages(
-        implicit lang: Lang, application: Application): Messages =
+    implicit def applicationMessages(implicit lang: Lang,
+                                     application: Application): Messages =
       new Messages(lang, messagesApiCache(application))
   }
 
@@ -283,15 +283,17 @@ object Messages {
     def read = PlayIO.readUrlAsString(url)(Codec.UTF8)
   }
 
-  private[i18n] case class Message(
-      key: String, pattern: String, source: MessageSource, sourceName: String)
+  private[i18n] case class Message(key: String,
+                                   pattern: String,
+                                   source: MessageSource,
+                                   sourceName: String)
       extends Positional
 
   /**
     * Message file Parser.
     */
-  private[i18n] class MessagesParser(
-      messageSource: MessageSource, messageSourceName: String)
+  private[i18n] class MessagesParser(messageSource: MessageSource,
+                                     messageSourceName: String)
       extends RegexParsers {
 
     case class Comment(msg: String)
@@ -313,14 +315,14 @@ object Messages {
 
     val comment = """^#.*""".r ^^ { case s => Comment(s) }
 
-    val messageKey = namedError(
-        """^[a-zA-Z0-9_.-]+""".r, "Message key expected")
+    val messageKey =
+      namedError("""^[a-zA-Z0-9_.-]+""".r, "Message key expected")
 
     val messagePattern = namedError(
         rep(
             ("""\""" ^^ (_ => "")) ~>
-            (// Ignore the leading \
-                ("\r" ?) ~> "\n" ^^ (_ => "") | // Ignore escaped end of lines \
+              (// Ignore the leading \
+              ("\r" ?) ~> "\n" ^^ (_ => "") | // Ignore escaped end of lines \
                 "n" ^^ (_ => "\n") | // Translate literal \n to real newline
                 """\""" | // Handle escaped \\
                 "^.".r ^^ ("""\""" + _)) | "^.".r // Or any character
@@ -330,7 +332,7 @@ object Messages {
 
     val message =
       ignoreWhiteSpace ~ messageKey ~
-      (ignoreWhiteSpace ~ "=" ~ ignoreWhiteSpace) ~ messagePattern ^^ {
+        (ignoreWhiteSpace ~ "=" ~ ignoreWhiteSpace) ~ messagePattern ^^ {
         case (_ ~ k ~ _ ~ v) =>
           Messages.Message(k, v.trim, messageSource, messageSourceName)
       }
@@ -338,7 +340,7 @@ object Messages {
     val sentence = (comment | positioned(message)) <~ newLine
 
     val parser =
-      phrase(( (sentence | blankLine).*) <~ end) ^^ {
+      phrase(((sentence | blankLine).*) <~ end) ^^ {
         case messages =>
           messages.collect {
             case m @ Messages.Message(_, _, _, _) => m
@@ -503,8 +505,9 @@ trait MessagesApi {
   * The internationalisation API.
   */
 @Singleton
-class DefaultMessagesApi @Inject()(
-    environment: Environment, configuration: Configuration, langs: Langs)
+class DefaultMessagesApi @Inject()(environment: Environment,
+                                   configuration: Configuration,
+                                   langs: Langs)
     extends MessagesApi {
 
   private val config = PlayConfig(configuration)
@@ -563,9 +566,11 @@ class DefaultMessagesApi @Inject()(
   def translate(key: String, args: Seq[Any])(
       implicit lang: Lang): Option[String] = {
     val codesToTry = Seq(lang.code, lang.language, "default", "default.play")
-    val pattern: Option[String] = codesToTry.foldLeft[Option[String]](None)(
-        (res, lang) => res.orElse(messages.get(lang).flatMap(_.get(key))))
-    pattern.map(pattern =>
+    val pattern: Option[String] =
+      codesToTry.foldLeft[Option[String]](None)((res, lang) =>
+        res.orElse(messages.get(lang).flatMap(_.get(key))))
+    pattern.map(
+        pattern =>
           new MessageFormat(pattern, lang.toLocale)
             .format(args.map(_.asInstanceOf[java.lang.Object]).toArray))
   }
@@ -612,7 +617,8 @@ class DefaultMessagesApi @Inject()(
   }
 
   lazy val langCookieName = config.getDeprecated[String](
-      "play.i18n.langCookieName", "application.lang.cookie")
+      "play.i18n.langCookieName",
+      "application.lang.cookie")
 
   lazy val langCookieSecure = config.get[Boolean]("play.i18n.langCookieSecure")
 
@@ -637,7 +643,7 @@ trait I18nComponents {
   def environment: Environment
   def configuration: Configuration
 
-  lazy val messagesApi: MessagesApi = new DefaultMessagesApi(
-      environment, configuration, langs)
+  lazy val messagesApi: MessagesApi =
+    new DefaultMessagesApi(environment, configuration, langs)
   lazy val langs: Langs = new DefaultLangs(configuration)
 }

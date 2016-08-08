@@ -95,7 +95,7 @@ class FixedBufferSpec extends AkkaSpec {
         import language.reflectiveCalls
         val buf = FixedSizeBuffer[Int](size)
 
-        val cheat = buf.asInstanceOf[ {
+        val cheat = buf.asInstanceOf[{
           def readIdx_=(l: Long): Unit; def writeIdx_=(l: Long): Unit
         }]
         cheat.readIdx_=(Int.MaxValue)

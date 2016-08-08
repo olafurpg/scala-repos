@@ -46,8 +46,8 @@ object Analyse extends LilaController {
         RedirectAtFen(pov, initialFen) {
           (env.analyser get pov.game.id) zip Env.fishnet.api
             .prioritaryAnalysisExists(pov.game.id) zip
-          (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
-              pov.game) flatMap {
+            (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+            .crosstableApi(pov.game) flatMap {
             case (((analysis, analysisInProgress), simul), crosstable) =>
               val pgn = Env.api.pgnDump(pov.game, initialFen)
               Env.api.roundApi.watcher(pov,
@@ -58,30 +58,30 @@ object Analyse extends LilaController {
                                        withMoveTimes = true,
                                        withOpening = true) map { data =>
                 Ok(
-                    html.analyse.replay(pov,
-                                        data,
-                                        initialFen,
-                                        Env.analyse
-                                          .annotator(pgn,
-                                                     analysis,
-                                                     pov.game.opening,
-                                                     pov.game.winnerColor,
-                                                     pov.game.status,
-                                                     pov.game.clock)
-                                          .toString,
-                                        analysis,
-                                        analysis map { a =>
-                                      AdvantageChart(a.infoAdvices,
-                                                     pov.game.pgnMoves,
-                                                     pov.game.startedAtTurn)
-                                    },
-                                        analysisInProgress,
-                                        simul,
-                                        new TimeChart(pov.game,
-                                                      pov.game.pgnMoves),
-                                        crosstable,
-                                        userTv,
-                                        divider(pov.game, initialFen)))
+                    html.analyse.replay(
+                        pov,
+                        data,
+                        initialFen,
+                        Env.analyse
+                          .annotator(pgn,
+                                     analysis,
+                                     pov.game.opening,
+                                     pov.game.winnerColor,
+                                     pov.game.status,
+                                     pov.game.clock)
+                          .toString,
+                        analysis,
+                        analysis map { a =>
+                          AdvantageChart(a.infoAdvices,
+                                         pov.game.pgnMoves,
+                                         pov.game.startedAtTurn)
+                        },
+                        analysisInProgress,
+                        simul,
+                        new TimeChart(pov.game, pov.game.pgnMoves),
+                        crosstable,
+                        userTv,
+                        divider(pov.game, initialFen)))
               }
           }
         }
@@ -94,19 +94,17 @@ object Analyse extends LilaController {
       fuccess {
         chess.Replay
           .plyAtFen(pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
-          .fold(err =>
-                  {
-                    logger.info(s"RedirectAtFen: $err")
-                    Redirect(url)
-                },
-                ply => Redirect(s"$url#$ply"))
+          .fold(err => {
+            logger.info(s"RedirectAtFen: $err")
+            Redirect(url)
+          }, ply => Redirect(s"$url#$ply"))
       }
     }
 
   private def replayBot(pov: Pov)(implicit ctx: Context) =
     GameRepo initialFen pov.game.id flatMap { initialFen =>
       (env.analyser get pov.game.id) zip
-      (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
+        (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
           pov.game) map {
         case ((analysis, simul), crosstable) =>
           val pgn = Env.api.pgnDump(pov.game, initialFen)

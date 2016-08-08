@@ -40,7 +40,8 @@ object Reflection {
 
 class Reflection(
     override val delegate: jfxse.Reflection = new jfxse.Reflection)
-    extends Effect(delegate) with InputDelegate[jfxse.Reflection]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.Reflection]
     with SFXDelegate[jfxse.Reflection] {
 
   /**

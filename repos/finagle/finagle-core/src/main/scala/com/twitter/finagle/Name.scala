@@ -57,8 +57,8 @@ object Name {
       val addr: Var[Addr],
       val id: Any,
       val path: com.twitter.finagle.Path
-  )
-      extends Name with Proxy {
+  ) extends Name
+      with Proxy {
     def self = id
 
     // Workaround for https://issues.scala-lang.org/browse/SI-4807
@@ -72,8 +72,9 @@ object Name {
   }
 
   object Bound {
-    def apply(
-        addr: Var[Addr], id: Any, path: com.twitter.finagle.Path): Name.Bound =
+    def apply(addr: Var[Addr],
+              id: Any,
+              path: com.twitter.finagle.Path): Name.Bound =
       new Bound(addr, id, path)
 
     def apply(addr: Var[Addr], id: Any): Name.Bound =
@@ -136,7 +137,7 @@ object Name {
                 Addr.Bound(set + Address(ia), metadata)
               case (Addr.Bound(_, _), sa) =>
                 Addr.Failed(new IllegalArgumentException(
-                        s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
+                    s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
               case (addr, _) => addr
             }
         }

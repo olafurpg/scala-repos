@@ -4,7 +4,7 @@ package psi
 package api
 package base
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

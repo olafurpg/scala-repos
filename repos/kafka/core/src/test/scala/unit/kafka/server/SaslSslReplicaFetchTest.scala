@@ -22,7 +22,8 @@ import kafka.api.SaslTestHarness
 import org.apache.kafka.common.protocol.SecurityProtocol
 
 class SaslSslReplicaFetchTest
-    extends BaseReplicaFetchTest with SaslTestHarness {
+    extends BaseReplicaFetchTest
+    with SaslTestHarness {
   override protected val zkSaslEnabled = false
   protected def securityProtocol = SecurityProtocol.SASL_SSL
   protected lazy val trustStoreFile = Some(

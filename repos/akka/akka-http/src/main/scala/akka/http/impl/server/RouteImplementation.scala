@@ -5,7 +5,11 @@
 package akka.http.impl.server
 
 import akka.http.impl.util.JavaMapping
-import akka.http.javadsl.server.values.{PathMatcher, BasicCredentials, OAuth2Credentials}
+import akka.http.javadsl.server.values.{
+  PathMatcher,
+  BasicCredentials,
+  OAuth2Credentials
+}
 import akka.http.scaladsl.model.StatusCodes.Redirection
 import akka.http.scaladsl.server.util.TupleOps.Join
 import scala.language.implicitConversions
@@ -16,7 +20,15 @@ import akka.http.scaladsl.server.directives.{Credentials, ContentTypeResolver}
 import akka.http.scaladsl.server.directives.FileAndResourceDirectives.DirectoryRenderer
 import akka.http.scaladsl.model.HttpHeader
 import akka.http.scaladsl.model.headers.{HttpCookie, CustomHeader}
-import akka.http.scaladsl.server.{Route ⇒ ScalaRoute, Directive ⇒ ScalaDirective, PathMatcher ⇒ ScalaPathMatcher, PathMatcher1, Directive0, Directive1, Directives}
+import akka.http.scaladsl.server.{
+  Route ⇒ ScalaRoute,
+  Directive ⇒ ScalaDirective,
+  PathMatcher ⇒ ScalaPathMatcher,
+  PathMatcher1,
+  Directive0,
+  Directive1,
+  Directives
+}
 import akka.http.impl.util.JavaMapping.Implicits._
 import akka.http.scaladsl.server
 import akka.http.javadsl.server._
@@ -62,7 +74,8 @@ private[http] object ExtractionMap {
   * INTERNAL API
   */
 private[http] object RouteImplementation
-    extends Directives with server.RouteConcatenation {
+    extends Directives
+    with server.RouteConcatenation {
   def apply(route: Route): ScalaRoute = {
     def directiveFor(route: DirectiveRoute): Directive0 = route match {
       case RouteAlternatives() ⇒ ScalaDirective.Empty
@@ -189,8 +202,7 @@ private[http] object RouteImplementation
               scalaResolver(resolver))
         }
       case FileAndResourceRouteWithDefaultResolver(constructor) ⇒
-        RouteImplementation(
-            constructor(new directives.ContentTypeResolver {
+        RouteImplementation(constructor(new directives.ContentTypeResolver {
           def resolve(fileName: String): ContentType =
             ContentTypeResolver.Default(fileName)
         }))
@@ -217,13 +229,13 @@ private[http] object RouteImplementation
                 .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
 
         (requestValToDirective(dyn.value1) & requestValToDirective(
-                dyn.value2))(runToRoute)
+            dyn.value2))(runToRoute)
 
       case o: OpaqueRoute ⇒
         (ctx ⇒
-          o.handle(new RequestContextImpl(ctx))
-            .asInstanceOf[RouteResultImpl]
-            .underlying)
+           o.handle(new RequestContextImpl(ctx))
+             .asInstanceOf[RouteResultImpl]
+             .underlying)
       case p: Product ⇒
         extractExecutionContext { implicit ec ⇒
           complete((500, s"Not implemented: ${p.productPrefix}"))
@@ -233,7 +245,7 @@ private[http] object RouteImplementation
   def pathMatcherDirective[T](
       matchers: immutable.Seq[PathMatcher[_]],
       directive: PathMatcher1[T] ⇒ Directive1[T] // this type is too specific and only a placeholder for a proper polymorphic function
-      ): Directive0 = {
+  ): Directive0 = {
     // Concatenating PathMatchers is a bit complicated as we don't want to build up a tuple
     // but something which we can later split all the separate values and add them to the
     // ExtractionMap.

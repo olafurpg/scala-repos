@@ -47,10 +47,9 @@ class RemoteConfigSpec
       Transports.head._1 should ===(
           classOf[akka.remote.transport.netty.NettyTransport].getName)
       Transports.head._2 should ===(Nil)
-      Adapters should ===(
-          Map("gremlin" -> classOf[
-                  akka.remote.transport.FailureInjectorProvider].getName,
-              "trttl" -> classOf[akka.remote.transport.ThrottlerProvider].getName))
+      Adapters should ===(Map(
+          "gremlin" -> classOf[akka.remote.transport.FailureInjectorProvider].getName,
+          "trttl" -> classOf[akka.remote.transport.ThrottlerProvider].getName))
 
       WatchFailureDetectorImplementationClass should ===(
           classOf[PhiAccrualFailureDetector].getName)
@@ -62,11 +61,11 @@ class RemoteConfigSpec
       WatchFailureDetectorConfig.getInt("max-sample-size") should ===(200)
       WatchFailureDetectorConfig.getMillisDuration(
           "acceptable-heartbeat-pause") should ===(10 seconds)
-      WatchFailureDetectorConfig.getMillisDuration("min-std-deviation") should ===(
-          100 millis)
+      WatchFailureDetectorConfig
+        .getMillisDuration("min-std-deviation") should ===(100 millis)
 
-      remoteSettings.config.getString("akka.remote.log-frame-size-exceeding") should ===(
-          "off")
+      remoteSettings.config
+        .getString("akka.remote.log-frame-size-exceeding") should ===("off")
     }
 
     "be able to parse AkkaProtocol related config elements" in {
@@ -92,7 +91,7 @@ class RemoteConfigSpec
 
       ConnectionTimeout should ===(15.seconds)
       ConnectionTimeout should ===(new AkkaProtocolSettings(
-              RARP(system).provider.remoteSettings.config).HandshakeTimeout)
+          RARP(system).provider.remoteSettings.config).HandshakeTimeout)
       WriteBufferHighWaterMark should ===(None)
       WriteBufferLowWaterMark should ===(None)
       SendBufferSize should ===(Some(256000))

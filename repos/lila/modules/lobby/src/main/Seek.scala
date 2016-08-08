@@ -30,9 +30,9 @@ case class Seek(_id: String,
 
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
-    compatibilityProperties == h.compatibilityProperties &&
-    (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
-    h.ratingRangeCompatibleWith(this)
+      compatibilityProperties == h.compatibilityProperties &&
+      (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
+      h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Seek) = realRatingRange.fold(true) {
     range =>

@@ -55,15 +55,15 @@ trait ClassHelpers { self: ControlHelpers =>
                              modifiers: List[Function1[String, String]],
                              targetType: Class[C]): Box[Class[C]] =
     (for (place <- where.view;
-    mod <- modifiers.view;
-    fullName = place + "." + mod(name);
-    ignore = List(classOf[ClassNotFoundException],
-                  classOf[ClassCastException],
-                  classOf[NoClassDefFoundError]);
-    klass <- tryo(ignore)(Class
-          .forName(fullName)
-          .asSubclass(targetType)
-          .asInstanceOf[Class[C]])) yield klass).headOption
+          mod <- modifiers.view;
+          fullName = place + "." + mod(name);
+          ignore = List(classOf[ClassNotFoundException],
+                        classOf[ClassCastException],
+                        classOf[NoClassDefFoundError]);
+          klass <- tryo(ignore)(Class
+                    .forName(fullName)
+                    .asSubclass(targetType)
+                    .asInstanceOf[Class[C]])) yield klass).headOption
 
   /**
     * General method to in find a class according to its type, its name, a list of possible
@@ -77,8 +77,9 @@ trait ClassHelpers { self: ControlHelpers =>
     *
     * @return a Box, either containing the found class or an Empty can.
     */
-  def findType[C <: AnyRef](
-      name: String, where: List[String], modifiers: List[String => String])(
+  def findType[C <: AnyRef](name: String,
+                            where: List[String],
+                            modifiers: List[String => String])(
       implicit m: Manifest[C]): Box[Class[C]] =
     findClass(name, where, modifiers, m.runtimeClass.asInstanceOf[Class[C]])
 
@@ -108,8 +109,9 @@ trait ClassHelpers { self: ControlHelpers =>
     *
     * @return a Box, either containing the found class or an Empty can.
     */
-  def findClass[C <: AnyRef](
-      name: String, where: List[String], targetType: Class[C]): Box[Class[C]] =
+  def findClass[C <: AnyRef](name: String,
+                             where: List[String],
+                             targetType: Class[C]): Box[Class[C]] =
     findClass(name, where, nameModifiers, targetType)
 
   /**
@@ -150,7 +152,7 @@ trait ClassHelpers { self: ControlHelpers =>
   def findType[C <: AnyRef](where: List[(String, List[String])])(
       implicit m: Manifest[C]): Box[Class[C]] =
     (for ((name, packages) <- where;
-    klass <- findType[C](name, packages)) yield klass).headOption
+          klass <- findType[C](name, packages)) yield klass).headOption
 
   /**
     * Find a class given a list of possible names and corresponding packages, turning underscored
@@ -213,12 +215,12 @@ trait ClassHelpers { self: ControlHelpers =>
       clz.getMethod(meth).invoke(clz.newInstance)
     } catch {
       case c: InvocationTargetException => {
-          def findRoot(e: Throwable) {
-            if (e.getCause == null || e.getCause == e) throw e
-            else findRoot(e.getCause)
-          }
-          findRoot(c)
+        def findRoot(e: Throwable) {
+          if (e.getCause == null || e.getCause == e) throw e
+          else findRoot(e.getCause)
         }
+        findRoot(c)
+      }
     }
   }
 
@@ -256,8 +258,11 @@ trait ClassHelpers { self: ControlHelpers =>
         inst,
         StringHelpers.camelify(meth),
         params,
-        Empty) or _invokeMethod(
-        clz, inst, StringHelpers.camelifyMethod(meth), params, Empty)
+        Empty) or _invokeMethod(clz,
+                                inst,
+                                StringHelpers.camelifyMethod(meth),
+                                params,
+                                Empty)
   }
 
   /**
@@ -283,8 +288,11 @@ trait ClassHelpers { self: ControlHelpers =>
         inst,
         StringHelpers.camelify(meth),
         params,
-        Full(ptypes)) or _invokeMethod(
-        clz, inst, StringHelpers.camelifyMethod(meth), params, Full(ptypes))
+        Full(ptypes)) or _invokeMethod(clz,
+                                       inst,
+                                       StringHelpers.camelifyMethod(meth),
+                                       params,
+                                       Full(ptypes))
   }
 
   /**
@@ -313,8 +321,8 @@ trait ClassHelpers { self: ControlHelpers =>
        */
       def alternateMethods: List[Method] =
         clz.getDeclaredMethods.toList.filter(m =>
-              m.getName.equals(meth) && isPublic(m.getModifiers) &&
-              m.getParameterTypes.length == params.length)
+          m.getName.equals(meth) && isPublic(m.getModifiers) &&
+            m.getParameterTypes.length == params.length)
       methCacheLock.read {
         def key = (clz.getName, meth, params.length)
         if (Props.productionMode && methodCache.contains(key)) {
@@ -350,7 +358,7 @@ trait ClassHelpers { self: ControlHelpers =>
       .filter(m => inst != null || isStatic(m.getModifiers))
       .map((m: Method) => tryo { m.invoke(inst, params: _*) })
       .find((x: Box[Any]) =>
-            x match {
+        x match {
           case result @ Full(_) => true
           case Failure(_, Full(c: IllegalAccessException), _) => false
           case Failure(_, Full(c: IllegalArgumentException), _) => false
@@ -392,20 +400,18 @@ trait ClassHelpers { self: ControlHelpers =>
     on match {
       case null => Empty
       case instance => {
-          controllerMethods(instance).toList match {
-            case Nil => Empty
-            case x :: xs =>
-              Full(
-                  () =>
-                    {
-                  try {
-                    Full(x.invoke(instance))
-                  } catch {
-                    case e: InvocationTargetException => throw e.getCause
-                  }
-              })
-          }
+        controllerMethods(instance).toList match {
+          case Nil => Empty
+          case x :: xs =>
+            Full(() => {
+              try {
+                Full(x.invoke(instance))
+              } catch {
+                case e: InvocationTargetException => throw e.getCause
+              }
+            })
         }
+      }
     }
   }
 

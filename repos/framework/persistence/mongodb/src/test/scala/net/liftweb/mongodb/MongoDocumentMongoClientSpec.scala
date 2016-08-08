@@ -30,8 +30,10 @@ import org.specs2.mutable.Specification
 import json._
 
 package mongoclienttestdocs {
-  case class SessCollection(
-      _id: ObjectId, name: String, dbtype: String, count: Int)
+  case class SessCollection(_id: ObjectId,
+                            name: String,
+                            dbtype: String,
+                            count: Int)
       extends MongoDocument[SessCollection] {
 
     def meta = SessCollection

@@ -33,16 +33,19 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext
   * the value is the entire content of file.
   */
 private[spark] class WholeTextFileInputFormat
-    extends CombineFileInputFormat[Text, Text] with Configurable {
+    extends CombineFileInputFormat[Text, Text]
+    with Configurable {
 
-  override protected def isSplitable(
-      context: JobContext, file: Path): Boolean = false
+  override protected def isSplitable(context: JobContext,
+                                     file: Path): Boolean = false
 
   override def createRecordReader(
       split: InputSplit,
       context: TaskAttemptContext): RecordReader[Text, Text] = {
     val reader = new ConfigurableCombineFileRecordReader(
-        split, context, classOf[WholeTextFileRecordReader])
+        split,
+        context,
+        classOf[WholeTextFileRecordReader])
     reader.setConf(getConf)
     reader
   }

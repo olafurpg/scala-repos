@@ -60,8 +60,9 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
   case class FixedPoint(maxIterations: Int) extends Strategy
 
   /** A batch of rules. */
-  protected case class Batch(
-      name: String, strategy: Strategy, rules: Rule[TreeType]*)
+  protected case class Batch(name: String,
+                             strategy: Strategy,
+                             rules: Rule[TreeType]*)
 
   /** Defines a sequence of rule batches, to be overridden by the implementation. */
   protected def batches: Seq[Batch]
@@ -92,7 +93,7 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
               logTrace(s"""
                   |=== Applying Rule ${rule.ruleName} ===
                   |${sideBySide(plan.treeString, result.treeString).mkString(
-                          "\n")}
+                              "\n")}
                 """.stripMargin)
             }
 

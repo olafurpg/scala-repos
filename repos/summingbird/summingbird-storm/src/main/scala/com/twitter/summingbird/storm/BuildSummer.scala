@@ -53,8 +53,10 @@ object BuildSummer {
     }
   }
 
-  private[this] final def legacyBuilder(
-      storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
+  private[this] final def legacyBuilder(storm: Storm,
+                                        dag: Dag[Storm],
+                                        node: StormNode,
+                                        jobID: JobId) = {
     val nodeName = dag.getNodeName(node)
     val cacheSize = storm.getOrElse(dag, node, DEFAULT_FM_CACHE)
     require(
@@ -72,11 +74,11 @@ object BuildSummer {
 
     if (cacheSize.lowerBound == 0) {
       new SummerBuilder {
-        def getSummer[
-            K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-            (K, V), Map[K, V]] = {
+        def getSummer[K, V: Semigroup]
+          : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
           new com.twitter.algebird.util.summer.NullSummer[K, V](
-              tupleInCounter, tupleOutCounter)
+              tupleInCounter,
+              tupleOutCounter)
         }
       }
     } else {
@@ -92,9 +94,8 @@ object BuildSummer {
 
       if (!useAsyncCache.get) {
         new SummerBuilder {
-          def getSummer[
-              K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
+          def getSummer[K, V: Semigroup]
+            : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
             new SyncSummingQueue[K, V](BufferSize(cacheSize.lowerBound),
                                        FlushFrequency(flushFrequency.get),
                                        MemoryFlushPercent(softMemoryFlush.get),
@@ -116,9 +117,8 @@ object BuildSummer {
             s"[$nodeName] valueCombinerCrushSize : ${valueCombinerCrushSize.get}")
 
         new SummerBuilder {
-          def getSummer[
-              K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
+          def getSummer[K, V: Semigroup]
+            : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
             val executor = Executors.newFixedThreadPool(asyncPoolSize.get)
             val futurePool = FuturePool(executor)
             val summer = new AsyncListSum[K, V](
@@ -135,13 +135,11 @@ object BuildSummer {
                 futurePool,
                 Compact(false),
                 CompactionSize(0))
-            summer.withCleanup(
-                () =>
-                  {
-                Future {
-                  executor.shutdown
-                  executor.awaitTermination(10, TimeUnit.SECONDS)
-                }
+            summer.withCleanup(() => {
+              Future {
+                executor.shutdown
+                executor.awaitTermination(10, TimeUnit.SECONDS)
+              }
             })
           }
         }

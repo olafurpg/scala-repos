@@ -24,7 +24,11 @@ import scala.reflect.{classTag, ClassTag}
 
 import org.apache.spark.annotation.Experimental
 import org.apache.spark.sql.catalyst.encoders.{encoderFor, ExpressionEncoder}
-import org.apache.spark.sql.catalyst.expressions.{BoundReference, DecodeUsingSerializer, EncodeUsingSerializer}
+import org.apache.spark.sql.catalyst.expressions.{
+  BoundReference,
+  DecodeUsingSerializer,
+  EncodeUsingSerializer
+}
 import org.apache.spark.sql.types._
 
 /**
@@ -71,9 +75,9 @@ import org.apache.spark.sql.types._
 @Experimental
 @implicitNotFound(
     "Unable to find encoder for type stored in a Dataset.  Primitive types " +
-    "(Int, String, etc) and Product types (case classes) are supported by importing " +
-    "sqlContext.implicits._  Support for serializing other types will be added in future " +
-    "releases.")
+      "(Int, String, etc) and Product types (case classes) are supported by importing " +
+      "sqlContext.implicits._  Support for serializing other types will be added in future " +
+      "releases.")
 trait Encoder[T] extends Serializable {
 
   /** Returns the schema of encoding this type of object as a Row. */
@@ -191,7 +195,7 @@ object Encoders {
     *
     * @since 1.6.0
     */
-  def kryo[T : ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
+  def kryo[T: ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
 
   /**
     * Creates an encoder that serializes objects of type T using Kryo.
@@ -213,7 +217,7 @@ object Encoders {
     *
     * @since 1.6.0
     */
-  def javaSerialization[T : ClassTag]: Encoder[T] =
+  def javaSerialization[T: ClassTag]: Encoder[T] =
     genericSerializer(useKryo = false)
 
   /**
@@ -230,16 +234,16 @@ object Encoders {
     javaSerialization(ClassTag[T](clazz))
 
   /** Throws an exception if T is not a public class. */
-  private def validatePublicClass[T : ClassTag](): Unit = {
+  private def validatePublicClass[T: ClassTag](): Unit = {
     if (!Modifier.isPublic(classTag[T].runtimeClass.getModifiers)) {
       throw new UnsupportedOperationException(
           s"${classTag[T].runtimeClass.getName} is not a public class. " +
-          "Only public classes are supported.")
+            "Only public classes are supported.")
     }
   }
 
   /** A way to construct encoders using generic serializers. */
-  private def genericSerializer[T : ClassTag](useKryo: Boolean): Encoder[T] = {
+  private def genericSerializer[T: ClassTag](useKryo: Boolean): Encoder[T] = {
     if (classTag[T].runtimeClass.isPrimitive) {
       throw new UnsupportedOperationException(
           "Primitive types are not supported.")
@@ -250,15 +254,13 @@ object Encoders {
     ExpressionEncoder[T](
         schema = new StructType().add("value", BinaryType),
         flat = true,
-        toRowExpressions = Seq(
-              EncodeUsingSerializer(BoundReference(0,
-                                                   ObjectType(classOf[AnyRef]),
-                                                   nullable = true),
-                                    kryo = useKryo)),
+        toRowExpressions = Seq(EncodeUsingSerializer(
+            BoundReference(0, ObjectType(classOf[AnyRef]), nullable = true),
+            kryo = useKryo)),
         fromRowExpression = DecodeUsingSerializer[T](
-              BoundReference(0, BinaryType, nullable = true),
-              classTag[T],
-              kryo = useKryo),
+            BoundReference(0, BinaryType, nullable = true),
+            classTag[T],
+            kryo = useKryo),
         clsTag = classTag[T]
     )
   }
@@ -289,8 +291,8 @@ object Encoders {
                             e2: Encoder[T2],
                             e3: Encoder[T3],
                             e4: Encoder[T4]): Encoder[(T1, T2, T3, T4)] = {
-    ExpressionEncoder.tuple(
-        encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
+    ExpressionEncoder
+      .tuple(encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
   }
 
   /**

@@ -45,9 +45,11 @@ class CpuProfileTest extends FunSuite {
 
     assert(CpuProfile.isRunnable(newElem("foo", "bar")))
 
-    assert(!CpuProfile.isRunnable(
+    assert(
+        !CpuProfile.isRunnable(
             newElem("sun.nio.ch.EPollArrayWrapper", "epollWait")))
-    assert(!CpuProfile.isRunnable(
+    assert(
+        !CpuProfile.isRunnable(
             newElem("sun.nio.ch.KQueueArrayWrapper", "kevent0")))
   }
 }

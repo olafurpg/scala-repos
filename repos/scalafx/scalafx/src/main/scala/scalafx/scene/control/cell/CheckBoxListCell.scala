@@ -71,10 +71,13 @@ object CheckBoxListCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
+      message =
+        "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
       since = "1.0")
-  def forListView[T](getSelectedProperty: jfxu.Callback[
-          T, jfxbv.ObservableValue[java.lang.Boolean]]) =
+  def forListView[T](
+      getSelectedProperty: jfxu.Callback[
+          T,
+          jfxbv.ObservableValue[java.lang.Boolean]]) =
     jfxscc.CheckBoxListCell.forListView(getSelectedProperty)
 
   /**
@@ -96,10 +99,12 @@ object CheckBoxListCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
+      message =
+        "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
       since = "1.0")
   def forListView[T](getSelectedProperty: jfxu.Callback[
-                         T, jfxbv.ObservableValue[java.lang.Boolean]],
+                         T,
+                         jfxbv.ObservableValue[java.lang.Boolean]],
                      converter: jfxu.StringConverter[T]) =
     jfxscc.CheckBoxListCell.forListView(getSelectedProperty, converter)
 }
@@ -115,8 +120,8 @@ object CheckBoxListCell {
   * @define SP Function that takes a T instance and return a obsevable boolean.
   */
 class CheckBoxListCell[T](
-    override val delegate: jfxscc.CheckBoxListCell[T] = new jfxscc.CheckBoxListCell[
-          T])
+    override val delegate: jfxscc.CheckBoxListCell[T] =
+      new jfxscc.CheckBoxListCell[T])
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.CheckBoxListCell[T], T, T]
     with StateSelectableCell[jfxscc.CheckBoxListCell[T], T, T]

@@ -22,7 +22,7 @@ trait Enumeratee2TFunctions {
   def cogroupI[J, K, F[_]](
       implicit M: Monad[F],
       order: (J,
-      K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
+              K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
     new Enumeratee2T[J, K, Either3[J, (J, K), K], F] {
       def apply[A] = {
         // Used to 'replay' values from the right for when values from the left order equal
@@ -41,50 +41,50 @@ trait Enumeratee2TFunctions {
           }
         }
 
-        def step(
-            s: StepM[A], rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
+        def step(s: StepM[A],
+                 rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
           s.fold[IterateeT[J, IterateeM, StepM[A]]](
-              cont = contf =>
-                  {
-                  for {
-                    leftOpt <- peek[J, IterateeM]
-                    rightOpt <- lift[J, K, F, Option[K]](peek[K, F])
-                    a <- (leftOpt, rightOpt) match {
-                      case (left, Some(right))
-                          if left.forall(order(_, right) == GT) =>
-                        for {
-                          _ <- lift[J, K, F, Option[K]](head[K, F])
-                          a <- iterateeT[J, IterateeM, StepM[A]](
-                              contf(elInput(Right3(right))) >>==
-                              (step(_, Nil).value))
-                        } yield a
+              cont = contf => {
+                for {
+                  leftOpt <- peek[J, IterateeM]
+                  rightOpt <- lift[J, K, F, Option[K]](peek[K, F])
+                  a <- (leftOpt, rightOpt) match {
+                        case (left, Some(right))
+                            if left.forall(order(_, right) == GT) =>
+                          for {
+                            _ <- lift[J, K, F, Option[K]](head[K, F])
+                            a <- iterateeT[J, IterateeM, StepM[A]](
+                                    contf(elInput(Right3(right))) >>==
+                                      (step(_, Nil).value))
+                          } yield a
 
-                      case (Some(left), right)
-                          if right.forall(order(left, _) == LT) =>
-                        for {
-                          _ <- head[J, IterateeM]
-                          a <- iterateeT[J, IterateeM, StepM[A]](
-                              advance(left, rbuf, scont(contf)) >>==
-                              (step(_, rbuf).value))
-                        } yield a
+                        case (Some(left), right)
+                            if right.forall(order(left, _) == LT) =>
+                          for {
+                            _ <- head[J, IterateeM]
+                            a <- iterateeT[J, IterateeM, StepM[A]](
+                                    advance(left, rbuf, scont(contf)) >>==
+                                      (step(_, rbuf).value))
+                          } yield a
 
-                      case (Some(left), Some(right)) =>
-                        for {
-                          _ <- lift[J, K, F, Option[K]](head[K, F])
-                          a <- step(
-                              s,
-                              if (rbuf.headOption.exists(order(left, _) == EQ))
-                                right :: rbuf else right :: Nil)
-                        } yield a
+                        case (Some(left), Some(right)) =>
+                          for {
+                            _ <- lift[J, K, F, Option[K]](head[K, F])
+                            a <- step(s,
+                                      if (rbuf.headOption.exists(
+                                              order(left, _) == EQ))
+                                        right :: rbuf
+                                      else right :: Nil)
+                          } yield a
 
-                      case _ => done[J, IterateeM, StepM[A]](s, eofInput)
-                    }
-                  } yield a
+                        case _ => done[J, IterateeM, StepM[A]](s, eofInput)
+                      }
+                } yield a
               },
               done = (a, r) =>
-                  done[J, IterateeM, StepM[A]](
-                      sdone(a, if (r.isEof) eofInput else emptyInput),
-                      if (r.isEof) eofInput else emptyInput)
+                done[J, IterateeM, StepM[A]](
+                    sdone(a, if (r.isEof) eofInput else emptyInput),
+                    if (r.isEof) eofInput else emptyInput)
           )
         }
 
@@ -94,21 +94,21 @@ trait Enumeratee2TFunctions {
 
   def joinI[J, K, F[_]](implicit M: Monad[F],
                         ord: (J,
-                        K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
+                              K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
     new Enumeratee2T[J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[(J, K), F, A])
           : StepT[Either3[J, (J, K), K], F, StepT[(J, K), F, A]] = step.fold(
             cont = contf =>
-                scont { in: Input[Either3[J, (J, K), K]] =>
+              scont { in: Input[Either3[J, (J, K), K]] =>
                 val nextInput =
                   in.flatMap(_.middleOr(emptyInput[(J, K)]) { elInput(_) })
 
                 contf(nextInput) >>== (s => cstep(s).pointI)
             },
             done = (a, r) =>
-                sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
-                      if (r.isEof) eofInput else emptyInput)
+              sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
+                    if (r.isEof) eofInput else emptyInput)
         )
 
         (step: StepT[(J, K), F, A]) =>
@@ -118,39 +118,38 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def mergeI[E : Order, F[_]: Monad]: Enumeratee2T[E, E, E, F] =
+  def mergeI[E: Order, F[_]: Monad]: Enumeratee2T[E, E, E, F] =
     new Enumeratee2T[E, E, E, F] {
       def apply[A] = {
         def step(s: StepM[A]): IterateeT[E, IterateeM, StepM[A]] =
           s.fold[IterateeT[E, IterateeM, StepM[A]]](
-              cont = contf =>
-                  {
-                  for {
-                    leftOpt <- peek[E, IterateeM]
-                    rightOpt <- lift[E, E, F, Option[E]](peek[E, F])
-                    a <- (leftOpt, rightOpt) match {
-                      case (left, Some(right)) if left.forall(_ > right) =>
-                        for {
-                          _ <- lift[E, E, F, Option[E]](head[E, F])
-                          a <- iterateeT[E, IterateeM, StepM[A]](
-                              contf(elInput(right)) >>== (step(_).value))
-                        } yield a
+              cont = contf => {
+                for {
+                  leftOpt <- peek[E, IterateeM]
+                  rightOpt <- lift[E, E, F, Option[E]](peek[E, F])
+                  a <- (leftOpt, rightOpt) match {
+                        case (left, Some(right)) if left.forall(_ > right) =>
+                          for {
+                            _ <- lift[E, E, F, Option[E]](head[E, F])
+                            a <- iterateeT[E, IterateeM, StepM[A]](
+                                    contf(elInput(right)) >>== (step(_).value))
+                          } yield a
 
-                      case (Some(left), _) =>
-                        for {
-                          _ <- head[E, IterateeM]
-                          a <- iterateeT[E, IterateeM, StepM[A]](
-                              contf(elInput(left)) >>== (step(_).value))
-                        } yield a
+                        case (Some(left), _) =>
+                          for {
+                            _ <- head[E, IterateeM]
+                            a <- iterateeT[E, IterateeM, StepM[A]](
+                                    contf(elInput(left)) >>== (step(_).value))
+                          } yield a
 
-                      case _ => done[E, IterateeM, StepM[A]](s, eofInput)
-                    }
-                  } yield a
+                        case _ => done[E, IterateeM, StepM[A]](s, eofInput)
+                      }
+                } yield a
               },
               done = (a, r) =>
-                  done[E, IterateeM, StepM[A]](
-                      sdone(a, if (r.isEof) eofInput else emptyInput),
-                      if (r.isEof) eofInput else emptyInput)
+                done[E, IterateeM, StepM[A]](
+                    sdone(a, if (r.isEof) eofInput else emptyInput),
+                    if (r.isEof) eofInput else emptyInput)
           )
 
         step
@@ -165,7 +164,7 @@ trait Enumeratee2TFunctions {
         def cstep(step: StepT[J, F, A])
           : StepT[Either3[J, (J, K), K], F, StepT[J, F, A]] = step.fold(
             cont = contf =>
-                scont { in: Input[Either3[J, (J, K), K]] =>
+              scont { in: Input[Either3[J, (J, K), K]] =>
                 val nextInput =
                   in map {
                     case Left3(j) => j
@@ -176,8 +175,8 @@ trait Enumeratee2TFunctions {
                 contf(nextInput) >>== (s => cstep(s).pointI)
             },
             done = (a, r) =>
-                sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
-                      if (r.isEof) eofInput else emptyInput)
+              sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
+                    if (r.isEof) eofInput else emptyInput)
         )
 
         (step: StepT[J, F, A]) =>

@@ -15,7 +15,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class MigrationTo0_13Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("migrate tasks in zk") {
     val f = new Fixture
@@ -87,7 +89,8 @@ class MigrationTo0_13Test
     And("we run the migration again")
     f.migration.migrateTasks().futureValue
 
-    Then("Only the second task is considered and the first one does not crash the migration")
+    Then(
+        "Only the second task is considered and the first one does not crash the migration")
     val taskKeys2 = f.taskRepo.tasksKeys(appId).futureValue
     taskKeys2 should have size 2
     taskKeys2 should contain(task1.getId)
@@ -162,11 +165,11 @@ class MigrationTo0_13Test
         store = state,
         metrics = metrics,
         newState = () =>
-            MarathonTaskState(
-                MarathonTask
-                  .newBuilder()
-                  .setId(UUID.randomUUID().toString)
-                  .build()),
+          MarathonTaskState(
+              MarathonTask
+                .newBuilder()
+                .setId(UUID.randomUUID().toString)
+                .build()),
         prefix = TaskRepository.storePrefix)
     lazy val taskRepo = {
       val metrics = new Metrics(new MetricRegistry)
@@ -206,8 +209,8 @@ private[state] class LegacyTaskStore(store: PersistentStore) {
     PREFIX + appId.safePath + ID_DELIMITER + taskId
   }
 
-  private[this] def serialize(
-      task: MarathonTask, sink: ObjectOutputStream): Unit = {
+  private[this] def serialize(task: MarathonTask,
+                              sink: ObjectOutputStream): Unit = {
     val size = task.getSerializedSize
     sink.writeInt(size)
     sink.write(task.toByteArray)

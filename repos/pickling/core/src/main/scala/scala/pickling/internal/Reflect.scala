@@ -20,7 +20,8 @@ object Reflect {
     */
   def getField(top: Class[_], name: String): Field = {
     def getFieldHelper(cls: Class[_]): Field = {
-      try cls.getDeclaredField(name) catch {
+      try cls.getDeclaredField(name)
+      catch {
         case nsf: NoSuchFieldException =>
           if ((cls.getSuperclass != null) &&
               (cls.getSuperclass != classOf[Object]) &&
@@ -35,7 +36,8 @@ object Reflect {
 
   def getMethod(top: Class[_], name: String, args: Array[Class[_]]): Method = {
     def getMethodHelper(cls: Class[_]): Method = {
-      try cls.getDeclaredMethod(name, args: _*) catch {
+      try cls.getDeclaredMethod(name, args: _*)
+      catch {
         case nsf: NoSuchMethodException =>
           if ((cls.getSuperclass != null) &&
               cls.getSuperclass != classOf[Object] && cls.getSuperclass != cls)

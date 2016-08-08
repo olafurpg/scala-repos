@@ -87,7 +87,8 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
     case e: WebApplicationException =>
       //scalastyle:off null
       if (Status.fromStatusCode(e.getResponse.getStatus) != null) {
-        Json.obj("message" -> Status
+        Json.obj(
+            "message" -> Status
               .fromStatusCode(e.getResponse.getStatus)
               .getReasonPhrase)
       } else {

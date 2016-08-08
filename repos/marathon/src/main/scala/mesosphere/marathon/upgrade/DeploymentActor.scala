@@ -8,11 +8,19 @@ import mesosphere.marathon.SchedulerActions
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{DeploymentStatus, DeploymentStepFailure, DeploymentStepSuccess}
+import mesosphere.marathon.event.{
+  DeploymentStatus,
+  DeploymentStepFailure,
+  DeploymentStepSuccess
+}
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.state.{AppDefinition, PathId}
-import mesosphere.marathon.upgrade.DeploymentManager.{DeploymentFailed, DeploymentFinished, DeploymentStepInfo}
+import mesosphere.marathon.upgrade.DeploymentManager.{
+  DeploymentFailed,
+  DeploymentFinished,
+  DeploymentStepInfo
+}
 import mesosphere.mesos.Constraints
 import org.apache.mesos.SchedulerDriver
 
@@ -29,7 +37,8 @@ private class DeploymentActor(parent: ActorRef,
                               storage: StorageProvider,
                               healthCheckManager: HealthCheckManager,
                               eventBus: EventStream)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import context.dispatcher
   import mesosphere.marathon.upgrade.DeploymentActor._
@@ -51,8 +60,9 @@ private class DeploymentActor(parent: ActorRef,
       val step = steps.next()
       currentStepNr += 1
       currentStep = Some(step)
-      parent ! DeploymentStepInfo(
-          plan, currentStep.getOrElse(DeploymentStep(Nil)), currentStepNr)
+      parent ! DeploymentStepInfo(plan,
+                                  currentStep.getOrElse(DeploymentStep(Nil)),
+                                  currentStepNr)
 
       performStep(step) onComplete {
         case Success(_) => self ! NextStep
@@ -80,7 +90,8 @@ private class DeploymentActor(parent: ActorRef,
       eventBus.publish(DeploymentStatus(plan, step))
 
       val futures = step.actions.map { action =>
-        healthCheckManager.addAllFor(action.app) // ensure health check actors are in place before tasks are launched
+        healthCheckManager
+          .addAllFor(action.app) // ensure health check actors are in place before tasks are launched
         action match {
           case StartApplication(app, scaleTo) => startApp(app, scaleTo)
           case ScaleApplication(app, scaleTo, toKill) =>
@@ -120,13 +131,13 @@ private class DeploymentActor(parent: ActorRef,
                scaleTo: Int,
                toKill: Option[Iterable[Task]]): Future[Unit] = {
     val runningTasks = taskTracker.appTasksLaunchedSync(app.id)
-    def killToMeetConstraints(
-        notSentencedAndRunning: Iterable[Task], toKillCount: Int) =
+    def killToMeetConstraints(notSentencedAndRunning: Iterable[Task],
+                              toKillCount: Int) =
       Constraints.selectTasksToKill(app, notSentencedAndRunning, toKillCount)
 
     val ScalingProposition(tasksToKill, tasksToStart) =
-      ScalingProposition.propose(
-          runningTasks, toKill, killToMeetConstraints, scaleTo)
+      ScalingProposition
+        .propose(runningTasks, toKill, killToMeetConstraints, scaleTo)
 
     def killTasksIfNeeded: Future[Unit] =
       tasksToKill.fold(Future.successful(())) {
@@ -187,18 +198,19 @@ private class DeploymentActor(parent: ActorRef,
     } else {
       val promise = Promise[Unit]()
       context.actorOf(
-          Props(new TaskReplaceActor(driver,
-                                     taskQueue,
-                                     taskTracker,
-                                     eventBus,
-                                     app,
-                                     promise)))
+          Props(
+              new TaskReplaceActor(driver,
+                                   taskQueue,
+                                   taskTracker,
+                                   eventBus,
+                                   app,
+                                   promise)))
       promise.future
     }
   }
 
-  def resolveArtifacts(
-      app: AppDefinition, urls: Map[URL, String]): Future[Unit] = {
+  def resolveArtifacts(app: AppDefinition,
+                       urls: Map[URL, String]): Future[Unit] = {
     val promise = Promise[Boolean]()
     context.actorOf(
         Props(classOf[ResolveArtifactsActor], app, urls, promise, storage))

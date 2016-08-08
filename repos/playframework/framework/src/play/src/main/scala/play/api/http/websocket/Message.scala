@@ -34,8 +34,8 @@ case class BinaryMessage(data: ByteString) extends Message
   * @param statusCode The close status code.
   * @param reason The reason it was closed.
   */
-case class CloseMessage(
-    statusCode: Option[Int] = Some(CloseCodes.Regular), reason: String = "")
+case class CloseMessage(statusCode: Option[Int] = Some(CloseCodes.Regular),
+                        reason: String = "")
     extends Message
 
 object CloseMessage {

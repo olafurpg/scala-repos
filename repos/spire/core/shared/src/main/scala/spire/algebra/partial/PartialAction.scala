@@ -101,7 +101,9 @@ object RightPartialAction {
   *
   */
 trait PartialAction[P, G]
-    extends Any with LeftPartialAction[P, G] with RightPartialAction[P, G]
+    extends Any
+    with LeftPartialAction[P, G]
+    with RightPartialAction[P, G]
 
 object PartialAction {
   @inline final def apply[P, G](

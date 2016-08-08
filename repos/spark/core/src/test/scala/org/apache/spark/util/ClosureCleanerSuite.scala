@@ -19,7 +19,12 @@ package org.apache.spark.util
 
 import java.io.NotSerializableException
 
-import org.apache.spark.{SparkContext, SparkException, SparkFunSuite, TaskContext}
+import org.apache.spark.{
+  SparkContext,
+  SparkException,
+  SparkFunSuite,
+  TaskContext
+}
 import org.apache.spark.LocalSparkContext._
 import org.apache.spark.partial.CountEvaluator
 import org.apache.spark.rdd.RDD
@@ -77,7 +82,7 @@ class ClosureCleanerSuite extends SparkFunSuite {
         case rse: ReturnStatementInClosureException => // Success!
         case e @ (_: NotSerializableException | _: SparkException) =>
           fail(s"Expected ReturnStatementInClosureException, but got $e.\n" +
-              "This means the closure provided by user is not actually cleaned.")
+            "This means the closure provided by user is not actually cleaned.")
       }
     }
 
@@ -402,8 +407,9 @@ private object TestUserClosuresActuallyCleaned {
     rdd
       .combineByKey({ _ =>
         return; 1
-      }: Int => Int, { case (_, _) => return; 1 }: (Int,
-      Int) => Int, { case (_, _) => return; 1 }: (Int, Int) => Int)
+      }: Int => Int, { case (_, _) => return; 1 }: (Int, Int) => Int, {
+        case (_, _) => return; 1
+      }: (Int, Int) => Int)
       .count()
   }
   def testAggregateByKey(rdd: RDD[(Int, Int)]): Unit = {
@@ -495,27 +501,25 @@ class TestCreateNullValue {
     // Bring in all primitive types into the closure such that they become
     // parameters of the closure constructor. This allows us to test whether
     // null values are created correctly for each type.
-    val nestedClosure = () =>
-      {
-        // scalastyle:off println
-        if (s.toString == "123") {
-          // Don't really output them to avoid noisy
-          println(bo)
-          println(c)
-          println(b)
-          println(s)
-          println(i)
-          println(l)
-          println(f)
-          println(d)
-        }
+    val nestedClosure = () => {
+      // scalastyle:off println
+      if (s.toString == "123") {
+        // Don't really output them to avoid noisy
+        println(bo)
+        println(c)
+        println(b)
+        println(s)
+        println(i)
+        println(l)
+        println(f)
+        println(d)
+      }
 
-        val closure = () =>
-          {
-            println(getX)
-        }
-        // scalastyle:on println
-        ClosureCleaner.clean(closure)
+      val closure = () => {
+        println(getX)
+      }
+      // scalastyle:on println
+      ClosureCleaner.clean(closure)
     }
     nestedClosure()
   }

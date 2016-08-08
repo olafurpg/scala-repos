@@ -74,7 +74,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   /**
     * Writes `data` to a Parquet file, reads it back and check file contents.
     */
-  protected def checkParquetFile[T <: Product : ClassTag : TypeTag](
+  protected def checkParquetFile[T <: Product: ClassTag: TypeTag](
       data: Seq[T]): Unit = {
     withParquetDataFrame(data)(r => checkAnswer(r, data.map(Row.fromTuple)))
   }
@@ -97,7 +97,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
 
   test("SPARK-11694 Parquet logical types are not being tested properly") {
     val parquetSchema =
-      MessageTypeParser.parseMessageType("""message root {
+      MessageTypeParser.parseMessageType(
+          """message root {
         |  required int32 a(INT_8);
         |  required int32 b(INT_16);
         |  required int32 c(DATE);
@@ -124,10 +125,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       val path = new Path(location.getCanonicalPath)
       val conf = sparkContext.hadoopConfiguration
       writeMetadata(parquetSchema, path, conf)
-      readParquetFile(path.toString)(df =>
-            {
-          val sparkTypes = df.schema.map(_.dataType)
-          assert(sparkTypes === expectedSparkTypes)
+      readParquetFile(path.toString)(df => {
+        val sparkTypes = df.schema.map(_.dataType)
+        assert(sparkTypes === expectedSparkTypes)
       })
     }
   }
@@ -300,8 +300,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   test("compression codec") {
     def compressionCodecFor(path: String, codecName: String): String = {
       val codecs = for {
-        footer <- readAllFootersWithoutSummaryFiles(
-            new Path(path), hadoopConfiguration)
+        footer <- readAllFootersWithoutSummaryFiles(new Path(path),
+                                                    hadoopConfiguration)
         block <- footer.getParquetMetadata.getBlocks.asScala
         column <- block.getColumns.asScala
       } yield column.getCodec.name()
@@ -378,7 +378,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         StructType.fromAttributes(ScalaReflection.attributesFor[(Int, String)])
       writeMetadata(schema, path, hadoopConfiguration)
 
-      assert(fs.exists(
+      assert(
+          fs.exists(
               new Path(path, ParquetFileWriter.PARQUET_COMMON_METADATA_FILE)))
       assert(
           fs.exists(new Path(path, ParquetFileWriter.PARQUET_METADATA_FILE)))
@@ -473,7 +474,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         assertResult(df.schema) {
           StructType(
               StructField("a", BooleanType, nullable = true) :: StructField(
-                  "b", IntegerType, nullable = true) :: Nil)
+                  "b",
+                  IntegerType,
+                  nullable = true) :: Nil)
         }
       }
     }
@@ -503,8 +506,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -533,8 +536,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -558,8 +561,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -606,8 +609,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -647,8 +650,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       } finally {
         // Manually clear the hadoop configuration for other tests.
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -659,8 +662,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     val data: Dataset[String] = sqlContext
       .range(200)
       .map(i =>
-            if (i < 150) null
-            else "a")
+        if (i < 150) null
+        else "a")
     val df = data.toDF("col")
     assert(df.agg("col" -> "count").collect().head.getLong(0) == 50)
 
@@ -815,8 +818,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   }
 }
 
-class JobCommitFailureParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class JobCommitFailureParquetOutputCommitter(outputPath: Path,
+                                             context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitJob(jobContext: JobContext): Unit = {
@@ -824,8 +827,8 @@ class JobCommitFailureParquetOutputCommitter(
   }
 }
 
-class TaskCommitFailureParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class TaskCommitFailureParquetOutputCommitter(outputPath: Path,
+                                              context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitTask(context: TaskAttemptContext): Unit = {

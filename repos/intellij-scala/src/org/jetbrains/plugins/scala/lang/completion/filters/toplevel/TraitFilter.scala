@@ -8,7 +8,7 @@ import com.intellij.psi.filters.ElementFilter
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 
-/** 
+/**
   * User: Alexander Podkhalyuzin
   * Date: 03.07.2008
   */

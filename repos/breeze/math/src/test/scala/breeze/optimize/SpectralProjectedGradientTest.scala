@@ -45,8 +45,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class SpectralProjectedGradientTest
-    extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    extends PropSpec
+    with PropertyChecks
+    with OptimizeTestBaseTrait
+    with VectorMatchers
+    with Matchers {
 
   property("optimize a simple multivariate gaussian") {
     val optimizer =
@@ -66,7 +69,8 @@ class SpectralProjectedGradientTest
 
   property("optimize a simple multivariate gaussian with projection") {
     val optimizer = new SpectralProjectedGradient[DenseVector[Double]](
-        tolerance = 1.0E-5, projection = _.map(scala.math.min(_, 2.0)))
+        tolerance = 1.0E-5,
+        projection = _.map(scala.math.min(_, 2.0)))
 
     forAll { init: DenseVector[Double] =>
       init := clip(init, Double.NegativeInfinity, 2.0)

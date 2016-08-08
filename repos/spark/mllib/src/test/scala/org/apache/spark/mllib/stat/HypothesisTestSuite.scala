@@ -19,7 +19,11 @@ package org.apache.spark.mllib.stat
 
 import java.util.Random
 
-import org.apache.commons.math3.distribution.{ExponentialDistribution, NormalDistribution, UniformRealDistribution}
+import org.apache.commons.math3.distribution.{
+  ExponentialDistribution,
+  NormalDistribution,
+  UniformRealDistribution
+}
 import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 
 import org.apache.spark.{SparkException, SparkFunSuite}
@@ -86,8 +90,18 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("chi squared pearson matrix independence") {
-    val data = Array(
-        40.0, 24.0, 29.0, 56.0, 32.0, 42.0, 31.0, 10.0, 0.0, 30.0, 15.0, 12.0)
+    val data = Array(40.0,
+                     24.0,
+                     29.0,
+                     56.0,
+                     32.0,
+                     42.0,
+                     31.0,
+                     10.0,
+                     0.0,
+                     30.0,
+                     15.0,
+                     12.0)
     // [[40.0, 56.0, 31.0, 30.0],
     //  [24.0, 32.0, 10.0, 15.0],
     //  [29.0, 42.0, 0.0,  12.0]]
@@ -222,8 +236,9 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Comparing an exponential sample with mean X to an exponential distribution with mean Y
     // Where X != Y
     val result3 = Statistics.kolmogorovSmirnovTest(sampledExp, expCDF)
-    val referenceStat3 = ksTest.kolmogorovSmirnovStatistic(
-        new ExponentialDistribution(0.2), sampledExp.collect())
+    val referenceStat3 =
+      ksTest.kolmogorovSmirnovStatistic(new ExponentialDistribution(0.2),
+                                        sampledExp.collect())
     val referencePVal3 =
       1 - ksTest.cdf(referenceStat3, sampledNorm.count().toInt)
     // verify vs apache math commons ks test

@@ -33,7 +33,7 @@ abstract class JSEnvTest {
         }
 
       assertFalse("VM shouldn't log errors, warnings or traces. Log:\n" +
-                  log.mkString("\n"),
+                    log.mkString("\n"),
                   hasBadLog)
       assertEquals("Output should match", expectedOut, console.getLog)
     }

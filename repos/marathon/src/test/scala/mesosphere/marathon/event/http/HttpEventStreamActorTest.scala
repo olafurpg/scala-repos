@@ -7,7 +7,10 @@ import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.LeaderInfo
 import mesosphere.marathon.event.LocalLeadershipEvent
-import mesosphere.marathon.event.http.HttpEventStreamActor.{HttpEventStreamConnectionClosed, HttpEventStreamConnectionOpen}
+import mesosphere.marathon.event.http.HttpEventStreamActor.{
+  HttpEventStreamConnectionClosed,
+  HttpEventStreamConnectionOpen
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.test.MarathonActorSupport
 import org.mockito.Mockito.{when => call, verify, verifyNoMoreInteractions}
@@ -16,8 +19,12 @@ import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 import scala.concurrent.duration._
 
 class HttpEventStreamActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with MockitoSugar with ImplicitSender
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with MockitoSugar
+    with ImplicitSender
     with BeforeAndAfter {
 
   test("Register Handler") {

@@ -26,7 +26,11 @@ import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.command.RunnableCommand
-import org.apache.spark.sql.execution.datasources.{BucketSpec, DataSource, LogicalRelation}
+import org.apache.spark.sql.execution.datasources.{
+  BucketSpec,
+  DataSource,
+  LogicalRelation
+}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
@@ -116,14 +120,14 @@ private[hive] case class CreateMetastoreDataSource(
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
           s"Table name ${tableIdent.table} is not a valid name for " +
-          s"metastore. Metastore only accepts table name containing characters, numbers and _.")
+            s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
           s"Database name ${tableIdent.database.get} is not a valid name " +
-          s"for metastore. Metastore only accepts database name containing " +
-          s"characters, numbers and _.")
+            s"for metastore. Metastore only accepts database name containing " +
+            s"characters, numbers and _.")
     }
 
     val tableName = tableIdent.unquotedString
@@ -142,8 +146,8 @@ private[hive] case class CreateMetastoreDataSource(
       if (!options.contains("path") && managedIfNoPath) {
         isExternal = false
         options +
-        ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
+          ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
       } else {
         options
       }
@@ -185,14 +189,14 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
           s"Table name ${tableIdent.table} is not a valid name for " +
-          s"metastore. Metastore only accepts table name containing characters, numbers and _.")
+            s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
           s"Database name ${tableIdent.database.get} is not a valid name " +
-          s"for metastore. Metastore only accepts database name containing " +
-          s"characters, numbers and _.")
+            s"for metastore. Metastore only accepts database name containing " +
+            s"characters, numbers and _.")
     }
 
     val tableName = tableIdent.unquotedString
@@ -203,8 +207,8 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
       if (!options.contains("path")) {
         isExternal = false
         options +
-        ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
+          ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
       } else {
         options
       }
@@ -214,31 +218,33 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
       // Check if we need to throw an exception or just return.
       mode match {
         case SaveMode.ErrorIfExists =>
-          throw new AnalysisException(
-              s"Table $tableName already exists. " +
-              s"If you are using saveAsTable, you can set SaveMode to SaveMode.Append to " +
-              s"insert data into the table or set SaveMode to SaveMode.Overwrite to overwrite" +
-              s"the existing data. " +
-              s"Or, if you are using SQL CREATE TABLE, you need to drop $tableName first.")
+          throw new AnalysisException(s"Table $tableName already exists. " +
+            s"If you are using saveAsTable, you can set SaveMode to SaveMode.Append to " +
+            s"insert data into the table or set SaveMode to SaveMode.Overwrite to overwrite" +
+            s"the existing data. " +
+            s"Or, if you are using SQL CREATE TABLE, you need to drop $tableName first.")
         case SaveMode.Ignore =>
           // Since the table already exists and the save mode is Ignore, we will just return.
           return Seq.empty[Row]
         case SaveMode.Append =>
           // Check if the specified data source match the data source of the existing table.
-          val dataSource = DataSource(
-              sqlContext = sqlContext,
-              userSpecifiedSchema = Some(query.schema.asNullable),
-              partitionColumns = partitionColumns,
-              bucketSpec = bucketSpec,
-              className = provider,
-              options = optionsWithPath)
+          val dataSource = DataSource(sqlContext = sqlContext,
+                                      userSpecifiedSchema =
+                                        Some(query.schema.asNullable),
+                                      partitionColumns = partitionColumns,
+                                      bucketSpec = bucketSpec,
+                                      className = provider,
+                                      options = optionsWithPath)
           // TODO: Check that options from the resolved relation match the relation that we are
           // inserting into (i.e. using the same compression).
 
-          EliminateSubqueryAliases(sqlContext.sessionState.catalog
+          EliminateSubqueryAliases(
+              sqlContext.sessionState.catalog
                 .lookupRelation(tableIdent)) match {
-            case l @ LogicalRelation(
-                _: InsertableRelation | _: HadoopFsRelation, _, _) =>
+            case l @ LogicalRelation(_: InsertableRelation |
+                                     _: HadoopFsRelation,
+                                     _,
+                                     _) =>
               existingSchema = Some(l.schema)
             case o =>
               throw new AnalysisException(

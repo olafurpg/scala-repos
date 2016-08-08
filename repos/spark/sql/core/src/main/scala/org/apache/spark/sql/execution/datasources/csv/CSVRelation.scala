@@ -43,7 +43,8 @@ object CSVRelation extends Logging {
     file.mapPartitionsWithIndex({
       case (split, iter) =>
         new BulkCsvReader(if (params.headerFlag)
-                            iter.filterNot(_ == firstLine) else iter,
+                            iter.filterNot(_ == firstLine)
+                          else iter,
                           params,
                           headers = header)
     }, true)
@@ -81,8 +82,9 @@ object CSVRelation extends Logging {
             s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
         None
       } else if (params.failFast && schemaFields.length != tokens.length) {
-        throw new RuntimeException(s"Malformed line in FAILFAST mode: " +
-            s"${tokens.mkString(params.delimiter.toString)}")
+        throw new RuntimeException(
+            s"Malformed line in FAILFAST mode: " +
+              s"${tokens.mkString(params.delimiter.toString)}")
       } else {
         val indexSafeTokens =
           if (params.permissive && schemaFields.length > tokens.length) {
@@ -115,7 +117,7 @@ object CSVRelation extends Logging {
         } catch {
           case NonFatal(e) if params.dropMalformed =>
             logWarning("Parse exception. " +
-                s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
+              s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
             None
         }
       }
@@ -138,15 +140,16 @@ private[sql] class CsvOutputWriter(path: String,
                                    dataSchema: StructType,
                                    context: TaskAttemptContext,
                                    params: CSVOptions)
-    extends OutputWriter with Logging {
+    extends OutputWriter
+    with Logging {
 
   // create the Generator without separator inserted between 2 records
   private[this] val text = new Text()
 
   private val recordWriter: RecordWriter[NullWritable, Text] = {
     new TextOutputFormat[NullWritable, Text]() {
-      override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+      override def getDefaultWorkFile(context: TaskAttemptContext,
+                                      extension: String): Path = {
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")
@@ -159,8 +162,8 @@ private[sql] class CsvOutputWriter(path: String,
 
   private var firstRow: Boolean = params.headerFlag
 
-  private val csvWriter = new LineCsvWriter(
-      params, dataSchema.fieldNames.toSeq)
+  private val csvWriter =
+    new LineCsvWriter(params, dataSchema.fieldNames.toSeq)
 
   private def rowToString(row: Seq[Any]): Seq[String] = row.map { field =>
     if (field != null) {

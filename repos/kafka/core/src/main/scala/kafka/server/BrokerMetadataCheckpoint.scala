@@ -28,15 +28,16 @@ case class BrokerMetadata(brokerId: Int)
   */
 class BrokerMetadataCheckpoint(val file: File) extends Logging {
   private val lock = new Object()
-  new File(file + ".tmp").delete() // try to delete any existing temp files for cleanliness
+  new File(file + ".tmp")
+    .delete() // try to delete any existing temp files for cleanliness
 
   def write(brokerMetadata: BrokerMetadata) = {
     lock synchronized {
       try {
         val brokerMetaProps = new Properties()
         brokerMetaProps.setProperty("version", 0.toString)
-        brokerMetaProps.setProperty(
-            "broker.id", brokerMetadata.brokerId.toString)
+        brokerMetaProps.setProperty("broker.id",
+                                    brokerMetadata.brokerId.toString)
         val temp = new File(file.getAbsolutePath + ".tmp")
         val fileOutputStream = new FileOutputStream(temp)
         brokerMetaProps.store(fileOutputStream, "")
@@ -67,15 +68,17 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
           case _ =>
             throw new IOException(
                 "Unrecognized version of the server meta.properties file: " +
-                version)
+                  version)
         }
       } catch {
         case e: FileNotFoundException =>
-          warn("No meta.properties file under dir %s".format(
+          warn(
+              "No meta.properties file under dir %s".format(
                   file.getAbsolutePath()))
           None
         case e1: Exception =>
-          error("Failed to read meta.properties file under dir %s due to %s"
+          error(
+              "Failed to read meta.properties file under dir %s due to %s"
                 .format(file.getAbsolutePath(), e1.getMessage))
           throw e1
       }

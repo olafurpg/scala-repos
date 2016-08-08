@@ -31,7 +31,9 @@ import org.apache.spark.serializer.{KryoRegistrator, KryoSerializer}
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkConfSuite
-    extends SparkFunSuite with LocalSparkContext with ResetSystemProperties {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with ResetSystemProperties {
   test("Test byteString conversion") {
     val conf = new SparkConf()
     // Simply exercise the API, we don't need a complete conversion test since that's handled in
@@ -48,7 +50,8 @@ class SparkConfSuite
     // UtilsSuite.scala
     assert(
         conf.getTimeAsMs("fake", "1ms") === TimeUnit.MILLISECONDS.toMillis(1))
-    assert(conf.getTimeAsSeconds("fake", "1000ms") === TimeUnit.MILLISECONDS
+    assert(
+        conf.getTimeAsSeconds("fake", "1000ms") === TimeUnit.MILLISECONDS
           .toSeconds(1000))
   }
 
@@ -162,7 +165,7 @@ class SparkConfSuite
 
     try {
       val t0 = System.currentTimeMillis()
-      while ( (System.currentTimeMillis() - t0) < 1000) {
+      while ((System.currentTimeMillis() - t0) < 1000) {
         val conf = Try(new SparkConf(loadDefaults = true))
         assert(conf.isSuccess === true)
       }
@@ -170,7 +173,7 @@ class SparkConfSuite
       executor.shutdownNow()
       val sysProps = System.getProperties
       for (key <- sysProps.stringPropertyNames().asScala
-                     if key.startsWith("spark.5425.")) sysProps.remove(key)
+           if key.startsWith("spark.5425.")) sysProps.remove(key)
     }
   }
 
@@ -180,17 +183,17 @@ class SparkConfSuite
     conf.registerKryoClasses(Array(classOf[Class1], classOf[Class2]))
     assert(
         conf.get("spark.kryo.classesToRegister") === classOf[Class1].getName +
-        "," + classOf[Class2].getName)
+          "," + classOf[Class2].getName)
 
     conf.registerKryoClasses(Array(classOf[Class3]))
     assert(
         conf.get("spark.kryo.classesToRegister") === classOf[Class1].getName +
-        "," + classOf[Class2].getName + "," + classOf[Class3].getName)
+          "," + classOf[Class2].getName + "," + classOf[Class3].getName)
 
     conf.registerKryoClasses(Array(classOf[Class2]))
     assert(
         conf.get("spark.kryo.classesToRegister") === classOf[Class1].getName +
-        "," + classOf[Class2].getName + "," + classOf[Class3].getName)
+          "," + classOf[Class2].getName + "," + classOf[Class3].getName)
 
     // Kryo doesn't expose a way to discover registered classes, but at least make sure this doesn't
     // blow up.

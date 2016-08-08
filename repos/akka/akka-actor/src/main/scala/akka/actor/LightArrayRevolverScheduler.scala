@@ -36,7 +36,8 @@ import akka.dispatch.AbstractNodeQueue
 class LightArrayRevolverScheduler(config: Config,
                                   log: LoggingAdapter,
                                   threadFactory: ThreadFactory)
-    extends Scheduler with Closeable {
+    extends Scheduler
+    with Closeable {
 
   import Helpers.Requiring
   import Helpers.ConfigOps
@@ -50,8 +51,8 @@ class LightArrayRevolverScheduler(config: Config,
     .requiring(
         _ >= 10.millis || !Helpers.isWindows,
         "minimum supported akka.scheduler.tick-duration on Windows is 10ms")
-    .requiring(
-        _ >= 1.millis, "minimum supported akka.scheduler.tick-duration is 1ms")
+    .requiring(_ >= 1.millis,
+               "minimum supported akka.scheduler.tick-duration is 1ms")
   val ShutdownTimeout =
     config.getMillisDuration("akka.scheduler.shutdown-timeout")
 
@@ -85,21 +86,21 @@ class LightArrayRevolverScheduler(config: Config,
     val sleepMs =
       if (Helpers.isWindows) (nanos + 4999999) / 10000000 * 10
       else (nanos + 999999) / 1000000
-    try Thread.sleep(sleepMs) catch {
+    try Thread.sleep(sleepMs)
+    catch {
       case _: InterruptedException ⇒
         Thread.currentThread.interrupt() // we got woken up
     }
   }
 
-  override def schedule(initialDelay: FiniteDuration,
-                        delay: FiniteDuration,
-                        runnable: Runnable)(
-      implicit executor: ExecutionContext): Cancellable = {
+  override def schedule(
+      initialDelay: FiniteDuration,
+      delay: FiniteDuration,
+      runnable: Runnable)(implicit executor: ExecutionContext): Cancellable = {
     checkMaxDelay(roundUp(delay).toNanos)
     val preparedEC = executor.prepare()
     try new AtomicReference[Cancellable](InitialRepeatMarker)
-    with Cancellable {
-      self ⇒
+    with Cancellable { self ⇒
       compareAndSet(
           InitialRepeatMarker,
           schedule(
@@ -111,10 +112,11 @@ class LightArrayRevolverScheduler(config: Config,
                     val driftNanos = clock() - getAndAdd(delay.toNanos)
                     if (self.get != null)
                       swap(
-                          schedule(preparedEC,
-                                   this,
-                                   Duration.fromNanos(Math.max(
-                                           delay.toNanos - driftNanos, 1))))
+                          schedule(
+                              preparedEC,
+                              this,
+                              Duration.fromNanos(
+                                  Math.max(delay.toNanos - driftNanos, 1))))
                   } catch {
                     case _: SchedulerException ⇒
                     // ignore failure to enqueue or terminated target actor
@@ -147,13 +149,15 @@ class LightArrayRevolverScheduler(config: Config,
 
   override def scheduleOnce(delay: FiniteDuration, runnable: Runnable)(
       implicit executor: ExecutionContext): Cancellable =
-    try schedule(executor.prepare(), runnable, roundUp(delay)) catch {
+    try schedule(executor.prepare(), runnable, roundUp(delay))
+    catch {
       case SchedulerException(msg) ⇒ throw new IllegalStateException(msg)
     }
 
   override def close(): Unit =
     Await.result(stop(), getShutdownTimeout) foreach { task ⇒
-      try task.run() catch {
+      try task.run()
+      catch {
         case e: InterruptedException ⇒ throw e
         case _: SchedulerException ⇒ // ignore terminated actors
         case NonFatal(e) ⇒ log.error(e, "exception while executing timer task")
@@ -171,8 +175,9 @@ class LightArrayRevolverScheduler(config: Config,
   private val wheelMask = WheelSize - 1
   private val queue = new TaskQueue
 
-  private def schedule(
-      ec: ExecutionContext, r: Runnable, delay: FiniteDuration): TimerTask =
+  private def schedule(ec: ExecutionContext,
+                       r: Runnable,
+                       delay: FiniteDuration): TimerTask =
     if (delay <= Duration.Zero) {
       if (stopped.get != null)
         throw new SchedulerException("cannot enqueue after timer shutdown")
@@ -197,7 +202,7 @@ class LightArrayRevolverScheduler(config: Config,
       // 1 second margin in the error message due to rounding
       throw new IllegalArgumentException(
           s"Task scheduled with [${delayNanos.nanos.toSeconds}] seconds delay, " +
-          s"which is too far in future, maximum delay is [${(tickNanos * Int.MaxValue).nanos.toSeconds - 1}] seconds")
+            s"which is too far in future, maximum delay is [${(tickNanos * Int.MaxValue).nanos.toSeconds - 1}] seconds")
 
   private val stopped = new AtomicReference[Promise[immutable.Seq[TimerTask]]]
   private def stop(): Future[immutable.Seq[TimerTask]] = {
@@ -214,106 +219,112 @@ class LightArrayRevolverScheduler(config: Config,
   @volatile private var timerThread: Thread = threadFactory.newThread(
       new Runnable {
 
-    var tick = 0
-    val wheel = Array.fill(WheelSize)(new TaskQueue)
+        var tick = 0
+        val wheel = Array.fill(WheelSize)(new TaskQueue)
 
-    private def clearAll(): immutable.Seq[TimerTask] = {
-      @tailrec
-      def collect(q: TaskQueue, acc: Vector[TimerTask]): Vector[TimerTask] = {
-        q.poll() match {
-          case null ⇒ acc
-          case x ⇒ collect(q, acc :+ x)
+        private def clearAll(): immutable.Seq[TimerTask] = {
+          @tailrec
+          def collect(q: TaskQueue,
+                      acc: Vector[TimerTask]): Vector[TimerTask] = {
+            q.poll() match {
+              case null ⇒ acc
+              case x ⇒ collect(q, acc :+ x)
+            }
+          }
+          ((0 until WheelSize) flatMap (i ⇒
+                                          collect(wheel(i), Vector.empty))) ++ collect(
+              queue,
+              Vector.empty)
         }
-      }
-      ((0 until WheelSize) flatMap (i ⇒ collect(wheel(i), Vector.empty))) ++ collect(
-          queue, Vector.empty)
-    }
 
-    @tailrec
-    private def checkQueue(time: Long): Unit = queue.pollNode() match {
-      case null ⇒ ()
-      case node ⇒
-        node.value.ticks match {
-          case 0 ⇒ node.value.executeTask()
-          case ticks ⇒
-            val futureTick =
-              ((time - start + // calculate the nanos since timer start
-                      (ticks * tickNanos) + // adding the desired delay
-                      tickNanos - 1 // rounding up
-                      ) / tickNanos).toInt // and converting to slot number
-            // tick is an Int that will wrap around, but toInt of futureTick gives us modulo operations
-            // and the difference (offset) will be correct in any case
-            val offset = futureTick - tick
-            val bucket = futureTick & wheelMask
-            node.value.ticks = offset
-            wheel(bucket).addNode(node)
+        @tailrec
+        private def checkQueue(time: Long): Unit = queue.pollNode() match {
+          case null ⇒ ()
+          case node ⇒
+            node.value.ticks match {
+              case 0 ⇒ node.value.executeTask()
+              case ticks ⇒
+                val futureTick =
+                  ((time - start + // calculate the nanos since timer start
+                    (ticks * tickNanos) + // adding the desired delay
+                    tickNanos - 1 // rounding up
+                  ) / tickNanos).toInt // and converting to slot number
+                // tick is an Int that will wrap around, but toInt of futureTick gives us modulo operations
+                // and the difference (offset) will be correct in any case
+                val offset = futureTick - tick
+                val bucket = futureTick & wheelMask
+                node.value.ticks = offset
+                wheel(bucket).addNode(node)
+            }
+            checkQueue(time)
         }
-        checkQueue(time)
-    }
 
-    override final def run =
-      try nextTick() catch {
-        case t: Throwable ⇒
-          log.error(t, "exception on LARS’ timer thread")
-          stopped.get match {
-            case null ⇒
-              val thread = threadFactory.newThread(this)
-              log.info("starting new LARS thread")
-              try thread.start() catch {
-                case e: Throwable ⇒
-                  log.error(
-                      e, "LARS cannot start new thread, ship’s going down!")
-                  stopped.set(Promise successful Nil)
-                  clearAll()
+        override final def run =
+          try nextTick()
+          catch {
+            case t: Throwable ⇒
+              log.error(t, "exception on LARS’ timer thread")
+              stopped.get match {
+                case null ⇒
+                  val thread = threadFactory.newThread(this)
+                  log.info("starting new LARS thread")
+                  try thread.start()
+                  catch {
+                    case e: Throwable ⇒
+                      log.error(
+                          e,
+                          "LARS cannot start new thread, ship’s going down!")
+                      stopped.set(Promise successful Nil)
+                      clearAll()
+                  }
+                  timerThread = thread
+                case p ⇒
+                  assert(stopped.compareAndSet(p, Promise successful Nil),
+                         "Stop signal violated in LARS")
+                  p success clearAll()
               }
-              timerThread = thread
+              throw t
+          }
+
+        @tailrec final def nextTick(): Unit = {
+          val time = clock()
+          val sleepTime = start + (tick * tickNanos) - time
+
+          if (sleepTime > 0) {
+            // check the queue before taking a nap
+            checkQueue(time)
+            waitNanos(sleepTime)
+          } else {
+            val bucket = tick & wheelMask
+            val tasks = wheel(bucket)
+            val putBack = new TaskQueue
+
+            @tailrec def executeBucket(): Unit = tasks.pollNode() match {
+              case null ⇒ ()
+              case node ⇒
+                val task = node.value
+                if (!task.isCancelled) {
+                  if (task.ticks >= WheelSize) {
+                    task.ticks -= WheelSize
+                    putBack.addNode(node)
+                  } else task.executeTask()
+                }
+                executeBucket()
+            }
+            executeBucket()
+            wheel(bucket) = putBack
+
+            tick += 1
+          }
+          stopped.get match {
+            case null ⇒ nextTick()
             case p ⇒
               assert(stopped.compareAndSet(p, Promise successful Nil),
                      "Stop signal violated in LARS")
               p success clearAll()
           }
-          throw t
-      }
-
-    @tailrec final def nextTick(): Unit = {
-      val time = clock()
-      val sleepTime = start + (tick * tickNanos) - time
-
-      if (sleepTime > 0) {
-        // check the queue before taking a nap
-        checkQueue(time)
-        waitNanos(sleepTime)
-      } else {
-        val bucket = tick & wheelMask
-        val tasks = wheel(bucket)
-        val putBack = new TaskQueue
-
-        @tailrec def executeBucket(): Unit = tasks.pollNode() match {
-          case null ⇒ ()
-          case node ⇒
-            val task = node.value
-            if (!task.isCancelled) {
-              if (task.ticks >= WheelSize) {
-                task.ticks -= WheelSize
-                putBack.addNode(node)
-              } else task.executeTask()
-            }
-            executeBucket()
         }
-        executeBucket()
-        wheel(bucket) = putBack
-
-        tick += 1
-      }
-      stopped.get match {
-        case null ⇒ nextTick()
-        case p ⇒
-          assert(stopped.compareAndSet(p, Promise successful Nil),
-                 "Stop signal violated in LARS")
-          p success clearAll()
-      }
-    }
-  })
+      })
 
   timerThread.start()
 }
@@ -355,8 +366,8 @@ object LightArrayRevolverScheduler {
             true
           } catch {
             case _: InterruptedException ⇒ {
-                Thread.currentThread.interrupt(); false
-              }
+              Thread.currentThread.interrupt(); false
+            }
             case NonFatal(e) ⇒ { executionContext.reportFailure(e); false }
           }
       }

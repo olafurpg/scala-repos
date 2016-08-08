@@ -59,12 +59,14 @@ class UseRoleIgnoredMultiJvmNode2 extends UseRoleIgnoredSpec
 class UseRoleIgnoredMultiJvmNode3 extends UseRoleIgnoredSpec
 
 abstract class UseRoleIgnoredSpec
-    extends MultiNodeSpec(UseRoleIgnoredMultiJvmSpec) with MultiNodeClusterSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(UseRoleIgnoredMultiJvmSpec)
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import akka.cluster.routing.UseRoleIgnoredMultiJvmSpec._
 
-  def receiveReplies(
-      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] = {
+  def receiveReplies(routeeType: RouteeType,
+                     expectedReplies: Int): Map[Address, Int] = {
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
     (receiveWhile(5 seconds, messages = expectedReplies) {
       case Reply(`routeeType`, ref) ⇒ fullAddress(ref)
@@ -144,8 +146,8 @@ abstract class UseRoleIgnoredSpec
             ClusterRouterGroup(
                 RoundRobinGroup(paths = Nil),
                 ClusterRouterGroupSettings(totalInstances = 6,
-                                           routeesPaths = List("/user/foo",
-                                                               "/user/bar"),
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
                                            allowLocalRoutees = false,
                                            useRole = role)).props,
             "router-2b")
@@ -209,8 +211,8 @@ abstract class UseRoleIgnoredSpec
             ClusterRouterGroup(
                 RoundRobinGroup(paths = Nil),
                 ClusterRouterGroupSettings(totalInstances = 6,
-                                           routeesPaths = List("/user/foo",
-                                                               "/user/bar"),
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
                                            allowLocalRoutees = true,
                                            useRole = role)).props,
             "router-3b")
@@ -274,8 +276,8 @@ abstract class UseRoleIgnoredSpec
             ClusterRouterGroup(
                 RoundRobinGroup(paths = Nil),
                 ClusterRouterGroupSettings(totalInstances = 6,
-                                           routeesPaths = List("/user/foo",
-                                                               "/user/bar"),
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
                                            allowLocalRoutees = true,
                                            useRole = role)).props,
             "router-4b")
@@ -339,8 +341,8 @@ abstract class UseRoleIgnoredSpec
             ClusterRouterGroup(
                 RoundRobinGroup(paths = Nil),
                 ClusterRouterGroupSettings(totalInstances = 6,
-                                           routeesPaths = List("/user/foo",
-                                                               "/user/bar"),
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
                                            allowLocalRoutees = true,
                                            useRole = role)).props,
             "router-5b")

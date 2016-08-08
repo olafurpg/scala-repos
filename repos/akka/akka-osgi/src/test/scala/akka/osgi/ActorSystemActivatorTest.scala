@@ -13,7 +13,11 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 import akka.util.Timeout
 import de.kalpatec.pojosr.framework.launch.BundleDescriptor
-import test.{RuntimeNameActorSystemActivator, TestActivators, PingPongActorSystemActivator}
+import test.{
+  RuntimeNameActorSystemActivator,
+  TestActivators,
+  PingPongActorSystemActivator
+}
 import test.PingPong._
 import PojoSRTestSupport.bundle
 import org.scalatest.Matchers
@@ -29,13 +33,15 @@ object ActorSystemActivatorTest {
 }
 
 class PingPongActorSystemActivatorTest
-    extends WordSpec with Matchers with PojoSRTestSupport {
+    extends WordSpec
+    with Matchers
+    with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 
   val testBundles: immutable.Seq[BundleDescriptor] = buildTestBundles(
       List(bundle(TEST_BUNDLE_NAME).withActivator(
-              classOf[PingPongActorSystemActivator])))
+          classOf[PingPongActorSystemActivator])))
 
   "PingPongActorSystemActivator" must {
 
@@ -63,13 +69,15 @@ class PingPongActorSystemActivatorTest
 }
 
 class RuntimeNameActorSystemActivatorTest
-    extends WordSpec with Matchers with PojoSRTestSupport {
+    extends WordSpec
+    with Matchers
+    with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 
   val testBundles: immutable.Seq[BundleDescriptor] = buildTestBundles(
       List(bundle(TEST_BUNDLE_NAME).withActivator(
-              classOf[RuntimeNameActorSystemActivator])))
+          classOf[RuntimeNameActorSystemActivator])))
 
   "RuntimeNameActorSystemActivator" must {
 

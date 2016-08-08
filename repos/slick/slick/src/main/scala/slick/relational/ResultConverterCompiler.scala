@@ -39,7 +39,8 @@ trait ResultConverterCompiler[Domain <: ResultConverterDomain] {
           default)
     case TypeMapping(ch, mapper, _) =>
       createTypeMappingResultConverter(
-          compile(ch).asInstanceOf[ResultConverter[Domain, Any]], mapper)
+          compile(ch).asInstanceOf[ResultConverter[Domain, Any]],
+          mapper)
     case RebuildOption(disc, data) =>
       val discConv = createIsDefinedResultConverter(
           compile(disc).asInstanceOf[ResultConverter[Domain, Option[Any]]])
@@ -89,8 +90,10 @@ object ResultConverterCompiler {
 
 /** A node that wraps a ResultConverter */
 final case class CompiledMapping(
-    converter: ResultConverter[_ <: ResultConverterDomain, _], buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    converter: ResultConverter[_ <: ResultConverterDomain, _],
+    buildType: Type)
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = CompiledMapping
   def rebuild = copy()
   override def getDumpInfo = {

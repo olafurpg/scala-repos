@@ -16,7 +16,12 @@
   */
 package kafka.consumer
 
-import kafka.api.{OffsetRequest, Request, FetchRequestBuilder, FetchResponsePartitionData}
+import kafka.api.{
+  OffsetRequest,
+  Request,
+  FetchRequestBuilder,
+  FetchResponsePartitionData
+}
 import kafka.cluster.BrokerEndPoint
 import kafka.message.ByteBufferMessageSet
 import kafka.server.{PartitionFetchState, AbstractFetcherThread}
@@ -31,12 +36,12 @@ class ConsumerFetcherThread(
     sourceBroker: BrokerEndPoint,
     partitionMap: Map[TopicAndPartition, PartitionTopicInfo],
     val consumerFetcherManager: ConsumerFetcherManager)
-    extends AbstractFetcherThread(
-        name = name,
-        clientId = config.clientId,
-        sourceBroker = sourceBroker,
-        fetchBackOffMs = config.refreshLeaderBackoffMs,
-        isInterruptible = true) {
+    extends AbstractFetcherThread(name = name,
+                                  clientId = config.clientId,
+                                  sourceBroker = sourceBroker,
+                                  fetchBackOffMs =
+                                    config.refreshLeaderBackoffMs,
+                                  isInterruptible = true) {
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -94,7 +99,9 @@ class ConsumerFetcherThread(
       case _ => OffsetRequest.LatestTime
     }
     val newOffset = simpleConsumer.earliestOrLatestOffset(
-        topicAndPartition, startTimestamp, Request.OrdinaryConsumerId)
+        topicAndPartition,
+        startTimestamp,
+        Request.OrdinaryConsumerId)
     val pti = partitionMap(topicAndPartition)
     pti.resetFetchOffset(newOffset)
     pti.resetConsumeOffset(newOffset)

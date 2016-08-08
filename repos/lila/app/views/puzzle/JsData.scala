@@ -11,8 +11,7 @@ import lila.puzzle._
 object JsData extends lila.Steroids {
 
   def history(infos: UserInfos) =
-    Json.obj(
-        "attempts" -> infos.history.map { a =>
+    Json.obj("attempts" -> infos.history.map { a =>
       Json.obj("puzzleId" -> a.puzzleId,
                "date" -> a.date,
                "win" -> a.win,

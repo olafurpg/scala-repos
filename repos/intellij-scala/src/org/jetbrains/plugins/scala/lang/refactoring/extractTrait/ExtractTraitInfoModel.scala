@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package lang.refactoring.extractTrait
 
-import com.intellij.refactoring.classMembers.{AbstractMemberInfoModel, MemberInfoChange}
+import com.intellij.refactoring.classMembers.{
+  AbstractMemberInfoModel,
+  MemberInfoChange
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaration
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 

@@ -49,7 +49,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
         parts.files must haveLength(2)
         parts.file("file1") must beSome.like {
           case filePart =>
-            PlayIO.readFileAsString(filePart.ref.file) must_== "the first file\r\n"
+            PlayIO
+              .readFileAsString(filePart.ref.file) must_== "the first file\r\n"
         }
         parts.file("file2") must beSome.like {
           case filePart =>
@@ -60,7 +61,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
 
   "The multipart/form-data parser" should {
     "parse some content" in new WithApplication() {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data; boundary=aabbccddee"
           ))
 
@@ -70,7 +72,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     }
 
     "parse some content that arrives one byte at a time" in new WithApplication() {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data; boundary=aabbccddee"
           ))
 
@@ -81,7 +84,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     }
 
     "return bad request for invalid body" in new WithApplication() {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data" // no boundary
           ))
 
@@ -95,7 +99,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     "validate the full length of the body" in new WithApplication(
         _.configure("play.http.parser.maxDiskBuffer" -> "100")
     ) {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data; boundary=aabbccddee"
           ))
 
@@ -109,7 +114,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     "not parse more than the max data length" in new WithApplication(
         _.configure("play.http.parser.maxMemoryBuffer" -> "30")
     ) {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data; boundary=aabbccddee"
           ))
 
@@ -121,7 +127,8 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     }
 
     "work if there's no crlf at the start" in new WithApplication() {
-      val parser = parse.multipartFormData.apply(FakeRequest().withHeaders(
+      val parser = parse.multipartFormData.apply(
+          FakeRequest().withHeaders(
               CONTENT_TYPE -> "multipart/form-data; boundary=aabbccddee"
           ))
 
@@ -149,15 +156,15 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     }
 
     "parse unquoted content disposition" in {
-      val result = FileInfoMatcher.unapply(
-          Map("content-disposition" -> """form-data; name=document; filename=hello.txt"""))
+      val result = FileInfoMatcher.unapply(Map(
+          "content-disposition" -> """form-data; name=document; filename=hello.txt"""))
       result must not(beEmpty)
       result.get must equalTo(("document", "hello.txt", None))
     }
 
     "ignore extended filename in content disposition" in {
-      val result = FileInfoMatcher.unapply(
-          Map("content-disposition" -> """form-data; name=document; filename=hello.txt; filename*=utf-8''ignored.txt"""))
+      val result = FileInfoMatcher.unapply(Map(
+          "content-disposition" -> """form-data; name=document; filename=hello.txt; filename*=utf-8''ignored.txt"""))
       result must not(beEmpty)
       result.get must equalTo(("document", "hello.txt", None))
     }

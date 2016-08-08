@@ -35,7 +35,7 @@ object Test {
   import scala.reflect.runtime.universe._
   // Complicated by the absence of usable type constructor type tags.
   def extract[A, CC[X]](xs: CC[A]): CC[A] = xs
-  def whatis[T : TypeTag](x: T): Unit = {
+  def whatis[T: TypeTag](x: T): Unit = {
     val tpe = typeOf[T]
     val access = tpe.typeSymbol
       .asInstanceOf[scala.reflect.internal.HasFlags]

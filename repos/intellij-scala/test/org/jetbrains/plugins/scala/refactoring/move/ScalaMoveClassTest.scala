@@ -14,8 +14,14 @@ import com.intellij.refactoring.PackageWrapper
 import com.intellij.refactoring.move.moveClassesOrPackages.SingleSourceRootMoveDestination
 import com.intellij.testFramework.{PlatformTestUtil, PsiTestUtil}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.refactoring.move.ScalaMoveClassesOrPackagesProcessor
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import org.jetbrains.plugins.scala.util.TestUtils
@@ -131,8 +137,9 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     PlatformTestUtil.assertDirectoriesEqual(rootDir2, rootDir)
   }
 
-  private def performAction(
-      classNames: Array[String], newPackageName: String, mode: Kinds.Value) {
+  private def performAction(classNames: Array[String],
+                            newPackageName: String,
+                            mode: Kinds.Value) {
     val classes = new ArrayBuffer[PsiClass]()
     for (name <- classNames) {
       classes ++= ScalaPsiManager

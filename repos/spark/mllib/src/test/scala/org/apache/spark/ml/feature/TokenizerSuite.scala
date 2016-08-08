@@ -29,7 +29,8 @@ import org.apache.spark.sql.{DataFrame, Row}
 case class TokenizerTestData(rawText: String, wantedTokens: Array[String])
 
 class TokenizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -44,7 +45,8 @@ class TokenizerSuite
 }
 
 class RegexTokenizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import org.apache.spark.ml.feature.RegexTokenizerSuite._
@@ -93,7 +95,8 @@ class RegexTokenizerSuite
       .setInputCol("rawText")
       .setOutputCol("tokens")
       .setToLowercase(false)
-    val dataset = sqlContext.createDataFrame(Seq(
+    val dataset = sqlContext.createDataFrame(
+        Seq(
             TokenizerTestData("JAVA SCALA", Array("JAVA", "SCALA")),
             TokenizerTestData("java scala", Array("java", "scala"))
         ))

@@ -29,9 +29,11 @@ import org.apache.spark.internal.Logging
   * the records (bytebuffers) in the log file sequentially and return them as an
   * iterator of bytebuffers.
   */
-private[streaming] class FileBasedWriteAheadLogReader(
-    path: String, conf: Configuration)
-    extends Iterator[ByteBuffer] with Closeable with Logging {
+private[streaming] class FileBasedWriteAheadLogReader(path: String,
+                                                      conf: Configuration)
+    extends Iterator[ByteBuffer]
+    with Closeable
+    with Logging {
 
   private val instream = HdfsUtils.getInputStream(path, conf)
   private var closed =
@@ -62,7 +64,7 @@ private[streaming] class FileBasedWriteAheadLogReader(
         case e: IOException =>
           logWarning(
               "Error while trying to read data. If the file was deleted, " +
-              "this should be okay.",
+                "this should be okay.",
               e)
           close()
           if (HdfsUtils.checkFileExists(path, conf)) {

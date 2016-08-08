@@ -58,15 +58,15 @@ private[round] final class Finisher(messenger: Messenger,
         .pair(g.whitePlayer.userId, g.blackPlayer.userId)
         .flatMap {
           case (whiteO, blackO) => {
-              val finish = FinishGame(g, whiteO, blackO)
-              updateCountAndPerfs(finish) inject {
-                message foreach { messenger.system(g, _) }
-                GameRepo game g.id foreach { newGame =>
-                  bus.publish(finish.copy(game = newGame | g), 'finishGame)
-                }
-                prog.events
+            val finish = FinishGame(g, whiteO, blackO)
+            updateCountAndPerfs(finish) inject {
+              message foreach { messenger.system(g, _) }
+              GameRepo game g.id foreach { newGame =>
+                bus.publish(finish.copy(game = newGame | g), 'finishGame)
               }
+              prog.events
             }
+          }
         }
     }
   }
@@ -77,10 +77,11 @@ private[round] final class Finisher(messenger: Messenger,
       game.player(color).userId foreach { userId =>
         game.perfType foreach { perfType =>
           timeline !
-          (Propagate(GameEnd(playerId = game fullIdOf color,
-                             opponent = game.player(!color).userId,
-                             win = game.winnerColor map (color ==),
-                             perf = perfType.key)) toUser userId)
+            (Propagate(
+                GameEnd(playerId = game fullIdOf color,
+                        opponent = game.player(!color).userId,
+                        win = game.winnerColor map (color ==),
+                        perf = perfType.key)) toUser userId)
         }
       }
   }
@@ -93,7 +94,7 @@ private[round] final class Finisher(messenger: Messenger,
                                                               white,
                                                               black)
       } zip (finish.white ?? incNbGames(finish.game)) zip
-      (finish.black ?? incNbGames(finish.game)) void
+        (finish.black ?? incNbGames(finish.game)) void
     }
 
   private def incNbGames(game: Game)(user: User): Funit = game.finished ?? {
@@ -102,7 +103,8 @@ private[round] final class Finisher(messenger: Messenger,
     UserRepo.incNbGames(user.id,
                         game.rated,
                         game.hasAi,
-                        result = if (game.winnerUserId exists (user.id ==)) 1
+                        result =
+                          if (game.winnerUserId exists (user.id ==)) 1
                           else if (game.loserUserId exists (user.id ==)) -1
                           else 0,
                         totalTime = totalTime,

@@ -39,11 +39,11 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
   @Before
   override def setUp() {
     super.setUp()
-    val props = createBrokerConfigs(
-        2,
-        zkConnect,
-        interBrokerSecurityProtocol = Some(securityProtocol),
-        trustStoreFile = trustStoreFile)
+    val props = createBrokerConfigs(2,
+                                    zkConnect,
+                                    interBrokerSecurityProtocol =
+                                      Some(securityProtocol),
+                                    trustStoreFile = trustStoreFile)
     brokers = props.map(KafkaConfig.fromProps).map(TestUtils.createServer(_))
   }
 
@@ -75,8 +75,9 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
         keySerializer = new StringSerializer,
         valueSerializer = new StringSerializer)
     val records =
-      testMessageList1.map(m => new ProducerRecord(topic1, m, m)) ++ testMessageList2
-        .map(m => new ProducerRecord(topic2, m, m))
+      testMessageList1
+        .map(m => new ProducerRecord(topic1, m, m)) ++ testMessageList2.map(
+          m => new ProducerRecord(topic2, m, m))
     records.map(producer.send).foreach(_.get)
     producer.close()
 
@@ -88,10 +89,10 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
           brokers.head.getLogManager().getLog(topicAndPart).get.logEndOffset
         result = result && expectedOffset > 0 && brokers.forall { item =>
           (expectedOffset == item
-                .getLogManager()
-                .getLog(topicAndPart)
-                .get
-                .logEndOffset)
+            .getLogManager()
+            .getLog(topicAndPart)
+            .get
+            .logEndOffset)
         }
       }
       result

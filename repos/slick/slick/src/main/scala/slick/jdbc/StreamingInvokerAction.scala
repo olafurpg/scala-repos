@@ -12,8 +12,7 @@ import slick.util.{DumpInfo, CloseableIterator, ignoreFollowOnError}
   */
 trait StreamingInvokerAction[R, T, -E <: Effect]
     extends SynchronousDatabaseAction[R, Streaming[T], JdbcBackend, E]
-    with FixedSqlStreamingAction[R, T, E] {
-  self =>
+    with FixedSqlStreamingAction[R, T, E] { self =>
 
   protected[this] def createInvoker(sql: Iterable[String]): Invoker[T]
   protected[this] def createBuilder: Builder[T, R]
@@ -36,20 +35,21 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
     var count = 0L
     try {
       while (if (bufferNext) it.hasNext && count < limit
-      else count < limit && it.hasNext) {
+             else count < limit && it.hasNext) {
         count += 1
         ctx.emit(it.next())
       }
     } catch {
       case NonFatal(ex) =>
-        try it.close() catch ignoreFollowOnError
+        try it.close()
+        catch ignoreFollowOnError
         throw ex
     }
     if (if (bufferNext) it.hasNext else count == limit) it else null
   }
 
-  override final def cancelStream(
-      ctx: JdbcBackend#StreamingContext, state: StreamState): Unit =
+  override final def cancelStream(ctx: JdbcBackend#StreamingContext,
+                                  state: StreamState): Unit =
     state.close()
 
   override def getDumpInfo =

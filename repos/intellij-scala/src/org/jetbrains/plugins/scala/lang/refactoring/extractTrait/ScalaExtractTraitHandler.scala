@@ -15,7 +15,11 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScNewTemplateDefinition, ScSuperReference}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScNewTemplateDefinition,
+  ScSuperReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
@@ -54,8 +58,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       case Array(clazz: ScTemplateDefinition) => clazz
       case _ =>
         val parent = PsiTreeUtil.findCommonParent(elements: _*)
-        PsiTreeUtil.getParentOfType(
-            parent, classOf[ScTemplateDefinition], false)
+        PsiTreeUtil
+          .getParentOfType(parent, classOf[ScTemplateDefinition], false)
     }
 
     if (dataContext != null) {
@@ -86,8 +90,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     if (messages.nonEmpty) throw new RuntimeException(messages.mkString("\n"))
     inWriteCommandAction(project, "Extract trait") {
       val traitText = "trait ExtractedTrait {\n\n}"
-      val newTrt = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-          traitText, clazz.getContext, clazz)
+      val newTrt = ScalaPsiElementFactory
+        .createTemplateDefinitionFromText(traitText, clazz.getContext, clazz)
       val newTrtAdded = clazz match {
         case anon: ScNewTemplateDefinition =>
           val tBody =
@@ -101,8 +105,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     }
   }
 
-  private def invokeOnClass(
-      clazz: ScTemplateDefinition, project: Project, editor: Editor) {
+  private def invokeOnClass(clazz: ScTemplateDefinition,
+                            project: Project,
+                            editor: Editor) {
     if (clazz == null) return
 
     UsageTrigger.trigger(ScalaBundle.message("extract.trait.id"))
@@ -115,8 +120,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     val extractInfo = new ExtractInfo(clazz, memberInfos)
     extractInfo.collect()
 
-    val isOk = ExtractSuperClassUtil.showConflicts(
-        dialog, extractInfo.conflicts, clazz.getProject)
+    val isOk = ExtractSuperClassUtil
+      .showConflicts(dialog, extractInfo.conflicts, clazz.getProject)
     if (!isOk) return
 
     val name = dialog.getTraitName
@@ -135,8 +140,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     addSelfType(trt, extractInfo.selfTypeText)
     addTypeParameters(trt, extractInfo.typeParameters)
     ExtractSuperUtil.addExtendsTo(clazz, trt, extractInfo.typeArgs)
-    val pullUpProcessor = new ScalaPullUpProcessor(
-        clazz.getProject, clazz, trt, memberInfos)
+    val pullUpProcessor =
+      new ScalaPullUpProcessor(clazz.getProject, clazz, trt, memberInfos)
     pullUpProcessor.moveMembersToBase()
   }
 
@@ -146,8 +151,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       case Some(selfTpe) =>
         val traitText = s"trait ${trt.name} {\n$selfTpe\n}"
         val dummyTrait =
-          ScalaPsiElementFactory.createTemplateDefinitionFromText(
-              traitText, trt.getParent, trt)
+          ScalaPsiElementFactory
+            .createTemplateDefinitionFromText(traitText, trt.getParent, trt)
         val selfTypeElem = dummyTrait.extendsBlock.selfTypeElement.get
         val extendsBlock = trt.extendsBlock
         val templateBody = extendsBlock.templateBody match {
@@ -160,7 +165,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
         val lBrace = templateBody.getFirstChild
         val ste = templateBody.addAfter(selfTypeElem, lBrace)
         templateBody.addAfter(
-            ScalaPsiElementFactory.createNewLine(trt.getManager), lBrace)
+            ScalaPsiElementFactory.createNewLine(trt.getManager),
+            lBrace)
         ScalaPsiUtil.adjustTypes(ste)
     }
   }
@@ -169,7 +175,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     if (typeParamsText == null || typeParamsText.isEmpty) return
     val clause =
       ScalaPsiElementFactory.createTypeParameterClauseFromTextWithContext(
-          typeParamsText, trt, trt.nameId)
+          typeParamsText,
+          trt,
+          trt.nameId)
     trt.addAfter(clause, trt.nameId)
   }
 
@@ -189,8 +197,10 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
         else pckg.getDirectories()(0)
       }
     ScalaDirectoryService
-      .createClassFromTemplate(
-          dir, name, "Scala Trait", askToDefineVariables = false)
+      .createClassFromTemplate(dir,
+                               name,
+                               "Scala Trait",
+                               askToDefineVariables = false)
       .asInstanceOf[ScTrait]
   }
 
@@ -259,8 +269,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       }
     }
 
-    private def collectConflicts(
-        ref: ScReferenceElement, resolve: PsiElement) {
+    private def collectConflicts(ref: ScReferenceElement,
+                                 resolve: PsiElement) {
       resolve match {
         case named: PsiNamedElement =>
           ScalaPsiUtil.nameContext(named) match {
@@ -272,7 +282,7 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
               conflicts.putValue(m, message)
             case m: ScMember
                 if clazz.isInstanceOf[ScNewTemplateDefinition] &&
-                m.containingClass == clazz && !selected.contains(m) =>
+                  m.containingClass == clazz && !selected.contains(m) =>
               val message = ScalaBundle.message(
                   "member.of.anonymous.class.cannot.be.used.in.extracted.member",
                   named.name,
@@ -280,8 +290,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
               conflicts.putValue(m, message)
             case m: PsiMember
                 if m.containingClass != null &&
-                ref.qualifier.exists(_.isInstanceOf[ScSuperReference]) &&
-                clazz.isInheritor(m.containingClass, deep = true) =>
+                  ref.qualifier.exists(_.isInstanceOf[ScSuperReference]) &&
+                  clazz.isInheritor(m.containingClass, deep = true) =>
               val message = ScalaBundle.message(
                   "super.reference.used.in.extracted.member",
                   currentMemberName)
@@ -334,8 +344,8 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
 
       classesForSelfType.foreach {
         case cl: PsiClass if cl.getTypeParameters.nonEmpty =>
-          val message = ScalaBundle.message(
-              "type.parameters.for.self.type.not.supported", cl.name)
+          val message = ScalaBundle
+            .message("type.parameters.for.self.type.not.supported", cl.name)
           conflicts.putValue(cl, message)
         case _ =>
       }

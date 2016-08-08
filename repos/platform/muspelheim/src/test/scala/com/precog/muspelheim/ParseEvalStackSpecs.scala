@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -80,10 +80,11 @@ trait ActorPlatformSpecs {
 }
 
 trait TestStackLike[M[+ _]]
-    extends ParseEvalStack[M] with EchoHttpClientModule[M]
-    with MemoryDatasetConsumer[M] with IdSourceScannerModule
-    with EvalStackLike {
-  self =>
+    extends ParseEvalStack[M]
+    with EchoHttpClientModule[M]
+    with MemoryDatasetConsumer[M]
+    with IdSourceScannerModule
+    with EvalStackLike { self =>
   import TestStack._
 
   protected lazy val parseEvalLogger =
@@ -120,8 +121,11 @@ trait TestStackLike[M[+ _]]
                                             Path.Root,
                                             AccountPlan.Free)
   private def dummyEvaluationContext =
-    EvaluationContext(
-        "dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
+    EvaluationContext("dummyAPIKey",
+                      dummyAccount,
+                      Path.Root,
+                      Path.Root,
+                      new DateTime)
 
   def eval(str: String, debug: Boolean = false): Set[SValue] =
     evalE(str, debug) map { _._2 }
@@ -132,8 +136,9 @@ trait TestStackLike[M[+ _]]
     val preForest = compile(str)
     val forest = preForest filter { _.errors filterNot isWarning isEmpty }
 
-    assert(forest.size == 1 ||
-        preForest.forall(_.errors filterNot isWarning isEmpty))
+    assert(
+        forest.size == 1 ||
+          preForest.forall(_.errors filterNot isWarning isEmpty))
     val tree = forest.head
 
     val Right(dag) = decorate(emit(tree))

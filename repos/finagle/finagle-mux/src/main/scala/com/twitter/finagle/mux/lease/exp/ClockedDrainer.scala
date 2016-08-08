@@ -3,8 +3,19 @@ package com.twitter.finagle.mux.lease.exp
 import com.twitter.app.GlobalFlag
 import com.twitter.conversions.storage.intToStorageUnitableWholeNumber
 import com.twitter.conversions.time._
-import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver, DefaultStatsReceiver}
-import com.twitter.util.{Duration, Stopwatch, StorageUnit, Timer, Time, NilStopwatch}
+import com.twitter.finagle.stats.{
+  StatsReceiver,
+  NullStatsReceiver,
+  DefaultStatsReceiver
+}
+import com.twitter.util.{
+  Duration,
+  Stopwatch,
+  StorageUnit,
+  Timer,
+  Time,
+  NilStopwatch
+}
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -39,8 +50,8 @@ private[finagle] class ClockedDrainer(
     lr: LogsReceiver = NullLogsReceiver,
     statsReceiver: StatsReceiver = NullStatsReceiver,
     verbose: Boolean = false
-)
-    extends Thread("GcDrainer") with Lessor {
+) extends Thread("GcDrainer")
+    with Lessor {
 
   private[this] val lessees =
     Collections.newSetFromMap(new ConcurrentHashMap[Lessee, java.lang.Boolean])
@@ -146,8 +157,9 @@ private[finagle] class ClockedDrainer(
 
     coord.sleepUntilDiscountRemaining(space, { () =>
       if (verbose) {
-        log.info("AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
-            coord.counter + "; space=" + space)
+        log.info(
+            "AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
+              coord.counter + "; space=" + space)
       }
 
       // discount (bytes) / rate (bytes / second) == expiry (seconds)
@@ -185,8 +197,8 @@ private[finagle] class ClockedDrainer(
     if (verbose) {
       log.info(
           "AWAIT-DRAIN: n=" + npending() + "; clock=" + coord.counter +
-          "; space=" + space + "; maxWaitMs=" + maxWait.inMilliseconds +
-          "; minDiscount=" + space.minDiscount)
+            "; space=" + space + "; maxWaitMs=" + maxWait.inMilliseconds +
+            "; minDiscount=" + space.minDiscount)
     }
 
     coord.sleepUntilFinishedDraining(space, maxWait, npending, log)
@@ -202,8 +214,9 @@ private[finagle] class ClockedDrainer(
     if (coord.counter.info.generation() == generation) {
       val n = npending()
       if (verbose)
-        log.info("FORCE-GC: n=" + n + "; clock=" + coord.counter + "; space=" +
-            space)
+        log.info(
+            "FORCE-GC: n=" + n + "; clock=" + coord.counter + "; space=" +
+              space)
 
       lr.record("byteLeft", coord.counter.info.remaining().inBytes.toString)
 
@@ -288,8 +301,9 @@ private[finagle] object ClockedDrainer {
     if (drainerEnabled()) {
       Coordinator.create() match {
         case None =>
-          log.warning("Failed to acquire a ParNew+CMS Coordinator; cannot " +
-              "construct drainer")
+          log.warning(
+              "Failed to acquire a ParNew+CMS Coordinator; cannot " +
+                "construct drainer")
           Lessor.nil
         case Some(coord) =>
           val rSnooper = new RequestSnooper(

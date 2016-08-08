@@ -5,8 +5,8 @@ trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[
       Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[
       Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream]
-  with BindRec[Stream] with Zip[Stream] with Unzip[Stream]
-  with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream]
+  with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] =
       map(cojoin(fa))(f)
@@ -40,8 +40,8 @@ trait StreamInstances {
         implicit M: Monoid[B]) =
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
 
-    override def foldRight[A, B](
-        fa: Stream[A], z: => B)(f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A,
+                                                             => B) => B): B =
       if (fa.isEmpty) z
       else f(fa.head, foldRight(fa.tail, z)(f))
 
@@ -55,8 +55,8 @@ trait StreamInstances {
         Stream.cons(f(fa.head, fb.headOption), zipWithL(fa.tail, bTail)(f))
       }
 
-    override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(
-        f: (Option[A], B) => C) =
+    override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A],
+                                                                     B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
     override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] =
@@ -203,15 +203,13 @@ trait StreamFunctions {
 
   final def unfoldForest[A, B](as: Stream[A])(
       f: A => (B, () => Stream[A])): Stream[Tree[B]] =
-    as.map(
-        a =>
-          {
-        def unfoldTree(x: A): Tree[B] =
-          f(x) match {
-            case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
-          }
+    as.map(a => {
+      def unfoldTree(x: A): Tree[B] =
+        f(x) match {
+          case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
+        }
 
-        unfoldTree(a)
+      unfoldTree(a)
     })
 
   final def unfoldForestM[A, B, M[_]: Monad](as: Stream[A])(
@@ -223,8 +221,8 @@ trait StreamFunctions {
 
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
-            Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))(
-                (ts: Stream[Tree[B]]) => Tree.Node(abs._1, ts)))
+        Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))(
+            (ts: Stream[Tree[B]]) => Tree.Node(abs._1, ts)))
 
     mapM(as, unfoldTreeM)
   }

@@ -14,8 +14,9 @@ object Version {
   def versionSettings: Seq[Setting[_]] =
     inConfig(Compile)(
         Seq(
-            resourceGenerators <+= generateVersion(
-                resourceManaged, _ / "version.conf", """|akka.version = "%s"
+            resourceGenerators <+= generateVersion(resourceManaged,
+                                                   _ / "version.conf",
+                                                   """|akka.version = "%s"
          |"""),
             sourceGenerators <+= generateVersion(sourceManaged,
                                                  _ / "akka" / "Version.scala",
@@ -27,8 +28,9 @@ object Version {
          |""")
         ))
 
-  def generateVersion(
-      dir: SettingKey[File], locate: File => File, template: String) =
+  def generateVersion(dir: SettingKey[File],
+                      locate: File => File,
+                      template: String) =
     Def.task[Seq[File]] {
       val file = locate(dir.value)
       val content = template.stripMargin.format(version.value)

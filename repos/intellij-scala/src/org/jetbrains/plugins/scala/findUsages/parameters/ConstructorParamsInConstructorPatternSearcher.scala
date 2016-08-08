@@ -11,7 +11,10 @@ import com.intellij.usages.{Usage, UsageInfoToUsageConverter}
 import com.intellij.util.Processor
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScConstructorPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 
@@ -46,9 +49,10 @@ class ConstructorParamsInConstructorPatternSearcher
                     inReadAction {
                       val descriptor =
                         new UsageInfoToUsageConverter.TargetElementsDescriptor(
-                            Array(), Array(only))
-                      val usage = UsageInfoToUsageConverter.convert(
-                          descriptor, new UsageInfo(t))
+                            Array(),
+                            Array(only))
+                      val usage = UsageInfoToUsageConverter
+                        .convert(descriptor, new UsageInfo(t))
                       processor0.process(usage)
                     }
                   }
@@ -66,7 +70,8 @@ class ConstructorParamsInConstructorPatternSearcher
       inReadAction {
         if (!param.isValid) return None
 
-        PsiTreeUtil.getParentOfType(param, classOf[ScPrimaryConstructor]) match {
+        PsiTreeUtil
+          .getParentOfType(param, classOf[ScPrimaryConstructor]) match {
           case pc @ ScPrimaryConstructor.ofClass(cls) if cls.isCase =>
             pc.parameters.indexOf(param) match {
               case -1 => None

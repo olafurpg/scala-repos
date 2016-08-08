@@ -49,7 +49,8 @@ object OpenHashMap {
   *  @define willNotTerminateInf
   */
 class OpenHashMap[Key, Value](initialSize: Int)
-    extends AbstractMap[Key, Value] with Map[Key, Value]
+    extends AbstractMap[Key, Value]
+    with Map[Key, Value]
     with MapLike[Key, Value, OpenHashMap[Key, Value]] {
 
   import OpenHashMap.OpenEntry
@@ -91,8 +92,8 @@ class OpenHashMap[Key, Value](initialSize: Int)
     val oldTable = table
     table = new Array[Entry](newSize)
     mask = newSize - 1
-    oldTable.foreach(
-        entry => if (entry != null && entry.value != None) addEntry(entry))
+    oldTable.foreach(entry =>
+      if (entry != null && entry.value != None) addEntry(entry))
     deleted = 0
   }
 
@@ -103,9 +104,9 @@ class OpenHashMap[Key, Value](initialSize: Int)
 
   /** Return the index of the first slot in the hash table (in probe order)
     * that either is empty, or is or was last occupied by the given key.
-    * 
+    *
     * This method is an optimization for when the hash value is in hand.
-    * 
+    *
     * @param hash hash value for `key`
     */
   private[this] def findIndex(key: Key, hash: Int): Int = {
@@ -114,7 +115,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
     var index = hash & mask
     var perturb = index
     while (table(index) != null && !(table(index).hash == hash &&
-        table(index).key == key)) {
+             table(index).key == key)) {
       j = 5 * j + 1 + perturb
       perturb >>= 5
       index = j & mask
@@ -205,8 +206,8 @@ class OpenHashMap[Key, Value](initialSize: Int)
 
     private[this] def advance() {
       if (initialModCount != modCount) sys.error("Concurrent modification")
-      while ( (index <= mask) &&
-      (table(index) == null || table(index).value == None)) index += 1
+      while ((index <= mask) &&
+             (table(index) == null || table(index).value == None)) index += 1
     }
 
     def hasNext = { advance(); index <= mask }
@@ -238,11 +239,9 @@ class OpenHashMap[Key, Value](initialSize: Int)
     */
   override def foreach[U](f: ((Key, Value)) => U) {
     val startModCount = modCount
-    foreachUndeletedEntry(
-        entry =>
-          {
-        if (modCount != startModCount) sys.error("Concurrent Modification")
-        f((entry.key, entry.value.get))
+    foreachUndeletedEntry(entry => {
+      if (modCount != startModCount) sys.error("Concurrent Modification")
+      f((entry.key, entry.value.get))
     })
   }
 
@@ -257,9 +256,8 @@ class OpenHashMap[Key, Value](initialSize: Int)
   }
 
   override def retain(f: (Key, Value) => Boolean) = {
-    foreachUndeletedEntry(
-        entry =>
-          if (!f(entry.key, entry.value.get)) {
+    foreachUndeletedEntry(entry =>
+      if (!f(entry.key, entry.value.get)) {
         entry.value = None; size -= 1; deleted += 1
     })
     this

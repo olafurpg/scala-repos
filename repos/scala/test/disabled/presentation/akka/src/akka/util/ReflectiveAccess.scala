@@ -32,8 +32,8 @@ object ReflectiveAccess {
     * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
     */
   object Remote {
-    val TRANSPORT = Config.config.getString(
-        "akka.remote.layer", "akka.remote.netty.NettyRemoteSupport")
+    val TRANSPORT = Config.config
+      .getString("akka.remote.layer", "akka.remote.netty.NettyRemoteSupport")
 
     private[akka] val configDefaultAddress = new InetSocketAddress(
         Config.config.getString("akka.remote.server.hostname", "localhost"),
@@ -56,8 +56,9 @@ object ReflectiveAccess {
 
     protected[akka] val defaultRemoteSupport: Option[() => RemoteSupport] =
       remoteSupportClass map { remoteClass => () =>
-        createInstance[RemoteSupport](
-            remoteClass, Array[Class[_]](), Array[AnyRef]()) match {
+        createInstance[RemoteSupport](remoteClass,
+                                      Array[Class[_]](),
+                                      Array[AnyRef]()) match {
           case Right(value) => value
           case Left(exception) =>
             val e = new ModuleNotAvailableException(
@@ -100,8 +101,8 @@ object ReflectiveAccess {
           None
       }
 
-    def resolveFutureIfMessageIsJoinPoint(
-        message: Any, future: Future[_]): Boolean = {
+    def resolveFutureIfMessageIsJoinPoint(message: Any,
+                                          future: Future[_]): Boolean = {
       ensureEnabled
       if (typedActorObjectInstance.get.isJoinPointAndOneWay(message)) {
         future
@@ -188,7 +189,8 @@ object ReflectiveAccess {
 
   //Obtains a reference to fqn.MODULE$
   def getObjectFor[T](
-      fqn: String, classloader: ClassLoader = loader): Either[Exception, T] =
+      fqn: String,
+      classloader: ClassLoader = loader): Either[Exception, T] =
     try {
       getClassFor(fqn) match {
         case Right(value) =>

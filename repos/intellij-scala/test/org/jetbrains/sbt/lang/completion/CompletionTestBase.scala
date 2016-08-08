@@ -17,7 +17,8 @@ import org.jetbrains.sbt.resolvers.SbtResolverIndexesManager
   * @since 7/17/14.
   */
 abstract class CompletionTestBase
-    extends completion.CompletionTestBase with MockSbt {
+    extends completion.CompletionTestBase
+    with MockSbt {
 
   override def folderPath = super.folderPath + "Sbt/"
   override def testFileExt = ".sbt"
@@ -35,8 +36,9 @@ abstract class CompletionTestBase
     assert(file != null, "file " + filePath + " not found")
     val fileText =
       Sbt.DefaultImplicitImports.map("import " + _).mkString("\n") + "\n" +
-      StringUtil.convertLineSeparators(FileUtil.loadFile(
-              new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+        StringUtil.convertLineSeparators(
+            FileUtil.loadFile(new File(file.getCanonicalPath),
+                              CharsetToolkit.UTF8))
     val mockFile = new LightVirtualFile(fileName, fileText)
     assert(mockFile != null, "Mock file can not be created")
     (fileName, mockFile)
@@ -51,8 +53,8 @@ abstract class CompletionTestBase
   override def checkResult(got: Array[String], _expected: String) {
     import scala.collection.JavaConversions._
     val expected = _expected.split("\n")
-    UsefulTestCase.assertContainsElements[String](
-        got.toSet.toSeq, expected.toSeq)
+    UsefulTestCase
+      .assertContainsElements[String](got.toSet.toSeq, expected.toSeq)
   }
 
   override def setUp() {

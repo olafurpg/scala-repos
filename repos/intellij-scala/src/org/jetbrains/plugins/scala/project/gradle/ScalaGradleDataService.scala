@@ -5,16 +5,32 @@ import java.io.File
 import java.util
 
 import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.externalSystem.model.{DataNode, ExternalSystemException, ProjectKeys}
-import com.intellij.openapi.externalSystem.service.notification.{ExternalSystemNotificationManager, NotificationSource, NotificationCategory, NotificationData}
-import com.intellij.openapi.externalSystem.service.project.{IdeModifiableModelsProvider, IdeModelsProvider}
+import com.intellij.openapi.externalSystem.model.{
+  DataNode,
+  ExternalSystemException,
+  ProjectKeys
+}
+import com.intellij.openapi.externalSystem.service.notification.{
+  ExternalSystemNotificationManager,
+  NotificationSource,
+  NotificationCategory,
+  NotificationData
+}
+import com.intellij.openapi.externalSystem.service.project.{
+  IdeModifiableModelsProvider,
+  IdeModelsProvider
+}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.libraries.Library
 import org.jetbrains.plugins.gradle.model.data.ScalaModelData
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.scala.project._
-import org.jetbrains.sbt.project.data.service.{Importer, AbstractImporter, AbstractDataService}
+import org.jetbrains.sbt.project.data.service.{
+  Importer,
+  AbstractImporter,
+  AbstractDataService
+}
 
 import scala.collection.JavaConverters._
 
@@ -28,8 +44,10 @@ class ScalaGradleDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ScalaModelData] =
-    new ScalaGradleDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new ScalaGradleDataService.Importer(toImport,
+                                        projectData,
+                                        project,
+                                        modelsProvider)
 }
 
 private object ScalaGradleDataService {
@@ -38,8 +56,10 @@ private object ScalaGradleDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ScalaModelData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[ScalaModelData](dataToImport,
+                                               projectData,
+                                               project,
+                                               modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -54,8 +74,8 @@ private object ScalaGradleDataService {
         configureScalaSdk(module, compilerClasspath)
       }
 
-    private def configureScalaSdk(
-        module: Module, compilerClasspath: Seq[File]): Unit = {
+    private def configureScalaSdk(module: Module,
+                                  compilerClasspath: Seq[File]): Unit = {
       val compilerVersionOption =
         findScalaLibraryIn(compilerClasspath).flatMap(getVersionFromJar)
       if (compilerVersionOption.isEmpty) {
@@ -109,7 +129,8 @@ private object ScalaGradleDataService {
 
         val additionalOptions =
           if (options.getAdditionalParameters != null)
-            options.getAdditionalParameters.asScala else Seq.empty
+            options.getAdditionalParameters.asScala
+          else Seq.empty
 
         presentations.flatMap((include _).tupled) ++ additionalOptions
       }

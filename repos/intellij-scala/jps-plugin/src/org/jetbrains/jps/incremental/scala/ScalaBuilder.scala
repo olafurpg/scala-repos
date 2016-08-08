@@ -10,8 +10,16 @@ import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.ModuleChunk
 import org.jetbrains.jps.builders.java.JavaBuilderUtil
 import org.jetbrains.jps.incremental._
-import org.jetbrains.jps.incremental.messages.{BuildMessage, CompilerMessage, ProgressMessage}
-import org.jetbrains.jps.incremental.scala.data.{CompilationData, CompilerData, SbtData}
+import org.jetbrains.jps.incremental.messages.{
+  BuildMessage,
+  CompilerMessage,
+  ProgressMessage
+}
+import org.jetbrains.jps.incremental.scala.data.{
+  CompilationData,
+  CompilerData,
+  SbtData
+}
 import org.jetbrains.jps.incremental.scala.local.LocalServer
 import org.jetbrains.jps.incremental.scala.model.IncrementalityType
 import org.jetbrains.jps.incremental.scala.remote.RemoteServer
@@ -58,7 +66,7 @@ object ScalaBuilder {
     def getPreviousIncrementalType: Option[IncrementalityType] = {
       storageFile.filter(_.exists).flatMap { file =>
         val result = using(new DataInputStream(
-                new BufferedInputStream(new FileInputStream(file)))) { in =>
+            new BufferedInputStream(new FileInputStream(file)))) { in =>
           try {
             Some(IncrementalityType.valueOf(in.readUTF()))
           } catch {
@@ -76,7 +84,8 @@ object ScalaBuilder {
       storageFile.foreach { file =>
         val parentDir = file.getParentFile
         if (!parentDir.exists()) parentDir.mkdirs()
-        using(new DataOutputStream(
+        using(
+            new DataOutputStream(
                 new BufferedOutputStream(new FileOutputStream(file)))) {
           _.writeUTF(incrType.name)
         }
@@ -111,11 +120,10 @@ object ScalaBuilder {
                 context.getProjectDescriptor.getProject)) {
           cleanCaches()
           setPreviousIncrementalType(incrType)
-          context.processMessage(
-              new CompilerMessage(
-                  "scala",
-                  BuildMessage.Kind.WARNING,
-                  "type of incremental compiler has been changed, full rebuild..."))
+          context.processMessage(new CompilerMessage(
+              "scala",
+              BuildMessage.Kind.WARNING,
+              "type of incremental compiler has been changed, full rebuild..."))
         }
       case Some(_) =>
         if (ScalaBuilder.isScalaProject(
@@ -138,7 +146,8 @@ object ScalaBuilder {
 
   def hasBuildModules(chunk: ModuleChunk): Boolean = {
     import _root_.scala.collection.JavaConversions._
-    chunk.getModules.exists(_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
+    chunk.getModules
+      .exists(_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
   }
 
   def projectSettings(context: CompileContext) =
@@ -148,8 +157,8 @@ object ScalaBuilder {
     JavaBuilderUtil.isCompileJavaIncrementally(context) && {
       for {
         chunk <- context.getProjectDescriptor.getBuildTargetIndex
-          .getSortedTargetChunks(context)
-          .asScala
+                  .getSortedTargetChunks(context)
+                  .asScala
         target <- chunk.getTargets.asScala
       } {
         if (!context.getScope.isAffected(target)) return false
@@ -208,8 +217,8 @@ object ScalaBuilder {
     if (settings.isCompileServerEnabled &&
         JavaBuilderUtil.CONSTANT_SEARCH_SERVICE.get(context) != null) {
       cleanLocalServerCache()
-      new RemoteServer(
-          InetAddress.getByName(null), settings.getCompileServerPort)
+      new RemoteServer(InetAddress.getByName(null),
+                       settings.getCompileServerPort)
     } else {
       localServer
     }

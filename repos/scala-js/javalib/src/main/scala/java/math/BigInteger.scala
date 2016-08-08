@@ -124,14 +124,14 @@ object BigInteger {
   }
 
   @inline
-  private def checkCriticalArgument(
-      expression: Boolean, errorMessage: => String): Unit = {
+  private def checkCriticalArgument(expression: Boolean,
+                                    errorMessage: => String): Unit = {
     if (!expression) throw new IllegalArgumentException(errorMessage)
   }
 
   @inline
-  private[math] final class QuotAndRem(
-      val quot: BigInteger, val rem: BigInteger) {
+  private[math] final class QuotAndRem(val quot: BigInteger,
+                                       val rem: BigInteger) {
     def toArray(): Array[BigInteger] = Array[BigInteger](quot, rem)
   }
 }
@@ -376,8 +376,8 @@ class BigInteger extends Number with Comparable[BigInteger] {
           val resDigits = new Array[Int](resLength)
           val resSign = if (thisSign == divisorSign) 1 else -1
           if (divisorLen == 1) {
-            Division.divideArrayByInt(
-                resDigits, digits, thisLen, divisor.digits(0))
+            Division
+              .divideArrayByInt(resDigits, digits, thisLen, divisor.digits(0))
           } else {
             Division.divide(resDigits,
                             resLength,
@@ -433,10 +433,10 @@ class BigInteger extends Number with Comparable[BigInteger] {
                                               thisLen,
                                               divisorDigits,
                                               divisorLen)
-        val result0 = new BigInteger(
-            quotientSign, quotientLength, quotientDigits)
-        val result1 = new BigInteger(
-            thisSign, remainderLength, remainderDigits)
+        val result0 =
+          new BigInteger(quotientSign, quotientLength, quotientDigits)
+        val result1 =
+          new BigInteger(thisSign, remainderLength, remainderDigits)
         result0.cutOffLeadingZeroes()
         result1.cutOffLeadingZeroes()
         new QuotAndRem(result0, result1)
@@ -450,7 +450,7 @@ class BigInteger extends Number with Comparable[BigInteger] {
   override def equals(x: Any): Boolean = x match {
     case that: BigInteger =>
       this.sign == that.sign && this.numberLength == that.numberLength &&
-      this.equalsArrays(that.digits)
+        this.equalsArrays(that.digits)
     case _ => false
   }
 
@@ -638,12 +638,12 @@ class BigInteger extends Number with Comparable[BigInteger] {
       val resLength = divisorLen
       var resDigits = new Array[Int](resLength)
       if (resLength == 1) {
-        resDigits(0) = Division.remainderArrayByInt(
-            digits, thisLen, divisor.digits(0))
+        resDigits(0) =
+          Division.remainderArrayByInt(digits, thisLen, divisor.digits(0))
       } else {
         val qLen = thisLen - divisorLen + 1
-        resDigits = Division.divide(
-            null, qLen, digits, thisLen, divisor.digits, divisorLen)
+        resDigits = Division
+          .divide(null, qLen, digits, thisLen, divisor.digits, divisorLen)
       }
       val result = new BigInteger(sign, resLength, resDigits)
       result.cutOffLeadingZeroes()
@@ -832,9 +832,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
     @tailrec
     def loop(): Unit = if (bytesLen > highBytes) {
       digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-      (byteValues(bytesLen - 2) & 0xFF) << 8 |
-      (byteValues(bytesLen - 3) & 0xFF) << 16 |
-      (byteValues(bytesLen - 4) & 0xFF) << 24
+          (byteValues(bytesLen - 2) & 0xFF) << 8 |
+          (byteValues(bytesLen - 3) & 0xFF) << 16 |
+          (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen -= 4
       if (digits(i) != 0) {
         digits(i) = -digits(i)
@@ -842,9 +842,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
         i += 1
         while (bytesLen > highBytes) {
           digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-          (byteValues(bytesLen - 2) & 0xFF) << 8 |
-          (byteValues(bytesLen - 3) & 0xFF) << 16 |
-          (byteValues(bytesLen - 4) & 0xFF) << 24
+              (byteValues(bytesLen - 2) & 0xFF) << 8 |
+              (byteValues(bytesLen - 3) & 0xFF) << 16 |
+              (byteValues(bytesLen - 4) & 0xFF) << 24
           bytesLen -= 4
           digits(i) = ~digits(i)
           i += 1
@@ -883,9 +883,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
     var i = 0
     while (bytesLen > highBytes) {
       digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-      (byteValues(bytesLen - 2) & 0xFF) << 8 |
-      (byteValues(bytesLen - 3) & 0xFF) << 16 |
-      (byteValues(bytesLen - 4) & 0xFF) << 24
+          (byteValues(bytesLen - 2) & 0xFF) << 8 |
+          (byteValues(bytesLen - 3) & 0xFF) << 16 |
+          (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen = bytesLen - 4
       i += 1
     }

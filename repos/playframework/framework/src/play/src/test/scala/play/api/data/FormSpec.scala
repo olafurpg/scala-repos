@@ -215,8 +215,9 @@ object FormSpec extends Specification {
     ScalaForms.defaultValuesForm
       .bindFromRequest(Map("name" -> Seq("another text")))
       .get must equalTo((42, "another text"))
-    ScalaForms.defaultValuesForm.bindFromRequest(Map("pos" -> Seq("123"))).get must equalTo(
-        (123, "default text"))
+    ScalaForms.defaultValuesForm
+      .bindFromRequest(Map("pos" -> Seq("123")))
+      .get must equalTo((123, "default text"))
     ScalaForms.defaultValuesForm
       .bindFromRequest(Map("pos" -> Seq("123"), "name" -> Seq("another text")))
       .get must equalTo((123, "another text"))
@@ -227,8 +228,9 @@ object FormSpec extends Specification {
   }
 
   "support repeated values" in {
-    ScalaForms.repeatedForm.bindFromRequest(Map("name" -> Seq("Kiki"))).get must equalTo(
-        ("Kiki", Seq()))
+    ScalaForms.repeatedForm
+      .bindFromRequest(Map("name" -> Seq("Kiki")))
+      .get must equalTo(("Kiki", Seq()))
     ScalaForms.repeatedForm
       .bindFromRequest(
           Map("name" -> Seq("Kiki"), "emails[0]" -> Seq("kiki@gmail.com")))
@@ -346,7 +348,9 @@ object FormSpec extends Specification {
 
   "support boolean binding from json" in {
     ScalaForms.booleanForm.bind(Json.obj("accepted" -> "true")).get must beTrue
-    ScalaForms.booleanForm.bind(Json.obj("accepted" -> "false")).get must beFalse
+    ScalaForms.booleanForm
+      .bind(Json.obj("accepted" -> "false"))
+      .get must beFalse
   }
 
   "reject boolean binding from an invalid json" in {
@@ -441,7 +445,7 @@ object ScalaForms {
                    s => (s.headOption map { _ == '3' }) getOrElse false)
         .transform[Int](Integer.parseInt _, _.toString)
         .verifying("number.42", _ < 42)
-    )
+  )
 
   val emailForm = Form(
       tuple(

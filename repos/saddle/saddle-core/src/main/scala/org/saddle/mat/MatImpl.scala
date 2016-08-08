@@ -23,8 +23,8 @@ import org.saddle._
   * Houses specialized method implementations for code reuse in Mat subclasses
   */
 private[saddle] object MatImpl {
-  def map[@spec(Boolean, Int, Long, Double) A : ST,
-          @spec(Boolean, Int, Long, Double) B : ST](mat: Mat[A])(
+  def map[@spec(Boolean, Int, Long, Double) A: ST,
+          @spec(Boolean, Int, Long, Double) B: ST](mat: Mat[A])(
       f: A => B): Mat[B] = {
     val sca = implicitly[ST[A]]
     val scb = implicitly[ST[B]]
@@ -39,8 +39,9 @@ private[saddle] object MatImpl {
     Mat[B](mat.numRows, mat.numCols, buf)
   }
 
-  def withoutRows[@spec(Boolean, Int, Long, Double) A : ST](
-      m: Mat[A], locs: Array[Int]): Mat[A] = {
+  def withoutRows[@spec(Boolean, Int, Long, Double) A: ST](
+      m: Mat[A],
+      locs: Array[Int]): Mat[A] = {
     if (m.length == 0) Mat.empty[A]
     else {
       val locset = locs.toSet
@@ -63,8 +64,9 @@ private[saddle] object MatImpl {
     }
   }
 
-  def takeRows[@spec(Boolean, Int, Long, Double) A : ST](
-      m: Mat[A], locs: Array[Int]): Mat[A] = {
+  def takeRows[@spec(Boolean, Int, Long, Double) A: ST](
+      m: Mat[A],
+      locs: Array[Int]): Mat[A] = {
     if (m.length == 0) Mat.empty[A]
     else {
       val buf = Buffer[A](m.length)

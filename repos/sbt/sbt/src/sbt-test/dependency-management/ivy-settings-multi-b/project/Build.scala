@@ -7,5 +7,5 @@ object Build extends Build {
     Project("a", file(".")) settings (externalIvySettings()) dependsOn (b)
   lazy val b =
     Project("b", file("b")) settings
-    (externalIvySettings((baseDirectory in ThisBuild) / "ivysettings.xml"))
+      (externalIvySettings((baseDirectory in ThisBuild) / "ivysettings.xml"))
 }

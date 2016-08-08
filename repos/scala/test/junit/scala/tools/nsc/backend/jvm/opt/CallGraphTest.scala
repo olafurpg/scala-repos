@@ -46,11 +46,11 @@ class CallGraphTest extends ClearAfterClass {
   import callGraph._
 
   def compile(code: String,
-              allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+              allowMessage: StoreReporter#Info => Boolean = _ => false)
+    : List[ClassNode] = {
     CallGraphTest.notPerRun.foreach(_.clear())
-    compileClasses(compiler)(code, allowMessage = allowMessage)
-      .map(c => byteCodeRepository.classNode(c.name).get)
+    compileClasses(compiler)(code, allowMessage = allowMessage).map(c =>
+      byteCodeRepository.classNode(c.name).get)
   }
 
   def callsInMethod(methodNode: MethodNode): List[MethodInsnNode] =
@@ -123,25 +123,36 @@ class CallGraphTest extends ClearAfterClass {
         "operand stack at the callsite in Test::t1(LC;)I contains more values",
         "operand stack at the callsite in Test::t2(LD;)I contains more values")
     var msgCount = 0
-    val checkMsg = (m: StoreReporter#Info) =>
-      {
-        msgCount += 1
-        ok exists (m.msg contains _)
+    val checkMsg = (m: StoreReporter#Info) => {
+      msgCount += 1
+      ok exists (m.msg contains _)
     }
     val List(cCls, cMod, dCls, testCls) = compile(code, checkMsg)
     assert(msgCount == 6, msgCount)
 
-    val List(cf1, cf2, cf3, cf4, cf5, cf6, cf7) = findAsmMethods(
-        cCls, _.startsWith("f"))
+    val List(cf1, cf2, cf3, cf4, cf5, cf6, cf7) =
+      findAsmMethods(cCls, _.startsWith("f"))
     val List(df1, df3) = findAsmMethods(dCls, _.startsWith("f"))
     val g1 = findAsmMethod(cMod, "g1")
     val List(t1, t2) = findAsmMethods(testCls, _.startsWith("t"))
 
-    val List(
-    cf1Call, cf2Call, cf3Call, cf4Call, cf5Call, cf6Call, cf7Call, cg1Call) =
+    val List(cf1Call,
+             cf2Call,
+             cf3Call,
+             cf4Call,
+             cf5Call,
+             cf6Call,
+             cf7Call,
+             cg1Call) =
       callsInMethod(t1)
-    val List(
-    df1Call, df2Call, df3Call, df4Call, df5Call, df6Call, df7Call, dg1Call) =
+    val List(df1Call,
+             df2Call,
+             df3Call,
+             df4Call,
+             df5Call,
+             df6Call,
+             df7Call,
+             dg1Call) =
       callsInMethod(t2)
 
     val cClassBType = classBTypeFromClassNode(cCls)

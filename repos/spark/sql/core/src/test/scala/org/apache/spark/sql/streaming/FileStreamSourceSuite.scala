@@ -30,8 +30,10 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 
   import testImplicits._
 
-  case class AddTextFileData(
-      source: FileStreamSource, content: String, src: File, tmp: File)
+  case class AddTextFileData(source: FileStreamSource,
+                             content: String,
+                             src: File,
+                             tmp: File)
       extends AddData {
 
     override def addData(): Offset = {
@@ -82,14 +84,15 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 }
 
 class FileStreamSourceSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
-  private def createFileStreamSourceAndGetSchema(
-      format: Option[String],
-      path: Option[String],
-      schema: Option[StructType] = None): StructType = {
+  private def createFileStreamSourceAndGetSchema(format: Option[String],
+                                                 path: Option[String],
+                                                 schema: Option[StructType] =
+                                                   None): StructType = {
     val reader = sqlContext.read
     format.foreach(reader.format)
     schema.foreach(reader.schema)
@@ -106,16 +109,18 @@ class FileStreamSourceSuite
 
   test("FileStreamSource schema: no path") {
     val e = intercept[IllegalArgumentException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = None, schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = None,
+                                         schema = None)
     }
     assert("'path' is not specified" === e.getMessage)
   }
 
   test("FileStreamSource schema: path doesn't exist") {
     intercept[AnalysisException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = Some("/a/b/c"), schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = Some("/a/b/c"),
+                                         schema = None)
     }
   }
 
@@ -319,21 +324,28 @@ class FileStreamSourceSuite
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
-    val fileSource = createFileStreamSource(
-        "parquet", src.getCanonicalPath, Some(valueSchema))
+    val fileSource = createFileStreamSource("parquet",
+                                            src.getCanonicalPath,
+                                            Some(valueSchema))
     val filtered = fileSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddParquetFileData(
-            fileSource, Seq("drop1", "keep2", "keep3"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop1", "keep2", "keep3"),
+                           src,
+                           tmp),
         CheckAnswer("keep2", "keep3"),
         StopStream,
-        AddParquetFileData(
-            fileSource, Seq("drop4", "keep5", "keep6"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop4", "keep5", "keep6"),
+                           src,
+                           tmp),
         StartStream,
         CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddParquetFileData(
-            fileSource, Seq("drop7", "keep8", "keep9"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop7", "keep8", "keep9"),
+                           src,
+                           tmp),
         CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 
@@ -401,7 +413,8 @@ class FileStreamSourceSuite
 }
 
 class FileStreamSourceStressTestSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
@@ -411,12 +424,9 @@ class FileStreamSourceStressTestSuite
 
     val textSource = createFileStreamSource("text", src.getCanonicalPath)
     val ds = textSource.toDS[String]().map(_.toInt + 1)
-    runStressTest(
-        ds,
-        data =>
-          {
-            AddTextFileData(textSource, data.mkString("\n"), src, tmp)
-        })
+    runStressTest(ds, data => {
+      AddTextFileData(textSource, data.mkString("\n"), src, tmp)
+    })
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)

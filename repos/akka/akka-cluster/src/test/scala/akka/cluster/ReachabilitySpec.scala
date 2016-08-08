@@ -98,9 +98,10 @@ class ReachabilitySpec extends WordSpec with Matchers {
       r.records should ===(Vector(Record(nodeD, nodeC, Unreachable, 1L)))
 
       val r2 = r.unreachable(nodeB, nodeD).unreachable(nodeB, nodeE)
-      r2.records.toSet should ===(Set(Record(nodeD, nodeC, Unreachable, 1L),
-                                      Record(nodeB, nodeD, Unreachable, 5L),
-                                      Record(nodeB, nodeE, Unreachable, 6L)))
+      r2.records.toSet should ===(
+          Set(Record(nodeD, nodeC, Unreachable, 1L),
+              Record(nodeB, nodeD, Unreachable, 5L),
+              Record(nodeB, nodeE, Unreachable, 6L)))
     }
 
     "have correct aggregated status" in {

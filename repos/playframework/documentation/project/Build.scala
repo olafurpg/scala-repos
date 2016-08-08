@@ -17,7 +17,8 @@ object ApplicationBuild extends Build {
     .enablePlugins(PlayDocsPlugin)
     .disablePlugins(PlayEnhancer)
     .settings(
-        resolvers += Resolver.sonatypeRepo("releases"), // TODO: Delete this eventually, just needed for lag between deploying to sonatype and getting on maven central
+        resolvers += Resolver
+          .sonatypeRepo("releases"), // TODO: Delete this eventually, just needed for lag between deploying to sonatype and getting on maven central
         version := PlayVersion.current,
         libraryDependencies ++= Seq(
             "org.mockito" % "mockito-core" % "1.9.5" % "test"
@@ -25,25 +26,26 @@ object ApplicationBuild extends Build {
         PlayDocsKeys.docsJarFile :=
           Some((packageBin in (playDocs, Compile)).value),
         PlayDocsKeys.playDocsValidationConfig :=
-          PlayDocsValidation.ValidationConfig(downstreamWikiPages = Set(
+          PlayDocsValidation.ValidationConfig(
+              downstreamWikiPages = Set(
                   "ScalaAnorm",
                   "PlaySlickMigrationGuide",
                   "ScalaTestingWithScalaTest",
                   "ScalaFunctionalTestingWithScalaTest"
               )),
         PlayDocsKeys.javaManualSourceDirectories :=
-        (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
+          (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
         PlayDocsKeys.scalaManualSourceDirectories :=
-        (baseDirectory.value / "manual" / "working" / "scalaGuide" ** "code").get,
+          (baseDirectory.value / "manual" / "working" / "scalaGuide" ** "code").get,
         PlayDocsKeys.commonManualSourceDirectories :=
-        (baseDirectory.value / "manual" / "working" / "commonGuide" ** "code").get,
+          (baseDirectory.value / "manual" / "working" / "commonGuide" ** "code").get,
         unmanagedSourceDirectories in Test ++=
-        (baseDirectory.value / "manual" / "detailedTopics" ** "code").get,
+          (baseDirectory.value / "manual" / "detailedTopics" ** "code").get,
         unmanagedResourceDirectories in Test ++=
-        (baseDirectory.value / "manual" / "detailedTopics" ** "code").get,
+          (baseDirectory.value / "manual" / "detailedTopics" ** "code").get,
         // Don't include sbt files in the resources
         excludeFilter in (Test, unmanagedResources) :=
-        (excludeFilter in (Test, unmanagedResources)).value || "*.sbt",
+          (excludeFilter in (Test, unmanagedResources)).value || "*.sbt",
         crossScalaVersions := Seq("2.11.7"),
         scalaVersion := PlayVersion.scalaVersion,
         fork in Test := true,

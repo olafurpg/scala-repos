@@ -96,8 +96,10 @@ trait Imports { self: IMain =>
     * (3) It imports multiple same-named implicits, but only the
     * last one imported is actually usable.
     */
-  case class ComputedImports(
-      header: String, prepend: String, append: String, access: String)
+  case class ComputedImports(header: String,
+                             prepend: String,
+                             append: String,
+                             access: String)
 
   protected def importsCode(wanted: Set[Name],
                             wrapper: Request#Wrapper,
@@ -130,7 +132,8 @@ trait Imports { self: IMain =>
           case _: ImportHandler => true
           case x if generousImports =>
             x.definesImplicit ||
-            (x.definedNames exists (d => wanted.exists(w => d.startsWith(w))))
+              (x.definedNames exists (d =>
+                                        wanted.exists(w => d.startsWith(w))))
           case x => x.definesImplicit || (x.definedNames exists wanted)
         }
 
@@ -164,7 +167,8 @@ trait Imports { self: IMain =>
 
     def wrapBeforeAndAfter[T](op: => T): T = {
       addWrapper()
-      try op finally addWrapper()
+      try op
+      finally addWrapper()
     }
 
     // imports from Predef are relocated to the template header to allow hiding.
@@ -195,8 +199,9 @@ trait Imports { self: IMain =>
               if (!currentImps.contains(imv)) {
                 x match {
                   case _: ClassHandler =>
-                    code.append("import " + objName + req.accessPath + ".`" +
-                        imv + "`\n")
+                    code.append(
+                        "import " + objName + req.accessPath + ".`" +
+                          imv + "`\n")
                   case _ =>
                     val valName =
                       req.lineRep.packageName + req.lineRep.readName

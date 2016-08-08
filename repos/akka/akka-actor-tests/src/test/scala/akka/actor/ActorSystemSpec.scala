@@ -22,7 +22,8 @@ import scala.util.control.NoStackTrace
 class JavaExtensionSpec extends JavaExtension with JUnitSuiteLike
 
 object TestExtension
-    extends ExtensionId[TestExtension] with ExtensionIdProvider {
+    extends ExtensionId[TestExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new TestExtension(s)
 }
@@ -31,7 +32,8 @@ object TestExtension
 class TestExtension(val system: ExtendedActorSystem) extends Extension
 
 object FailingTestExtension
-    extends ExtensionId[FailingTestExtension] with ExtensionIdProvider {
+    extends ExtensionId[FailingTestExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new FailingTestExtension(s)
 
@@ -58,12 +60,12 @@ object ActorSystemSpec {
       case n: Int ⇒
         master = sender()
         terminaters = Set() ++
-        (for (i ← 1 to n) yield {
-              val man =
-                context.watch(context.system.actorOf(Props[Terminater]))
-              man ! "run"
-              man
-            })
+            (for (i ← 1 to n) yield {
+            val man =
+              context.watch(context.system.actorOf(Props[Terminater]))
+            man ! "run"
+            man
+          })
       case Terminated(child) if terminaters contains child ⇒
         terminaters -= child
         if (terminaters.isEmpty) {
@@ -104,8 +106,8 @@ object ActorSystemSpec {
     }
   }
 
-  class SlowDispatcher(
-      _config: Config, _prerequisites: DispatcherPrerequisites)
+  class SlowDispatcher(_config: Config,
+                       _prerequisites: DispatcherPrerequisites)
       extends MessageDispatcherConfigurator(_config, _prerequisites) {
     private val instance = new Dispatcher(
         this,
@@ -119,8 +121,8 @@ object ActorSystemSpec {
           mbox: Mailbox,
           hasMessageHint: Boolean,
           hasSystemMessageHint: Boolean): Boolean = {
-        val ret = super.registerForExecution(
-            mbox, hasMessageHint, hasSystemMessageHint)
+        val ret = super
+          .registerForExecution(mbox, hasMessageHint, hasSystemMessageHint)
         doneIt.switchOn {
           TestKit.awaitCond(mbox.actor.actor != null, 1.second)
           mbox.actor.actor match {
@@ -160,7 +162,8 @@ object ActorSystemSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorSystemSpec
-    extends AkkaSpec(ActorSystemSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorSystemSpec.config)
+    with ImplicitSender {
 
   import ActorSystemSpec.FastActor
 
@@ -190,7 +193,7 @@ class ActorSystemSpec
 
     "allow valid names" in {
       shutdown(ActorSystem(
-              "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"))
+          "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"))
     }
 
     "support extensions" in {
@@ -299,9 +302,10 @@ class ActorSystemSpec
     "reliably create waves of actors" in {
       import system.dispatcher
       implicit val timeout = Timeout((20 seconds).dilated)
-      val waves = for (i ← 1 to 3) yield
-        system.actorOf(Props[ActorSystemSpec.Waves]) ? 50000
-      Await.result(Future.sequence(waves), timeout.duration + 5.seconds) should ===(
+      val waves = for (i ← 1 to 3)
+        yield system.actorOf(Props[ActorSystemSpec.Waves]) ? 50000
+      Await
+        .result(Future.sequence(waves), timeout.duration + 5.seconds) should ===(
           Vector("done", "done", "done"))
     }
 
@@ -336,11 +340,11 @@ class ActorSystemSpec
       }
 
       created filter
-      (ref ⇒
-            !ref.isTerminated && !ref
-              .asInstanceOf[ActorRefWithCell]
-              .underlying
-              .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+        (ref ⇒
+           !ref.isTerminated && !ref
+             .asInstanceOf[ActorRefWithCell]
+             .underlying
+             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {
@@ -358,8 +362,7 @@ class ActorSystemSpec
             .parseString(
                 "akka.actor.guardian-supervisor-strategy=akka.actor.StoppingSupervisorStrategy")
             .withFallback(AkkaSpec.testConf))
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case "die" ⇒ throw new Exception("hello")
         }
@@ -383,8 +386,7 @@ class ActorSystemSpec
             .parseString(
                 "akka.actor.guardian-supervisor-strategy=\"akka.actor.ActorSystemSpec$Strategy\"")
             .withFallback(AkkaSpec.testConf))
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case "die" ⇒ throw new Exception("hello")
         }
@@ -397,15 +399,15 @@ class ActorSystemSpec
 
     "work with a passed in ExecutionContext" in {
       val ecProbe = TestProbe()
-      val ec = new ActorSystemSpec.TestExecutionContext(
-          ecProbe.ref, ExecutionContexts.global())
+      val ec =
+        new ActorSystemSpec.TestExecutionContext(ecProbe.ref,
+                                                 ExecutionContexts.global())
 
       val system2 =
         ActorSystem(name = "default", defaultExecutionContext = Some(ec))
 
       try {
-        val ref = system2.actorOf(
-            Props(new Actor {
+        val ref = system2.actorOf(Props(new Actor {
           def receive = {
             case "ping" ⇒ sender() ! "pong"
           }
@@ -424,8 +426,9 @@ class ActorSystemSpec
 
     "not use passed in ExecutionContext if executor is configured" in {
       val ecProbe = TestProbe()
-      val ec = new ActorSystemSpec.TestExecutionContext(
-          ecProbe.ref, ExecutionContexts.global())
+      val ec =
+        new ActorSystemSpec.TestExecutionContext(ecProbe.ref,
+                                                 ExecutionContexts.global())
 
       val config = ConfigFactory.parseString(
           "akka.actor.default-dispatcher.executor = \"fork-join-executor\"")
@@ -434,8 +437,7 @@ class ActorSystemSpec
                                 defaultExecutionContext = Some(ec))
 
       try {
-        val ref = system2.actorOf(
-            Props(new Actor {
+        val ref = system2.actorOf(Props(new Actor {
           def receive = {
             case "ping" ⇒ sender() ! "pong"
           }

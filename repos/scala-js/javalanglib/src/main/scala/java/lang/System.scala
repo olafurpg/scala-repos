@@ -223,15 +223,15 @@ object System {
       sysProp.setProperty("java.version", "1.8")
       sysProp.setProperty("java.vm.specification.version", "1.8")
       sysProp.setProperty("java.vm.specification.vendor", "Oracle Corporation")
-      sysProp.setProperty(
-          "java.vm.specification.name", "Java Virtual Machine Specification")
+      sysProp.setProperty("java.vm.specification.name",
+                          "Java Virtual Machine Specification")
       sysProp.setProperty("java.vm.name", "Scala.js")
-      linkingInfo.linkerVersion.foreach(
-          v => sysProp.setProperty("java.vm.version", v))
+      linkingInfo.linkerVersion.foreach(v =>
+        sysProp.setProperty("java.vm.version", v))
       sysProp.setProperty("java.specification.version", "1.8")
       sysProp.setProperty("java.specification.vendor", "Oracle Corporation")
-      sysProp.setProperty(
-          "java.specification.name", "Java Platform API Specification")
+      sysProp.setProperty("java.specification.name",
+                          "Java Platform API Specification")
       sysProp.setProperty("file.separator", "/")
       sysProp.setProperty("path.separator", ":")
       sysProp.setProperty("line.separator", "\n")
@@ -250,8 +250,9 @@ object System {
     SystemProperties.value
 
   def setProperties(properties: ju.Properties): Unit = {
-    SystemProperties.value = if (properties != null) properties
-    else SystemProperties.loadSystemProperties()
+    SystemProperties.value =
+      if (properties != null) properties
+      else SystemProperties.loadSystemProperties()
   }
 
   def getProperty(key: String): String =

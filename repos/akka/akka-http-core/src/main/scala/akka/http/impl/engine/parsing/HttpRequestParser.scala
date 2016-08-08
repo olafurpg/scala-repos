@@ -29,8 +29,9 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
   private[this] var uriBytes: Array[Byte] = _
 
   def createShallowCopy(): HttpRequestParser =
-    new HttpRequestParser(
-        settings, rawRequestUriHeader, headerParser.createShallowCopy())
+    new HttpRequestParser(settings,
+                          rawRequestUriHeader,
+                          headerParser.createShallowCopy())
 
   def parseMessage(input: ByteString, offset: Int): StateResult = {
     var cursor = parseMethod(input, offset)
@@ -64,7 +65,7 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
             ErrorInfo(
                 "Unsupported HTTP method",
                 s"HTTP method too long (started with '${sb.toString}'). " +
-                "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
+                  "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
 
     @tailrec def parseMethod(meth: HttpMethod, ix: Int = 1): Int =
       if (ix == meth.value.length)
@@ -139,12 +140,14 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
         val allHeaders0 =
           if (rawRequestUriHeader)
             `Raw-Request-URI`(new String(
-                    uriBytes, HttpCharsets.`US-ASCII`.nioCharset)) :: headers
+                uriBytes,
+                HttpCharsets.`US-ASCII`.nioCharset)) :: headers
           else headers
 
         val allHeaders =
           if (method == HttpMethods.GET) {
-            Handshake.Server.websocketUpgrade(headers, hostHeaderPresent) match {
+            Handshake.Server
+              .websocketUpgrade(headers, hostHeaderPresent) match {
               case Some(upgrade) ⇒ upgrade :: allHeaders0
               case None ⇒ allHeaders0
             }
@@ -182,7 +185,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           } else {
             emitRequestStart(defaultEntity(cth, contentLength))
             parseFixedLengthBody(contentLength, closeAfterResponseCompletion)(
-                input, bodyStart)
+                input,
+                bodyStart)
           }
 
         case Some(_) if !method.isEntityAccepted ⇒
@@ -190,8 +194,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
                            s"${method.name} requests must not have an entity")
 
         case Some(te) ⇒
-          val completedHeaders = addTransferEncodingWithChunkedPeeled(
-              headers, te)
+          val completedHeaders =
+            addTransferEncodingWithChunkedPeeled(headers, te)
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitRequestStart(chunkedEntity(cth), completedHeaders)

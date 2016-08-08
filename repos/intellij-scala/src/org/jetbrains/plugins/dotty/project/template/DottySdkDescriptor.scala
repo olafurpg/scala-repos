@@ -4,8 +4,17 @@ import java.io.File
 
 import com.intellij.openapi.roots.libraries.LibraryType
 import org.jetbrains.plugins.dotty.project.DottyLibraryType
-import org.jetbrains.plugins.scala.project.{ScalaLanguageLevel, ScalaLibraryProperties, Version}
-import org.jetbrains.plugins.scala.project.template.{DottyArtifact, Artifact, SdkDescriptor, SdkDescriptorCompanion}
+import org.jetbrains.plugins.scala.project.{
+  ScalaLanguageLevel,
+  ScalaLibraryProperties,
+  Version
+}
+import org.jetbrains.plugins.scala.project.template.{
+  DottyArtifact,
+  Artifact,
+  SdkDescriptor,
+  SdkDescriptorCompanion
+}
 
 /**
   * @author adkozlov
@@ -53,7 +62,10 @@ object DottySdkDescriptor extends SdkDescriptorCompanion {
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    DottySdkDescriptor(
-        None, compilerFiles, libraryFiles, sourceFiles, docFiles)
+    DottySdkDescriptor(None,
+                       compilerFiles,
+                       libraryFiles,
+                       sourceFiles,
+                       docFiles)
   }
 }

@@ -13,8 +13,9 @@ class DocResolver(
     forceJavaVersion: Option[String] // for testing
 )(
     implicit config: EnsimeConfig
-)
-    extends Actor with ActorLogging with DocUsecaseHandling {
+) extends Actor
+    with ActorLogging
+    with DocUsecaseHandling {
 
   var htmlToJar = Map.empty[String, File]
   var jarNameToJar = Map.empty[String, File]
@@ -148,7 +149,8 @@ class DocResolver(
         forceJavaVersion.getOrElse(scala.util.Properties.javaVersion)
       val version =
         if (rawVersion.startsWith("1.8")) "8"
-        else if (rawVersion.startsWith("1.7")) "7" else "6"
+        else if (rawVersion.startsWith("1.7")) "7"
+        else "6"
       val anchor = sig.java.member.map { m =>
         "#" + { if (version == "8") toJava8Anchor(m) else m }
       }.getOrElse("")

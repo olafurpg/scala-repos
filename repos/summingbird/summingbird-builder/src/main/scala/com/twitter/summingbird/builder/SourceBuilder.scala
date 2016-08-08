@@ -60,11 +60,12 @@ object SourceBuilder {
   implicit def sg[T]: Semigroup[SourceBuilder[T]] =
     Semigroup.from(_ ++ _)
 
-  def nextName[T : Manifest]: String =
+  def nextName[T: Manifest]: String =
     "%s_%d".format(manifest[T], nextId.getAndIncrement)
 
   def apply[T](eventSource: EventSource[T], timeOf: T => Date)(
-      implicit mf: Manifest[T], eventCodec: Codec[T]) = {
+      implicit mf: Manifest[T],
+      eventCodec: Codec[T]) = {
     implicit val te = TimeExtractor[T](timeOf(_).getTime)
     val newID = nextName[T]
     val scaldingSource =
@@ -78,7 +79,7 @@ object SourceBuilder {
   }
 }
 
-case class SourceBuilder[T : Manifest] private (
+case class SourceBuilder[T: Manifest] private (
     @transient node: SourceBuilder.Node[T],
     @transient registrar: IKryoRegistrar,
     id: String,
@@ -86,10 +87,10 @@ case class SourceBuilder[T : Manifest] private (
     extends Serializable {
   import SourceBuilder.{adjust, Node, nextName}
 
-  def map[U : Manifest](fn: T => U): SourceBuilder[U] =
+  def map[U: Manifest](fn: T => U): SourceBuilder[U] =
     copy(node = node.map(fn))
   def filter(fn: T => Boolean): SourceBuilder[T] = copy(node = node.filter(fn))
-  def flatMap[U : Manifest](fn: T => TraversableOnce[U]): SourceBuilder[U] =
+  def flatMap[U: Manifest](fn: T => TraversableOnce[U]): SourceBuilder[U] =
     copy(node = node.flatMap(fn))
 
   /**
@@ -103,12 +104,13 @@ case class SourceBuilder[T : Manifest] private (
       valMf: Manifest[V]): SourceBuilder[(K2, V)] =
     copy(node = node.asInstanceOf[Node[(K1, V)]].flatMapKeys(fn))
 
-  def flatMapBuilder[U : Manifest](
+  def flatMapBuilder[U: Manifest](
       newFlatMapper: FlatMapper[T, U]): SourceBuilder[U] =
     flatMap(newFlatMapper(_))
 
   def write[U](sink: CompoundSink[U])(conversion: T => TraversableOnce[U])(
-      implicit batcher: Batcher, mf: Manifest[U]): SourceBuilder[T] = {
+      implicit batcher: Batcher,
+      mf: Manifest[U]): SourceBuilder[T] = {
     val newNode = node
       .flatMap(conversion)
       .write(
@@ -118,24 +120,22 @@ case class SourceBuilder[T : Manifest] private (
           }
       )
     copy(
-        node = node
-            .either(newNode)
-            .flatMap[T] {
-            case Left(t) => Some(t)
-            case Right(u) => None
-          }
-      )
+        node = node.either(newNode).flatMap[T] {
+          case Left(t) => Some(t)
+          case Right(u) => None
+        }
+    )
   }
 
-  def write(
-      sink: CompoundSink[T])(implicit batcher: Batcher): SourceBuilder[T] =
+  def write(sink: CompoundSink[T])(
+      implicit batcher: Batcher): SourceBuilder[T] =
     copy(
         node = node.write(
-              sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
-              sink.online.map { supplier =>
+            sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
+            sink.online.map { supplier =>
               new StormSink[T] { lazy val toFn = supplier() }
             }
-          )
+        )
     )
 
   def leftJoin[K, V, JoinedValue](service: CompoundService[K, JoinedValue])(
@@ -146,15 +146,15 @@ case class SourceBuilder[T : Manifest] private (
     : SourceBuilder[(K, (V, Option[JoinedValue]))] =
     copy(
         node = node
-            .asInstanceOf[Node[(K, V)]]
-            .leftJoin((
-                    service.offline,
-                    service.online.map {
+          .asInstanceOf[Node[(K, V)]]
+          .leftJoin((
+              service.offline,
+              service.online.map {
                 fn: Function0[ReadableStore[K, JoinedValue]] =>
                   ReadableServiceFactory(fn)
               }
-                ))
-      )
+          ))
+    )
 
   /** Set's an Option on all nodes ABOVE this point */
   def set(opt: Any): SourceBuilder[T] =
@@ -217,7 +217,7 @@ case class SourceBuilder[T : Manifest] private (
         val newNode = OptionalUnzip2[Scalding, Storm]()(node)._1.map { p =>
           Producer.evToKeyed(p.name(id)).sumByKey(batchSetStore)
         }.getOrElse(sys.error(
-                "Scalding mode specified alongside some online-only Source, Service or Sink."))
+            "Scalding mode specified alongside some online-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
                          batcher,
@@ -234,7 +234,7 @@ case class SourceBuilder[T : Manifest] private (
         val newNode = OptionalUnzip2[Scalding, Storm]()(node)._2.map { p =>
           Producer.evToKeyed(p.name(id)).sumByKey(givenStore)
         }.getOrElse(sys.error(
-                "Storm mode specified alongside some offline-only Source, Service or Sink."))
+            "Storm mode specified alongside some offline-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
                          batcher,

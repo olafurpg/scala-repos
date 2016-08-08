@@ -9,7 +9,12 @@ import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.plugin.auth.Identity
 import mesosphere.marathon.state.PathId.StringPathId
-import mesosphere.marathon.state.{AppDefinition, Group, GroupManager, Timestamp}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  Group,
+  GroupManager,
+  Timestamp
+}
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.upgrade.{DeploymentPlan, DeploymentStep}
 import org.mockito.Mockito._
@@ -20,7 +25,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TasksResourceTest
-    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers
+    with Mockito {
 
   test("killTasks") {
     Given("two apps and 1 task each")
@@ -43,8 +51,8 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource.killTasks(
-        scale = false, force = false, body = bodyBytes, auth.request)
+    val response = taskResource
+      .killTasks(scale = false, force = false, body = bodyBytes, auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200
@@ -86,8 +94,8 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource.killTasks(
-        scale = true, force = true, body = bodyBytes, auth.request)
+    val response = taskResource
+      .killTasks(scale = true, force = true, body = bodyBytes, auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200
@@ -175,8 +183,12 @@ class TasksResourceTest
     val taskId3 = Task.Id.forApp(appId).idString
     val body = s"""{"ids": ["$taskId1", "$taskId2", "$taskId3"]}""".getBytes
 
-    taskKiller = new TaskKiller(
-        taskTracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(taskTracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
     taskResource = new TasksResource(
         service,
         taskTracker,
@@ -209,8 +221,10 @@ class TasksResourceTest
 
     When("we ask to kill those two tasks")
     val ex = intercept[BadRequestException] {
-      taskResource.killTasks(
-          scale = false, force = false, body = bodyBytes, auth.request)
+      taskResource.killTasks(scale = false,
+                             force = false,
+                             body = bodyBytes,
+                             auth.request)
     }
 
     Then("An exception should be thrown that points to the invalid taskId")

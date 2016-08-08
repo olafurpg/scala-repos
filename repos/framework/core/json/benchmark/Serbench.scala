@@ -6,8 +6,8 @@ import java.io._
 import java.util.Date
 
 object Serbench extends Benchmark {
-  val classes = List(
-      classOf[Project], classOf[Team], classOf[Employee], classOf[Language])
+  val classes =
+    List(classOf[Project], classOf[Team], classOf[Employee], classOf[Language])
   val project = Project(
       "test",
       new Date,
@@ -20,16 +20,16 @@ object Serbench extends Benchmark {
 
   val jvalueProject = {
     ("name" -> "test") ~ ("startDate" -> new Date().getTime) ~
-    ("lang" -> (("name" -> "Scala") ~ ("version" -> 2.75))) ~
-    ("teams" -> List(
-            ("role" -> "QA") ~
+      ("lang" -> (("name" -> "Scala") ~ ("version" -> 2.75))) ~
+      ("teams" -> List(
+          ("role" -> "QA") ~
             ("members" -> List(("name" -> "John Doe") ~ ("experience" -> 5),
                                ("name" -> "Mike") ~ ("experience" -> 3))),
-            ("role" -> "Impl") ~
+          ("role" -> "Impl") ~
             ("members" -> List(("name" -> "Mark") ~ ("experience" -> 4),
                                ("name" -> "Mary") ~ ("experience" -> 5),
                                ("name" -> "Nick Noob") ~ ("experience" -> 1)))
-        ))
+      ))
   }
 
   lazy val bigJValue = {
@@ -84,8 +84,10 @@ object Serbench extends Benchmark {
     baos.toByteArray
   }
 
-  case class Project(
-      name: String, startDate: Date, lang: Option[Language], teams: List[Team])
+  case class Project(name: String,
+                     startDate: Date,
+                     lang: Option[Language],
+                     teams: List[Team])
       extends Serializable
   case class Language(name: String, version: Double) extends Serializable
   case class Team(role: String, members: List[Employee]) extends Serializable

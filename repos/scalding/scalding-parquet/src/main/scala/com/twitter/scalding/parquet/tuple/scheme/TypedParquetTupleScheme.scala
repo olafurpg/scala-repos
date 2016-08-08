@@ -15,7 +15,11 @@ import com.twitter.bijection.{Injection, GZippedBase64String}
 import com.twitter.chill.KryoInjection
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapred._
-import org.apache.parquet.hadoop.mapred.{Container, DeprecatedParquetOutputFormat, DeprecatedParquetInputFormat}
+import org.apache.parquet.hadoop.mapred.{
+  Container,
+  DeprecatedParquetOutputFormat,
+  DeprecatedParquetInputFormat
+}
 import org.apache.parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
 import org.apache.parquet.schema._
 
@@ -42,7 +46,8 @@ class ParquetTupleMaterializer[T](val converter: ParquetTupleConverter[T])
   * @tparam T user defined value type
   */
 abstract class ParquetReadSupport[T](val rootSchema: String)
-    extends ReadSupport[T] with Serializable {
+    extends ReadSupport[T]
+    with Serializable {
   val tupleConverter: ParquetTupleConverter[T]
 
   lazy val rootType: MessageType =
@@ -85,8 +90,8 @@ class ReadSupportInstanceProxy[T] extends ReadSupport[T] {
       keyValueMetaData: JMap[String, String],
       fileSchema: MessageType,
       readContext: ReadContext): RecordMaterializer[T] = {
-    getDelegateInstance(configuration).prepareForRead(
-        configuration, keyValueMetaData, fileSchema, readContext)
+    getDelegateInstance(configuration)
+      .prepareForRead(configuration, keyValueMetaData, fileSchema, readContext)
   }
 }
 
@@ -101,7 +106,8 @@ class ReadSupportInstanceProxy[T] extends ReadSupport[T] {
   * @tparam T user defined value type
   */
 abstract class ParquetWriteSupport[T](val rootSchema: String)
-    extends WriteSupport[T] with Serializable {
+    extends WriteSupport[T]
+    with Serializable {
 
   var recordConsumer: RecordConsumer = null
 
@@ -176,12 +182,12 @@ class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
     jobConf.setInputFormat(classOf[DeprecatedParquetInputFormat[T]])
     jobConf.set(ParquetInputOutputFormat.READ_SUPPORT_INSTANCE,
                 ParquetInputOutputFormat.injection(readSupport))
-    ParquetInputFormat.setReadSupportClass(
-        jobConf, classOf[ReadSupportInstanceProxy[_]])
+    ParquetInputFormat
+      .setReadSupportClass(jobConf, classOf[ReadSupportInstanceProxy[_]])
   }
 
-  override def source(
-      flowProcess: FlowProcess[JobConf], sc: SourceCallType): Boolean = {
+  override def source(flowProcess: FlowProcess[JobConf],
+                      sc: SourceCallType): Boolean = {
     val value: Container[T] = sc.getInput.createValue()
 
     val hasNext = sc.getInput.next(null, value)
@@ -203,13 +209,13 @@ class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
                 ParquetInputOutputFormat.injection(writeSupport))
   }
 
-  override def sink(
-      flowProcess: FlowProcess[JobConf], sinkCall: SinkCallType): Unit = {
+  override def sink(flowProcess: FlowProcess[JobConf],
+                    sinkCall: SinkCallType): Unit = {
     val tuple = sinkCall.getOutgoingEntry
     require(
         tuple.size == 1,
         "TypedParquetTupleScheme expects tuple with an arity of exactly 1, but found " +
-        tuple.getFields)
+          tuple.getFields)
     val value = tuple.getObject(0).asInstanceOf[T]
     val outputCollector = sinkCall.getOutput
     outputCollector.collect(null, value)

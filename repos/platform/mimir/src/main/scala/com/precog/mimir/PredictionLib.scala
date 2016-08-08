@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -44,19 +44,22 @@ import scalaz.syntax.std.boolean._
 import scalaz.syntax.traverse._
 
 trait PredictionLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ModelLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ModelLibModule[M] {
   import trans._
   import trans.constants._
 
   trait PredictionSupport
-      extends ColumnarTableLib with ModelSupport with RegressionSupport {
+      extends ColumnarTableLib
+      with ModelSupport
+      with RegressionSupport {
     val confIntvStr = "confidenceInterval"
     val predIntvStr = "predictionInterval"
     val fitStr = "fit"
 
     trait LinearPredictionBase extends LinearModelBase {
-      protected def morph1Apply(
-          models: Models, trans: Double => Double): Morph1Apply =
+      protected def morph1Apply(models: Models,
+                                trans: Double => Double): Morph1Apply =
         new Morph1Apply {
           def scanner(modelSet: ModelSet): CScanner = new CScanner {
             type A = Unit
@@ -80,8 +83,8 @@ trait PredictionLibModule[M[+ _]]
 
                       val varCovarMatrix = new Matrix(model.varCovar)
 
-                      case class Intervals(
-                          confidence: Array[Double], prediction: Array[Double])
+                      case class Intervals(confidence: Array[Double],
+                                           prediction: Array[Double])
 
                       val res = Model
                         .filteredRange(scannerPrelims.includedModel, range)
@@ -90,9 +93,9 @@ trait PredictionLibModule[M[+ _]]
                           case (Intervals(arrConf, arrPred), i) =>
                             val includedDoubles =
                               1.0 +:
-                              (scannerPrelims.cpaths map {
-                                    scannerPrelims.includedCols(_).apply(i)
-                                  })
+                                (scannerPrelims.cpaths map {
+                                  scannerPrelims.includedCols(_).apply(i)
+                                })
                             val includedMatrix =
                               new Matrix(Array(includedDoubles.toArray))
 
@@ -144,15 +147,20 @@ trait PredictionLibModule[M[+ _]]
                       val pathPredictionUpper = makeCPath(predIntvStr, 1)
 
                       Map(ColumnRef(pathFit, CDouble) -> ArrayDoubleColumn(
-                              definedModel, resultArray),
+                              definedModel,
+                              resultArray),
                           ColumnRef(pathConfidenceUpper, CDouble) -> ArrayDoubleColumn(
-                              definedModel, confidenceUpper),
+                              definedModel,
+                              confidenceUpper),
                           ColumnRef(pathConfidenceLower, CDouble) -> ArrayDoubleColumn(
-                              definedModel, confidenceLower),
+                              definedModel,
+                              confidenceLower),
                           ColumnRef(pathPredictionUpper, CDouble) -> ArrayDoubleColumn(
-                              definedModel, predictionUpper),
+                              definedModel,
+                              predictionUpper),
                           ColumnRef(pathPredictionLower, CDouble) -> ArrayDoubleColumn(
-                              definedModel, predictionLower))
+                              definedModel,
+                              predictionLower))
                   }
 
                 val identitiesResult = Model.idRes(cols, modelSet)
@@ -181,7 +189,8 @@ trait PredictionLibModule[M[+ _]]
             val forcedTable = table.transform(spec).force
             val tables0 =
               Range(0, scanners.size) map { i =>
-                forcedTable.map(_.transform(
+                forcedTable.map(
+                    _.transform(
                         DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
               }
             val tables: M[Seq[Table]] = (tables0.toList).sequence
@@ -192,8 +201,8 @@ trait PredictionLibModule[M[+ _]]
     }
 
     trait LogisticPredictionBase extends LogisticModelBase {
-      protected def morph1Apply(
-          models: Models, trans: Double => Double): Morph1Apply =
+      protected def morph1Apply(models: Models,
+                                trans: Double => Double): Morph1Apply =
         new Morph1Apply {
           def scanner(modelSet: ModelSet): CScanner = new CScanner {
             type A = Unit
@@ -214,7 +223,8 @@ trait PredictionLibModule[M[+ _]]
                                           CPathField(model.name),
                                           CPathField(fitStr))
 
-                      Map(ColumnRef(pathFit, CDouble) -> ArrayDoubleColumn(
+                      Map(
+                          ColumnRef(pathFit, CDouble) -> ArrayDoubleColumn(
                               scannerPrelims.definedModel,
                               scannerPrelims.resultArray))
                   }
@@ -246,7 +256,8 @@ trait PredictionLibModule[M[+ _]]
             val forcedTable = table.transform(spec).force
             val tables0 =
               Range(0, scanners.size) map { i =>
-                forcedTable.map(_.transform(
+                forcedTable.map(
+                    _.transform(
                         DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
               }
             val tables: M[Seq[Table]] = (tables0.toList).sequence

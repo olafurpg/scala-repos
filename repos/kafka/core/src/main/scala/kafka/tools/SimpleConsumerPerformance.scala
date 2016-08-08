@@ -18,7 +18,11 @@ package kafka.tools
 
 import java.net.URI
 import java.text.SimpleDateFormat
-import kafka.api.{PartitionOffsetRequestInfo, FetchRequestBuilder, OffsetRequest}
+import kafka.api.{
+  PartitionOffsetRequestInfo,
+  FetchRequestBuilder,
+  OffsetRequest
+}
 import kafka.consumer.SimpleConsumer
 import kafka.utils._
 import org.apache.log4j.Logger
@@ -56,7 +60,8 @@ object SimpleConsumerPerformance {
         Map(
             topicAndPartition -> PartitionOffsetRequestInfo(
                 if (config.fromLatest)
-                  OffsetRequest.LatestTime else OffsetRequest.EarliestTime,
+                  OffsetRequest.LatestTime
+                else OffsetRequest.EarliestTime,
                 1)
         ))
     var offset: Long = consumer
@@ -152,7 +157,7 @@ object SimpleConsumerPerformance {
     val resetBeginningOffsetOpt = parser.accepts(
         "from-latest",
         "If the consumer does not already have an established " +
-        "offset to consume from, start with the latest message present in the log rather than the earliest message.")
+          "offset to consume from, start with the latest message present in the log rather than the earliest message.")
     val partitionOpt = parser
       .accepts("partition", "The topic partition to consume from.")
       .withRequiredArg
@@ -175,8 +180,8 @@ object SimpleConsumerPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, topicOpt, urlOpt, numMessagesOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, topicOpt, urlOpt, numMessagesOpt)
 
     val url = new URI(options.valueOf(urlOpt))
     val fetchSize = options.valueOf(fetchSizeOpt).intValue

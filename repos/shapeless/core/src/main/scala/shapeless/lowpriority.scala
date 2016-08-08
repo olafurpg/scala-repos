@@ -50,8 +50,8 @@ object LowPriority {
   sealed trait Ignoring[T] extends Serializable
 
   object Ignoring {
-    implicit def materialize[T]: Ignoring[T] = macro LowPriorityMacros
-      .mkLowPriorityIgnoring[T]
+    implicit def materialize[T]: Ignoring[T] =
+      macro LowPriorityMacros.mkLowPriorityIgnoring[T]
   }
 
   /** For internal use by `LowPriority` */
@@ -63,7 +63,8 @@ object LowPriority {
 
 @macrocompat.bundle
 class LowPriorityMacros(val c: whitebox.Context)
-    extends OpenImplicitMacros with LowPriorityTypes {
+    extends OpenImplicitMacros
+    with LowPriorityTypes {
   import c.universe._
 
   def strictTpe = typeOf[Strict[_]].typeConstructor
@@ -82,7 +83,7 @@ class LowPriorityMacros(val c: whitebox.Context)
         c.abort(c.enclosingPosition, "Can't get looked for implicit type")
     }
 
-  def mkLowPriorityIgnoring[T : WeakTypeTag]: Tree =
+  def mkLowPriorityIgnoring[T: WeakTypeTag]: Tree =
     secondOpenImplicitTpe match {
       case Some(tpe) =>
         c.inferImplicitValue(
@@ -116,10 +117,11 @@ trait LowPriorityTypes {
         case TypeRef(_, cpdTpe, List(highTpe))
             if cpdTpe.asType.toType.typeConstructor =:= lowPriorityForTpe =>
           Some(("", highTpe))
-        case TypeRef(
-            _, cpdTpe, List(ConstantType(Constant(ignored: String)), tTpe))
+        case TypeRef(_,
+                     cpdTpe,
+                     List(ConstantType(Constant(ignored: String)), tTpe))
             if cpdTpe.asType.toType.typeConstructor =:= lowPriorityForIgnoringTpe &&
-            ignored.nonEmpty =>
+              ignored.nonEmpty =>
           Some(ignored, tTpe)
         case _ =>
           None

@@ -11,10 +11,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.impl.libraries.LibraryEx.ModifiableModelEx
 import org.jdom.Element
-import org.jetbrains.idea.maven.importing.{MavenImporter, MavenRootModelAdapter}
-import org.jetbrains.idea.maven.model.{MavenArtifact, MavenArtifactInfo, MavenId, MavenPlugin}
+import org.jetbrains.idea.maven.importing.{
+  MavenImporter,
+  MavenRootModelAdapter
+}
+import org.jetbrains.idea.maven.model.{
+  MavenArtifact,
+  MavenArtifactInfo,
+  MavenId,
+  MavenPlugin
+}
 import org.jetbrains.idea.maven.project._
-import org.jetbrains.idea.maven.server.{MavenEmbedderWrapper, NativeMavenProjectHolder}
+import org.jetbrains.idea.maven.server.{
+  MavenEmbedderWrapper,
+  NativeMavenProjectHolder
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10
 import org.jetbrains.plugins.scala.project._
@@ -27,16 +38,22 @@ import scala.collection.JavaConversions._
   */
 class ScalaMavenImporter
     extends MavenImporter("org.scala-tools", "maven-scala-plugin") {
-  override def collectSourceFolders(
-      mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(
-        mavenProject, "add-source", "sourceDir", "src/main/scala", result)
+  override def collectSourceFolders(mavenProject: MavenProject,
+                                    result: java.util.List[String]) {
+    collectSourceOrTestFolders(mavenProject,
+                               "add-source",
+                               "sourceDir",
+                               "src/main/scala",
+                               result)
   }
 
-  override def collectTestFolders(
-      mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(
-        mavenProject, "add-source", "testSourceDir", "src/test/scala", result)
+  override def collectTestFolders(mavenProject: MavenProject,
+                                  result: java.util.List[String]) {
+    collectSourceOrTestFolders(mavenProject,
+                               "add-source",
+                               "testSourceDir",
+                               "src/test/scala",
+                               result)
   }
 
   private def collectSourceOrTestFolders(mavenProject: MavenProject,
@@ -73,8 +90,8 @@ class ScalaMavenImporter
       val compilerOptions = {
         val plugins =
           configuration.plugins.map(id => mavenProject.localPathTo(id).getPath)
-        configuration.compilerOptions ++ plugins.map(
-            path => "-Xplugin:" + path)
+        configuration.compilerOptions ++ plugins.map(path =>
+          "-Xplugin:" + path)
       }
 
       module.configureScalaCompilerSettingsFrom("Maven", compilerOptions)
@@ -85,8 +102,8 @@ class ScalaMavenImporter
         .filter(_.getName.contains("scala-library"))
         .find(_.scalaVersion == Some(compilerVersion))
         .getOrElse(throw new ExternalSystemException(
-                "Cannot find project Scala library " + compilerVersion.number +
-                " for module " + module.getName))
+            "Cannot find project Scala library " + compilerVersion.number +
+              " for module " + module.getName))
 
       if (!scalaLibrary.isScalaSdk) {
         val languageLevel =
@@ -139,7 +156,8 @@ class ScalaMavenImporter
 private object ScalaMavenImporter {
   implicit class RichMavenProject(val project: MavenProject) extends AnyVal {
     def localPathTo(id: MavenId) =
-      project.getLocalRepository / id.getGroupId.replaceAll("\\.", "/") / id.getArtifactId / id.getVersion / "%s-%s.jar"
+      project.getLocalRepository / id.getGroupId
+        .replaceAll("\\.", "/") / id.getArtifactId / id.getVersion / "%s-%s.jar"
         .format(id.getArtifactId, id.getVersion)
   }
 
@@ -166,7 +184,8 @@ private class ScalaConfiguration(project: MavenProject) {
       .findPlugin("org.scala-tools", "maven-scala-plugin")
       .toOption
       .filter(!_.isDefault)
-      .orElse(project
+      .orElse(
+          project
             .findPlugin("net.alchim31.maven", "scala-maven-plugin")
             .toOption
             .filter(!_.isDefault))

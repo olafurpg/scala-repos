@@ -21,7 +21,10 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FsShell, FileSystem}
 import typed.KeyedListLike
 import scala.util.{Failure, Success}
-import scala.concurrent.{Future, ExecutionContext => ConcurrentExecutionContext}
+import scala.concurrent.{
+  Future,
+  ExecutionContext => ConcurrentExecutionContext
+}
 
 /**
   * Object containing various implicit conversions required to create Scalding flows in the REPL.
@@ -84,18 +87,18 @@ trait BaseReplState {
   private[scalding] def printModeBanner(): Unit = {
     val (modeString, homeDir) = mode match {
       case localMode: Local => {
-          (localMode.toString, System.getProperty("user.dir"))
-        }
+        (localMode.toString, System.getProperty("user.dir"))
+      }
       case hdfsMode: Hdfs => {
-          val defaultFs = FileSystem.get(hdfsMode.jobConf)
-          val m = customConfig.get(mr2Key) match {
-            case Some("local") =>
-              s"${hdfsMode.getClass.getSimpleName}Local(${hdfsMode.strict})"
-            case _ =>
-              s"${hdfsMode.getClass.getSimpleName}(${hdfsMode.strict})"
-          }
-          (m, defaultFs.getWorkingDirectory.toString)
+        val defaultFs = FileSystem.get(hdfsMode.jobConf)
+        val m = customConfig.get(mr2Key) match {
+          case Some("local") =>
+            s"${hdfsMode.getClass.getSimpleName}Local(${hdfsMode.strict})"
+          case _ =>
+            s"${hdfsMode.getClass.getSimpleName}(${hdfsMode.strict})"
         }
+        (m, defaultFs.getWorkingDirectory.toString)
+      }
     }
     println(s"${Console.GREEN}#### Scalding mode: ${modeString}")
     println(s"#### User home: ${homeDir}${Console.RESET}")
@@ -239,8 +242,8 @@ object ReplImplicits extends FieldConversions {
     * @param source to convert to a RichPipe.
     * @return a RichPipe wrapping the result of reading the specified Source.
     */
-  implicit def sourceToRichPipe(source: Source)(
-      implicit flowDef: FlowDef, mode: Mode): RichPipe =
+  implicit def sourceToRichPipe(source: Source)(implicit flowDef: FlowDef,
+                                                mode: Mode): RichPipe =
     RichPipe(source.read(flowDef, mode))
 
   /**
@@ -295,7 +298,9 @@ object ReplImplicits extends FieldConversions {
     * (e.g. allows .snapshot to be called on Grouped, CoGrouped, etc)
     */
   implicit def keyedListLikeToShellTypedPipe[
-      K, V, T[K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T])(
+      K,
+      V,
+      T[K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T])(
       implicit state: BaseReplState) =
     new ShellTypedPipe(kll.toTypedPipe)(state)
 

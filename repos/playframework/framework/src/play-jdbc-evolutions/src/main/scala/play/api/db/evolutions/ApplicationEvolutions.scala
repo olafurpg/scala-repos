@@ -153,8 +153,8 @@ class ApplicationEvolutions @Inject()(config: EvolutionsConfig,
       case _ => lockPlayEvolutionsLockSqls
     }
     try {
-      for (script <- lockScripts) s.executeQuery(
-          applySchema(script, dbConfig.schema))
+      for (script <- lockScripts)
+        s.executeQuery(applySchema(script, dbConfig.schema))
     } catch {
       case e: SQLException =>
         if (attempts == 0) throw e
@@ -303,10 +303,10 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
 
     // Since the evolutions config was completely inverted and has changed massively, we have our own deprecated
     // implementation that reads deprecated keys from the root config, otherwise reads from the passed in config
-    def getDeprecated[A : ConfigLoader](config: PlayConfig,
-                                        baseKey: => String,
-                                        path: String,
-                                        deprecated: String): A = {
+    def getDeprecated[A: ConfigLoader](config: PlayConfig,
+                                       baseKey: => String,
+                                       path: String,
+                                       deprecated: String): A = {
       if (rootConfig.underlying.hasPath(deprecated)) {
         rootConfig.reportDeprecation(s"$baseKey.$path", deprecated)
         rootConfig.get[A](deprecated)
@@ -330,15 +330,23 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
     // Load defaults
     val enabled = config.get[Boolean]("enabled")
     val schema = config.get[String]("schema")
-    val autocommit = getDeprecated[Boolean](
-        config, "play.evolutions", "autocommit", "evolutions.autocommit")
-    val useLocks = getDeprecated[Boolean](
-        config, "play.evolutions", "useLocks", "evolutions.use.locks")
+    val autocommit = getDeprecated[Boolean](config,
+                                            "play.evolutions",
+                                            "autocommit",
+                                            "evolutions.autocommit")
+    val useLocks = getDeprecated[Boolean](config,
+                                          "play.evolutions",
+                                          "useLocks",
+                                          "evolutions.use.locks")
     val autoApply = config.get[Boolean]("autoApply")
     val autoApplyDowns = config.get[Boolean]("autoApplyDowns")
 
-    val defaultConfig = new DefaultEvolutionsDatasourceConfig(
-        enabled, schema, autocommit, useLocks, autoApply, autoApplyDowns)
+    val defaultConfig = new DefaultEvolutionsDatasourceConfig(enabled,
+                                                              schema,
+                                                              autocommit,
+                                                              useLocks,
+                                                              autoApply,
+                                                              autoApplyDowns)
 
     // Load config specific to datasources
     // Since not all the datasources will necessarily appear in the db map, because some will come from deprecated
@@ -362,8 +370,12 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
                                  s"play.evolutions.db.$datasource",
                                  "autoApplyDowns",
                                  s"applyDownEvolutions.$datasource")
-        datasource -> new DefaultEvolutionsDatasourceConfig(
-            enabled, schema, autocommit, useLocks, autoApply, autoApplyDowns)
+        datasource -> new DefaultEvolutionsDatasourceConfig(enabled,
+                                                            schema,
+                                                            autocommit,
+                                                            useLocks,
+                                                            autoApply,
+                                                            autoApplyDowns)
     }.toMap
 
     new DefaultEvolutionsConfig(defaultConfig, datasourceConfig)
@@ -409,28 +421,29 @@ class EvolutionsWebCommands @Inject()(evolutions: EvolutionsApi,
       .getOrElse("/")
 
     // Regex removes all parent directories from request path
-    request.path.replaceFirst("^((?!/@evolutions).)*(/@evolutions.*$)", "$2") match {
+    request.path
+      .replaceFirst("^((?!/@evolutions).)*(/@evolutions.*$)", "$2") match {
 
       case applyEvolutions(db) => {
-          Some {
-            val scripts =
-              evolutions.scripts(db, reader, config.forDatasource(db).schema)
-            evolutions.evolve(db,
-                              scripts,
-                              config.forDatasource(db).autocommit,
-                              config.forDatasource(db).schema)
-            buildLink.forceReload()
-            play.api.mvc.Results.Redirect(redirectUrl)
-          }
+        Some {
+          val scripts =
+            evolutions.scripts(db, reader, config.forDatasource(db).schema)
+          evolutions.evolve(db,
+                            scripts,
+                            config.forDatasource(db).autocommit,
+                            config.forDatasource(db).schema)
+          buildLink.forceReload()
+          play.api.mvc.Results.Redirect(redirectUrl)
         }
+      }
 
       case resolveEvolutions(db, rev) => {
-          Some {
-            evolutions.resolve(db, rev.toInt, config.forDatasource(db).schema)
-            buildLink.forceReload()
-            play.api.mvc.Results.Redirect(redirectUrl)
-          }
+        Some {
+          evolutions.resolve(db, rev.toInt, config.forDatasource(db).schema)
+          buildLink.forceReload()
+          play.api.mvc.Results.Redirect(redirectUrl)
         }
+      }
 
       case _ => None
     }

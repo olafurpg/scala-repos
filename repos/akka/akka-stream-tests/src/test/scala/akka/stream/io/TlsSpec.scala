@@ -32,12 +32,12 @@ object TlsSpec {
     val password = "changeme"
 
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    keyStore.load(
-        getClass.getResourceAsStream("/keystore"), password.toCharArray)
+    keyStore
+      .load(getClass.getResourceAsStream("/keystore"), password.toCharArray)
 
     val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    trustStore.load(
-        getClass.getResourceAsStream(trustPath), password.toCharArray)
+    trustStore
+      .load(getClass.getResourceAsStream(trustPath), password.toCharArray)
 
     val keyManagerFactory =
       KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
@@ -114,7 +114,8 @@ class TlsSpec
     }
 
     val cipherSuites = NegotiateNewSession.withCipherSuites(
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA")
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_RSA_WITH_AES_128_CBC_SHA")
     def clientTls(closing: TLSClosing) =
       TLS(sslContext, cipherSuites, Client, closing)
     def badClientTls(closing: TLSClosing) =
@@ -266,7 +267,7 @@ class TlsSpec
             bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
         }.take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreCancel
 
@@ -283,7 +284,7 @@ class TlsSpec
             bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
         }.take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreBoth
 
@@ -340,8 +341,8 @@ class TlsSpec
     object SessionRenegotiationFirstOne extends PayloadScenario {
       override def flow = logCipherSuite
       def inputs =
-        NegotiateNewSession.withCipherSuites("TLS_RSA_WITH_AES_128_CBC_SHA") :: send(
-            "hello") :: Nil
+        NegotiateNewSession
+          .withCipherSuites("TLS_RSA_WITH_AES_128_CBC_SHA") :: send("hello") :: Nil
       def output = ByteString("TLS_RSA_WITH_AES_128_CBC_SHAhello")
     }
 
@@ -376,7 +377,7 @@ class TlsSpec
                                         scenario.rightClosing,
                                         onRHS))
           .transform(() ⇒
-                new PushStage[SslTlsInbound, SslTlsInbound] {
+            new PushStage[SslTlsInbound, SslTlsInbound] {
               override def onPush(elem: SslTlsInbound,
                                   ctx: Context[SslTlsInbound]) =
                 ctx.push(elem)
@@ -412,19 +413,19 @@ class TlsSpec
         .collect { case Right(e) ⇒ e }
         .toMat(Sink.head)(Keep.right)
 
-      val simple = Flow.fromSinkAndSourceMat(
-          getError, Source.maybe[SslTlsOutbound])(Keep.left)
+      val simple =
+        Flow.fromSinkAndSourceMat(getError, Source.maybe[SslTlsOutbound])(
+            Keep.left)
 
       // The creation of actual TCP connections is necessary. It is the easiest way to decouple the client and server
       // under error conditions, and has the bonus of matching most actual SSL deployments.
       val (server, serverErr) = Tcp()
         .bind("localhost", 0)
-        .map(c ⇒
-              {
-            c.flow
-              .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
-                      Keep.right))(Keep.right)
-              .run()
+        .map(c ⇒ {
+          c.flow
+            .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
+                Keep.right))(Keep.right)
+            .run()
         })
         .toMat(Sink.head)(Keep.both)
         .run()
@@ -432,11 +433,12 @@ class TlsSpec
       val clientErr = simple
         .join(badClientTls(IgnoreBoth))
         .join(Tcp().outgoingConnection(
-                Await.result(server, 1.second).localAddress))
+            Await.result(server, 1.second).localAddress))
         .run()
 
-      Await.result(serverErr.flatMap(identity), 1.second).getMessage should include(
-          "certificate_unknown")
+      Await
+        .result(serverErr.flatMap(identity), 1.second)
+        .getMessage should include("certificate_unknown")
       Await.result(clientErr, 1.second).getMessage should equal(
           "General SSLEngine problem")
     }
@@ -444,10 +446,9 @@ class TlsSpec
     "reliably cancel subscriptions when TransportIn fails early" in assertAllStagesStopped {
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
+        .fromGraph(GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
+                                   Sink.head[ByteString],
+                                   Sink.head[SslTlsInbound])((_, _, _)) {
           implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             s ~> tls.in1; tls.out1 ~> o1
@@ -466,10 +467,9 @@ class TlsSpec
     "reliably cancel subscriptions when UserIn fails early" in assertAllStagesStopped {
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Source.asSubscriber[ByteString],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
+        .fromGraph(GraphDSL.create(Source.asSubscriber[ByteString],
+                                   Sink.head[ByteString],
+                                   Sink.head[SslTlsInbound])((_, _, _)) {
           implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             Source.failed[SslTlsOutbound](ex) ~> tls.in1; tls.out1 ~> o1

@@ -41,10 +41,10 @@ object Test extends ScaladocModelTest {
     for ((method, name, refs) <- expected) {
       assert(method.valueParams(0)(0).resultType.name == name,
              method.valueParams(0)(0).resultType.name + " == " + name +
-             " (in " + method.qualifiedName + ")")
+               " (in " + method.qualifiedName + ")")
       assert(method.valueParams(0)(0).resultType.refEntity.size == refs,
              method.valueParams(0)(0).resultType.refEntity.size + " == " +
-             refs + " (in " + method.qualifiedName + ")")
+               refs + " (in " + method.qualifiedName + ")")
     }
 
     val A = base._package("pack1")._package("c")._class("A")

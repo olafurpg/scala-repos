@@ -76,7 +76,8 @@ object Timeline extends AnimationStatics {
   * @define DV Default value:
   */
 class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
-    extends Animation(delegate) with SFXDelegate[jfxa.Timeline] {
+    extends Animation(delegate)
+    with SFXDelegate[jfxa.Timeline] {
 
   // CONSTRUCTORS
 
@@ -98,11 +99,9 @@ class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
     // this(new jfxa.Timeline(targetFramerate, keyFrames.map(_.delegate).toArray: _*))
     // solution from https://github.com/scalafx/scalafx/issues/7
     // this(new jfxa.Timeline(targetFramerate, keyFrames.map { kf: KeyFrame => kf.delegate } : _*))
-    this(
-        new jfxa.Timeline(targetFramerate,
-                          keyFrames
-                            .map((keyFrame: KeyFrame) => keyFrame.delegate)
-                            .toArray: _*))
+    this(new jfxa.Timeline(
+        targetFramerate,
+        keyFrames.map((keyFrame: KeyFrame) => keyFrame.delegate).toArray: _*))
   }
 
   // PROPERTIES

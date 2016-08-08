@@ -29,7 +29,8 @@ class IntegralCompTest extends WordSpec with Matchers {
       //Boxed
       intComp.isIntegral(new java.lang.Long(2)) shouldBe true
       intComp.isIntegral(new java.lang.Integer(2)) shouldBe true
-      intComp.isIntegral(new java.lang.Short(2.asInstanceOf[Short])) shouldBe true
+      intComp
+        .isIntegral(new java.lang.Short(2.asInstanceOf[Short])) shouldBe true
       intComp.isIntegral(new java.lang.Long(2)) shouldBe true
       intComp.isIntegral(new java.lang.Long(2)) shouldBe true
       //These are not integrals

@@ -42,11 +42,11 @@ case object Native extends NettyTransport
 /**
   * creates a Server implementation based Netty
   */
-class NettyServer(config: ServerConfig,
-                  val applicationProvider: ApplicationProvider,
-                  stopHook: () => Future[_],
-                  val actorSystem: ActorSystem)(
-    implicit val materializer: Materializer)
+class NettyServer(
+    config: ServerConfig,
+    val applicationProvider: ApplicationProvider,
+    stopHook: () => Future[_],
+    val actorSystem: ActorSystem)(implicit val materializer: Materializer)
     extends Server {
 
   private val nettyConfig =
@@ -96,8 +96,8 @@ class NettyServer(config: ServerConfig,
       None
   }
 
-  private def setOptions(
-      setOption: (ChannelOption[AnyRef], AnyRef) => Any, config: Config) = {
+  private def setOptions(setOption: (ChannelOption[AnyRef], AnyRef) => Any,
+                         config: Config) = {
     def unwrap(value: ConfigValue) = value.unwrapped() match {
       case number: Number => number.intValue().asInstanceOf[Integer]
       case other => other
@@ -108,8 +108,8 @@ class NettyServer(config: ServerConfig,
       .filterNot(_.getKey.startsWith("child."))
       .foreach { option =>
         if (ChannelOption.exists(option.getKey)) {
-          setOption(
-              ChannelOption.valueOf(option.getKey), unwrap(option.getValue))
+          setOption(ChannelOption.valueOf(option.getKey),
+                    unwrap(option.getValue))
         } else {
           logger.warn(
               "Ignoring unknown Netty channel option: " + option.getKey)
@@ -132,8 +132,8 @@ class NettyServer(config: ServerConfig,
     val serverChannelEventLoop = eventLoop.next
 
     // Watches for channel events, and pushes them through a reactive streams publisher.
-    val channelPublisher = new HandlerPublisher(
-        serverChannelEventLoop, classOf[Channel])
+    val channelPublisher =
+      new HandlerPublisher(serverChannelEventLoop, classOf[Channel])
 
     val channelClass = transport match {
       case Native => classOf[EpollServerSocketChannel]
@@ -189,8 +189,9 @@ class NettyServer(config: ServerConfig,
 
       // Netty HTTP decoders/encoders/etc
       pipeline.addLast("decoder",
-                       new HttpRequestDecoder(
-                           maxInitialLineLength, maxHeaderSize, maxChunkSize))
+                       new HttpRequestDecoder(maxInitialLineLength,
+                                              maxHeaderSize,
+                                              maxChunkSize))
       pipeline.addLast("encoder", new HttpResponseEncoder())
       pipeline.addLast("decompressor", new HttpContentDecompressor())
       if (logWire) {

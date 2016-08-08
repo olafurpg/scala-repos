@@ -7,7 +7,11 @@ import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.launcher.{TaskOp, TaskLauncher}
 import mesosphere.marathon.metrics.Metrics
-import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonSchedulerDriverHolder,
+  MarathonSpec,
+  MarathonTestHelper
+}
 import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.OfferID
 import org.apache.mesos.Protos.{Offer, TaskInfo}

@@ -5,8 +5,15 @@ package play.api.libs.iteratee
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
-import play.api.libs.iteratee.internal.{eagerFuture, executeFuture, executeIteratee, prepared}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
+import play.api.libs.iteratee.internal.{
+  eagerFuture,
+  executeFuture,
+  executeIteratee,
+  prepared
+}
 
 /**
   * Various helper methods to construct, compose and traverse Iteratees.
@@ -40,8 +47,8 @@ object Iteratee {
     * @param f a function folding the previous state and an input to a new state
     * $paramEcSingle
     */
-  def fold[E, A](state: A)(
-      f: (A, E) => A)(implicit ec: ExecutionContext): Iteratee[E, A] =
+  def fold[E, A](state: A)(f: (A, E) => A)(
+      implicit ec: ExecutionContext): Iteratee[E, A] =
     foldM(state)((a, e: E) => eagerFuture(f(a, e)))(ec)
 
   /**
@@ -63,9 +70,9 @@ object Iteratee {
       case Input.EOF => Done(s, Input.EOF)
       case Input.Empty => Cont[E, A](step(s))
       case Input.El(e) => {
-          val newS = executeFuture(f(s, e))(pec);
-          flatten(newS.map(s1 => Cont[E, A](step(s1)))(dec))
-        }
+        val newS = executeFuture(f(s, e))(pec);
+        flatten(newS.map(s1 => Cont[E, A](step(s1)))(dec))
+      }
     }
     (Cont[E, A](step(state)))
   }
@@ -86,13 +93,12 @@ object Iteratee {
       case Input.EOF => Done(s, Input.EOF)
       case Input.Empty => Cont[E, A](step(s))
       case Input.El(e) => {
-          val newS = executeFuture(f(s, e))(pec);
-          flatten(
-              newS.map[Iteratee[E, A]] {
-            case (s1, done) =>
-              if (!done) Cont[E, A](step(s1)) else Done(s1, Input.Empty)
-          }(dec))
-        }
+        val newS = executeFuture(f(s, e))(pec);
+        flatten(newS.map[Iteratee[E, A]] {
+          case (s1, done) =>
+            if (!done) Cont[E, A](step(s1)) else Done(s1, Input.Empty)
+        }(dec))
+      }
     }
     (Cont[E, A](step(state)))
   }
@@ -240,14 +246,12 @@ object Iteratee {
   def eofOrElse[E] = new EofOrElse[E] {
     def apply[A, B](otherwise: => B)(eofValue: A): Iteratee[E, Either[B, A]] = {
       def cont: Iteratee[E, Either[B, A]] =
-        Cont(
-            (in: Input[E]) =>
-              {
-            in match {
-              case Input.El(e) => Done(Left(otherwise), in)
-              case Input.EOF => Done(Right(eofValue), in)
-              case Input.Empty => cont
-            }
+        Cont((in: Input[E]) => {
+          in match {
+            case Input.El(e) => Done(Left(otherwise), in)
+            case Input.EOF => Done(Right(eofValue), in)
+            case Input.Empty => cont
+          }
         })
       cont
     }
@@ -594,9 +598,9 @@ trait Iteratee[E, +A] { self =>
           case Step.Error(msg, e) => Error(msg, e)
         }(dec)
       case Step.Cont(k) => {
-          implicit val pec = ec.prepare()
-          Cont((in: Input[E]) => executeIteratee(k(in))(dec).flatMap(f)(pec))
-        }
+        implicit val pec = ec.prepare()
+        Cont((in: Input[E]) => executeIteratee(k(in))(dec).flatMap(f)(pec))
+      }
       case Step.Error(msg, e) => Error(msg, e)
     }
   }
@@ -634,17 +638,17 @@ trait Iteratee[E, +A] { self =>
       case Step.Done(a, e) =>
         executeIteratee(f(a))(pec).pureFlatFold {
           case Step.Done(a, eIn) => {
-              val fullIn = (e, eIn) match {
-                case (Input.Empty, in) => in
-                case (in, Input.Empty) => in
-                case (Input.EOF, _) => Input.EOF
-                case (in, Input.EOF) => in
-                case (Input.El(e1), Input.El(e2)) =>
-                  Input.El[E](p(e1) ++ p(e2))
-              }
-
-              Done(a, fullIn)
+            val fullIn = (e, eIn) match {
+              case (Input.Empty, in) => in
+              case (in, Input.Empty) => in
+              case (Input.EOF, _) => Input.EOF
+              case (in, Input.EOF) => in
+              case (Input.El(e1), Input.El(e2)) =>
+                Input.El[E](p(e1) ++ p(e2))
             }
+
+            Done(a, fullIn)
+          }
           case Step.Cont(k) => k(e)
           case Step.Error(msg, e) => Error(msg, e)
         }(dec)
@@ -776,7 +780,8 @@ trait Iteratee[E, +A] { self =>
   * state is immediately available.
   */
 private sealed trait StepIteratee[E, A]
-    extends Iteratee[E, A] with Step[E, A] {
+    extends Iteratee[E, A]
+    with Step[E, A] {
 
   final override def it: Iteratee[E, A] = this
   final def immediateUnflatten: Step[E, A] = this
@@ -805,7 +810,8 @@ private sealed trait StepIteratee[E, A]
 
   protected[play] final override def pureFoldNoEC[B](
       folder: Step[E, A] => B): Future[B] = {
-    try Future.successful(folder(immediateUnflatten)) catch {
+    try Future.successful(folder(immediateUnflatten))
+    catch {
       case NonFatal(e) => Future.failed(e)
     }
   }
@@ -820,7 +826,8 @@ private sealed trait StepIteratee[E, A]
   * An iteratee in the "done" state.
   */
 private final class DoneIteratee[E, A](a: A, e: Input[E])
-    extends Step.Done[A, E](a, e) with StepIteratee[E, A] {
+    extends Step.Done[A, E](a, e)
+    with StepIteratee[E, A] {
 
   /**
     * Use an optimized implementation because this method is called by Play when running an
@@ -828,8 +835,7 @@ private final class DoneIteratee[E, A](a: A, e: Input[E])
     */
   override def mapM[B](f: A => Future[B])(
       implicit ec: ExecutionContext): Iteratee[E, B] = {
-    Iteratee.flatten(
-        executeFuture {
+    Iteratee.flatten(executeFuture {
       f(a).map[Iteratee[E, B]](Done(_, e))(dec)
     }(ec /* delegate preparation */ ))
   }
@@ -839,13 +845,15 @@ private final class DoneIteratee[E, A](a: A, e: Input[E])
   * An iteratee in the "cont" state.
   */
 private final class ContIteratee[E, A](k: Input[E] => Iteratee[E, A])
-    extends Step.Cont[E, A](k) with StepIteratee[E, A] {}
+    extends Step.Cont[E, A](k)
+    with StepIteratee[E, A] {}
 
 /**
   * An iteratee in the "error" state.
   */
 private final class ErrorIteratee[E](msg: String, e: Input[E])
-    extends Step.Error[E](msg, e) with StepIteratee[E, Nothing] {}
+    extends Step.Error[E](msg, e)
+    with StepIteratee[E, Nothing] {}
 
 /**
   * An iteratee whose state is provided in a Future, vs [[StepIteratee]].

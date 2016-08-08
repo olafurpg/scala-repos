@@ -38,7 +38,8 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 class AppendOnlyMap[K, V](initialCapacity: Int = 64)
-    extends Iterable[(K, V)] with Serializable {
+    extends Iterable[(K, V)]
+    with Serializable {
 
   import AppendOnlyMap._
 

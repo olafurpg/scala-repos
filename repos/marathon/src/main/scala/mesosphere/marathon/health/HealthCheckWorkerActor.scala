@@ -6,7 +6,12 @@ import javax.net.ssl.{KeyManager, SSLContext, X509TrustManager}
 
 import akka.actor.{Actor, ActorLogging, PoisonPill}
 import akka.util.Timeout
-import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol.{COMMAND, HTTP, HTTPS, TCP}
+import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol.{
+  COMMAND,
+  HTTP,
+  HTTPS,
+  TCP
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.{AppDefinition, Timestamp}
 import mesosphere.util.ThreadPoolContext
@@ -61,7 +66,7 @@ class HealthCheckWorkerActor extends Actor with ActorLogging {
             Future.failed {
               val message =
                 s"COMMAND health checks can only be performed " +
-                "by the Mesos executor."
+                  "by the Mesos executor."
               log.warning(message)
               new UnsupportedOperationException(message)
             }
@@ -101,8 +106,10 @@ class HealthCheckWorkerActor extends Actor with ActorLogging {
             s"Ignoring health check HTTP response ${response.status.intValue} for ${task.taskId}")
         None
       } else {
-        Some(Unhealthy(
-                task.taskId, launched.appVersion, response.status.toString()))
+        Some(
+            Unhealthy(task.taskId,
+                      launched.appVersion,
+                      response.status.toString()))
       }
     }
   }
@@ -144,18 +151,18 @@ class HealthCheckWorkerActor extends Actor with ActorLogging {
       implicit val requestTimeout = Timeout(check.timeout)
       implicit def trustfulSslContext: SSLContext = {
         object BlindFaithX509TrustManager extends X509TrustManager {
-          def checkClientTrusted(
-              chain: Array[X509Certificate], authType: String): Unit = ()
-          def checkServerTrusted(
-              chain: Array[X509Certificate], authType: String): Unit = ()
+          def checkClientTrusted(chain: Array[X509Certificate],
+                                 authType: String): Unit = ()
+          def checkServerTrusted(chain: Array[X509Certificate],
+                                 authType: String): Unit = ()
           def getAcceptedIssuers: Array[X509Certificate] =
             Array[X509Certificate]()
         }
 
         val context = SSLContext.getInstance("Default")
         //scalastyle:off null
-        context.init(
-            Array[KeyManager](), Array(BlindFaithX509TrustManager), null)
+        context
+          .init(Array[KeyManager](), Array(BlindFaithX509TrustManager), null)
         //scalastyle:on
         context
       }
@@ -167,8 +174,10 @@ class HealthCheckWorkerActor extends Actor with ActorLogging {
       if (acceptableResponses contains response.status.intValue)
         Some(Healthy(task.taskId, launched.appVersion))
       else
-        Some(Unhealthy(
-                task.taskId, launched.appVersion, response.status.toString()))
+        Some(
+            Unhealthy(task.taskId,
+                      launched.appVersion,
+                      response.status.toString()))
     }
   }
 }

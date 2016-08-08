@@ -24,14 +24,16 @@ private[akka] class HdrHistogram(highestTrackableValue: Long,
     new hdr.Histogram(highestTrackableValue, numberOfSignificantValueDigits)
 
   def update(value: Long) {
-    try hist.recordValue(value) catch {
+    try hist.recordValue(value)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }
   }
 
   def updateWithCount(value: Long, count: Long) {
-    try hist.recordValueWithCount(value, count) catch {
+    try hist.recordValueWithCount(value, count)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }
@@ -42,7 +44,7 @@ private[akka] class HdrHistogram(highestTrackableValue: Long,
       ex: ArrayIndexOutOfBoundsException): IllegalArgumentException =
     new IllegalArgumentException(
         s"Given value $value can not be stored in this histogram " +
-        s"(min: ${hist.getLowestTrackableValue}, max: ${hist.getHighestTrackableValue}})",
+          s"(min: ${hist.getLowestTrackableValue}, max: ${hist.getHighestTrackableValue}})",
         ex)
 
   def getData = hist.copy().getHistogramData

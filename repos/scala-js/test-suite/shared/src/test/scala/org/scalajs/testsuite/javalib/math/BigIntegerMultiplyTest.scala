@@ -563,12 +563,12 @@ class BigIntegerMultiplyTest {
   @Test def testPow31_issue_2045(): Unit = {
     assertEquals(BigInt("2147483648"), BigInt(2).pow(31))
     assertEquals(BigInt("1326443518324400147398656"), BigInt(6).pow(31))
-    assertEquals(
-        BigInt("10000000000000000000000000000000"), BigInt(10).pow(31))
-    assertEquals(
-        BigInt("338820052976784335907174521413566464"), BigInt(14).pow(31))
-    assertEquals(
-        BigInt("819308872942260126404286866009182175232"), BigInt(18).pow(31))
+    assertEquals(BigInt("10000000000000000000000000000000"),
+                 BigInt(10).pow(31))
+    assertEquals(BigInt("338820052976784335907174521413566464"),
+                 BigInt(14).pow(31))
+    assertEquals(BigInt("819308872942260126404286866009182175232"),
+                 BigInt(18).pow(31))
     assertEquals(BigInt("412195366437884247746798137865015318806528"),
                  BigInt(22).pow(31))
     assertEquals(BigInt("73143171433403393900724146770015259539275776"),

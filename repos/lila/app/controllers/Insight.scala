@@ -23,8 +23,10 @@ object Insight extends LilaController {
          dimension = Dimension.Perf.key,
          filters = "")
 
-  def path(
-      username: String, metric: String, dimension: String, filters: String) =
+  def path(username: String,
+           metric: String,
+           dimension: String,
+           filters: String) =
     Open { implicit ctx =>
       Accessible(username) { user =>
         import lila.insight.InsightApi.UserStatus._
@@ -41,8 +43,8 @@ object Insight extends LilaController {
                                      cache = cache,
                                      prefId = prefId,
                                      ui = env.jsonView.ui(cache.ecos),
-                                     question = env.jsonView.question(
-                                           metric, dimension, filters),
+                                     question = env.jsonView
+                                       .question(metric, dimension, filters),
                                      stale = s == Stale))
         }
       }

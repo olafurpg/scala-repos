@@ -12,4 +12,5 @@ trait SemigroupKSyntax1 {
 }
 
 trait SemigroupKSyntax
-    extends SemigroupK.ToSemigroupKOps with SemigroupKSyntax1
+    extends SemigroupK.ToSemigroupKOps
+    with SemigroupKSyntax1

@@ -20,7 +20,10 @@ package org.apache.spark.sql.execution
 import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.execution.datasources.{DataSourceStrategy, FileSourceStrategy}
+import org.apache.spark.sql.execution.datasources.{
+  DataSourceStrategy,
+  FileSourceStrategy
+}
 import org.apache.spark.sql.internal.SQLConf
 
 class SparkPlanner(val sparkContext: SparkContext,
@@ -32,7 +35,7 @@ class SparkPlanner(val sparkContext: SparkContext,
 
   def strategies: Seq[Strategy] =
     experimentalMethods.extraStrategies ++
-    (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
+      (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
 
   /**
     * Used to build table scan operators where complex projection and filtering are done using
@@ -73,8 +76,8 @@ class SparkPlanner(val sparkContext: SparkContext,
       filterCondition.map(Filter(_, scan)).getOrElse(scan)
     } else {
       val scan = scanBuilder((projectSet ++ filterSet).toSeq)
-      Project(
-          projectList, filterCondition.map(Filter(_, scan)).getOrElse(scan))
+      Project(projectList,
+              filterCondition.map(Filter(_, scan)).getOrElse(scan))
     }
   }
 }

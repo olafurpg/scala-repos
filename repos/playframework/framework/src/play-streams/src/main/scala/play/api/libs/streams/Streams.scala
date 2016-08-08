@@ -7,7 +7,10 @@ import akka.stream.Materializer
 import akka.stream.scaladsl._
 import org.reactivestreams._
 import play.api.libs.iteratee._
-import play.api.libs.streams.impl.{SubscriberPublisherProcessor, SubscriberIteratee}
+import play.api.libs.streams.impl.{
+  SubscriberPublisherProcessor,
+  SubscriberIteratee
+}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
@@ -119,8 +122,8 @@ object Streams {
     * Fold an Iteratee and publish its result. This method is used
     * by iterateeDoneToPublisher to extract the value of a Done iteratee.
     */
-  private def iterateeFoldToPublisher[T, U, V](
-      iter: Iteratee[T, U], f: Step[T, U] => Future[V])(
+  private def iterateeFoldToPublisher[T, U, V](iter: Iteratee[T, U],
+                                               f: Step[T, U] => Future[V])(
       implicit ec: ExecutionContext): Publisher[V] = {
     val fut: Future[V] = iter.fold(f)(ec.prepare)
     val pubr: Publisher[V] = futureToPublisher(fut)
@@ -154,8 +157,8 @@ object Streams {
     * be ignored. If it is set to Some(x) then it will call onNext
     * with the value x.
     */
-  def enumeratorToPublisher[T](
-      enum: Enumerator[T], emptyElement: Option[T] = None): Publisher[T] =
+  def enumeratorToPublisher[T](enum: Enumerator[T],
+                               emptyElement: Option[T] = None): Publisher[T] =
     new impl.EnumeratorPublisher(enum, emptyElement)
 
   /**

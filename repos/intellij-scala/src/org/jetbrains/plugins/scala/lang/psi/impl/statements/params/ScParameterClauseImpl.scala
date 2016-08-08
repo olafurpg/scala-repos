@@ -37,8 +37,8 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
   override def toString: String = "ParametersClause"
 
   def parameters: Seq[ScParameter] = {
-    getStubOrPsiChildren[ScParameter](
-        TokenSets.PARAMETERS, JavaArrayFactoryUtil.ScParameterFactory)
+    getStubOrPsiChildren[ScParameter](TokenSets.PARAMETERS,
+                                      JavaArrayFactoryUtil.ScParameterFactory)
   }
 
   @volatile

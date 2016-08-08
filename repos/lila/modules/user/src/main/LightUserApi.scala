@@ -18,7 +18,8 @@ final class LightUserApi(coll: Coll) {
     def read(doc: BSONDocument) =
       LightUser(
           id = doc.getAs[String](F.id) err "LightUser id missing",
-          name = doc.getAs[String](F.username) err "LightUser username missing",
+          name = doc
+              .getAs[String](F.username) err "LightUser username missing",
           title = doc.getAs[String](F.title))
   }
 

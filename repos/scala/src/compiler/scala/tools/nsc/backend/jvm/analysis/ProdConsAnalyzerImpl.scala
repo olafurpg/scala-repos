@@ -70,8 +70,8 @@ trait ProdConsAnalyzerImpl {
     * Returns the potential producer instructions of a (local or stack) value in the frame of `insn`.
     * This method simply returns the producer information computed by the SourceValue analysis.
     */
-  def producersForValueAt(
-      insn: AbstractInsnNode, slot: Int): Set[AbstractInsnNode] = {
+  def producersForValueAt(insn: AbstractInsnNode,
+                          slot: Int): Set[AbstractInsnNode] = {
     frameAt(insn).getValue(slot).insns.asScala.toSet
   }
 
@@ -79,19 +79,16 @@ trait ProdConsAnalyzerImpl {
     * Returns the potential consumer instructions of a (local or stack) value in the frame of `insn`.
     * This is the counterpart of `producersForValueAt`.
     */
-  def consumersOfValueAt(
-      insn: AbstractInsnNode, slot: Int): Set[AbstractInsnNode] = {
-    producersForValueAt(insn, slot).flatMap(
-        prod =>
-          {
-        val outputNumber = outputValueSlots(prod).indexOf(slot)
-        _consumersOfOutputsFrom
-          .get(prod)
-          .map(v =>
-                {
-              v(outputNumber)
-          })
-          .getOrElse(Set.empty)
+  def consumersOfValueAt(insn: AbstractInsnNode,
+                         slot: Int): Set[AbstractInsnNode] = {
+    producersForValueAt(insn, slot).flatMap(prod => {
+      val outputNumber = outputValueSlots(prod).indexOf(slot)
+      _consumersOfOutputsFrom
+        .get(prod)
+        .map(v => {
+          v(outputNumber)
+        })
+        .getOrElse(Set.empty)
     })
   }
 
@@ -113,8 +110,8 @@ trait ProdConsAnalyzerImpl {
         _consumersOfOutputsFrom
           .get(insn)
           .map(v =>
-                v.indices.flatMap(v.apply)(collection.breakOut): Set[
-                    AbstractInsnNode])
+            v.indices
+              .flatMap(v.apply)(collection.breakOut): Set[AbstractInsnNode])
           .getOrElse(Set.empty)
     }
 
@@ -125,10 +122,10 @@ trait ProdConsAnalyzerImpl {
     * and LOAD. If the producer of the value is a LOAD, then the producers of the stored value(s) are
     * returned instead.
     */
-  def initialProducersForValueAt(
-      insn: AbstractInsnNode, slot: Int): Set[AbstractInsnNode] = {
-    def initialProducers(
-        insn: AbstractInsnNode, producedSlot: Int): Set[AbstractInsnNode] = {
+  def initialProducersForValueAt(insn: AbstractInsnNode,
+                                 slot: Int): Set[AbstractInsnNode] = {
+    def initialProducers(insn: AbstractInsnNode,
+                         producedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, producedSlot)
         _initialProducersCache.getOrElseUpdate(key, {
@@ -152,10 +149,10 @@ trait ProdConsAnalyzerImpl {
     * Returns the potential ultimate consumers of a value in the frame of `insn`. Consumers are
     * tracked through copying operations such as SOTRE and LOAD.
     */
-  def ultimateConsumersOfValueAt(
-      insn: AbstractInsnNode, slot: Int): Set[AbstractInsnNode] = {
-    def ultimateConsumers(
-        insn: AbstractInsnNode, consumedSlot: Int): Set[AbstractInsnNode] = {
+  def ultimateConsumersOfValueAt(insn: AbstractInsnNode,
+                                 slot: Int): Set[AbstractInsnNode] = {
+    def ultimateConsumers(insn: AbstractInsnNode,
+                          consumedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, consumedSlot)
         _ultimateConsumersCache.getOrElseUpdate(key, {
@@ -216,7 +213,8 @@ trait ProdConsAnalyzerImpl {
     *   - the result is the value at slot 2 in the frame of `copyOp`
     */
   private def copyOperationSourceValue(
-      copyOp: AbstractInsnNode, producedSlot: Int): (SourceValue, Int) = {
+      copyOp: AbstractInsnNode,
+      producedSlot: Int): (SourceValue, Int) = {
     val frame = frameAt(copyOp)
 
     // Index of the produced value. Example: DUP_X1 produces 3 values, so producedIndex is 0, 1 or 2,
@@ -248,10 +246,8 @@ trait ProdConsAnalyzerImpl {
     }
 
     if (isLoad(copyOp)) {
-      val slot = copyOp
-        .asInstanceOf[VarInsnNode]
-        .`var`
-        (frame.getLocal(slot), slot)
+      val slot = copyOp.asInstanceOf[VarInsnNode].`var`
+      (frame.getLocal(slot), slot)
     } else if (isStore(copyOp)) {
       stackValue(0)
     } else
@@ -316,8 +312,8 @@ trait ProdConsAnalyzerImpl {
     *   - if consumedSlot == 2, the result is Set(3)
     *   - if consumedSlot == 3, the result is Set(2, 4)
     */
-  private def copyOperationProducedValueSlots(
-      copyOp: AbstractInsnNode, consumedSlot: Int): Set[Int] = {
+  private def copyOperationProducedValueSlots(copyOp: AbstractInsnNode,
+                                              consumedSlot: Int): Set[Int] = {
     if (isStore(copyOp)) Set(copyOp.asInstanceOf[VarInsnNode].`var`)
     else {
       val nextFrame = frameAt(copyOp.getNext)
@@ -445,7 +441,8 @@ trait ProdConsAnalyzerImpl {
 
   /** For each instruction, a set of potential consumers of the produced values. */
   private lazy val _consumersOfOutputsFrom: Map[
-      AbstractInsnNode, Vector[Set[AbstractInsnNode]]] = {
+      AbstractInsnNode,
+      Vector[Set[AbstractInsnNode]]] = {
     var res = Map.empty[AbstractInsnNode, Vector[Set[AbstractInsnNode]]]
     for {
       insn <- methodNode.instructions.iterator.asScala
@@ -458,17 +455,20 @@ trait ProdConsAnalyzerImpl {
           producer,
           Vector.fill(producedSlots.size)(Set.empty[AbstractInsnNode]))
       val outputIndex = producedSlots.indexOf(i)
-      res = res.updated(producer,
-                        currentConsumers.updated(
-                            outputIndex, currentConsumers(outputIndex) + insn))
+      res = res.updated(
+          producer,
+          currentConsumers.updated(outputIndex,
+                                   currentConsumers(outputIndex) + insn))
     }
     res
   }
 
   private val _initialProducersCache: mutable.AnyRefMap[
-      (AbstractInsnNode, Int), Set[AbstractInsnNode]] = mutable.AnyRefMap.empty
+      (AbstractInsnNode, Int),
+      Set[AbstractInsnNode]] = mutable.AnyRefMap.empty
   private val _ultimateConsumersCache: mutable.AnyRefMap[
-      (AbstractInsnNode, Int), Set[AbstractInsnNode]] = mutable.AnyRefMap.empty
+      (AbstractInsnNode, Int),
+      Set[AbstractInsnNode]] = mutable.AnyRefMap.empty
 }
 
 /**
@@ -504,13 +504,14 @@ abstract class InitialProducer extends AbstractInsnNode(-1) {
 
 case class ParameterProducer(local: Int) extends InitialProducer
 case class UninitializedLocalProducer(local: Int) extends InitialProducer
-case class ExceptionProducer[V <: Value](
-    handlerLabel: LabelNode, handlerFrame: Frame[V])
+case class ExceptionProducer[V <: Value](handlerLabel: LabelNode,
+                                         handlerFrame: Frame[V])
     extends InitialProducer
 
 class InitialProducerSourceInterpreter extends SourceInterpreter {
-  override def newParameterValue(
-      isInstanceMethod: Boolean, local: Int, tp: Type): SourceValue = {
+  override def newParameterValue(isInstanceMethod: Boolean,
+                                 local: Int,
+                                 tp: Type): SourceValue = {
     new SourceValue(tp.getSize, ParameterProducer(local))
   }
 
@@ -521,7 +522,7 @@ class InitialProducerSourceInterpreter extends SourceInterpreter {
   override def newExceptionValue(tryCatchBlockNode: TryCatchBlockNode,
                                  handlerFrame: Frame[_ <: Value],
                                  exceptionType: Type): SourceValue = {
-    new SourceValue(
-        1, ExceptionProducer(tryCatchBlockNode.handler, handlerFrame))
+    new SourceValue(1,
+                    ExceptionProducer(tryCatchBlockNode.handler, handlerFrame))
   }
 }

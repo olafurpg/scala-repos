@@ -29,7 +29,10 @@ class TestKitUsageSpec
     extends TestKit(
         ActorSystem("TestKitUsageSpec",
                     ConfigFactory.parseString(TestKitUsageSpec.config)))
-    with DefaultTimeout with ImplicitSender with WordSpecLike with Matchers
+    with DefaultTimeout
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
     with BeforeAndAfterAll {
   import TestKitUsageSpec._
 
@@ -142,10 +145,10 @@ object TestKitUsageSpec {
       extends Actor {
     def receive = {
       case msg => {
-          head foreach { next ! _ }
-          next ! msg
-          tail foreach { next ! _ }
-        }
+        head foreach { next ! _ }
+        next ! msg
+        tail foreach { next ! _ }
+      }
     }
   }
 }

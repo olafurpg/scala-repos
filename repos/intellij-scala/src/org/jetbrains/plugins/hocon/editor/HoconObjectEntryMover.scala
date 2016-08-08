@@ -5,7 +5,10 @@ import com.intellij.codeInsight.editorActions.moveUpDown.{LineMover, LineRange}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.psi.{PsiElement, PsiFile}
-import org.jetbrains.plugins.hocon.editor.HoconObjectEntryMover.{PrefixModKey, PrefixModification}
+import org.jetbrains.plugins.hocon.editor.HoconObjectEntryMover.{
+  PrefixModKey,
+  PrefixModification
+}
 import org.jetbrains.plugins.hocon.psi._
 
 import scala.annotation.tailrec
@@ -44,16 +47,18 @@ import scala.annotation.tailrec
   * @author ghik
   */
 class HoconObjectEntryMover extends LineMover {
-  override def checkAvailable(
-      editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean =
+  override def checkAvailable(editor: Editor,
+                              file: PsiFile,
+                              info: MoveInfo,
+                              down: Boolean): Boolean =
     super.checkAvailable(editor, file, info, down) &&
-    !editor.getSelectionModel.hasSelection &&
-    (file match {
-          case hoconFile: HoconPsiFile =>
-            checkAvailableHocon(editor, hoconFile, info, down)
-          case _ =>
-            false
-        })
+      !editor.getSelectionModel.hasSelection &&
+      (file match {
+        case hoconFile: HoconPsiFile =>
+          checkAvailableHocon(editor, hoconFile, info, down)
+        case _ =>
+          false
+      })
 
   private def checkAvailableHocon(editor: Editor,
                                   file: HoconPsiFile,
@@ -104,11 +109,11 @@ class HoconObjectEntryMover extends LineMover {
     def isByEdge(entry: HObjectEntry) = !entry.parent.exists(_.isToplevel) && {
       // todo suspicious
       if (down)
-        entry.nextEntry.forall(
-            ne => entry.parent.exists(pp => startLine(ne) == endLine(pp)))
+        entry.nextEntry.forall(ne =>
+          entry.parent.exists(pp => startLine(ne) == endLine(pp)))
       else
-        entry.previousEntry.forall(
-            pe => entry.parent.exists(pp => endLine(pe) == startLine(pp)))
+        entry.previousEntry.forall(pe =>
+          entry.parent.exists(pp => endLine(pe) == startLine(pp)))
     }
 
     def keyString(keyedField: HKeyedField) =
@@ -139,10 +144,10 @@ class HoconObjectEntryMover extends LineMover {
           .flatMap(_.prefixingField)
           .map(_.enclosingObjectField)
           .filter(of =>
-                field.parent.exists(pp => edgeLine(of) == edgeLine(pp)) &&
-                canInsert(of))
+            field.parent.exists(pp => edgeLine(of) == edgeLine(pp)) &&
+              canInsert(of))
           .map(of =>
-                (of, of.keyedField.fieldsInPathForward.map(keyString).toList))
+            (of, of.keyedField.fieldsInPathForward.map(keyString).toList))
       } else None
 
     def canInsertInto(field: HObjectField) =
@@ -167,8 +172,8 @@ class HoconObjectEntryMover extends LineMover {
         field: HObjectField): Option[(HObjectField, List[String])] =
       for {
         adjacentField <- adjacentEntry(field)
-          .collect({ case f: HObjectField => f })
-          .filter(canInsertInto)
+                          .collect({ case f: HObjectField => f })
+                          .filter(canInsertInto)
         prefixToRemove <- {
           val prefix =
             adjacentField.keyedField.fieldsInPathForward.map(keyString).toList
@@ -192,8 +197,9 @@ class HoconObjectEntryMover extends LineMover {
               new LineRange(sourceRange.endLine, endLine(enclosingField) + 1)
             else
               new LineRange(startLine(enclosingField), sourceRange.startLine)
-          val mod = PrefixModification(
-              objField.getTextOffset, 0, prefixToAdd.mkString("", ".", "."))
+          val mod = PrefixModification(objField.getTextOffset,
+                                       0,
+                                       prefixToAdd.mkString("", ".", "."))
           (sourceRange, targetRange, Some(mod))
       } orElse fieldToDescendInto(objField).map {
         case (adjacentField, prefixToRemove) =>
@@ -247,8 +253,9 @@ class HoconObjectEntryMover extends LineMover {
     rangesOpt.isDefined
   }
 
-  override def beforeMove(
-      editor: Editor, info: MoveInfo, down: Boolean): Unit =
+  override def beforeMove(editor: Editor,
+                          info: MoveInfo,
+                          down: Boolean): Unit =
     info.getUserData(PrefixModKey).foreach {
       case PrefixModification(offset, length, replacement) =>
         // we need to move caret manually when adding prefix exactly at caret position

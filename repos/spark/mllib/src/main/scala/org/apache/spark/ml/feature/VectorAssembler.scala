@@ -22,7 +22,12 @@ import scala.collection.mutable.ArrayBuilder
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.Transformer
-import org.apache.spark.ml.attribute.{Attribute, AttributeGroup, NumericAttribute, UnresolvedAttribute}
+import org.apache.spark.ml.attribute.{
+  Attribute,
+  AttributeGroup,
+  NumericAttribute,
+  UnresolvedAttribute
+}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util._
@@ -37,7 +42,9 @@ import org.apache.spark.sql.types._
   */
 @Experimental
 class VectorAssembler(override val uid: String)
-    extends Transformer with HasInputCols with HasOutputCol
+    extends Transformer
+    with HasInputCols
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vecAssembler"))
@@ -85,8 +92,8 @@ class VectorAssembler(override val uid: String)
             // from metadata, check the first row.
             val numAttrs =
               group.numAttributes.getOrElse(first.getAs[Vector](index).size)
-            Array.tabulate(numAttrs)(
-                i => NumericAttribute.defaultAttr.withName(c + "_" + i))
+            Array.tabulate(numAttrs)(i =>
+              NumericAttribute.defaultAttr.withName(c + "_" + i))
           }
         case otherType =>
           throw new SparkException(
@@ -108,8 +115,8 @@ class VectorAssembler(override val uid: String)
       }
     }
 
-    dataset.select(
-        col("*"), assembleFunc(struct(args: _*)).as($(outputCol), metadata))
+    dataset.select(col("*"),
+                   assembleFunc(struct(args: _*)).as($(outputCol), metadata))
   }
 
   override def transformSchema(schema: StructType): StructType = {

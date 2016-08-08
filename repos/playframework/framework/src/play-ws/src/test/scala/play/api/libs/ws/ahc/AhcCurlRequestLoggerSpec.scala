@@ -7,12 +7,19 @@ import org.slf4j.Logger
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mock.Mockito
 import play.api.libs.ws._
-import play.api.test.{WithServer, WsTestClient, PlaySpecification, WithApplication}
+import play.api.test.{
+  WithServer,
+  WsTestClient,
+  PlaySpecification,
+  WithApplication
+}
 
 import scala.concurrent.Future
 
 class AhcCurlRequestLoggerSpec
-    extends PlaySpecification with WsTestClient with Mockito
+    extends PlaySpecification
+    with WsTestClient
+    with Mockito
     with org.specs2.specification.mutable.ExecutionEnvironment {
 
   def is(implicit ee: ExecutionEnv) = {

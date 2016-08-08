@@ -64,7 +64,7 @@ object ScaloidBuild extends Build {
       ),
       javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       resolvers += "Android Repository" at
-      (new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository").getCanonicalFile.toURI.toString,
+        (new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository").getCanonicalFile.toURI.toString,
       addCompilerPlugin(
           "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
   )

@@ -23,7 +23,9 @@ import akka.actor.Status.Failure
   */
 class ProducerFeatureTest
     extends TestKit(ActorSystem("ProducerFeatureTest", AkkaSpec.testConf))
-    with WordSpecLike with BeforeAndAfterAll with BeforeAndAfterEach
+    with WordSpecLike
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
     with Matchers {
 
   import ProducerFeatureTest._
@@ -54,8 +56,9 @@ class ProducerFeatureTest
       val message =
         CamelMessage("test", Map(CamelMessage.MessageExchangeId -> "123"))
       producer.tell(message, testActor)
-      expectMsg(CamelMessage("received TEST",
-                             Map(CamelMessage.MessageExchangeId -> "123")))
+      expectMsg(
+          CamelMessage("received TEST",
+                       Map(CamelMessage.MessageExchangeId -> "123")))
     }
 
     "02 produce a message and receive failure response" in {
@@ -64,14 +67,14 @@ class ProducerFeatureTest
       val supervisor = system.actorOf(Props(new Actor {
         def receive = {
           case p: Props ⇒ {
-              val producer = context.actorOf(p)
-              context.watch(producer)
-              sender() ! producer
-            }
+            val producer = context.actorOf(p)
+            context.watch(producer)
+            sender() ! producer
+          }
           case Terminated(actorRef) ⇒ {
-              deadActor = Some(actorRef)
-              latch.countDown()
-            }
+            deadActor = Some(actorRef)
+            latch.countDown()
+          }
         }
         override val supervisorStrategy =
           OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
@@ -126,8 +129,9 @@ class ProducerFeatureTest
       val message =
         CamelMessage("test", Map(CamelMessage.MessageExchangeId -> "123"))
       producer.tell(message, testActor)
-      expectMsg(CamelMessage("received test",
-                             Map(CamelMessage.MessageExchangeId -> "123")))
+      expectMsg(
+          CamelMessage("received test",
+                       Map(CamelMessage.MessageExchangeId -> "123")))
     }
 
     "11 produce message to direct:producer-test-3 and receive failure response" in {
@@ -156,9 +160,10 @@ class ProducerFeatureTest
       val message =
         CamelMessage("test", Map(CamelMessage.MessageExchangeId -> "123"))
       producer.tell(message, testActor)
-      expectMsg(CamelMessage("received test",
-                             Map(CamelMessage.MessageExchangeId -> "123",
-                                 "test" -> "result")))
+      expectMsg(
+          CamelMessage("received test",
+                       Map(CamelMessage.MessageExchangeId -> "123",
+                           "test" -> "result")))
     }
 
     "13 produce message, forward failure response of direct:producer-test-2 to a replying target actor and receive response" in {
@@ -220,9 +225,10 @@ class ProducerFeatureTest
         CamelMessage("test", Map(CamelMessage.MessageExchangeId -> "123"))
 
       producer.tell(message, testActor)
-      expectMsg(CamelMessage("received test",
-                             Map(CamelMessage.MessageExchangeId -> "123",
-                                 "test" -> "result")))
+      expectMsg(
+          CamelMessage("received test",
+                       Map(CamelMessage.MessageExchangeId -> "123",
+                           "test" -> "result")))
     }
 
     "17 produce message, forward failure response from direct:producer-test-3 to a replying target actor and receive response" in {
@@ -298,7 +304,7 @@ class ProducerFeatureTest
       filterEvents(EventFilter[Exception](occurrences = 1)) {
         val producerSupervisor =
           system.actorOf(Props(new ProducerSupervisor(
-                                 Props(new ChildProducer("mock:mock", true)))),
+                             Props(new ChildProducer("mock:mock", true)))),
                          "21-ignore-deadletter-sender-ref-test")
         mockEndpoint.reset()
         producerSupervisor.tell(CamelMessage("test", Map()), testActor)
@@ -333,7 +339,8 @@ object ProducerFeatureTest {
   }
 
   class ChildProducer(uri: String, upper: Boolean = false)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     override def oneway = true
 
     var lastSender: Option[ActorRef] = None
@@ -358,7 +365,8 @@ object ProducerFeatureTest {
   }
 
   class TestProducer(uri: String, upper: Boolean = false)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     def endpointUri = uri
 
     override def preRestart(reason: Throwable, message: Option[Any]) {
@@ -376,7 +384,8 @@ object ProducerFeatureTest {
   }
 
   class TestForwarder(uri: String, target: ActorRef)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     def endpointUri = uri
 
     override def headersToCopy = Set(CamelMessage.MessageExchangeId, "test")
@@ -393,9 +402,9 @@ object ProducerFeatureTest {
                 new AkkaCamelException(new Exception("failure"), msg.headers))
           case _ ⇒
             context.sender() !
-            (msg.mapBody { body: String ⇒
-                  "received %s" format body
-                })
+              (msg.mapBody { body: String ⇒
+                "received %s" format body
+              })
         }
     }
   }
@@ -404,7 +413,7 @@ object ProducerFeatureTest {
     def receive = {
       case msg: CamelMessage ⇒
         context.sender() !
-        (msg.copy(headers = msg.headers + ("test" -> "result")))
+          (msg.copy(headers = msg.headers + ("test" -> "result")))
       case msg: akka.actor.Status.Failure ⇒
         msg.cause match {
           case e: AkkaCamelException ⇒

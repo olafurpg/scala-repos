@@ -11,7 +11,11 @@ import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
@@ -49,8 +53,8 @@ object MultilineStringUtil {
     }
   }
 
-  def needAddMethodCallToMLString(
-      stringElement: PsiElement, methodName: String): Boolean = {
+  def needAddMethodCallToMLString(stringElement: PsiElement,
+                                  methodName: String): Boolean = {
     var parent = stringElement.getParent
 
     do {
@@ -95,9 +99,10 @@ object MultilineStringUtil {
           ref.resolve() match {
             case funDef: ScFunction =>
               val tpe = funDef.returnType
-              tpe.exists(scType =>
+              tpe.exists(
+                  scType =>
                     scType.canonicalText.endsWith("java.lang.String") ||
-                    scType.canonicalText.endsWith("scala.Predef.String"))
+                      scType.canonicalText.endsWith("scala.Predef.String"))
             case _ => true
           }
         case _ => true
@@ -105,8 +110,9 @@ object MultilineStringUtil {
     case _ => true
   }
 
-  def insertStripMargin(
-      document: Document, literal: ScLiteral, marginChar: Char) {
+  def insertStripMargin(document: Document,
+                        literal: ScLiteral,
+                        marginChar: Char) {
     if (needAddStripMargin(literal, "" + marginChar)) {
       document.insertString(literal.getTextRange.getEndOffset,
                             if (marginChar == '|') ".stripMargin"
@@ -247,7 +253,7 @@ object MultilineStringUtil {
                 document.getText.substring(startLineOffset, literalStart))
             val marginIndent =
               quotesIndent + interpolatorPrefixLength(literal) +
-              settings.marginIndent
+                settings.marginIndent
             for (lineNumber <- startLineNumber + 1 to endLineNumber) {
               insertIndent(lineNumber, marginIndent, Some(marginChar))
             }
@@ -257,7 +263,7 @@ object MultilineStringUtil {
             val quotesIndent = oldIndent + settings.regularIndent
             val marginIndent =
               quotesIndent + interpolatorPrefixLength(literal) +
-              settings.marginIndent
+                settings.marginIndent
             for (lineNumber <- startLineNumber + 1 to endLineNumber) {
               insertIndent(lineNumber, marginIndent, Some(marginChar))
             }
@@ -298,8 +304,8 @@ class MultilineStringSettings(project: Project) {
 
   def getSmartSpaces(count: Int) =
     if (useTabs) {
-      StringUtil.repeat("\t", count / tabSize) + StringUtil.repeat(
-          " ", count % tabSize)
+      StringUtil.repeat("\t", count / tabSize) + StringUtil
+        .repeat(" ", count % tabSize)
     } else {
       StringUtil.repeat(" ", count)
     }

@@ -648,9 +648,10 @@ object Serializers {
         case TagApply =>
           Apply(readTree(), readIdent(), readTrees())(readType())
         case TagApplyStatically =>
-          val result1 = ApplyStatically(
-              readTree(), readClassType(), readIdent(), readTrees())(
-              readType())
+          val result1 = ApplyStatically(readTree(),
+                                        readClassType(),
+                                        readIdent(),
+                                        readTrees())(readType())
           if (useHacks065 && result1.tpe != NoType &&
               isConstructorName(result1.method.name)) result1.copy()(NoType)
           else result1
@@ -681,8 +682,10 @@ object Serializers {
         case TagJSSuperBracketSelect =>
           JSSuperBracketSelect(readClassType(), readTree(), readTree())
         case TagJSSuperBracketCall =>
-          JSSuperBracketCall(
-              readClassType(), readTree(), readTree(), readTrees())
+          JSSuperBracketCall(readClassType(),
+                             readTree(),
+                             readTree(),
+                             readTrees())
         case TagJSSuperConstructorCall => JSSuperConstructorCall(readTrees())
         case TagLoadJSConstructor => LoadJSConstructor(readClassType())
         case TagLoadJSModule => LoadJSModule(readClassType())
@@ -776,7 +779,8 @@ object Serializers {
           if (useHacks065 && result2.resultType != NoType &&
               isConstructorName(result2.name.name)) {
             result2.copy(resultType = NoType, body = result2.body)(
-                result2.optimizerHints, result2.hash)(result2.pos)
+                result2.optimizerHints,
+                result2.hash)(result2.pos)
           } else {
             result2
           }
@@ -786,8 +790,8 @@ object Serializers {
                       readTree().asInstanceOf[ParamDef],
                       readTree())
         case TagConstructorExportDef =>
-          val result = ConstructorExportDef(
-              readString(), readParamDefs(), readTree())
+          val result =
+            ConstructorExportDef(readString(), readParamDefs(), readTree())
           if (foundArguments) {
             foundArguments = false
             new RewriteArgumentsTransformer()
@@ -903,16 +907,18 @@ object Serializers {
               } else if ((first & Format2Mask) == Format2MaskValue) {
                 val lineDiff = first >> Format2Shift
                 val column = readByte() & 0xff // unsigned
-                Position(
-                    lastPosition.source, lastPosition.line + lineDiff, column)
+                Position(lastPosition.source,
+                         lastPosition.line + lineDiff,
+                         column)
               } else {
                 assert(
                     (first & Format3Mask) == Format3MaskValue,
                     s"Position format error: first byte $first does not match any format")
                 val lineDiff = readShort()
                 val column = readByte() & 0xff // unsigned
-                Position(
-                    lastPosition.source, lastPosition.line + lineDiff, column)
+                Position(lastPosition.source,
+                         lastPosition.line + lineDiff,
+                         column)
               }
             }
           lastPosition = result
@@ -961,7 +967,8 @@ object Serializers {
                 List(argumentsParamDef(tree.pos)),
                 resultType,
                 transform(body, isStat = resultType == NoType))(
-          tree.optimizerHints, None)(tree.pos)
+          tree.optimizerHints,
+          None)(tree.pos)
     }
 
     def transformConstructorExportDef(

@@ -21,9 +21,11 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementations of [[EvaluationInstances]] */
-class JDBCEvaluationInstances(
-    client: String, config: StorageClientConfig, prefix: String)
-    extends EvaluationInstances with Logging {
+class JDBCEvaluationInstances(client: String,
+                              config: StorageClientConfig,
+                              prefix: String)
+    extends EvaluationInstances
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "evaluationinstances")

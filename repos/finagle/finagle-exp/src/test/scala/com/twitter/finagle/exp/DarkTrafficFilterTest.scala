@@ -30,8 +30,8 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
 
     val enableSampling = (s: String) => gate()
 
-    val filter = new DarkTrafficFilter(
-        darkService, enableSampling, statsReceiver)
+    val filter =
+      new DarkTrafficFilter(darkService, enableSampling, statsReceiver)
 
     val forwarded = Seq("darkTrafficFilter", "forwarded")
     val skipped = Seq("darkTrafficFilter", "skipped")

@@ -53,29 +53,39 @@ class UriSpec extends WordSpec with Matchers {
           "FEDCBA9876543210FEDCBA9876543210",
           "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210")
       Host("[1080:0:0:0:8:800:200C:417A]") shouldEqual IPv6Host(
-          "108000000000000000080800200C417A", "1080:0:0:0:8:800:200C:417A")
+          "108000000000000000080800200C417A",
+          "1080:0:0:0:8:800:200C:417A")
       Host("[3ffe:2a00:100:7031::1]") shouldEqual IPv6Host(
-          "3ffe2a00010070310000000000000001", "3ffe:2a00:100:7031::1")
+          "3ffe2a00010070310000000000000001",
+          "3ffe:2a00:100:7031::1")
       Host("[1080::8:800:200C:417A]") shouldEqual IPv6Host(
-          "108000000000000000080800200C417A", "1080::8:800:200C:417A")
+          "108000000000000000080800200C417A",
+          "1080::8:800:200C:417A")
       Host("[::192.9.5.5]") shouldEqual IPv6Host(
-          "000000000000000000000000C0090505", "::192.9.5.5")
+          "000000000000000000000000C0090505",
+          "::192.9.5.5")
       Host("[::FFFF:129.144.52.38]") shouldEqual IPv6Host(
-          "00000000000000000000FFFF81903426", "::FFFF:129.144.52.38")
+          "00000000000000000000FFFF81903426",
+          "::FFFF:129.144.52.38")
       Host("[2010:836B:4179::836B:4179]") shouldEqual IPv6Host(
-          "2010836B4179000000000000836B4179", "2010:836B:4179::836B:4179")
+          "2010836B4179000000000000836B4179",
+          "2010:836B:4179::836B:4179")
 
       // Quad length
       Host("[abcd::]") shouldEqual IPv6Host("ABCD0000000000000000000000000000",
                                             "abcd::")
       Host("[abcd::1]") shouldEqual IPv6Host(
-          "ABCD0000000000000000000000000001", "abcd::1")
+          "ABCD0000000000000000000000000001",
+          "abcd::1")
       Host("[abcd::12]") shouldEqual IPv6Host(
-          "ABCD0000000000000000000000000012", "abcd::12")
+          "ABCD0000000000000000000000000012",
+          "abcd::12")
       Host("[abcd::123]") shouldEqual IPv6Host(
-          "ABCD0000000000000000000000000123", "abcd::123")
+          "ABCD0000000000000000000000000123",
+          "abcd::123")
       Host("[abcd::1234]") shouldEqual IPv6Host(
-          "ABCD0000000000000000000000001234", "abcd::1234")
+          "ABCD0000000000000000000000001234",
+          "abcd::1234")
 
       // Full length
       Host("[2001:0db8:0100:f101:0210:a4ff:fee3:9566]") shouldEqual IPv6Host(
@@ -88,49 +98,68 @@ class UriSpec extends WordSpec with Matchers {
           "20010db80100f1010210a4fffee39566",
           "2001:db8:100:f101:210:a4ff:fee3:9566")
       Host("[2001:0db8:100:f101:0:0:0:1]") shouldEqual IPv6Host(
-          "20010db80100f1010000000000000001", "2001:0db8:100:f101:0:0:0:1")
+          "20010db80100f1010000000000000001",
+          "2001:0db8:100:f101:0:0:0:1")
       Host("[1:2:3:4:5:6:255.255.255.255]") shouldEqual IPv6Host(
-          "000100020003000400050006FFFFFFFF", "1:2:3:4:5:6:255.255.255.255")
+          "000100020003000400050006FFFFFFFF",
+          "1:2:3:4:5:6:255.255.255.255")
 
       // Legal IPv4
       Host("[::1.2.3.4]") shouldEqual IPv6Host(
-          "00000000000000000000000001020304", "::1.2.3.4")
+          "00000000000000000000000001020304",
+          "::1.2.3.4")
       Host("[3:4::5:1.2.3.4]") shouldEqual IPv6Host(
-          "00030004000000000000000501020304", "3:4::5:1.2.3.4")
+          "00030004000000000000000501020304",
+          "3:4::5:1.2.3.4")
       Host("[::ffff:1.2.3.4]") shouldEqual IPv6Host(
-          "00000000000000000000ffff01020304", "::ffff:1.2.3.4")
+          "00000000000000000000ffff01020304",
+          "::ffff:1.2.3.4")
       Host("[::0.0.0.0]") shouldEqual IPv6Host(
-          "00000000000000000000000000000000", "::0.0.0.0") // Min IPv4
+          "00000000000000000000000000000000",
+          "::0.0.0.0") // Min IPv4
       Host("[::255.255.255.255]") shouldEqual IPv6Host(
-          "000000000000000000000000FFFFFFFF", "::255.255.255.255") // Max IPv4
+          "000000000000000000000000FFFFFFFF",
+          "::255.255.255.255") // Max IPv4
 
       // Zipper position
       Host("[::1:2:3:4:5:6:7]") shouldEqual IPv6Host(
-          "00000001000200030004000500060007", "::1:2:3:4:5:6:7")
+          "00000001000200030004000500060007",
+          "::1:2:3:4:5:6:7")
       Host("[1::1:2:3:4:5:6]") shouldEqual IPv6Host(
-          "00010000000100020003000400050006", "1::1:2:3:4:5:6")
+          "00010000000100020003000400050006",
+          "1::1:2:3:4:5:6")
       Host("[1:2::1:2:3:4:5]") shouldEqual IPv6Host(
-          "00010002000000010002000300040005", "1:2::1:2:3:4:5")
+          "00010002000000010002000300040005",
+          "1:2::1:2:3:4:5")
       Host("[1:2:3::1:2:3:4]") shouldEqual IPv6Host(
-          "00010002000300000001000200030004", "1:2:3::1:2:3:4")
+          "00010002000300000001000200030004",
+          "1:2:3::1:2:3:4")
       Host("[1:2:3:4::1:2:3]") shouldEqual IPv6Host(
-          "00010002000300040000000100020003", "1:2:3:4::1:2:3")
+          "00010002000300040000000100020003",
+          "1:2:3:4::1:2:3")
       Host("[1:2:3:4:5::1:2]") shouldEqual IPv6Host(
-          "00010002000300040005000000010002", "1:2:3:4:5::1:2")
+          "00010002000300040005000000010002",
+          "1:2:3:4:5::1:2")
       Host("[1:2:3:4:5:6::1]") shouldEqual IPv6Host(
-          "00010002000300040005000600000001", "1:2:3:4:5:6::1")
+          "00010002000300040005000600000001",
+          "1:2:3:4:5:6::1")
       Host("[1:2:3:4:5:6:7::]") shouldEqual IPv6Host(
-          "00010002000300040005000600070000", "1:2:3:4:5:6:7::")
+          "00010002000300040005000600070000",
+          "1:2:3:4:5:6:7::")
 
       // Zipper length
       Host("[1:1:1::1:1:1:1]") shouldEqual IPv6Host(
-          "00010001000100000001000100010001", "1:1:1::1:1:1:1")
+          "00010001000100000001000100010001",
+          "1:1:1::1:1:1:1")
       Host("[1:1:1::1:1:1]") shouldEqual IPv6Host(
-          "00010001000100000000000100010001", "1:1:1::1:1:1")
+          "00010001000100000000000100010001",
+          "1:1:1::1:1:1")
       Host("[1:1:1::1:1]") shouldEqual IPv6Host(
-          "00010001000100000000000000010001", "1:1:1::1:1")
+          "00010001000100000000000000010001",
+          "1:1:1::1:1")
       Host("[1:1::1:1]") shouldEqual IPv6Host(
-          "00010001000000000000000000010001", "1:1::1:1")
+          "00010001000000000000000000010001",
+          "1:1::1:1")
       Host("[1:1::1]") shouldEqual IPv6Host("00010001000000000000000000000001",
                                             "1:1::1")
       Host("[1::1]") shouldEqual IPv6Host("00010000000000000000000000000001",
@@ -142,13 +171,17 @@ class UriSpec extends WordSpec with Matchers {
 
       // A few more variations
       Host("[21ff:abcd::1]") shouldEqual IPv6Host(
-          "21ffabcd000000000000000000000001", "21ff:abcd::1")
+          "21ffabcd000000000000000000000001",
+          "21ff:abcd::1")
       Host("[2001:db8:100:f101::1]") shouldEqual IPv6Host(
-          "20010db80100f1010000000000000001", "2001:db8:100:f101::1")
+          "20010db80100f1010000000000000001",
+          "2001:db8:100:f101::1")
       Host("[a:b:c::12:1]") shouldEqual IPv6Host(
-          "000a000b000c00000000000000120001", "a:b:c::12:1")
+          "000a000b000c00000000000000120001",
+          "a:b:c::12:1")
       Host("[a:b::0:1:2:3]") shouldEqual IPv6Host(
-          "000a000b000000000000000100020003", "a:b::0:1:2:3")
+          "000a000b000000000000000100020003",
+          "a:b::0:1:2:3")
     }
     "support inetAddresses round-trip for Inet6Addresses" in {
       def fromAddress(address: String): IPv6Host =
@@ -367,10 +400,16 @@ class UriSpec extends WordSpec with Matchers {
       query.toMultiMap shouldEqual Map("a" -> List("1"),
                                        "b" -> List("", "4", "2"),
                                        "c" -> List("3"))
-      query.toList shouldEqual List(
-          "a" -> "1", "b" -> "2", "c" -> "3", "b" -> "4", "b" -> "")
-      query.toSeq shouldEqual Seq(
-          "a" -> "1", "b" -> "2", "c" -> "3", "b" -> "4", "b" -> "")
+      query.toList shouldEqual List("a" -> "1",
+                                    "b" -> "2",
+                                    "c" -> "3",
+                                    "b" -> "4",
+                                    "b" -> "")
+      query.toSeq shouldEqual Seq("a" -> "1",
+                                  "b" -> "2",
+                                  "c" -> "3",
+                                  "b" -> "4",
+                                  "b" -> "")
     }
     "support conversion from list of name/value pairs" in {
       import Query._
@@ -398,11 +437,13 @@ class UriSpec extends WordSpec with Matchers {
 
     // http://tools.ietf.org/html/rfc3986#section-1.1.2
     "be correctly parsed from and rendered to simple test examples" in {
-      Uri("ftp://ftp.is.co.za/rfc/rfc1808.txt") shouldEqual Uri.from(
-          scheme = "ftp", host = "ftp.is.co.za", path = "/rfc/rfc1808.txt")
+      Uri("ftp://ftp.is.co.za/rfc/rfc1808.txt") shouldEqual Uri
+        .from(scheme = "ftp", host = "ftp.is.co.za", path = "/rfc/rfc1808.txt")
 
       Uri("http://www.ietf.org/rfc/rfc2396.txt") shouldEqual Uri.from(
-          scheme = "http", host = "www.ietf.org", path = "/rfc/rfc2396.txt")
+          scheme = "http",
+          host = "www.ietf.org",
+          path = "/rfc/rfc2396.txt")
 
       Uri("ldap://[2001:db8::7]/c=GB?objectClass?one") shouldEqual Uri.from(
           scheme = "ldap",
@@ -410,17 +451,19 @@ class UriSpec extends WordSpec with Matchers {
           path = "/c=GB",
           queryString = Some("objectClass?one"))
 
-      Uri("mailto:John.Doe@example.com") shouldEqual Uri.from(
-          scheme = "mailto", path = "John.Doe@example.com")
+      Uri("mailto:John.Doe@example.com") shouldEqual Uri
+        .from(scheme = "mailto", path = "John.Doe@example.com")
 
-      Uri("news:comp.infosystems.www.servers.unix") shouldEqual Uri.from(
-          scheme = "news", path = "comp.infosystems.www.servers.unix")
+      Uri("news:comp.infosystems.www.servers.unix") shouldEqual Uri
+        .from(scheme = "news", path = "comp.infosystems.www.servers.unix")
 
       Uri("tel:+1-816-555-1212") shouldEqual Uri.from(scheme = "tel",
                                                       path = "+1-816-555-1212")
 
-      Uri("telnet://192.0.2.16:80/") shouldEqual Uri.from(
-          scheme = "telnet", host = "192.0.2.16", port = 80, path = "/")
+      Uri("telnet://192.0.2.16:80/") shouldEqual Uri.from(scheme = "telnet",
+                                                          host = "192.0.2.16",
+                                                          port = 80,
+                                                          path = "/")
 
       Uri("urn:oasis:names:specification:docbook:dtd:xml:4.1.2") shouldEqual Uri
         .from(scheme = "urn",
@@ -437,12 +480,13 @@ class UriSpec extends WordSpec with Matchers {
       // illegal paths
       Uri("foo/another@url/[]and{}") shouldEqual Uri.from(
           path = "foo/another@url/%5B%5Dand%7B%7D")
-      a[IllegalUriException] should be thrownBy Uri(
-          "foo/another@url/[]and{}", mode = Uri.ParsingMode.Strict)
+      a[IllegalUriException] should be thrownBy Uri("foo/another@url/[]and{}",
+                                                    mode =
+                                                      Uri.ParsingMode.Strict)
 
       // handle query parameters with more than percent-encoded character
-      Uri("?%7Ba%7D=$%7B%7D", UTF8, Uri.ParsingMode.Strict).query() shouldEqual Query
-        .Cons("{a}", s"$${}", Query.Empty)
+      Uri("?%7Ba%7D=$%7B%7D", UTF8, Uri.ParsingMode.Strict)
+        .query() shouldEqual Query.Cons("{a}", s"$${}", Query.Empty)
 
       // don't double decode
       Uri("%2520").path.head shouldEqual "%20"
@@ -531,7 +575,8 @@ class UriSpec extends WordSpec with Matchers {
       normalize("#") shouldEqual "#"
       normalize("#{}[]") shouldEqual "#%7B%7D%5B%5D"
       a[IllegalUriException] should be thrownBy normalize(
-          "#{}[]", mode = Uri.ParsingMode.Strict)
+          "#{}[]",
+          mode = Uri.ParsingMode.Strict)
     }
 
     "support tunneling a URI through a query param" in {
@@ -572,7 +617,7 @@ class UriSpec extends WordSpec with Matchers {
         IllegalUriException(
             "Illegal URI reference: Invalid input ' ', expected '/', 'EOI', '#', '?' or pchar (line 1, column 28)",
             "http://www.example.com/name with spaces/\n" +
-            "                           ^")
+              "                           ^")
       }
 
       // illegal path with control character

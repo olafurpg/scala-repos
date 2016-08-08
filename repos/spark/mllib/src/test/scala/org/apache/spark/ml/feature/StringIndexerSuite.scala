@@ -24,10 +24,16 @@ import org.apache.spark.ml.util.{DefaultReadWriteTest, MLTestingUtils}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{
+  DoubleType,
+  StringType,
+  StructField,
+  StructType
+}
 
 class StringIndexerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -40,7 +46,8 @@ class StringIndexerSuite
 
   test("StringIndexer") {
     val data = sc.parallelize(
-        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")), 2)
+        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")),
+        2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
     val indexer = new StringIndexer()
       .setInputCol("label")
@@ -108,7 +115,8 @@ class StringIndexerSuite
 
   test("StringIndexer with a numeric input column") {
     val data = sc.parallelize(
-        Seq((0, 100), (1, 200), (2, 300), (3, 100), (4, 100), (5, 300)), 2)
+        Seq((0, 100), (1, 200), (2, 300), (3, 100), (4, 100), (5, 300)),
+        2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
     val indexer = new StringIndexer()
       .setInputCol("label")
@@ -178,7 +186,8 @@ class StringIndexerSuite
   test("IndexToString.transform") {
     val labels = Array("a", "b", "c")
     val df0 = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0, "a"),
               (1, "b"),
               (2, "c"),
@@ -196,8 +205,8 @@ class StringIndexerSuite
     }
 
     val attr = NominalAttribute.defaultAttr.withValues(labels)
-    val df1 = df0.select(
-        col("index").as("indexWithAttr", attr.toMetadata()), col("expected"))
+    val df1 = df0.select(col("index").as("indexWithAttr", attr.toMetadata()),
+                         col("expected"))
 
     val idxToStr1 =
       new IndexToString().setInputCol("indexWithAttr").setOutputCol("actual")
@@ -209,7 +218,8 @@ class StringIndexerSuite
 
   test("StringIndexer, IndexToString are inverses") {
     val data = sc.parallelize(
-        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")), 2)
+        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")),
+        2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
     val indexer = new StringIndexer()
       .setInputCol("label")

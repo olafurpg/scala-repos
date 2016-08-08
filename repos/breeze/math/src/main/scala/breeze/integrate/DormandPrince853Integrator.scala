@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{DormandPrince853Integrator => ApacheDormandPrince853Integrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  DormandPrince853Integrator => ApacheDormandPrince853Integrator
+}
 
 class DormandPrince853Integrator(minStep: Double,
                                  maxStep: Double,

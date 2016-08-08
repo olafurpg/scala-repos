@@ -15,11 +15,17 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral,
+  ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
@@ -33,7 +39,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
                  protected var myWrap: Wrap,
                  protected val mySettings: CodeStyleSettings,
                  val subBlocksContext: Option[SubBlocksContext] = None)
-    extends Object with ScalaTokenTypes with ASTBlock {
+    extends Object
+    with ScalaTokenTypes
+    with ASTBlock {
 
   protected var mySubBlocks: util.List[Block] = null
 
@@ -70,10 +78,10 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     def isBlockOnlyScope(scope: PsiElement) =
       !isLeaf && Set(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tLPARENTHESIS)
         .contains(scope.getNode.getElementType) &&
-      (scope.getParent match {
-            case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
-            case _ => false
-          })
+        (scope.getParent match {
+          case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
+          case _ => false
+        })
     parent match {
       case m: ScMatchStmt =>
         if (m.caseClauses.length == 0) {
@@ -91,7 +99,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case l: ScLiteral
           if l.isMultiLineString &&
-          scalaSettings.MULTILINE_STRING_SUPORT != ScalaCodeStyleSettings.MULTILINE_STRING_NONE =>
+            scalaSettings.MULTILINE_STRING_SUPORT != ScalaCodeStyleSettings.MULTILINE_STRING_NONE =>
         new ChildAttributes(Indent.getSpaceIndent(3, true), null)
       case b: ScBlockExpr
           if b.lastExpr.exists(_.isInstanceOf[ScFunctionExpr]) =>
@@ -129,7 +137,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         val grandParent = parent.getParent
         new ChildAttributes(if (grandParent != null &&
                                 (grandParent.isInstanceOf[ScCaseClause] ||
-                                    grandParent.isInstanceOf[ScFunctionExpr]))
+                                grandParent.isInstanceOf[ScFunctionExpr]))
                               Indent.getNormalIndent
                             else Indent.getNoneIndent,
                             null)
@@ -149,8 +157,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       case _: ScalaFile => new ChildAttributes(Indent.getNoneIndent, null)
       case _: ScCaseClause => new ChildAttributes(Indent.getNormalIndent, null)
       case _: ScExpression | _: ScPattern | _: ScParameters =>
-        new ChildAttributes(
-            Indent.getContinuationWithoutFirstIndent, this.getAlignment)
+        new ChildAttributes(Indent.getContinuationWithoutFirstIndent,
+                            this.getAlignment)
       case _: ScDocComment =>
         new ChildAttributes(
             Indent.getSpaceIndent(
@@ -160,10 +168,11 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case p: ScParameterClause
           if scalaSettings.USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS &&
-          isConstructorArgOrMemberFunctionParameter(p) =>
+            isConstructorArgOrMemberFunctionParameter(p) =>
         new ChildAttributes(
             Indent.getSpaceIndent(
-                scalaSettings.ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS, false),
+                scalaSettings.ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS,
+                false),
             null)
       case p: ScParameterClause =>
         new ChildAttributes(
@@ -184,12 +193,12 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     val owner = paramClause.owner
     owner != null &&
     (owner.isInstanceOf[ScPrimaryConstructor] ||
-        owner.isInstanceOf[ScFunction])
+    owner.isInstanceOf[ScFunction])
   }
 
   def getSpacing(child1: Block, child2: Block) = {
-    ScalaSpacingProcessor.getSpacing(
-        child1.asInstanceOf[ScalaBlock], child2.asInstanceOf[ScalaBlock])
+    ScalaSpacingProcessor.getSpacing(child1.asInstanceOf[ScalaBlock],
+                                     child2.asInstanceOf[ScalaBlock])
   }
 
   def getSubBlocks: util.List[Block] = {
@@ -211,8 +220,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     if (node.getPsi.isInstanceOf[PsiErrorElement]) return true
     var lastChild = node.getLastChildNode
     while (lastChild != null &&
-    (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
-        lastChild.getPsi.isInstanceOf[PsiComment])) {
+           (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
+           lastChild.getPsi.isInstanceOf[PsiComment])) {
       lastChild = lastChild.getTreePrev
     }
     if (lastChild == null) {

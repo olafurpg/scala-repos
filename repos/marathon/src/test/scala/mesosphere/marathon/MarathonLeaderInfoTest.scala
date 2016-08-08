@@ -10,7 +10,9 @@ import org.mockito.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class MarathonLeaderInfoTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   class Fixture {
     lazy val candidate = mock[Candidate]
     lazy val maybeCandidate = Some(candidate)
@@ -18,8 +20,8 @@ class MarathonLeaderInfoTest
     lazy val eventStream = new EventStream()
     lazy val metrics = new MarathonLeaderInfoMetrics(
         new Metrics(new MetricRegistry))
-    lazy val leaderInfo = new MarathonLeaderInfo(
-        maybeCandidate, leader, eventStream, metrics)
+    lazy val leaderInfo =
+      new MarathonLeaderInfo(maybeCandidate, leader, eventStream, metrics)
 
     def verifyNoMoreInteractions(): Unit = {
       Mockito.verifyNoMoreInteractions(candidate)

@@ -19,7 +19,8 @@ object NodeLeavingAndExitingMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 

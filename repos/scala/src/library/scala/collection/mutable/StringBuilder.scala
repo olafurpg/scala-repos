@@ -29,9 +29,12 @@ import immutable.StringLike
   */
 @SerialVersionUID(0 - 8525408645367278351L)
 final class StringBuilder(private val underlying: JavaStringBuilder)
-    extends AbstractSeq[Char] with java.lang.CharSequence
-    with IndexedSeq[Char] with StringLike[StringBuilder]
-    with ReusableBuilder[Char, String] with Serializable {
+    extends AbstractSeq[Char]
+    with java.lang.CharSequence
+    with IndexedSeq[Char]
+    with StringLike[StringBuilder]
+    with ReusableBuilder[Char, String]
+    with Serializable {
 
   override protected[this] def thisCollection: StringBuilder = this
   override protected[this] def toCollection(
@@ -310,8 +313,10 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     * @throws StringIndexOutOfBoundsException  if index < 0, index > length,
     *         offset < 0, len < 0, or (offset + len) > str.length.
     */
-  def insertAll(
-      index: Int, str: Array[Char], offset: Int, len: Int): StringBuilder = {
+  def insertAll(index: Int,
+                str: Array[Char],
+                offset: Int,
+                len: Int): StringBuilder = {
     underlying.insert(index, str, offset, len)
     this
   }

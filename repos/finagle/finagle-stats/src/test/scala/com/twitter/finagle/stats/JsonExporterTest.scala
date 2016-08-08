@@ -13,7 +13,9 @@ import scala.util.matching.Regex
 
 @RunWith(classOf[JUnitRunner])
 class JsonExporterTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   // 2015-02-05 20:05:00 +0000
   private val zeroSecs = Time.fromSeconds(1423166700)
@@ -24,8 +26,9 @@ class JsonExporterTest
 
     def assertParam(r: Request, expected: Boolean, default: Boolean): Unit =
       withClue(s"params=${r.params}") {
-        assert(expected == exporter.readBooleanParam(
-                new RequestParamMap(r), "hi", default))
+        assert(
+            expected == exporter
+              .readBooleanParam(new RequestParamMap(r), "hi", default))
       }
 
     // param doesn't exist so uses default
@@ -35,14 +38,16 @@ class JsonExporterTest
     // param exists but value not true, so always false
     assertParam(Request(("hi", "")), expected = false, default = false)
     assertParam(Request(("hi", "")), expected = false, default = true)
-    assertParam(
-        Request(("hi", ""), ("hi", "nope")), expected = false, default = true)
+    assertParam(Request(("hi", ""), ("hi", "nope")),
+                expected = false,
+                default = true)
 
     // param exists and value is true, so always true
     assertParam(Request(("hi", "1")), expected = true, default = false)
     assertParam(Request(("hi", "true")), expected = true, default = true)
-    assertParam(
-        Request(("hi", "no"), ("hi", "true")), expected = true, default = true)
+    assertParam(Request(("hi", "no"), ("hi", "true")),
+                expected = true,
+                default = true)
   }
 
   test("samples can be filtered") {
@@ -59,7 +64,7 @@ class JsonExporterTest
     val filteredSample = exporter.filterSample(sample)
     assert(filteredSample.size == 1,
            "Expected 1 metric to pass through the filter. Found: " +
-           filteredSample.size)
+             filteredSample.size)
     assert(filteredSample.contains("jvm_uptime"),
            "Expected to find jvm_uptime metric in unfiltered samples")
   }

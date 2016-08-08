@@ -147,7 +147,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def doc =
         if (classEnabled) {
           s"Entity class storing rows of table ${TableValue.name}\n" +
-          columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
+            columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
         } else {
           s"Row type of table ${TableValue.name}\n"
         }
@@ -161,7 +161,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def PlainSqlMapper: PlainSqlMapper
 
-    /** Plain SQL GetResult mapper generator definition 
+    /** Plain SQL GetResult mapper generator definition
         @group Basic customization overrides */
     trait PlainSqlMapperDef extends TermDef {
       def doc =
@@ -176,7 +176,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableClass: TableClass
 
-    /** Table class generator definition 
+    /** Table class generator definition
         @group Basic customization overrides */
     trait TableClassDef extends TypeDef {
 
@@ -200,13 +200,15 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val collidingTerms = columns.map(_.rawName) intersect scalaKeywords
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala keywords and were escaped: " +
-            collidingTerms.mkString(", ") else ""
+              collidingTerms.mkString(", ")
+          else ""
         } + {
           val collidingTerms =
             columns.map(_.rawName) intersect slickTableTermMembersNoArgs
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala method names and were disambiguated: " +
-            collidingTerms.mkString(", ") else ""
+              collidingTerms.mkString(", ")
+          else ""
         }
       def rawName: String = tableName(model.name.table)
       def code: Code
@@ -248,7 +250,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableValue: TableValue
 
-    /** Table value generator definition (generates a collection-like value representing this database table). 
+    /** Table value generator definition (generates a collection-like value representing this database table).
         @group Basic customization overrides */
     trait TableValueDef extends TermDef {
       def doc =
@@ -266,7 +268,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Column related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class ColumnDef(val model: m.Column) extends TermDef {
@@ -322,7 +324,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName: String = model.name.toCamelCase.uncapitalize
       def doc: String =
         "Database column " + model.name + " " +
-        model.options.map(_.toString).mkString(", ")
+          model.options.map(_.toString).mkString(", ")
     }
 
     /** Primary key generator virtual class */
@@ -335,7 +337,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
     /**
       * PrimaryKey related generator definition
       * (Currently only used for composite primary keys.)
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class PrimaryKeyDef(val model: m.PrimaryKey)
@@ -367,7 +369,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * ForeignKey related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class ForeignKeyDef(val model: m.ForeignKey)
@@ -426,7 +428,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Index related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class IndexDef(val model: m.Index) extends TermDef {
@@ -442,8 +444,8 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName = disambiguateTerm("index" + id)
       def doc: String =
         (if (model.unique) "Uniqueness " else "") + "Index over " +
-        columns.map(_.name).mkString("(", ",", ")") +
-        s" (database name ${dbName})"
+          columns.map(_.name).mkString("(", ",", ")") +
+          s" (database name ${dbName})"
     }
 
     /** Common interface for any kind of definition within the generated code */
@@ -477,12 +479,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       override def docWithCode: Code = {
         val newdoc =
           doc +
-          (if (scalaKeywords.contains(rawName))
-             s"\nNOTE: The name was escaped because it collided with a Scala keyword."
-           else "") +
-          (if (slickTableTermMembersNoArgs.contains(rawName))
-             s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
-           else "")
+            (if (scalaKeywords.contains(rawName))
+               s"\nNOTE: The name was escaped because it collided with a Scala keyword."
+             else "") +
+            (if (slickTableTermMembersNoArgs.contains(rawName))
+               s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
+             else "")
         codegen.docWithCode(newdoc, code)
       }
 
@@ -630,7 +632,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
     final def uncapitalize: String = str(0).toString.toLowerCase + str.tail
 
     /**
-      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters. 
+      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters.
       * Removes one '_' from each sequence of one or more subsequent '_' (to avoid collision).
       * (Warning: Not unicode-safe, uses String#apply)
       */

@@ -102,7 +102,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -133,7 +134,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -167,7 +169,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -226,7 +229,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     } catch {
       case e: ConnectException =>
         throw new SubmitRestConnectionException(
-            "Connect Exception when connect to server", e)
+            "Connect Exception when connect to server",
+            e)
     }
     readResponse(conn)
   }
@@ -269,15 +273,16 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
 
     try { Await.result(responseFuture, 10.seconds) } catch {
       case unreachable @ (_: FileNotFoundException | _: SocketException) =>
-        throw new SubmitRestConnectionException(
-            "Unable to connect to server", unreachable)
+        throw new SubmitRestConnectionException("Unable to connect to server",
+                                                unreachable)
       case malformed @ (_: JsonProcessingException |
           _: SubmitRestProtocolException) =>
         throw new SubmitRestProtocolException(
-            "Malformed response received from server", malformed)
+            "Malformed response received from server",
+            malformed)
       case timeout: TimeoutException =>
-        throw new SubmitRestConnectionException(
-            "No response from server", timeout)
+        throw new SubmitRestConnectionException("No response from server",
+                                                timeout)
     }
   }
 
@@ -319,7 +324,7 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     if (!valid) {
       throw new IllegalArgumentException(
           "This REST client only supports master URLs that start with " +
-          "one of the following: " + supportedMasterPrefixes.mkString(","))
+            "one of the following: " + supportedMasterPrefixes.mkString(","))
     }
   }
 
@@ -431,8 +436,11 @@ private[spark] object RestSubmissionClient {
     }
     val sparkProperties = conf.getAll.toMap
     val client = new RestSubmissionClient(master)
-    val submitRequest = client.constructSubmitRequest(
-        appResource, mainClass, appArgs, sparkProperties, env)
+    val submitRequest = client.constructSubmitRequest(appResource,
+                                                      mainClass,
+                                                      appArgs,
+                                                      sparkProperties,
+                                                      env)
     client.createSubmission(submitRequest)
   }
 
@@ -458,7 +466,7 @@ private[spark] object RestSubmissionClient {
     env.filterKeys { k =>
       // SPARK_HOME is filtered out because it is usually wrong on the remote machine (SPARK-12345)
       (k.startsWith("SPARK_") && k != "SPARK_ENV_LOADED" &&
-          k != "SPARK_HOME") || k.startsWith("MESOS_")
+      k != "SPARK_HOME") || k.startsWith("MESOS_")
     }
   }
 }

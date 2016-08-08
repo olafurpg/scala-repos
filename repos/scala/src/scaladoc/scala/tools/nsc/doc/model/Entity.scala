@@ -72,7 +72,7 @@ object Entity {
   /** Ordering deprecated things last. */
   implicit lazy val EntityOrdering: Ordering[Entity] =
     Ordering[(Boolean, String, Boolean)] on
-    (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
+      (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
 }
 
 /** A template, which is either a class, trait, object or package. Depending on whether documentation is available
@@ -230,7 +230,9 @@ trait NoDocTemplate extends TemplateEntity {
   *  in the source: trait U extends T -- C appears in U as a MemberTemplateImpl
   *    -- that is, U has a member for it but C doesn't get its own page */
 trait MemberTemplateEntity
-    extends TemplateEntity with MemberEntity with HigherKinded {
+    extends TemplateEntity
+    with MemberEntity
+    with HigherKinded {
 
   /** The value parameters of this case class, or an empty list if this class is not a case class. As case class value
     * parameters cannot be curried, the outer list has exactly one element. */
@@ -307,13 +309,14 @@ trait DocTemplateEntity extends MemberTemplateEntity {
   def implicitsShadowing: Map[MemberEntity, ImplicitMemberShadowing]
 
   /** Classes that can be implicitly converted to this class */
-  def incomingImplicitlyConvertedClasses: List[
-      (DocTemplateEntity, ImplicitConversion)]
+  def incomingImplicitlyConvertedClasses: List[(DocTemplateEntity,
+                                                ImplicitConversion)]
 
   /** Classes to which this class can be implicitly converted to
       NOTE: Some classes might not be included in the scaladoc run so they will be NoDocTemplateEntities */
-  def outgoingImplicitlyConvertedClasses: List[
-      (TemplateEntity, TypeEntity, ImplicitConversion)]
+  def outgoingImplicitlyConvertedClasses: List[(TemplateEntity,
+                                                TypeEntity,
+                                                ImplicitConversion)]
 
   /** If this template takes place in inheritance and implicit conversion relations, it will be shown in this diagram */
   def inheritanceDiagram: Option[Diagram]
@@ -540,7 +543,8 @@ trait ImplicitInScopeConstraint extends Constraint {
 }
 
 trait TypeClassConstraint
-    extends ImplicitInScopeConstraint with TypeParamConstraint {
+    extends ImplicitInScopeConstraint
+    with TypeParamConstraint {
 
   /** Type class name */
   def typeClassEntity: TemplateEntity
@@ -548,7 +552,7 @@ trait TypeClassConstraint
   /** toString for debugging */
   override def toString =
     typeParamName + " is a class of type " + typeClassEntity.qualifiedName +
-    " (" + typeParamName + ": " + typeClassEntity.name + ")"
+      " (" + typeParamName + ": " + typeClassEntity.name + ")"
 }
 
 trait KnownTypeClassConstraint extends TypeClassConstraint {
@@ -559,7 +563,7 @@ trait KnownTypeClassConstraint extends TypeClassConstraint {
   /** toString for debugging */
   override def toString =
     typeExplanation(typeParamName) + " (" + typeParamName + ": " +
-    typeClassEntity.name + ")"
+      typeClassEntity.name + ")"
 }
 
 /** A constraint involving a type parameter */
@@ -577,7 +581,7 @@ trait EqualTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is " + rhs.name + " (" + typeParamName + " =:= " +
-    rhs.name + ")"
+      rhs.name + ")"
 }
 
 trait BoundedTypeParamConstraint extends TypeParamConstraint {
@@ -591,8 +595,8 @@ trait BoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a superclass of " + lowerBound.name +
-    " and a subclass of " + upperBound.name + " (" + typeParamName + " >: " +
-    lowerBound.name + " <: " + upperBound.name + ")"
+      " and a subclass of " + upperBound.name + " (" + typeParamName + " >: " +
+      lowerBound.name + " <: " + upperBound.name + ")"
 }
 
 trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
@@ -603,7 +607,7 @@ trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a superclass of " + lowerBound.name + " (" +
-    typeParamName + " >: " + lowerBound.name + ")"
+      typeParamName + " >: " + lowerBound.name + ")"
 }
 
 trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
@@ -614,5 +618,5 @@ trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a subclass of " + upperBound.name + " (" +
-    typeParamName + " <: " + upperBound.name + ")"
+      typeParamName + " <: " + upperBound.name + ")"
 }

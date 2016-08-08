@@ -24,8 +24,15 @@ import org.json4s.JsonDSL._
 
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeReference, InterpretedOrdering}
-import org.apache.spark.sql.catalyst.parser.{DataTypeParser, LegacyTypeStringParser}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  AttributeReference,
+  InterpretedOrdering
+}
+import org.apache.spark.sql.catalyst.parser.{
+  DataTypeParser,
+  LegacyTypeStringParser
+}
 import org.apache.spark.sql.catalyst.util.quoteIdentifier
 
 /**
@@ -92,7 +99,8 @@ import org.apache.spark.sql.catalyst.util.quoteIdentifier
   */
 @DeveloperApi
 case class StructType(fields: Array[StructField])
-    extends DataType with Seq[StructField] {
+    extends DataType
+    with Seq[StructField] {
 
   /** No-arg constructor for kryo. */
   def this() = this(Array.empty[StructField])
@@ -128,8 +136,11 @@ case class StructType(fields: Array[StructField])
     *   .add("c", StringType)
     */
   def add(name: String, dataType: DataType): StructType = {
-    StructType(fields :+ new StructField(
-            name, dataType, nullable = true, Metadata.empty))
+    StructType(
+        fields :+ new StructField(name,
+                                  dataType,
+                                  nullable = true,
+                                  Metadata.empty))
   }
 
   /**
@@ -261,8 +272,8 @@ case class StructType(fields: Array[StructField])
   def printTreeString(): Unit = println(treeString)
   // scalastyle:on println
 
-  private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+  private[sql] def buildFormattedString(prefix: String,
+                                        builder: StringBuilder): Unit = {
     fields.foreach(field => field.buildFormattedString(prefix, builder))
   }
 
@@ -355,7 +366,8 @@ object StructType extends AbstractDataType {
   override private[sql] def simpleString: String = "struct"
 
   private[sql] def fromString(raw: String): StructType = {
-    Try(DataType.fromJson(raw)).getOrElse(LegacyTypeStringParser.parse(raw)) match {
+    Try(DataType.fromJson(raw))
+      .getOrElse(LegacyTypeStringParser.parse(raw)) match {
       case t: StructType => t
       case _ => throw new RuntimeException(s"Failed parsing StructType: $raw")
     }
@@ -369,9 +381,8 @@ object StructType extends AbstractDataType {
   }
 
   protected[sql] def fromAttributes(attributes: Seq[Attribute]): StructType =
-    StructType(
-        attributes.map(
-            a => StructField(a.name, a.dataType, a.nullable, a.metadata)))
+    StructType(attributes.map(a =>
+      StructField(a.name, a.dataType, a.nullable, a.metadata)))
 
   def removeMetadata(key: String, dt: DataType): DataType =
     dt match {
@@ -409,8 +420,10 @@ object StructType extends AbstractDataType {
             rightMapped
               .get(leftName)
               .map {
-                case rightField @ StructField(
-                    _, rightType, rightNullable, _) =>
+                case rightField @ StructField(_,
+                                              rightType,
+                                              rightNullable,
+                                              _) =>
                   leftField.copy(dataType = merge(leftType, rightType),
                                  nullable = leftNullable || rightNullable)
               }
@@ -436,17 +449,16 @@ object StructType extends AbstractDataType {
           DecimalType(leftPrecision, leftScale)
         } else if ((leftPrecision != rightPrecision) &&
                    (leftScale != rightScale)) {
-          throw new SparkException(
-              "Failed to merge decimal types with incompatible " +
-              s"precision $leftPrecision and $rightPrecision & scale $leftScale and $rightScale")
+          throw new SparkException("Failed to merge decimal types with incompatible " +
+            s"precision $leftPrecision and $rightPrecision & scale $leftScale and $rightScale")
         } else if (leftPrecision != rightPrecision) {
           throw new SparkException(
               "Failed to merge decimal types with incompatible " +
-              s"precision $leftPrecision and $rightPrecision")
+                s"precision $leftPrecision and $rightPrecision")
         } else {
           throw new SparkException(
               "Failed to merge decimal types with incompatible " +
-              s"scala $leftScale and $rightScale")
+                s"scala $leftScale and $rightScale")
         }
 
       case (leftUdt: UserDefinedType[_], rightUdt: UserDefinedType[_])

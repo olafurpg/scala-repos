@@ -43,8 +43,9 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
   def expect(expected: A, test: BiFunction[A, A, JBoolean]): A =
     expect(expected, defaultTimeout, test)
 
-  def expect(
-      expected: A, timeout: Duration, test: BiFunction[A, A, JBoolean]): A =
+  def expect(expected: A,
+             timeout: Duration,
+             test: BiFunction[A, A, JBoolean]): A =
     expect(expected, timeout, test.apply(_, _))
 
   def expect(expected: A, test: (A, A) => Boolean): A =
@@ -55,8 +56,8 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
       case null =>
         throw new AssertionError(s"timeout ($timeout) waiting for $expected")
       case Input.El(input) =>
-        assert(
-            test(expected, input), s"expected [$expected] but found [$input]")
+        assert(test(expected, input),
+               s"expected [$expected] but found [$input]")
         input
       case other =>
         throw new AssertionError(

@@ -39,8 +39,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ModifierSpec
-    extends SimpleSFXDelegateSpec[
-        jfxsi.KeyCombination.Modifier, KeyCombination.Modifier](
+    extends SimpleSFXDelegateSpec[jfxsi.KeyCombination.Modifier,
+                                  KeyCombination.Modifier](
         classOf[jfxsi.KeyCombination.Modifier],
         classOf[KeyCombination.Modifier]) {
 

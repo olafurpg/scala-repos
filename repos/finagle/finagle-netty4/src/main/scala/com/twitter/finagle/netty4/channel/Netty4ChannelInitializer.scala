@@ -57,8 +57,8 @@ private[netty4] class Netty4ChannelInitializer(
 
   val exceptionHandler = new ChannelExceptionHandler(stats, logger)
 
-  def initChannelTls(
-      config: Netty4ListenerTLSConfig, ch: SocketChannel): Unit = {
+  def initChannelTls(config: Netty4ListenerTLSConfig,
+                     ch: SocketChannel): Unit = {
     for (Netty4ListenerTLSConfig(newEngine) <- tlsConfig) {
       val engine = newEngine()
       engine.self.setUseClientMode(false)
@@ -85,8 +85,8 @@ private[netty4] class Netty4ChannelInitializer(
 
     if (readTimeout.isFinite) {
       val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
-      pipeline.addLast(
-          "readTimeout", new ReadTimeoutHandler(timeoutValue, timeoutUnit))
+      pipeline.addLast("readTimeout",
+                       new ReadTimeoutHandler(timeoutValue, timeoutUnit))
     }
 
     tlsConfig.foreach(initChannelTls(_, ch))
@@ -131,8 +131,8 @@ private[netty4] object ChannelExceptionHandler {
   * Logs channel exceptions
   */
 @Sharable
-private[netty4] class ChannelExceptionHandler(
-    stats: StatsReceiver, log: java.util.logging.Logger)
+private[netty4] class ChannelExceptionHandler(stats: StatsReceiver,
+                                              log: java.util.logging.Logger)
     extends ChannelInboundHandlerAdapter {
   import ChannelExceptionHandler.FinestIOExceptionMessages
 
@@ -151,8 +151,8 @@ private[netty4] class ChannelExceptionHandler(
     case _ => Level.WARNING
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, t: Throwable): Unit = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               t: Throwable): Unit = {
     t match {
       case e: ReadTimeoutException => readTimeoutCounter.incr()
       case e: WriteTimedOutException => writeTimeoutCounter.incr()

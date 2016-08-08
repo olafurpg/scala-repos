@@ -22,7 +22,10 @@ import breeze.linalg.{Vector => BV}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
-import org.apache.spark.mllib.classification.NaiveBayes.{Bernoulli, Multinomial}
+import org.apache.spark.mllib.classification.NaiveBayes.{
+  Bernoulli,
+  Multinomial
+}
 import org.apache.spark.mllib.classification.NaiveBayesSuite._
 import org.apache.spark.mllib.linalg._
 import org.apache.spark.mllib.util.MLlibTestSparkContext
@@ -30,7 +33,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class NaiveBayesSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var dataset: DataFrame = _
@@ -45,8 +49,8 @@ class NaiveBayesSuite
         Array(0.10, 0.10, 0.70, 0.10) // label 2
     ).map(_.map(math.log))
 
-    dataset = sqlContext.createDataFrame(
-        generateNaiveBayesInput(pi, theta, 100, 42))
+    dataset =
+      sqlContext.createDataFrame(generateNaiveBayesInput(pi, theta, 100, 42))
   }
 
   def validatePrediction(predictionAndLabels: DataFrame): Unit = {
@@ -58,8 +62,9 @@ class NaiveBayesSuite
     assert(numOfErrorPredictions < predictionAndLabels.count() / 5)
   }
 
-  def validateModelFit(
-      piData: Vector, thetaData: Matrix, model: NaiveBayesModel): Unit = {
+  def validateModelFit(piData: Vector,
+                       thetaData: Matrix,
+                       model: NaiveBayesModel): Unit = {
     assert(Vectors.dense(model.pi.toArray.map(math.exp)) ~==
              Vectors.dense(piData.toArray.map(math.exp)) absTol 0.05,
            "pi mismatch")
@@ -67,8 +72,8 @@ class NaiveBayesSuite
            "theta mismatch")
   }
 
-  def expectedMultinomialProbabilities(
-      model: NaiveBayesModel, feature: Vector): Vector = {
+  def expectedMultinomialProbabilities(model: NaiveBayesModel,
+                                       feature: Vector): Vector = {
     val logClassProbs: BV[Double] =
       model.pi.toBreeze + model.theta.multiply(feature).toBreeze
     val classProbs = logClassProbs.toArray.map(math.exp)
@@ -76,8 +81,8 @@ class NaiveBayesSuite
     Vectors.dense(classProbs.map(_ / classProbsSum))
   }
 
-  def expectedBernoulliProbabilities(
-      model: NaiveBayesModel, feature: Vector): Vector = {
+  def expectedBernoulliProbabilities(model: NaiveBayesModel,
+                                     feature: Vector): Vector = {
     val negThetaMatrix = model.theta.map(v => math.log(1.0 - math.exp(v)))
     val negFeature = Vectors.dense(feature.toArray.map(v => 1.0 - v))
     val piTheta: BV[Double] =
@@ -94,17 +99,17 @@ class NaiveBayesSuite
                             modelType: String): Unit = {
     featureAndProbabilities.collect().foreach {
       case Row(features: Vector, probability: Vector) => {
-          assert(probability.toArray.sum ~== 1.0 relTol 1.0e-10)
-          val expected = modelType match {
-            case Multinomial =>
-              expectedMultinomialProbabilities(model, features)
-            case Bernoulli =>
-              expectedBernoulliProbabilities(model, features)
-            case _ =>
-              throw new UnknownError(s"Invalid modelType: $modelType.")
-          }
-          assert(probability ~== expected relTol 1.0e-10)
+        assert(probability.toArray.sum ~== 1.0 relTol 1.0e-10)
+        val expected = modelType match {
+          case Multinomial =>
+            expectedMultinomialProbabilities(model, features)
+          case Bernoulli =>
+            expectedBernoulliProbabilities(model, features)
+          case _ =>
+            throw new UnknownError(s"Invalid modelType: $modelType.")
         }
+        assert(probability ~== expected relTol 1.0e-10)
+      }
     }
   }
 
@@ -137,16 +142,24 @@ class NaiveBayesSuite
     val pi = Vectors.dense(piArray)
     val theta = new DenseMatrix(3, 4, thetaArray.flatten, true)
 
-    val testDataset = sqlContext.createDataFrame(generateNaiveBayesInput(
-            piArray, thetaArray, nPoints, 42, "multinomial"))
+    val testDataset = sqlContext.createDataFrame(
+        generateNaiveBayesInput(piArray,
+                                thetaArray,
+                                nPoints,
+                                42,
+                                "multinomial"))
     val nb = new NaiveBayes().setSmoothing(1.0).setModelType("multinomial")
     val model = nb.fit(testDataset)
 
     validateModelFit(pi, theta, model)
     assert(model.hasParent)
 
-    val validationDataset = sqlContext.createDataFrame(generateNaiveBayesInput(
-            piArray, thetaArray, nPoints, 17, "multinomial"))
+    val validationDataset = sqlContext.createDataFrame(
+        generateNaiveBayesInput(piArray,
+                                thetaArray,
+                                nPoints,
+                                17,
+                                "multinomial"))
 
     val predictionAndLabels =
       model.transform(validationDataset).select("prediction", "label")
@@ -227,8 +240,10 @@ class NaiveBayesSuite
       assert(model.theta === model2.theta)
     }
     val nb = new NaiveBayes()
-    testEstimatorAndModelReadWrite(
-        nb, dataset, NaiveBayesSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(nb,
+                                   dataset,
+                                   NaiveBayesSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 

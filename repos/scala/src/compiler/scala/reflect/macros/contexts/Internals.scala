@@ -20,8 +20,8 @@ trait Internals extends scala.tools.nsc.transform.TypingTransformers {
       override def transform(tree: Tree): Tree = hof(tree, api)
     }
 
-    def transform(tree: Tree)(
-        transformer: (Tree, TransformApi) => Tree): Tree =
+    def transform(tree: Tree)(transformer: (Tree,
+                                            TransformApi) => Tree): Tree =
       new HofTransformer(transformer).transform(tree)
 
     class HofTypingTransformer(hof: (Tree, TypingTransformApi) => Tree)

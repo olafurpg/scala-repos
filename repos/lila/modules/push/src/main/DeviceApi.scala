@@ -15,12 +15,16 @@ private final class DeviceApi(coll: Coll) {
     coll.find(BSONDocument("_id" -> deviceId)).one[Device]
 
   private[push] def findByUserId(userId: String): Fu[List[Device]] =
-    coll.find(BSONDocument("userId" -> userId)).cursor[Device]().collect[List]()
+    coll
+      .find(BSONDocument("userId" -> userId))
+      .cursor[Device]()
+      .collect[List]()
 
   private[push] def findLastByUserId(platform: String)(
       userId: String): Fu[Option[Device]] =
     coll
-      .find(BSONDocument(
+      .find(
+          BSONDocument(
               "platform" -> platform,
               "userId" -> userId
           ))

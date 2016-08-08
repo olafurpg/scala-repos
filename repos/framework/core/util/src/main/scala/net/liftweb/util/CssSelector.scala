@@ -17,7 +17,11 @@
 package net.liftweb
 package util
 
-import scala.util.parsing.combinator.{PackratParsers, Parsers, ImplicitConversions}
+import scala.util.parsing.combinator.{
+  PackratParsers,
+  Parsers,
+  ImplicitConversions
+}
 import scala.xml.{Elem, NodeSeq}
 
 import net.liftweb.common._
@@ -58,8 +62,9 @@ final case class EnclosedSelector(selector: CssSelector, kid: CssSelector)
   def withSubnode(sn: SubNode): CssSelector = this
 }
 
-final case class AttrSelector(
-    name: String, value: String, subNodes: Box[SubNode])
+final case class AttrSelector(name: String,
+                              value: String,
+                              subNodes: Box[SubNode])
     extends CssSelector {
   def withSubnode(sn: SubNode): CssSelector = this.copy(subNodes = Full(sn))
 }
@@ -113,9 +118,11 @@ sealed trait AttributeRule
 
 final case class AttrSubNode(attr: String) extends SubNode with AttributeRule
 final case class AttrAppendSubNode(attr: String)
-    extends SubNode with AttributeRule
+    extends SubNode
+    with AttributeRule
 final case class AttrRemoveSubNode(attr: String)
-    extends SubNode with AttributeRule
+    extends SubNode
+    with AttributeRule
 
 final case class SelectThisNode(kids: Boolean) extends SubNode
 
@@ -165,8 +172,8 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
   private implicit def str2chars(s: String): List[Char] =
     new scala.collection.immutable.WrappedString(s).toList
 
-  private def fixAll(
-      all: List[CssSelector], sn: Option[SubNode]): CssSelector = {
+  private def fixAll(all: List[CssSelector],
+                     sn: Option[SubNode]): CssSelector = {
     (all, sn) match {
       // case (Nil, Some())
       case (r :: Nil, None) => r
@@ -182,9 +189,9 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     if (in.atEnd) Success(CharSequenceReader.EofCh, in) else Failure("", in)
   }
   private lazy val topParser: Parser[CssSelector] =
-    phrase(
-        rep1((_idMatch | _dataNameMatch | _nameMatch | _classMatch | _attrMatch | _elemMatch | _colonMatch | _starMatch) <~
-            (rep1(' ') | atEnd)) ~ opt(subNode)) ^^ {
+    phrase(rep1(
+        (_idMatch | _dataNameMatch | _nameMatch | _classMatch | _attrMatch | _elemMatch | _colonMatch | _starMatch) <~
+          (rep1(' ') | atEnd)) ~ opt(subNode)) ^^ {
       case (one :: Nil) ~ sn => fixAll(List(one), sn)
       case all ~ None if all.takeRight(1).head == StarSelector(Empty, false) =>
         fixAll(all.dropRight(1), Some(KidsSubNode()))
@@ -220,11 +227,11 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
 
   private lazy val _starMatch: Parser[CssSelector] =
     ('*' ^^ {
-          case sn => StarSelector(Empty, false)
-        }) |
-    ('^' ^^ {
-          case sn => StarSelector(Empty, true)
-        })
+      case sn => StarSelector(Empty, false)
+    }) |
+      ('^' ^^ {
+        case sn => StarSelector(Empty, true)
+      })
 
   private lazy val _dataNameMatch: Parser[CssSelector] =
     ';' ~> id ^^ {
@@ -257,20 +264,23 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
 
   private lazy val subNode: Parser[SubNode] =
     rep(' ') ~>
-    ((opt('*') ~ '[' ~> attrName <~ '+' ~ ']' ^^ { name =>
-              AttrAppendSubNode(name)
-            }) |
+      ((opt('*') ~ '[' ~> attrName <~ '+' ~ ']' ^^ { name =>
+        AttrAppendSubNode(name)
+      }) |
         (opt('*') ~ '[' ~> attrName <~ '!' ~ ']' ^^ { name =>
-              AttrRemoveSubNode(name)
-            }) |
+          AttrRemoveSubNode(name)
+        }) |
         (opt('*') ~ '[' ~> attrName <~ ']' ^^ { name =>
-              AttrSubNode(name)
-            }) | ('!' ~ '!' ^^ (a => DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
+          AttrSubNode(name)
+        }) | ('!' ~ '!' ^^ (a => DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
         (a => SurroundKids()) | ('-' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-        ('*' ~ '<' ^^ (a => AppendKidsSubNode())) | '*' ^^ (a => KidsSubNode()) | '^' ~ '*' ^^
-        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a => SelectThisNode(false)))
+        ('*' ~ '<' ^^ (a =>
+                         AppendKidsSubNode())) | '*' ^^ (a =>
+                                                           KidsSubNode()) | '^' ~ '*' ^^
+        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
+                                                      SelectThisNode(false)))
 
   private lazy val attrName: Parser[String] =
     (letter | '_' | ':') ~ rep(letter | number | '-' | '_' | ':' | '.') ^^ {
@@ -278,27 +288,20 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     }
 
   private lazy val attrConst: Parser[String] = {
-    (('\'' ~> rep(elem("isValid",
-                       (c: Char) =>
-                         {
-                       c != '\'' && c >= ' '
-                   })) <~ '\'') ^^ {
-          case s => s.mkString
-        }) |
-    (('"' ~> rep(elem("isValid",
-                      (c: Char) =>
-                        {
-                      c != '"' && c >= ' '
-                  })) <~ '"') ^^ {
-          case s => s.mkString
-        }) |
-    (rep1(
-            elem("isValid",
-                 (c: Char) =>
-                   {
-                 c != '\'' && c != '"' && c > ' '
-             })) ^^ {
-          case s => s.mkString
-        })
+    (('\'' ~> rep(elem("isValid", (c: Char) => {
+      c != '\'' && c >= ' '
+    })) <~ '\'') ^^ {
+      case s => s.mkString
+    }) |
+      (('"' ~> rep(elem("isValid", (c: Char) => {
+        c != '"' && c >= ' '
+      })) <~ '"') ^^ {
+        case s => s.mkString
+      }) |
+      (rep1(elem("isValid", (c: Char) => {
+        c != '\'' && c != '"' && c > ' '
+      })) ^^ {
+        case s => s.mkString
+      })
   }
 }

@@ -12,7 +12,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
           case -\/(h) =>
             -\/(F.ap(h)(g))
           case \/-(h) =>
-            -\/(F.map(g)(_ (h)))
+            -\/(F.map(g)(_(h)))
         }
       case \/-(g) =>
         run match {
@@ -24,8 +24,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
     })
 
   def cojoin(implicit F: Cobind[F]): OneOr[F, OneOr[F, A]] =
-    OneOr(
-        run match {
+    OneOr(run match {
       case \/-(_) =>
         \/-(this)
       case -\/(a) =>
@@ -33,8 +32,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
     })
 
   def cobind[B](f: OneOr[F, A] => B)(implicit F: Cobind[F]): OneOr[F, B] =
-    OneOr(
-        run match {
+    OneOr(run match {
       case \/-(_) =>
         \/-(f(this))
       case -\/(a) =>
@@ -76,8 +74,8 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.foldMap1(a)(f)
     }
 
-  def foldMapRight1[B](
-      z: A => B)(f: (A, => B) => B)(implicit F: Foldable1[F]): B =
+  def foldMapRight1[B](z: A => B)(f: (A, => B) => B)(
+      implicit F: Foldable1[F]): B =
     run match {
       case \/-(a) =>
         z(a)
@@ -93,8 +91,8 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.foldMapLeft1(a)(z)(f)
     }
 
-  def traverse[G[_], B](f: A => G[B])(
-      implicit T: Traverse[F], F: Applicative[G]): G[OneOr[F, B]] =
+  def traverse[G[_], B](f: A => G[B])(implicit T: Traverse[F],
+                                      F: Applicative[G]): G[OneOr[F, B]] =
     run match {
       case \/-(a) =>
         F.map(f(a))(t => OneOr(\/-(t)))
@@ -102,8 +100,8 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.map(T.traverse(a)(f))(t => OneOr(-\/(t)))
     }
 
-  def traverse1[G[_], B](
-      f: A => G[B])(implicit T: Traverse1[F], F: Apply[G]): G[OneOr[F, B]] =
+  def traverse1[G[_], B](f: A => G[B])(implicit T: Traverse1[F],
+                                       F: Apply[G]): G[OneOr[F, B]] =
     run match {
       case \/-(a) =>
         F.map(f(a))(t => OneOr(\/-(t)))
@@ -120,7 +118,8 @@ private sealed trait OneOrFunctor[F[_]] extends Functor[OneOr[F, ?]] {
 }
 
 private sealed trait OneOrCobind[F[_]]
-    extends Cobind[OneOr[F, ?]] with OneOrFunctor[F] {
+    extends Cobind[OneOr[F, ?]]
+    with OneOrFunctor[F] {
   implicit def F: Cobind[F]
 
   override final def cobind[A, B](fa: OneOr[F, A])(
@@ -129,7 +128,8 @@ private sealed trait OneOrCobind[F[_]]
 }
 
 private sealed trait OneOrComonad[F[_]]
-    extends OneOrCobind[F] with Comonad[OneOr[F, ?]] {
+    extends OneOrCobind[F]
+    with Comonad[OneOr[F, ?]] {
   implicit def F: Comonad[F]
 
   override def copoint[A](fa: OneOr[F, A]) =
@@ -137,7 +137,8 @@ private sealed trait OneOrComonad[F[_]]
 }
 
 private sealed trait OneOrApplicative[F[_]]
-    extends Applicative[OneOr[F, ?]] with OneOrFunctor[F] {
+    extends Applicative[OneOr[F, ?]]
+    with OneOrFunctor[F] {
   implicit def F: Apply[F]
 
   override final def ap[A, B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
@@ -180,7 +181,8 @@ private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, ?]] {
 }
 
 private sealed trait OneOrFoldable1[F[_]]
-    extends Foldable1[OneOr[F, ?]] with OneOrFoldable[F] {
+    extends Foldable1[OneOr[F, ?]]
+    with OneOrFoldable[F] {
 
   implicit def F: Foldable1[F]
 
@@ -198,7 +200,9 @@ private sealed trait OneOrFoldable1[F[_]]
 }
 
 private sealed trait OneOrTraverse[F[_]]
-    extends Traverse[OneOr[F, ?]] with OneOrFunctor[F] with OneOrFoldable[F] {
+    extends Traverse[OneOr[F, ?]]
+    with OneOrFunctor[F]
+    with OneOrFoldable[F] {
 
   implicit def F: Traverse[F]
 
@@ -208,7 +212,8 @@ private sealed trait OneOrTraverse[F[_]]
 }
 
 private sealed trait OneOrTraverse1[F[_]]
-    extends Traverse1[OneOr[F, ?]] with OneOrFoldable1[F]
+    extends Traverse1[OneOr[F, ?]]
+    with OneOrFoldable1[F]
     with OneOrTraverse[F] {
 
   implicit def F: Traverse1[F]
@@ -229,7 +234,8 @@ private sealed trait OneOrEqual[F[_], A] extends Equal[OneOr[F, A]] {
 }
 
 private sealed trait OneOrOrder[F[_], A]
-    extends Order[OneOr[F, A]] with OneOrEqual[F, A] {
+    extends Order[OneOr[F, A]]
+    with OneOrEqual[F, A] {
   implicit def OA: Order[A]
   implicit def OFA: Order[F[A]]
 
@@ -259,15 +265,15 @@ sealed abstract class OneOrInstances extends OneOrInstances0 {
       def F = implicitly
     }
 
-  implicit def OneOrEqual[F[_], A](
-      implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
+  implicit def OneOrEqual[F[_], A](implicit oa: Equal[A],
+                                   ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
     new OneOrEqual[F, A] {
       def OA = implicitly
       def OFA = implicitly
     }
 
-  implicit def OneOrShow[F[_], A](
-      implicit oa: Show[A], ofa: Show[F[A]]): Show[OneOr[F, A]] =
+  implicit def OneOrShow[F[_], A](implicit oa: Show[A],
+                                  ofa: Show[F[A]]): Show[OneOr[F, A]] =
     new OneOrShow[F, A] {
       def OA = implicitly
       def OFA = implicitly
@@ -280,8 +286,8 @@ sealed abstract class OneOrInstances0 extends OneOrInstances1 {
       def F = implicitly
     }
 
-  implicit def OneOrOrder[F[_], A](
-      implicit oa: Order[A], ofa: Order[F[A]]): Order[OneOr[F, A]] =
+  implicit def OneOrOrder[F[_], A](implicit oa: Order[A],
+                                   ofa: Order[F[A]]): Order[OneOr[F, A]] =
     new OneOrOrder[F, A] {
       def OA = implicitly
       def OFA = implicitly

@@ -19,8 +19,8 @@ import com.twitter.util.Try
   * @param request the request that was used to generate response
   * to be seen by [[deserialize]].
   */
-class DeserializeCtx[Rep](
-    val request: ThriftStruct, replyDeserializer: Array[Byte] => Try[Rep]) {
+class DeserializeCtx[Rep](val request: ThriftStruct,
+                          replyDeserializer: Array[Byte] => Try[Rep]) {
 
   // thread safety provided via synchronization on this
   private var deserialized: Try[Rep] = null

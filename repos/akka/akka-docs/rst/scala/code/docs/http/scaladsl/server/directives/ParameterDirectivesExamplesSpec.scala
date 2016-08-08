@@ -10,7 +10,8 @@ import akka.http.scaladsl.unmarshalling.PredefinedFromStringUnmarshallers
 import docs.http.scaladsl.server.RoutingSpec
 
 class ParameterDirectivesExamplesSpec
-    extends RoutingSpec with PredefinedFromStringUnmarshallers {
+    extends RoutingSpec
+    with PredefinedFromStringUnmarshallers {
   "example-1" in {
     val route = parameter('color) { color =>
       complete(s"The color is '$color'")
@@ -124,7 +125,8 @@ class ParameterDirectivesExamplesSpec
       responseAs[String] === "The color is 'blue' and the city is Chicago."
     }
 
-    Get("/?color=blue&city=Chicago&city=Boston") ~> Route.seal(route) ~> check {
+    Get("/?color=blue&city=Chicago&city=Boston") ~> Route
+      .seal(route) ~> check {
       responseAs[String] === "The color is 'blue' and the cities are Chicago, Boston."
     }
   }

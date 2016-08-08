@@ -43,7 +43,8 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
     // completes or fails when the connection succeeds or fails
     // and closed is a Future[Done] representing the stream completion from above
     val (upgradeResponse, closed) = Http().singleWebSocketRequest(
-        WebSocketRequest("ws://echo.websocket.org"), flow)
+        WebSocketRequest("ws://echo.websocket.org"),
+        flow)
 
     val connected = upgradeResponse.map { upgrade =>
       // just like a regular http request we can get 404 NotFound,
@@ -81,8 +82,8 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
     val (upgradeResponse, _) = Http().singleWebSocketRequest(
         WebSocketRequest(
             "ws://example.com:8080/some/path",
-            extraHeaders = Seq(Authorization(BasicHttpCredentials(
-                          "johan", "correcthorsebatterystaple")))),
+            extraHeaders = Seq(Authorization(
+                BasicHttpCredentials("johan", "correcthorsebatterystaple")))),
         flow)
     //#authorized-single-WebSocket-request
   }

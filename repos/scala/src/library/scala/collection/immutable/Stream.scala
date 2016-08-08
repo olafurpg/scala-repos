@@ -200,10 +200,11 @@ import scala.language.implicitConversions
   */
 @deprecatedInheritance("This class will be sealed.", "2.11.0")
 abstract class Stream[+A]
-    extends AbstractSeq[A] with LinearSeq[A]
+    extends AbstractSeq[A]
+    with LinearSeq[A]
     with GenericTraversableTemplate[A, Stream]
-    with LinearSeqOptimized[A, Stream[A]] with Serializable {
-  self =>
+    with LinearSeqOptimized[A, Stream[A]]
+    with Serializable { self =>
 
   override def companion: GenericCompanion[Stream] = Stream
 
@@ -394,8 +395,8 @@ abstract class Stream[+A]
     * @return A new collection containing the modifications from the application
     * of `op`.
     */
-  override final def scanLeft[B, That](z: B)(
-      op: (B, A) => B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =
+  override final def scanLeft[B, That](z: B)(op: (B, A) => B)(
+      implicit bf: CanBuildFrom[Stream[A], B, That]): That =
     if (isStreamBuilder(bf))
       asThat(
           if (isEmpty) Stream(z)
@@ -509,8 +510,8 @@ abstract class Stream[+A]
       )
     else super.flatMap(f)(bf)
 
-  override private[scala] def filterImpl(
-      p: A => Boolean, isFlipped: Boolean): Stream[A] = {
+  override private[scala] def filterImpl(p: A => Boolean,
+                                         isFlipped: Boolean): Stream[A] = {
     // optimization: drop leading prefix of elems for which f returns false
     // var rest = this dropWhile (!p(_)) - forget DRY principle - GC can't collect otherwise
     var rest = this
@@ -711,7 +712,7 @@ abstract class Stream[+A]
           if (scout.tailDefined) {
             scout = scout.tail
             // Use 2x 1x iterator trick for cycle detection; slow iterator can add strings
-            while ( (cursor ne scout) && scout.tailDefined) {
+            while ((cursor ne scout) && scout.tailDefined) {
               b append sep append cursor.head
               n += 1
               cursor = cursor.tail
@@ -808,12 +809,12 @@ abstract class Stream[+A]
     */
   override def take(n: Int): Stream[A] =
     (// Note that the n == 1 condition appears redundant but is not.
-     // It prevents "tail" from being referenced (and its head being evaluated)
-     // when obtaining the last element of the result. Such are the challenges
-     // of working with a lazy-but-not-really sequence.
-     if (n <= 0 || isEmpty) Stream.empty
-     else if (n == 1) cons(head, Stream.empty)
-     else cons(head, tail take n - 1))
+    // It prevents "tail" from being referenced (and its head being evaluated)
+    // when obtaining the last element of the result. Such are the challenges
+    // of working with a lazy-but-not-really sequence.
+    if (n <= 0 || isEmpty) Stream.empty
+    else if (n == 1) cons(head, Stream.empty)
+    else cons(head, tail take n - 1))
 
   @tailrec final override def drop(n: Int): Stream[A] =
     if (n <= 0 || isEmpty) this
@@ -1063,7 +1064,8 @@ abstract class Stream[+A]
   *  iterate as lazily as it traverses the tail.
   */
 final class StreamIterator[+A] private ()
-    extends AbstractIterator[A] with Iterator[A] {
+    extends AbstractIterator[A]
+    with Iterator[A] {
   def this(self: Stream[A]) {
     this()
     these = new LazyCell(self)
@@ -1256,7 +1258,7 @@ object Stream extends SeqFactory[Stream] {
     loop(0)
   }
 
-  override def range[T : Integral](start: T, end: T, step: T): Stream[T] = {
+  override def range[T: Integral](start: T, end: T, step: T): Stream[T] = {
     val num = implicitly[Integral[T]]
     import num._
 
@@ -1264,8 +1266,9 @@ object Stream extends SeqFactory[Stream] {
     else cons(start, range(start + step, end, step))
   }
 
-  private[immutable] def filteredTail[A](
-      stream: Stream[A], p: A => Boolean, isFlipped: Boolean) = {
+  private[immutable] def filteredTail[A](stream: Stream[A],
+                                         p: A => Boolean,
+                                         isFlipped: Boolean) = {
     cons(stream.head, stream.tail.filterImpl(p, isFlipped))
   }
 
@@ -1284,8 +1287,8 @@ object Stream extends SeqFactory[Stream] {
     * head, it is now possible for GC to collect any leading and filtered-out elements
     * which do not satisfy the filter, while the tail is still processing (see SI-8990).
     */
-  private[immutable] final class StreamWithFilter[A](
-      sl: => Stream[A], p: A => Boolean)
+  private[immutable] final class StreamWithFilter[A](sl: => Stream[A],
+                                                     p: A => Boolean)
       extends FilterMonadic[A, Stream[A]] {
     private var s = sl // set to null to allow GC after filtered
     private lazy val filtered = { val f = s filter p; s = null; f } // don't set to null if throw during filter

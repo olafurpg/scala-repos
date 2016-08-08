@@ -31,7 +31,11 @@ import javafx.{print => jfxp}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 import scalafx.stage.Window
 
@@ -55,8 +59,8 @@ object PrinterJob {
     * Companion Object for [[scalafx.print.PrinterJob.JobStatus]].
     */
   object JobStatus
-      extends SFXEnumDelegateCompanion[
-          jfxp.PrinterJob.JobStatus, PrinterJob.JobStatus] {
+      extends SFXEnumDelegateCompanion[jfxp.PrinterJob.JobStatus,
+                                       PrinterJob.JobStatus] {
 
     /**
       * The job has been cancelled by the application.

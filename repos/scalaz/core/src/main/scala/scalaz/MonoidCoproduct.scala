@@ -14,7 +14,7 @@ import scalaz.std.vector._
 sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
 
   /** The associative operation of the monoid coproduct */
-  def |+|[A >: M : Monoid, B >: N : Monoid](m: A :+: B): A :+: B = {
+  def |+|[A >: M: Monoid, B >: N: Monoid](m: A :+: B): A :+: B = {
     @annotation.tailrec
     def go(r1: Vector[A \/ B], r2: Vector[A \/ B]): Vector[A \/ B] =
       (r1, r2) match {
@@ -31,39 +31,39 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
   }
 
   /** Append a value from the left monoid */
-  def appendLeft[A >: M : Monoid, B >: N : Monoid](m: A): A :+: B =
+  def appendLeft[A >: M: Monoid, B >: N: Monoid](m: A): A :+: B =
     |+|[A, B](:+:.inL(m))
 
   /** Append a value from the right monoid */
-  def appendRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
+  def appendRight[A >: M: Monoid, B >: N: Monoid](n: B): A :+: B =
     |+|[A, B](:+:.inR(n))
 
   /** Prepend a value from the left monoid */
-  def prependLeft[A >: M : Monoid, B >: N : Monoid](m: A): A :+: B =
+  def prependLeft[A >: M: Monoid, B >: N: Monoid](m: A): A :+: B =
     :+:.inL(m) |+| (this: (A :+: B))
 
   /** Prepend a value from the right monoid */
-  def prependRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
+  def prependRight[A >: M: Monoid, B >: N: Monoid](n: B): A :+: B =
     :+:.inR(n) |+| (this: (A :+: B))
 
   /** Project out the value in the left monoid */
-  def left[A >: M : Monoid]: A =
+  def left[A >: M: Monoid]: A =
     rep.foldLeft(mzero[A]) { (m, e) =>
       m |+| e.fold(a => a, _ => mzero[A])
     }
 
   /** Project out the value in the right monoid */
-  def right[A >: N : Monoid]: A =
+  def right[A >: N: Monoid]: A =
     rep.foldLeft(mzero[A]) { (n, e) =>
       n |+| e.fold(_ => mzero[A], a => a)
     }
 
   /** Project out both monoids individually */
-  def both[A >: M : Monoid, B >: N : Monoid]: (A, B) =
+  def both[A >: M: Monoid, B >: N: Monoid]: (A, B) =
     fold(m => (m, mzero[B]), n => (mzero[A], n))
 
   /** A homomorphism to a monoid `Z` (if `f` and `g` are homomorphisms). */
-  def fold[Z : Monoid](f: M => Z, g: N => Z): Z =
+  def fold[Z: Monoid](f: M => Z, g: N => Z): Z =
     rep.foldMap(_.fold(f, g))
 
   /**
@@ -74,8 +74,8 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
     * This allows you to add up `N` values while having the opportunity to "track"
     * an evolving `M` value, and vice versa.
     */
-  def untangle[A >: M : Monoid, B >: N : Monoid](
-      f: (B, A) => A, g: (A, B) => B): (A, B) =
+  def untangle[A >: M: Monoid, B >: N: Monoid](f: (B, A) => A,
+                                               g: (A, B) => B): (A, B) =
     rep.foldLeft(mzero[(A, B)]) {
       case ((curm, curn), -\/(m)) =>
         (curm |+| f(curn, m), curn)
@@ -87,14 +87,14 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
     * Like `untangle`, except `M` values are simply combined without regard to the
     * `N` values to the left of it.
     */
-  def untangleLeft[A >: M : Monoid, B >: N : Monoid](f: (A, B) => B): (A, B) =
+  def untangleLeft[A >: M: Monoid, B >: N: Monoid](f: (A, B) => B): (A, B) =
     untangle[A, B]((_, m) => m, f)
 
   /**
     * Like `untangle`, except `N` values are simply combined without regard to the
     * `N` values to the left of it.
     */
-  def untangleRight[A >: M : Monoid, B >: N : Monoid](f: (B, A) => A): (A, B) =
+  def untangleRight[A >: M: Monoid, B >: N: Monoid](f: (B, A) => A): (A, B) =
     untangle[A, B](f, (_, n) => n)
 }
 
@@ -107,10 +107,10 @@ object :+: {
   /** The identity of the monoid coproduct */
   def empty[M, N]: M :+: N = new :+:(Vector())
 
-  implicit def monoidCoproductEqual[M : Equal, N : Equal]: Equal[M :+: N] =
+  implicit def monoidCoproductEqual[M: Equal, N: Equal]: Equal[M :+: N] =
     Equal.equalBy(_.rep)
 
-  implicit def instance[M : Monoid, N : Monoid]: Monoid[M :+: N] =
+  implicit def instance[M: Monoid, N: Monoid]: Monoid[M :+: N] =
     new Monoid[M :+: N] {
       val zero = empty
       def append(a: M :+: N, b: => M :+: N) = a |+| b

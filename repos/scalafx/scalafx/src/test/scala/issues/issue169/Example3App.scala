@@ -45,19 +45,17 @@ object Example3App extends App {
             (elem: jfxc.ObservableList[String]) =>
               Array[jfxb.Observable](elem)))
 
-  items.onChange(
-      (_, changes) =>
-        {
-      println(s"onChange(_, $changes")
-      for (change <- changes) change match {
-        case ObservableBuffer.Add(_, _) => println(s"  case Add: $change")
-        case ObservableBuffer.Remove(_, _) =>
-          println(s"  case Remove: $change")
-        case ObservableBuffer.Reorder(_, _, _) =>
-          println(s"  case Reorder: $change")
-        case ObservableBuffer.Update(_, _) =>
-          println(s"  case Update: $change")
-      }
+  items.onChange((_, changes) => {
+    println(s"onChange(_, $changes")
+    for (change <- changes) change match {
+      case ObservableBuffer.Add(_, _) => println(s"  case Add: $change")
+      case ObservableBuffer.Remove(_, _) =>
+        println(s"  case Remove: $change")
+      case ObservableBuffer.Reorder(_, _, _) =>
+        println(s"  case Reorder: $change")
+      case ObservableBuffer.Update(_, _) =>
+        println(s"  case Update: $change")
+    }
   })
 
   // Should produce `Add` notification

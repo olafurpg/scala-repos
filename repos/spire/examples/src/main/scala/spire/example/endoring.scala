@@ -45,7 +45,7 @@ object EndoRingExample extends App {
     * for an abelian group `ab`. This defines addition as group addition after
     * applying the endomorphism and multiplication as composition.
     */
-  class EndoRing[A : AbGroup] extends Ring[Endo[A]] {
+  class EndoRing[A: AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
     def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
@@ -58,7 +58,7 @@ object EndoRingExample extends App {
   }
 
   object EndoRing {
-    def apply[A : AbGroup] = new EndoRing[A]
+    def apply[A: AbGroup] = new EndoRing[A]
   }
 
   implicit val intEndoRing = EndoRing[Int]

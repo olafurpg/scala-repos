@@ -10,7 +10,7 @@ class NeedsToBeAbstractBugsTest extends AnnotatorTestBase(NeedsToBeAbstract) {
 
   def testSCL2981(): Unit = {
     assertMatches(messages(
-            "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}")) {
+        "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}")) {
       case Nil =>
     }
   }

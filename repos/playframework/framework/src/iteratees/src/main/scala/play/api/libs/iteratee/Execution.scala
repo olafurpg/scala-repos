@@ -47,7 +47,7 @@ object Execution {
      *       - a Runnable is running and trampoline is active
      *       - no more Runnables are enqueued for execution after the current Runnable
      *         completes
-     * - next: Runnable => 
+     * - next: Runnable =>
      *       - a Runnable is running and trampoline is active
      *       - one Runnable is scheduled for execution after the current Runnable
      *         completes
@@ -72,7 +72,7 @@ object Execution {
             runnable.run()
             executeScheduled()
           } finally {
-            // We've run all the Runnables, so show that the 
+            // We've run all the Runnables, so show that the
             // trampoline has been shut down.
             local.set(null)
           }

@@ -27,8 +27,8 @@ final case class GuiceApplicationBuilder(
     eagerly: Boolean = false,
     loadConfiguration: Environment => Configuration = Configuration.load,
     global: Option[GlobalSettings.Deprecated] = None,
-    loadModules: (Environment,
-    Configuration) => Seq[GuiceableModule] = GuiceableModule.loadModules)
+    loadModules: (Environment, Configuration) => Seq[GuiceableModule] =
+      GuiceableModule.loadModules)
     extends GuiceBuilder[GuiceApplicationBuilder](
         environment,
         configuration,
@@ -70,9 +70,8 @@ final case class GuiceApplicationBuilder(
     * Set the module loader.
     * Overrides the default or any previously configured values.
     */
-  def load(
-      loader: (Environment,
-      Configuration) => Seq[GuiceableModule]): GuiceApplicationBuilder =
+  def load(loader: (Environment, Configuration) => Seq[GuiceableModule])
+    : GuiceApplicationBuilder =
     copy(loadModules = loader)
 
   /**
@@ -150,9 +149,8 @@ final case class GuiceApplicationBuilder(
       eagerly: Boolean = eagerly,
       loadConfiguration: Environment => Configuration = loadConfiguration,
       global: Option[GlobalSettings] = global,
-      loadModules: (Environment,
-      Configuration) => Seq[GuiceableModule] = loadModules)
-    : GuiceApplicationBuilder =
+      loadModules: (Environment, Configuration) => Seq[GuiceableModule] =
+        loadModules): GuiceApplicationBuilder =
     new GuiceApplicationBuilder(environment,
                                 configuration,
                                 modules,
@@ -194,8 +192,8 @@ final case class GuiceApplicationBuilder(
     import scala.collection.JavaConverters._
     import scala.collection.mutable
 
-    val deprecatedValues = List(
-        "DEBUG", "WARN", "ERROR", "INFO", "TRACE", "OFF")
+    val deprecatedValues =
+      List("DEBUG", "WARN", "ERROR", "INFO", "TRACE", "OFF")
 
     // Recursively checks each key to see if it contains a deprecated value
     def hasDeprecatedValue(values: mutable.Map[String, AnyRef]): Boolean = {
@@ -230,22 +228,24 @@ private class AdditionalRouterProvider(additional: Router)
   lazy val get = Router.from(additional.routes.orElse(fallback.get.routes))
 }
 
-private class FakeRoutes(
-    injected: PartialFunction[(String, String), Handler], fallback: Router)
+private class FakeRoutes(injected: PartialFunction[(String, String), Handler],
+                         fallback: Router)
     extends Router {
   def documentation = fallback.documentation
   // Use withRoutes first, then delegate to the parentRoutes if no route is defined
   val routes =
     new AbstractPartialFunction[RequestHeader, Handler] {
       override def applyOrElse[A <: RequestHeader, B >: Handler](
-          rh: A, default: A => B) =
-        injected.applyOrElse(
-            (rh.method, rh.path), (_: (String, String)) => default(rh))
+          rh: A,
+          default: A => B) =
+        injected.applyOrElse((rh.method, rh.path),
+                             (_: (String, String)) => default(rh))
       def isDefinedAt(rh: RequestHeader) =
         injected.isDefinedAt((rh.method, rh.path))
     } orElse new AbstractPartialFunction[RequestHeader, Handler] {
       override def applyOrElse[A <: RequestHeader, B >: Handler](
-          rh: A, default: A => B) =
+          rh: A,
+          default: A => B) =
         fallback.routes.applyOrElse(rh, default)
       def isDefinedAt(x: RequestHeader) = fallback.routes.isDefinedAt(x)
     }
@@ -257,8 +257,8 @@ private class FakeRoutes(
 private case class FakeRouterConfig(
     withRoutes: PartialFunction[(String, String), Handler])
 
-private class FakeRouterProvider @Inject()(
-    config: FakeRouterConfig, parent: RoutesProvider)
+private class FakeRouterProvider @Inject()(config: FakeRouterConfig,
+                                           parent: RoutesProvider)
     extends Provider[Router] {
   lazy val get: Router = new FakeRoutes(config.withRoutes, parent.get)
 }

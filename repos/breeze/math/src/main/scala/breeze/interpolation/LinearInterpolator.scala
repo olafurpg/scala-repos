@@ -9,8 +9,8 @@ import scala.reflect.ClassTag
 import breeze.linalg._
 import breeze.math.Field
 
-class LinearInterpolator[T : ClassTag : Field : Ordering](
-    x_coords: Vector[T], y_coords: Vector[T])
+class LinearInterpolator[T: ClassTag: Field: Ordering](x_coords: Vector[T],
+                                                       y_coords: Vector[T])
     extends HandyUnivariateInterpolator[T](x_coords, y_coords) {
 
   private val ord = implicitly[Ordering[T]]
@@ -54,7 +54,7 @@ class LinearInterpolator[T : ClassTag : Field : Ordering](
 }
 
 object LinearInterpolator {
-  def apply[T : ClassTag : Field : Ordering](
-      x_coords: Vector[T], y_coords: Vector[T]) =
+  def apply[T: ClassTag: Field: Ordering](x_coords: Vector[T],
+                                          y_coords: Vector[T]) =
     new LinearInterpolator(x_coords, y_coords)
 }

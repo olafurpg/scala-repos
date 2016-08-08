@@ -17,7 +17,14 @@
 
 package org.apache.spark.mllib.stat.distribution
 
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => DBM, DenseVector => DBV, Vector => BV}
+import breeze.linalg.{
+  diag,
+  eigSym,
+  max,
+  DenseMatrix => DBM,
+  DenseVector => DBV,
+  Vector => BV
+}
 
 import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.mllib.linalg.{Matrices, Matrix, Vector, Vectors}
@@ -35,8 +42,8 @@ import org.apache.spark.mllib.util.MLUtils
   */
 @Since("1.3.0")
 @DeveloperApi
-class MultivariateGaussian @Since("1.3.0")(
-    @Since("1.3.0") val mu: Vector, @Since("1.3.0") val sigma: Matrix)
+class MultivariateGaussian @Since("1.3.0")(@Since("1.3.0") val mu: Vector,
+                                           @Since("1.3.0") val sigma: Matrix)
     extends Serializable {
 
   require(sigma.numCols == sigma.numRows, "Covariance matrix must be square")
@@ -132,7 +139,8 @@ class MultivariateGaussian @Since("1.3.0")(
 
       // calculate the root-pseudo-inverse of the diagonal matrix of singular values
       // by inverting the square root of all non-zero values
-      val pinvS = diag(new DBV(
+      val pinvS = diag(
+          new DBV(
               d.map(v => if (v > tol) math.sqrt(1.0 / v) else 0.0).toArray))
 
       (pinvS * u.t,

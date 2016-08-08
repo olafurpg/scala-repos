@@ -17,7 +17,16 @@ limitations under the License.
 package com.twitter.summingbird.batch
 
 import com.twitter.algebird.Monoid
-import com.twitter.algebird.{Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper, ExclusiveLower, Universe}
+import com.twitter.algebird.{
+  Empty,
+  Interval,
+  Intersection,
+  InclusiveLower,
+  ExclusiveUpper,
+  InclusiveUpper,
+  ExclusiveLower,
+  Universe
+}
 import com.twitter.bijection.{Bijection, Injection}
 import scala.collection.Iterator.iterate
 

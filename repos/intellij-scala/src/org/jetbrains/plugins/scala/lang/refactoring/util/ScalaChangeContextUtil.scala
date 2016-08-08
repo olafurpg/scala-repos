@@ -3,7 +3,10 @@ package lang.refactoring.util
 
 import com.intellij.openapi.util.{Key, TextRange}
 import com.intellij.psi._
-import org.jetbrains.plugins.scala.conversion.copy.{Associations, ScalaCopyPastePostProcessor}
+import org.jetbrains.plugins.scala.conversion.copy.{
+  Associations,
+  ScalaCopyPastePostProcessor
+}
 
 /**
   * Nikolay.Tropin
@@ -51,8 +54,8 @@ object ScalaChangeContextUtil {
     elem.getCopyableUserData(ASSOCIATIONS_KEY) match {
       case null =>
       case as: Associations =>
-        as.associations.foreach(
-            a => a.range = a.range.shiftRight(offsetChange))
+        as.associations.foreach(a =>
+          a.range = a.range.shiftRight(offsetChange))
     }
   }
 }

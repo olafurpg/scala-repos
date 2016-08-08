@@ -8,14 +8,38 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.decompiler.DecompilerUtil
 import org.jetbrains.plugins.scala.extensions.ObjectExt
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScFieldId, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScFieldId,
+  ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter,
+  ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement, ScTypeParametersOwner, ScTypedDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{NonValueType, ScMethodType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions,
+  ScNamedElement,
+  ScTypeParametersOwner,
+  ScTypedDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  NonValueType,
+  ScMethodType,
+  TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 
 import scala.annotation.tailrec
@@ -83,23 +107,22 @@ trait ScType {
 
   def removeVarianceAbstracts(variance: Int): ScType = {
     var index = 0
-    recursiveVarianceUpdate(
-        (tp: ScType, i: Int) =>
-          {
-            tp match {
-              case ScAbstractType(_, lower, upper) =>
-                i match {
-                  case -1 => (true, lower)
-                  case 1 => (true, upper)
-                  case 0 =>
-                    (true,
-                     ScSkolemizedType(
-                         s"_$$${ index += 1; index }", Nil, lower, upper))
-                }
-              case _ => (false, tp)
-            }
-        },
-        variance).unpackedType
+    recursiveVarianceUpdate((tp: ScType, i: Int) => {
+      tp match {
+        case ScAbstractType(_, lower, upper) =>
+          i match {
+            case -1 => (true, lower)
+            case 1 => (true, upper)
+            case 0 =>
+              (true,
+               ScSkolemizedType(s"_$$${ index += 1; index }",
+                                Nil,
+                                lower,
+                                upper))
+          }
+        case _ => (false, tp)
+      }
+    }, variance).unpackedType
   }
 
   def removeUndefines(): ScType = {
@@ -137,20 +160,16 @@ trait ScType {
 
   def recursiveVarianceUpdate(update: (ScType, Int) => (Boolean, ScType),
                               variance: Int = 1): ScType = {
-    recursiveVarianceUpdateModifiable[Unit](
-        (),
-        (tp, v, T) =>
-          {
-            val (newTp, newV) = update(tp, v)
-            (newTp, newV, ())
-        },
-        variance)
+    recursiveVarianceUpdateModifiable[Unit]((), (tp, v, T) => {
+      val (newTp, newV) = update(tp, v)
+      (newTp, newV, ())
+    }, variance)
   }
 
-  def recursiveVarianceUpdateModifiable[T](
-      data: T,
-      update: (ScType, Int, T) => (Boolean, ScType, T),
-      variance: Int = 1): ScType = {
+  def recursiveVarianceUpdateModifiable[T](data: T,
+                                           update: (ScType, Int,
+                                                    T) => (Boolean, ScType, T),
+                                           variance: Int = 1): ScType = {
     val res = update(this, variance, data)
     if (res._1) res._2
     else this
@@ -160,14 +179,12 @@ trait ScType {
     val set: mutable.HashSet[ScAbstractType] =
       new mutable.HashSet[ScAbstractType]
 
-    recursiveUpdate(
-        tp =>
-          {
-        tp match {
-          case a: ScAbstractType => set += a
-          case _ =>
-        }
-        (false, tp)
+    recursiveUpdate(tp => {
+      tp match {
+        case a: ScAbstractType => set += a
+        case _ =>
+      }
+      (false, tp)
     })
 
     set.toSeq
@@ -241,8 +258,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   )
 
   @tailrec
-  def extractClass(
-      t: ScType, project: Option[Project] = None): Option[PsiClass] = {
+  def extractClass(t: ScType,
+                   project: Option[Project] = None): Option[PsiClass] = {
     t match {
       case p @ ScParameterizedType(t1, _) =>
         extractClass(t1, project) //performance improvement
@@ -272,8 +289,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             if (visitedAlias.contains(t)) return None
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractClassType(
-                proj.actualSubst.subst(result.get), project, visitedAlias + t)
+            extractClassType(proj.actualSubst.subst(result.get),
+                             project,
+                             visitedAlias + t)
           case _ => None
         }
       case ScExistentialType(quantified, _) =>
@@ -316,8 +334,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
           case t: ScTypeAliasDefinition if withoutAliases =>
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractDesignated(
-                proj.actualSubst.subst(result.get), withoutAliases)
+            extractDesignated(proj.actualSubst.subst(result.get),
+                              withoutAliases)
           case _ => Some((proj.actualElement, proj.actualSubst))
         }
       case p @ ScParameterizedType(t1, _) =>
@@ -422,19 +440,19 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
         proj.actualElement match {
           case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
             t.aliasedType(TypingContext.empty)
-              .flatMap(
-                  t => expandAliases(proj.actualSubst.subst(t), visited + tp))
+              .flatMap(t =>
+                expandAliases(proj.actualSubst.subst(t), visited + tp))
           case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
             t.upperBound.flatMap(upper =>
-                  expandAliases(proj.actualSubst.subst(upper), visited + tp))
+              expandAliases(proj.actualSubst.subst(upper), visited + tp))
           case _ => Success(tp, None)
         }
       case at: ScAbstractType =>
         expandAliases(at.upper, visited + tp) // ugly hack for SCL-3592
       case ScDesignatorType(t: ScType) => expandAliases(t, visited + tp)
       case ScDesignatorType(ta: ScTypeAliasDefinition) =>
-        expandAliases(
-            ta.aliasedType(TypingContext.empty).getOrNothing, visited + tp)
+        expandAliases(ta.aliasedType(TypingContext.empty).getOrNothing,
+                      visited + tp)
       case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
         t.upperBound.flatMap(expandAliases(_, visited + tp))
       case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
@@ -493,8 +511,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   def designator(element: PsiNamedElement): ScType = {
     element match {
       case td: ScClass =>
-        StdType.QualNameToType.getOrElse(
-            td.qualifiedName, new ScDesignatorType(element))
+        StdType.QualNameToType
+          .getOrElse(td.qualifiedName, new ScDesignatorType(element))
       case _ =>
         val clazzOpt = element match {
           case p: ScClassParameter => Option(p.containingClass)
@@ -502,16 +520,18 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             element.getContext match {
               case _: ScTemplateBody | _: ScEarlyDefinitions =>
                 Option(
-                    ScalaPsiUtil.contextOfType(
-                        element, strict = true, classOf[ScTemplateDefinition]))
+                    ScalaPsiUtil.contextOfType(element,
+                                               strict = true,
+                                               classOf[ScTemplateDefinition]))
               case _ => None
             }
         }
 
         clazzOpt match {
           case Some(clazz) =>
-            ScProjectionType(
-                ScThisType(clazz), element, superReference = false)
+            ScProjectionType(ScThisType(clazz),
+                             element,
+                             superReference = false)
           case _ => new ScDesignatorType(element)
         }
     }

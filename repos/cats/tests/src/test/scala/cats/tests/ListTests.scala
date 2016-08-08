@@ -2,7 +2,13 @@ package cats
 package tests
 
 import cats.data.NonEmptyList
-import cats.laws.discipline.{TraverseTests, CoflatMapTests, MonadCombineTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  TraverseTests,
+  CoflatMapTests,
+  MonadCombineTests,
+  SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq._
 
@@ -15,8 +21,8 @@ class ListTests extends CatsSuite {
   checkAll("CoflatMap[List]", SerializableTests.serializable(CoflatMap[List]))
 
   checkAll("List[Int]", MonadCombineTests[List].monadCombine[Int, Int, Int])
-  checkAll(
-      "MonadCombine[List]", SerializableTests.serializable(MonadCombine[List]))
+  checkAll("MonadCombine[List]",
+           SerializableTests.serializable(MonadCombine[List]))
 
   checkAll(
       "List[Int] with Option",

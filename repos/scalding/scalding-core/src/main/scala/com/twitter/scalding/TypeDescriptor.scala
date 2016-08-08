@@ -49,6 +49,7 @@ object TypeDescriptor {
     * as the java type would have different consequences for Cascading's
     * null handling.
     */
-  implicit def typeDescriptor[T]: TypeDescriptor[T] = macro com.twitter.scalding.macros.impl.TypeDescriptorProviderImpl
-    .caseClassTypeDescriptorImpl[T]
+  implicit def typeDescriptor[T]: TypeDescriptor[T] =
+    macro com.twitter.scalding.macros.impl.TypeDescriptorProviderImpl
+      .caseClassTypeDescriptorImpl[T]
 }

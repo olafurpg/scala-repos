@@ -31,8 +31,8 @@ trait Decoder {
   def withMaxBytesPerChunk(maxBytesPerChunk: Int): Decoder
 
   def decoderFlow: Flow[ByteString, ByteString, NotUsed]
-  def decode(
-      input: ByteString)(implicit mat: Materializer): Future[ByteString] =
+  def decode(input: ByteString)(
+      implicit mat: Materializer): Future[ByteString] =
     Source
       .single(input)
       .via(decoderFlow)

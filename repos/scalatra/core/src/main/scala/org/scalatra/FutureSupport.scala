@@ -43,7 +43,7 @@ trait FutureSupport extends AsyncSupport {
 
   override protected def isAsyncExecutable(result: Any): Boolean =
     classOf[Future[_]].isAssignableFrom(result.getClass) ||
-    classOf[AsyncResult].isAssignableFrom(result.getClass)
+      classOf[AsyncResult].isAssignableFrom(result.getClass)
 
   override protected def renderResponse(actionResult: Any): Unit = {
     actionResult match {
@@ -66,30 +66,30 @@ trait FutureSupport extends AsyncSupport {
         case Success(r: AsyncResult) => renderFutureResult(r.is)
         case t => {
 
-            if (gotResponseAlready.compareAndSet(false, true)) {
-              withinAsyncContext(context) {
-                try {
-                  t map { result =>
-                    renderResponse(result)
-                  } recover {
-                    case e: HaltException =>
-                      renderHaltException(e)
-                    case e =>
-                      try {
-                        renderResponse(errorHandler(e))
-                      } catch {
-                        case e: Throwable =>
-                          ScalatraBase.runCallbacks(Failure(e))
-                          renderUncaughtException(e)
-                          ScalatraBase.runRenderCallbacks(Failure(e))
-                      }
-                  }
-                } finally {
-                  context.complete()
+          if (gotResponseAlready.compareAndSet(false, true)) {
+            withinAsyncContext(context) {
+              try {
+                t map { result =>
+                  renderResponse(result)
+                } recover {
+                  case e: HaltException =>
+                    renderHaltException(e)
+                  case e =>
+                    try {
+                      renderResponse(errorHandler(e))
+                    } catch {
+                      case e: Throwable =>
+                        ScalatraBase.runCallbacks(Failure(e))
+                        renderUncaughtException(e)
+                        ScalatraBase.runRenderCallbacks(Failure(e))
+                    }
                 }
+              } finally {
+                context.complete()
               }
             }
           }
+        }
       }
     }
 

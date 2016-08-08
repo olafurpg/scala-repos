@@ -17,7 +17,15 @@
 package net.liftweb
 package util
 
-import java.io.{InputStream, ByteArrayOutputStream, ByteArrayInputStream, Reader, File, FileInputStream, BufferedReader}
+import java.io.{
+  InputStream,
+  ByteArrayOutputStream,
+  ByteArrayInputStream,
+  Reader,
+  File,
+  FileInputStream,
+  BufferedReader
+}
 import scala.util.Try
 import scala.xml._
 import common._
@@ -47,7 +55,9 @@ object AvoidTypeErasureIssues1 {
   * This object adds functionality to Scala standard types.
   */
 object BasicTypesHelpers
-    extends BasicTypesHelpers with StringHelpers with ControlHelpers
+    extends BasicTypesHelpers
+    with StringHelpers
+    with ControlHelpers
 
 /**
   * This trait adds functionality to Scala standard types
@@ -113,12 +123,12 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def compareElem(left: Elem, right: Elem): Boolean =
     compareXml(left.child, right.child) && left.label == right.label &&
-    (((null eq left.prefix) && (null eq right.prefix)) ||
+      (((null eq left.prefix) && (null eq right.prefix)) ||
         left.prefix == right.prefix) && left.scope == right.scope &&
-    compareMetaData(left.attributes.toList, right.attributes.toList)
+      compareMetaData(left.attributes.toList, right.attributes.toList)
 
-  private def findFilter(
-      m: MetaData, lst: List[MetaData]): Box[List[MetaData]] = {
+  private def findFilter(m: MetaData,
+                         lst: List[MetaData]): Box[List[MetaData]] = {
     var found = false
     val ret = lst.filter {
       case PrefixedAttribute(pre, label, value, _) if !found =>
@@ -193,8 +203,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     * A helper class that facilitates wrapping of one PartialFunction
     * around another
     */
-  final implicit class PartialFunctionWrapper[
-      A](around: PartialFunction[A, _]) {
+  final implicit class PartialFunctionWrapper[A](around: PartialFunction[A, _]) {
 
     /**
       * Allows you to put a guard around a partial function

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -61,10 +61,10 @@ class SchedulerTest {
 
   @Test
   def testMockSchedulerPeriodicTask() {
-    mockTime.scheduler.schedule(
-        "test1", counter1.getAndIncrement, delay = 1, period = 1)
-    mockTime.scheduler.schedule(
-        "test2", counter2.getAndIncrement, delay = 100, period = 100)
+    mockTime.scheduler
+      .schedule("test1", counter1.getAndIncrement, delay = 1, period = 1)
+    mockTime.scheduler
+      .schedule("test2", counter2.getAndIncrement, delay = 100, period = 100)
     assertEquals("Counter1 should not be incremented prior to task running.",
                  0,
                  counter1.get)
@@ -84,8 +84,8 @@ class SchedulerTest {
     mockTime.scheduler.schedule(
         "test1",
         () =>
-          mockTime.scheduler.schedule(
-              "test2", counter2.getAndIncrement, delay = 0),
+          mockTime.scheduler
+            .schedule("test2", counter2.getAndIncrement, delay = 0),
         delay = 1)
     mockTime.sleep(1)
     assertEquals(1, counter2.get)

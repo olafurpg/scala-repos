@@ -11,8 +11,9 @@ class CacheIvyTest extends Properties("CacheIvy") {
   import sbinary._
   import sbinary.DefaultProtocol._
 
-  private def cachePreservesEquality[T : Format](
-      m: T, eq: (T, T) => Prop, str: T => String): Prop = {
+  private def cachePreservesEquality[T: Format](m: T,
+                                                eq: (T, T) => Prop,
+                                                str: T => String): Prop = {
     val out = fromByteArray[T](toByteArray(m))
     eq(out, m) :| s"Expected: ${str(m)}" :| s"Got: ${str(out)}"
   }
@@ -73,7 +74,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
     def str(m: ModuleID) = {
       import m._
       s"ModuleID($organization, ${m.name}, $revision, $configurations, $isChanging, $isTransitive, $isForce, $explicitArtifacts, $exclusions, " +
-      s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
+        s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
     }
     def eq(a: ModuleID, b: ModuleID): Prop = {
       import CrossVersion._

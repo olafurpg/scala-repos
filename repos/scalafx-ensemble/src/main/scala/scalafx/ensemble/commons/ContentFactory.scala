@@ -91,11 +91,14 @@ object ContentFactory {
     // Load syntax highlighter
     val shCoreJs =
       loadResourceAsString(
-          this, "/scalafx/ensemble/syntaxhighlighter/shCore.js") + ";"
+          this,
+          "/scalafx/ensemble/syntaxhighlighter/shCore.js") + ";"
     val shBrushScala = loadResourceAsString(
-        this, "/scalafx/ensemble/syntaxhighlighter/shBrushScala.js")
+        this,
+        "/scalafx/ensemble/syntaxhighlighter/shBrushScala.js")
     val shCoreDefaultCss = loadResourceAsString(
-        this, "/scalafx/ensemble/syntaxhighlighter/shCoreDefault.css")
+        this,
+        "/scalafx/ensemble/syntaxhighlighter/shCoreDefault.css")
 
     val exampleInfo = new ExampleInfo(exampleName, exampleGroupName)
 
@@ -142,7 +145,8 @@ object ContentFactory {
         items = Seq(
             new Button { thisButton =>
               text = "Save SBT Project..."
-              tooltip = "Save sample code in a new project that can be build and run with SBT"
+              tooltip =
+                "Save sample code in a new project that can be build and run with SBT"
               onAction = (ae: ActionEvent) =>
                 try {
                   val initialDir = SBTProjectBuilder.parentDir
@@ -154,9 +158,10 @@ object ContentFactory {
                     Option(fileChooser.showDialog(thisButton.scene.window()))
                   result match {
                     case Some(projectDir) =>
-                      SBTProjectBuilder.createSampleProject(
-                          projectDir, exampleInfo)
-                      SBTProjectBuilder.parentDir = projectDir.getCanonicalFile.getParentFile
+                      SBTProjectBuilder.createSampleProject(projectDir,
+                                                            exampleInfo)
+                      SBTProjectBuilder.parentDir =
+                        projectDir.getCanonicalFile.getParentFile
                     case _ =>
                   }
                 } catch {

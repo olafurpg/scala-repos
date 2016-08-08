@@ -11,7 +11,8 @@ class NeedsToBeMixinTest extends AnnotatorTestBase(NeedsToBeMixin) {
   def testProblem() {
     val Message = NeedsToBeMixin.message("Class", "C", ("base", "T"))
 
-    assertMatches(messages(
+    assertMatches(
+        messages(
             """
         |trait Base {
         |  def base: Int

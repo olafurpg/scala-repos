@@ -7,7 +7,10 @@ import com.intellij.lang._
 import com.intellij.openapi.util._
 import com.intellij.psi._
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.formatter.{FormattingDocumentModelImpl, PsiBasedFormattingModel}
+import com.intellij.psi.formatter.{
+  FormattingDocumentModelImpl,
+  PsiBasedFormattingModel
+}
 import com.intellij.psi.impl.source.tree.TreeUtil
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.formatting.ScalaFormattingModelBuilder._
@@ -15,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 
 sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder {
 
-  def createModel(
-      element: PsiElement, settings: CodeStyleSettings): FormattingModel = {
+  def createModel(element: PsiElement,
+                  settings: CodeStyleSettings): FormattingModel = {
     val node: ASTNode = element.getNode
     assert(node != null)
     val containingFile: PsiFile = element.getContainingFile.getViewProvider
@@ -37,8 +40,9 @@ sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder {
         FormattingDocumentModelImpl.createOn(containingFile))
   }
 
-  def getRangeAffectingIndent(
-      file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange = {
+  def getRangeAffectingIndent(file: PsiFile,
+                              offset: Int,
+                              elementAtOffset: ASTNode): TextRange = {
     elementAtOffset.getTextRange
   }
 }
@@ -65,7 +69,10 @@ object ScalaFormattingModelBuilder {
         elementTypeToUse = prevNode.getElementType
       }
       com.intellij.psi.formatter.FormatterUtil.replaceWhiteSpace(
-          whiteSpace, leafElement, elementTypeToUse, textRange)
+          whiteSpace,
+          leafElement,
+          elementTypeToUse,
+          textRange)
       whiteSpace
     }
   }

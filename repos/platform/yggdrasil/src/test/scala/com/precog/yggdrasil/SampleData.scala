@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -44,15 +44,15 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import CValueGenerators.JSchema
 
-case class SampleData(
-    data: Stream[JValue], schema: Option[(Int, JSchema)] = None) {
+case class SampleData(data: Stream[JValue],
+                      schema: Option[(Int, JSchema)] = None) {
   override def toString = {
     "SampleData: \ndata = " + data
       .map(_.toString.replaceAll("\n", "\n  "))
       .mkString("[\n  ", ",\n  ", "]\n") + "\nschema: " + schema
   }
 
-  def sortBy[B : Ordering](f: JValue => B) = copy(data = data.sortBy(f))
+  def sortBy[B: Ordering](f: JValue => B) = copy(data = data.sortBy(f))
 }
 
 object SampleData extends CValueGenerators {
@@ -150,8 +150,8 @@ object SampleData extends CValueGenerators {
         for {
           sampleData <- arbitrary(sample)
         } yield {
-          SampleData(
-              distinctBy(sampleData.data)(_ \ "keys"), sampleData.schema)
+          SampleData(distinctBy(sampleData.data)(_ \ "keys"),
+                     sampleData.schema)
         }
     )
   }
@@ -161,8 +161,8 @@ object SampleData extends CValueGenerators {
         for {
           sampleData <- arbitrary(sample)
         } yield {
-          SampleData(
-              distinctBy(sampleData.data)(_ \ "value"), sampleData.schema)
+          SampleData(distinctBy(sampleData.data)(_ \ "value"),
+                     sampleData.schema)
         }
     )
   }
@@ -183,16 +183,16 @@ object SampleData extends CValueGenerators {
     val gen = for {
       sampleData <- arbitrary(sample)
     } yield {
-      val rows = for (row <- sampleData.data) yield
-        if (Random.nextDouble < 0.25) JUndefined else row
+      val rows = for (row <- sampleData.data)
+        yield if (Random.nextDouble < 0.25) JUndefined else row
       SampleData(rows, sampleData.schema)
     }
 
     Arbitrary(gen)
   }
 
-  def undefineRowsForColumn(
-      sample: Arbitrary[SampleData], path: JPath): Arbitrary[SampleData] = {
+  def undefineRowsForColumn(sample: Arbitrary[SampleData],
+                            path: JPath): Arbitrary[SampleData] = {
     val gen = for {
       sampleData <- arbitrary(sample)
     } yield {

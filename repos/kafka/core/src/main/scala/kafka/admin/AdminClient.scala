@@ -20,7 +20,12 @@ import kafka.common.KafkaException
 import kafka.coordinator.{GroupOverview, GroupSummary, MemberSummary}
 import kafka.utils.Logging
 import org.apache.kafka.clients._
-import org.apache.kafka.clients.consumer.internals.{ConsumerNetworkClient, ConsumerProtocol, RequestFuture, SendFailedException}
+import org.apache.kafka.clients.consumer.internals.{
+  ConsumerNetworkClient,
+  ConsumerProtocol,
+  RequestFuture,
+  SendFailedException
+}
 import org.apache.kafka.common.config.ConfigDef.{Importance, Type}
 import org.apache.kafka.common.config.{AbstractConfig, ConfigDef}
 import org.apache.kafka.common.errors.DisconnectException
@@ -56,7 +61,7 @@ class AdminClient(val time: Time,
 
       now = time.milliseconds()
     } while (now < deadline &&
-    future.exception().isInstanceOf[SendFailedException])
+      future.exception().isInstanceOf[SendFailedException])
 
     throw future.exception()
   }
@@ -261,8 +266,10 @@ object AdminClient {
         DefaultRequestTimeoutMs,
         time)
 
-    val highLevelClient = new ConsumerNetworkClient(
-        networkClient, metadata, time, DefaultRetryBackoffMs)
+    val highLevelClient = new ConsumerNetworkClient(networkClient,
+                                                    metadata,
+                                                    time,
+                                                    DefaultRetryBackoffMs)
 
     new AdminClient(time,
                     DefaultRequestTimeoutMs,

@@ -56,7 +56,7 @@ class TinyJoinAndMergeJob(args: Args) extends Job(args) {
     }
     .joinWithTiny('id -> 'id, people)
 
-    (messages ++ people).groupBy('id) { _.size('count) }.write(output)
+  (messages ++ people).groupBy('id) { _.size('count) }.write(output)
 }
 
 object TsvNoCacheJob {
@@ -123,8 +123,8 @@ class MultipleGroupByJob(args: Args) extends Job(args) {
   import com.twitter.scalding.serialization._
   import MultipleGroupByJobData._
   implicit val stringOrdSer = new StringOrderedSerialization()
-  implicit val stringTup2OrdSer = new OrderedSerialization2(
-      stringOrdSer, stringOrdSer)
+  implicit val stringTup2OrdSer =
+    new OrderedSerialization2(stringOrdSer, stringOrdSer)
   val otherStream = TypedPipe
     .from(data)
     .map { k =>
@@ -343,15 +343,16 @@ object OrderedSerializationTest {
     } yield NestedCaseClass(RichDate(ts), (b, b))
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
   val data = sample[List[NestedCaseClass]].take(1000)
 }
 
 case class NestedCaseClass(day: RichDate, key: (String, String))
 
 class ComplexJob(input: List[NestedCaseClass], args: Args) extends Job(args) {
-  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] =
+    macro com.twitter.scalding.serialization.macros.impl
+      .OrderedSerializationProviderImpl[T]
 
   val ds1 = TypedPipe
     .from(input)
@@ -370,8 +371,9 @@ class ComplexJob(input: List[NestedCaseClass], args: Args) extends Job(args) {
 }
 
 class ComplexJob2(input: List[NestedCaseClass], args: Args) extends Job(args) {
-  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] =
+    macro com.twitter.scalding.serialization.macros.impl
+      .OrderedSerializationProviderImpl[T]
 
   val ds1 = TypedPipe.from(input).map(_ -> (1L, "asfg"))
 
@@ -430,17 +432,15 @@ class CheckForFlowProcessInTypedJob(args: Args) extends Job(args) {
   inA.group
     .join(inB.group)
     .forceToReducers
-    .mapGroup((key, valuesIter) =>
-          {
-        stat.inc
+    .mapGroup((key, valuesIter) => {
+      stat.inc
 
-        val flowProcess = RuntimeStats.getFlowProcessForUniqueId(uniqueID)
-        if (flowProcess == null) {
-          throw new NullPointerException(
-              "No active FlowProcess was available.")
-        }
+      val flowProcess = RuntimeStats.getFlowProcessForUniqueId(uniqueID)
+      if (flowProcess == null) {
+        throw new NullPointerException("No active FlowProcess was available.")
+      }
 
-        valuesIter.map({ case (a, b) => s"$a:$b" })
+      valuesIter.map({ case (a, b) => s"$a:$b" })
     })
     .toTypedPipe
     .write(TypedTsv[(String, String)]("output"))
@@ -460,7 +460,9 @@ object PlatformTest {
 // Keeping all of the specifications in the same tests puts the result output all together at the end.
 // This is useful given that the Hadoop MiniMRCluster and MiniDFSCluster spew a ton of logging.
 class PlatformTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
 
   "An InAndOutTest" should {
     val inAndOut = Seq("a", "b", "c")
@@ -496,9 +498,9 @@ class PlatformTest
           _.map { f: Float =>
             (f * 10).toInt
           }.toList shouldBe
-          (outputData.map { f: Float =>
-                (f * 10).toInt
-              }.toList)
+            (outputData.map { f: Float =>
+              (f * 10).toInt
+            }.toList)
         }
         .run
     }
@@ -786,7 +788,8 @@ class PlatformTest
           // The job will fail with an exception if the FlowProcess is unavailable.
         }
         .inspectCompletedFlow({ flow =>
-          flow.getFlowStats.getCounterValue(Stats.ScaldingGroup, "joins") shouldBe 2
+          flow.getFlowStats
+            .getCounterValue(Stats.ScaldingGroup, "joins") shouldBe 2
         })
         .run
     }
@@ -801,7 +804,8 @@ class PlatformTest
           // The job will fail with an exception if the FlowProcess is unavailable.
         }
         .inspectCompletedFlow({ flow =>
-          flow.getFlowStats.getCounterValue(Stats.ScaldingGroup, "joins") shouldBe 2
+          flow.getFlowStats
+            .getCounterValue(Stats.ScaldingGroup, "joins") shouldBe 2
         })
         .run
     }

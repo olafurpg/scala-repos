@@ -43,16 +43,21 @@ trait WritableSequenceFileScheme extends SchemedSource {
 object WritableSequenceFile {
 
   /** by default uses the first two fields in the tuple */
-  def apply[K <: Writable : Manifest, V <: Writable : Manifest](
+  def apply[K <: Writable: Manifest, V <: Writable: Manifest](
       path: String): WritableSequenceFile[K, V] =
     WritableSequenceFile(path, Dsl.intFields(0 to 1))
 }
 
-case class WritableSequenceFile[
-    K <: Writable : Manifest, V <: Writable : Manifest](
-    p: String, f: Fields, override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends FixedPathSource(p) with WritableSequenceFileScheme
-    with LocalTapSource with TypedSink[(K, V)] with TypedSource[(K, V)] {
+case class WritableSequenceFile[K <: Writable: Manifest,
+                                V <: Writable: Manifest](
+    p: String,
+    f: Fields,
+    override val sinkMode: SinkMode = SinkMode.REPLACE)
+    extends FixedPathSource(p)
+    with WritableSequenceFileScheme
+    with LocalTapSource
+    with TypedSink[(K, V)]
+    with TypedSource[(K, V)] {
 
   override val fields = f
   override val keyType =
@@ -72,7 +77,7 @@ case class WritableSequenceFile[
 object MultipleWritableSequenceFiles {
 
   /** by default uses the first two fields in the tuple */
-  def apply[K <: Writable : Manifest, V <: Writable : Manifest](
+  def apply[K <: Writable: Manifest, V <: Writable: Manifest](
       paths: Seq[String]): MultipleWritableSequenceFiles[K, V] =
     MultipleWritableSequenceFiles(paths, Dsl.intFields(0 to 1))
 }
@@ -80,11 +85,14 @@ object MultipleWritableSequenceFiles {
 /**
   * This is only a TypedSource as sinking into multiple directories is not well defined
   */
-case class MultipleWritableSequenceFiles[
-    K <: Writable : Manifest, V <: Writable : Manifest](
-    p: Seq[String], f: Fields)
-    extends FixedPathSource(p: _*) with WritableSequenceFileScheme
-    with LocalTapSource with TypedSource[(K, V)] {
+case class MultipleWritableSequenceFiles[K <: Writable: Manifest,
+                                         V <: Writable: Manifest](
+    p: Seq[String],
+    f: Fields)
+    extends FixedPathSource(p: _*)
+    with WritableSequenceFileScheme
+    with LocalTapSource
+    with TypedSource[(K, V)] {
 
   override val fields = f
   override val keyType =

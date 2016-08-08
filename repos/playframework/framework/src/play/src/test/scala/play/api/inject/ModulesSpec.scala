@@ -8,7 +8,10 @@ import org.specs2.mutable.Specification
 
 import com.google.inject.AbstractModule
 
-import play.{Configuration => JavaConfiguration, Environment => JavaEnvironment}
+import play.{
+  Configuration => JavaConfiguration,
+  Environment => JavaEnvironment
+}
 import play.api.{Configuration, Environment}
 
 class ModulesSpec extends Specification {
@@ -17,7 +20,8 @@ class ModulesSpec extends Specification {
 
     "load simple Guice modules" in {
       val env = Environment.simple()
-      val conf = Configuration("play.modules.enabled" -> Seq(
+      val conf = Configuration(
+          "play.modules.enabled" -> Seq(
               classOf[PlainGuiceModule].getName
           ))
 
@@ -30,7 +34,8 @@ class ModulesSpec extends Specification {
 
     "load Guice modules that take a Scala Environment and Configuration" in {
       val env = Environment.simple()
-      val conf = Configuration("play.modules.enabled" -> Seq(
+      val conf = Configuration(
+          "play.modules.enabled" -> Seq(
               classOf[ScalaGuiceModule].getName
           ))
       val located: Seq[Any] = Modules.locate(env, conf)
@@ -44,7 +49,8 @@ class ModulesSpec extends Specification {
 
     "load Guice modules that take a Java Environment and Configuration" in {
       val env = Environment.simple()
-      val conf = Configuration("play.modules.enabled" -> Seq(
+      val conf = Configuration(
+          "play.modules.enabled" -> Seq(
               classOf[JavaGuiceModule].getName
           ))
       val located: Seq[Any] = Modules.locate(env, conf)
@@ -62,14 +68,14 @@ class PlainGuiceModule extends AbstractModule {
   def configure(): Unit = ()
 }
 
-class ScalaGuiceModule(
-    val environment: Environment, val configuration: Configuration)
+class ScalaGuiceModule(val environment: Environment,
+                       val configuration: Configuration)
     extends AbstractModule {
   def configure(): Unit = ()
 }
 
-class JavaGuiceModule(
-    val environment: JavaEnvironment, val configuration: JavaConfiguration)
+class JavaGuiceModule(val environment: JavaEnvironment,
+                      val configuration: JavaConfiguration)
     extends AbstractModule {
   def configure(): Unit = ()
 }

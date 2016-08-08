@@ -65,7 +65,8 @@ class HDFSCheckpointStore(val config: HDFSState.Config)(
   @transient private val logger = LoggerFactory.getLogger(classOf[HDFSState])
 
   protected lazy val versionedStore = new FileVersionTracking(
-      config.rootPath, FileSystem.get(new URI(config.rootPath), config.conf))
+      config.rootPath,
+      FileSystem.get(new URI(config.rootPath), config.conf))
 
   private def version(b: BatchID) =
     batcher.earliestTimeOf(b).milliSinceEpoch
@@ -73,8 +74,8 @@ class HDFSCheckpointStore(val config: HDFSState.Config)(
   val startBatch: InclusiveLower[BatchID] = config.startTime
     .map(batcher.batchOf(_))
     .orElse {
-      val mostRecentB = versionedStore.mostRecentVersion.map(
-          t => batcher.batchOf(Timestamp(t)).next)
+      val mostRecentB = versionedStore.mostRecentVersion.map(t =>
+        batcher.batchOf(Timestamp(t)).next)
       logger.info("Most recent batch found on disk: " + mostRecentB.toString)
       mostRecentB
     }
@@ -98,8 +99,8 @@ class HDFSCheckpointStore(val config: HDFSState.Config)(
       versionedStore.succeedVersion(version(b))
     }
 
-  override def checkpointFailure(
-      runningBatches: Iterable[BatchID], err: Throwable) =
+  override def checkpointFailure(runningBatches: Iterable[BatchID],
+                                 err: Throwable) =
     runningBatches.foreach { b =>
       versionedStore.deleteVersion(version(b))
     }

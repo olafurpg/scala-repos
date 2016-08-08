@@ -31,9 +31,9 @@ object ScalaTestingWithDatabases extends Specification {
           url = "jdbc:mysql://localhost/test",
           name = "mydatabase",
           config = Map(
-                "user" -> "test",
-                "password" -> "secret"
-            )
+              "user" -> "test",
+              "password" -> "secret"
+          )
       )
       //#full-config
 
@@ -66,9 +66,9 @@ object ScalaTestingWithDatabases extends Specification {
             url = "jdbc:mysql://localhost/test",
             name = "mydatabase",
             config = Map(
-                  "user" -> "test",
-                  "password" -> "secret"
-              )
+                "user" -> "test",
+                "password" -> "secret"
+            )
         )(block)
       }
       //#custom-with-database
@@ -91,7 +91,10 @@ object ScalaTestingWithDatabases extends Specification {
       //#in-memory
 
       try {
-        database.getConnection().getMetaData.getDatabaseProductName must_== "H2"
+        database
+          .getConnection()
+          .getMetaData
+          .getDatabaseProductName must_== "H2"
       } finally {
         database.shutdown()
       }
@@ -104,16 +107,19 @@ object ScalaTestingWithDatabases extends Specification {
       val database = Databases.inMemory(
           name = "mydatabase",
           urlOptions = Map(
-                "MODE" -> "MYSQL"
-            ),
+              "MODE" -> "MYSQL"
+          ),
           config = Map(
-                "logStatements" -> true
-            )
+              "logStatements" -> true
+          )
       )
       //#in-memory-full-config
 
       try {
-        database.getConnection().getMetaData.getDatabaseProductName must_== "H2"
+        database
+          .getConnection()
+          .getMetaData
+          .getDatabaseProductName must_== "H2"
       } finally {
         //#in-memory-shutdown
         database.shutdown()
@@ -142,11 +148,11 @@ object ScalaTestingWithDatabases extends Specification {
         Databases.withInMemory(
             name = "mydatabase",
             urlOptions = Map(
-                  "MODE" -> "MYSQL"
-              ),
+                "MODE" -> "MYSQL"
+            ),
             config = Map(
-                  "logStatements" -> true
-              )
+                "logStatements" -> true
+            )
         )(block)
       }
       //#with-in-memory-custom
@@ -194,34 +200,36 @@ object ScalaTestingWithDatabases extends Specification {
         Evolutions.cleanupEvolutions(database)
         //#cleanup-evolutions-simple
 
-        connection.prepareStatement("select * from test").executeQuery() must throwAn[
-            SQLException]
+        connection
+          .prepareStatement("select * from test")
+          .executeQuery() must throwAn[SQLException]
     }
 
     "allow running evolutions from a custom path" in play.api.db.Databases
       .withInMemory() { database =>
-      //#apply-evolutions-custom-path
-      import play.api.db.evolutions._
+        //#apply-evolutions-custom-path
+        import play.api.db.evolutions._
 
-      Evolutions.applyEvolutions(
-          database, ClassLoaderEvolutionsReader.forPrefix("testdatabase/"))
-      //#apply-evolutions-custom-path
-      ok
-    }
+        Evolutions.applyEvolutions(
+            database,
+            ClassLoaderEvolutionsReader.forPrefix("testdatabase/"))
+        //#apply-evolutions-custom-path
+        ok
+      }
 
     "allow play to manage evolutions for you" in play.api.db.Databases
       .withInMemory() { database =>
-      //#with-evolutions
-      import play.api.db.evolutions._
+        //#with-evolutions
+        import play.api.db.evolutions._
 
-      Evolutions.withEvolutions(database) {
-        val connection = database.getConnection()
+        Evolutions.withEvolutions(database) {
+          val connection = database.getConnection()
 
-        // ...
+          // ...
+        }
+        //#with-evolutions
+        ok
       }
-      //#with-evolutions
-      ok
-    }
 
     "allow simple composition of with database and with evolutions" in {
       //#with-evolutions-custom
@@ -232,11 +240,11 @@ object ScalaTestingWithDatabases extends Specification {
 
         Databases.withInMemory(
             urlOptions = Map(
-                  "MODE" -> "MYSQL"
-              ),
+                "MODE" -> "MYSQL"
+            ),
             config = Map(
-                  "logStatements" -> true
-              )
+                "logStatements" -> true
+            )
         ) { database =>
           Evolutions.withEvolutions(
               database,

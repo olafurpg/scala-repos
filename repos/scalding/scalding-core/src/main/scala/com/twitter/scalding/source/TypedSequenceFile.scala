@@ -26,7 +26,8 @@ import com.twitter.scalding.SequenceFile
   * consistent across JVM instances. Use Thrift sources instead.
   */
 class TypedSequenceFile[T](val path: String)
-    extends SequenceFile(path, Fields.FIRST) with Mappable[T]
+    extends SequenceFile(path, Fields.FIRST)
+    with Mappable[T]
     with TypedSink[T] {
   override def converter[U >: T] =
     TupleConverter.asSuperConverter[T, U](TupleConverter.singleConverter[T])

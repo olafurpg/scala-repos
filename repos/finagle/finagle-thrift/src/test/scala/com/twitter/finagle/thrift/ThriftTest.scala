@@ -18,9 +18,9 @@ trait ThriftTest { self: FunSuite =>
   def ifaceManifest: ClassTag[Iface]
   val processor: Iface
   val ifaceToService: (Iface,
-  TProtocolFactory) => Service[Array[Byte], Array[Byte]]
+                       TProtocolFactory) => Service[Array[Byte], Array[Byte]]
   val serviceToIface: (Service[ThriftClientRequest, Array[Byte]],
-  TProtocolFactory) => Iface
+                       TProtocolFactory) => Iface
   val loopback = InetAddress.getLoopbackAddress
 
   /**
@@ -70,12 +70,13 @@ trait ThriftTest { self: FunSuite =>
   }
 
   private val newBuilderClient = (protocolFactory: TProtocolFactory,
-  addr: SocketAddress, clientIdOpt: Option[ClientId]) =>
+                                  addr: SocketAddress,
+                                  clientIdOpt: Option[ClientId]) =>
     new {
       val serviceFactory = ClientBuilder()
         .hosts(Seq(addr.asInstanceOf[InetSocketAddress]))
         .codec(ThriftClientFramedCodec(clientIdOpt).protocolFactory(
-                protocolFactory))
+            protocolFactory))
         .name("thriftclient")
         .hostConnectionLimit(2)
         .tracer(DefaultTracer)
@@ -102,7 +103,8 @@ trait ThriftTest { self: FunSuite =>
   }
 
   private val newAPIClient = (protocolFactory: TProtocolFactory,
-  addr: SocketAddress, clientIdOpt: Option[ClientId]) =>
+                              addr: SocketAddress,
+                              clientIdOpt: Option[ClientId]) =>
     new {
       implicit val cls = ifaceManifest
       val client = {
@@ -128,7 +130,7 @@ trait ThriftTest { self: FunSuite =>
 
   // For some reason, the compiler needs some help here.
   private type NewClient = (TProtocolFactory, SocketAddress,
-  Option[ClientId]) => {
+                            Option[ClientId]) => {
     def close()
     val client: Iface
   }
@@ -155,15 +157,17 @@ trait ThriftTest { self: FunSuite =>
       (clientName, newClient) <- clients
       (serverName, newServer) <- servers
       testDef <- thriftTests
-    } test("server:%s client:%s proto:%s %s".format(
-            serverName, clientName, protoName, testDef.label)) {
+    } test(
+        "server:%s client:%s proto:%s %s"
+          .format(serverName, clientName, protoName, testDef.label)) {
       val tracer = new BufferingTracer
       val previous = DefaultTracer.self
       DefaultTracer.self = tracer
       val server = newServer(proto)
       val client = newClient(proto, server.boundAddr, testDef.clientIdOpt)
       Trace.letClear {
-        try testDef.testFunction(client.client, tracer) finally {
+        try testDef.testFunction(client.client, tracer)
+        finally {
           DefaultTracer.self = previous
           server.close()
           client.close()

@@ -24,7 +24,12 @@ import scala.collection.JavaConverters._
 import org.scalatest.Matchers
 import org.scalatest.Matchers._
 
-import org.apache.spark.{SparkContext, SparkException, SparkFunSuite, TestUtils}
+import org.apache.spark.{
+  SparkContext,
+  SparkException,
+  SparkFunSuite,
+  TestUtils
+}
 
 class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
 
@@ -43,7 +48,8 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
       TestUtils.createJarWithFiles(
           Map("resource1" -> "resource1Contents-child",
               "resource2" -> "resource2Contents"))).toArray
-  val fileUrlsParent = List(TestUtils.createJarWithFiles(
+  val fileUrlsParent = List(
+      TestUtils.createJarWithFiles(
           Map("resource1" -> "resource1Contents-parent"))).toArray
 
   test("child first") {
@@ -105,7 +111,7 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
     assert(classLoader.getResources("resource2").asScala.size === 1)
 
     res1.map(scala.io.Source.fromURL(_).mkString) should contain inOrderOnly
-    ("resource1Contents-child", "resource1Contents-parent")
+      ("resource1Contents-child", "resource1Contents-parent")
   }
 
   test("driver sets context class loader in local mode") {

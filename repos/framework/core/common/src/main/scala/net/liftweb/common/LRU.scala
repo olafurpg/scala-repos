@@ -57,8 +57,9 @@ private[common] trait LinkedListElem[T1, T2] {
   *        happens is that these functions are invoked. Note that this happens
   *        after `[[expired]]` is invoked.
   */
-class LRUMap[K, V](
-    initMaxSize: Int, loadFactor: Box[Float], expiredFunc: ((K, V) => Unit)*)
+class LRUMap[K, V](initMaxSize: Int,
+                   loadFactor: Box[Float],
+                   expiredFunc: ((K, V) => Unit)*)
     extends LinkedListElem[K, V] {
   import java.util.HashMap
 
@@ -184,7 +185,7 @@ class LRUMap[K, V](
       toRemove.remove
       localMap.remove(toRemove.value1)
       expired(toRemove.value1, toRemove.value2)
-      expiredFunc.foreach(_ (toRemove.value1, toRemove.value2))
+      expiredFunc.foreach(_(toRemove.value1, toRemove.value2))
     }
   }
 

@@ -27,8 +27,11 @@ object PlainSQL extends App {
                       city: String,
                       state: String,
                       zip: String)
-  case class Coffee(
-      name: String, supID: Int, price: Double, sales: Int, total: Int)
+  case class Coffee(name: String,
+                    supID: Int,
+                    price: Double,
+                    sales: Int,
+                    total: Int)
 
   // Result set getters
   implicit val getSupplierResult = GetResult(
@@ -124,7 +127,8 @@ object PlainSQL extends App {
     // Iterate through all coffees and output them
     sql"select * from coffees".as[Coffee].map { cs =>
       println("Coffees:")
-      for (c <- cs) println("* " + c.name + "\t" + c.supID + "\t" + c.price +
+      for (c <- cs)
+        println("* " + c.name + "\t" + c.supID + "\t" + c.price +
           "\t" + c.sales + "\t" + c.total)
     }
 

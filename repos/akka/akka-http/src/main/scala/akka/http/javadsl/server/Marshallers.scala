@@ -5,7 +5,10 @@
 package akka.http.javadsl.server
 
 import akka.http.javadsl.model._
-import akka.http.scaladsl.marshalling.{ToResponseMarshaller, Marshaller ⇒ ScalaMarshaller}
+import akka.http.scaladsl.marshalling.{
+  ToResponseMarshaller,
+  Marshaller ⇒ ScalaMarshaller
+}
 import akka.http.impl.server.MarshallerImpl
 import akka.http.scaladsl
 import akka.japi.function
@@ -77,13 +80,8 @@ object Marshallers {
       contentType: ContentType,
       convert: function.Function[T, ResponseEntity]): Marshaller[T] =
     MarshallerImpl { _ ⇒
-      ScalaMarshaller.withFixedContentType(contentType.asScala)(
-          t ⇒
-            HttpResponse
-              .create()
-              .withStatus(200)
-              .withEntity(convert(t))
-              .asScala)
+      ScalaMarshaller.withFixedContentType(contentType.asScala)(t ⇒
+        HttpResponse.create().withStatus(200).withEntity(convert(t)).asScala)
     }
 
   /**
@@ -93,7 +91,7 @@ object Marshallers {
       contentType: ContentType,
       convert: function.Function[T, HttpResponse]): Marshaller[T] =
     MarshallerImpl { _ ⇒
-      ScalaMarshaller.withFixedContentType(contentType.asScala)(
-          t ⇒ convert(t).asScala)
+      ScalaMarshaller.withFixedContentType(contentType.asScala)(t ⇒
+        convert(t).asScala)
     }
 }

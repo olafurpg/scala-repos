@@ -56,15 +56,15 @@ object ParserInput {
 
   implicit def apply(bytes: Array[Byte]): ByteArrayBasedParserInput =
     new ByteArrayBasedParserInput(bytes)
-  implicit def apply(
-      bytes: Array[Byte], endIndex: Int): ByteArrayBasedParserInput =
+  implicit def apply(bytes: Array[Byte],
+                     endIndex: Int): ByteArrayBasedParserInput =
     new ByteArrayBasedParserInput(bytes, endIndex)
   implicit def apply(string: String): StringBasedParserInput =
     new StringBasedParserInput(string)
   implicit def apply(chars: Array[Char]): CharArrayBasedParserInput =
     new CharArrayBasedParserInput(chars)
-  implicit def apply(
-      chars: Array[Char], endIndex: Int): CharArrayBasedParserInput =
+  implicit def apply(chars: Array[Char],
+                     endIndex: Int): CharArrayBasedParserInput =
     new CharArrayBasedParserInput(chars, endIndex)
 
   abstract class DefaultParserInput extends ParserInput {
@@ -75,7 +75,8 @@ object ParserInput {
             if (lineNr < line) rec(ix + 1, ix + 1, lineNr + 1)
             else sliceString(lineStartIx, ix)
           else rec(ix + 1, lineStartIx, lineNr)
-        else if (lineNr == line) sliceString(lineStartIx, ix) else ""
+        else if (lineNr == line) sliceString(lineStartIx, ix)
+        else ""
       rec(ix = 0, lineStartIx = 0, lineNr = 1)
     }
   }

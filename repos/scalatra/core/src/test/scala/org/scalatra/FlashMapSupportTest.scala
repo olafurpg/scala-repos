@@ -31,7 +31,8 @@ class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
 }
 
 class FlashMapSupportSecondTestServlet
-    extends ScalatraServlet with FlashMapSupport {
+    extends ScalatraServlet
+    with FlashMapSupport {
   post("/redirect") {
     flash("message") = "redirected"
     redirect("/first/message")

@@ -89,7 +89,7 @@ class FormFieldDirectivesSpec extends RoutingSpec {
       } ~> check { rejection shouldEqual MissingFormFieldRejection("sex") }
     }
     "properly extract the value if only a urlencoded deserializer is available for a multipart field that comes without a" +
-    "Content-Type (or text/plain)" in {
+      "Content-Type (or text/plain)" in {
       Post("/", multipartForm) ~> {
         formFields('firstName, "age", 'sex.?, "VIPBoolean" ? false) {
           (firstName, age, sex, vip) ⇒

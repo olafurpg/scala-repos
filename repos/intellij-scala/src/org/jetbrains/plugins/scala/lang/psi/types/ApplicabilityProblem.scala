@@ -2,14 +2,20 @@ package org.jetbrains.plugins.scala.lang.psi.types
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, TypeParameter}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter,
+  TypeParameter
+}
 
 /**
   * Pavel.Fatin, 02.06.2010
   */
-//TODO must be abstract with no description when completed 
+//TODO must be abstract with no description when completed
 sealed class ApplicabilityProblem(val description: String = "unknown")
 
 object ApplicabilityProblem {
@@ -30,9 +36,10 @@ case class UnresolvedParameter(assignment: ScAssignStmt)
 //TODO , parameter
 case class ExpansionForNonRepeatedParameter(argument: ScExpression)
     extends ApplicabilityProblem
-case class ElementApplicabilityProblem(
-    element: PsiElement, actual: ScType, found: ScType)
-    extends ApplicabilityProblem("42") //todo 
+case class ElementApplicabilityProblem(element: PsiElement,
+                                       actual: ScType,
+                                       found: ScType)
+    extends ApplicabilityProblem("42") //todo
 
 // applicability problem
 case class DoesNotTakeParameters() extends ApplicabilityProblem
@@ -44,8 +51,8 @@ case class MissedValueParameter(parameter: Parameter)
 //TODO expectedType -> parameter
 case class TypeMismatch(expression: ScExpression, expectedType: ScType)
     extends ApplicabilityProblem
-case class DefaultTypeParameterMismatch(
-    expectedType: ScType, actualType: ScType)
+case class DefaultTypeParameterMismatch(expectedType: ScType,
+                                        actualType: ScType)
     extends ApplicabilityProblem
 case object WrongTypeParameterInferred extends ApplicabilityProblem
 

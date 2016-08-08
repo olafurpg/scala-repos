@@ -79,7 +79,8 @@ object IncompleteClickHandler extends JFXApp {
               new Label(
                   "If Issue 102 is not fixed, some buttons below may not respond correctly."),
               new Button {
-                text = "Button 1: Buggy event handler: should print two messages, but prints one."
+                text =
+                  "Button 1: Buggy event handler: should print two messages, but prints one."
                 // Disable as old buggy handler no longer compiles
                 disable = true
                 //              onAction = {
@@ -88,7 +89,8 @@ object IncompleteClickHandler extends JFXApp {
                 //              }
               },
               new Button {
-                text = "Button 2: Buggy event handler: should print two messages, but prints none."
+                text =
+                  "Button 2: Buggy event handler: should print two messages, but prints none."
                 // Disable as old buggy handler no longer compiles
                 disable = true
                 //              onAction = (ae: java.awt.event.ActionEvent) => {
@@ -97,15 +99,16 @@ object IncompleteClickHandler extends JFXApp {
                 //              }
               },
               new Button {
-                text = "Button 3: Former buggy event handler: should print two messages, used to print none."
-                onAction = () =>
-                  {
-                    println("Button 3 - Message 1")
-                    println("Button 3 - Message 2")
+                text =
+                  "Button 3: Former buggy event handler: should print two messages, used to print none."
+                onAction = () => {
+                  println("Button 3 - Message 1")
+                  println("Button 3 - Message 2")
                 }
               },
               new Button {
-                text = "Button 4: Buggy event handler: should print two messages, but prints none."
+                text =
+                  "Button 4: Buggy event handler: should print two messages, but prints none."
                 // Disable as old buggy handler no longer compiles
                 disable = true
                 //              onAction = (ae: javafx.event.ActionEvent) => {
@@ -115,10 +118,9 @@ object IncompleteClickHandler extends JFXApp {
               },
               new Button {
                 text = "Button 5: Fine event handler: prints two messages."
-                onAction = (ae: scalafx.event.ActionEvent) =>
-                  {
-                    println("Button 5 - Message 1")
-                    println("Button 5 - Message 2")
+                onAction = (ae: scalafx.event.ActionEvent) => {
+                  println("Button 5 - Message 1")
+                  println("Button 5 - Message 2")
                 }
               },
               new Button {

@@ -1,7 +1,11 @@
 package com.twitter.finagle.service
 
 import com.twitter.finagle.Status
-import com.twitter.finagle.{NotShardableException, ShardNotAvailableException, Service}
+import com.twitter.finagle.{
+  NotShardableException,
+  ShardNotAvailableException,
+  Service
+}
 import com.twitter.hashing.Distributor
 import com.twitter.util.{Await, Future}
 import org.junit.runner.RunWith

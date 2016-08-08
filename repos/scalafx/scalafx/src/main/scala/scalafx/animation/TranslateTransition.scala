@@ -66,9 +66,11 @@ object TranslateTransition extends AnimationStatics {
   * @define DV Default value:
   */
 class TranslateTransition(
-    override val delegate: jfxa.TranslateTransition = new jfxa.TranslateTransition(
+    override val delegate: jfxa.TranslateTransition =
+      new jfxa.TranslateTransition(
           ))
-    extends Transition(delegate) with SFXDelegate[jfxa.TranslateTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.TranslateTransition] {
 
   // CONSTRUCTORS
 

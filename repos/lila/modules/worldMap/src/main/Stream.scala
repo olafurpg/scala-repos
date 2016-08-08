@@ -40,7 +40,8 @@ private final class Stream(geoIp: MaxMindIpGeo, geoIpCacheTtl: Duration)
       channel push Stream.Event.Remove(id)
     case Stream.Get =>
       sender ! {
-        Enumerator.enumerate(games.values.map(game2json(makeMd5))) andThen Enumerator
+        Enumerator
+          .enumerate(games.values.map(game2json(makeMd5))) andThen Enumerator
           .enumerate(List(loadCompleteJson)) andThen producer
       }
   }

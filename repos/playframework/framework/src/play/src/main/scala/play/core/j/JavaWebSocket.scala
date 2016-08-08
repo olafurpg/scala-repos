@@ -62,18 +62,17 @@ object JavaWebSocket extends JavaHelpers {
 
                 val source = Source
                   .actorRef[A](256, OverflowStrategy.dropNew)
-                  .mapMaterializedValue {
-                    actor =>
-                      val socketOut = new JWebSocket.Out[A] {
-                        def write(frame: A) = {
-                          actor ! frame
-                        }
-                        def close() = {
-                          actor ! Status.Success(())
-                        }
+                  .mapMaterializedValue { actor =>
+                    val socketOut = new JWebSocket.Out[A] {
+                      def write(frame: A) = {
+                        actor ! frame
                       }
+                      def close() = {
+                        actor ! Status.Success(())
+                      }
+                    }
 
-                      jws.onReady(socketIn, socketOut)
+                    jws.onReady(socketIn, socketOut)
                   }
 
                 transformer.transform(Flow.fromSinkAndSource(sink, source))

@@ -26,7 +26,9 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.util.Utils
 
 class QueryPartitionSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext.implicits._
 
   test("SPARK-5068: query data when path doesn't exist") {
@@ -38,16 +40,21 @@ class QueryPartitionSuite
 
       val tmpDir = Files.createTempDir()
       // create the table for test
-      sql(s"CREATE TABLE table_with_partition(key int,value string) " +
-          s"PARTITIONED by (ds string) location '${tmpDir.toURI.toString}' ")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='1') " +
-          "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='2') " +
-          "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='3') " +
-          "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='4') " +
-          "SELECT key,value FROM testData")
+      sql(
+          s"CREATE TABLE table_with_partition(key int,value string) " +
+            s"PARTITIONED by (ds string) location '${tmpDir.toURI.toString}' ")
+      sql(
+          "INSERT OVERWRITE TABLE table_with_partition  partition (ds='1') " +
+            "SELECT key,value FROM testData")
+      sql(
+          "INSERT OVERWRITE TABLE table_with_partition  partition (ds='2') " +
+            "SELECT key,value FROM testData")
+      sql(
+          "INSERT OVERWRITE TABLE table_with_partition  partition (ds='3') " +
+            "SELECT key,value FROM testData")
+      sql(
+          "INSERT OVERWRITE TABLE table_with_partition  partition (ds='4') " +
+            "SELECT key,value FROM testData")
 
       // test for the exist path
       checkAnswer(

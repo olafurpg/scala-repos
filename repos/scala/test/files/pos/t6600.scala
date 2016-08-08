@@ -1,5 +1,6 @@
 final class Natural
-    extends scala.math.ScalaNumber with scala.math.ScalaNumericConversions {
+    extends scala.math.ScalaNumber
+    with scala.math.ScalaNumericConversions {
   def intValue(): Int = 0
   def longValue(): Long = 0L
   def floatValue(): Float = 0.0F

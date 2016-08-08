@@ -20,7 +20,12 @@ package org.apache.spark.api.python
 import java.io._
 import java.net._
 import java.nio.charset.StandardCharsets
-import java.util.{ArrayList => JArrayList, Collections, List => JList, Map => JMap}
+import java.util.{
+  ArrayList => JArrayList,
+  Collections,
+  List => JList,
+  Map => JMap
+}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -30,7 +35,10 @@ import scala.util.control.NonFatal
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.compress.CompressionCodec
 import org.apache.hadoop.mapred.{InputFormat, JobConf, OutputFormat}
-import org.apache.hadoop.mapreduce.{InputFormat => NewInputFormat, OutputFormat => NewOutputFormat}
+import org.apache.hadoop.mapreduce.{
+  InputFormat => NewInputFormat,
+  OutputFormat => NewOutputFormat
+}
 
 import org.apache.spark._
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaSparkContext}
@@ -40,8 +48,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.{SerializableConfiguration, Utils}
 
-private[spark] class PythonRDD(
-    parent: RDD[_], func: PythonFunction, preservePartitoning: Boolean)
+private[spark] class PythonRDD(parent: RDD[_],
+                               func: PythonFunction,
+                               preservePartitoning: Boolean)
     extends RDD[Array[Byte]](parent) {
 
   val bufferSize = conf.getInt("spark.buffer.size", 65536)
@@ -55,8 +64,8 @@ private[spark] class PythonRDD(
 
   val asJavaRDD: JavaRDD[Array[Byte]] = JavaRDD.fromRDD(this)
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[Array[Byte]] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[Array[Byte]] = {
     val runner = new PythonRunner(func, bufferSize, reuse_worker)
     runner.compute(firstParent.iterator(split, context), split.index, context)
   }
@@ -78,8 +87,9 @@ private[spark] case class PythonFunction(
 /**
   * A helper class to run Python UDFs in Spark.
   */
-private[spark] class PythonRunner(
-    func: PythonFunction, bufferSize: Int, reuse_worker: Boolean)
+private[spark] class PythonRunner(func: PythonFunction,
+                                  bufferSize: Int,
+                                  reuse_worker: Boolean)
     extends Logging {
 
   private val envVars = func.envVars
@@ -94,7 +104,8 @@ private[spark] class PythonRunner(
     val localdir = env.blockManager.diskBlockManager.localDirs
       .map(f => f.getPath())
       .mkString(",")
-    envVars.put("SPARK_LOCAL_DIRS", localdir) // it's also used in monitor thread
+    envVars
+      .put("SPARK_LOCAL_DIRS", localdir) // it's also used in monitor thread
     if (reuse_worker) {
       envVars.put("SPARK_REUSE_WORKER", "1")
     }
@@ -104,8 +115,8 @@ private[spark] class PythonRunner(
     @volatile var released = false
 
     // Start a thread to feed the process input from our parent's iterator
-    val writerThread = new WriterThread(
-        env, worker, inputIterator, partitionIndex, context)
+    val writerThread =
+      new WriterThread(env, worker, inputIterator, partitionIndex, context)
 
     context.addTaskCompletionListener { context =>
       writerThread.shutdownOnTaskCompletion()
@@ -183,8 +194,9 @@ private[spark] class PythonRunner(
               // Check whether the worker is ready to be re-used.
               if (stream.readInt() == SpecialLengths.END_OF_STREAM) {
                 if (reuse_worker) {
-                  env.releasePythonWorker(
-                      pythonExec, envVars.asScala.toMap, worker)
+                  env.releasePythonWorker(pythonExec,
+                                          envVars.asScala.toMap,
+                                          worker)
                   released = true
                 }
               }
@@ -208,7 +220,8 @@ private[spark] class PythonRunner(
 
           case eof: EOFException =>
             throw new SparkException(
-                "Python worker exited unexpectedly (crashed)", eof)
+                "Python worker exited unexpectedly (crashed)",
+                eof)
         }
       }
 
@@ -356,8 +369,8 @@ private class PairwiseRDD(prev: RDD[Array[Byte]])
     extends RDD[(Long, Array[Byte])](prev) {
   override def getPartitions: Array[Partition] = prev.partitions
   override val partitioner: Option[Partitioner] = prev.partitioner
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[(Long, Array[Byte])] =
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[(Long, Array[Byte])] =
     prev.iterator(split, context).grouped(2).map {
       case Seq(a, b) => (Utils.deserializeLongValue(a), b)
       case x => throw new SparkException("PairwiseRDD: unexpected value: " + x)
@@ -447,8 +460,8 @@ private[spark] object PythonRDD extends Logging {
     }
   }
 
-  def readBroadcastFromFile(
-      sc: JavaSparkContext, path: String): Broadcast[PythonBroadcast] = {
+  def readBroadcastFromFile(sc: JavaSparkContext,
+                            path: String): Broadcast[PythonBroadcast] = {
     sc.broadcast(new PythonBroadcast(path))
   }
 
@@ -521,8 +534,12 @@ private[spark] object PythonRDD extends Logging {
       confAsMap: java.util.HashMap[String, String],
       batchSize: Int): JavaRDD[Array[Byte]] = {
     val mergedConf = getMergedConf(confAsMap, sc.hadoopConfiguration())
-    val rdd = newAPIHadoopRDDFromClassNames[K, V, F](
-        sc, Some(path), inputFormatClass, keyClass, valueClass, mergedConf)
+    val rdd = newAPIHadoopRDDFromClassNames[K, V, F](sc,
+                                                     Some(path),
+                                                     inputFormatClass,
+                                                     keyClass,
+                                                     valueClass,
+                                                     mergedConf)
     val confBroadcasted =
       sc.sc.broadcast(new SerializableConfiguration(mergedConf))
     val converted = convertRDD(rdd,
@@ -549,8 +566,12 @@ private[spark] object PythonRDD extends Logging {
       confAsMap: java.util.HashMap[String, String],
       batchSize: Int): JavaRDD[Array[Byte]] = {
     val conf = PythonHadoopUtil.mapToConf(confAsMap)
-    val rdd = newAPIHadoopRDDFromClassNames[K, V, F](
-        sc, None, inputFormatClass, keyClass, valueClass, conf)
+    val rdd = newAPIHadoopRDDFromClassNames[K, V, F](sc,
+                                                     None,
+                                                     inputFormatClass,
+                                                     keyClass,
+                                                     valueClass,
+                                                     conf)
     val confBroadcasted = sc.sc.broadcast(new SerializableConfiguration(conf))
     val converted = convertRDD(rdd,
                                keyConverterClass,
@@ -593,8 +614,12 @@ private[spark] object PythonRDD extends Logging {
       confAsMap: java.util.HashMap[String, String],
       batchSize: Int): JavaRDD[Array[Byte]] = {
     val mergedConf = getMergedConf(confAsMap, sc.hadoopConfiguration())
-    val rdd = hadoopRDDFromClassNames[K, V, F](
-        sc, Some(path), inputFormatClass, keyClass, valueClass, mergedConf)
+    val rdd = hadoopRDDFromClassNames[K, V, F](sc,
+                                               Some(path),
+                                               inputFormatClass,
+                                               keyClass,
+                                               valueClass,
+                                               mergedConf)
     val confBroadcasted =
       sc.sc.broadcast(new SerializableConfiguration(mergedConf))
     val converted = convertRDD(rdd,
@@ -621,8 +646,12 @@ private[spark] object PythonRDD extends Logging {
       confAsMap: java.util.HashMap[String, String],
       batchSize: Int): JavaRDD[Array[Byte]] = {
     val conf = PythonHadoopUtil.mapToConf(confAsMap)
-    val rdd = hadoopRDDFromClassNames[K, V, F](
-        sc, None, inputFormatClass, keyClass, valueClass, conf)
+    val rdd = hadoopRDDFromClassNames[K, V, F](sc,
+                                               None,
+                                               inputFormatClass,
+                                               keyClass,
+                                               valueClass,
+                                               conf)
     val confBroadcasted = sc.sc.broadcast(new SerializableConfiguration(conf))
     val converted = convertRDD(rdd,
                                keyConverterClass,
@@ -666,8 +695,8 @@ private[spark] object PythonRDD extends Logging {
     * The thread will terminate after all the data are sent or any exceptions happen.
     */
   def serveIterator[T](items: Iterator[T], threadName: String): Int = {
-    val serverSocket = new ServerSocket(
-        0, 1, InetAddress.getByName("localhost"))
+    val serverSocket =
+      new ServerSocket(0, 1, InetAddress.getByName("localhost"))
     // Close the socket if no connection in 3 seconds
     serverSocket.setSoTimeout(3000)
 
@@ -709,13 +738,15 @@ private[spark] object PythonRDD extends Logging {
     // we cannot call first() on the converted RDD. Instead, we call first() on the original RDD
     // and then convert locally.
     val (key, value) = rdd.first()
-    val (kc, vc) = getKeyValueConverters(
-        keyConverterClass, valueConverterClass, new JavaToWritableConverter)
+    val (kc, vc) = getKeyValueConverters(keyConverterClass,
+                                         valueConverterClass,
+                                         new JavaToWritableConverter)
     (kc.convert(key).getClass, vc.convert(value).getClass)
   }
 
   private def getKeyValueTypes(
-      keyClass: String, valueClass: String): Option[(Class[_], Class[_])] = {
+      keyClass: String,
+      valueClass: String): Option[(Class[_], Class[_])] = {
     for {
       k <- Option(keyClass)
       v <- Option(valueClass)
@@ -742,8 +773,9 @@ private[spark] object PythonRDD extends Logging {
       keyConverterClass: String,
       valueConverterClass: String,
       defaultConverter: Converter[Any, Any]): RDD[(Any, Any)] = {
-    val (kc, vc) = getKeyValueConverters(
-        keyConverterClass, valueConverterClass, defaultConverter)
+    val (kc, vc) = getKeyValueConverters(keyConverterClass,
+                                         valueConverterClass,
+                                         defaultConverter)
     PythonHadoopUtil.convertRDD(rdd, kc, vc)
   }
 
@@ -793,8 +825,8 @@ private[spark] object PythonRDD extends Logging {
     val rdd = SerDeUtil.pythonToPairRDD(pyRDD, batchSerialized)
     val (kc, vc) = getKeyValueTypes(keyClass, valueClass).getOrElse(
         inferKeyValueTypes(rdd, keyConverterClass, valueConverterClass))
-    val mergedConf = getMergedConf(
-        confAsMap, pyRDD.context.hadoopConfiguration)
+    val mergedConf =
+      getMergedConf(confAsMap, pyRDD.context.hadoopConfiguration)
     val codec = Option(compressionCodecClass).map(
         Utils.classForName(_).asInstanceOf[Class[C]])
     val converted = convertRDD(rdd,
@@ -802,8 +834,12 @@ private[spark] object PythonRDD extends Logging {
                                valueConverterClass,
                                new JavaToWritableConverter)
     val fc = Utils.classForName(outputFormatClass).asInstanceOf[Class[F]]
-    converted.saveAsHadoopFile(
-        path, kc, vc, fc, new JobConf(mergedConf), codec = codec)
+    converted.saveAsHadoopFile(path,
+                               kc,
+                               vc,
+                               fc,
+                               new JobConf(mergedConf),
+                               codec = codec)
   }
 
   /**
@@ -828,8 +864,8 @@ private[spark] object PythonRDD extends Logging {
     val rdd = SerDeUtil.pythonToPairRDD(pyRDD, batchSerialized)
     val (kc, vc) = getKeyValueTypes(keyClass, valueClass).getOrElse(
         inferKeyValueTypes(rdd, keyConverterClass, valueConverterClass))
-    val mergedConf = getMergedConf(
-        confAsMap, pyRDD.context.hadoopConfiguration)
+    val mergedConf =
+      getMergedConf(confAsMap, pyRDD.context.hadoopConfiguration)
     val converted = convertRDD(rdd,
                                keyConverterClass,
                                valueConverterClass,
@@ -876,8 +912,8 @@ private class BytesToString
   * Internal class that acts as an `AccumulatorParam` for Python accumulators. Inside, it
   * collects a list of pickled strings that we pass to Python through a socket.
   */
-private class PythonAccumulatorParam(
-    @transient private val serverHost: String, serverPort: Int)
+private class PythonAccumulatorParam(@transient private val serverHost: String,
+                                     serverPort: Int)
     extends AccumulatorParam[JList[Array[Byte]]] {
 
   Utils.checkHost(serverHost, "Expected hostname")
@@ -900,8 +936,8 @@ private class PythonAccumulatorParam(
   override def zero(value: JList[Array[Byte]]): JList[Array[Byte]] =
     new JArrayList
 
-  override def addInPlace(
-      val1: JList[Array[Byte]], val2: JList[Array[Byte]]): JList[Array[Byte]] =
+  override def addInPlace(val1: JList[Array[Byte]],
+                          val2: JList[Array[Byte]]): JList[Array[Byte]] =
     synchronized {
       if (serverHost == null) {
         // This happens on the worker node, where we just want to remember all the updates
@@ -936,7 +972,8 @@ private class PythonAccumulatorParam(
   */
 // scalastyle:off no.finalize
 private[spark] class PythonBroadcast(@transient var path: String)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Read data from disks, then copy it to `out`

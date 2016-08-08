@@ -146,7 +146,7 @@ abstract class StreamingLinearAlgorithm[
     *
     */
   @Since("1.1.0")
-  def predictOnValues[K : ClassTag](
+  def predictOnValues[K: ClassTag](
       data: DStream[(K, Vector)]): DStream[(K, Double)] = {
     if (model.isEmpty) {
       throw new IllegalArgumentException(
@@ -165,7 +165,8 @@ abstract class StreamingLinearAlgorithm[
   def predictOnValues[K](data: JavaPairDStream[K, Vector])
     : JavaPairDStream[K, java.lang.Double] = {
     implicit val tag = fakeClassTag[K]
-    JavaPairDStream.fromPairDStream(predictOnValues(data.dstream)
+    JavaPairDStream.fromPairDStream(
+        predictOnValues(data.dstream)
           .asInstanceOf[DStream[(K, java.lang.Double)]])
   }
 }

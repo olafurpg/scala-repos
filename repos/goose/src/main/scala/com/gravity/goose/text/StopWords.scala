@@ -28,8 +28,8 @@ import com.gravity.goose.utils.FileHelper
 object StopWords {
 
   // the confusing pattern below is basically just match any non-word character excluding white-space.
-  private val PUNCTUATION: StringReplacement = StringReplacement.compile(
-      "[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}\\p{Pc}\\s]", string.empty)
+  private val PUNCTUATION: StringReplacement = StringReplacement
+    .compile("[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}\\p{Pc}\\s]", string.empty)
 
   val STOP_WORDS = FileHelper
     .loadResourceFile("stopwords-en.txt", StopWords.getClass)
@@ -51,11 +51,9 @@ object StopWords {
 
     val overlappingStopWords: List[String] = new ArrayList[String]
 
-    candidateWords.foreach(
-        w =>
-          {
-        if (STOP_WORDS.contains(w.toLowerCase))
-          overlappingStopWords.add(w.toLowerCase)
+    candidateWords.foreach(w => {
+      if (STOP_WORDS.contains(w.toLowerCase))
+        overlappingStopWords.add(w.toLowerCase)
     })
     ws.setWordCount(candidateWords.length)
     ws.setStopWordCount(overlappingStopWords.size)

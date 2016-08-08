@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ChoiceBoxSpec[J <: AnyRef]
     extends SimpleSFXDelegateSpec[jfxsc.ChoiceBox[J], ChoiceBox[J]](
-        classOf[jfxsc.ChoiceBox[J]], classOf[ChoiceBox[J]])
+        classOf[jfxsc.ChoiceBox[J]],
+        classOf[ChoiceBox[J]])
     with RunOnApplicationThread

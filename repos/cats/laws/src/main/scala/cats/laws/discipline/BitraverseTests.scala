@@ -6,7 +6,8 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 trait BitraverseTests[F[_, _]]
-    extends BifoldableTests[F] with BifunctorTests[F] {
+    extends BifoldableTests[F]
+    with BifunctorTests[F] {
   def laws: BitraverseLaws[F]
 
   def bitraverse[G[_], A, B, C, D, E, H](implicit G: Applicative[G],

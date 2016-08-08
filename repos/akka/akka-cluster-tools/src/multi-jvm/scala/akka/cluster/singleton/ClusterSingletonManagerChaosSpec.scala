@@ -35,7 +35,9 @@ object ClusterSingletonManagerChaosSpec extends MultiNodeConfig {
   val fifth = role("fifth")
   val sixth = role("sixth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -73,7 +75,8 @@ class ClusterSingletonManagerChaosMultiJvmNode7
 
 class ClusterSingletonManagerChaosSpec
     extends MultiNodeSpec(ClusterSingletonManagerChaosSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterSingletonManagerChaosSpec._
 
   override def initialParticipants = roles.size
@@ -108,8 +111,10 @@ class ClusterSingletonManagerChaosSpec
 
   def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
     runOn(nodes.filterNot(_ == nodes.head): _*) {
-      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
-          node(nodes.head).address)
+      memberProbe
+        .expectMsgType[MemberUp](15.seconds)
+        .member
+        .address should ===(node(nodes.head).address)
     }
     runOn(nodes.head) {
       memberProbe

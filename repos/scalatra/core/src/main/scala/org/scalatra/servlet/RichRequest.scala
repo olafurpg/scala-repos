@@ -162,8 +162,8 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     */
   def serverName: String = r.getServerName
 
-  @deprecated(
-      message = "Use HttpServletRequest.serverName instead", since = "2.0.0")
+  @deprecated(message = "Use HttpServletRequest.serverName instead",
+              since = "2.0.0")
   def host: String = serverName
 
   /**
@@ -172,8 +172,8 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     */
   def serverPort: Int = r.getServerPort
 
-  @deprecated(
-      message = "Use HttpServletRequest.serverPort instead", since = "2.0.0")
+  @deprecated(message = "Use HttpServletRequest.serverPort instead",
+              since = "2.0.0")
   def port: String = Integer.toString(r.getServerPort)
 
   /**
@@ -203,7 +203,8 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
       val enc =
         if (encoding == null || encoding.trim.length == 0) {
           if (contentType.exists(_ equalsIgnoreCase "application/json"))
-            "UTF-8" else "ISO-8859-1"
+            "UTF-8"
+          else "ISO-8859-1"
         } else encoding
       val body: String = try {
         Source.fromInputStream(r.getInputStream, enc).mkString

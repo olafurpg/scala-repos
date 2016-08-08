@@ -6,10 +6,26 @@ case class Two[
 ](v: A, w: B)
 
 case class TwoLong[
-    @specialized(
-        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) A,
-    @specialized(
-        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) B
+    @specialized(Char,
+                 Boolean,
+                 Byte,
+                 Short,
+                 Int,
+                 Long,
+                 Float,
+                 Double,
+                 Unit,
+                 AnyRef) A,
+    @specialized(Char,
+                 Boolean,
+                 Byte,
+                 Short,
+                 Int,
+                 Long,
+                 Float,
+                 Double,
+                 Unit,
+                 AnyRef) B
 ](v: A, w: B)
 
 case class TwoCool[

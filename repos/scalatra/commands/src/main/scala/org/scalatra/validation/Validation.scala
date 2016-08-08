@@ -19,10 +19,10 @@ object Validation {
       messageFormat: String = "%s is required."): FieldValidation[AnyRef] =
     Validators.notNull(fieldName, messageFormat).validate(value)
 
-  def nonEmptyCollection[TResult <: Traversable[_]](
-      fieldName: String,
-      value: ⇒ TResult,
-      messageFormat: String = "%s must not be empty.")
+  def nonEmptyCollection[TResult <: Traversable[_]](fieldName: String,
+                                                    value: ⇒ TResult,
+                                                    messageFormat: String =
+                                                      "%s must not be empty.")
     : FieldValidation[TResult] =
     Validators.nonEmptyCollection(fieldName, messageFormat).validate(value)
 
@@ -32,12 +32,12 @@ object Validation {
     : FieldValidation[String] =
     Validators.validEmail(fieldName, messageFormat).validate(value)
 
-  def validAbsoluteUrl(
-      fieldName: String,
-      value: ⇒ String,
-      allowLocalHost: Boolean,
-      messageFormat: String = "%s must be a valid absolute url.",
-      schemes: Seq[String] = Seq("http", "https")) =
+  def validAbsoluteUrl(fieldName: String,
+                       value: ⇒ String,
+                       allowLocalHost: Boolean,
+                       messageFormat: String =
+                         "%s must be a valid absolute url.",
+                       schemes: Seq[String] = Seq("http", "https")) =
     Validators
       .validAbsoluteUrl(fieldName, allowLocalHost, messageFormat, schemes)
       .validate(value)
@@ -65,23 +65,25 @@ object Validation {
       confirmationValue: => String,
       messageFormat: String = "%%s must match %s."): FieldValidation[String] =
     Validators
-      .validConfirmation(
-          fieldName, confirmationFieldName, confirmationValue, messageFormat)
+      .validConfirmation(fieldName,
+                         confirmationFieldName,
+                         confirmationValue,
+                         messageFormat)
       .validate(value)
 
-  def greaterThan[T <% Ordered[T]](
-      fieldName: String,
-      value: ⇒ T,
-      min: T,
-      messageFormat: String = "%%s must be greater than %s.")
+  def greaterThan[T <% Ordered[T]](fieldName: String,
+                                   value: ⇒ T,
+                                   min: T,
+                                   messageFormat: String =
+                                     "%%s must be greater than %s.")
     : FieldValidation[T] =
     Validators.greaterThan(fieldName, min, messageFormat).validate(value)
 
-  def lessThan[T <% Ordered[T]](
-      fieldName: String,
-      value: ⇒ T,
-      max: T,
-      messageFormat: String = "%%s must be less than %s.")
+  def lessThan[T <% Ordered[T]](fieldName: String,
+                                value: ⇒ T,
+                                max: T,
+                                messageFormat: String =
+                                  "%%s must be less than %s.")
     : FieldValidation[T] =
     Validators.lessThan(fieldName, max, messageFormat).validate(value)
 
@@ -103,11 +105,11 @@ object Validation {
     : FieldValidation[T] =
     Validators.lessThanOrEqualTo(fieldName, max, messageFormat).validate(value)
 
-  def minLength(
-      fieldName: String,
-      value: ⇒ String,
-      min: Int,
-      messageFormat: String = "%%s must be at least %s characters long.")
+  def minLength(fieldName: String,
+                value: ⇒ String,
+                min: Int,
+                messageFormat: String =
+                  "%%s must be at least %s characters long.")
     : FieldValidation[String] =
     Validators.minLength(fieldName, min, messageFormat).validate(value)
 

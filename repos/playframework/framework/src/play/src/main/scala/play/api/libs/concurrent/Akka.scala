@@ -53,8 +53,9 @@ object Akka {
     * @tparam T The class that implements the actor.
     * @return A provider for the actor.
     */
-  def providerOf[T <: Actor : ClassTag](
-      name: String, props: Props => Props = identity): Provider[ActorRef] =
+  def providerOf[T <: Actor: ClassTag](
+      name: String,
+      props: Props => Props = identity): Provider[ActorRef] =
     new ActorRefProvider(name, props)
 
   /**
@@ -86,8 +87,9 @@ object Akka {
     * @tparam T The class that implements the actor.
     * @return A binding for the actor.
     */
-  def bindingOf[T <: Actor : ClassTag](
-      name: String, props: Props => Props = identity): Binding[ActorRef] =
+  def bindingOf[T <: Actor: ClassTag](
+      name: String,
+      props: Props => Props = identity): Binding[ActorRef] =
     bind[ActorRef].qualifiedWith(name).to(providerOf[T](name, props)).eagerly()
 }
 
@@ -136,8 +138,9 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     *              configuration.
     * @tparam T The class that implements the actor.
     */
-  def bindActor[T <: Actor : ClassTag](
-      name: String, props: Props => Props = identity): Unit = {
+  def bindActor[T <: Actor: ClassTag](
+      name: String,
+      props: Props => Props = identity): Unit = {
     accessBinder
       .bind(classOf[ActorRef])
       .annotatedWith(Names.named(name))
@@ -194,8 +197,8 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     * @tparam ActorClass The class that implements the actor that the factory creates
     * @tparam FactoryClass The class of the actor factory
     */
-  def bindActorFactory[
-      ActorClass <: Actor : ClassTag, FactoryClass : ClassTag]: Unit = {
+  def bindActorFactory[ActorClass <: Actor: ClassTag, FactoryClass: ClassTag]
+    : Unit = {
     accessBinder.install(
         new FactoryModuleBuilder()
           .implement(classOf[Actor],
@@ -208,8 +211,8 @@ trait AkkaGuiceSupport { self: AbstractModule =>
 /**
   * Provider for creating actor refs
   */
-class ActorRefProvider[T <: Actor : ClassTag](
-    name: String, props: Props => Props)
+class ActorRefProvider[T <: Actor: ClassTag](name: String,
+                                             props: Props => Props)
     extends Provider[ActorRef] {
 
   @Inject private var actorSystem: ActorSystem = _
@@ -236,8 +239,9 @@ trait InjectedActorSupport {
     * @param context The context to create the actor from.
     * @return An ActorRef for the created actor.
     */
-  def injectedChild(
-      create: => Actor, name: String, props: Props => Props = identity)(
+  def injectedChild(create: => Actor,
+                    name: String,
+                    props: Props => Props = identity)(
       implicit context: ActorContext): ActorRef = {
     context.actorOf(props(Props(create)), name)
   }
@@ -253,7 +257,9 @@ trait AkkaComponents {
   def applicationLifecycle: ApplicationLifecycle
 
   lazy val actorSystem: ActorSystem = new ActorSystemProvider(
-      environment, configuration, applicationLifecycle).get
+      environment,
+      configuration,
+      applicationLifecycle).get
 }
 
 /**

@@ -30,7 +30,7 @@ private[graphx] object VertexPartitionBase {
     * Construct the constituents of a VertexPartitionBase from the given vertices, merging duplicate
     * entries arbitrarily.
     */
-  def initFrom[VD : ClassTag](iter: Iterator[(VertexId, VD)])
+  def initFrom[VD: ClassTag](iter: Iterator[(VertexId, VD)])
     : (VertexIdToIndexMap, Array[VD], BitSet) = {
     val map = new GraphXPrimitiveKeyOpenHashMap[VertexId, VD]
     iter.foreach { pair =>
@@ -43,7 +43,7 @@ private[graphx] object VertexPartitionBase {
     * Construct the constituents of a VertexPartitionBase from the given vertices, merging duplicate
     * entries using `mergeFunc`.
     */
-  def initFrom[VD : ClassTag](
+  def initFrom[VD: ClassTag](
       iter: Iterator[(VertexId, VD)],
       mergeFunc: (VD, VD) => VD): (VertexIdToIndexMap, Array[VD], BitSet) = {
     val map = new GraphXPrimitiveKeyOpenHashMap[VertexId, VD]
@@ -62,7 +62,7 @@ private[graphx] object VertexPartitionBase {
   * [[VertexPartition.VertexPartitionOpsConstructor]]).
   */
 private[graphx] abstract class VertexPartitionBase[
-    @specialized(Long, Int, Double) VD : ClassTag]
+    @specialized(Long, Int, Double) VD: ClassTag]
     extends Serializable {
 
   def index: VertexIdToIndexMap
@@ -91,5 +91,5 @@ private[graphx] abstract class VertexPartitionBase[
   */
 private[graphx] trait VertexPartitionBaseOpsConstructor[
     T[X] <: VertexPartitionBase[X]] {
-  def toOps[VD : ClassTag](partition: T[VD]): VertexPartitionBaseOps[VD, T]
+  def toOps[VD: ClassTag](partition: T[VD]): VertexPartitionBaseOps[VD, T]
 }

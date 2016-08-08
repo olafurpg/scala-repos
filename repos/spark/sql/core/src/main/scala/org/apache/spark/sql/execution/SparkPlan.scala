@@ -17,7 +17,12 @@
 
 package org.apache.spark.sql.execution
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +47,9 @@ import org.apache.spark.util.ThreadUtils
   * The base class for physical operators.
   */
 abstract class SparkPlan
-    extends QueryPlan[SparkPlan] with Logging with Serializable {
+    extends QueryPlan[SparkPlan]
+    with Logging
+    with Serializable {
 
   /**
     * A handle to the SQL Context that was used to create this plan.   Since many operators need
@@ -258,8 +265,8 @@ abstract class SparkPlan
   /**
     * Decode the byte arrays back to UnsafeRows and put them into buffer.
     */
-  private def decodeUnsafeRows(
-      bytes: Array[Byte], buffer: ArrayBuffer[InternalRow]): Unit = {
+  private def decodeUnsafeRows(bytes: Array[Byte],
+                               buffer: ArrayBuffer[InternalRow]): Unit = {
     val nFields = schema.length
 
     val codec = CompressionCodec.createCodec(SparkEnv.get.conf)
@@ -358,8 +365,8 @@ abstract class SparkPlan
       inputSchema: Seq[Attribute],
       useSubexprElimination: Boolean = false): () => MutableProjection = {
     log.debug(s"Creating MutableProj: $expressions, inputSchema: $inputSchema")
-    GenerateMutableProjection.generate(
-        expressions, inputSchema, useSubexprElimination)
+    GenerateMutableProjection
+      .generate(expressions, inputSchema, useSubexprElimination)
   }
 
   protected def newPredicate(

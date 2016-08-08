@@ -31,7 +31,12 @@ import org.mockito.Mockito.{mock, spy, verify, when}
 import org.scalatest.{BeforeAndAfterEach, PrivateMethodTester}
 
 import org.apache.spark.executor.TaskMetrics
-import org.apache.spark.rpc.{RpcCallContext, RpcEndpoint, RpcEndpointRef, RpcEnv}
+import org.apache.spark.rpc.{
+  RpcCallContext,
+  RpcEndpoint,
+  RpcEndpointRef,
+  RpcEnv
+}
 import org.apache.spark.scheduler._
 import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages._
 import org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend
@@ -42,7 +47,9 @@ import org.apache.spark.util.ManualClock
   * A test suite for the heartbeating behavior between the driver and the executors.
   */
 class HeartbeatReceiverSuite
-    extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with PrivateMethodTester
     with LocalSparkContext {
 
   private val executorId1 = "executor-1"
@@ -77,8 +84,8 @@ class HeartbeatReceiverSuite
     when(scheduler.sc).thenReturn(sc)
     heartbeatReceiverClock = new ManualClock
     heartbeatReceiver = new HeartbeatReceiver(sc, heartbeatReceiverClock)
-    heartbeatReceiverRef = sc.env.rpcEnv
-      .setupEndpoint("heartbeat", heartbeatReceiver)
+    heartbeatReceiverRef =
+      sc.env.rpcEnv.setupEndpoint("heartbeat", heartbeatReceiver)
     when(scheduler.executorHeartbeatReceived(any(), any(), any()))
       .thenReturn(true)
   }
@@ -211,13 +218,14 @@ class HeartbeatReceiverSuite
     // executor means we permanently adjust the target number downwards until we
     // explicitly request new executors. For more detail, see SPARK-8119.
     assert(fakeClusterManager.getTargetNumExecutors === 2)
-    assert(fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
-                                                           executorId2))
+    assert(
+        fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
+                                                        executorId2))
   }
 
   /** Manually send a heartbeat and return the response. */
-  private def triggerHeartbeat(
-      executorId: String, executorShouldReregister: Boolean): Unit = {
+  private def triggerHeartbeat(executorId: String,
+                               executorShouldReregister: Boolean): Unit = {
     val metrics = new TaskMetrics
     val blockManagerId = BlockManagerId(executorId, "localhost", 12345)
     val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
@@ -237,15 +245,13 @@ class HeartbeatReceiverSuite
   }
 
   private def addExecutorAndVerify(executorId: String): Unit = {
-    assert(
-        heartbeatReceiver.addExecutor(executorId).map { f =>
+    assert(heartbeatReceiver.addExecutor(executorId).map { f =>
       Await.result(f, 10.seconds)
     } === Some(true))
   }
 
   private def removeExecutorAndVerify(executorId: String): Unit = {
-    assert(
-        heartbeatReceiver.removeExecutor(executorId).map { f =>
+    assert(heartbeatReceiver.removeExecutor(executorId).map { f =>
       Await.result(f, 10.seconds)
     } === Some(true))
   }
@@ -277,8 +283,10 @@ private class FakeSchedulerBackend(scheduler: TaskSchedulerImpl,
 
   protected override def doRequestTotalExecutors(
       requestedTotal: Int): Boolean = {
-    clusterManagerEndpoint.askWithRetry[Boolean](RequestExecutors(
-            requestedTotal, localityAwareTasks, hostToLocalTaskCount))
+    clusterManagerEndpoint.askWithRetry[Boolean](
+        RequestExecutors(requestedTotal,
+                         localityAwareTasks,
+                         hostToLocalTaskCount))
   }
 
   protected override def doKillExecutors(executorIds: Seq[String]): Boolean = {

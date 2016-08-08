@@ -4,8 +4,11 @@ import gitbucket.core.model._
 import org.scalatest.FunSpec
 
 class PullRequestServiceSpec
-    extends FunSpec with ServiceSpecBase with PullRequestService
-    with IssuesService with AccountService {
+    extends FunSpec
+    with ServiceSpecBase
+    with PullRequestService
+    with IssuesService
+    with AccountService {
 
   def swap(r: (Issue, PullRequest)) = (r._2 -> r._1)
 
@@ -32,8 +35,8 @@ class PullRequestServiceSpec
             getPullRequestFromBranch("user1", "repo1", "head1", "master") == Some(
                 r2))
         updateClosed("user1", "repo1", r2._1.issueId, true)
-        assert(Seq(r1, r2).contains(getPullRequestFromBranch(
-                    "user1", "repo1", "head1", "master").get))
+        assert(Seq(r1, r2).contains(
+            getPullRequestFromBranch("user1", "repo1", "head1", "master").get))
         updateClosed("user1", "repo1", r1._1.issueId, true)
         updateClosed("user1", "repo1", r3._1.issueId, true)
         assert(

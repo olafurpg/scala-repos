@@ -45,7 +45,8 @@ final case class Bits(elements: Seq[Bits.BitElement]) {
             val remainingBits = bits - numBits
             val highestNBits = value >> remainingBits
             val lowestNBitMask = (~(0xff << numBits) & 0xff)
-            data(byteIdx) = (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
+            data(byteIdx) =
+              (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
 
             if (remainingBits > 0)
               rec(byteIdx + 1, 0, Multibit(remainingBits, value) +: rest)
@@ -76,7 +77,8 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
     bits.run() match {
       case s: Success[Bits] ⇒ s
       case Failure(e: ParseError) ⇒
-        Failure(new RuntimeException(
+        Failure(
+            new RuntimeException(
                 formatError(e, new ErrorFormatter(showTraces = true))))
       case _ ⇒ throw new IllegalStateException()
     }
@@ -101,6 +103,6 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
   }
   def value: Rule1[Long] = rule {
     capture(oneOrMore(CharPredicate.HexDigit)) ~>
-    ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
+      ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
   }
 }

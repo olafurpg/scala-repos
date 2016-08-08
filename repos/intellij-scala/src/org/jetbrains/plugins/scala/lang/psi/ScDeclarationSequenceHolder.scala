@@ -11,7 +11,12 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHolder
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScTrait, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition,
+  ScTrait,
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
 
@@ -27,7 +32,7 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
         (processor match {
           case b: BaseProcessor =>
             b.kinds.contains(ResolveTargets.OBJECT) ||
-            b.kinds.contains(ResolveTargets.VAL)
+              b.kinds.contains(ResolveTargets.VAL)
           case _ => true
         }) && t.fakeCompanionModule.isDefined
       }

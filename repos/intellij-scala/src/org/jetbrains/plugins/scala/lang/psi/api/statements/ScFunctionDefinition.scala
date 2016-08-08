@@ -10,8 +10,14 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, StaticTraitScFunctionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper,
+  StaticTraitScFunctionWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
@@ -30,15 +36,14 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
   def removeAssignment()
 
   def returnUsages(withBooleanInfix: Boolean = false): Array[PsiElement] =
-    body.fold(Array.empty[PsiElement])(
-        exp =>
-          {
-        (exp.depthFirst(!_.isInstanceOf[ScFunction])
-              .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
-                withBooleanInfix))
-          .filter(_.getContainingFile == getContainingFile)
-          .toArray
-          .distinct
+    body.fold(Array.empty[PsiElement])(exp => {
+      (exp
+        .depthFirst(!_.isInstanceOf[ScFunction])
+        .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
+          withBooleanInfix))
+        .filter(_.getContainingFile == getContainingFile)
+        .toArray
+        .distinct
     })
 
   def canBeTailRecursive = getParent match {
@@ -91,7 +96,8 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
                   .toSeq if ref.isReferenceTo(this)
         } yield {
           RecursiveReference(
-              ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
+              ref,
+              expressions.contains(possiblyTailRecursiveCallFor(ref)))
         }
       case None => Seq.empty
     }

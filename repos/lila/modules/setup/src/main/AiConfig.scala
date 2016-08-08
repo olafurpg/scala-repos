@@ -12,7 +12,8 @@ case class AiConfig(variant: chess.variant.Variant,
                     level: Int,
                     color: Color,
                     fen: Option[String] = None)
-    extends Config with Positional {
+    extends Config
+    with Positional {
 
   val strictFen = true
 
@@ -22,18 +23,19 @@ case class AiConfig(variant: chess.variant.Variant,
   def game =
     fenGame { chessGame =>
       val realVariant = chessGame.board.variant
-      Game.make(
-          game = chessGame,
-          whitePlayer = Player.make(color = ChessColor.White,
-                                    aiLevel = creatorColor.black option level),
-          blackPlayer = Player.make(color = ChessColor.Black,
-                                    aiLevel = creatorColor.white option level),
-          mode = Mode.Casual,
-          variant = realVariant,
-          source = (realVariant == chess.variant.FromPosition)
-              .fold(Source.Position, Source.Ai),
-          daysPerTurn = makeDaysPerTurn,
-          pgnImport = None)
+      Game.make(game = chessGame,
+                whitePlayer =
+                  Player.make(color = ChessColor.White,
+                              aiLevel = creatorColor.black option level),
+                blackPlayer =
+                  Player.make(color = ChessColor.Black,
+                              aiLevel = creatorColor.white option level),
+                mode = Mode.Casual,
+                variant = realVariant,
+                source = (realVariant == chess.variant.FromPosition)
+                  .fold(Source.Position, Source.Ai),
+                daysPerTurn = makeDaysPerTurn,
+                pgnImport = None)
     } start
 
   def pov = Pov(game, creatorColor)

@@ -12,14 +12,14 @@ class BitSetTest {
     val bitSet = BitSet.empty
     val size = bitSet.toBitMask.length
     bitSet ^= bitSet
-    assert(
-        bitSet.toBitMask.length == size, "Capacity of bitset changed after ^=")
+    assert(bitSet.toBitMask.length == size,
+           "Capacity of bitset changed after ^=")
     bitSet |= bitSet
-    assert(
-        bitSet.toBitMask.length == size, "Capacity of bitset changed after |=")
+    assert(bitSet.toBitMask.length == size,
+           "Capacity of bitset changed after |=")
     bitSet &= bitSet
-    assert(
-        bitSet.toBitMask.length == size, "Capacity of bitset changed after &=")
+    assert(bitSet.toBitMask.length == size,
+           "Capacity of bitset changed after &=")
     bitSet &~= bitSet
     assert(bitSet.toBitMask.length == size,
            "Capacity of bitset changed after &~=")

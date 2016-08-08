@@ -33,8 +33,8 @@ trait OptionInstances extends OptionInstances1 {
         case Some(a) => f(b, a)
       }
 
-    def foldRight[A, B](
-        fa: Option[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](fa: Option[A], lb: Eval[B])(
+        f: (A, Eval[B]) => Eval[B]): Eval[B] =
       fa match {
         case None => lb
         case Some(a) => f(a, lb)
@@ -99,8 +99,8 @@ private[std] sealed trait OptionInstances1 extends OptionInstances2 {
       implicit ev: PartialOrder[A]): PartialOrder[Option[A]] =
     new PartialOrder[Option[A]] {
       def partialCompare(x: Option[A], y: Option[A]): Double =
-        x.fold(if (y.isDefined) -1.0 else 0.0)(
-            a => y.fold(1.0)(ev.partialCompare(_, a)))
+        x.fold(if (y.isDefined) -1.0 else 0.0)(a =>
+          y.fold(1.0)(ev.partialCompare(_, a)))
     }
 }
 

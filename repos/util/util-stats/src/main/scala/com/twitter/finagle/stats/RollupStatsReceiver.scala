@@ -11,7 +11,8 @@ package com.twitter.finagle.stats
   * - "/errors/clientErrors/java_net_ConnectException"
   */
 class RollupStatsReceiver(val self: StatsReceiver)
-    extends StatsReceiver with Proxy {
+    extends StatsReceiver
+    with Proxy {
   val repr = self.repr
 
   private[this] def tails[A](s: Seq[A]): Seq[Seq[A]] = {
@@ -21,9 +22,9 @@ class RollupStatsReceiver(val self: StatsReceiver)
 
       case Seq(hd, tl @ _ *) =>
         Seq(Seq(hd)) ++
-        (tails(tl) map { t =>
-              Seq(hd) ++ t
-            })
+          (tails(tl) map { t =>
+            Seq(hd) ++ t
+          })
     }
   }
 

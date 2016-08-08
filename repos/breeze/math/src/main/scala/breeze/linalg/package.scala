@@ -84,8 +84,8 @@ package object linalg {
     if (mat.length == 0) {
       DenseMatrix.zeros[Double](0, 0)
     } else {
-      DenseMatrix.tabulate(mat.length, mat.head.length)(
-          (i, j) => mat(i)(j).toDouble)
+      DenseMatrix.tabulate(mat.length, mat.head.length)((i, j) =>
+        mat(i)(j).toDouble)
     }
   }
 
@@ -103,7 +103,7 @@ package object linalg {
         escape)
   }
 
-  def mmwrite[T : Numeric](file: File, mat: Matrix[T]): Unit = {
+  def mmwrite[T: Numeric](file: File, mat: Matrix[T]): Unit = {
     if (mat.activeSize == mat.size) {
       val out = new PrintWriter(FileStreams.output(file))
       out.println("%%MatrixMarket matrix array real general")
@@ -136,7 +136,8 @@ package object linalg {
 
   // implicits for lifting scalars with appropriate operators
   implicit class InjectNumericOps[T](val repr: T)
-      extends AnyVal with ImmutableNumericOps[T]
+      extends AnyVal
+      with ImmutableNumericOps[T]
 
   /**
     * Basic linear algebraic operations.
@@ -149,20 +150,21 @@ package object linalg {
   private[linalg] def requireSquareMatrix[V](mat: Matrix[V]): Unit =
     if (mat.rows != mat.cols) throw new MatrixNotSquareException
 
-  private[linalg] def requireSymmetricMatrix(
-      mat: Matrix[Double], tol: Double = 1e-7): Unit = {
+  private[linalg] def requireSymmetricMatrix(mat: Matrix[Double],
+                                             tol: Double = 1e-7): Unit = {
     requireSquareMatrix(mat)
 
-    for (i <- 0 until mat.rows; j <- 0 until i) if (abs(mat(i, j) - mat(j, i)) > abs(
-                                                        mat(i, j)) * tol)
-      throw new MatrixNotSymmetricException
+    for (i <- 0 until mat.rows; j <- 0 until i)
+      if (abs(mat(i, j) - mat(j, i)) > abs(mat(i, j)) * tol)
+        throw new MatrixNotSymmetricException
   }
 
   /**
     * Vector cross product of 3D vectors a and b.
     */
   def cross[V1](a: DenseVector[V1], b: DenseVector[V1])(
-      implicit ring: Ring[V1], man: ClassTag[V1]): DenseVector[V1] = {
+      implicit ring: Ring[V1],
+      man: ClassTag[V1]): DenseVector[V1] = {
     require(a.length == 3)
     require(b.length == 3)
     DenseVector(
@@ -176,7 +178,7 @@ package object linalg {
     * Returns the rank of each element in the given vector, adjusting for
     * ties.
     */
-  def ranks[V : Ordering](x: Vector[V]): Array[Double] = {
+  def ranks[V: Ordering](x: Vector[V]): Array[Double] = {
     val a = x
     val as = argsort(a)
     val rv = new Array[Double](as.length)
@@ -185,7 +187,7 @@ package object linalg {
       // count number of tied values at rank i
       var numTiedValuesAtI = 1
       while (i + numTiedValuesAtI < as.length &&
-      a(as(i + numTiedValuesAtI)) == a(as(i))) {
+             a(as(i + numTiedValuesAtI)) == a(as(i))) {
         numTiedValuesAtI += 1
       }
 
@@ -207,10 +209,11 @@ package object linalg {
     * The lower triangular portion of the given real quadratic matrix X. Note
     * that no check will be performed regarding the symmetry of X.
     */
-  def lowerTriangular[T : Semiring : ClassTag : Zero](
+  def lowerTriangular[T: Semiring: ClassTag: Zero](
       X: Matrix[T]): DenseMatrix[T] = {
     val N = X.rows
-    DenseMatrix.tabulate(N, N)((i, j) =>
+    DenseMatrix.tabulate(N, N)(
+        (i, j) =>
           if (j <= i) X(i, j)
           else implicitly[Semiring[T]].zero)
   }
@@ -219,10 +222,11 @@ package object linalg {
     * The lower triangular portion of the given real quadratic matrix X with
     * the diagnal elements is zero!
     */
-  def strictlyLowerTriangular[T : Semiring : ClassTag : Zero](
+  def strictlyLowerTriangular[T: Semiring: ClassTag: Zero](
       X: Matrix[T]): DenseMatrix[T] = {
     val N = X.rows
-    DenseMatrix.tabulate(N, N)((i, j) =>
+    DenseMatrix.tabulate(N, N)(
+        (i, j) =>
           if (j < i) X(i, j)
           else implicitly[Semiring[T]].zero)
   }
@@ -231,10 +235,11 @@ package object linalg {
     * The upper triangular portion of the given real quadratic matrix X. Note
     * that no check will be performed regarding the symmetry of X.
     */
-  def upperTriangular[T : Semiring : ClassTag : Zero](
+  def upperTriangular[T: Semiring: ClassTag: Zero](
       X: Matrix[T]): DenseMatrix[T] = {
     val N = X.rows
-    DenseMatrix.tabulate(N, N)((i, j) =>
+    DenseMatrix.tabulate(N, N)(
+        (i, j) =>
           if (j >= i) X(i, j)
           else implicitly[Semiring[T]].zero)
   }
@@ -243,10 +248,11 @@ package object linalg {
     * The upper triangular portion of the given real quadratic matrix X with
     * the diagnal elements is zero!
     */
-  def strictlyUpperTriangular[T : Semiring : ClassTag : Zero](
+  def strictlyUpperTriangular[T: Semiring: ClassTag: Zero](
       X: Matrix[T]): DenseMatrix[T] = {
     val N = X.rows
-    DenseMatrix.tabulate(N, N)((i, j) =>
+    DenseMatrix.tabulate(N, N)(
+        (i, j) =>
           if (j > i) X(i, j)
           else implicitly[Semiring[T]].zero)
   }
@@ -297,8 +303,8 @@ package object linalg {
     * Compute the covariance matrix from the given data, centering
     * if necessary. Very simple, just does the basic thing.
     */
-  def cov(
-      x: DenseMatrix[Double], center: Boolean = true): DenseMatrix[Double] = {
+  def cov(x: DenseMatrix[Double],
+          center: Boolean = true): DenseMatrix[Double] = {
     val xc = scale(x, center, false)
     (xc.t * xc) /= xc.rows - 1.0
   }
@@ -306,30 +312,30 @@ package object linalg {
   // <editor-fold defaultstate="collapsed" desc=" functions declared using the CanXXX idiom (this allows calling parameters by name, etc.) ">
 
   import breeze.linalg.Options.{Zero => OZero, _}
-  def padRight[T](
-      v: DenseVector[T],
-      dimensions: Dimensions1)(implicit canPad: CanPadRight[DenseVector[T],
-                                                            Dimensions1,
-                                                            DenseVector[T]])
-    : DenseVector[T] = canPad(v, dimensions, OZero)
-  def padRight[T](
-      v: DenseVector[T],
-      dimensions: Dimensions1,
-      mode: OptPadMode)(implicit canPad: CanPadRight[
-                            DenseVector[T], Dimensions1, DenseVector[T]])
-    : DenseVector[T] = canPad(v, dimensions, mode)
-  def padRight[T](
-      v: DenseMatrix[T],
-      dimensions: Dimensions1)(implicit canPad: CanPadRight[DenseMatrix[T],
-                                                            Dimensions1,
-                                                            DenseMatrix[T]])
-    : DenseMatrix[T] = canPad(v, dimensions, OZero)
-  def padRight[T](
-      v: DenseMatrix[T],
-      dimensions: Dimensions2,
-      mode: OptPadMode)(implicit canPad: CanPadRight[
-                            DenseMatrix[T], Dimensions2, DenseMatrix[T]])
-    : DenseMatrix[T] = canPad(v, dimensions, mode)
+  def padRight[T](v: DenseVector[T], dimensions: Dimensions1)(
+      implicit canPad: CanPadRight[DenseVector[T],
+                                   Dimensions1,
+                                   DenseVector[T]]): DenseVector[T] =
+    canPad(v, dimensions, OZero)
+  def padRight[T](v: DenseVector[T],
+                  dimensions: Dimensions1,
+                  mode: OptPadMode)(
+      implicit canPad: CanPadRight[DenseVector[T],
+                                   Dimensions1,
+                                   DenseVector[T]]): DenseVector[T] =
+    canPad(v, dimensions, mode)
+  def padRight[T](v: DenseMatrix[T], dimensions: Dimensions1)(
+      implicit canPad: CanPadRight[DenseMatrix[T],
+                                   Dimensions1,
+                                   DenseMatrix[T]]): DenseMatrix[T] =
+    canPad(v, dimensions, OZero)
+  def padRight[T](v: DenseMatrix[T],
+                  dimensions: Dimensions2,
+                  mode: OptPadMode)(
+      implicit canPad: CanPadRight[DenseMatrix[T],
+                                   Dimensions2,
+                                   DenseMatrix[T]]): DenseMatrix[T] =
+    canPad(v, dimensions, mode)
   def padLeft[T](v: DenseVector[T], dimensions: Dimensions1)(
       implicit canPad: CanPadLeft[DenseVector[T], Dimensions1, DenseVector[T]])
     : DenseVector[T] = canPad(v, dimensions, OZero)

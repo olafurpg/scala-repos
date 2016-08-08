@@ -117,7 +117,8 @@ object SharedLeveldbPluginDocSpec {
   //#shared-store-usage
   trait SharedStoreUsage extends Actor {
     override def preStart(): Unit = {
-      context.actorSelection("akka.tcp://example@127.0.0.1:2552/user/store") ! Identify(
+      context
+        .actorSelection("akka.tcp://example@127.0.0.1:2552/user/store") ! Identify(
           1)
     }
 
@@ -146,22 +147,21 @@ class MyJournal extends AsyncWriteJournal {
   //#sync-journal-plugin-api
   def asyncWriteMessages(
       messages: immutable.Seq[AtomicWrite]): Future[immutable.Seq[Try[Unit]]] =
-    Future.fromTry(
-        Try {
+    Future.fromTry(Try {
       // blocking call here
       ???
     })
   //#sync-journal-plugin-api
 
-  def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] = ???
-  def asyncReplayMessages(persistenceId: String,
-                          fromSequenceNr: Long,
-                          toSequenceNr: Long,
-                          max: Long)(
-      replayCallback: (PersistentRepr) => Unit): Future[Unit] = ???
-  def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] = ???
+  def asyncDeleteMessagesTo(persistenceId: String,
+                            toSequenceNr: Long): Future[Unit] = ???
+  def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(replayCallback: (PersistentRepr) => Unit): Future[Unit] = ???
+  def asyncReadHighestSequenceNr(persistenceId: String,
+                                 fromSequenceNr: Long): Future[Long] = ???
 
   // optionally override:
   override def receivePluginInternal: Receive = super.receivePluginInternal
@@ -187,8 +187,9 @@ object PersistenceTCKDoc {
 
     //#journal-tck-scala
     class MyJournalSpec
-        extends JournalSpec(config = ConfigFactory.parseString(
-                  """akka.persistence.journal.plugin = "my.journal.plugin"""")) {
+        extends JournalSpec(
+            config = ConfigFactory.parseString(
+                """akka.persistence.journal.plugin = "my.journal.plugin"""")) {
 
       override def supportsRejectingNonSerializableObjects: CapabilityFlag =
         false // or CapabilityFlag.off
@@ -200,7 +201,8 @@ object PersistenceTCKDoc {
 
     //#snapshot-store-tck-scala
     class MySnapshotStoreSpec
-        extends SnapshotStoreSpec(config = ConfigFactory.parseString("""
+        extends SnapshotStoreSpec(config = ConfigFactory.parseString(
+            """
         akka.persistence.snapshot-store.plugin = "my.snapshot-store.plugin"
         """))
     //#snapshot-store-tck-scala
@@ -213,7 +215,9 @@ object PersistenceTCKDoc {
 
     //#journal-tck-before-after-scala
     class MyJournalSpec
-        extends JournalSpec(config = ConfigFactory.parseString("""
+        extends JournalSpec(
+            config = ConfigFactory.parseString(
+                """
         akka.persistence.journal.plugin = "my.journal.plugin"
         """)) {
 
@@ -221,7 +225,8 @@ object PersistenceTCKDoc {
         true // or CapabilityFlag.on
 
       val storageLocations = List(
-          new File(system.settings.config
+          new File(
+              system.settings.config
                 .getString("akka.persistence.journal.leveldb.dir")),
           new File(
               config.getString("akka.persistence.snapshot-store.local.dir")))

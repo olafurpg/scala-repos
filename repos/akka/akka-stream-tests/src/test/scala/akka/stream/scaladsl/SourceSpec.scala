@@ -150,7 +150,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
 
       val s = Source
         .fromGraph(GraphDSL.create(source, source, source, source, source)(
-                Seq(_, _, _, _, _)) { implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
+            Seq(_, _, _, _, _)) { implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
           import GraphDSL.Implicits._
           val m = b.add(Merge[Int](5))
           i0.out ~> m.in(0)
@@ -207,7 +207,8 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
     "combine from two inputs with simplified API" in {
       val probes = Seq.fill(2)(TestPublisher.manualProbe[Int]())
       val source =
-        Source.fromPublisher(probes(0)) :: Source.fromPublisher(probes(1)) :: Nil
+        Source
+          .fromPublisher(probes(0)) :: Source.fromPublisher(probes(1)) :: Nil
       val out = TestSubscriber.manualProbe[Int]
 
       Source
@@ -292,9 +293,9 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       EventFilter[RuntimeException](message = "expected", occurrences = 1) intercept whenReady(
           Source
             .unfold((0, 1)) {
-          case (a, _) if a > 10000000 ⇒ throw t
-          case (a, b) ⇒ Some((b, a + b) → a)
-        }
+              case (a, _) if a > 10000000 ⇒ throw t
+              case (a, b) ⇒ Some((b, a + b) → a)
+            }
             .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
             .failed) {
         _ should be theSameInstanceAs (t)

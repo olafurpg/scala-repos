@@ -70,18 +70,18 @@ class TestScalaSymbols extends FunSuite {
   }
 
   test("constructorParamWithTypeArgs") {
-    assert(Compat.constructorParamTypes[ParentTag.Foo2] == Seq(
+    assert(
+        Compat.constructorParamTypes[ParentTag.Foo2] == Seq(
             "scala.Tuple2[scala.Int,java.lang.String]"))
   }
 
   test("parentClassesWithTypeArgs") {
     val parentClassKeys = Compat.parentClassTags[ParentTag.Biz].toSet
-    assert(
-        parentClassKeys == Set(
-            "scala.pickling.generator.scalasymbols.ParentTag.Foo[java.lang.String,scala.Int]",
-            "scala.pickling.generator.scalasymbols.ParentTag.Baz[java.lang.String]",
-            "scala.Any",
-            "java.lang.Object"))
+    assert(parentClassKeys == Set(
+        "scala.pickling.generator.scalasymbols.ParentTag.Foo[java.lang.String,scala.Int]",
+        "scala.pickling.generator.scalasymbols.ParentTag.Baz[java.lang.String]",
+        "scala.Any",
+        "java.lang.Object"))
   }
 
   test("detectTransient") {

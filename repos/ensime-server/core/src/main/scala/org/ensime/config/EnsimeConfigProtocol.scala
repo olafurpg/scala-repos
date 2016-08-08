@@ -16,7 +16,9 @@ import org.ensime.api._
 
 object EnsimeConfigProtocol {
   object Protocol
-      extends DefaultSexpProtocol with OptionAltFormat with ScalariformFormat
+      extends DefaultSexpProtocol
+      with OptionAltFormat
+      with ScalariformFormat
       with CamelCaseToDashes
   import org.ensime.config.EnsimeConfigProtocol.Protocol._
 

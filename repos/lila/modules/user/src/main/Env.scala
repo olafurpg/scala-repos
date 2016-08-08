@@ -34,8 +34,8 @@ final class Env(config: Config,
 
   lazy val trophyApi = new TrophyApi(db(CollectionTrophy))
 
-  lazy val rankingApi = new RankingApi(
-      db(CollectionRanking), mongoCache, lightUser)
+  lazy val rankingApi =
+    new RankingApi(db(CollectionRanking), mongoCache, lightUser)
 
   lazy val jsonView = new JsonView(isOnline)
 

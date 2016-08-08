@@ -23,8 +23,8 @@ class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
       .doPostponedOperationsAndUnblockDocument(editor.getDocument)
     CodeStyleManager
       .getInstance(project)
-      .adjustLineIndent(
-          file, member.getModifierList.getTextRange.getStartOffset)
+      .adjustLineIndent(file,
+                        member.getModifierList.getTextRange.getStartOffset)
   }
 
   def getText: String =
@@ -34,7 +34,7 @@ class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
 
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     member.isValid && member.getContainingFile == file &&
-    member.getManager.isInProject(file)
+      member.getManager.isInProject(file)
 
   def startInWriteAction(): Boolean = true
 }

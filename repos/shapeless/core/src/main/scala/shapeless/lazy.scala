@@ -126,8 +126,8 @@ object Lazy {
   class Values[T <: HList](val values: T) extends Serializable
   object Values {
     implicit val hnilValues: Values[HNil] = new Values(HNil)
-    implicit def hconsValues[H, T <: HList](
-        implicit lh: Lazy[H], t: Values[T]): Values[H :: T] =
+    implicit def hconsValues[H, T <: HList](implicit lh: Lazy[H],
+                                            t: Values[T]): Values[H :: T] =
       new Values(lh.value :: t.values)
   }
 
@@ -193,7 +193,9 @@ trait OpenImplicitMacros {
 
 @macrocompat.bundle
 class LazyMacros(val c: whitebox.Context)
-    extends CaseClassMacros with OpenImplicitMacros with LowPriorityTypes {
+    extends CaseClassMacros
+    with OpenImplicitMacros
+    with LowPriorityTypes {
   import c.universe._
   import c.internal._
   import decorators._
@@ -201,14 +203,14 @@ class LazyMacros(val c: whitebox.Context)
   def mkLazyImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
         (tree,
-        actualType) => q"_root_.shapeless.Lazy.apply[$actualType]($tree)",
+         actualType) => q"_root_.shapeless.Lazy.apply[$actualType]($tree)",
         q"null.asInstanceOf[_root_.shapeless.Lazy[_root_.scala.Nothing]]"
     )
 
   def mkStrictImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
         (tree,
-        actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
+         actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
         q"null.asInstanceOf[_root_.shapeless.Strict[_root_.scala.Nothing]]"
     )
 
@@ -304,7 +306,7 @@ class LazyMacros(val c: whitebox.Context)
           if (tree.isEmpty) {
             tpe.typeSymbol.annotations
               .find(_.tree.tpe =:= typeOf[
-                      _root_.scala.annotation.implicitNotFound])
+                  _root_.scala.annotation.implicitNotFound])
               .foreach { infAnn =>
                 val global = c.universe.asInstanceOf[scala.tools.nsc.Global]
                 val analyzer: global.analyzer.type = global.analyzer
@@ -372,8 +374,10 @@ class LazyMacros(val c: whitebox.Context)
         val open0 = open match {
           case Nil => Nil
           case h :: t =>
-            h.copy(dependsOn = if (h.instTpe =:= tpe ||
-                                   h.dependsOn.exists(_ =:= tpe)) h.dependsOn
+            h.copy(
+                dependsOn =
+                  if (h.instTpe =:= tpe ||
+                      h.dependsOn.exists(_ =:= tpe)) h.dependsOn
                   else tpe :: h.dependsOn) :: t
         }
         copy(open = open0)
@@ -388,8 +392,9 @@ class LazyMacros(val c: whitebox.Context)
         (state0.copy(open = inst :: state0.open).update(inst), inst)
       }
 
-      def closeInst(
-          tpe: Type, tree: Tree, actualTpe: Type): (State, Instance) = {
+      def closeInst(tpe: Type,
+                    tree: Tree,
+                    actualTpe: Type): (State, Instance) = {
         assert(open.nonEmpty)
         assert(open.head.instTpe =:= tpe)
         val instance = open.head
@@ -407,8 +412,8 @@ class LazyMacros(val c: whitebox.Context)
 
       def dependsOn(tpe: Type): List[Instance] = {
         import scala.::
-        def helper(
-            tpes: List[List[Type]], acc: List[Instance]): List[Instance] =
+        def helper(tpes: List[List[Type]],
+                   acc: List[Instance]): List[Instance] =
           tpes match {
             case Nil => acc
             case Nil :: t =>
@@ -537,10 +542,10 @@ class LazyMacros(val c: whitebox.Context)
                                List(Ident(nme.SELECTOR_DUMMY))),
                          args) =>
               Apply(transform(qual), transformTrees(args))
-            case UnApply(Apply(TypeApply(
-                               Select(qual, nme.unapply | nme.unapplySeq), _),
-                               List(Ident(nme.SELECTOR_DUMMY))),
-                         args) =>
+            case UnApply(
+                Apply(TypeApply(Select(qual, nme.unapply | nme.unapplySeq), _),
+                      List(Ident(nme.SELECTOR_DUMMY))),
+                args) =>
               Apply(transform(qual), transformTrees(args))
             case t => t
           }

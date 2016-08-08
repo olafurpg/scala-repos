@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   * @since 29.09.2015.
   */
 class ScalaTypeOfVariableMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     if (params.length == 0) return null
     Option(params(0).calculateResult(context))
       .flatMap(MacroUtil.resultToScExpr(_, context))
@@ -19,8 +19,8 @@ class ScalaTypeOfVariableMacro extends Macro {
       .orNull
   }
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext) =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext) =
     calculateResult(params, context)
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =

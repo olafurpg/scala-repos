@@ -52,17 +52,17 @@ import org.apache.spark.streaming.scheduler.rate.RateEstimator
   *  starting point of the stream
   * @param messageHandler function for translating each message into the desired type
   */
-private[streaming] class DirectKafkaInputDStream[K : ClassTag,
-                                                 V : ClassTag,
+private[streaming] class DirectKafkaInputDStream[K: ClassTag,
+                                                 V: ClassTag,
                                                  U <: Decoder[K]: ClassTag,
                                                  T <: Decoder[V]: ClassTag,
-                                                 R : ClassTag](
+                                                 R: ClassTag](
     _ssc: StreamingContext,
     val kafkaParams: Map[String, String],
     val fromOffsets: Map[TopicAndPartition, Long],
     messageHandler: MessageAndMetadata[K, V] => R
-)
-    extends InputDStream[R](_ssc) with Logging {
+) extends InputDStream[R](_ssc)
+    with Logging {
   val maxRetries =
     context.sparkContext.getConf.getInt("spark.streaming.kafka.maxRetries", 1)
 
@@ -77,8 +77,10 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
     */
   override protected[streaming] val rateController: Option[RateController] = {
     if (RateController.isBackPressureEnabled(ssc.conf)) {
-      Some(new DirectKafkaRateController(
-              id, RateEstimator.create(ssc.conf, context.graph.batchDuration)))
+      Some(
+          new DirectKafkaRateController(
+              id,
+              RateEstimator.create(ssc.conf, context.graph.batchDuration)))
     } else {
       None
     }
@@ -108,9 +110,9 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
             case (tp, lag) =>
               val backpressureRate = Math.round(lag / totalLag.toFloat * rate)
               tp ->
-              (if (maxRateLimitPerPartition > 0) {
-                 Math.min(backpressureRate, maxRateLimitPerPartition)
-               } else backpressureRate)
+                (if (maxRateLimitPerPartition > 0) {
+                   Math.min(backpressureRate, maxRateLimitPerPartition)
+                 } else backpressureRate)
           }
         case None =>
           offsets.map { case (tp, offset) => tp -> maxRateLimitPerPartition }
@@ -119,8 +121,7 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
     if (effectiveRateLimitPerPartition.values.sum > 0) {
       val secsPerBatch =
         context.graph.batchDuration.milliseconds.toDouble / 1000
-      Some(
-          effectiveRateLimitPerPartition.map {
+      Some(effectiveRateLimitPerPartition.map {
         case (tp, limit) => tp -> (secsPerBatch * limit).toLong
       })
     } else {
@@ -183,7 +184,7 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
       offsetRange.fromOffset != offsetRange.untilOffset
     }.map { offsetRange =>
       s"topic: ${offsetRange.topic}\tpartition: ${offsetRange.partition}\t" +
-      s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
+        s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
     }.mkString("\n")
     // Copy offsetRanges to immutable.List to prevent from being modified by the user
     val metadata = Map("offsets" -> offsetRanges.toList,
@@ -202,8 +203,8 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
   private[streaming] class DirectKafkaInputDStreamCheckpointData
       extends DStreamCheckpointData(this) {
     def batchForTime: mutable.HashMap[Time, Array[(String, Int, Long, Long)]] = {
-      data.asInstanceOf[mutable.HashMap[
-              Time, Array[OffsetRange.OffsetRangeTuple]]]
+      data.asInstanceOf[
+          mutable.HashMap[Time, Array[OffsetRange.OffsetRangeTuple]]]
     }
 
     override def update(time: Time) {
@@ -242,8 +243,8 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
   /**
     * A RateController to retrieve the rate from RateEstimator.
     */
-  private[streaming] class DirectKafkaRateController(
-      id: Int, estimator: RateEstimator)
+  private[streaming] class DirectKafkaRateController(id: Int,
+                                                     estimator: RateEstimator)
       extends RateController(id, estimator) {
     override def publish(rate: Long): Unit = ()
   }

@@ -12,7 +12,8 @@ trait Broadcasted[+T, B] extends NumericOps[Broadcasted[T, B]] {
 }
 
 trait BroadcastedLike[T, B, Self <: Broadcasted[T, B]]
-    extends Broadcasted[T, B] with NumericOps[Self] {
+    extends Broadcasted[T, B]
+    with NumericOps[Self] {
   def map[U, Res](f: B => U)(
       implicit cmv: CanMapValues[Self, B, U, Res]): Res = {
     cmv(repr, f)

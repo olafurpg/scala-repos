@@ -27,7 +27,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class HashingTFSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -36,7 +37,8 @@ class HashingTFSuite
 
   test("hashingTF") {
     val df = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0, "a a b b c d".split(" ").toSeq)
           ))
       .toDF("id", "words")

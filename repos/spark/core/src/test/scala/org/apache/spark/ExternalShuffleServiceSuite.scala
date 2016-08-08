@@ -22,7 +22,10 @@ import org.scalatest.BeforeAndAfterAll
 import org.apache.spark.network.TransportContext
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.server.TransportServer
-import org.apache.spark.network.shuffle.{ExternalShuffleBlockHandler, ExternalShuffleClient}
+import org.apache.spark.network.shuffle.{
+  ExternalShuffleBlockHandler,
+  ExternalShuffleClient
+}
 
 /**
   * This suite creates an external shuffle server and routes all shuffle fetches through it.
@@ -78,8 +81,8 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
 
     // Invalidate the registered executors, disallowing access to their shuffle blocks (without
     // deleting the actual shuffle files, so we could access them without the shuffle service).
-    rpcHandler.applicationRemoved(
-        sc.conf.getAppId, false /* cleanupLocalDirs */ )
+    rpcHandler.applicationRemoved(sc.conf.getAppId,
+                                  false /* cleanupLocalDirs */ )
 
     // Now Spark will receive FetchFailed, and not retry the stage due to "spark.test.noStageRetry"
     // being set.

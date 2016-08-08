@@ -33,7 +33,8 @@ import scala.collection.Set
 @SerialVersionUID(1)
 trait CounterLike[
     K, V, +M <: scala.collection.mutable.Map[K, V], +This <: Counter[K, V]]
-    extends TensorLike[K, V, This] with Serializable {
+    extends TensorLike[K, V, This]
+    with Serializable {
   def data: M
   def default: V
 
@@ -87,15 +88,15 @@ trait Counter[K, V]
 object Counter extends CounterOps {
 
   /** Returns an empty counter. */
-  def apply[K, V : Zero](): Counter[K, V] =
+  def apply[K, V: Zero](): Counter[K, V] =
     new Impl(scala.collection.mutable.HashMap[K, V]())
 
   /** Returns a counter by summing all the given values. */
-  def apply[K, V : Zero : Semiring](values: (K, V)*): Counter[K, V] =
+  def apply[K, V: Zero: Semiring](values: (K, V)*): Counter[K, V] =
     apply(values)
 
   /** Returns a counter by summing all the given values. */
-  def apply[K, V : Zero : Semiring](
+  def apply[K, V: Zero: Semiring](
       values: TraversableOnce[(K, V)]): Counter[K, V] = {
     val rv = apply[K, V]()
     val field = implicitly[Semiring[V]]
@@ -119,8 +120,8 @@ object Counter extends CounterOps {
     def default = zero.zero
   }
 
-  implicit def canMapValues[K, V, RV : Zero]: CanMapValues[
-      Counter[K, V], V, RV, Counter[K, RV]] = {
+  implicit def canMapValues[K, V, RV: Zero]
+    : CanMapValues[Counter[K, V], V, RV, Counter[K, RV]] = {
     new CanMapValues[Counter[K, V], V, RV, Counter[K, RV]] {
       override def apply(from: Counter[K, V], fn: (V => RV)) = {
         val rv = Counter[K, RV]()
@@ -132,8 +133,8 @@ object Counter extends CounterOps {
     }
   }
 
-  implicit def canMapActiveValues[K, V, RV : Zero]: CanMapActiveValues[
-      Counter[K, V], V, RV, Counter[K, RV]] = {
+  implicit def canMapActiveValues[K, V, RV: Zero]
+    : CanMapActiveValues[Counter[K, V], V, RV, Counter[K, RV]] = {
     new CanMapActiveValues[Counter[K, V], V, RV, Counter[K, RV]] {
       override def apply(from: Counter[K, V], fn: (V => RV)) = {
         val rv = Counter[K, RV]()
@@ -160,13 +161,13 @@ object Counter extends CounterOps {
 
   implicit def scalarOf[K, V]: ScalarOf[Counter[K, V], V] = ScalarOf.dummy
 
-  implicit def canTraverseKeyValuePairs[K, V]: CanTraverseKeyValuePairs[
-      Counter[K, V], K, V] =
+  implicit def canTraverseKeyValuePairs[K, V]
+    : CanTraverseKeyValuePairs[Counter[K, V], K, V] =
     new CanTraverseKeyValuePairs[Counter[K, V], K, V] {
 
       /** Traverses all values from the given collection. */
-      override def traverse(
-          from: Counter[K, V], fn: KeyValuePairsVisitor[K, V]): Unit = {
+      override def traverse(from: Counter[K, V],
+                            fn: KeyValuePairsVisitor[K, V]): Unit = {
         for ((k, v) <- from.activeIterator) {
           fn.visit(k, v)
         }
@@ -175,8 +176,8 @@ object Counter extends CounterOps {
       override def isTraversableAgain(from: Counter[K, V]): Boolean = true
     }
 
-  implicit def normImplDouble[
-      K, V : Field]: norm.Impl2[Counter[K, V], Double, Double] =
+  implicit def normImplDouble[K, V: Field]
+    : norm.Impl2[Counter[K, V], Double, Double] =
     new norm.Impl2[Counter[K, V], Double, Double] {
       override def apply(ctr: Counter[K, V], p: Double): Double = {
         var result = 0.0
@@ -187,8 +188,8 @@ object Counter extends CounterOps {
       }
     }
 
-  implicit def canCreateZeros[K, V : Zero : Semiring]: CanCreateZeros[
-      Counter[K, V], K] = {
+  implicit def canCreateZeros[K, V: Zero: Semiring]
+    : CanCreateZeros[Counter[K, V], K] = {
     new CanCreateZeros[Counter[K, V], K] {
       // Shouldn't need to supply a key value here, but it really mixes up the
       // VectorSpace hierarchy since it would require separate types for
@@ -199,8 +200,8 @@ object Counter extends CounterOps {
     }
   }
 
-  implicit def canCreateZerosLike[K, V : Zero : Semiring]: CanCreateZerosLike[
-      Counter[K, V], Counter[K, V]] = {
+  implicit def canCreateZerosLike[K, V: Zero: Semiring]
+    : CanCreateZerosLike[Counter[K, V], Counter[K, V]] = {
     new CanCreateZerosLike[Counter[K, V], Counter[K, V]] {
       // Shouldn't need to supply a key value here, but it really mixes up the
       // VectorSpace hierarchy since it would require separate types for

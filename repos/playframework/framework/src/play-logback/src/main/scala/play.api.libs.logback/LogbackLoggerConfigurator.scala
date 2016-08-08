@@ -57,9 +57,11 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
     def resourceUrl =
       env
         .resource("logback.xml")
-        .orElse(env.resource(
+        .orElse(
+            env.resource(
                 if (env.mode == Mode.Dev)
-                  "logback-play-dev.xml" else "logback-play-default.xml"
+                  "logback-play-dev.xml"
+                else "logback-play-default.xml"
             ))
 
     val configUrl =

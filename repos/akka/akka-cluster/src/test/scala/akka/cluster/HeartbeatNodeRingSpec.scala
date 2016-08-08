@@ -33,8 +33,10 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
     }
 
     "pick specified number of nodes + unreachable as receivers" in {
-      val ring = HeartbeatNodeRing(
-          cc, nodes, unreachable = Set(aa, dd, ee), monitoredByNrOfMembers = 3)
+      val ring = HeartbeatNodeRing(cc,
+                                   nodes,
+                                   unreachable = Set(aa, dd, ee),
+                                   monitoredByNrOfMembers = 3)
       ring.myReceivers should ===(ring.receivers(cc))
 
       ring.receivers(aa) should ===(Set(bb, cc, dd, ff)) // unreachable ee skipped

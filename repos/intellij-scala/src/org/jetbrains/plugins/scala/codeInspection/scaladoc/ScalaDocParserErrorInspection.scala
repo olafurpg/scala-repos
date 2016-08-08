@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 class ScalaDocParserErrorInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
 
     new ScalaElementVisitor {
       override def visitDocComment(s: ScDocComment) {

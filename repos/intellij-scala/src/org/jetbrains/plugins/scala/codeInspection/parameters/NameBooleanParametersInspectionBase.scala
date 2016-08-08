@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala
 package codeInspection.parameters
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool,
+  ProblemHighlightType,
+  ProblemsHolder
+}
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions._
@@ -22,8 +26,8 @@ import scala.collection.Seq
 abstract class NameBooleanParametersInspectionBase
     extends LocalInspectionTool {
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitMethodCallExpression(mc: ScMethodCall) {
         if (mc == null || mc.args == null || mc.args.exprs.isEmpty) return
@@ -47,8 +51,8 @@ abstract class NameBooleanParametersInspectionBase
         }
       }
 
-      def isArgForBooleanParam(
-          expr: ScExpression, argList: ScArgumentExprList): Boolean = {
+      def isArgForBooleanParam(expr: ScExpression,
+                               argList: ScArgumentExprList): Boolean = {
         argList.parameterOf(expr).exists(isBooleanParam)
       }
 
@@ -64,8 +68,9 @@ abstract class NameBooleanParametersInspectionBase
         mc.getInvokedExpr match {
           case ref: ScReferenceExpression =>
             ref.bind().exists { srr =>
-              val targets = (Seq(srr.element) ++ srr.innerResolveResult.map(
-                      _.getElement)).filterBy(classOf[ScFunction])
+              val targets =
+                (Seq(srr.element) ++ srr.innerResolveResult.map(_.getElement))
+                  .filterBy(classOf[ScFunction])
               targets.exists(_.parameters.size == 1)
             }
           case _ => false

@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{AdamsMoultonIntegrator => ApacheAdamsMoultonIntegrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  AdamsMoultonIntegrator => ApacheAdamsMoultonIntegrator
+}
 
 class AdamsMoultonIntegrator(order: Int,
                              minStep: Double,

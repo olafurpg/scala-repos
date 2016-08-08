@@ -66,7 +66,8 @@ private[http] class Utf8Encoder extends PushStage[String, ByteString] {
   override def onUpstreamFinish(
       ctx: Context[ByteString]): TerminationDirective =
     if (inSurrogatePair)
-      ctx.fail(new IllegalArgumentException(
+      ctx.fail(
+          new IllegalArgumentException(
               "Truncated String input (ends in the middle of surrogate pair)"))
     else super.onUpstreamFinish(ctx)
 }

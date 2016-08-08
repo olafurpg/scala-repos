@@ -24,9 +24,10 @@ object MultipleInheritance extends AnnotatorPart[ScTemplateDefinition] {
       case (Some(psiClass), entries)
           if isMixable(psiClass) && entries.size > 1 =>
         entries.map(_._1).foreach { refElement =>
-          holder.createErrorAnnotation(refElement,
-                                       "%s %s inherited multiple times".format(
-                                           kindOf(psiClass), psiClass.name))
+          holder.createErrorAnnotation(
+              refElement,
+              "%s %s inherited multiple times".format(kindOf(psiClass),
+                                                      psiClass.name))
         }
       case _ =>
     }

@@ -66,8 +66,9 @@ trait Versions {
     }
   }
 
-  protected case class Entity(
-      url: String, minVersion: Version, hardcodedVersions: Seq[String]) {
+  protected case class Entity(url: String,
+                              minVersion: Version,
+                              hardcodedVersions: Seq[String]) {
     def defaultVersion: String = hardcodedVersions.last
   }
 }

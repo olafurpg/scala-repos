@@ -16,7 +16,11 @@ import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.marathon.{UnknownGroupException, ConflictingChangeException, MarathonConf}
+import mesosphere.marathon.{
+  UnknownGroupException,
+  ConflictingChangeException,
+  MarathonConf
+}
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -208,7 +212,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
                     "steps" -> DeploymentPlan(originalGroup, updatedGroup).steps
                 )
                 .toString()
-            )
+          )
         } else {
           val (deployment, _) =
             updateOrCreate(id.toRootPath, groupUpdate, force)
@@ -266,10 +270,10 @@ class GroupsResource @Inject()(groupManager: GroupManager,
       deploymentResult(deployment)
   }
 
-  private def applyGroupUpdate(group: Group,
-                               groupUpdate: GroupUpdate,
-                               newVersion: Timestamp)(
-      implicit identity: Identity) = {
+  private def applyGroupUpdate(
+      group: Group,
+      groupUpdate: GroupUpdate,
+      newVersion: Timestamp)(implicit identity: Identity) = {
     def versionChange = groupUpdate.version.map { targetVersion =>
       checkAuthorization(UpdateGroup, group)
       val versionedGroup = result(groupManager.group(group.id, targetVersion))
@@ -305,9 +309,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
     versionChange orElse scaleChange getOrElse createOrUpdateChange
   }
 
-  private def updateOrCreate(id: PathId,
-                             update: GroupUpdate,
-                             force: Boolean)(
+  private def updateOrCreate(id: PathId, update: GroupUpdate, force: Boolean)(
       implicit identity: Identity): (DeploymentPlan, PathId) = {
     val version = Timestamp.now()
 

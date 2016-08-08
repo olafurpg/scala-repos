@@ -18,7 +18,9 @@ import org.specs2.ScalaCheck
 import org.scalacheck.{Arbitrary, Gen}
 
 object BodyParserSpec
-    extends PlaySpecification with ExecutionSpecification with ScalaCheck {
+    extends PlaySpecification
+    with ExecutionSpecification
+    with ScalaCheck {
 
   def run[A](bodyParser: BodyParser[A]) = {
     import scala.concurrent.ExecutionContext.Implicits.global

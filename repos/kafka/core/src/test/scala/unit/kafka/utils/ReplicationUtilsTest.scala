@@ -53,7 +53,8 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
           "isr" -> List(1, 2)))
 
   val topicDataLeaderIsrAndControllerEpoch = LeaderIsrAndControllerEpoch(
-      LeaderAndIsr(1, leaderEpoch, List(1, 2), 0), controllerEpoch)
+      LeaderAndIsr(1, leaderEpoch, List(1, 2), 0),
+      controllerEpoch)
 
   @Before
   override def setUp() {
@@ -104,8 +105,8 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
     assertEquals(newZkVersion1, 1)
 
     // mismatched zkVersion with the same data
-    val newLeaderAndIsr2 = new LeaderAndIsr(
-        brokerId, leaderEpoch, replicas, zkVersion + 1)
+    val newLeaderAndIsr2 =
+      new LeaderAndIsr(brokerId, leaderEpoch, replicas, zkVersion + 1)
     val (updateSucceeded2, newZkVersion2) =
       ReplicationUtils.updateLeaderAndIsr(zkUtils,
                                           "my-topic-test",
@@ -118,8 +119,8 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
     assertEquals(newZkVersion2, 1)
 
     // mismatched zkVersion and leaderEpoch
-    val newLeaderAndIsr3 = new LeaderAndIsr(
-        brokerId, leaderEpoch + 1, replicas, zkVersion + 1)
+    val newLeaderAndIsr3 =
+      new LeaderAndIsr(brokerId, leaderEpoch + 1, replicas, zkVersion + 1)
     val (updateSucceeded3, newZkVersion3) =
       ReplicationUtils.updateLeaderAndIsr(zkUtils,
                                           "my-topic-test",
@@ -134,12 +135,13 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
   @Test
   def testGetLeaderIsrAndEpochForPartition() {
     val leaderIsrAndControllerEpoch =
-      ReplicationUtils.getLeaderIsrAndEpochForPartition(
-          zkUtils, topic, partitionId)
+      ReplicationUtils
+        .getLeaderIsrAndEpochForPartition(zkUtils, topic, partitionId)
+    assertEquals(topicDataLeaderIsrAndControllerEpoch,
+                 leaderIsrAndControllerEpoch.get)
     assertEquals(
-        topicDataLeaderIsrAndControllerEpoch, leaderIsrAndControllerEpoch.get)
-    assertEquals(None,
-                 ReplicationUtils.getLeaderIsrAndEpochForPartition(
-                     zkUtils, topic, partitionId + 1))
+        None,
+        ReplicationUtils
+          .getLeaderIsrAndEpochForPartition(zkUtils, topic, partitionId + 1))
   }
 }

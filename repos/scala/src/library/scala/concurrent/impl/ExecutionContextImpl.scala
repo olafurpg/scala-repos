@@ -8,14 +8,30 @@
 
 package scala.concurrent.impl
 
-import java.util.concurrent.{ForkJoinPool, ForkJoinWorkerThread, ForkJoinTask, Callable, Executor, ExecutorService, ThreadFactory, TimeUnit}
+import java.util.concurrent.{
+  ForkJoinPool,
+  ForkJoinWorkerThread,
+  ForkJoinTask,
+  Callable,
+  Executor,
+  ExecutorService,
+  ThreadFactory,
+  TimeUnit
+}
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.Collection
-import scala.concurrent.{BlockContext, ExecutionContext, CanAwait, ExecutionContextExecutor, ExecutionContextExecutorService}
+import scala.concurrent.{
+  BlockContext,
+  ExecutionContext,
+  CanAwait,
+  ExecutionContextExecutor,
+  ExecutionContextExecutorService
+}
 import scala.annotation.tailrec
 
-private[scala] class ExecutionContextImpl private[impl](
-    val executor: Executor, val reporter: Throwable => Unit)
+private[scala] class ExecutionContextImpl private[impl] (
+    val executor: Executor,
+    val reporter: Throwable => Unit)
     extends ExecutionContextExecutor {
   require(executor ne null, "Executor must not be null")
   override def execute(runnable: Runnable) = executor execute runnable
@@ -29,7 +45,8 @@ private[concurrent] object ExecutionContextImpl {
                                    maxThreads: Int,
                                    prefix: String,
                                    uncaught: Thread.UncaughtExceptionHandler)
-      extends ThreadFactory with ForkJoinPool.ForkJoinWorkerThreadFactory {
+      extends ThreadFactory
+      with ForkJoinPool.ForkJoinWorkerThreadFactory {
 
     require(prefix ne null, "DefaultThreadFactory.prefix must be non null")
     require(maxThreads > 0,
@@ -42,7 +59,7 @@ private[concurrent] object ExecutionContextImpl {
         case `maxThreads` | Int.`MaxValue` => false
         case other =>
           currentNumberOfThreads.compareAndSet(other, other + 1) ||
-          reserveThread()
+            reserveThread()
       }
 
     @tailrec private final def deregisterThread(): Boolean =
@@ -50,7 +67,7 @@ private[concurrent] object ExecutionContextImpl {
         case 0 => false
         case other =>
           currentNumberOfThreads.compareAndSet(other, other - 1) ||
-          deregisterThread()
+            deregisterThread()
       }
 
     def wire[T <: Thread](thread: T): T = {
@@ -63,11 +80,13 @@ private[concurrent] object ExecutionContextImpl {
     // As per ThreadFactory contract newThread should return `null` if cannot create new thread.
     def newThread(runnable: Runnable): Thread =
       if (reserveThread())
-        wire(
-            new Thread(new Runnable {
+        wire(new Thread(new Runnable {
           // We have to decrement the current thread count when the thread exits
-          override def run() = try runnable.run() finally deregisterThread()
-        })) else null
+          override def run() =
+            try runnable.run()
+            finally deregisterThread()
+        }))
+      else null
 
     def newThread(fjp: ForkJoinPool): ForkJoinWorkerThread =
       if (reserveThread()) {
@@ -102,11 +121,14 @@ private[concurrent] object ExecutionContextImpl {
   def createDefaultExecutorService(
       reporter: Throwable => Unit): ExecutorService = {
     def getInt(name: String, default: String) =
-      (try System.getProperty(name, default) catch {
+      (try System.getProperty(name, default)
+      catch {
         case e: SecurityException => default
       }) match {
         case s if s.charAt(0) == 'x' =>
-          (Runtime.getRuntime.availableProcessors * s.substring(1).toDouble).ceil.toInt
+          (Runtime.getRuntime.availableProcessors * s
+            .substring(1)
+            .toDouble).ceil.toInt
         case other => other.toInt
       }
 
@@ -124,13 +146,14 @@ private[concurrent] object ExecutionContextImpl {
         maxNoOfThreads)
 
     // The thread factory must provide additional threads to support managed blocking.
-    val maxExtraThreads = getInt(
-        "scala.concurrent.context.maxExtraThreads", "256")
+    val maxExtraThreads =
+      getInt("scala.concurrent.context.maxExtraThreads", "256")
 
     val uncaughtExceptionHandler: Thread.UncaughtExceptionHandler =
       new Thread.UncaughtExceptionHandler {
-        override def uncaughtException(
-            thread: Thread, cause: Throwable): Unit = reporter(cause)
+        override def uncaughtException(thread: Thread,
+                                       cause: Throwable): Unit =
+          reporter(cause)
       }
 
     val threadFactory = new ExecutionContextImpl.DefaultThreadFactory(
@@ -139,8 +162,10 @@ private[concurrent] object ExecutionContextImpl {
         prefix = "scala-execution-context-global",
         uncaught = uncaughtExceptionHandler)
 
-    new ForkJoinPool(
-        desiredParallelism, threadFactory, uncaughtExceptionHandler, true) {
+    new ForkJoinPool(desiredParallelism,
+                     threadFactory,
+                     uncaughtExceptionHandler,
+                     true) {
       override def execute(runnable: Runnable): Unit = {
         val fjt: ForkJoinTask[_] = runnable match {
           case t: ForkJoinTask[_] => t
@@ -169,20 +194,20 @@ private[concurrent] object ExecutionContextImpl {
     }
   }
 
-  def fromExecutor(
-      e: Executor,
-      reporter: Throwable => Unit = ExecutionContext.defaultReporter)
-    : ExecutionContextImpl =
+  def fromExecutor(e: Executor,
+                   reporter: Throwable => Unit =
+                     ExecutionContext.defaultReporter): ExecutionContextImpl =
     new ExecutionContextImpl(
-        Option(e).getOrElse(createDefaultExecutorService(reporter)), reporter)
+        Option(e).getOrElse(createDefaultExecutorService(reporter)),
+        reporter)
 
-  def fromExecutorService(
-      es: ExecutorService,
-      reporter: Throwable => Unit = ExecutionContext.defaultReporter)
+  def fromExecutorService(es: ExecutorService,
+                          reporter: Throwable => Unit =
+                            ExecutionContext.defaultReporter)
     : ExecutionContextImpl with ExecutionContextExecutorService = {
     new ExecutionContextImpl(
-        Option(es).getOrElse(createDefaultExecutorService(reporter)), reporter)
-    with ExecutionContextExecutorService {
+        Option(es).getOrElse(createDefaultExecutorService(reporter)),
+        reporter) with ExecutionContextExecutorService {
       final def asExecutorService: ExecutorService =
         executor.asInstanceOf[ExecutorService]
       override def execute(command: Runnable) = executor.execute(command)

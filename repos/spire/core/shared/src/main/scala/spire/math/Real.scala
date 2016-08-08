@@ -486,8 +486,9 @@ object Real extends RealInstances {
     }
   }
 
-  private[spire] def powerSeries(
-      ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+  private[spire] def powerSeries(ps: Stream[Rational],
+                                 terms: Int => Int,
+                                 x: Real): Real = {
     Real({ p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
@@ -522,12 +523,14 @@ object Real extends RealInstances {
   }
 
   def sinDr(x: Real): Real =
-    x * powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))), n => n, x * x)
+    x * powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))),
+                    n => n,
+                    x * x)
 
   def cosDr(x: Real): Real =
-    powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n => n, x * x)
+    powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))),
+                n => n,
+                x * x)
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)
@@ -566,8 +569,10 @@ trait RealInstances {
 class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional
-    extends Fractional[Real] with Order[Real]
-    with Signed[Real] with Trig[Real] {
+    extends Fractional[Real]
+    with Order[Real]
+    with Signed[Real]
+    with Trig[Real] {
   def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 

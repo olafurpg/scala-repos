@@ -3,7 +3,12 @@ package org.jetbrains.plugins.scala.codeInsight.intention.types
 import com.intellij.codeInsight.completion.{InsertHandler, InsertionContext}
 import com.intellij.codeInsight.lookup._
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
-import com.intellij.codeInsight.template.{Expression, ExpressionContext, Result, TextResult}
+import com.intellij.codeInsight.template.{
+  Expression,
+  ExpressionContext,
+  Result,
+  TextResult
+}
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import org.jetbrains.plugins.scala.lang.psi.types.ScTypeText
 
@@ -23,8 +28,8 @@ abstract class ChooseValueExpression[T](lookupItems: Seq[T], defaultItem: T)
       LookupElementBuilder
         .create(elem, lookupString(elem))
         .withInsertHandler(new InsertHandler[LookupElement] {
-          override def handleInsert(
-              context: InsertionContext, item: LookupElement): Unit = {
+          override def handleInsert(context: InsertionContext,
+                                    item: LookupElement): Unit = {
             val topLevelEditor =
               InjectedLanguageUtil.getTopLevelEditor(context.getEditor)
             val templateState =
@@ -34,8 +39,9 @@ abstract class ChooseValueExpression[T](lookupItems: Seq[T], defaultItem: T)
               if (range != null) {
                 //need to insert with FQNs
                 val newText = result(item.getObject.asInstanceOf[T])
-                topLevelEditor.getDocument.replaceString(
-                    range.getStartOffset, range.getEndOffset, newText)
+                topLevelEditor.getDocument.replaceString(range.getStartOffset,
+                                                         range.getEndOffset,
+                                                         newText)
               }
             }
           }
@@ -54,8 +60,8 @@ abstract class ChooseValueExpression[T](lookupItems: Seq[T], defaultItem: T)
     calculateResult(context)
 }
 
-class ChooseTypeTextExpression(
-    lookupItems: Seq[ScTypeText], default: ScTypeText)
+class ChooseTypeTextExpression(lookupItems: Seq[ScTypeText],
+                               default: ScTypeText)
     extends ChooseValueExpression[ScTypeText](lookupItems, default) {
   def this(lookupItems: Seq[ScTypeText]) {
     this(lookupItems, lookupItems.head)

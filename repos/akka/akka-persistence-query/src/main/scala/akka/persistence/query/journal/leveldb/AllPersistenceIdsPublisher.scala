@@ -20,8 +20,10 @@ private[akka] object AllPersistenceIdsPublisher {
   def props(liveQuery: Boolean,
             maxBufSize: Int,
             writeJournalPluginId: String): Props =
-    Props(new AllPersistenceIdsPublisher(
-            liveQuery, maxBufSize, writeJournalPluginId))
+    Props(
+        new AllPersistenceIdsPublisher(liveQuery,
+                                       maxBufSize,
+                                       writeJournalPluginId))
 
   private case object Continue
 }
@@ -29,9 +31,11 @@ private[akka] object AllPersistenceIdsPublisher {
 /**
   * INTERNAL API
   */
-private[akka] class AllPersistenceIdsPublisher(
-    liveQuery: Boolean, maxBufSize: Int, writeJournalPluginId: String)
-    extends ActorPublisher[String] with DeliveryBuffer[String]
+private[akka] class AllPersistenceIdsPublisher(liveQuery: Boolean,
+                                               maxBufSize: Int,
+                                               writeJournalPluginId: String)
+    extends ActorPublisher[String]
+    with DeliveryBuffer[String]
     with ActorLogging {
 
   val journal: ActorRef =

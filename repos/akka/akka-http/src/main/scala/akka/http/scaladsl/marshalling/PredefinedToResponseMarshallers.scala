@@ -31,7 +31,8 @@ trait PredefinedToResponseMarshallers
     }
 
   implicit def fromStatusCodeAndValue[S, T](
-      implicit sConv: S ⇒ StatusCode, mt: ToEntityMarshaller[T]): TRM[(S, T)] =
+      implicit sConv: S ⇒ StatusCode,
+      mt: ToEntityMarshaller[T]): TRM[(S, T)] =
     fromStatusCodeAndHeadersAndValue[T] compose {
       case (status, value) ⇒ (sConv(status), Nil, value)
     }
@@ -46,11 +47,9 @@ trait PredefinedToResponseMarshallers
   implicit def fromStatusCodeAndHeadersAndValue[T](
       implicit mt: ToEntityMarshaller[T])
     : TRM[(StatusCode, immutable.Seq[HttpHeader], T)] =
-    Marshaller(
-        implicit ec ⇒
-          {
-        case (status, headers, value) ⇒
-          mt(value).fast map (_ map (_ map (HttpResponse(status, headers, _))))
+    Marshaller(implicit ec ⇒ {
+      case (status, headers, value) ⇒
+        mt(value).fast map (_ map (_ map (HttpResponse(status, headers, _))))
     })
 }
 

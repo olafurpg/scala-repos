@@ -76,7 +76,7 @@ object CalculatorApi extends XmlApiHelper {
 <pre name="code" class="xml">
 &lt;api operation="sum" success="true">&lt;result>15&lt;/result>&lt;/api>
 </pre>
-  * 
+  *
   */
 trait XMLApiHelper {
 
@@ -141,11 +141,12 @@ trait XMLApiHelper {
     * the root element based on the second element of the request path.
     */
   protected def operation: Option[NodeSeq] =
-    (for (req <- S.request) yield
-      req.path.partPath match {
-        case _ :: name :: _ => name
-        case _ => ""
-      }).map(Text(_))
+    (for (req <- S.request)
+      yield
+        req.path.partPath match {
+          case _ :: name :: _ => name
+          case _ => ""
+        }).map(Text(_))
 
   /**
     * The method that wraps the outer-most tag around the body. The success,
@@ -172,10 +173,11 @@ trait XMLApiHelper {
     * Build the Response based on Success, an optional message
     * and the body
     */
-  protected def buildResponse(
-      success: Boolean, msg: Box[NodeSeq], body: NodeSeq): LiftResponse =
+  protected def buildResponse(success: Boolean,
+                              msg: Box[NodeSeq],
+                              body: NodeSeq): LiftResponse =
     XmlResponse(
         createTag(body) % (successAttrName -> success) %
-        (new UnprefixedAttribute(operationAttrName, operation, Null)) %
-        (new UnprefixedAttribute(msgAttrName, msg, Null)))
+          (new UnprefixedAttribute(operationAttrName, operation, Null)) %
+          (new UnprefixedAttribute(msgAttrName, msg, Null)))
 }

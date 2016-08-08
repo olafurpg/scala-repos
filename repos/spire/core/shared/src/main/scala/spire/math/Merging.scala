@@ -6,7 +6,7 @@ import spire.algebra.Order
   *  Interface for a merging strategy object.
   */
 trait Merge extends Any {
-  def merge[@sp A : Order : ClassTag](a: Array[A], b: Array[A]): Array[A]
+  def merge[@sp A: Order: ClassTag](a: Array[A], b: Array[A]): Array[A]
 }
 
 /**
@@ -93,7 +93,7 @@ abstract class BinaryMerge {
   */
 object BinaryMerge extends Merge {
 
-  def merge[@sp T : Order : ClassTag](a: Array[T], b: Array[T]): Array[T] = {
+  def merge[@sp T: Order: ClassTag](a: Array[T], b: Array[T]): Array[T] = {
     new ArrayBinaryMerge(a, b).result
   }
 
@@ -109,7 +109,8 @@ object BinaryMerge extends Merge {
   }*/
 
   private class ArrayBinaryMerge[@specialized T](a: Array[T], b: Array[T])(
-      implicit o: Order[T], c: ClassTag[T])
+      implicit o: Order[T],
+      c: ClassTag[T])
       extends BinaryMerge {
 
     def compare(ai: Int, bi: Int): Int = o.compare(a(ai), b(bi))
@@ -144,7 +145,7 @@ object BinaryMerge extends Merge {
   */
 object LinearMerge extends Merge {
 
-  def merge[@sp T : Order : ClassTag](a: Array[T], b: Array[T]): Array[T] = {
+  def merge[@sp T: Order: ClassTag](a: Array[T], b: Array[T]): Array[T] = {
     val o = implicitly[Order[T]]
     val r = Array.ofDim[T](a.length + b.length)
     var ri = 0

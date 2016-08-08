@@ -48,8 +48,8 @@ object BroadcastTest {
       // Collect the small RDD so we can print the observed sizes locally.
       observedSizes.collect().foreach(i => println(i))
       println(
-          "Iteration %d took %.0f milliseconds".format(
-              i, (System.nanoTime - startTime) / 1E6))
+          "Iteration %d took %.0f milliseconds"
+            .format(i, (System.nanoTime - startTime) / 1E6))
     }
 
     sc.stop()

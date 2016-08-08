@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef
 
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScObject, ScClass}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition,
+  ScObject,
+  ScClass
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScClassParameterImpl
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext

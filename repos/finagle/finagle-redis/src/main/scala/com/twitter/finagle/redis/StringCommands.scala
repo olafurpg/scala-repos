@@ -206,8 +206,9 @@ trait Strings { self: BaseClient =>
     * @param key, millis
     * @see http://redis.io/commands/psetex
     */
-  def pSetEx(
-      key: ChannelBuffer, millis: Long, value: ChannelBuffer): Future[Unit] =
+  def pSetEx(key: ChannelBuffer,
+             millis: Long,
+             value: ChannelBuffer): Future[Unit] =
     doRequest(PSetEx(key, millis, value)) {
       case StatusReply(message) => Future.Unit
     }
@@ -242,8 +243,9 @@ trait Strings { self: BaseClient =>
     * @param key, seconds, value
     * @see http://redis.io/commands/setex
     */
-  def setEx(
-      key: ChannelBuffer, seconds: Long, value: ChannelBuffer): Future[Unit] =
+  def setEx(key: ChannelBuffer,
+            seconds: Long,
+            value: ChannelBuffer): Future[Unit] =
     doRequest(SetEx(key, seconds, value)) {
       case StatusReply(message) => Future.Unit
     }
@@ -299,8 +301,9 @@ trait Strings { self: BaseClient =>
     * @param key, millis, value
     * @see http://redis.io.commands/set
     */
-  def setPx(
-      key: ChannelBuffer, millis: Long, value: ChannelBuffer): Future[Unit] =
+  def setPx(key: ChannelBuffer,
+            millis: Long,
+            value: ChannelBuffer): Future[Unit] =
     doRequest(Set(key, value, Some(InMilliseconds(millis)))) {
       case StatusReply(_) => Future.Unit
     }
@@ -358,8 +361,9 @@ trait Strings { self: BaseClient =>
     * @return the length of the string after it was modified.
     * @see http://redis.io/commands/setrange
     */
-  def setRange(
-      key: ChannelBuffer, offset: Int, value: ChannelBuffer): Future[JLong] =
+  def setRange(key: ChannelBuffer,
+               offset: Int,
+               value: ChannelBuffer): Future[JLong] =
     doRequest(SetRange(key, offset, value)) {
       case IntegerReply(n) => Future.value(n)
     }

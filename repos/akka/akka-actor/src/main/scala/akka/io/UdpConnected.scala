@@ -24,7 +24,8 @@ import akka.actor._
   * The Java API for generating UDP commands is available at [[UdpConnectedMessage]].
   */
 object UdpConnected
-    extends ExtensionId[UdpConnectedExt] with ExtensionIdProvider {
+    extends ExtensionId[UdpConnectedExt]
+    with ExtensionIdProvider {
 
   override def lookup = UdpConnected
 
@@ -71,8 +72,8 @@ object UdpConnected
     * has been successfully enqueued to the O/S kernel.
     */
   final case class Send(payload: ByteString, ack: Any) extends Command {
-    require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+    require(ack != null,
+            "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }
@@ -152,9 +153,10 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
       system.settings.config.getConfig("akka.io.udp-connected"))
 
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[UdpConnectedManager], this)
-                             .withDeploy(Deploy.local),
-                         name = "IO-UDP-CONN")
+    system.systemActorOf(
+        props =
+          Props(classOf[UdpConnectedManager], this).withDeploy(Deploy.local),
+        name = "IO-UDP-CONN")
   }
 
   /**
@@ -163,7 +165,8 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
   def getManager: ActorRef = manager
 
   val bufferPool: BufferPool = new DirectByteBufferPool(
-      settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
+      settings.DirectBufferSize,
+      settings.MaxDirectBufferPoolSize)
 }
 
 /**

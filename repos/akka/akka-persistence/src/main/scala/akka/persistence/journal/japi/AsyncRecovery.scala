@@ -30,8 +30,8 @@ abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin {
                             def accept(p: PersistentRepr) = replayCallback(p)
                           }).map(Unit.unbox)
 
-  final def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] =
+  final def asyncReadHighestSequenceNr(persistenceId: String,
+                                       fromSequenceNr: Long): Future[Long] =
     doAsyncReadHighestSequenceNr(persistenceId, fromSequenceNr: Long)
       .map(_.longValue)
 }

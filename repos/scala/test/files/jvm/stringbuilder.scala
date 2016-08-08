@@ -54,8 +54,9 @@ object Test2 {
     val j1 = new java.lang.StringBuilder
     val s1 = new StringBuilder
     j1 append "###" append Array('0', '1', '2') append "xyz".subSequence(0, 3)
-    s1 append "###" appendAll Array('0', '1', '2') appendAll List(
-        'x', 'y', 'z')
+    s1 append "###" appendAll Array('0', '1', '2') appendAll List('x',
+                                                                  'y',
+                                                                  'z')
     println(
         "s1.toString equals j1.toString = " + (s1.toString equals j1.toString))
   }
@@ -66,9 +67,9 @@ object Test3 {
     val j0 = new java.lang.StringBuilder("abc")
     val s0 = new StringBuilder("abc")
     j0 insert (0, true) insert (0, 1.toByte) insert (0, 'a') insert
-    (0, 88.toShort) insert (0, 9) insert (0, -1L)
+      (0, 88.toShort) insert (0, 9) insert (0, -1L)
     s0 insert (0, true) insert (0, 1.toByte) insert (0, 'a') insert
-    (0, 88.toShort) insert (0, 9) insert (0, -1L)
+      (0, 88.toShort) insert (0, 9) insert (0, -1L)
     println("j0=" + j0 + ", s0=" + s0)
     println(
         "s0.toString equals j0.toString = " + (s0.toString equals j0.toString))
@@ -76,9 +77,9 @@ object Test3 {
     val j1 = new java.lang.StringBuilder
     val s1 = new StringBuilder
     j1 insert (0, "###") insert (0, Array('0', '1', '2')) insert
-    (0, "xyz".subSequence(0, 3))
+      (0, "xyz".subSequence(0, 3))
     s1 insert (0, "###") insertAll (0, Array('0', '1', '2')) insertAll
-    (0, List('x', 'y', 'z'))
+      (0, List('x', 'y', 'z'))
     println("j1=" + j1 + ", s1=" + s1)
     println(
         "s1.toString equals j1.toString = " + (s1.toString equals j1.toString))

@@ -18,7 +18,8 @@ object NodeUpMultiJvmSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
@@ -26,7 +27,8 @@ class NodeUpMultiJvmNode1 extends NodeUpSpec
 class NodeUpMultiJvmNode2 extends NodeUpSpec
 
 abstract class NodeUpSpec
-    extends MultiNodeSpec(NodeUpMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(NodeUpMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import NodeUpMultiJvmSpec._
   import ClusterEvent._

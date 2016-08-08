@@ -22,8 +22,7 @@ object ScalaCsrf extends PlaySpecification {
   class CSRFController(addToken: CSRFAddToken, checkToken: CSRFCheck)
       extends Controller {
     def getToken =
-      addToken(
-          Action { implicit request =>
+      addToken(Action { implicit request =>
         val Token(name, value) = CSRF.getToken.get
         Ok(s"$name=$value")
       })
@@ -54,8 +53,7 @@ object ScalaCsrf extends PlaySpecification {
 
     "allow getting the token" in new WithApplication() {
       val originalToken = Crypto.generateSignedToken
-      val addAndGetToken = addToken(
-          Action { implicit request =>
+      val addAndGetToken = addToken(Action { implicit request =>
         //#get-token
         val token: Option[CSRF.Token] = CSRF.getToken
         //#get-token
@@ -107,9 +105,8 @@ object ScalaCsrf extends PlaySpecification {
       //#csrf-check
 
       await(save(FakeRequest("POST", "/")
-                .withCookies(Cookie("foo", "bar"))
-                .withHeaders(
-                    CONTENT_TYPE -> "application/x-www-form-urlencoded"))).header.status must_== FORBIDDEN
+        .withCookies(Cookie("foo", "bar"))
+        .withHeaders(CONTENT_TYPE -> "application/x-www-form-urlencoded"))).header.status must_== FORBIDDEN
     }
 
     "allow per action token handling" in new WithApplication() {
@@ -170,9 +167,8 @@ object ScalaCsrf extends PlaySpecification {
       //#csrf-actions
 
       await(save(FakeRequest("POST", "/")
-                .withCookies(Cookie("foo", "bar"))
-                .withHeaders(
-                    CONTENT_TYPE -> "application/x-www-form-urlencoded"))).header.status must_== FORBIDDEN
+        .withCookies(Cookie("foo", "bar"))
+        .withHeaders(CONTENT_TYPE -> "application/x-www-form-urlencoded"))).header.status must_== FORBIDDEN
       val body =
         await(form(FakeRequest("GET", "/")).flatMap(_.body.consumeData))
       Crypto.extractSignedToken(body.utf8String) must beSome

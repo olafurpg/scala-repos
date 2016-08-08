@@ -18,7 +18,9 @@ object TypedMultiMapSpec {
 }
 
 class TypedMultiMapSpec
-    extends WordSpec with Matchers with ConversionCheckedTripleEquals {
+    extends WordSpec
+    with Matchers
+    with ConversionCheckedTripleEquals {
   import TypedMultiMapSpec._
 
   "A TypedMultiMap" must {

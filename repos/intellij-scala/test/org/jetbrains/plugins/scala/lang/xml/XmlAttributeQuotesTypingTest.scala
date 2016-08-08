@@ -20,7 +20,7 @@ class XmlAttributeQuotesTypingTest
   def testQuotesAfterSecondAttribute() {
     val text =
       "class A { val xml = <aaa attr1=\"blahlbha\" attr2" + CARET_MARKER +
-      "\n}"
+        "\n}"
     val assumedStub =
       "class A { val xml = <aaa attr1=\"blahlbha\" attr2=\"\"\n}"
 

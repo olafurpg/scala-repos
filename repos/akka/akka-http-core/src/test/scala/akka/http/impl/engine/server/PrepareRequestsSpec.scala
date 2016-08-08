@@ -4,7 +4,12 @@
 package akka.http.impl.engine.server
 
 import akka.http.impl.engine.parsing.ParserOutput
-import akka.http.impl.engine.parsing.ParserOutput.{StrictEntityCreator, EntityStreamError, EntityChunk, StreamedEntityCreator}
+import akka.http.impl.engine.parsing.ParserOutput.{
+  StrictEntityCreator,
+  EntityStreamError,
+  EntityChunk,
+  StreamedEntityCreator
+}
 import akka.http.impl.engine.server.HttpServerBluePrint.PrepareRequests
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ServerSettings
@@ -43,8 +48,9 @@ class PrepareRequestsSpec extends AkkaSpec {
       Uri("http://example.com/"),
       HttpProtocols.`HTTP/1.1`,
       List(),
-      StrictEntityCreator(HttpEntity.Strict(
-              ContentTypes.`application/octet-stream`, ByteString("body"))),
+      StrictEntityCreator(
+          HttpEntity.Strict(ContentTypes.`application/octet-stream`,
+                            ByteString("body"))),
       true,
       false)
 
@@ -97,7 +103,7 @@ class PrepareRequestsSpec extends AkkaSpec {
       upstreamProbe.expectNoMsg(100.millis)
 
       inSub.sendNext(ParserOutput.EntityChunk(
-              HttpEntity.ChunkStreamPart(ByteString("abc"))))
+          HttpEntity.ChunkStreamPart(ByteString("abc"))))
       entityProbe.expectNext()
       entitySub.request(1)
       inSub.sendNext(ParserOutput.MessageEnd)

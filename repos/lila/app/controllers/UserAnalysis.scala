@@ -41,8 +41,11 @@ object UserAnalysis extends LilaController with TheftPrevention {
       } | SituationPlus(Situation(variant), 1)
     val pov = makePov(situation)
     val orientation = get("color").flatMap(chess.Color.apply) | pov.color
-    Env.api.roundApi.userAnalysisJson(
-        pov, ctx.pref, decodedFen, orientation, owner = false) map { data =>
+    Env.api.roundApi.userAnalysisJson(pov,
+                                      ctx.pref,
+                                      decodedFen,
+                                      orientation,
+                                      owner = false) map { data =>
       Ok(html.board.userAnalysis(data, pov))
     }
   }
@@ -85,20 +88,17 @@ object UserAnalysis extends LilaController with TheftPrevention {
           data =>
             Env.importer.importer
               .inMemory(data)
-              .fold(err => BadRequest(jsonError(err.shows)).fuccess,
-                    game =>
-                      {
-                        val pov = Pov(game, chess.Color(true))
-                        Env.api.roundApi.userAnalysisJson(pov,
-                                                          ctx.pref,
-                                                          initialFen = none,
-                                                          pov.color,
-                                                          owner = false) map {
-                          data =>
-                            Ok(data)
-                        }
-                    })
-        )
+              .fold(err => BadRequest(jsonError(err.shows)).fuccess, game => {
+                val pov = Pov(game, chess.Color(true))
+                Env.api.roundApi.userAnalysisJson(pov,
+                                                  ctx.pref,
+                                                  initialFen = none,
+                                                  pov.color,
+                                                  owner = false) map { data =>
+                  Ok(data)
+                }
+              })
+      )
       .map(_ as JSON)
   }
 
@@ -112,7 +112,8 @@ object UserAnalysis extends LilaController with TheftPrevention {
             .validate[Forecast.Steps]
             .fold(err => BadRequest(err.toString).fuccess,
                   forecasts =>
-                    Env.round.forecastApi.save(pov, forecasts) >> Env.round.forecastApi
+                    Env.round.forecastApi
+                      .save(pov, forecasts) >> Env.round.forecastApi
                       .loadForDisplay(pov) map {
                       case None => Ok(Json.obj("none" -> true))
                       case Some(fc) => Ok(Json toJson fc) as JSON
@@ -132,11 +133,11 @@ object UserAnalysis extends LilaController with TheftPrevention {
             .validate[Forecast.Steps]
             .fold(
                 err => BadRequest(err.toString).fuccess,
-                forecasts =>
-                  {
-                    def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
-                    Env.round.forecastApi.playAndSave(pov, uci, forecasts) >> Env.current.scheduler
-                      .after(wait.millis) {
+                forecasts => {
+                  def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
+                  Env.round.forecastApi
+                    .playAndSave(pov, uci, forecasts) >> Env.current.scheduler
+                    .after(wait.millis) {
                       Ok(Json.obj("reload" -> true))
                     }
                 }

@@ -23,12 +23,14 @@ trait StructuredTypeStrings extends DestructureTypes {
   object LabelAndType {
     val empty = LabelAndType("", "")
   }
-  case class Grouping(
-      ldelim: String, mdelim: String, rdelim: String, labels: Boolean) {
-    def join(elems: String*): String = (if (elems.isEmpty) ""
-                                        else
-                                          elems.mkString(
-                                              ldelim, mdelim, rdelim))
+  case class Grouping(ldelim: String,
+                      mdelim: String,
+                      rdelim: String,
+                      labels: Boolean) {
+    def join(elems: String*): String =
+      (if (elems.isEmpty) ""
+       else
+         elems.mkString(ldelim, mdelim, rdelim))
   }
   val NoGrouping = Grouping("", "", "", labels = false)
   val ListGrouping = Grouping("(", ", ", ")", labels = false)
@@ -37,7 +39,8 @@ trait StructuredTypeStrings extends DestructureTypes {
 
   private def str(level: Int)(body: => String): String = "  " * level + body
   private def block(level: Int, grouping: Grouping)(
-      name: String, nodes: List[TypeNode]): String = {
+      name: String,
+      nodes: List[TypeNode]): String = {
     val l1 = str(level)(name + grouping.ldelim)
     val l2 = nodes.map(_ show level + 1)
     val l3 = str(level)(grouping.rdelim)
@@ -45,7 +48,8 @@ trait StructuredTypeStrings extends DestructureTypes {
     l1 +: l2 :+ l3 mkString "\n"
   }
   private def maybeBlock(level: Int, grouping: Grouping)(
-      name: String, nodes: List[TypeNode]): String = {
+      name: String,
+      nodes: List[TypeNode]): String = {
     val threshold = 70
 
     val try1 = str(level)(
@@ -169,18 +173,18 @@ trait TypeStrings {
                                        "boolean",
                                        "void")
   private val primitiveMap = (primitives.toList map { x =>
-        val key = x match {
-          case "int" => "Integer"
-          case "char" => "Character"
-          case s => s.capitalize
-        }
-        val value = x match {
-          case "void" => "Unit"
-          case s => s.capitalize
-        }
+    val key = x match {
+      case "int" => "Integer"
+      case "char" => "Character"
+      case s => s.capitalize
+    }
+    val value = x match {
+      case "void" => "Unit"
+      case s => s.capitalize
+    }
 
-        ("java.lang." + key) -> ("scala." + value)
-      }).toMap
+    ("java.lang." + key) -> ("scala." + value)
+  }).toMap
 
   def isAnonClass(cl: Class[_]) = {
     val xs = cl.getName.reverse takeWhile (_ != '$')
@@ -223,7 +227,7 @@ trait TypeStrings {
     brackets(clazz.getTypeParameters map tvarString: _*)
   }
 
-  private def tparamString[T : ru.TypeTag]: String = {
+  private def tparamString[T: ru.TypeTag]: String = {
     import ru._ // get TypeRefTag in scope so that pattern match works (TypeRef is an abstract type)
     def typeArguments: List[ru.Type] = ru.typeOf[T] match {
       case ru.TypeRef(_, _, args) => args; case _ => Nil
@@ -242,7 +246,7 @@ trait TypeStrings {
   def fromValue(value: Any): String =
     if (value == null) "Null" else fromClazz(anyClass(value))
   def fromClazz(clazz: JClass): String = scalaName(clazz) + tparamString(clazz)
-  def fromTag[T : ru.TypeTag : ClassTag]: String =
+  def fromTag[T: ru.TypeTag: ClassTag]: String =
     scalaName(classTag[T].runtimeClass) + tparamString[T]
 
   /** Reducing fully qualified noise for some common packages.

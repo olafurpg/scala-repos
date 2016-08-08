@@ -14,7 +14,9 @@ object ScalatraContext {
 }
 
 trait ScalatraContext
-    extends ServletApiImplicits with SessionSupport with CookieContext {
+    extends ServletApiImplicits
+    with SessionSupport
+    with CookieContext {
 
   import org.scalatra.ScalatraContext.StableValuesContext
 
@@ -66,7 +68,8 @@ trait ScalatraContext
   }
 
   protected[this] implicit def scalatraContext: ScalatraContext = {
-    new StableValuesContext()(
-        HttpServletRequestReadOnly(request), response, servletContext)
+    new StableValuesContext()(HttpServletRequestReadOnly(request),
+                              response,
+                              servletContext)
   }
 }

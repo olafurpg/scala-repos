@@ -6,7 +6,12 @@ package base
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.{PsiAnnotationOwner, PsiElement, PsiLanguageInjectionHost, PsiLiteral}
+import com.intellij.psi.{
+  PsiAnnotationOwner,
+  PsiElement,
+  PsiLanguageInjectionHost,
+  PsiLiteral
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
@@ -16,7 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * Date: 22.02.2008
   */
 trait ScLiteral
-    extends ScExpression with PsiLiteral with PsiLanguageInjectionHost {
+    extends ScExpression
+    with PsiLiteral
+    with PsiLanguageInjectionHost {
 
   /**
     * This method works only for null literal (to avoid possibly dangerous usage)

@@ -10,8 +10,7 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
 
   test("getAllUsers") {
     withTestDB { implicit session =>
-      assert(
-          AccountService.getAllUsers() match {
+      assert(AccountService.getAllUsers() match {
         case List(
             Account("root",
                     "root",
@@ -91,7 +90,8 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
 
       AccountService.updateGroupMembers(group1, List((user1, true)))
 
-      assert(AccountService.getGroupMembers(group1) == List(
+      assert(
+          AccountService.getGroupMembers(group1) == List(
               GroupMember(group1, user1, true)))
       assert(AccountService.getGroupsByUserName(user1) == List(group1))
 

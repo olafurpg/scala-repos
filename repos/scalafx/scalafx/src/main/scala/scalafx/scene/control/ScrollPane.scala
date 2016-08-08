@@ -33,7 +33,11 @@ import javafx.{geometry => jfxg, scene => jfxs}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.geometry.Bounds
 import scalafx.scene.Node
 
@@ -42,13 +46,13 @@ object ScrollPane {
     if (v != null) v.delegate else null
 
   object ScrollBarPolicy
-      extends SFXEnumDelegateCompanion[
-          jfxsc.ScrollPane.ScrollBarPolicy, ScrollBarPolicy] {
+      extends SFXEnumDelegateCompanion[jfxsc.ScrollPane.ScrollBarPolicy,
+                                       ScrollBarPolicy] {
 
     /** Indicates that a scroll bar should always be shown. */
     val Always = new ScrollBarPolicy(jfxsc.ScrollPane.ScrollBarPolicy.ALWAYS)
-    @deprecated(
-        "Use Always; ALWAYS will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Always; ALWAYS will be removed in a future release",
+                "8.0.60-R10")
     val ALWAYS = Always
 
     /** Indicates that a scroll bar should be shown when required. */
@@ -60,8 +64,8 @@ object ScrollPane {
 
     /** Indicates that a scroll bar should never be shown */
     val Never = new ScrollBarPolicy(jfxsc.ScrollPane.ScrollBarPolicy.NEVER)
-    @deprecated(
-        "Use Never; NEVER will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Never; NEVER will be removed in a future release",
+                "8.0.60-R10")
     val NEVER = Never
 
     protected override def unsortedValues: Array[ScrollBarPolicy] =
@@ -76,7 +80,8 @@ object ScrollPane {
 
 class ScrollPane(
     override val delegate: jfxsc.ScrollPane = new jfxsc.ScrollPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.ScrollPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ScrollPane] {
 
   /**
     * The node used as the content of this ScrollPane.
@@ -93,7 +98,7 @@ class ScrollPane(
   }
 
   /**
-    * If true and if the contained node is a Resizable, then the node will be kept resized to match the height of the 
+    * If true and if the contained node is a Resizable, then the node will be kept resized to match the height of the
     * ScrollPane's viewport.
     */
   def fitToHeight: BooleanProperty = delegate.fitToHeightProperty
@@ -102,7 +107,7 @@ class ScrollPane(
   }
 
   /**
-    * If true and if the contained node is a Resizable, then the node will be kept resized to match the width of the 
+    * If true and if the contained node is a Resizable, then the node will be kept resized to match the width of the
     * ScrollPane's viewport.
     */
   def fitToWidth: BooleanProperty = delegate.fitToWidthProperty

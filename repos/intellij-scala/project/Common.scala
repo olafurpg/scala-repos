@@ -19,8 +19,8 @@ object Common {
   def newProject(projectName: String): Project =
     newProject(projectName, file(projectName))
 
-  def unmanagedJarsFrom(
-      sdkDirectory: File, subdirectories: String*): Classpath = {
+  def unmanagedJarsFrom(sdkDirectory: File,
+                        subdirectories: String*): Classpath = {
     val sdkPathFinder = subdirectories.foldLeft(PathFinder.empty) {
       (finder, dir) =>
         finder +++ (sdkDirectory / dir)

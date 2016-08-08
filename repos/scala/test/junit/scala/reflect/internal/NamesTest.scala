@@ -55,11 +55,11 @@ class NamesTest {
     assert(lookupTypeName("fisch".toCharArray) eq fy)
     assert(lookupTypeName("uhu".toCharArray) eq uy)
 
-    assertThrows[AssertionError](
-        lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](lookupTypeName("dog".toCharArray),
+                                 _ contains "not yet created")
     val d = newTermName("dog")
-    assertThrows[AssertionError](
-        lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](lookupTypeName("dog".toCharArray),
+                                 _ contains "not yet created")
     val dy = d.toTypeName
     assert(lookupTypeName("dog".toCharArray) eq dy)
   }

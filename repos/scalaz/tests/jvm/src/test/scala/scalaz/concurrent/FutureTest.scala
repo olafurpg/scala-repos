@@ -8,7 +8,7 @@ import java.util.concurrent._
 import ConcurrentTest._
 
 object FutureTest extends SpecLite {
-  implicit def FutureEqual[A : Equal] =
+  implicit def FutureEqual[A: Equal] =
     Equal[A].contramap((_: Future[A]).unsafePerformSync)
 
   checkAll(monad.laws[Future])
@@ -115,8 +115,8 @@ object FutureTest extends SpecLite {
     else
       Future.fork(
           non.both(deadlocks(depth - 1), deadlocks(depth - 1)) map
-          ({
-            case (l, r) => l ++ r
-          })
+            ({
+              case (l, r) => l ++ r
+            })
       )
 }

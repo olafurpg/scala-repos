@@ -8,8 +8,8 @@ import lila.user.tube.userTube
 import lila.user.User
 import tube._
 
-private[team] final class PaginatorBuilder(
-    maxPerPage: Int, maxUserPerPage: Int) {
+private[team] final class PaginatorBuilder(maxPerPage: Int,
+                                           maxUserPerPage: Int) {
 
   def popularTeams(page: Int): Fu[Paginator[Team]] =
     Paginator(adapter = new Adapter[Team](selector = TeamRepo.enabledQuery,
@@ -28,7 +28,8 @@ private[team] final class PaginatorBuilder(
     def slice(offset: Int, length: Int): Fu[Seq[MemberWithUser]] =
       for {
         members ← $find[Member](
-            $query[Member](selector) sort sorting skip offset, length)
+                     $query[Member](selector) sort sorting skip offset,
+                     length)
         users ← $find.byOrderedIds[User](members.map(_.user))
       } yield
         members zip users map {

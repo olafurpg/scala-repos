@@ -24,8 +24,9 @@ import org.ensime.util.FileUtils
 class Project(
     broadcaster: ActorRef,
     implicit val config: EnsimeConfig
-)
-    extends Actor with ActorLogging with Stash {
+) extends Actor
+    with ActorLogging
+    with Stash {
   import context.{dispatcher, system}
 
   import FileUtils._
@@ -98,16 +99,16 @@ class Project(
         }
       }))
 
-      scalac = context.actorOf(
-          Analyzer(merger, indexer, searchService), "scalac")
-      javac = context.actorOf(
-          JavaAnalyzer(merger, indexer, searchService), "javac")
+      scalac =
+        context.actorOf(Analyzer(merger, indexer, searchService), "scalac")
+      javac =
+        context.actorOf(JavaAnalyzer(merger, indexer, searchService), "javac")
     } else {
       log.warning(
           "Detected a pure Java project. Scala queries are not available.")
       scalac = system.deadLetters
-      javac = context.actorOf(
-          JavaAnalyzer(broadcaster, indexer, searchService), "javac")
+      javac = context
+        .actorOf(JavaAnalyzer(broadcaster, indexer, searchService), "javac")
     }
     debugger = context.actorOf(DebugManager(broadcaster), "debugging")
     docs = context.actorOf(DocResolver(), "docs")

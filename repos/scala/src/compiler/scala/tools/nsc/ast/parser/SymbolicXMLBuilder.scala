@@ -57,9 +57,33 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     val _xml: NameType = "xml"
   }
 
-  import xmltypes.{_Comment, _Elem, _EntityRef, _Group, _MetaData, _NamespaceBinding, _NodeBuffer, _PCData, _PrefixedAttribute, _ProcInstr, _Text, _Unparsed, _UnprefixedAttribute}
+  import xmltypes.{
+    _Comment,
+    _Elem,
+    _EntityRef,
+    _Group,
+    _MetaData,
+    _NamespaceBinding,
+    _NodeBuffer,
+    _PCData,
+    _PrefixedAttribute,
+    _ProcInstr,
+    _Text,
+    _Unparsed,
+    _UnprefixedAttribute
+  }
 
-  import xmlterms.{_Null, __Elem, __Text, _buf, _md, _plus, _scope, _tmpscope, _xml}
+  import xmlterms.{
+    _Null,
+    __Elem,
+    __Text,
+    _buf,
+    _md,
+    _plus,
+    _scope,
+    _tmpscope,
+    _xml
+  }
 
   /** Attachment for trees deriving from text nodes (Text, CData, entities). Used for coalescing. */
   case class TextAttache(pos: Position, text: String)
@@ -153,8 +177,14 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
       case (Some(pre), rest) => (const(pre), const(rest))
       case _ => (wild, const(n))
     }
-    mkXML(
-        pos, isPattern = true, prepat, labpat, null, null, empty = false, args)
+    mkXML(pos,
+          isPattern = true,
+          prepat,
+          labpat,
+          null,
+          null,
+          empty = false,
+          args)
   }
 
   protected def convertToTextPat(t: Tree): Tree = t match {
@@ -181,11 +211,11 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
 
   /** could optimize if args.length == 0, args.length == 1 AND args(0) is <: Node. */
   def makeXMLseq(pos: Position, args: Seq[Tree]) = {
-    val buffer = ValDef(
-        NoMods, _buf, TypeTree(), New(_scala_xml_NodeBuffer, ListOfNil))
+    val buffer =
+      ValDef(NoMods, _buf, TypeTree(), New(_scala_xml_NodeBuffer, ListOfNil))
     val applies =
       args filterNot isEmptyText map
-      (t => Apply(Select(Ident(_buf), _plus), List(t)))
+        (t => Apply(Select(Ident(_buf), _plus), List(t)))
 
     atPos(pos)(Block(buffer :: applies.toList, Ident(_buf)))
   }
@@ -264,20 +294,21 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     def handleUnprefixedAttribute(key: String, value: Tree) =
       mkAttributeTree(null, key, value)
 
-    val attributes: List[Tree] = for ((k, v) <- attrMap.toList.reverse) yield
-      splitPrefix(k) match {
-        case (Some(pre), rest) => handlePrefixedAttribute(pre, rest, v)
-        case _ => handleUnprefixedAttribute(k, v)
-      }
+    val attributes: List[Tree] = for ((k, v) <- attrMap.toList.reverse)
+      yield
+        splitPrefix(k) match {
+          case (Some(pre), rest) => handlePrefixedAttribute(pre, rest, v)
+          case _ => handleUnprefixedAttribute(k, v)
+        }
 
-    lazy val scopeDef = ValDef(
-        NoMods, _scope, _scala_xml_NamespaceBinding, Ident(_tmpscope))
+    lazy val scopeDef =
+      ValDef(NoMods, _scope, _scala_xml_NamespaceBinding, Ident(_tmpscope))
     lazy val tmpScopeDef = ValDef(Modifiers(MUTABLE),
                                   _tmpscope,
                                   _scala_xml_NamespaceBinding,
                                   Ident(_scope))
-    lazy val metadataDef = ValDef(
-        Modifiers(MUTABLE), _md, _scala_xml_MetaData, _scala_xml_Null)
+    lazy val metadataDef =
+      ValDef(Modifiers(MUTABLE), _md, _scala_xml_MetaData, _scala_xml_Null)
     val makeSymbolicAttrs =
       if (!attributes.isEmpty) Ident(_md) else _scala_xml_Null
 

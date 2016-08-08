@@ -80,8 +80,8 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
     def rootLoader: LazyType = settings.YclasspathImpl.value match {
       case ClassPathRepresentationType.Flat =>
-        new loaders.PackageLoaderUsingFlatClassPath(
-            FlatClassPath.RootPackage, flatClassPath)
+        new loaders.PackageLoaderUsingFlatClassPath(FlatClassPath.RootPackage,
+                                                    flatClassPath)
       case ClassPathRepresentationType.Recursive =>
         new loaders.PackageLoader(classPath)
     }
@@ -108,8 +108,10 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
   // Members declared in scala.reflect.internal.Reporting
   def reporter = new scala.reflect.internal.ReporterImpl {
-    protected def info0(
-        pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
+    protected def info0(pos: Position,
+                        msg: String,
+                        severity: Severity,
+                        force: Boolean): Unit =
       println(msg)
   }
 

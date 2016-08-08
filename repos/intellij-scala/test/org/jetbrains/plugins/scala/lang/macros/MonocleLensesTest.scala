@@ -8,12 +8,24 @@ import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.PsiTestUtil
-import com.intellij.testFramework.fixtures.{IdeaTestFixtureFactory, IdeaProjectTestFixture, TestFixtureBuilder, CodeInsightTestFixture}
+import com.intellij.testFramework.fixtures.{
+  IdeaTestFixtureFactory,
+  IdeaProjectTestFixture,
+  TestFixtureBuilder,
+  CodeInsightTestFixture
+}
 import org.jetbrains.plugins.scala.LightScalaTestCase
-import org.jetbrains.plugins.scala.base.{ScalaLightPlatformCodeInsightTestCaseAdapter, SimpleTestCase, ScalaLightCodeInsightFixtureTestAdapter}
+import org.jetbrains.plugins.scala.base.{
+  ScalaLightPlatformCodeInsightTestCaseAdapter,
+  SimpleTestCase,
+  ScalaLightCodeInsightFixtureTestAdapter
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScClass}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScClass
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.ScFunctionDefinitionImpl
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.util.TestUtils
@@ -39,8 +51,9 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
   protected def folderPath: String = TestUtils.getTestDataPath
 
-  protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+  protected def addIvyCacheLibrary(libraryName: String,
+                                   libraryPath: String,
+                                   jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -55,15 +68,18 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     val caretPos = text.indexOf("<caret>")
     configureFromFileTextAdapter("dummy.scala", text.replace("<caret>", ""))
     val exp = PsiTreeUtil
-      .findElementOfClassAtOffset(
-          getFileAdapter, caretPos, classOf[ScalaPsiElement], false)
+      .findElementOfClassAtOffset(getFileAdapter,
+                                  caretPos,
+                                  classOf[ScalaPsiElement],
+                                  false)
       .asInstanceOf[ScObject]
     exp.allMethods.find(_.name == methodName) match {
       case Some(x) =>
         x.method.asInstanceOf[ScFunctionDefinition].returnType match {
           case Success(t, _) =>
-            org.junit.Assert.assertEquals(
-                s"${t.toString} != $expectedType", expectedType, t.toString)
+            org.junit.Assert.assertEquals(s"${t.toString} != $expectedType",
+                                          expectedType,
+                                          t.toString)
           case Failure(cause, _) => org.junit.Assert.fail(cause)
         }
       case None => org.junit.Assert.fail("method not found")

@@ -2,7 +2,7 @@ import scala.reflect.runtime.universe._
 import scala.language._
 
 object Test {
-  def whatis[T : TypeTag](x: T) = typeOf[T]
+  def whatis[T: TypeTag](x: T) = typeOf[T]
   def sshow(label: String, xs: Traversable[Any]) {
     println("==== " + label + " ====\n")
     xs.toList.map("" + _).sorted foreach println
@@ -626,64 +626,76 @@ object Test {
     })); x.y.reflected -> whatis(x).toString
   }
   def f24 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f25 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f26 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f27 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f28 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f29 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f30 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f31 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f32 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f33 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f34 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f35 = {
-    val x = ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (Any { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f36 = {
     val x = ((new ABC): (A { val y: P }) with (Any { val y: P }));
@@ -790,64 +802,76 @@ object Test {
     })); x.y.reflected -> whatis(x).toString
   }
   def f60 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f61 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f62 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f63 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f64 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f65 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f66 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f67 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f68 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f69 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f70 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f71 = {
-    val x = ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (A { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f72 = {
     val x = ((new ABC): (B { val y: P }) with (Any { val y: P }));
@@ -954,64 +978,76 @@ object Test {
     })); x.y.reflected -> whatis(x).toString
   }
   def f96 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f97 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f98 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f99 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f100 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f101 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f102 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f103 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f104 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f105 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f106 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f107 = {
-    val x = ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (B { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f108 = {
     val x = ((new ABC): (C { val y: P }) with (Any { val y: P }));
@@ -1118,64 +1154,76 @@ object Test {
     })); x.y.reflected -> whatis(x).toString
   }
   def f132 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f133 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f134 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (Any {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f135 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f136 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f137 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (A {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f138 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f139 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f140 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (B {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def f141 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: P
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: P
+      })); x.y.reflected -> whatis(x).toString
   }
   def f142 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: Q
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: Q
+      })); x.y.reflected -> whatis(x).toString
   }
   def f143 = {
-    val x = ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
-      val y: R forSome { type R <: P with Q }
-    })); x.y.reflected -> whatis(x).toString
+    val x =
+      ((new ABC): (C { val y: R forSome { type R <: P with Q } }) with (C {
+        val y: R forSome { type R <: P with Q }
+      })); x.y.reflected -> whatis(x).toString
   }
   def g0(x: R1_0) = x.y
   def g1(x: R1_1) = x.y

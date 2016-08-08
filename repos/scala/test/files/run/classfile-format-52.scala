@@ -2,7 +2,14 @@ import java.io.{File, FileOutputStream}
 
 import scala.tools.partest._
 import scala.tools.asm
-import asm.{AnnotationVisitor, ClassWriter, FieldVisitor, Handle, MethodVisitor, Opcodes}
+import asm.{
+  AnnotationVisitor,
+  ClassWriter,
+  FieldVisitor,
+  Handle,
+  MethodVisitor,
+  Opcodes
+}
 import Opcodes._
 
 // This test ensures that we can read JDK 8 (classfile format 52) files, including those
@@ -15,7 +22,7 @@ import Opcodes._
 object Test extends DirectTest {
   override def extraSettings: String =
     "-Yopt:l:classpath -usejavacp -d " + testOutput.path + " -cp " +
-    testOutput.path
+      testOutput.path
 
   def generateInterface() {
     val interfaceName = "HasDefaultMethod"
@@ -47,7 +54,8 @@ object Test extends DirectTest {
 
     val fos = new FileOutputStream(
         new File(s"${testOutput.path}/$interfaceName.class"))
-    try fos write bytes finally fos.close()
+    try fos write bytes
+    finally fos.close()
   }
 
   def code =
@@ -67,10 +75,8 @@ class Driver extends HasDefaultMethod {
       testUnderJavaAtLeast("1.8") {
         generateInterface()
         compile()
-        Class
-          .forName("Driver")
-          .newInstance()
-          ()
+        Class.forName("Driver").newInstance()
+        ()
       } otherwise {
         println("hello from publicMethod")
         println("hello from staticMethod")

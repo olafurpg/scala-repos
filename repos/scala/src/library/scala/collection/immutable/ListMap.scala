@@ -64,8 +64,10 @@ object ListMap extends ImmutableMapFactory[ListMap] {
     "The semantics of immutable collections makes inheriting from ListMap error-prone.",
     "2.11.0")
 class ListMap[A, +B]
-    extends AbstractMap[A, B] with Map[A, B]
-    with MapLike[A, B, ListMap[A, B]] with Serializable {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, ListMap[A, B]]
+    with Serializable {
 
   override def empty = ListMap.empty
 
@@ -107,8 +109,9 @@ class ListMap[A, +B]
     *  @param elem2 the second element to add.
     *  @param elems the remaining elements to add.
     */
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): ListMap[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): ListMap[A, B1] =
     this + elem1 + elem2 ++ elems
 
   /** Adds a number of elements provided by a traversable object
@@ -149,7 +152,8 @@ class ListMap[A, +B]
   @SerialVersionUID(-6453056603889598734L)
   protected class Node[B1 >: B](override protected val key: A,
                                 override protected val value: B1)
-      extends ListMap[A, B1] with Serializable {
+      extends ListMap[A, B1]
+      with Serializable {
 
     /** Returns the number of mappings in this map.
       *
@@ -191,7 +195,8 @@ class ListMap[A, +B]
 
     @tailrec private def get0(cur: ListMap[A, B1], k: A): Option[B1] =
       if (k == cur.key) Some(cur.value)
-      else if (cur.next.nonEmpty) get0(cur.next, k) else None
+      else if (cur.next.nonEmpty) get0(cur.next, k)
+      else None
 
     override def contains(key: A): Boolean = contains0(this, key)
 
@@ -215,8 +220,9 @@ class ListMap[A, +B]
       */
     override def -(k: A): ListMap[A, B1] = remove0(k, this, Nil)
 
-    @tailrec private def remove0(
-        k: A, cur: ListMap[A, B1], acc: List[ListMap[A, B1]]): ListMap[A, B1] =
+    @tailrec private def remove0(k: A,
+                                 cur: ListMap[A, B1],
+                                 acc: List[ListMap[A, B1]]): ListMap[A, B1] =
       if (cur.isEmpty) acc.last
       else if (k == cur.key)
         (cur.next /: acc) {

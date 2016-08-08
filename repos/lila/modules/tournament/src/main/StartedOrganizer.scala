@@ -61,8 +61,9 @@ private[tournament] final class StartedOrganizer(api: TournamentApi,
       } andThenAnyway scheduleNext
   }
 
-  private def startPairing(
-      tour: Tournament, activeUserIds: List[String], startAt: Long): Funit =
+  private def startPairing(tour: Tournament,
+                           activeUserIds: List[String],
+                           startAt: Long): Funit =
     getWaitingUsers(tour) zip PairingRepo.playingUserIds(tour) map {
       case (waitingUsers, playingUserIds) =>
         val users = waitingUsers intersect activeUserIds diff playingUserIds

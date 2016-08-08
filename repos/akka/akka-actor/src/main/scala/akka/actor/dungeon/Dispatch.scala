@@ -17,8 +17,7 @@ import akka.dispatch.ProducesMessageQueue
 import akka.serialization.SerializerWithStringManifest
 import akka.dispatch.UnboundedMailbox
 
-private[akka] trait Dispatch {
-  this: ActorCell ⇒
+private[akka] trait Dispatch { this: ActorCell ⇒
 
   @volatile private var _mailboxDoNotCallMeDirectly: Mailbox =
     _ //This must be volatile since it isn't protected by the mailbox status
@@ -30,8 +29,10 @@ private[akka] trait Dispatch {
 
   @tailrec final def swapMailbox(newMailbox: Mailbox): Mailbox = {
     val oldMailbox = mailbox
-    if (!Unsafe.instance.compareAndSwapObject(
-            this, AbstractActorCell.mailboxOffset, oldMailbox, newMailbox))
+    if (!Unsafe.instance.compareAndSwapObject(this,
+                                              AbstractActorCell.mailboxOffset,
+                                              oldMailbox,
+                                              newMailbox))
       swapMailbox(newMailbox)
     else oldMailbox
   }
@@ -71,10 +72,9 @@ private[akka] trait Dispatch {
           val gotType =
             if (mbox.messageQueue == null) "null"
             else mbox.messageQueue.getClass.getName
-          Create(
-              Some(ActorInitializationException(
-                      self,
-                      s"Actor [$self] requires mailbox type [$req] got [$gotType]")))
+          Create(Some(ActorInitializationException(
+              self,
+              s"Actor [$self] requires mailbox type [$req] got [$gotType]")))
         }
       case _ ⇒ Create(None)
     }
@@ -98,8 +98,11 @@ private[akka] trait Dispatch {
     swapMailbox(mbox)
     mailbox.setActor(this)
     // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
-    val createMessage = Create(Some(ActorInitializationException(
-                self, "failure while creating ActorCell", failure)))
+    val createMessage = Create(
+        Some(
+            ActorInitializationException(self,
+                                         "failure while creating ActorCell",
+                                         failure)))
     mailbox.systemEnqueue(self, createMessage)
     this
   }
@@ -131,19 +134,23 @@ private[akka] trait Dispatch {
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
   final def suspend(): Unit =
-    try dispatcher.systemDispatch(this, Suspend()) catch handleException
+    try dispatcher.systemDispatch(this, Suspend())
+    catch handleException
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
   final def resume(causedByFailure: Throwable): Unit =
-    try dispatcher.systemDispatch(this, Resume(causedByFailure)) catch handleException
+    try dispatcher.systemDispatch(this, Resume(causedByFailure))
+    catch handleException
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
   final def restart(cause: Throwable): Unit =
-    try dispatcher.systemDispatch(this, Recreate(cause)) catch handleException
+    try dispatcher.systemDispatch(this, Recreate(cause))
+    catch handleException
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
   final def stop(): Unit =
-    try dispatcher.systemDispatch(this, Terminate()) catch handleException
+    try dispatcher.systemDispatch(this, Terminate())
+    catch handleException
 
   def sendMessage(msg: Envelope): Unit =
     try {
@@ -169,5 +176,6 @@ private[akka] trait Dispatch {
     } catch handleException
 
   override def sendSystemMessage(message: SystemMessage): Unit =
-    try dispatcher.systemDispatch(this, message) catch handleException
+    try dispatcher.systemDispatch(this, message)
+    catch handleException
 }

@@ -9,8 +9,7 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * Nikolay.Tropin
   * 2014-08-29
   */
-private[changeInfo] trait ParametersChangeInfo {
-  this: ScalaChangeInfo =>
+private[changeInfo] trait ParametersChangeInfo { this: ScalaChangeInfo =>
 
   private val oldParameters = ScalaParameterInfo.allForMethod(function)
   private val oldParametersArray = oldParameters.flatten.toArray
@@ -34,7 +33,7 @@ private[changeInfo] trait ParametersChangeInfo {
   val isParameterTypesChanged: Boolean = newParameters.zipWithIndex.exists {
     case (p, i) =>
       (p.oldIndex == i) &&
-      (p.getTypeText != getOldParameterTypes(i) ||
+        (p.getTypeText != getOldParameterTypes(i) ||
           p.isRepeatedParameter != oldParametersArray(i).isRepeatedParameter ||
           p.isByName != oldParametersArray(i).isByName)
   }

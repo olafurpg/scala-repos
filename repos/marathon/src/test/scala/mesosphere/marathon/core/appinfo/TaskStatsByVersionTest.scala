@@ -10,7 +10,9 @@ import play.api.libs.json.Json
 import scala.concurrent.duration._
 
 class TaskStatsByVersionTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("no tasks") {
     Given("no tasks")
@@ -78,13 +80,14 @@ class TaskStatsByVersionTest
 
       stats should be(
           TaskStatsByVersion(
-              maybeStartedAfterLastScaling = TaskStats.forSomeTasks(
-                    now, afterLastScalingTasks, statuses),
-              maybeWithLatestConfig = TaskStats.forSomeTasks(
-                    now, afterLastConfigChangeTasks, statuses),
-              maybeWithOutdatedConfig = TaskStats.forSomeTasks(now,
-                                                               outdatedTasks,
-                                                               statuses),
+              maybeStartedAfterLastScaling =
+                TaskStats.forSomeTasks(now, afterLastScalingTasks, statuses),
+              maybeWithLatestConfig =
+                TaskStats.forSomeTasks(now,
+                                       afterLastConfigChangeTasks,
+                                       statuses),
+              maybeWithOutdatedConfig =
+                TaskStats.forSomeTasks(now, outdatedTasks, statuses),
               maybeTotalSummary = TaskStats.forSomeTasks(now, tasks, statuses)
           )
       )
@@ -107,9 +110,10 @@ class TaskStatsByVersionTest
     s"task$taskIdCounter"
   }
   private[this] def runningTaskStartedAt(
-      version: Timestamp, startingDelay: FiniteDuration): Task = {
+      version: Timestamp,
+      startingDelay: FiniteDuration): Task = {
     val startedAt = (version + startingDelay).toDateTime.getMillis
-    MarathonTestHelper.runningTask(
-        newTaskId(), appVersion = version, startedAt = startedAt)
+    MarathonTestHelper
+      .runningTask(newTaskId(), appVersion = version, startedAt = startedAt)
   }
 }

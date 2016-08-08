@@ -164,7 +164,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
             reporter.warning(
                 claszSymbol.pos,
                 s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
-                "Such classes will overwrite one another on case-insensitive filesystems."
+                  "Such classes will overwrite one another on case-insensitive filesystems."
             )
         }
 
@@ -227,14 +227,14 @@ abstract class GenBCode extends BCodeSyncAndTry {
           q2.asScala foreach {
             case Item2(_, mirror, plain, bean, _) =>
               if (mirror != null)
-                byteCodeRepository.add(
-                    mirror, ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(mirror,
+                                       ByteCodeRepository.CompilationUnit)
               if (plain != null)
-                byteCodeRepository.add(
-                    plain, ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(plain,
+                                       ByteCodeRepository.CompilationUnit)
               if (bean != null)
-                byteCodeRepository.add(
-                    bean, ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(bean,
+                                       ByteCodeRepository.CompilationUnit)
           }
         if (settings.YoptBuildCallGraph)
           q2.asScala foreach { item =>
@@ -254,8 +254,8 @@ abstract class GenBCode extends BCodeSyncAndTry {
       def setInnerClasses(classNode: ClassNode): Unit =
         if (classNode != null) {
           classNode.innerClasses.clear()
-          addInnerClasses(
-              classNode, bTypes.backendUtils.collectNestedClasses(classNode))
+          addInnerClasses(classNode,
+                          bTypes.backendUtils.collectNestedClasses(classNode))
         }
 
       def run() {
@@ -276,7 +276,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
             } catch {
               case e: java.lang.RuntimeException
                   if e.getMessage != null &&
-                  (e.getMessage contains "too large!") =>
+                    (e.getMessage contains "too large!") =>
                 reporter.error(
                     NoPosition,
                     s"Could not write class ${item.plain.name} because it exceeds JVM code size limits. ${e.getMessage}")
@@ -405,16 +405,16 @@ abstract class GenBCode extends BCodeSyncAndTry {
     /* Pipeline that writes classfile representations to disk. */
     private def drainQ3() {
 
-      def sendToDisk(
-          cfr: SubItem3, outFolder: scala.tools.nsc.io.AbstractFile) {
+      def sendToDisk(cfr: SubItem3,
+                     outFolder: scala.tools.nsc.io.AbstractFile) {
         if (cfr != null) {
           val SubItem3(jclassName, jclassBytes) = cfr
           try {
             val outFile =
               if (outFolder == null) null
               else getFileForClassfile(outFolder, jclassName, ".class")
-            bytecodeWriter.writeClass(
-                jclassName, jclassName, jclassBytes, outFile)
+            bytecodeWriter
+              .writeClass(jclassName, jclassName, jclassBytes, outFile)
           } catch {
             case e: FileConflictException =>
               error(s"error writing $jclassName: ${e.getMessage}")

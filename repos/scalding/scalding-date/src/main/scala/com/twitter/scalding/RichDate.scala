@@ -43,8 +43,8 @@ object RichDate {
     * We allow either date, date with time in minutes, date with time down to seconds.
     * The separator between date and time can be a space or "T".
     */
-  implicit def apply(str: String)(
-      implicit tz: TimeZone, dp: DateParser): RichDate =
+  implicit def apply(str: String)(implicit tz: TimeZone,
+                                  dp: DateParser): RichDate =
     dp.parse(str).get
 
   /* If the format is one of the truncated DateOps formats, we can do

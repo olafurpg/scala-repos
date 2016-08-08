@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[MaxAbsScaler]] and [[MaxAbsScalerModel]].
   */
 private[feature] trait MaxAbsScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
@@ -57,7 +59,8 @@ private[feature] trait MaxAbsScalerParams
   */
 @Experimental
 class MaxAbsScaler @Since("2.0.0")(override val uid: String)
-    extends Estimator[MaxAbsScalerModel] with MaxAbsScalerParams
+    extends Estimator[MaxAbsScalerModel]
+    with MaxAbsScalerParams
     with DefaultParamsWritable {
 
   @Since("2.0.0")
@@ -105,9 +108,11 @@ object MaxAbsScaler extends DefaultParamsReadable[MaxAbsScaler] {
   *
   */
 @Experimental
-class MaxAbsScalerModel private[ml](
-    override val uid: String, val maxAbs: Vector)
-    extends Model[MaxAbsScalerModel] with MaxAbsScalerParams with MLWritable {
+class MaxAbsScalerModel private[ml] (override val uid: String,
+                                     val maxAbs: Vector)
+    extends Model[MaxAbsScalerModel]
+    with MaxAbsScalerParams
+    with MLWritable {
 
   import MaxAbsScalerModel._
 

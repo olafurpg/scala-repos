@@ -1,15 +1,19 @@
 package org.jetbrains.plugins.scala.debugger.evaluation.evaluator
 
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
-import com.intellij.debugger.engine.evaluation.{EvaluateExceptionUtil, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateExceptionUtil,
+  EvaluationContextImpl
+}
 import com.sun.jdi.BooleanValue
 
 /**
   * User: Alefas
   * Date: 19.10.11
   */
-class ScalaIfEvaluator(
-    condition: Evaluator, ifBranch: Evaluator, elseBranch: Option[Evaluator])
+class ScalaIfEvaluator(condition: Evaluator,
+                       ifBranch: Evaluator,
+                       elseBranch: Option[Evaluator])
     extends Evaluator {
   private var modifier: Modifier = null
 

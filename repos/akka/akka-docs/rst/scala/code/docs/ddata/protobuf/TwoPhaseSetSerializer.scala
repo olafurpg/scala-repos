@@ -15,7 +15,8 @@ import docs.ddata.TwoPhaseSet
 import docs.ddata.protobuf.msg.TwoPhaseSetMessages
 
 class TwoPhaseSetSerializer(val system: ExtendedActorSystem)
-    extends Serializer with SerializationSupport {
+    extends Serializer
+    with SerializationSupport {
 
   override def includeManifest: Boolean = false
 
@@ -28,8 +29,8 @@ class TwoPhaseSetSerializer(val system: ExtendedActorSystem)
           s"Can't serialize object of type ${obj.getClass}")
   }
 
-  override def fromBinary(
-      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+  override def fromBinary(bytes: Array[Byte],
+                          clazz: Option[Class[_]]): AnyRef = {
     twoPhaseSetFromBinary(bytes)
   }
 
@@ -70,8 +71,8 @@ class TwoPhaseSetSerializerWithCompression(system: ExtendedActorSystem)
           s"Can't serialize object of type ${obj.getClass}")
   }
 
-  override def fromBinary(
-      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+  override def fromBinary(bytes: Array[Byte],
+                          clazz: Option[Class[_]]): AnyRef = {
     twoPhaseSetFromBinary(decompress(bytes))
   }
   //#compression

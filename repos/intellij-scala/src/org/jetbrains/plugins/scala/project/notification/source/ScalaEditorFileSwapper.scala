@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package project.notification.source
 
-import com.intellij.openapi.fileEditor.impl.{EditorFileSwapper, EditorWithProviderComposite}
+import com.intellij.openapi.fileEditor.impl.{
+  EditorFileSwapper,
+  EditorWithProviderComposite
+}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.vfs.VirtualFile
@@ -49,8 +52,9 @@ class ScalaEditorFileSwapper extends EditorFileSwapper {
   def getFileToSwapTo(project: Project,
                       editorWithProviderComposite: EditorWithProviderComposite)
     : Pair[VirtualFile, Integer] = {
-    Pair.create(ScalaEditorFileSwapper.findSourceFile(
-                    project, editorWithProviderComposite.getFile),
-                null)
+    Pair.create(
+        ScalaEditorFileSwapper
+          .findSourceFile(project, editorWithProviderComposite.getFile),
+        null)
   }
 }

@@ -53,12 +53,9 @@ object ExecutionTestJobs {
 
   def mergeFanout(in: List[Int]): Execution[Iterable[(Int, Int)]] = {
     // Force a reduce, so no fancy optimizations kick in
-    val source = TypedPipe
-      .from(in)
-      .groupBy(_ % 3)
-      .head
+    val source = TypedPipe.from(in).groupBy(_ % 3).head
 
-      (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
+    (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
   }
 }
 
@@ -152,7 +149,7 @@ class ExecutionTest extends WordSpec with Matchers {
         .shouldFail()
       // If both are good, we succeed:
       Execution.from(1).zip(Execution.from("1")).shouldSucceed() shouldBe
-      (1, "1")
+        (1, "1")
     }
 
     "Config transformer will isolate Configs" in {
@@ -160,7 +157,7 @@ class ExecutionTest extends WordSpec with Matchers {
         cfg =>
           if (cfg.get("test.cfg.variable").isDefined)
             Execution.failed(new Exception(
-                    s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
+                s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
           else Execution.from(())
       }
 
@@ -178,8 +175,8 @@ class ExecutionTest extends WordSpec with Matchers {
         _ =>
           Execution.withConfig(hasVariable)(addOption)
       }.flatMap(_ =>
-              doesNotHaveVariable(
-                  "Should not see variable in flatMap's after the isolation"))
+          doesNotHaveVariable(
+              "Should not see variable in flatMap's after the isolation"))
         .map(_ => true)
         .shouldSucceed() shouldBe true
     }
@@ -267,8 +264,9 @@ class ExecutionTest extends WordSpec with Matchers {
         .arg("output", "out")
         .source(TextLine("in"), List((0, "hello world"), (1, "goodbye world")))
         .typedSink(TypedTsv[(String, Long)]("out")) { outBuf =>
-          outBuf.toMap shouldBe Map(
-              "hello" -> 1L, "world" -> 2L, "goodbye" -> 1L)
+          outBuf.toMap shouldBe Map("hello" -> 1L,
+                                    "world" -> 2L,
+                                    "goodbye" -> 1L)
         }
         .run
         .runHadoop
@@ -423,12 +421,9 @@ class ExecutionTest extends WordSpec with Matchers {
     "Ability to do isolated caches so we don't exhaust memory" in {
 
       def memoryWastingExecutionGenerator(id: Int): Execution[Array[Long]] =
-        Execution.withNewCache(
-            Execution
-              .from(id)
-              .flatMap { idx =>
-            Execution.from(Array.fill(4000000)(idx.toLong))
-          })
+        Execution.withNewCache(Execution.from(id).flatMap { idx =>
+          Execution.from(Array.fill(4000000)(idx.toLong))
+        })
 
       def writeAll(numExecutions: Int): Execution[Unit] = {
         if (numExecutions > 0) {
@@ -443,8 +438,8 @@ class ExecutionTest extends WordSpec with Matchers {
       writeAll(400).shouldSucceed()
     }
     "handle failure" in {
-      val result = Execution.withParallelism(
-          Seq(Execution.failed(new Exception("failed"))), 1)
+      val result = Execution
+        .withParallelism(Seq(Execution.failed(new Exception("failed"))), 1)
 
       assert(result.waitFor(Config.default, Local(true)).isFailure)
     }

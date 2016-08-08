@@ -59,8 +59,8 @@ final class OffsetRange private (val topic: String,
   override def equals(obj: Any): Boolean = obj match {
     case that: OffsetRange =>
       this.topic == that.topic && this.partition == that.partition &&
-      this.fromOffset == that.fromOffset &&
-      this.untilOffset == that.untilOffset
+        this.fromOffset == that.fromOffset &&
+        this.untilOffset == that.untilOffset
     case _ => false
   }
 

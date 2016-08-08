@@ -19,7 +19,15 @@ package com.twitter.scalding.serialization.macros
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.nio.ByteBuffer
 
-import com.twitter.scalding.serialization.{JavaStreamEnrichments, Law, Law1, Law2, Law3, OrderedSerialization, Serialization}
+import com.twitter.scalding.serialization.{
+  JavaStreamEnrichments,
+  Law,
+  Law1,
+  Law2,
+  Law3,
+  OrderedSerialization,
+  Serialization
+}
 import org.scalacheck.Arbitrary.{arbitrary => arb}
 import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalatest.prop.{Checkers, PropertyChecks}
@@ -29,12 +37,12 @@ import scala.collection.immutable.Queue
 import scala.language.experimental.macros
 
 trait LowerPriorityImplicit {
-  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] =
+    macro impl.OrderedSerializationProviderImpl[T]
 }
 
 object LawTester {
-  def apply[T : Arbitrary](laws: Iterable[Law[T]]): Prop =
+  def apply[T: Arbitrary](laws: Iterable[Law[T]]): Prop =
     apply(implicitly[Arbitrary[T]].arbitrary, laws)
 
   def apply[T](g: Gen[T], laws: Iterable[Law[T]]): Prop =
@@ -135,8 +143,11 @@ case class TestCC(a: Int,
                   aBB: ByteBuffer)
     extends SealedTraitTest
 
-case class TestCaseClassB(
-    a: Int, b: Long, c: Option[Int], d: Double, e: Option[String])
+case class TestCaseClassB(a: Int,
+                          b: Long,
+                          c: Option[Int],
+                          d: Double,
+                          e: Option[String])
     extends SealedTraitTest
 
 case class TestCaseClassD(a: Int) extends SealedTraitTest
@@ -175,8 +186,8 @@ class MyData(override val _1: Int, override val _2: Option[Long])
 }
 
 object MacroOpaqueContainer {
-  def getOrdSer[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  def getOrdSer[T]: OrderedSerialization[T] =
+    macro impl.OrderedSerializationProviderImpl[T]
   import java.io._
   implicit val myContainerOrderedSerializer =
     new OrderedSerialization[MacroOpaqueContainer] {
@@ -230,7 +241,9 @@ object Container {
   case class InnerCaseClass(e: SetAlias)
 }
 class MacroOrderingProperties
-    extends FunSuite with PropertyChecks with ShouldMatchers
+    extends FunSuite
+    with PropertyChecks
+    with ShouldMatchers
     with LowerPriorityImplicit {
   type SetAlias = Set[Double]
 
@@ -238,12 +251,12 @@ class MacroOrderingProperties
   import Container.arbitraryInnerCaseClass
   import OrderedSerialization.{compare => oBufCompare}
 
-  def gen[T : Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
+  def gen[T: Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
 
-  def arbMap[T : Arbitrary, U](fn: T => U): Arbitrary[U] =
+  def arbMap[T: Arbitrary, U](fn: T => U): Arbitrary[U] =
     Arbitrary(gen[T].map(fn))
 
-  def collectionArb[C[_], T : Arbitrary](
+  def collectionArb[C[_], T: Arbitrary](
       implicit cbf: collection.generic.CanBuildFrom[Nothing, T, C[T]])
     : Arbitrary[C[T]] = Arbitrary {
     gen[List[T]].map { l =>
@@ -297,7 +310,7 @@ class MacroOrderingProperties
     }
   }
 
-  def checkMany[T : Arbitrary](implicit obuf: OrderedSerialization[T]) =
+  def checkMany[T: Arbitrary](implicit obuf: OrderedSerialization[T]) =
     forAll { i: List[(T, T)] =>
       checkManyExplicit(i)
     }
@@ -350,14 +363,14 @@ class MacroOrderingProperties
         "Comparing a and b with ordered bufferables compare after a serialization RT")
   }
 
-  def check[T : Arbitrary](implicit obuf: OrderedSerialization[T]) = {
+  def check[T: Arbitrary](implicit obuf: OrderedSerialization[T]) = {
     Checkers.check(LawTester(OrderedSerialization.allLaws))
     forAll(minSuccessful(500)) { (a: T, b: T) =>
       checkWithInputs(a, b)
     }
   }
 
-  def checkCollisions[T : Arbitrary : OrderedSerialization] = {
+  def checkCollisions[T: Arbitrary: OrderedSerialization] = {
     val ord = implicitly[OrderedSerialization[T]]
 
     val arbInput = Gen.containerOfN[Set, T](100, arb[T]).map(_.toList)

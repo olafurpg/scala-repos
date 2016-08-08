@@ -1,7 +1,7 @@
 package breeze.optimize
 /*
  Copyright 2015 David Hall, Daniel Ramage, Debasish Das
- 
+
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -26,8 +26,11 @@ import breeze.optimize.proximal.NonlinearMinimizer.Projection
 
 @RunWith(classOf[JUnitRunner])
 class ProjectedQuasiNewtonTest
-    extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    extends PropSpec
+    with PropertyChecks
+    with OptimizeTestBaseTrait
+    with VectorMatchers
+    with Matchers {
 
   property("optimize a simple multivariate gaussian") {
     val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-9)
@@ -45,8 +48,9 @@ class ProjectedQuasiNewtonTest
   }
 
   property("optimize a simple multivariate gaussian with projection") {
-    val optimizer = new ProjectedQuasiNewton(
-        tolerance = 1.0E-5, projection = _.map(scala.math.min(_, 2.0)))
+    val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-5,
+                                             projection =
+                                               _.map(scala.math.min(_, 2.0)))
 
     forAll { init: DenseVector[Double] =>
       init := clip(init, Double.NegativeInfinity, 2.0)

@@ -10,7 +10,7 @@ import Prop._
 trait AlternativeTests[F[_]] extends ApplicativeTests[F] with MonoidKTests[F] {
   def laws: AlternativeLaws[F]
 
-  def alternative[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def alternative[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

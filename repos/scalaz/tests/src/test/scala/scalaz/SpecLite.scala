@@ -34,7 +34,9 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
   class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
-      context = s; try a finally context = saved
+      context = s;
+      try a
+      finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 
@@ -93,18 +95,20 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
           if (!erasedClass.isInstance(ex))
             fail(
                 "wrong exception thrown, expected: " + erasedClass + " got: " +
-                ex)
+                  ex)
       }
     }
   }
   implicit def enrichAny[A](actual: => A): AnyOps[A] = new AnyOps(actual)
 
-  def prop[T, R](result: T => R)(
-      implicit toProp: (=> R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop =
+  def prop[T, R](result: T => R)(implicit toProp: (=> R) => Prop,
+                                 a: Arbitrary[T],
+                                 s: Shrink[T]): Prop =
     check1(result)
   implicit def propToProp(p: => Prop): Prop = p
-  implicit def check1[T, R](result: T => R)(
-      implicit toProp: (=> R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop =
+  implicit def check1[T, R](result: T => R)(implicit toProp: (=> R) => Prop,
+                                            a: Arbitrary[T],
+                                            s: Shrink[T]): Prop =
     Prop.forAll((t: T) => toProp(result(t)))
   implicit def unitToProp(u: => Unit): Prop = booleanToProp({ u; true })
   implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)

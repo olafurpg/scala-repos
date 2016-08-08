@@ -189,8 +189,8 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
       val joinedRow = new JoinedRow
 
       if (condition.isDefined) {
-        streamedIter.filter(
-            l => buildRows.exists(r => boundCondition(joinedRow(l, r))))
+        streamedIter.filter(l =>
+          buildRows.exists(r => boundCondition(joinedRow(l, r))))
       } else {
         streamedIter.filter(r => !buildRows.isEmpty)
       }

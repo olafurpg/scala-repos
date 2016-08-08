@@ -40,8 +40,8 @@ object SelectionMode
   val MULTIPLE = Multiple
 
   val Single = new SelectionMode(jfxsc.SelectionMode.SINGLE)
-  @deprecated(
-      "Use Single; SINGLE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Single; SINGLE will be removed in a future release",
+              "8.0.60-R10")
   val SINGLE = Single
 
   protected override def unsortedValues: Array[SelectionMode] =

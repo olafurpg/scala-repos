@@ -33,18 +33,18 @@ private[scalajs] object CoreJSLibs {
 
   def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     synchronized {
-      cachedLibByConfig.getOrElseUpdate(
-          (semantics, outputMode), makeLib(semantics, outputMode))
+      cachedLibByConfig.getOrElseUpdate((semantics, outputMode),
+                                        makeLib(semantics, outputMode))
     }
   }
 
-  private def makeLib(
-      semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
+  private def makeLib(semantics: Semantics,
+                      outputMode: OutputMode): VirtualJSFile = {
     new ScalaJSEnvVirtualJSFile(makeContent(semantics, outputMode))
   }
 
-  private def makeContent(
-      semantics: Semantics, outputMode: OutputMode): String = {
+  private def makeContent(semantics: Semantics,
+                          outputMode: OutputMode): String = {
     // This is a basic sort-of-C-style preprocessor
 
     def getOption(name: String): String = name match {

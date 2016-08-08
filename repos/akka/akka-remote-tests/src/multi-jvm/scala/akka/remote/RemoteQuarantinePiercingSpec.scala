@@ -8,7 +8,10 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -22,7 +25,8 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(
+      ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
                               """)))
@@ -42,7 +46,8 @@ class RemoteQuarantinePiercingMultiJvmNode2
     extends RemoteQuarantinePiercingSpec
 
 abstract class RemoteQuarantinePiercingSpec
-    extends MultiNodeSpec(RemoteQuarantinePiercingSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteQuarantinePiercingSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteQuarantinePiercingSpec._
@@ -107,7 +112,8 @@ abstract class RemoteQuarantinePiercingSpec
         Await.ready(system.whenTerminated, 30.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}

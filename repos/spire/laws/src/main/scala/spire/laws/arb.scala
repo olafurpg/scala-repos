@@ -43,36 +43,36 @@ object arb {
 
   implicit val sign: Arbitrary[Sign] = Arbitrary(gen.sign)
 
-  implicit def term[A : Arbitrary]: Arbitrary[poly.Term[A]] =
+  implicit def term[A: Arbitrary]: Arbitrary[poly.Term[A]] =
     Arbitrary(gen.term[A])
 
-  implicit def polynomial[A : Arbitrary : Semiring : Eq : ClassTag]: Arbitrary[
-      Polynomial[A]] =
+  implicit def polynomial[A: Arbitrary: Semiring: Eq: ClassTag]
+    : Arbitrary[Polynomial[A]] =
     Arbitrary(gen.polynomial[A])
 
-  implicit def complex[A : Arbitrary]: Arbitrary[Complex[A]] =
+  implicit def complex[A: Arbitrary]: Arbitrary[Complex[A]] =
     Arbitrary(gen.complex[A])
 
-  implicit def jet[A : Arbitrary : ClassTag]: Arbitrary[Jet[A]] =
+  implicit def jet[A: Arbitrary: ClassTag]: Arbitrary[Jet[A]] =
     Arbitrary(gen.jet2[A])
 
-  implicit def quaternion[A : Arbitrary]: Arbitrary[Quaternion[A]] =
+  implicit def quaternion[A: Arbitrary]: Arbitrary[Quaternion[A]] =
     Arbitrary(gen.quaternion[A])
 
-  implicit def bound[A : Arbitrary]: Arbitrary[Bound[A]] =
+  implicit def bound[A: Arbitrary]: Arbitrary[Bound[A]] =
     Arbitrary(gen.bound[A])
 
-  implicit def interval[A : Arbitrary : Order : AdditiveMonoid]: Arbitrary[
-      Interval[A]] =
+  implicit def interval[A: Arbitrary: Order: AdditiveMonoid]
+    : Arbitrary[Interval[A]] =
     Arbitrary(gen.interval[A])
 
-  implicit def freeMonoid[A : Arbitrary]: Arbitrary[FreeMonoid[A]] =
+  implicit def freeMonoid[A: Arbitrary]: Arbitrary[FreeMonoid[A]] =
     Arbitrary(gen.freeMonoid[A])
 
-  implicit def freeGroup[A : Arbitrary]: Arbitrary[FreeGroup[A]] =
+  implicit def freeGroup[A: Arbitrary]: Arbitrary[FreeGroup[A]] =
     Arbitrary(gen.freeGroup[A])
 
-  implicit def freeAbGroup[A : Arbitrary]: Arbitrary[FreeAbGroup[A]] =
+  implicit def freeAbGroup[A: Arbitrary]: Arbitrary[FreeAbGroup[A]] =
     Arbitrary(gen.freeAbGroup[A])
 
   implicit def perm: Arbitrary[Perm] =

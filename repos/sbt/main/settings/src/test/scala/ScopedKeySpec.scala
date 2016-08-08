@@ -18,8 +18,9 @@ class ScopedKeySpec extends Specification {
     ${beParsedAs("fullClasspath", ThisScope, "fullClasspath")}
 
   test:fullClasspath should
-    ${beParsedAs(
-        "test:fullClasspath", ThisScope in ConfigKey("test"), "fullClasspath")}
+    ${beParsedAs("test:fullClasspath",
+                 ThisScope in ConfigKey("test"),
+                 "fullClasspath")}
 
   *:fullClasspath
     ${beParsedAs("*:fullClasspath", GlobalScope, "fullClasspath")}
@@ -38,13 +39,13 @@ class ScopedKeySpec extends Specification {
     ${beParsedAs(
         "{file:/hello/}aea33a/test:fullClasspath",
         ThisScope in
-        (ProjectRef(new URI("file:/hello/"), "aea33a"), ConfigKey("test")),
+          (ProjectRef(new URI("file:/hello/"), "aea33a"), ConfigKey("test")),
         "fullClasspath")}
 
   {file:/hello/}/test:fullClasspath
     ${beParsedAs("{file:/hello/}/test:fullClasspath",
                  ThisScope in
-                 (BuildRef(new URI("file:/hello/")), ConfigKey("test")),
+                   (BuildRef(new URI("file:/hello/")), ConfigKey("test")),
                  "fullClasspath")}
 
   {.}/test:fullClasspath
@@ -55,8 +56,8 @@ class ScopedKeySpec extends Specification {
   {file:/hello/}/compile:doc::fullClasspath
     ${beParsedAs("{file:/hello/}/compile:doc::fullClasspath",
                  ThisScope in
-                 (BuildRef(new URI("file:/hello/")), ConfigKey("compile"),
-                     AttributeKey("doc")),
+                   (BuildRef(new URI("file:/hello/")), ConfigKey("compile"),
+                   AttributeKey("doc")),
                  "fullClasspath")}
                                                                 """
 

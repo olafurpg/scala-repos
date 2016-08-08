@@ -9,7 +9,14 @@ import mesosphere.marathon.core.task.Task.Terminated
 import mesosphere.marathon.core.task.update.TaskStatusUpdateStep
 import mesosphere.marathon.event.{EventModule, MesosStatusUpdateEvent}
 import mesosphere.marathon.state.Timestamp
-import org.apache.mesos.Protos.TaskState.{TASK_ERROR, TASK_FAILED, TASK_FINISHED, TASK_KILLED, TASK_LOST, TASK_RUNNING}
+import org.apache.mesos.Protos.TaskState.{
+  TASK_ERROR,
+  TASK_FAILED,
+  TASK_FINISHED,
+  TASK_KILLED,
+  TASK_LOST,
+  TASK_RUNNING
+}
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.slf4j.LoggerFactory
 import scala.collection.immutable.Seq
@@ -26,8 +33,9 @@ class PostToEventStreamStepImpl @Inject()(
 
   override def name: String = "postTaskStatusEvent"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             status: TaskStatus): Future[_] = {
 
     status.getState match {
       case Terminated(_) =>
@@ -45,8 +53,9 @@ class PostToEventStreamStepImpl @Inject()(
     Future.successful(())
   }
 
-  private[this] def postEvent(
-      timestamp: Timestamp, status: TaskStatus, task: Task): Unit = {
+  private[this] def postEvent(timestamp: Timestamp,
+                              status: TaskStatus,
+                              task: Task): Unit = {
     val taskId = task.taskId
     task.launched.foreach { launched =>
       log.info(

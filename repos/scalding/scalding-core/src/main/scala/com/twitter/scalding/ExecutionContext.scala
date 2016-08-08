@@ -16,7 +16,13 @@ limitations under the License.
 package com.twitter.scalding
 
 import cascading.flow.hadoop.HadoopFlow
-import cascading.flow.{Flow, FlowDef, FlowListener, FlowStepListener, FlowStepStrategy}
+import cascading.flow.{
+  Flow,
+  FlowDef,
+  FlowListener,
+  FlowStepListener,
+  FlowStepStrategy
+}
 import cascading.flow.planner.BaseFlowStep
 import cascading.pipe.Pipe
 import com.twitter.scalding.reducer_estimation.ReducerEstimatorStepStrategy
@@ -47,11 +53,10 @@ trait ExecutionContext {
   private def updateStepConfigWithDescriptions(
       step: BaseFlowStep[JobConf]): Unit = {
     val conf = step.getConfig
-    getIdentifierOpt(ExecutionContext.getDesc(step)).foreach(
-        descriptionString =>
-          {
+    getIdentifierOpt(ExecutionContext.getDesc(step))
+      .foreach(descriptionString => {
         conf.set(Config.StepDescriptions, descriptionString)
-    })
+      })
   }
 
   final def buildFlow: Try[Flow[_]] =
@@ -127,7 +132,8 @@ trait ExecutionContext {
             case Success(fn) => flow.addStepListener(fn(mode, configWithId))
             case Failure(e) =>
               new Exception(
-                  "Failed to decode flow step listener when submitting job", e)
+                  "Failed to decode flow step listener when submitting job",
+                  e)
           }
 
         case _ => ()
@@ -177,8 +183,8 @@ object ExecutionContext {
    * can be used inside of a Job to get an ExecutionContext if you want
    * to call a function that requires an implicit ExecutionContext
    */
-  def newContext(
-      conf: Config)(implicit fd: FlowDef, m: Mode): ExecutionContext =
+  def newContext(conf: Config)(implicit fd: FlowDef,
+                               m: Mode): ExecutionContext =
     new ExecutionContext {
       def config = conf
       def flowDef = fd

@@ -17,8 +17,11 @@ import scala.concurrent.Future
   * Most of the functionality is tested at a higher level in [[mesosphere.marathon.tasks.TaskTrackerImplTest]].
   */
 class TaskTrackerActorTest
-    extends MarathonActorSupport with FunSuiteLike with GivenWhenThen
-    with Mockito with Matchers {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("failures while loading the initial data are escalated") {
     val f = new Fixture
@@ -170,8 +173,8 @@ class TaskTrackerActorTest
       MarathonTestHelper.runningTaskProto(stagedTask.getId)
     val taskState = TaskSerializer.fromProto(stagedTaskNowRunning)
     probe.send(f.taskTrackerActor,
-               TaskTrackerActor.TaskUpdated(
-                   taskState, TaskTrackerActor.Ack(probe.ref, ())))
+               TaskTrackerActor
+                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")
@@ -197,8 +200,8 @@ class TaskTrackerActorTest
     val newTask = MarathonTestHelper.stagedTaskProto(appId)
     val taskState = TaskSerializer.fromProto(newTask)
     probe.send(f.taskTrackerActor,
-               TaskTrackerActor.TaskUpdated(
-                   taskState, TaskTrackerActor.Ack(probe.ref, ())))
+               TaskTrackerActor
+                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")
@@ -208,8 +211,7 @@ class TaskTrackerActorTest
 
   class Fixture {
     def failProps =
-      Props(
-          new Actor {
+      Props(new Actor {
         override def receive: Receive = {
           case _: Any => throw new RuntimeException("severe simulated failure")
         }
@@ -218,8 +220,7 @@ class TaskTrackerActorTest
     lazy val spyProbe = TestProbe()
 
     def spyActor =
-      Props(
-          new Actor {
+      Props(new Actor {
         override def receive: Receive = {
           case msg: Any => spyProbe.ref.forward(msg)
         }

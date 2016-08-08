@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -77,11 +77,15 @@ object Settings {
         q(host, "host") ++ q(id, "id") ++ q(token, "token") ++ q(
             accountsPort,
             "accountsPort") ++ q(accountsPath, "accountsPath") ++ q(
-            authPort, "authPort") ++ q(authPath, "authPath") ++ q(
-            ingestPort, "ingestPort") ++ q(ingestPath, "ingestPath") ++ q(
-            jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ q(
-            shardPort, "shardPort") ++ q(shardPath, "shardPath") ++ q(
-            secure, "secure")
+            authPort,
+            "authPort") ++ q(authPath, "authPath") ++ q(
+            ingestPort,
+            "ingestPort") ++ q(ingestPath, "ingestPath") ++ q(jobsPort,
+                                                              "jobsPort") ++ q(
+            jobsPath,
+            "jobsPath") ++ q(shardPort, "shardPort") ++ q(
+            shardPath,
+            "shardPath") ++ q(secure, "secure")
       }
 
       def settings: Option[Settings] =
@@ -140,8 +144,9 @@ object Settings {
       }
     }
     ps.settings.getOrElse {
-      sys.error("missing settings in %s:\n  %s" format
-          (f, ps.missing.mkString("\n  ")))
+      sys.error(
+          "missing settings in %s:\n  %s" format
+            (f, ps.missing.mkString("\n  ")))
     }
   }
 }

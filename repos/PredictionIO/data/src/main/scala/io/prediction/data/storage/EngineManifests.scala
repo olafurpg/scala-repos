@@ -69,7 +69,7 @@ trait EngineManifests {
 @DeveloperApi
 class EngineManifestSerializer
     extends CustomSerializer[EngineManifest](format =>
-          ({
+      ({
         case JObject(fields) =>
           val seed = EngineManifest(id = "",
                                     version = "",
@@ -89,7 +89,7 @@ class EngineManifestSerializer
                   enginemanifest.copy(description = Some(description))
                 case JField("files", JArray(s)) =>
                   enginemanifest.copy(files = s.map(t =>
-                              t match {
+                    t match {
                       case JString(file) => file
                       case _ => ""
                   }))
@@ -102,15 +102,17 @@ class EngineManifestSerializer
         case enginemanifest: EngineManifest =>
           JObject(
               JField("id", JString(enginemanifest.id)) :: JField(
-                  "version", JString(enginemanifest.version)) :: JField(
-                  "name", JString(enginemanifest.name)) :: JField(
+                  "version",
+                  JString(enginemanifest.version)) :: JField(
+                  "name",
+                  JString(enginemanifest.name)) :: JField(
                   "description",
                   enginemanifest.description
                     .map(x => JString(x))
                     .getOrElse(JNothing)) :: JField("files",
                                                     JArray(enginemanifest.files
-                                                          .map(x => JString(x))
-                                                          .toList)) :: JField(
+                                                      .map(x => JString(x))
+                                                      .toList)) :: JField(
                   "engineFactory",
                   JString(enginemanifest.engineFactory)) :: Nil)
       }))

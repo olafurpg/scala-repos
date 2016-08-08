@@ -62,10 +62,8 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
       parent.jobProgresslistener.stageIdToData.get((s.stageId, s.attemptId))
     }
     val name = lastStageInfo.map(_.name).getOrElse("(Unknown Stage Name)")
-    val description = lastStageData
-      .flatMap(_.description)
-      .getOrElse("")
-      (name, description)
+    val description = lastStageData.flatMap(_.description).getOrElse("")
+    (name, description)
   }
 
   private def makeJobEvent(jobUIDatas: Seq[JobUIData]): Seq[String] = {
@@ -100,7 +98,8 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
            |  'end': new Date(${completionTime}),
            |  'content': '<div class="application-timeline-content"' +
            |     'data-html="true" data-placement="top" data-toggle="tooltip"' +
-           |     'data-title="${Utility.escape(escapedDesc)} (Job ${jobId})<br>' +
+           |     'data-title="${Utility
+                                   .escape(escapedDesc)} (Job ${jobId})<br>' +
            |     'Status: ${status}<br>' +
            |     'Submitted: ${UIUtils.formatDate(new Date(submissionTime))}' +
            |     '${if (status != JobExecutionStatus.RUNNING) {
@@ -129,7 +128,8 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
              |  'content': '<div class="executor-event-content"' +
              |    'data-toggle="tooltip" data-placement="bottom"' +
              |    'data-title="Executor ${executorId}<br>' +
-             |    'Added at ${UIUtils.formatDate(new Date(event.startTime))}"' +
+             |    'Added at ${UIUtils
+                              .formatDate(new Date(event.startTime))}"' +
              |    'data-html="true">Executor ${executorId} added</div>'
              |}
            """.stripMargin
@@ -355,10 +355,12 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
 
       val helpText =
         """A job is triggered by an action, like count() or saveAsTextFile().""" +
-        " Click on a job to see information about the stages of tasks inside it."
+          " Click on a job to see information about the stages of tasks inside it."
 
-      UIUtils.headerSparkPage(
-          "Spark Jobs", content, parent, helpText = Some(helpText))
+      UIUtils.headerSparkPage("Spark Jobs",
+                              content,
+                              parent,
+                              helpText = Some(helpText))
     }
   }
 }

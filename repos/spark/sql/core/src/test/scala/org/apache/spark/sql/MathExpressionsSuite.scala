@@ -38,14 +38,15 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   private lazy val nnDoubleData =
     (1 to 10).map(i => DoubleData(i * 0.1, i * -0.1)).toDF()
 
-  private lazy val nullDoubles = Seq(
-      NullDoubles(1.0), NullDoubles(2.0), NullDoubles(3.0), NullDoubles(null))
-    .toDF()
+  private lazy val nullDoubles = Seq(NullDoubles(1.0),
+                                     NullDoubles(2.0),
+                                     NullDoubles(3.0),
+                                     NullDoubles(null)).toDF()
 
   private def testOneToOneMathFunction[
       @specialized(Int, Long, Float, Double) T,
-      @specialized(Int, Long, Float, Double) U](
-      c: Column => Column, f: T => U): Unit = {
+      @specialized(Int, Long, Float, Double) U](c: Column => Column,
+                                                f: T => U): Unit = {
     checkAnswer(
         doubleData.select(c('a)),
         (1 to 10).map(n => Row(f((n * 0.2 - 1).asInstanceOf[T])))
@@ -63,7 +64,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   }
 
   private def testOneToOneNonNegativeMathFunction(
-      c: Column => Column, f: Double => Double): Unit = {
+      c: Column => Column,
+      f: Double => Double): Unit = {
     checkAnswer(
         nnDoubleData.select(c('a)),
         (1 to 10).map(n => Row(f(n * 0.1)))
@@ -91,7 +93,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .collect()
           .toSeq
           .map(r => Row(f(r.getDouble(0), r.getDouble(0))))
-      )
+    )
 
     checkAnswer(
         nnDoubleData.select(c('a, 'b)),
@@ -99,7 +101,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .collect()
           .toSeq
           .map(r => Row(f(r.getDouble(0), r.getDouble(1))))
-      )
+    )
 
     checkAnswer(
         nnDoubleData.select(d('a, 2.0)),
@@ -162,7 +164,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         Seq((1, 2))
           .toDF()
           .select(toDegrees(lit(0)), toDegrees(lit(1)), toDegrees(lit(1.5)))
-      )
+    )
   }
 
   test("toRadians") {
@@ -172,7 +174,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         Seq((1, 2))
           .toDF()
           .select(toRadians(lit(0)), toRadians(lit(1)), toRadians(lit(1.5)))
-      )
+    )
   }
 
   test("cbrt") {
@@ -181,8 +183,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
   test("ceil and ceiling") {
     testOneToOneMathFunction(ceil, (d: Double) => math.ceil(d).toLong)
-    checkAnswer(
-        sql("SELECT ceiling(0), ceiling(1), ceiling(1.5)"), Row(0L, 1L, 2L))
+    checkAnswer(sql("SELECT ceiling(0), ceiling(1), ceiling(1.5)"),
+                Row(0L, 1L, 2L))
   }
 
   test("conv") {
@@ -226,8 +228,9 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
     val pi = "3.1415"
     checkAnswer(
-        sql(s"SELECT round($pi, -3), round($pi, -2), round($pi, -1), " +
-            s"round($pi, 0), round($pi, 1), round($pi, 2), round($pi, 3)"),
+        sql(
+            s"SELECT round($pi, -3), round($pi, -2), round($pi, -1), " +
+              s"round($pi, 0), round($pi, 1), round($pi, 2), round($pi, 3)"),
         Seq(
             Row(BigDecimal("0E3"),
                 BigDecimal("0E2"),
@@ -272,15 +275,15 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(data.selectExpr("hex(b)"), Seq(Row("FFFFFFFFFFFFFFE4")))
     checkAnswer(data.selectExpr("hex(c)"), Seq(Row("177828FED4")))
     checkAnswer(data.selectExpr("hex(d)"), Seq(Row("68656C6C6F")))
-    checkAnswer(
-        data.selectExpr("hex(cast(d as binary))"), Seq(Row("68656C6C6F")))
+    checkAnswer(data.selectExpr("hex(cast(d as binary))"),
+                Seq(Row("68656C6C6F")))
   }
 
   test("unhex") {
     val data = Seq(("1C", "737472696E67")).toDF("a", "b")
     checkAnswer(data.select(unhex('a)), Row(Array[Byte](28.toByte)))
-    checkAnswer(
-        data.select(unhex('b)), Row("string".getBytes(StandardCharsets.UTF_8)))
+    checkAnswer(data.select(unhex('b)),
+                Row("string".getBytes(StandardCharsets.UTF_8)))
     checkAnswer(data.selectExpr("unhex(a)"), Row(Array[Byte](28.toByte)))
     checkAnswer(data.selectExpr("unhex(b)"),
                 Row("string".getBytes(StandardCharsets.UTF_8)))
@@ -297,14 +300,14 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("log / ln") {
-    testOneToOneNonNegativeMathFunction(
-        org.apache.spark.sql.functions.log, math.log)
+    testOneToOneNonNegativeMathFunction(org.apache.spark.sql.functions.log,
+                                        math.log)
     checkAnswer(
         sql("SELECT ln(0), ln(1), ln(1.5)"),
         Seq((1, 2))
           .toDF()
           .select(logarithm(lit(0)), logarithm(lit(1)), logarithm(lit(1.5)))
-      )
+    )
   }
 
   test("log10") {
@@ -384,8 +387,10 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("abs") {
-    val input = Seq[(java.lang.Double, java.lang.Double)](
-        (null, null), (0.0, 0.0), (1.5, 1.5), (-2.5, 2.5))
+    val input = Seq[(java.lang.Double, java.lang.Double)]((null, null),
+                                                          (0.0, 0.0),
+                                                          (1.5, 1.5),
+                                                          (-2.5, 2.5))
     checkAnswer(
         input.toDF("key", "value").select(abs($"key").alias("a")).sort("a"),
         input.map(pair => Row(pair._2)))
@@ -418,13 +423,13 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(sqrt("a"), sqrt("b")), Row(1.0, 2.0))
 
     checkAnswer(sql("SELECT SQRT(4.0), SQRT(null)"), Row(2.0, null))
-    checkAnswer(
-        df.selectExpr("sqrt(a)", "sqrt(b)", "sqrt(null)"), Row(1.0, 2.0, null))
+    checkAnswer(df.selectExpr("sqrt(a)", "sqrt(b)", "sqrt(null)"),
+                Row(1.0, 2.0, null))
   }
 
   test("negative") {
-    checkAnswer(
-        sql("SELECT negative(1), negative(0), negative(-1)"), Row(-1, 0, 1))
+    checkAnswer(sql("SELECT negative(1), negative(0), negative(-1)"),
+                Row(-1, 0, 1))
   }
 
   test("positive") {

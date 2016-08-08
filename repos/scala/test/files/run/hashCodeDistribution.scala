@@ -5,8 +5,8 @@ object Test {
   val totalCodes = COUNT * COUNT
 
   def main(args: Array[String]) = {
-    val hashCodes = for (x <- 0 until COUNT; y <- 0 until COUNT) yield
-      C(x, y).hashCode
+    val hashCodes = for (x <- 0 until COUNT; y <- 0 until COUNT)
+      yield C(x, y).hashCode
 
     val uniques = hashCodes.distinct
     val collisionRate = (totalCodes - uniques.size) * 1000 / totalCodes

@@ -83,10 +83,13 @@ class DateTimeSpec extends WordSpec with Matchers {
         DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
       val roundTripOk: Matcher[DateTime] = Matcher { dt: DateTime ⇒
         MatchResult({
-          val rt = roundTrip(dt); dt == rt && dt.weekday == rt.weekday
-        }, dt.toRfc1123DateTimeString + " != " +
-        roundTrip(dt).toRfc1123DateTimeString, dt.toRfc1123DateTimeString +
-        " == " + roundTrip(dt).toRfc1123DateTimeString)
+                      val rt = roundTrip(dt);
+                      dt == rt && dt.weekday == rt.weekday
+                    },
+                    dt.toRfc1123DateTimeString + " != " +
+                      roundTrip(dt).toRfc1123DateTimeString,
+                    dt.toRfc1123DateTimeString +
+                      " == " + roundTrip(dt).toRfc1123DateTimeString)
       }
       all(httpDateTimes.take(10000)) should roundTripOk
     }

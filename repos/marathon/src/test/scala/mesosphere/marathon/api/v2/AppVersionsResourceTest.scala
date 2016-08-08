@@ -4,13 +4,20 @@ import mesosphere.marathon.api.TestAuthFixture
 import mesosphere.marathon.state.{GroupManager, Timestamp, AppDefinition}
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec}
+import mesosphere.marathon.{
+  MarathonConf,
+  MarathonSchedulerService,
+  MarathonSpec
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.concurrent.Future
 
 class AppVersionsResourceTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("access without authentication is denied") {
     Given("An unauthenticated request")
@@ -97,7 +104,10 @@ class AppVersionsResourceTest
     config = mock[MarathonConf]
     service = mock[MarathonSchedulerService]
     groupManager = mock[GroupManager]
-    appsVersionsResource = new AppVersionsResource(
-        service, groupManager, auth.auth, auth.auth, config)
+    appsVersionsResource = new AppVersionsResource(service,
+                                                   groupManager,
+                                                   auth.auth,
+                                                   auth.auth,
+                                                   config)
   }
 }

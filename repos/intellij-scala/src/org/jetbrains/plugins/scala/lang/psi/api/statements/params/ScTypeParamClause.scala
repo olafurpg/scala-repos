@@ -7,7 +7,7 @@ package params
 
 import com.intellij.psi.{PsiTypeParameter, PsiTypeParameterList}
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * @since 22.02.2008
   */

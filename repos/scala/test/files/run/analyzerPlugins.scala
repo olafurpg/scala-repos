@@ -81,38 +81,51 @@ object Test extends DirectTest {
     object analyzerPlugin extends AnalyzerPlugin {
       def treeClass(t: Tree) = t.getClass.toString.split('.').last
 
-      override def pluginsPt(
-          pt: Type, typer: Typer, tree: Tree, mode: Mode): Type = {
+      override def pluginsPt(pt: Type,
+                             typer: Typer,
+                             tree: Tree,
+                             mode: Mode): Type = {
         output += s"pluginsPt($pt, ${treeClass(tree)})"
         pt
       }
 
-      override def pluginsTyped(
-          tpe: Type, typer: Typer, tree: Tree, mode: Mode, pt: Type): Type = {
+      override def pluginsTyped(tpe: Type,
+                                typer: Typer,
+                                tree: Tree,
+                                mode: Mode,
+                                pt: Type): Type = {
         output += s"pluginsTyped($tpe, ${treeClass(tree)})"
         tpe
       }
 
-      override def pluginsTypeSig(
-          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
+      override def pluginsTypeSig(tpe: Type,
+                                  typer: Typer,
+                                  defTree: Tree,
+                                  pt: Type): Type = {
         output += s"pluginsTypeSig(${defTree.symbol}, ${treeClass(defTree)})"
         tpe
       }
 
-      override def pluginsTypeSigAccessor(
-          tpe: Type, typer: Typer, tree: ValDef, sym: Symbol): Type = {
+      override def pluginsTypeSigAccessor(tpe: Type,
+                                          typer: Typer,
+                                          tree: ValDef,
+                                          sym: Symbol): Type = {
         output += s"pluginsTypeSigAccessor(${tree.symbol})"
         tpe
       }
 
-      override def canAdaptAnnotations(
-          tree: Tree, typer: Typer, mode: Mode, pt: Type): Boolean = {
+      override def canAdaptAnnotations(tree: Tree,
+                                       typer: Typer,
+                                       mode: Mode,
+                                       pt: Type): Boolean = {
         output += s"canAdaptAnnotations(${treeClass(tree)}, $pt)"
         false
       }
 
-      override def pluginsTypedReturn(
-          tpe: Type, typer: Typer, tree: Return, pt: Type): Type = {
+      override def pluginsTypedReturn(tpe: Type,
+                                      typer: Typer,
+                                      tree: Return,
+                                      pt: Type): Type = {
         output += s"pluginsTypedReturn($tree, $pt)"
         tpe
       }

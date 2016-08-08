@@ -65,21 +65,24 @@ object Challenge extends LilaController {
       isForMe(c) ?? env.api.accept(c, ctx.me).flatMap {
         case Some(pov) =>
           negotiate(
-              html = Redirect(routes.Round.watcher(pov.game.id, "white")).fuccess,
+              html =
+                Redirect(routes.Round.watcher(pov.game.id, "white")).fuccess,
               api = apiVersion =>
-                  Env.api.roundApi.player(pov, apiVersion) map { Ok(_) }
+                Env.api.roundApi.player(pov, apiVersion) map { Ok(_) }
           ) flatMap withChallengeAnonCookie(ctx.isAnon, c, false)
         case None =>
-          negotiate(
-              html = Redirect(routes.Round.watcher(c.id, "white")).fuccess,
-              api = _ => notFoundJson("Someone else accepted the challenge"))
+          negotiate(html =
+                      Redirect(routes.Round.watcher(c.id, "white")).fuccess,
+                    api =
+                      _ => notFoundJson("Someone else accepted the challenge"))
       }
     }
   }
 
   private def withChallengeAnonCookie(
-      cond: Boolean, c: ChallengeModel, owner: Boolean)(res: Result)(
-      implicit ctx: Context): Fu[Result] =
+      cond: Boolean,
+      c: ChallengeModel,
+      owner: Boolean)(res: Result)(implicit ctx: Context): Fu[Result] =
     cond ?? {
       GameRepo.game(c.id).map {
         _ map { game =>
@@ -111,7 +114,9 @@ object Challenge extends LilaController {
 
   def rematchOf(gameId: String) = Auth { implicit ctx => me =>
     OptionFuResult(GameRepo game gameId) { g =>
-      Pov.opponentOfUserId(g, me.id).flatMap(_.userId) ?? UserRepo.byId flatMap {
+      Pov
+        .opponentOfUserId(g, me.id)
+        .flatMap(_.userId) ?? UserRepo.byId flatMap {
         _ ?? { opponent =>
           restriction(opponent) flatMap {
             case Some(r) =>
@@ -144,7 +149,7 @@ object Challenge extends LilaController {
                                              pref.challenge,
                                              follow,
                                              fromCheat = me.engine &&
-                                               !user.engine)
+                                                 !user.engine)
           }
       }
   }

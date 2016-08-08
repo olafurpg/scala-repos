@@ -3,7 +3,12 @@
   */
 package docs.io
 
-import java.net.{InetAddress, InetSocketAddress, NetworkInterface, StandardProtocolFamily}
+import java.net.{
+  InetAddress,
+  InetSocketAddress,
+  NetworkInterface,
+  StandardProtocolFamily
+}
 import java.net.DatagramSocket
 import java.nio.channels.DatagramChannel
 
@@ -31,7 +36,8 @@ final case class MulticastGroup(address: String, interface: String)
 //#multicast-group
 
 class Listener(iface: String, group: String, port: Int, sink: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   //#bind
   import context.system
   val opts = List(Inet6ProtocolFamily(), MulticastGroup(group, iface))
@@ -50,15 +56,16 @@ class Listener(iface: String, group: String, port: Int, sink: ActorRef)
 }
 
 class Sender(iface: String, group: String, port: Int, msg: String)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.system
   IO(Udp) ! Udp.SimpleSender(List(Inet6ProtocolFamily()))
 
   def receive = {
     case Udp.SimpleSenderReady => {
-        val remote = new InetSocketAddress(s"$group%$iface", port)
-        log.info("Sending message to {}", remote)
-        sender() ! Udp.Send(ByteString(msg), remote)
-      }
+      val remote = new InetSocketAddress(s"$group%$iface", port)
+      log.info("Sending message to {}", remote)
+      sender() ! Udp.Send(ByteString(msg), remote)
+    }
   }
 }

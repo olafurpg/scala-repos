@@ -98,7 +98,8 @@ object DialogEvent {
   * @define ORIGINALDOC Original Documentation]].
   */
 class DialogEvent(override val delegate: jfxsc.DialogEvent)
-    extends Event(delegate) with SFXDelegate[jfxsc.DialogEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsc.DialogEvent] {
 
   def this(source: Dialog[_], eventType: EventType[_ <: jfxe.Event]) =
     this(new jfxsc.DialogEvent(source.delegate, eventType.delegate))

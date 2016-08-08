@@ -77,7 +77,8 @@ class SexpParserSpec extends EnsimeSpec {
 
   it should "parse quoted expressions" in {
     parse("""'(:foo "foo" :bar "bar")""") shouldBe SexpCons(
-        SexpSymbol("quote"), SexpList(fookey, foo, barkey, bar))
+        SexpSymbol("quote"),
+        SexpList(fookey, foo, barkey, bar))
 
     parse("'foo") shouldBe SexpCons(SexpSymbol("quote"), foosym)
   }

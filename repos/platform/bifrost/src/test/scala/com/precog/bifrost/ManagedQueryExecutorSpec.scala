@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,7 +42,11 @@ import blueeyes.util.Clock
 import blueeyes.core.http.{MimeType, MimeTypes}
 import blueeyes.json._
 import blueeyes.bkka._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeExtractor => _,
+  DateTimeDecomposer => _,
+  _
+}
 
 import org.specs2.mutable.Specification
 
@@ -61,8 +65,8 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(15, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(15, "seconds"))
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
   val jobManager: JobManager[Future] = new InMemoryJobManager[Future]
@@ -75,20 +79,24 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
                                AccountPlan.Free)
   val ticker = actorSystem.actorOf(Props(new Ticker(ticks)))
 
-  def execute(
-      numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] = {
+  def execute(numTicks: Int,
+              ticksToTimeout: Option[Int] = None): Future[JobId] = {
     val timeout =
       ticksToTimeout map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
       }
     val executionResult = for {
       executor <- asyncExecutorFor(apiKey) leftMap {
-        EvaluationError.invalidState
-      }
-      ctx = EvaluationContext(
-          apiKey, account, Path("/\\\\/\\///\\/"), Path.Root, clock.now())
-      result <- executor.execute(
-          numTicks.toString, ctx, QueryOptions(timeout = timeout))
+                   EvaluationError.invalidState
+                 }
+      ctx = EvaluationContext(apiKey,
+                              account,
+                              Path("/\\\\/\\///\\/"),
+                              Path.Root,
+                              clock.now())
+      result <- executor.execute(numTicks.toString,
+                                 ctx,
+                                 QueryOptions(timeout = timeout))
     } yield result
 
     executionResult.valueOr(err => sys.error(err.toString))
@@ -119,11 +127,11 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
       _ <- waitFor(1)
       Some(job) <- jobManager.findJob(jobId)
       finalJob <- job.state match {
-        case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
-          waitForJobCompletion(jobId)
-        case _ =>
-          Future(job)
-      }
+                   case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
+                     waitForJobCompletion(jobId)
+                   case _ =>
+                     Future(job)
+                 }
     } yield finalJob
   }
 
@@ -193,9 +201,9 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
 }
 
 trait TestManagedPlatform
-    extends ManagedExecution with ManagedQueryModule
-    with SchedulableFuturesModule {
-  self =>
+    extends ManagedExecution
+    with ManagedQueryModule
+    with SchedulableFuturesModule { self =>
   def actorSystem: ActorSystem
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
@@ -219,28 +227,28 @@ trait TestManagedPlatform
         val numTicks = query.toInt
         EitherT
           .right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
-          schedule(0) {
-            StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
-              case i if i < numTicks =>
-                schedule(1) {
-                  Some((Slice.fromJValues(
-                            Stream(JObject("value" -> JString(".")))),
-                        i + 1))
-                }.liftM[JobQueryT]
+            schedule(0) {
+              StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
+                case i if i < numTicks =>
+                  schedule(1) {
+                    Some(
+                        (Slice.fromJValues(
+                             Stream(JObject("value" -> JString(".")))),
+                         i + 1))
+                  }.liftM[JobQueryT]
 
-              case _ =>
-                shardQueryMonad.point { None }
-            }
-          }.liftM[JobQueryT]
-        }
+                case _ =>
+                  shardQueryMonad.point { None }
+              }
+            }.liftM[JobQueryT]
+          }
       }
     }
   }
 
   def asyncExecutorFor(apiKey: APIKey)
     : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
-    EitherT.right(
-        Future(new AsyncQueryExecutor {
+    EitherT.right(Future(new AsyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
@@ -249,8 +257,7 @@ trait TestManagedPlatform
       Future,
       String,
       QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
-    EitherT.right(
-        Future(new SyncQueryExecutor {
+    EitherT.right(Future(new SyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }

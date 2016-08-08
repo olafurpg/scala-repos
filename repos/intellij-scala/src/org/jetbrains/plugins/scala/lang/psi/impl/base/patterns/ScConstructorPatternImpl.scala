@@ -13,17 +13,26 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScSimpleTypeElementImpl
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
 class ScConstructorPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstructorPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScConstructorPattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -55,7 +64,8 @@ class ScConstructorPatternImpl(node: ASTNode)
                   var i = 0
                   while (i < subpatterns.length) {
                     val tp = {
-                      substitutor.subst(params(i)
+                      substitutor.subst(
+                          params(i)
                             .getType(TypingContext.empty)
                             .getOrElse(return false))
                     }
@@ -86,9 +96,8 @@ class ScConstructorPatternImpl(node: ASTNode)
             val newSubst = {
               val clazzType = ScParameterizedType(
                   refType,
-                  td.getTypeParameters.map(
-                      tp =>
-                        ScUndefinedType(tp match {
+                  td.getTypeParameters.map(tp =>
+                    ScUndefinedType(tp match {
                       case tp: ScTypeParam =>
                         new ScTypeParameterType(tp, r.substitutor)
                       case _ => new ScTypeParameterType(tp, r.substitutor)
@@ -96,8 +105,7 @@ class ScConstructorPatternImpl(node: ASTNode)
               val emptySubst: ScSubstitutor =
                 new ScSubstitutor(
                     Map(td.typeParameters.map(tp =>
-                              ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                               Any)): _*),
+                      ((tp.name, ScalaPsiUtil.getPsiElementId(tp)), Any)): _*),
                     Map.empty,
                     None)
               expectedType match {
@@ -125,20 +133,21 @@ class ScConstructorPatternImpl(node: ASTNode)
           case obj: ScObject => Success(ScType.designator(obj), Some(this))
           case fun: ScFunction /*It's unapply method*/
               if (fun.name == "unapply" || fun.name == "unapplySeq") &&
-              fun.parameters.length == 1 =>
+                fun.parameters.length == 1 =>
             val substitutor = r.substitutor
             val subst =
               if (fun.typeParameters.isEmpty) substitutor
               else {
                 val undefSubst: ScSubstitutor =
-                  fun.typeParameters.foldLeft(ScSubstitutor.empty)((s, p) =>
+                  fun.typeParameters.foldLeft(ScSubstitutor.empty)(
+                      (s, p) =>
                         s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
                                 ScUndefinedType(
                                     new ScTypeParameterType(p, substitutor))))
                 val emptySubst: ScSubstitutor =
                   fun.typeParameters.foldLeft(ScSubstitutor.empty)((s, p) =>
-                        s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
-                                p.upperBound.getOrAny))
+                    s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
+                            p.upperBound.getOrAny))
                 val emptyRes = substitutor followed emptySubst
                 val result = fun.parameters(0).getType(TypingContext.empty)
                 if (result.isEmpty) emptyRes

@@ -3,7 +3,7 @@
   */
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import java.io.Closeable
 import scala.collection.immutable
@@ -34,8 +34,8 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     * Current internal cluster stats, updated periodically via event bus.
     */
   @volatile
-  private var _latestStats = CurrentInternalStats(
-      GossipStats(), VectorClockStats())
+  private var _latestStats =
+    CurrentInternalStats(GossipStats(), VectorClockStats())
 
   /**
     * Current cluster metrics, updated periodically via event bus.
@@ -49,7 +49,7 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
   private val eventBusListener: ActorRef = {
     cluster.system.systemActorOf(
         Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit =
             cluster.subscribe(self, classOf[ClusterDomainEvent])
           override def postStop(): Unit = cluster.unsubscribe(self)
@@ -64,14 +64,14 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
                 case MemberRemoved(member, _) ⇒
                   _state = _state.copy(members = _state.members - member,
                                        unreachable = _state.unreachable -
-                                         member)
+                                           member)
                 case UnreachableMember(member) ⇒
                   // replace current member with new member (might have different status, only address is used in equals)
                   _state = _state.copy(
                       unreachable = _state.unreachable - member + member)
                 case ReachableMember(member) ⇒
-                  _state = _state.copy(
-                      unreachable = _state.unreachable - member)
+                  _state =
+                    _state.copy(unreachable = _state.unreachable - member)
                 case event: MemberEvent ⇒
                   // replace current member with new member (might have different status, only address is used in equals)
                   val newUnreachable =
@@ -79,7 +79,7 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
                       _state.unreachable - event.member + event.member
                     else _state.unreachable
                   _state = _state.copy(members = _state.members -
-                                         event.member + event.member,
+                                           event.member + event.member,
                                        unreachable = newUnreachable)
                 case LeaderChanged(leader) ⇒
                   _state = _state.copy(leader = leader)
@@ -104,7 +104,7 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     state.members
       .find(_.uniqueAddress == selfUniqueAddress)
       .getOrElse(Member(selfUniqueAddress, cluster.selfRoles)
-            .copy(status = MemberStatus.Removed))
+        .copy(status = MemberStatus.Removed))
   }
 
   /**

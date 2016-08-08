@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,8 +36,13 @@ import scalaz.Scalaz._
 // import scalaz.syntax.arrow._
 
 object EmitterSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with Emitter with RawErrors with StaticLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with Emitter
+    with RawErrors
+    with StaticLibrarySpec {
 
   import instructions._
   import library._
@@ -48,13 +53,13 @@ object EmitterSpecs
     emit(tree)
   }
 
-  def testEmit(v: String)(
-      head: Vector[Instruction], streams: Vector[Instruction]*) =
+  def testEmit(v: String)(head: Vector[Instruction],
+                          streams: Vector[Instruction]*) =
     compileEmit(v).filter { case _: Line => false; case _ => true } must beOneOf(
         (head +: streams): _*)
 
-  def testEmitLine(v: String)(
-      head: Vector[Instruction], streams: Vector[Instruction]*) =
+  def testEmitLine(v: String)(head: Vector[Instruction],
+                              streams: Vector[Instruction]*) =
     compileEmit(v) must beOneOf((head +: streams): _*)
 
   "emitter" should {
@@ -211,17 +216,19 @@ object EmitterSpecs
     }
 
     "emit cross for division of load in static provenance with load in value provenance" in {
-      testEmit("load(\"foo\") * 2")(Vector(PushString("foo"),
-                                           AbsoluteLoad,
-                                           PushNum("2"),
-                                           Map2Cross(Mul)))
+      testEmit("load(\"foo\") * 2")(
+          Vector(PushString("foo"),
+                 AbsoluteLoad,
+                 PushNum("2"),
+                 Map2Cross(Mul)))
     }
 
     "emit cross for division of relative load in static provenance with load in value provenance" in {
-      testEmit("relativeLoad(\"foo\") * 2")(Vector(PushString("foo"),
-                                                   RelativeLoad,
-                                                   PushNum("2"),
-                                                   Map2Cross(Mul)))
+      testEmit("relativeLoad(\"foo\") * 2")(
+          Vector(PushString("foo"),
+                 RelativeLoad,
+                 PushNum("2"),
+                 Map2Cross(Mul)))
     }
 
     "emit line information for cross for division of load in static provenance with load in value provenance" in {
@@ -237,17 +244,19 @@ object EmitterSpecs
     }
 
     "emit cross for division of load in static provenance with load in value provenance" in {
-      testEmit("2 * load(\"foo\")")(Vector(PushNum("2"),
-                                           PushString("foo"),
-                                           AbsoluteLoad,
-                                           Map2Cross(Mul)))
+      testEmit("2 * load(\"foo\")")(
+          Vector(PushNum("2"),
+                 PushString("foo"),
+                 AbsoluteLoad,
+                 Map2Cross(Mul)))
     }
 
     "emit cross for division of relative load in static provenance with load in value provenance" in {
-      testEmit("2 * relativeLoad(\"foo\")")(Vector(PushNum("2"),
-                                                   PushString("foo"),
-                                                   RelativeLoad,
-                                                   Map2Cross(Mul)))
+      testEmit("2 * relativeLoad(\"foo\")")(
+          Vector(PushNum("2"),
+                 PushString("foo"),
+                 RelativeLoad,
+                 Map2Cross(Mul)))
     }
 
     "emit negation of literal numeric load with value provenance" in {
@@ -257,10 +266,8 @@ object EmitterSpecs
     }
 
     "emit negation of sum of two literal numeric loads with value provenance" in {
-      testEmit("neg (5 + 2)")(Vector(PushNum("5"),
-                                     PushNum("2"),
-                                     Map2Cross(Add),
-                                     Map1(Neg)))
+      testEmit("neg (5 + 2)")(
+          Vector(PushNum("5"), PushNum("2"), Map2Cross(Add), Map1(Neg)))
     }
 
     "emit and mark new expression" in {
@@ -272,9 +279,8 @@ object EmitterSpecs
     }
 
     "emit wrap object for object with single field having constant numeric value" in {
-      testEmit("{foo: 1}")(Vector(PushString("foo"),
-                                  PushNum("1"),
-                                  Map2Cross(WrapObject)))
+      testEmit("{foo: 1}")(
+          Vector(PushString("foo"), PushNum("1"), Map2Cross(WrapObject)))
     }
 
     "emit wrap object for object with single field having null value" in {
@@ -299,7 +305,8 @@ object EmitterSpecs
         | not(not(true))
         """.stripMargin
 
-      testEmit(input)(Vector(
+      testEmit(input)(
+          Vector(
               PushTrue,
               Map1(Comp),
               Map1(Comp)
@@ -783,11 +790,7 @@ object EmitterSpecs
 
     "emit filter match for where loads from same provenance" in {
       testEmit("""foo := load("foo") foo where foo""")(
-          Vector(PushString("foo"),
-                 AbsoluteLoad,
-                 Dup,
-                 Swap(1),
-                 FilterMatch))
+          Vector(PushString("foo"), AbsoluteLoad, Dup, Swap(1), FilterMatch))
     }
 
     "emit filter match for loads from same provenance when performing equality filter" in {
@@ -846,7 +849,8 @@ object EmitterSpecs
     }
 
     "emit count reduction" in {
-      testEmit("count(1)")(Vector(
+      testEmit("count(1)")(
+          Vector(
               PushNum("1"),
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000)))))
     }
@@ -911,7 +915,8 @@ object EmitterSpecs
     }
 
     "emit body of a fully applied characteristic function with two variables" in {
-      testEmit("""
+      testEmit(
+          """
         | fun(a, b) := 
         |   //campaigns where (//campaigns).ageRange = a & (//campaigns).gender = b
         | fun([25,36],
@@ -1124,7 +1129,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for cf example with paired tic variables in critical condition" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | solve 'a, 'b
         |   clicks' := clicks where clicks.time = 'a & clicks.pageId = 'b
@@ -1151,7 +1157,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for cf example with consecutively-constrained paired tic variables on a single set" in {
-      testEmit("""
+      testEmit(
+          """
         | organizations := //organizations
         | 
         | hist := solve 'revenue, 'campaign 
@@ -1316,7 +1323,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for rr cf example" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | 
         | totalPairs(sessionId) :=
@@ -1327,7 +1335,8 @@ object EmitterSpecs
     }.pendingUntilFixed // TODO this *really* should be working
 
     "emit split and merge for ctr example" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | imps := //impressions
         | solve 'day
@@ -1436,7 +1445,8 @@ object EmitterSpecs
     }
 
     "determine a histogram of a composite key of revenue and campaign" >> {
-      testEmit("""
+      testEmit(
+          """
         | campaigns := //campaigns
         | organizations := //organizations
         | 
@@ -1551,7 +1561,8 @@ object EmitterSpecs
 
     "emit code for examples" in {
       "deviant-durations.qrl" >> {
-        testEmit("""
+        testEmit(
+            """
           | interactions := //interactions
           | 
           | solve 'userId
@@ -1625,7 +1636,8 @@ object EmitterSpecs
       }
 
       "first-conversion.qrl" >> {
-        testEmit("""
+        testEmit(
+            """
           | solve 'userId
           |   conversions' := //conversions
           |   impressions' := //impressions
@@ -1736,7 +1748,8 @@ object EmitterSpecs
       }
 
       "histogram.qrl" >> {
-        testEmit("""
+        testEmit(
+            """
           | clicks := //clicks
           | 
           | histogram := solve 'value
@@ -2132,11 +2145,11 @@ object EmitterSpecs
   }
 
   /* val exampleDir = new File("quirrel/examples")
-  
+
   if (exampleDir.exists) {
     "specification examples" >> {
       val pending = Set("relative-durations.qrl")
-      
+
       for (file <- exampleDir.listFiles if file.getName endsWith ".qrl") {
         if (pending contains file.getName) {
           file.getName >> {

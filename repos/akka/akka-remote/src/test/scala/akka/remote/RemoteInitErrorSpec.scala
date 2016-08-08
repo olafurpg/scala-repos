@@ -51,12 +51,12 @@ class RemoteInitErrorSpec extends FlatSpec with Matchers {
       fail("initialization should fail due to invalid IP address")
     } catch {
       case NonFatal(e) ⇒ {
-          eventually(timeout(30 seconds), interval(800 milliseconds)) {
-            val current = currentThreadIds()
-            // no new threads should remain compared to the start state
-            (current diff start) should be(empty)
-          }
+        eventually(timeout(30 seconds), interval(800 milliseconds)) {
+          val current = currentThreadIds()
+          // no new threads should remain compared to the start state
+          (current diff start) should be(empty)
         }
+      }
     }
   }
 }

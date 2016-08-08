@@ -489,7 +489,8 @@ object Complex { outer =>
 
   /** `Complex` as `scala.math.Fractional` trait. */
   trait ComplexIsFractional
-      extends ComplexIsConflicted with Fractional[Complex] {
+      extends ComplexIsConflicted
+      with Fractional[Complex] {
     def div(x: Complex, y: Complex): Complex = x / y
   }
 
@@ -510,7 +511,8 @@ object Complex { outer =>
     * `Ordering` is required because `Numeric` extends `Ordering`.  Hence,
     * an ordering based upon the real then imaginary components is used. */
   implicit object ComplexIsFractional
-      extends ComplexIsFractional with ComplexOrdering
+      extends ComplexIsFractional
+      with ComplexOrdering
 
   implicit object logComplexImpl
       extends breeze.numerics.log.Impl[Complex, Complex] {

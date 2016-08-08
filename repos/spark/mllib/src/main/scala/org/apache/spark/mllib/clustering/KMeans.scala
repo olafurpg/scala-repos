@@ -45,7 +45,8 @@ class KMeans private (private var k: Int,
                       private var initializationSteps: Int,
                       private var epsilon: Double,
                       private var seed: Long)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Constructs a KMeans instance with default parameters: {k: 2, maxIterations: 20, runs: 1,
@@ -218,7 +219,7 @@ class KMeans private (private var k: Int,
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data is not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Compute squared norms and cache them.
@@ -235,7 +236,7 @@ class KMeans private (private var k: Int,
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
     model
   }
@@ -262,19 +263,20 @@ class KMeans private (private var k: Int,
 
     val centers = initialModel match {
       case Some(kMeansCenters) => {
-          Array(kMeansCenters.clusterCenters.map(s => new VectorWithNorm(s)))
-        }
+        Array(kMeansCenters.clusterCenters.map(s => new VectorWithNorm(s)))
+      }
       case None => {
-          if (initializationMode == KMeans.RANDOM) {
-            initRandom(data)
-          } else {
-            initKMeansParallel(data)
-          }
+        if (initializationMode == KMeans.RANDOM) {
+          initRandom(data)
+        } else {
+          initKMeansParallel(data)
         }
+      }
     }
     val initTimeInSeconds = (System.nanoTime() - initStartTime) / 1e9
-    logInfo(s"Initialization with $initializationMode took " +
-        "%.3f".format(initTimeInSeconds) + " seconds.")
+    logInfo(
+        s"Initialization with $initializationMode took " +
+          "%.3f".format(initTimeInSeconds) + " seconds.")
 
     val active = Array.fill(numRuns)(true)
     val costs = Array.fill(numRuns)(0.0)
@@ -335,7 +337,8 @@ class KMeans private (private var k: Int,
           if (count != 0) {
             scal(1.0 / count, sum)
             val newCenter = new VectorWithNorm(sum)
-            if (KMeans.fastSquaredDistance(newCenter, centers(run)(j)) > epsilon * epsilon) {
+            if (KMeans
+                  .fastSquaredDistance(newCenter, centers(run)(j)) > epsilon * epsilon) {
               changed = true
             }
             centers(run)(j) = newCenter
@@ -355,8 +358,9 @@ class KMeans private (private var k: Int,
     }
 
     val iterationTimeInSeconds = (System.nanoTime() - iterationStartTime) / 1e9
-    logInfo(s"Iterations took " + "%.3f".format(iterationTimeInSeconds) +
-        " seconds.")
+    logInfo(
+        s"Iterations took " + "%.3f".format(iterationTimeInSeconds) +
+          " seconds.")
 
     if (iteration == maxIterations) {
       logInfo(s"KMeans reached the max number of iterations: $maxIterations.")
@@ -385,8 +389,8 @@ class KMeans private (private var k: Int,
           sample
             .slice(r * k, (r + 1) * k)
             .map { v =>
-          new VectorWithNorm(Vectors.dense(v.vector.toArray), v.norm)
-        }
+              new VectorWithNorm(Vectors.dense(v.vector.toArray), v.norm)
+            }
             .toArray)
   }
 
@@ -437,25 +441,23 @@ class KMeans private (private var k: Int,
         }
         .persist(StorageLevel.MEMORY_AND_DISK)
       val sumCosts = costs.aggregate(new Array[Double](runs))(
-          seqOp = (s, v) =>
-              {
-              // s += v
-              var r = 0
-              while (r < runs) {
-                s(r) += v(r)
-                r += 1
-              }
-              s
+          seqOp = (s, v) => {
+            // s += v
+            var r = 0
+            while (r < runs) {
+              s(r) += v(r)
+              r += 1
+            }
+            s
           },
-          combOp = (s0, s1) =>
-              {
-              // s0 += s1
-              var r = 0
-              while (r < runs) {
-                s0(r) += s1(r)
-                r += 1
-              }
-              s0
+          combOp = (s0, s1) => {
+            // s0 += s1
+            var r = 0
+            while (r < runs) {
+              s0(r) += s1(r)
+              r += 1
+            }
+            s0
           }
       )
 
@@ -631,8 +633,8 @@ object KMeans {
     * Returns the squared Euclidean distance between two vectors computed by
     * [[org.apache.spark.mllib.util.MLUtils#fastSquaredDistance]].
     */
-  private[clustering] def fastSquaredDistance(
-      v1: VectorWithNorm, v2: VectorWithNorm): Double = {
+  private[clustering] def fastSquaredDistance(v1: VectorWithNorm,
+                                              v2: VectorWithNorm): Double = {
     MLUtils.fastSquaredDistance(v1.vector, v1.norm, v2.vector, v2.norm)
   }
 

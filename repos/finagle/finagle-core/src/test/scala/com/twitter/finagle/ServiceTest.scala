@@ -63,8 +63,9 @@ class ServiceTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("ServiceFactory.const should resolve immediately to the given service" +
-      "resolve immediately to the given service") {
+  test(
+      "ServiceFactory.const should resolve immediately to the given service" +
+        "resolve immediately to the given service") {
     val service = mock[Service[String, String]]
     when(service.close(any)) thenReturn Future.Done
     when(service("ok")) thenReturn Future.value("ko")
@@ -110,8 +111,7 @@ class ServiceTest extends FunSuite with MockitoSugar {
 
     val underlyingFactory = new ServiceFactory[Unit, Unit] {
       def apply(conn: ClientConnection) =
-        Future.value(
-            new Service[Unit, Unit] {
+        Future.value(new Service[Unit, Unit] {
           def apply(request: Unit): Future[Unit] = Future.Unit
           override def close(deadline: Time) = {
             serviceCloseCalled = true
@@ -132,69 +132,69 @@ class ServiceTest extends FunSuite with MockitoSugar {
   test(
       "FactoryToService closes underlying service after request, does not close factory")(
       new Ctx {
-    val service = new FactoryToService(underlyingFactory)
-    Await.result(service(Unit))
+        val service = new FactoryToService(underlyingFactory)
+        Await.result(service(Unit))
 
-    assert(serviceCloseCalled)
-    assert(!factoryCloseCalled)
-  })
+        assert(serviceCloseCalled)
+        assert(!factoryCloseCalled)
+      })
 
   test("FactoryToService delegates status / close to underlying factory")(
       new Ctx {
-    val service = new FactoryToService(underlyingFactory)
-    service.status
-    service.close()
+        val service = new FactoryToService(underlyingFactory)
+        service.status
+        service.close()
 
-    assert(statusCalled)
-    assert(factoryCloseCalled)
-  })
+        assert(statusCalled)
+        assert(factoryCloseCalled)
+      })
 
   test(
       "FactoryToService module delegates isAvailable / close to underlying factory")(
       new Ctx {
-    val stack = FactoryToService.module.toStack(
-        Stack.Leaf(Stack.Role("role"), underlyingFactory))
+        val stack = FactoryToService.module.toStack(
+            Stack.Leaf(Stack.Role("role"), underlyingFactory))
 
-    val factory =
-      stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
+        val factory =
+          stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
 
-    factory.status
-    factory.close()
+        factory.status
+        factory.close()
 
-    assert(statusCalled)
-    assert(factoryCloseCalled)
-  })
+        assert(statusCalled)
+        assert(factoryCloseCalled)
+      })
 
   test(
       "FactoryToService around module closes underlying service after request, does not close underlying factory")(
       new Ctx {
-    val stack = FactoryToService.module.toStack(
-        Stack.Leaf(Stack.Role("role"), underlyingFactory))
+        val stack = FactoryToService.module.toStack(
+            Stack.Leaf(Stack.Role("role"), underlyingFactory))
 
-    val factory =
-      stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
+        val factory =
+          stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
 
-    val service = new FactoryToService(factory)
-    Await.result(service(Unit))
+        val service = new FactoryToService(factory)
+        Await.result(service(Unit))
 
-    assert(serviceCloseCalled)
-    assert(!factoryCloseCalled)
-  })
+        assert(serviceCloseCalled)
+        assert(!factoryCloseCalled)
+      })
 
   test(
       "FactoryToService around module delegates isAvailable / close to underlying factory")(
       new Ctx {
-    val stack = FactoryToService.module.toStack(
-        Stack.Leaf(Stack.Role("role"), underlyingFactory))
+        val stack = FactoryToService.module.toStack(
+            Stack.Leaf(Stack.Role("role"), underlyingFactory))
 
-    val factory =
-      stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
+        val factory =
+          stack.make(Stack.Params.empty + FactoryToService.Enabled(true))
 
-    val service = new FactoryToService(factory)
-    service.status
-    service.close()
+        val service = new FactoryToService(factory)
+        service.status
+        service.close()
 
-    assert(statusCalled)
-    assert(factoryCloseCalled)
-  })
+        assert(statusCalled)
+        assert(factoryCloseCalled)
+      })
 }

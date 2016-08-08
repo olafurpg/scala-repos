@@ -17,7 +17,11 @@ limitations under the License.
 package com.twitter.summingbird.builder
 
 import com.twitter.bijection.Injection
-import com.twitter.chill.{InjectionDefaultRegistrar, InjectionRegistrar, IKryoRegistrar}
+import com.twitter.chill.{
+  InjectionDefaultRegistrar,
+  InjectionRegistrar,
+  IKryoRegistrar
+}
 import com.twitter.chill.java.IterableRegistrar
 import com.twitter.storehaus.algebra.MergeableStore.enrich
 import com.twitter.summingbird.{Env, KeyedProducer, Options, Platform, Summer}
@@ -34,14 +38,14 @@ import java.io.Serializable
   * @author Ashu Singhal
   */
 object CompletedBuilder {
-  def injectionRegistrar[T : Manifest](injection: Injection[T, Array[Byte]]) =
-    InjectionRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
+  def injectionRegistrar[T: Manifest](injection: Injection[T, Array[Byte]]) =
+    InjectionRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                       injection)
 
-  def injectionDefaultRegistrar[T : Manifest](
+  def injectionDefaultRegistrar[T: Manifest](
       injection: Injection[T, Array[Byte]]) =
-    InjectionDefaultRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
+    InjectionDefaultRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                              injection)
 }
 
 case class CompletedBuilder[P <: Platform[P], K, V](
@@ -51,8 +55,8 @@ case class CompletedBuilder[P <: Platform[P], K, V](
     @transient keyCodec: Injection[K, Array[Byte]],
     @transient valCodec: Injection[V, Array[Byte]],
     id: String,
-    @transient opts: Map[String, Options])(
-    implicit val keyMf: Manifest[K], val valMf: Manifest[V])
+    @transient opts: Map[String, Options])(implicit val keyMf: Manifest[K],
+                                           val valMf: Manifest[V])
     extends Serializable {
   import SourceBuilder.adjust
   import CompletedBuilder._

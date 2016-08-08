@@ -7,9 +7,11 @@ import breeze.numerics.{exp, log}
   *
   * @author dlwh
   **/
-case class Laplace(location: Double, scale: Double)(
-    implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+case class Laplace(location: Double, scale: Double)(implicit rand: RandBasis =
+                                                      Rand)
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   def mean: Double = location
 
   def mode: Double = location

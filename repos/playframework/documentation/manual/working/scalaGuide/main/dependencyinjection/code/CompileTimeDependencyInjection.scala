@@ -21,7 +21,7 @@ object CompileTimeDependencyInjection extends Specification {
       val context = ApplicationLoader
         .createContext(environment,
                        Map("play.application.loader" -> classOf[
-                               basic.MyApplicationLoader].getName))
+                           basic.MyApplicationLoader].getName))
       val application = ApplicationLoader(context).load(context)
       application must beAnInstanceOf[Application]
       application.routes.documentation must beEmpty
@@ -83,7 +83,8 @@ package messages {
   import play.api.i18n._
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) with I18nComponents {
+      extends BuiltInComponentsFromContext(context)
+      with I18nComponents {
     lazy val router = Router.empty
 
     lazy val myComponent = new MyComponent(messagesApi)
@@ -118,8 +119,8 @@ package routers {
   class MyComponents(context: Context)
       extends BuiltInComponentsFromContext(context) {
 
-    lazy val router = new Routes(
-        httpErrorHandler, applicationController, barRoutes, assets)
+    lazy val router =
+      new Routes(httpErrorHandler, applicationController, barRoutes, assets)
 
     lazy val barRoutes = new bar.Routes(httpErrorHandler)
     lazy val applicationController = new controllers.Application()

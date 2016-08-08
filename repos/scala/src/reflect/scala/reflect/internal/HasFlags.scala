@@ -83,7 +83,7 @@ trait HasFlags {
   def hasAccessorFlag = hasFlag(ACCESSOR)
   def hasDefault =
     hasFlag(DEFAULTPARAM) &&
-    hasFlag(METHOD | PARAM) // Second condition disambiguates with TRAIT
+      hasFlag(METHOD | PARAM) // Second condition disambiguates with TRAIT
   def hasJavaEnumFlag = hasFlag(JAVA_ENUM)
   def hasJavaAnnotationFlag = hasFlag(JAVA_ANNOTATION)
   @deprecated("Use isLocalToThis instead", "2.11.0")

@@ -20,8 +20,8 @@ import scala.annotation.tailrec
   * @since 25.05.12
   */
 object ScalaProjectSettingsUtil {
-  def isValidPackage(
-      packageName: String, checkPlaceholder: Boolean = true): Boolean = {
+  def isValidPackage(packageName: String,
+                     checkPlaceholder: Boolean = true): Boolean = {
     if (packageName.trim.startsWith(".") || packageName.trim.endsWith("."))
       return false
     val parts = packageName.split(".")
@@ -40,8 +40,8 @@ object ScalaProjectSettingsUtil {
     }
 
     @tailrec
-    private def checkInput(
-        inputString: String, checkExcludes: Boolean): Boolean = {
+    private def checkInput(inputString: String,
+                           checkExcludes: Boolean): Boolean = {
       if (checkExcludes &&
           inputString.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX))
         checkInput(inputString.substring(
@@ -59,8 +59,8 @@ object ScalaProjectSettingsUtil {
 
   def getPackageValidator: InputValidator = new InputValidator {
     def checkInput(inputString: String): Boolean = {
-      ScalaProjectSettingsUtil.isValidPackage(
-          inputString, checkPlaceholder = false)
+      ScalaProjectSettingsUtil
+        .isValidPackage(inputString, checkPlaceholder = false)
     }
 
     def canClose(inputString: String): Boolean = {
@@ -72,8 +72,8 @@ object ScalaProjectSettingsUtil {
                           patternJBList: JListCompatibility.JListContainer,
                           inputMessage: String,
                           inputTitle: String): JPanel = {
-    def addPattern(
-        pattern: String, patternJBList: JListCompatibility.JListContainer) {
+    def addPattern(pattern: String,
+                   patternJBList: JListCompatibility.JListContainer) {
       if (pattern == null) return
       val listModel = JListCompatibility.getDefaultListModel(
           patternJBList.getList.getModel) match {
@@ -86,8 +86,8 @@ object ScalaProjectSettingsUtil {
       JListCompatibility.add(listModel, index, pattern)
       patternJBList.getList.setSelectedValue(pattern, true)
       ScrollingUtil.ensureIndexIsVisible(patternJBList.getList, index, 0)
-      IdeFocusManager.getGlobalInstance.requestFocus(
-          patternJBList.getList, false)
+      IdeFocusManager.getGlobalInstance
+        .requestFocus(patternJBList.getList, false)
     }
 
     ToolbarDecorator
@@ -115,8 +115,8 @@ object ScalaProjectSettingsUtil {
       patternJBList: JListCompatibility.JListContainer,
       inputMessage: String,
       inputTitle: String): JPanel = {
-    def addPattern(
-        pattern: String, patternJBList: JListCompatibility.JListContainer) {
+    def addPattern(pattern: String,
+                   patternJBList: JListCompatibility.JListContainer) {
       if (pattern == null) return
       val listModel = JListCompatibility.getDefaultListModel(
           patternJBList.getList.getModel) match {
@@ -127,8 +127,8 @@ object ScalaProjectSettingsUtil {
       JListCompatibility.add(listModel, index + 1, pattern)
       patternJBList.getList.setSelectedValue(pattern, true)
       ScrollingUtil.ensureIndexIsVisible(patternJBList.getList, index, 0)
-      IdeFocusManager.getGlobalInstance.requestFocus(
-          patternJBList.getList, false)
+      IdeFocusManager.getGlobalInstance
+        .requestFocus(patternJBList.getList, false)
     }
 
     ToolbarDecorator
@@ -150,10 +150,10 @@ object ScalaProjectSettingsUtil {
       .addExtraAction(
           new AnActionButton(ApplicationBundle.message("button.add.blank"),
                              IconUtil.getAddBlankLineIcon) {
-        def actionPerformed(e: AnActionEvent) {
-          addPattern(ScalaCodeStyleSettings.BLANK_LINE, patternJBList)
-        }
-      })
+            def actionPerformed(e: AnActionEvent) {
+              addPattern(ScalaCodeStyleSettings.BLANK_LINE, patternJBList)
+            }
+          })
       .setRemoveAction(new AnActionButtonRunnable {
         override def run(t: AnActionButton): Unit = {
           val listModel = JListCompatibility.getDefaultListModel(
@@ -163,15 +163,16 @@ object ScalaProjectSettingsUtil {
           }
           val index = patternJBList.getList.getSelectedIndex
           if (index != -1) {
-            if (listModel.get(index) == ScalaCodeStyleSettings.ALL_OTHER_IMPORTS)
+            if (listModel
+                  .get(index) == ScalaCodeStyleSettings.ALL_OTHER_IMPORTS)
               return
             val size = listModel.size()
             listModel.remove(index)
             val to = if (index == size - 1) index - 1 else index
             patternJBList.getList.setSelectedIndex(to)
             ScrollingUtil.ensureIndexIsVisible(patternJBList.getList, to, 0)
-            IdeFocusManager.getGlobalInstance.requestFocus(
-                patternJBList.getList, false)
+            IdeFocusManager.getGlobalInstance
+              .requestFocus(patternJBList.getList, false)
           }
         }
       })

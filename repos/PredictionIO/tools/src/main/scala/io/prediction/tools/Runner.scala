@@ -31,14 +31,14 @@ object Runner extends Logging {
     env
       .split(',')
       .flatMap(p =>
-            p.split('=') match {
+        p.split('=') match {
           case Array(k, v) => List(k -> v)
           case _ => Nil
       })
       .toMap
 
-  def argumentValue(
-      arguments: Seq[String], argumentName: String): Option[String] = {
+  def argumentValue(arguments: Seq[String],
+                    argumentName: String): Option[String] = {
     val argumentIndex = arguments.indexOf(argumentName)
     try {
       arguments(argumentIndex) // just to make it error out if index is -1
@@ -204,8 +204,7 @@ object Runner extends Logging {
                        None,
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
-    Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
+    Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         cleanup(fs, ca.common.scratchUri)
         proc.destroy()

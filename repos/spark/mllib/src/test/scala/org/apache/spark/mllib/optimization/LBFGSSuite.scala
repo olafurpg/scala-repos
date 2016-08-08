@@ -24,11 +24,16 @@ import org.scalatest.Matchers
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext,
+  MLlibTestSparkContext
+}
 import org.apache.spark.mllib.util.TestingUtils._
 
 class LBFGSSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Matchers {
 
   val nPoints = 10000
   val A = 2.0
@@ -137,7 +142,7 @@ class LBFGSSuite
            "The last losses of LBFGS and GD should be within 2% difference.")
 
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-           (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 
@@ -229,7 +234,7 @@ class LBFGSSuite
 
     // for class LBFGS and the optimize method, we only look at the weights
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-           (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 }

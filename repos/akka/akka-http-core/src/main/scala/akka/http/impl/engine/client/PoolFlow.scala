@@ -69,8 +69,9 @@ private object PoolFlow {
     - Simple merge of the Connection Slots' outputs
 
    */
-  def apply(connectionFlow: Flow[
-                HttpRequest, HttpResponse, Future[Http.OutgoingConnection]],
+  def apply(connectionFlow: Flow[HttpRequest,
+                                 HttpResponse,
+                                 Future[Http.OutgoingConnection]],
             remoteAddress: InetSocketAddress,
             settings: ConnectionPoolSettings,
             log: LoggingAdapter)(
@@ -78,26 +79,26 @@ private object PoolFlow {
       fm: Materializer): Flow[RequestContext, ResponseContext, NotUsed] =
     Flow.fromGraph(
         GraphDSL.create[FlowShape[RequestContext, ResponseContext]]() {
-      implicit b ⇒
-        import settings._
-        import GraphDSL.Implicits._
+          implicit b ⇒
+            import settings._
+            import GraphDSL.Implicits._
 
-        val conductor =
-          b.add(PoolConductor(maxConnections, pipeliningLimit, log))
-        val slots = Vector
-          .tabulate(maxConnections)(
-              PoolSlot(_, connectionFlow, remoteAddress, settings))
-          .map(b.add(_))
-        val responseMerge = b.add(Merge[ResponseContext](maxConnections))
-        val slotEventMerge =
-          b.add(Merge[PoolSlot.RawSlotEvent](maxConnections))
+            val conductor =
+              b.add(PoolConductor(maxConnections, pipeliningLimit, log))
+            val slots = Vector
+              .tabulate(maxConnections)(
+                  PoolSlot(_, connectionFlow, remoteAddress, settings))
+              .map(b.add(_))
+            val responseMerge = b.add(Merge[ResponseContext](maxConnections))
+            val slotEventMerge =
+              b.add(Merge[PoolSlot.RawSlotEvent](maxConnections))
 
-        slotEventMerge.out ~> conductor.slotEventIn
-        for ((slot, ix) ← slots.zipWithIndex) {
-          conductor.slotOuts(ix) ~> slot.in
-          slot.out0 ~> responseMerge.in(ix)
-          slot.out1 ~> slotEventMerge.in(ix)
-        }
-        FlowShape(conductor.requestIn, responseMerge.out)
-    })
+            slotEventMerge.out ~> conductor.slotEventIn
+            for ((slot, ix) ← slots.zipWithIndex) {
+              conductor.slotOuts(ix) ~> slot.in
+              slot.out0 ~> responseMerge.in(ix)
+              slot.out1 ~> slotEventMerge.in(ix)
+            }
+            FlowShape(conductor.requestIn, responseMerge.out)
+        })
 }

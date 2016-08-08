@@ -22,13 +22,14 @@ object DecompilerUtil {
       "#org.jetbrains.plugins.scala.decompiler.DecompilerUtil")
 
   val DECOMPILER_VERSION = 270
-  private val SCALA_DECOMPILER_FILE_ATTRIBUTE = new FileAttribute(
-      "_is_scala_compiled_new_key_", DECOMPILER_VERSION, true)
+  private val SCALA_DECOMPILER_FILE_ATTRIBUTE =
+    new FileAttribute("_is_scala_compiled_new_key_", DECOMPILER_VERSION, true)
   private val SCALA_DECOMPILER_KEY =
     new Key[SoftReference[DecompilationResult]]("Is Scala File Key")
 
-  class DecompilationResult(
-      val isScala: Boolean, val sourceName: String, val timeStamp: Long) {
+  class DecompilationResult(val isScala: Boolean,
+                            val sourceName: String,
+                            val timeStamp: Long) {
     def sourceText: String = ""
   }
   object DecompilationResult {
@@ -62,13 +63,14 @@ object DecompilerUtil {
   private def attributesSupported = !ScalaLoader.isUnderUpsource
 
   def isScalaFile(file: VirtualFile): Boolean =
-    try isScalaFile(file, file.contentsToByteArray) catch {
+    try isScalaFile(file, file.contentsToByteArray)
+    catch {
       case e: IOException => false
     }
   def isScalaFile(file: VirtualFile, bytes: => Array[Byte]): Boolean =
     decompile(file, bytes).isScala
-  def decompile(
-      file: VirtualFile, bytes: => Array[Byte]): DecompilationResult = {
+  def decompile(file: VirtualFile,
+                bytes: => Array[Byte]): DecompilationResult = {
     if (!file.isInstanceOf[VirtualFileWithId]) return DecompilationResult.empty
     val timeStamp = file.getTimeStamp
     var data = file.getUserData(SCALA_DECOMPILER_KEY)
@@ -76,7 +78,8 @@ object DecompilerUtil {
     if (res == null || res.timeStamp != timeStamp) {
       val readAttribute =
         if (attributesSupported)
-          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file) else null
+          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file)
+        else null
       def updateAttributeAndData() {
         val decompilationResult = decompileInner(file, bytes)
         if (attributesSupported) {
@@ -100,8 +103,9 @@ object DecompilerUtil {
           val attributeTimeStamp = readAttribute.readLong()
           if (attributeTimeStamp != timeStamp) updateAttributeAndData()
           else
-            res = new DecompilationResult(
-                isScala, sourceName, attributeTimeStamp) {
+            res = new DecompilationResult(isScala,
+                                          sourceName,
+                                          attributeTimeStamp) {
               override lazy val sourceText: String = {
                 decompileInner(file, bytes).sourceText
               }
@@ -116,13 +120,14 @@ object DecompilerUtil {
     res
   }
 
-  private def decompileInner(
-      file: VirtualFile, bytes: Array[Byte]): DecompilationResult = {
+  private def decompileInner(file: VirtualFile,
+                             bytes: Array[Byte]): DecompilationResult = {
     try {
       Decompiler.decompile(file.getName, bytes) match {
         case Some((sourceFileName, decompiledSourceText)) =>
-          new DecompilationResult(
-              isScala = true, sourceFileName, file.getTimeStamp) {
+          new DecompilationResult(isScala = true,
+                                  sourceFileName,
+                                  file.getTimeStamp) {
             override def sourceText: String = decompiledSourceText
           }
         case _ =>

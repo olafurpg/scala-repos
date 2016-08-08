@@ -4,7 +4,11 @@ import com.twitter.finagle.tracing.{SpanId, TraceId, Flags}
 import com.twitter.finagle.{Dtab, Dentry, NameTree, Path}
 import com.twitter.io.Charsets
 import com.twitter.util.{Duration, Time, Updatable}
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers, ReadOnlyChannelBuffer}
+import org.jboss.netty.buffer.{
+  ChannelBuffer,
+  ChannelBuffers,
+  ReadOnlyChannelBuffer
+}
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -330,8 +334,8 @@ private[twitter] object Message {
                             error: String)
       extends Rdispatch(1, contexts, encodeString(error))
 
-  case class RdispatchNack(
-      tag: Int, contexts: Seq[(ChannelBuffer, ChannelBuffer)])
+  case class RdispatchNack(tag: Int,
+                           contexts: Seq[(ChannelBuffer, ChannelBuffer)])
       extends Rdispatch(2, contexts, ChannelBuffers.EMPTY_BUFFER)
 
   /** Indicates to the client to stop sending new requests. */
@@ -390,9 +394,10 @@ private[twitter] object Message {
       extends MarkerMessage {
     def typ = Types.BAD_Tdiscarded
     lazy val buf = ChannelBuffers.wrappedBuffer(
-        ChannelBuffers.wrappedBuffer(Array[Byte]((which >> 16 & 0xff).toByte,
-                                                 (which >> 8 & 0xff).toByte,
-                                                 (which & 0xff).toByte)),
+        ChannelBuffers.wrappedBuffer(
+            Array[Byte]((which >> 16 & 0xff).toByte,
+                        (which >> 8 & 0xff).toByte,
+                        (which & 0xff).toByte)),
         encodeString(why))
   }
 
@@ -484,7 +489,7 @@ private[twitter] object Message {
               (SpanId(buf.readLong()), // spanId
                SpanId(buf.readLong()), // parentId
                SpanId(buf.readLong())) // traceId
-              )
+          )
 
         case Treq.Keys.TraceFlag =>
           // We only know about bit=0, so discard
@@ -585,7 +590,7 @@ private[twitter] object Message {
       throw BadMessageException("short Tdiscarded message")
     val which =
       ((buf.readByte() & 0xff) << 16) | ((buf.readByte() & 0xff) << 8) |
-      (buf.readByte() & 0xff)
+        (buf.readByte() & 0xff)
     Tdiscarded(which, decodeUtf8(buf))
   }
 

@@ -75,14 +75,16 @@ trait AdditiveSemigroup[@sp(Byte, Short, Int, Long, Float, Double) A]
 }
 
 trait AdditiveCSemigroup[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveSemigroup[A] {
+    extends Any
+    with AdditiveSemigroup[A] {
   override def additive: CSemigroup[A] = new CSemigroup[A] {
     def op(x: A, y: A): A = plus(x, y)
   }
 }
 
 trait AdditiveMonoid[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveSemigroup[A] {
+    extends Any
+    with AdditiveSemigroup[A] {
   override def additive: Monoid[A] = new Monoid[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -113,7 +115,9 @@ trait AdditiveMonoid[@sp(Byte, Short, Int, Long, Float, Double) A]
 }
 
 trait AdditiveCMonoid[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveMonoid[A] with AdditiveCSemigroup[A] {
+    extends Any
+    with AdditiveMonoid[A]
+    with AdditiveCSemigroup[A] {
   override def additive: CMonoid[A] = new CMonoid[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -121,7 +125,8 @@ trait AdditiveCMonoid[@sp(Byte, Short, Int, Long, Float, Double) A]
 }
 
 trait AdditiveGroup[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveMonoid[A] {
+    extends Any
+    with AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -143,7 +148,9 @@ trait AdditiveGroup[@sp(Byte, Short, Int, Long, Float, Double) A]
 }
 
 trait AdditiveAbGroup[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveGroup[A] with AdditiveCMonoid[A] {
+    extends Any
+    with AdditiveGroup[A]
+    with AdditiveCMonoid[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)

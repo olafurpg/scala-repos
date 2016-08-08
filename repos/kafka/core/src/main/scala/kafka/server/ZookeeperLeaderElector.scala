@@ -36,7 +36,8 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
                              onBecomingLeader: () => Unit,
                              onResigningAsLeader: () => Unit,
                              brokerId: Int)
-    extends LeaderElector with Logging {
+    extends LeaderElector
+    with Logging {
   var leaderId = -1
   // create the election path in ZK, if one does not exist
   val index = electionPath.lastIndexOf("/")
@@ -66,9 +67,9 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
         Map("version" -> 1, "brokerid" -> brokerId, "timestamp" -> timestamp))
 
     leaderId = getControllerID
-    /* 
-     * We can get here during the initial startup and the handleDeleted ZK callback. Because of the potential race condition, 
-     * it's possible that the controller has already been elected when we get here. This check will prevent the following 
+    /*
+     * We can get here during the initial startup and the handleDeleted ZK callback. Because of the potential race condition,
+     * it's possible that the controller has already been elected when we get here. This check will prevent the following
      * createEphemeralPath method from getting into an infinite loop if this broker is already the controller.
      */
     if (leaderId != -1) {
@@ -94,8 +95,9 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
         leaderId = getControllerID
 
         if (leaderId != -1)
-          debug("Broker %d was elected as leader instead of broker %d".format(
-                  leaderId, brokerId))
+          debug(
+              "Broker %d was elected as leader instead of broker %d"
+                .format(leaderId, brokerId))
         else
           warn(
               "A leader has been elected but just resigned, this will result in another round of election")

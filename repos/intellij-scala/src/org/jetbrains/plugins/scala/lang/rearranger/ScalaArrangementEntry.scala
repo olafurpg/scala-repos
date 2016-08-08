@@ -17,9 +17,12 @@ class ScalaArrangementEntry(parent: ArrangementEntry,
                             entryType: ArrangementSettingsToken,
                             name: String,
                             canBeMatched: Boolean)
-    extends DefaultArrangementEntry(
-        parent, startOffset, endOffset, canBeMatched)
-    with TypeAwareArrangementEntry with NameAwareArrangementEntry
+    extends DefaultArrangementEntry(parent,
+                                    startOffset,
+                                    endOffset,
+                                    canBeMatched)
+    with TypeAwareArrangementEntry
+    with NameAwareArrangementEntry
     with ModifierAwareArrangementEntry {
 
   val modifiers = new util.HashSet[ArrangementSettingsToken]
@@ -58,7 +61,7 @@ class ScalaArrangementEntry(parent: ArrangementEntry,
   override def equals(o: Any) = o match {
     case other: ScalaArrangementEntry =>
       other.getStartOffset == startOffset && other.getEndOffset == endOffset &&
-      other.getType == entryType && other.getParent == parent
+        other.getType == entryType && other.getParent == parent
     case _ => false
   }
 }

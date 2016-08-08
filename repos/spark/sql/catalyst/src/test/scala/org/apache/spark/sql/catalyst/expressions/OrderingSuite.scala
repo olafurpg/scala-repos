@@ -100,11 +100,17 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
           val rowOrdering =
             InterpretedOrdering.forSchema(Seq(dataType, dataType))
           val genOrdering = GenerateOrdering.generate(BoundReference(
-                  0, dataType, nullable = true).asc :: BoundReference(
-                  1, dataType, nullable = true).asc :: Nil)
+              0,
+              dataType,
+              nullable = true).asc :: BoundReference(
+              1,
+              dataType,
+              nullable = true).asc :: Nil)
           val rowType = StructType(
               StructField("a", dataType, nullable = true) :: StructField(
-                  "b", dataType, nullable = true) :: Nil)
+                  "b",
+                  dataType,
+                  nullable = true) :: Nil)
           val maybeDataGenerator =
             RandomDataGenerator.forType(rowType, nullable = false)
           assume(maybeDataGenerator.isDefined)
@@ -120,9 +126,9 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
               assert(rowOrdering.compare(a, a) === 0)
               assert(rowOrdering.compare(b, b) === 0)
               assert(signum(genOrdering.compare(a, b)) === -1 * signum(
-                      genOrdering.compare(b, a)))
+                  genOrdering.compare(b, a)))
               assert(signum(rowOrdering.compare(a, b)) === -1 * signum(
-                      rowOrdering.compare(b, a)))
+                  rowOrdering.compare(b, a)))
               assert(signum(rowOrdering.compare(a, b)) === signum(
                          genOrdering.compare(a, b)),
                      "Generated and non-generated orderings should agree")

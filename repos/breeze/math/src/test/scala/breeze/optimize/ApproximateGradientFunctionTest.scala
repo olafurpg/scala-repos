@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 import breeze.linalg._
 
 /**
-  * 
+  *
   * @author dlwh
   */
 @RunWith(classOf[JUnitRunner])
@@ -25,8 +25,7 @@ class ApproximateGradientFunctionTest extends OptimizeTestBase {
     }
     val approxF = new ApproximateGradientFunction[Int, DenseVector[Double]](f)
 
-    check(
-        Prop.forAll { (x: DenseVector[Double]) =>
+    check(Prop.forAll { (x: DenseVector[Double]) =>
       val ap = approxF.gradientAt(x)
       val tr = f.gradientAt(x)
       assert(norm(ap - tr, 2) < 1E-4 * math.max(norm(ap, 2), 1),

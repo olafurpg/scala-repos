@@ -28,16 +28,14 @@ object OffsetCommitResponse extends Logging {
   def readFrom(buffer: ByteBuffer): OffsetCommitResponse = {
     val correlationId = buffer.getInt
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = ApiUtils.readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            val error = buffer.getShort
-            (TopicAndPartition(topic, partitionId), error)
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = ApiUtils.readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        val error = buffer.getShort
+        (TopicAndPartition(topic, partitionId), error)
+      })
     })
     OffsetCommitResponse(Map(pairs: _*), correlationId)
   }
@@ -71,12 +69,10 @@ case class OffsetCommitResponse(commitStatus: Map[TopicAndPartition, Short],
   override def sizeInBytes =
     4 + /* correlationId */
     4 + /* topic count */
-    commitStatusGroupedByTopic.foldLeft(0)(
-        (count, partitionStatusMap) =>
-          {
-        val (topic, partitionStatus) = partitionStatusMap
-        count + ApiUtils.shortStringLength(topic) + 4 + /* partition count */
-        partitionStatus.size * (4 /* partition */ + 2 /* error code */ )
+    commitStatusGroupedByTopic.foldLeft(0)((count, partitionStatusMap) => {
+      val (topic, partitionStatus) = partitionStatusMap
+      count + ApiUtils.shortStringLength(topic) + 4 + /* partition count */
+      partitionStatus.size * (4 /* partition */ + 2 /* error code */ )
     })
 
   override def describe(details: Boolean): String = { toString }

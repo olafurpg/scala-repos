@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -29,7 +29,10 @@ import java.io.File
 import scala.io.Source
 
 object ParserSpecs
-    extends Specification with ScalaCheck with StubPhases with Parser {
+    extends Specification
+    with ScalaCheck
+    with StubPhases
+    with Parser {
   import ast._
 
   val keywords = Set("new",
@@ -145,8 +148,11 @@ object ParserSpecs
         |   import std::time::*
         |   //foo
         | foo""".stripMargin) must beLike {
-        case Let(
-            _, _, _, Import(_, WildcardImport(Vector("std", "time")), _), _) =>
+        case Let(_,
+                 _,
+                 _,
+                 Import(_, WildcardImport(Vector("std", "time")), _),
+                 _) =>
           ok
       }
     }
@@ -171,13 +177,14 @@ object ParserSpecs
 
     "accept an assertion with a compound expression" in {
       parseSingle("assert a < 12 [a]") must beLike {
-        case Assert(
-            _,
-            Lt(_,
-               Dispatch(_, Identifier(Vector(), "a"), Vector()),
-               NumLit(_, "12")),
-            ArrayDef(
-            _, Vector(Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
+        case Assert(_,
+                    Lt(_,
+                       Dispatch(_, Identifier(Vector(), "a"), Vector()),
+                       NumLit(_, "12")),
+                    ArrayDef(
+                    _,
+                    Vector(
+                    Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
           ok
       }
     }
@@ -270,11 +277,12 @@ object ParserSpecs
 
     "accept a solve expression with a nested solve expression with two tic variables as a constraint" in {
       parseSingle("solve solve 'a, 'b 1 2") must beLike {
-        case Solve(
-            _,
-            Vector(Solve(
-            _, Vector(TicVar(_, "'a"), TicVar(_, "'b")), NumLit(_, "1"))),
-            NumLit(_, "2")) =>
+        case Solve(_,
+                   Vector(
+                   Solve(_,
+                         Vector(TicVar(_, "'a"), TicVar(_, "'b")),
+                         NumLit(_, "1"))),
+                   NumLit(_, "2")) =>
           ok
       }
     }
@@ -603,23 +611,23 @@ object ParserSpecs
 
     "accept an object definition with a null property" in {
       parseSingle("{ a: 1, b: 2, cafe: { foo: null }, star_BUckS: null }") must beLike {
-        case ObjectDef(
-            _,
-            Vector(("a", NumLit(_, "1")),
-                   ("b", NumLit(_, "2")),
-                   ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
-                   ("star_BUckS", NullLit(_)))) =>
+        case ObjectDef(_,
+                       Vector(
+                       ("a", NumLit(_, "1")),
+                       ("b", NumLit(_, "2")),
+                       ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
+                       ("star_BUckS", NullLit(_)))) =>
           ok
       }
 
       parseSingle(
           "{ \"a\": 1, \"b\": 2, \"cafe\": { \"foo\": null }, \"star_BUckS\": null }") must beLike {
-        case ObjectDef(
-            _,
-            Vector(("a", NumLit(_, "1")),
-                   ("b", NumLit(_, "2")),
-                   ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
-                   ("star_BUckS", NullLit(_)))) =>
+        case ObjectDef(_,
+                       Vector(
+                       ("a", NumLit(_, "1")),
+                       ("b", NumLit(_, "2")),
+                       ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
+                       ("star_BUckS", NullLit(_)))) =>
           ok
       }
     }
@@ -638,10 +646,10 @@ object ParserSpecs
     "accept an object definition with backtic-delimited properties" in {
       parseSingle(
           "{ `$see! what I can do___`: 1, `test \\` ing \\\\ with $%^&*!@#$ me!`: 2 }") must beLike {
-        case ObjectDef(
-            _,
-            Vector(("$see! what I can do___", NumLit(_, "1")),
-                   ("test ` ing \\ with $%^&*!@#$ me!", NumLit(_, "2")))) =>
+        case ObjectDef(_,
+                       Vector(("$see! what I can do___", NumLit(_, "1")),
+                              ("test ` ing \\ with $%^&*!@#$ me!",
+                               NumLit(_, "2")))) =>
           ok
       }
     }
@@ -649,10 +657,10 @@ object ParserSpecs
     "accept an object definition with quote-delimited properties containing special characters" in {
       parseSingle(
           "{ \"$see! what I can do___\": 1, \"test \\\" ing \\\\ with $%^&*!@#$ me!\": 2 }") must beLike {
-        case ObjectDef(
-            _,
-            Vector(("$see! what I can do___", NumLit(_, "1")),
-                   ("test \" ing \\ with $%^&*!@#$ me!", NumLit(_, "2")))) =>
+        case ObjectDef(_,
+                       Vector(("$see! what I can do___", NumLit(_, "1")),
+                              ("test \" ing \\ with $%^&*!@#$ me!",
+                               NumLit(_, "2")))) =>
           ok
       }
     }
@@ -681,8 +689,10 @@ object ParserSpecs
 
     "accept an array definition with multiple actuals" in {
       parseSingle("[1, 2, 3]") must beLike {
-        case ArrayDef(
-            _, Vector(NumLit(_, "1"), NumLit(_, "2"), NumLit(_, "3"))) =>
+        case ArrayDef(_,
+                      Vector(NumLit(_, "1"),
+                             NumLit(_, "2"),
+                             NumLit(_, "3"))) =>
           ok
       }
     }

@@ -342,9 +342,10 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried
     val G = Applicative[G]
     import std.stream.streamInstance
-    G.apF(G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(
-                s => z(s.reverse)))(f(focus)))(Traverse[Stream]
-          .traverse[G, A, B](rights)(f))
+    G.apF(
+        G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(s =>
+          z(s.reverse)))(f(focus)))(
+        Traverse[Stream].traverse[G, A, B](rights)(f))
   }
 
   def ap[B](f: => Zipper[A => B]): Zipper[B] = {
@@ -385,8 +386,8 @@ sealed abstract class ZipperInstances {
     override def traverseImpl[G[_]: Applicative, A, B](za: Zipper[A])(
         f: A => G[B]): G[Zipper[B]] =
       za traverse f
-    override def foldRight[A, B](fa: Zipper[A], z: => B)(
-        f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A,
+                                                             => B) => B): B =
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
@@ -406,14 +407,14 @@ sealed abstract class ZipperInstances {
     override def foldMap1[A, B](fa: Zipper[A])(f: A => B)(
         implicit F: Semigroup[B]) =
       fa.rights.foldLeft(
-          Foldable[Stream]
-            .foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
+          Foldable[Stream].foldMapRight1Opt(fa.lefts)(f)((a, b) =>
+            F.append(b, f(a))) match {
             case Some(b) => F.append(b, f(fa.focus))
             case None => f(fa.focus)
           }
       )((b, a) => F.append(b, f(a)))
-    override def foldMapRight1[A, B](fa: Zipper[A])(
-        z: A => B)(f: (A, => B) => B) =
+    override def foldMapRight1[A, B](fa: Zipper[A])(z: A => B)(
+        f: (A, => B) => B) =
       Foldable[Stream].foldLeft(
           fa.lefts,
           Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
@@ -423,7 +424,8 @@ sealed abstract class ZipperInstances {
       )((b, a) => f(a, b))
     override def foldMapLeft1[A, B](fa: Zipper[A])(z: A => B)(f: (B, A) => B) =
       fa.rights.foldLeft(
-          Foldable[Stream].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
+          Foldable[Stream]
+            .foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
             case Some(b) => f(b, fa.focus)
             case None => z(fa.focus)
           }
@@ -462,16 +464,16 @@ sealed abstract class ZipperInstances {
     }
   }
 
-  implicit def zipperEqual[A : Equal]: Equal[Zipper[A]] =
+  implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] =
     new Equal[Zipper[A]] {
       import std.stream.streamEqual
       def equal(a1: Zipper[A], a2: Zipper[A]) =
         streamEqual[A].equal(a1.lefts, a2.lefts) &&
-        Equal[A].equal(a1.focus, a2.focus) &&
-        streamEqual[A].equal(a1.rights, a2.rights)
+          Equal[A].equal(a1.focus, a2.focus) &&
+          streamEqual[A].equal(a1.rights, a2.rights)
     }
 
-  implicit def zipperShow[A : Show]: Show[Zipper[A]] = new Show[Zipper[A]] {
+  implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]] {
     import std.stream._
 
     override def show(f: Zipper[A]) =

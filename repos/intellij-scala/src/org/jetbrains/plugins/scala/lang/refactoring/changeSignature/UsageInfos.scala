@@ -6,11 +6,24 @@ import com.intellij.refactoring.changeSignature.{ChangeInfo, JavaChangeInfo}
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern, ScInfixPattern, ScPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScConstructorPattern,
+  ScInfixPattern,
+  ScPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor,
+  ScPrimaryConstructor,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScParameters}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter,
+  ScParameters
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
@@ -23,8 +36,7 @@ import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.S
   * Nikolay.Tropin
   * 2014-08-12
   */
-private[changeSignature] trait ScalaNamedElementUsageInfo {
-  this: UsageInfo =>
+private[changeSignature] trait ScalaNamedElementUsageInfo { this: UsageInfo =>
 
   def namedElement: ScNamedElement
 
@@ -63,7 +75,8 @@ private[changeSignature] object ScalaNamedElementUsageInfo {
 }
 
 private[changeSignature] case class FunUsageInfo(namedElement: ScFunction)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] case class PrimaryConstructorUsageInfo(
     pc: ScPrimaryConstructor)
@@ -73,11 +86,13 @@ private[changeSignature] case class PrimaryConstructorUsageInfo(
 
 private[changeSignature] case class OverriderValUsageInfo(
     namedElement: ScBindingPattern)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] case class OverriderClassParamUsageInfo(
     namedElement: ScClassParameter)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] trait MethodUsageInfo {
   def expr: ScExpression
@@ -91,8 +106,10 @@ private[changeSignature] trait MethodUsageInfo {
 }
 
 private[changeSignature] case class MethodCallUsageInfo(
-    ref: ScReferenceExpression, call: ScMethodCall)
-    extends UsageInfo(call) with MethodUsageInfo {
+    ref: ScReferenceExpression,
+    call: ScMethodCall)
+    extends UsageInfo(call)
+    with MethodUsageInfo {
 
   private val resolveResult = Option(ref).flatMap(_.bind())
   val substitutor = resolveResult.map(_.substitutor)
@@ -109,14 +126,16 @@ private[changeSignature] case class MethodCallUsageInfo(
 
 private[changeSignature] case class RefExpressionUsage(
     refExpr: ScReferenceExpression)
-    extends UsageInfo(refExpr: PsiReference) with MethodUsageInfo {
+    extends UsageInfo(refExpr: PsiReference)
+    with MethodUsageInfo {
   val expr = refExpr
   val ref = refExpr
   val argsInfo = OldArgsInfo(Seq.empty, method)
 }
 
 private[changeSignature] case class InfixExprUsageInfo(infix: ScInfixExpr)
-    extends UsageInfo(infix) with MethodUsageInfo {
+    extends UsageInfo(infix)
+    with MethodUsageInfo {
   val expr = infix
   val ref = infix.operation
   val argsInfo = OldArgsInfo(infix.argumentExpressions, method)
@@ -124,15 +143,18 @@ private[changeSignature] case class InfixExprUsageInfo(infix: ScInfixExpr)
 
 private[changeSignature] case class PostfixExprUsageInfo(
     postfix: ScPostfixExpr)
-    extends UsageInfo(postfix) with MethodUsageInfo {
+    extends UsageInfo(postfix)
+    with MethodUsageInfo {
   val expr = postfix
   val ref = postfix.operation
   val argsInfo = OldArgsInfo(postfix.argumentExpressions, method)
 }
 
 private[changeSignature] case class ConstructorUsageInfo(
-    ref: ScReferenceElement, constr: ScConstructor)
-    extends UsageInfo(constr) with MethodUsageInfo {
+    ref: ScReferenceElement,
+    constr: ScConstructor)
+    extends UsageInfo(constr)
+    with MethodUsageInfo {
 
   private val resolveResult = Option(ref).flatMap(_.bind())
   val substitutor = resolveResult.map(_.substitutor)
@@ -144,7 +166,8 @@ private[changeSignature] case class ConstructorUsageInfo(
 }
 
 private[changeSignature] case class AnonFunUsageInfo(
-    expr: ScExpression, ref: ScReferenceExpression)
+    expr: ScExpression,
+    ref: ScReferenceExpression)
     extends UsageInfo(expr)
 
 private[changeSignature] object isAnonFunUsage {
@@ -158,15 +181,16 @@ private[changeSignature] object isAnonFunUsage {
         Some(AnonFunUsageInfo(und, ref))
       case Both(ResolvesTo(m: PsiMethod), ChildOf(elem))
           if m.getParameterList.getParametersCount > 0 &&
-          !elem.isInstanceOf[MethodInvocation] =>
+            !elem.isInstanceOf[MethodInvocation] =>
         Some(AnonFunUsageInfo(ref, ref))
       case _ => None
     }
   }
 }
 
-private[changeSignature] case class ParameterUsageInfo(
-    oldIndex: Int, newName: String, ref: ScReferenceElement)
+private[changeSignature] case class ParameterUsageInfo(oldIndex: Int,
+                                                       newName: String,
+                                                       ref: ScReferenceElement)
     extends UsageInfo(ref: PsiElement)
 
 private[changeSignature] case class ImportUsageInfo(imp: ScReferenceElement)
@@ -178,11 +202,13 @@ private[changeSignature] trait PatternUsageInfo {
 
 private[changeSignature] case class ConstructorPatternUsageInfo(
     pattern: ScConstructorPattern)
-    extends UsageInfo(pattern) with PatternUsageInfo
+    extends UsageInfo(pattern)
+    with PatternUsageInfo
 
 private[changeSignature] case class InfixPatternUsageInfo(
     pattern: ScInfixPattern)
-    extends UsageInfo(pattern) with PatternUsageInfo
+    extends UsageInfo(pattern)
+    with PatternUsageInfo
 
 private[changeSignature] object UsageUtil {
 
@@ -213,8 +239,8 @@ private[changeSignature] object UsageUtil {
       case sc: ScalaChangeInfo => sc.newType
       case jc: JavaChangeInfo =>
         val method = jc.getMethod
-        val javaType = jc.getNewReturnType.getType(
-            method.getParameterList, method.getManager)
+        val javaType = jc.getNewReturnType
+          .getType(method.getParameterList, method.getManager)
         ScType.create(javaType, method.getProject)
       case _ => return None
     }
@@ -225,7 +251,8 @@ private[changeSignature] object UsageUtil {
 }
 
 private[changeSignature] case class OldArgsInfo(
-    args: Seq[ScExpression], namedElement: PsiNamedElement) {
+    args: Seq[ScExpression],
+    namedElement: PsiNamedElement) {
 
   val byOldParameterIndex = {
     args

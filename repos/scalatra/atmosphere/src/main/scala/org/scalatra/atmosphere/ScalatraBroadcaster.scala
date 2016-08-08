@@ -21,7 +21,7 @@ trait ScalatraBroadcaster extends Broadcaster {
       implicit executionContext: ExecutionContext): Future[T] = {
     val selectedResources = _resources.asScala filter clientFilter
     logger.trace("Sending %s to %s".format(msg, selectedResources.map(_.uuid)))
-    broadcast(_wireFormat.render(msg), selectedResources.toSet.asJava)
-      .map(_ => msg)
+    broadcast(_wireFormat.render(msg), selectedResources.toSet.asJava).map(_ =>
+      msg)
   }
 }

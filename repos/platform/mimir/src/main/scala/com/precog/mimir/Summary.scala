@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -48,7 +48,8 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
       reductions.reverse.zipWithIndex map {
         case (red, idx) =>
           trans.WrapObject(
-              trans.DerefArrayStatic(TransSpec1.Id, CPathIndex(idx)), red.name)
+              trans.DerefArrayStatic(TransSpec1.Id, CPathIndex(idx)),
+              red.name)
       }
     val reductionSpec = reductionSpecs reduce { trans.OuterObjectConcat(_, _) }
 
@@ -102,8 +103,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         coalesce(functions map { SingleSummary -> _ })
       }
 
-      def reduceTable(
-          table: Table, jtype: JType, ctx: MorphContext): M[Table] = {
+      def reduceTable(table: Table,
+                      jtype: JType,
+                      ctx: MorphContext): M[Table] = {
         val reduction = makeReduction(jtype)
 
         implicit def monoid = reduction.monoid
@@ -142,9 +144,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         // one JType-with-numeric-leaves per schema
         val jtypes: M[Seq[JType]] =
           jtypes0 map
-          (_ collect {
-                case opt if opt.isDefined => opt.get
-              })
+            (_ collect {
+              case opt if opt.isDefined => opt.get
+            })
 
         val specs: M[Seq[TransSpec1]] =
           jtypes map {
@@ -154,9 +156,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         // one table per schema
         val tables: M[Seq[Table]] =
           specs map
-          (_ map { spec =>
-                table.transform(spec).compact(TransSpec1.Id, AllDefined)
-              })
+            (_ map { spec =>
+              table.transform(spec).compact(TransSpec1.Id, AllDefined)
+            })
 
         val tablesWithType: M[Seq[(Table, JType)]] = for {
           tbls <- tables
@@ -178,9 +180,10 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
             _.zipWithIndex map {
               case (tbl, idx) =>
                 val modelId = "model" + (idx + 1)
-                tbl.transform(trans.WrapObject(DerefObjectStatic(TransSpec1.Id,
-                                                                 paths.Value),
-                                               modelId))
+                tbl.transform(
+                    trans.WrapObject(DerefObjectStatic(TransSpec1.Id,
+                                                       paths.Value),
+                                     modelId))
             }
           }
 

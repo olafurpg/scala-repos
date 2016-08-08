@@ -59,7 +59,8 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
             new DataField(fields(i), OpType.CONTINUOUS, DataType.DOUBLE))
         miningSchema.addMiningFields(
             new MiningField(fields(i)).setUsageType(FieldUsageType.ACTIVE))
-        clusteringModel.addClusteringFields(new ClusteringField(fields(i))
+        clusteringModel.addClusteringFields(
+            new ClusteringField(fields(i))
               .setCompareFunction(CompareFunctionType.ABS_DIFF))
       }
 
@@ -68,7 +69,8 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
       for (i <- model.clusterCenters.indices) {
         val cluster = new Cluster()
           .setName("cluster_" + i)
-          .setArray(new org.dmg.pmml.Array()
+          .setArray(
+              new org.dmg.pmml.Array()
                 .setType(Array.Type.REAL)
                 .setN(clusterCenter.size)
                 .setValue(model.clusterCenters(i).toArray.mkString(" ")))

@@ -7,7 +7,11 @@ import java.util.Comparator
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.IdeBundle
-import com.intellij.ide.structureView.{StructureViewModel, StructureViewTreeElement, TextEditorBasedStructureViewModel}
+import com.intellij.ide.structureView.{
+  StructureViewModel,
+  StructureViewTreeElement,
+  TextEditorBasedStructureViewModel
+}
 import com.intellij.ide.util.treeView.smartTree._
 import com.intellij.psi.PsiElement
 import org.jetbrains.annotations.NotNull
@@ -16,8 +20,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock,
+  ScTemplateBody
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.structureView.elements.impl._
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
 
@@ -31,8 +41,8 @@ class ScalaStructureViewModel(private val myRootElement: ScalaFile,
     with StructureViewModel.ElementInfoProvider {
   def isAlwaysLeaf(element: StructureViewTreeElement): Boolean =
     !(isAlwaysShowsPlus(element) ||
-        element.isInstanceOf[TestStructureViewElement] ||
-        element.isInstanceOf[ScalaValueStructureViewElement])
+      element.isInstanceOf[TestStructureViewElement] ||
+      element.isInstanceOf[ScalaValueStructureViewElement])
 
   def isAlwaysShowsPlus(element: StructureViewTreeElement): Boolean = {
     element match {
@@ -116,6 +126,6 @@ class ScalaStructureViewModel(private val myRootElement: ScalaFile,
 
 object ScalaStructureViewModel {
   private val NODE_PROVIDERS: util.Collection[NodeProvider[_ <: TreeElement]] =
-    util.Arrays.asList(
-        new ScalaInheritedMembersNodeProvider, new TestNodeProvider)
+    util.Arrays
+      .asList(new ScalaInheritedMembersNodeProvider, new TestNodeProvider)
 }

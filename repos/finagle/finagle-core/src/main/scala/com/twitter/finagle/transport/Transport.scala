@@ -5,7 +5,15 @@ import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.{Stack, Status}
 import com.twitter.finagle.ssl
 import com.twitter.io.{Buf, Reader, Writer}
-import com.twitter.util.{Closable, Future, Promise, Time, Throw, Return, Duration}
+import com.twitter.util.{
+  Closable,
+  Future,
+  Promise,
+  Time,
+  Throw,
+  Return,
+  Duration
+}
 import java.net.SocketAddress
 import java.security.cert.Certificate
 
@@ -243,8 +251,7 @@ object Transport {
       chunkOfA: A => Future[Option[Buf]]): Reader with Future[Unit] =
     new Promise[Unit] with Reader {
       private[this] val rw = Reader.writable()
-      become(
-          Transport.copyToWriter(trans, rw)(chunkOfA) respond {
+      become(Transport.copyToWriter(trans, rw)(chunkOfA) respond {
         case Throw(exc) => rw.fail(exc)
         case Return(_) => rw.close()
       })

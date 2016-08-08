@@ -70,13 +70,17 @@ private[nio] final class HeapIntBuffer private (_capacity: Int,
     GenHeapBuffer(this).generic_store(index, elem)
 
   @inline
-  override private[nio] def load(
-      startIndex: Int, dst: Array[Int], offset: Int, length: Int): Unit =
+  override private[nio] def load(startIndex: Int,
+                                 dst: Array[Int],
+                                 offset: Int,
+                                 length: Int): Unit =
     GenHeapBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(
-      startIndex: Int, src: Array[Int], offset: Int, length: Int): Unit =
+  override private[nio] def store(startIndex: Int,
+                                  src: Array[Int],
+                                  offset: Int,
+                                  length: Int): Unit =
     GenHeapBuffer(this).generic_store(startIndex, src, offset, length)
 }
 

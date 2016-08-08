@@ -27,8 +27,12 @@ import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.regression.IsotonicRegressionModel.IsotonicRegressionModelWriter
 import org.apache.spark.ml.util._
 import org.apache.spark.mllib.linalg.{Vector, Vectors, VectorUDT}
-import org.apache.spark.mllib.regression.{IsotonicRegression => MLlibIsotonicRegression}
-import org.apache.spark.mllib.regression.{IsotonicRegressionModel => MLlibIsotonicRegressionModel}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegression => MLlibIsotonicRegression
+}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegressionModel => MLlibIsotonicRegressionModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.{col, lit, udf}
@@ -39,8 +43,12 @@ import org.apache.spark.storage.StorageLevel
   * Params for isotonic regression.
   */
 private[regression] trait IsotonicRegressionBase
-    extends Params with HasFeaturesCol with HasLabelCol with HasPredictionCol
-    with HasWeightCol with Logging {
+    extends Params
+    with HasFeaturesCol
+    with HasLabelCol
+    with HasPredictionCol
+    with HasWeightCol
+    with Logging {
 
   /**
     * Param for whether the output sequence should be isotonic/increasing (true) or
@@ -52,7 +60,7 @@ private[regression] trait IsotonicRegressionBase
       this,
       "isotonic",
       "whether the output sequence should be isotonic/increasing (true) or" +
-      "antitonic/decreasing (false)")
+        "antitonic/decreasing (false)")
 
   /** @group getParam */
   final def getIsotonic: Boolean = $(isotonic)
@@ -111,7 +119,8 @@ private[regression] trait IsotonicRegressionBase
     * @return output schema
     */
   protected[ml] def validateAndTransformSchema(
-      schema: StructType, fitting: Boolean): StructType = {
+      schema: StructType,
+      fitting: Boolean): StructType = {
     if (fitting) {
       SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
       if (hasWeightCol) {
@@ -140,7 +149,8 @@ private[regression] trait IsotonicRegressionBase
 @Experimental
 class IsotonicRegression @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
-    extends Estimator[IsotonicRegressionModel] with IsotonicRegressionBase
+    extends Estimator[IsotonicRegressionModel]
+    with IsotonicRegressionBase
     with DefaultParamsWritable {
 
   @Since("1.5.0")
@@ -213,10 +223,11 @@ object IsotonicRegression extends DefaultParamsReadable[IsotonicRegression] {
   */
 @Since("1.5.0")
 @Experimental
-class IsotonicRegressionModel private[ml](
+class IsotonicRegressionModel private[ml] (
     override val uid: String,
     private val oldModel: MLlibIsotonicRegressionModel)
-    extends Model[IsotonicRegressionModel] with IsotonicRegressionBase
+    extends Model[IsotonicRegressionModel]
+    with IsotonicRegressionBase
     with MLWritable {
 
   /** @group setParam */
@@ -287,8 +298,8 @@ object IsotonicRegressionModel extends MLReadable[IsotonicRegressionModel] {
   /** [[MLWriter]] instance for [[IsotonicRegressionModel]] */
   private[IsotonicRegressionModel] class IsotonicRegressionModelWriter(
       instance: IsotonicRegressionModel
-  )
-      extends MLWriter with Logging {
+  ) extends MLWriter
+      with Logging {
 
     private case class Data(boundaries: Array[Double],
                             predictions: Array[Double],

@@ -4,7 +4,14 @@ import java.io._
 
 import org.specs2.mutable.Specification
 
-import sbt.internal.util.{AttributeEntry, AttributeMap, ConsoleOut, GlobalLogging, MainLogging, Settings}
+import sbt.internal.util.{
+  AttributeEntry,
+  AttributeMap,
+  ConsoleOut,
+  GlobalLogging,
+  MainLogging,
+  Settings
+}
 
 object PluginCommandTestPlugin0 extends AutoPlugin
 
@@ -73,8 +80,12 @@ object FakeState {
     val currentProject = Map(testProject.base.toURI -> testProject.id)
     val currentEval: () => sbt.compiler.Eval = () =>
       Load.mkEval(Nil, base, Nil)
-    val sessionSettings = SessionSettings(
-        base.toURI, currentProject, Nil, Map.empty, Nil, currentEval)
+    val sessionSettings = SessionSettings(base.toURI,
+                                          currentProject,
+                                          Nil,
+                                          Map.empty,
+                                          Nil,
+                                          currentEval)
 
     val delegates: (Scope) => Seq[Scope] = _ => Nil
     val scopeLocal: Def.ScopeLocal = _ => Nil
@@ -102,12 +113,14 @@ object FakeState {
 
     val detectedAutoPlugins: Seq[DetectedAutoPlugin] =
       plugins.map(p => DetectedAutoPlugin(p.label, p, hasAutoImport = false))
-    val detectedPlugins = new DetectedPlugins(
-        detectedModules, detectedAutoPlugins, builds)
-    val loadedPlugins = new LoadedPlugins(
-        base, pluginData, ClassLoader.getSystemClassLoader, detectedPlugins)
-    val buildUnit = new BuildUnit(
-        base.toURI, base, loadedDefinitions, loadedPlugins)
+    val detectedPlugins =
+      new DetectedPlugins(detectedModules, detectedAutoPlugins, builds)
+    val loadedPlugins = new LoadedPlugins(base,
+                                          pluginData,
+                                          ClassLoader.getSystemClassLoader,
+                                          detectedPlugins)
+    val buildUnit =
+      new BuildUnit(base.toURI, base, loadedDefinitions, loadedPlugins)
 
     val (partBuildUnit: PartBuildUnit, _) = Load.loaded(buildUnit)
     val loadedBuildUnit =

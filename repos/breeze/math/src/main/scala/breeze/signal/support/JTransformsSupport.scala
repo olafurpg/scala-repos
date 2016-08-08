@@ -58,9 +58,9 @@ object JTransformsSupport {
     for (n <- 0 until tempDV.length) {
       tempDV(n) match {
         case Complex(re, im) => {
-            tempRet(2 * n) = re
-            tempRet(2 * n + 1) = im
-          }
+          tempRet(2 * n) = re
+          tempRet(2 * n + 1) = im
+        }
       }
     }
     tempRet
@@ -90,10 +90,10 @@ object JTransformsSupport {
     for (r <- 0 until tempDM.rows; c <- 0 until tempDM.cols) {
       tempDM(r, c) match {
         case Complex(re, im) => {
-            val ind = r * 2 * tempCols + 2 * c
-            tempRet(ind) = re
-            tempRet(ind + 1) = im
-          }
+          val ind = r * 2 * tempCols + 2 * c
+          tempRet(ind) = re
+          tempRet(ind + 1) = im
+        }
       }
     }
     tempRet
@@ -114,8 +114,9 @@ object JTransformsSupport {
     tempRet
   }
 
-  private[signal] def tempToDenseMatrix(
-      tempArr: Array[Double], rows: Int, cols: Int): DenseMatrix[Complex] = {
+  private[signal] def tempToDenseMatrix(tempArr: Array[Double],
+                                        rows: Int,
+                                        cols: Int): DenseMatrix[Complex] = {
     val tempRet = DenseMatrix.zeros[Complex](rows, cols)
     for (r <- 0 until rows; c <- 0 until cols) {
       val ind = r * 2 * cols + 2 * c

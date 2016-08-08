@@ -68,8 +68,9 @@ private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
     assertProperty[Int](key, "memory", Utils.memoryStringToMb)
 
   /** Assert that a Spark property can be converted to a certain type. */
-  private def assertProperty[T](
-      key: String, valueType: String, convert: (String => T)): Unit = {
+  private def assertProperty[T](key: String,
+                                valueType: String,
+                                convert: (String => T)): Unit = {
     sparkProperties.get(key).foreach { value =>
       Try(convert(value)).getOrElse {
         throw new SubmitRestProtocolException(

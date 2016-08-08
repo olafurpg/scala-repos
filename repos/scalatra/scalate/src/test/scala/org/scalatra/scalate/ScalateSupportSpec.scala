@@ -9,8 +9,8 @@ class ScalateSupportSpec extends ScalatraSpec {
     "ScalateSupport should" ^ "render uncaught errors with 500.scaml" ! e1 ^ br ^ "not throw a NullPointerException for trivial requests" ! e2 ^ br ^ "render a simple template" ! e3 ^ br ^ "render a simple template with params" ! e4 ^ br ^ "looks for layouts in /WEB-INF/layouts" ! e5 ^ br ^ "generate a url from a template" ! e6 ^ br ^ "generate a url with params from a template" ! e7 ^ br ^ "render a simple template via jade method" ! e8 ^ br ^ "render a simple template with params via jade method" ! e9 ^ br ^ "render a simple template via scaml method" ! e10 ^ br ^ "render a simple template with params via scaml method" ! e11 ^ br ^ "render a simple template via ssp method" ! e12 ^ br ^ "render a simple template with params via ssp method" ! e13 ^ br ^ "render a simple template via mustache method" ! e14 ^ br ^ "render a simple template with params via mustache method" ! e15 ^ br ^ "looks for templates in legacy /WEB-INF/scalate/templates" ! e16 ^ br ^ "looks for index page if no template found" ! e17 ^ br ^ "implicitly bind flash" ! e18 ^ br ^ "implicitly bind session" ! e19 ^ br ^ "implicitly bind params" ! e20 ^ br ^ "implicitly bind multiParams" ! e21 ^ br ^ "set templateAttributes when creating a render context" ! e22 ^ br ^ "render to a string instead of response" ! e23 ^ br ^ "set status to 500 when rendering 500.scaml" ! e24 ^ br ^ end
 
   addServlet(
-      new ScalatraServlet with ScalateSupport
-      with ScalateUrlGeneratorSupport with FlashMapSupport {
+      new ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport
+      with FlashMapSupport {
 
         get("/barf") {
           throw new RuntimeException
@@ -130,20 +130,20 @@ class ScalateSupportSpec extends ScalatraSpec {
   // verify that it's looking in the right place.
   def e5 = get("/layout-strategy") {
     body must_==
-    (List(
-            "/WEB-INF/templates/layouts/default.mustache",
-            "/WEB-INF/templates/layouts/default.ssp",
-            "/WEB-INF/templates/layouts/default.scaml",
-            "/WEB-INF/templates/layouts/default.jade",
-            "/WEB-INF/layouts/default.mustache",
-            "/WEB-INF/layouts/default.ssp",
-            "/WEB-INF/layouts/default.scaml",
-            "/WEB-INF/layouts/default.jade",
-            "/WEB-INF/scalate/layouts/default.mustache",
-            "/WEB-INF/scalate/layouts/default.ssp",
-            "/WEB-INF/scalate/layouts/default.scaml",
-            "/WEB-INF/scalate/layouts/default.jade"
-        ) mkString ";")
+      (List(
+          "/WEB-INF/templates/layouts/default.mustache",
+          "/WEB-INF/templates/layouts/default.ssp",
+          "/WEB-INF/templates/layouts/default.scaml",
+          "/WEB-INF/templates/layouts/default.jade",
+          "/WEB-INF/layouts/default.mustache",
+          "/WEB-INF/layouts/default.ssp",
+          "/WEB-INF/layouts/default.scaml",
+          "/WEB-INF/layouts/default.jade",
+          "/WEB-INF/scalate/layouts/default.mustache",
+          "/WEB-INF/scalate/layouts/default.ssp",
+          "/WEB-INF/scalate/layouts/default.scaml",
+          "/WEB-INF/scalate/layouts/default.jade"
+      ) mkString ";")
   }
 
   def e6 = get("/url-generation") {

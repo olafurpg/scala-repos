@@ -14,8 +14,8 @@ import scala.collection.JavaConverters._
   * the duration after which a request is to be retried.
   */
 object Backoff {
-  private[this] def durations(
-      next: Duration, f: Duration => Duration): Stream[Duration] =
+  private[this] def durations(next: Duration,
+                              f: Duration => Duration): Stream[Duration] =
     next #:: durations(f(next), f)
 
   def apply(next: Duration)(f: Duration => Duration): Stream[Duration] =
@@ -34,8 +34,9 @@ object Backoff {
     *
     * @see [[exponentialJittered]] for a version that incorporates jitter.
     */
-  def exponential(
-      start: Duration, multiplier: Int, maximum: Duration): Stream[Duration] =
+  def exponential(start: Duration,
+                  multiplier: Int,
+                  maximum: Duration): Stream[Duration] =
     Backoff(start) { prev =>
       maximum.min(prev * multiplier)
     }
@@ -49,8 +50,8 @@ object Backoff {
     * @param maximum must be greater than 0 and greater than or equal to `start`.
     * @see [[decorrelatedJittered]] and [[equalJittered]] for alternative jittered approaches.
     */
-  def exponentialJittered(
-      start: Duration, maximum: Duration): Stream[Duration] =
+  def exponentialJittered(start: Duration,
+                          maximum: Duration): Stream[Duration] =
     exponentialJittered(start, maximum, Rng.threadLocal)
 
   private[this] val MinJitter = Duration.fromMilliseconds(1)
@@ -85,8 +86,8 @@ object Backoff {
     * @param maximum must be greater than 0 and greater than or equal to `start`.
     * @see [[exponentialJittered]] and [[equalJittered]] for alternative jittered approaches.
     */
-  def decorrelatedJittered(
-      start: Duration, maximum: Duration): Stream[Duration] =
+  def decorrelatedJittered(start: Duration,
+                           maximum: Duration): Stream[Duration] =
     decorrelatedJittered(start, maximum, Rng.threadLocal)
 
   /** Exposed for testing */
@@ -135,8 +136,9 @@ object Backoff {
     def next(attempt: Int): Stream[Duration] = {
       val shift = math.min(attempt - 1, MaxBitShift)
       val halfExp = start * (1L << shift)
-      val backoff = maximum.min(halfExp +
-          Duration.fromNanoseconds(rng.nextLong(halfExp.inNanoseconds)))
+      val backoff = maximum.min(
+          halfExp +
+            Duration.fromNanoseconds(rng.nextLong(halfExp.inNanoseconds)))
       backoff #:: next(attempt + 1)
     }
     start #:: next(1)
@@ -151,8 +153,9 @@ object Backoff {
   /**
     * Create backoffs that grow linear by `offset`, capped at `maximum`.
     */
-  def linear(
-      start: Duration, offset: Duration, maximum: Duration): Stream[Duration] =
+  def linear(start: Duration,
+             offset: Duration,
+             maximum: Duration): Stream[Duration] =
     Backoff(start) { prev =>
       maximum.min(prev + offset)
     }

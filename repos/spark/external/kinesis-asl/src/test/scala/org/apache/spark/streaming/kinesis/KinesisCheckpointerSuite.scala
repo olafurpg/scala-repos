@@ -37,8 +37,11 @@ import org.apache.spark.streaming.{Duration, TestSuiteBase}
 import org.apache.spark.util.ManualClock
 
 class KinesisCheckpointerSuite
-    extends TestSuiteBase with MockitoSugar with BeforeAndAfterEach
-    with PrivateMethodTester with Eventually {
+    extends TestSuiteBase
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with PrivateMethodTester
+    with Eventually {
 
   private val workerId = "dummyWorkerId"
   private val shardId = "dummyShardId"
@@ -59,8 +62,10 @@ class KinesisCheckpointerSuite
     receiverMock = mock[KinesisReceiver[Array[Byte]]]
     checkpointerMock = mock[IRecordProcessorCheckpointer]
     clock = new ManualClock()
-    kinesisCheckpointer = new KinesisCheckpointer(
-        receiverMock, checkpointInterval, workerId, clock)
+    kinesisCheckpointer = new KinesisCheckpointer(receiverMock,
+                                                  checkpointInterval,
+                                                  workerId,
+                                                  clock)
   }
 
   test("checkpoint is not called twice for the same sequence number") {

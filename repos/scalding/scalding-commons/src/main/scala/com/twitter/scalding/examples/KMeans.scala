@@ -90,8 +90,8 @@ object KMeans {
            // There is no need to use more than k reducers
              .withReducers(k)
              .mapValueStream { vectors =>
-           Iterator(centroidOf(vectors))
-         }
+               Iterator(centroidOf(vectors))
+             }
              // Now collect them all into one big
              .groupAll
              .toList
@@ -128,8 +128,8 @@ object KMeans {
    */
   def kmeans(k: Int,
              clusters: ValuePipe[List[LabeledVector]],
-             points: TypedPipe[LabeledVector]): Execution[(Int, ValuePipe[List[
-              LabeledVector]], TypedPipe[LabeledVector])] = {
+             points: TypedPipe[LabeledVector]): Execution[
+      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
 
     val key = StatKey("changed", "scalding.kmeans")
 

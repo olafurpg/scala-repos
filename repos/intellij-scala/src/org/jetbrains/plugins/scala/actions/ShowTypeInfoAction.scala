@@ -3,14 +3,22 @@ package actions
 
 import _root_.com.intellij.codeInsight.TargetElementUtil
 import _root_.com.intellij.psi._
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction,
+  AnActionEvent,
+  CommonDataKeys
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.{PsiTreeUtil, PsiUtilBase}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScSubstitutor,
+  ScType,
+  ScTypePresentation
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 
 /**
@@ -27,8 +35,8 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
     val editor = CommonDataKeys.EDITOR.getData(context)
 
     if (editor == null) return
-    val file = PsiUtilBase.getPsiFileInEditor(
-        editor, CommonDataKeys.PROJECT.getData(context))
+    val file = PsiUtilBase
+      .getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     val selectionModel = editor.getSelectionModel
@@ -96,8 +104,9 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
 }
 
 object ShowTypeInfoAction {
-  def getTypeInfoHint(
-      editor: Editor, file: PsiFile, offset: Int): Option[String] = {
+  def getTypeInfoHint(editor: Editor,
+                      file: PsiFile,
+                      offset: Int): Option[String] = {
     val typeInfoFromRef = file.findReferenceAt(offset) match {
       case ResolvedWithSubst(e, subst) => typeTextOf(e, subst)
       case _ =>
@@ -111,7 +120,10 @@ object ShowTypeInfoAction {
         }
     }
     val pattern = PsiTreeUtil.findElementOfClassAtOffset(
-        file, offset, classOf[ScBindingPattern], false)
+        file,
+        offset,
+        classOf[ScBindingPattern],
+        false)
     typeInfoFromRef.orElse(typeInfoFromPattern(pattern))
   }
 
@@ -124,8 +136,8 @@ object ShowTypeInfoAction {
 
   val NO_TYPE: String = "No type was inferred"
 
-  private[this] def typeTextOf(
-      elem: PsiElement, subst: ScSubstitutor): Option[String] = {
+  private[this] def typeTextOf(elem: PsiElement,
+                               subst: ScSubstitutor): Option[String] = {
     typeText(ScType.ofNamedElement(elem, subst))
   }
 

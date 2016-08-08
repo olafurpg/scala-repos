@@ -12,12 +12,12 @@ import cats.laws.discipline.{SemigroupKTests, MonoidKTests}
 
 class CokleisliTests extends SlowCatsSuite {
 
-  implicit def cokleisliEq[F[_], A, B](
-      implicit A: Arbitrary[F[A]], FB: Eq[B]): Eq[Cokleisli[F, A, B]] =
+  implicit def cokleisliEq[F[_], A, B](implicit A: Arbitrary[F[A]],
+                                       FB: Eq[B]): Eq[Cokleisli[F, A, B]] =
     Eq.by[Cokleisli[F, A, B], F[A] => B](_.run)
 
-  def cokleisliEqE[F[_], A](
-      implicit A: Arbitrary[F[A]], FA: Eq[A]): Eq[Cokleisli[F, A, A]] =
+  def cokleisliEqE[F[_], A](implicit A: Arbitrary[F[A]],
+                            FA: Eq[A]): Eq[Cokleisli[F, A, A]] =
     Eq.by[Cokleisli[F, A, A], F[A] => A](_.run)
 
   implicit val iso =
@@ -52,11 +52,11 @@ class CokleisliTests extends SlowCatsSuite {
     // Ceremony to help scalac to do the right thing, see also #267.
     type CokleisliNEL[A, B] = Cokleisli[NonEmptyList, A, B]
 
-    implicit def ev0[A : Arbitrary, B : Arbitrary]: Arbitrary[CokleisliNEL[
-            A, B]] =
+    implicit def ev0[A: Arbitrary, B: Arbitrary]
+      : Arbitrary[CokleisliNEL[A, B]] =
       cokleisliArbitrary
 
-    implicit def ev1[A : Arbitrary, B : Eq]: Eq[CokleisliNEL[A, B]] =
+    implicit def ev1[A: Arbitrary, B: Eq]: Eq[CokleisliNEL[A, B]] =
       cokleisliEq[NonEmptyList, A, B](oneAndArbitrary, Eq[B])
 
     checkAll("Cokleisli[NonEmptyList, Int, Int]",
@@ -69,11 +69,10 @@ class CokleisliTests extends SlowCatsSuite {
     // More ceremony, see above
     type CokleisliNELE[A] = Cokleisli[NonEmptyList, A, A]
 
-    implicit def ev0[A : Arbitrary]: Arbitrary[CokleisliNELE[A]] =
+    implicit def ev0[A: Arbitrary]: Arbitrary[CokleisliNELE[A]] =
       cokleisliArbitrary[NonEmptyList, A, A]
 
-    implicit def ev1[A : Eq](
-        implicit arb: Arbitrary[A]): Eq[CokleisliNELE[A]] =
+    implicit def ev1[A: Eq](implicit arb: Arbitrary[A]): Eq[CokleisliNELE[A]] =
       cokleisliEqE[NonEmptyList, A](oneAndArbitrary, Eq[A])
 
     {

@@ -17,7 +17,8 @@ import akka.actor.DeadLetterSuppression
   * Receives Heartbeat messages and replies.
   */
 private[cluster] final class ClusterHeartbeatReceiver
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ClusterHeartbeatSender._
 
   // Important - don't use Cluster(context.system) in constructor because that would
@@ -39,13 +40,17 @@ private[cluster] object ClusterHeartbeatSender {
     * Sent at regular intervals for failure detection.
     */
   final case class Heartbeat(from: Address)
-      extends ClusterMessage with PriorityMessage with DeadLetterSuppression
+      extends ClusterMessage
+      with PriorityMessage
+      with DeadLetterSuppression
 
   /**
     * Sent as reply to [[Heartbeat]] messages.
     */
   final case class HeartbeatRsp(from: UniqueAddress)
-      extends ClusterMessage with PriorityMessage with DeadLetterSuppression
+      extends ClusterMessage
+      with PriorityMessage
+      with DeadLetterSuppression
 
   // sent to self only
   case object HeartbeatTick
@@ -60,7 +65,8 @@ private[cluster] object ClusterHeartbeatSender {
  * failure detector.
  */
 private[cluster] final class ClusterHeartbeatSender
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ClusterHeartbeatSender._
 
   val cluster = Cluster(context.system)
@@ -156,8 +162,9 @@ private[cluster] final class ClusterHeartbeatSender
     state.activeReceivers foreach { to ⇒
       if (cluster.failureDetector.isMonitoring(to.address)) {
         if (verboseHeartbeat)
-          log.debug(
-              "Cluster Node [{}] - Heartbeat to [{}]", selfAddress, to.address)
+          log.debug("Cluster Node [{}] - Heartbeat to [{}]",
+                    selfAddress,
+                    to.address)
       } else {
         if (verboseHeartbeat)
           log.debug("Cluster Node [{}] - First Heartbeat to [{}]",
@@ -165,8 +172,9 @@ private[cluster] final class ClusterHeartbeatSender
                     to.address)
         // schedule the expected first heartbeat for later, which will give the
         // other side a chance to reply, and also trigger some resends if needed
-        scheduler.scheduleOnce(
-            HeartbeatExpectedResponseAfter, self, ExpectedFirstHeartbeat(to))
+        scheduler.scheduleOnce(HeartbeatExpectedResponseAfter,
+                               self,
+                               ExpectedFirstHeartbeat(to))
       }
       heartbeatReceiver(to.address) ! selfHeartbeat
     }
@@ -210,8 +218,8 @@ private[cluster] final case class ClusterHeartbeatSenderState(
   def init(nodes: Set[UniqueAddress],
            unreachable: Set[UniqueAddress]): ClusterHeartbeatSenderState =
     copy(
-        ring = ring.copy(
-              nodes = nodes + selfAddress, unreachable = unreachable))
+        ring =
+          ring.copy(nodes = nodes + selfAddress, unreachable = unreachable))
 
   def contains(node: UniqueAddress): Boolean = ring.nodes(node)
 
@@ -225,7 +233,7 @@ private[cluster] final case class ClusterHeartbeatSenderState(
     if (newState.oldReceiversNowUnreachable(node))
       newState.copy(
           oldReceiversNowUnreachable = newState.oldReceiversNowUnreachable -
-            node)
+              node)
     else newState
   }
 

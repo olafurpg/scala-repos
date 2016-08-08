@@ -13,8 +13,8 @@ import org.ensime.api._
 
 import scala.collection.mutable
 
-case class DMClassPrepareEvent(
-    prepareEvent: ClassPrepareEvent, eventSet: EventSet)
+case class DMClassPrepareEvent(prepareEvent: ClassPrepareEvent,
+                               eventSet: EventSet)
 
 object DebugManager {
   def apply(
@@ -27,8 +27,8 @@ object DebugManager {
 class DebugManager(
     broadcaster: ActorRef,
     config: EnsimeConfig
-)
-    extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
 
   // TODO this is built once on startup - probably makes sense for it to be done each time a debug vm is created
   private var sourceMap = new SourceMap(config)
@@ -260,8 +260,8 @@ class DebugManager(
   def handleDebugStartReq(commandLine: String): RpcResponse = {
     disposeCurrentVM()
     try {
-      val vm = new VM(
-          VmStart(commandLine), vmOptions(), self, broadcaster, sourceMap)
+      val vm =
+        new VM(VmStart(commandLine), vmOptions(), self, broadcaster, sourceMap)
       maybeVM = Some(vm)
       vm.start()
       DebugVmSuccess()
@@ -275,8 +275,11 @@ class DebugManager(
   def handleDebugAttachReq(hostname: String, port: String): RpcResponse = {
     disposeCurrentVM()
     try {
-      val vm = new VM(
-          VmAttach(hostname, port), vmOptions(), self, broadcaster, sourceMap)
+      val vm = new VM(VmAttach(hostname, port),
+                      vmOptions(),
+                      self,
+                      broadcaster,
+                      sourceMap)
       maybeVM = Some(vm)
       vm.start()
       DebugVmSuccess()

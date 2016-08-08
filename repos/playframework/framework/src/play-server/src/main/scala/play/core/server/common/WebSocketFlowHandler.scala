@@ -19,8 +19,8 @@ object WebSocketFlowHandler {
     */
   def webSocketProtocol(bufferLimit: Int)
     : BidiFlow[RawMessage, Message, Message, Message, NotUsed] = {
-    BidiFlow.fromGraph(
-        new GraphStage[BidiShape[RawMessage, Message, Message, Message]] {
+    BidiFlow.fromGraph(new GraphStage[
+        BidiShape[RawMessage, Message, Message, Message]] {
       // The stream of incoming messages from the websocket connection
       val remoteIn = Inlet[RawMessage]("WebSocketIn")
       // The stream of websocket messages going to the application
@@ -85,8 +85,8 @@ object WebSocketFlowHandler {
             }
           }
 
-          def toMessage(
-              messageType: MessageType.Type, data: ByteString): Message = {
+          def toMessage(messageType: MessageType.Type,
+                        data: ByteString): Message = {
             messageType match {
               case MessageType.Text => TextMessage(data.utf8String)
               case MessageType.Binary => BinaryMessage(data)
@@ -107,7 +107,7 @@ object WebSocketFlowHandler {
                 null
               case MessageType.Continuation
                   if currentPartialMessage.data.size +
-                  read.data.size > bufferLimit =>
+                    read.data.size > bufferLimit =>
                 serverInitiatedClose(
                     CloseMessage(CloseCodes.TooBig, "Message was too big"))
                 null
@@ -118,15 +118,15 @@ object WebSocketFlowHandler {
                 currentPartialMessage = null
                 message
               case MessageType.Continuation =>
-                currentPartialMessage = RawMessage(
-                    currentPartialMessage.messageType,
-                    currentPartialMessage.data ++ read.data,
-                    false)
+                currentPartialMessage =
+                  RawMessage(currentPartialMessage.messageType,
+                             currentPartialMessage.data ++ read.data,
+                             false)
                 null
               case _ if currentPartialMessage != null =>
                 serverInitiatedClose(CloseMessage(
-                        CloseCodes.ProtocolError,
-                        "Received non continuation frame when previous message wasn't finished"))
+                    CloseCodes.ProtocolError,
+                    "Received non continuation frame when previous message wasn't finished"))
                 null
               case _ if read.isFinal =>
                 toMessage(read.messageType, read.data)
@@ -305,8 +305,9 @@ object WebSocketFlowHandler {
   private val logger = Logger("play.core.server.common.WebSocketFlowHandler")
 
   // Low level API for raw, possibly fragmented messages
-  case class RawMessage(
-      messageType: MessageType.Type, data: ByteString, isFinal: Boolean)
+  case class RawMessage(messageType: MessageType.Type,
+                        data: ByteString,
+                        isFinal: Boolean)
   object MessageType extends Enumeration {
     type Type = Value
     val Ping, Pong, Text, Binary, Continuation, Close = Value

@@ -93,7 +93,8 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(
         zkReady,
         "Zookeeper not setup yet or already torn down, cannot get zookeeper client")
-    Option(zkClient).getOrElse(throw new IllegalStateException(
+    Option(zkClient).getOrElse(
+        throw new IllegalStateException(
             "Zookeeper client is not yet initialized"))
   }
 
@@ -115,18 +116,13 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(zkReady, "Zookeeper should be set up beforehand")
 
     // Kafka broker startup
-    Utils.startServiceOnPort(
-        brokerPort,
-        port =>
-          {
-            brokerPort = port
-            brokerConf = new KafkaConfig(brokerConfiguration)
-            server = new KafkaServer(brokerConf)
-            server.startup()
-            (server, port)
-        },
-        new SparkConf(),
-        "KafkaBroker")
+    Utils.startServiceOnPort(brokerPort, port => {
+      brokerPort = port
+      brokerConf = new KafkaConfig(brokerConfiguration)
+      server = new KafkaServer(brokerConf)
+      server.startup()
+      (server, port)
+    }, new SparkConf(), "KafkaBroker")
 
     brokerReady = true
   }
@@ -181,8 +177,8 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Java-friendly function for sending messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: JMap[String, JInt]): Unit = {
-    sendMessages(
-        topic, Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
+    sendMessages(topic,
+                 Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
   }
 
   /** Send the messages to the Kafka broker */
@@ -195,8 +191,8 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Send the array of messages to the Kafka broker */
   def sendMessages(topic: String, messages: Array[String]): Unit = {
-    producer = new Producer[String, String](
-        new ProducerConfig(producerConfiguration))
+    producer =
+      new Producer[String, String](new ProducerConfig(producerConfiguration))
     producer.send(
         messages.map { new KeyedMessage[String, String](topic, _) }: _*)
     producer.close()
@@ -255,15 +251,17 @@ private[kafka] class KafkaTestUtils extends Logging {
     tryAgain(1)
   }
 
-  private def waitUntilMetadataIsPropagated(
-      topic: String, partition: Int): Unit = {
+  private def waitUntilMetadataIsPropagated(topic: String,
+                                            partition: Int): Unit = {
     def isPropagated =
       server.apis.metadataCache.getPartitionInfo(topic, partition) match {
         case Some(partitionState) =>
           val leaderAndInSyncReplicas =
             partitionState.leaderIsrAndControllerEpoch.leaderAndIsr
 
-          ZkUtils.getLeaderForPartition(zkClient, topic, partition).isDefined &&
+          ZkUtils
+            .getLeaderForPartition(zkClient, topic, partition)
+            .isDefined &&
           Request.isValidBrokerId(leaderAndInSyncReplicas.leader) &&
           leaderAndInSyncReplicas.isr.size >= 1
 

@@ -20,11 +20,12 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       Machine(jstore[K, (BatchID, V)], jstore[(K, BatchID), V])
   }
 
-  case class Machine[K, V](
-      offline: Store[K, (BatchID, V)], online: Store[(K, BatchID), V])(
-      implicit val batcher: Batcher, semi: Semigroup[V]) {
-    val mergeable = ClientMergeable(
-        offline, MergeableStore.fromStoreNoMulti(online), 10)
+  case class Machine[K, V](offline: Store[K, (BatchID, V)],
+                           online: Store[(K, BatchID), V])(
+      implicit val batcher: Batcher,
+      semi: Semigroup[V]) {
+    val mergeable =
+      ClientMergeable(offline, MergeableStore.fromStoreNoMulti(online), 10)
   }
 
   def jstore[K, V]: Store[K, V] =
@@ -87,12 +88,12 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       Await.result(
           Future
             .collect(machine.mergeable
-                  .multiMerge(keys)
-                  .collect {
-            case ((k, BatchID(2)), fopt) =>
-              fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
-          }
-                  .toSeq)
+              .multiMerge(keys)
+              .collect {
+                case ((k, BatchID(2)), fopt) =>
+                  fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
+              }
+              .toSeq)
             .map(_.forall(identity)))
   }
 
@@ -116,9 +117,9 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       Await.result(
           Future
             .collect(merged.collect {
-          case ((k, BatchID(2)), fopt) =>
-            fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
-        })
+              case ((k, BatchID(2)), fopt) =>
+                fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
+            })
             .map(_.forall(identity)))
   }
 

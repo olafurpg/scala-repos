@@ -14,10 +14,12 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/23/15.
   */
-class CachedMappedWithRecursionGuard(
-    psiElement: Any, defaultValue: => Any, dependencyItem: Object)
+class CachedMappedWithRecursionGuard(psiElement: Any,
+                                     defaultValue: => Any,
+                                     dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
 }
 
 object CachedMappedWithRecursionGuard {
@@ -177,8 +179,8 @@ object CachedMappedWithRecursionGuard {
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           } else EmptyTree
 
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$mappedKeyTypeFQN[(..$parameterTypes), $retTp]]($keyId)
           ..$cacheStatsField

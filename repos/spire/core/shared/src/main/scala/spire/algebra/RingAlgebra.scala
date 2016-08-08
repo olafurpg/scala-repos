@@ -8,8 +8,8 @@ package algebra
 trait RingAlgebra[V, @sp R] extends Any with Module[V, R] with Rng[V]
 
 object RingAlgebra {
-  implicit def ZAlgebra[A](
-      implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] =
+  implicit def ZAlgebra[A](implicit vector0: Ring[A],
+                           scalar0: Ring[Int]): ZAlgebra[A] =
     new ZAlgebra[A] {
       val vector: Ring[A] = vector0
       val scalar: Ring[Int] = scalar0
@@ -41,4 +41,6 @@ trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
   * complex numbers.
   */
 trait FieldAlgebra[V, @sp(Float, Double) F]
-    extends Any with RingAlgebra[V, F] with VectorSpace[V, F]
+    extends Any
+    with RingAlgebra[V, F]
+    with VectorSpace[V, F]

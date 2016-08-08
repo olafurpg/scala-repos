@@ -3,32 +3,42 @@ package project.template
 
 import java.util
 
-import com.intellij.facet.impl.ui.libraries.{LibraryCompositionSettings, LibraryOptionsPanel}
+import com.intellij.facet.impl.ui.libraries.{
+  LibraryCompositionSettings,
+  LibraryOptionsPanel
+}
 import com.intellij.framework.library.FrameworkLibraryVersionFilter
 import com.intellij.ide.util.projectWizard.ModuleBuilder.ModuleConfigurationUpdater
-import com.intellij.ide.util.projectWizard.{JavaModuleBuilder, ModuleWizardStep, SettingsStep}
+import com.intellij.ide.util.projectWizard.{
+  JavaModuleBuilder,
+  ModuleWizardStep,
+  SettingsStep
+}
 import com.intellij.openapi.module.{JavaModuleType, Module}
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.ui.configuration.libraries.CustomLibraryDescription
-import com.intellij.openapi.roots.ui.configuration.projectRoot.{LibrariesContainer, LibrariesContainerFactory}
+import com.intellij.openapi.roots.ui.configuration.projectRoot.{
+  LibrariesContainer,
+  LibrariesContainerFactory
+}
 import com.intellij.openapi.util.Disposer
 
 /**
   * @author Pavel Fatin
   */
-class ScalaModuleBuilder(
-    languageName: String, libraryDescription: CustomLibraryDescription)
+class ScalaModuleBuilder(languageName: String,
+                         libraryDescription: CustomLibraryDescription)
     extends JavaModuleBuilder {
   private var librariesContainer: LibrariesContainer = _
 
   private var libraryCompositionSettings: LibraryCompositionSettings = _
 
-  addModuleConfigurationUpdater(
-      new ModuleConfigurationUpdater() {
+  addModuleConfigurationUpdater(new ModuleConfigurationUpdater() {
     override def update(module: Module, rootModel: ModifiableRootModel) {
-      libraryCompositionSettings.addLibraries(
-          rootModel, new util.ArrayList[Library](), librariesContainer)
+      libraryCompositionSettings.addLibraries(rootModel,
+                                              new util.ArrayList[Library](),
+                                              librariesContainer)
     }
   })
 
@@ -42,8 +52,8 @@ class ScalaModuleBuilder(
 
   private class ScalaStep(settingsStep: SettingsStep)
       extends ModuleWizardStep() {
-    private val javaStep = JavaModuleType.getModuleType.modifyProjectTypeStep(
-        settingsStep, ScalaModuleBuilder.this)
+    private val javaStep = JavaModuleType.getModuleType
+      .modifyProjectTypeStep(settingsStep, ScalaModuleBuilder.this)
 
     private val libraryPanel = new LibraryOptionsPanel(
         libraryDescription,
@@ -52,8 +62,8 @@ class ScalaModuleBuilder(
         librariesContainer,
         false)
 
-    settingsStep.addSettingsField(
-        s"$languageName S\u001BDK:", libraryPanel.getSimplePanel)
+    settingsStep.addSettingsField(s"$languageName S\u001BDK:",
+                                  libraryPanel.getSimplePanel)
 
     override def updateDataModel() {
       libraryCompositionSettings = libraryPanel.apply()

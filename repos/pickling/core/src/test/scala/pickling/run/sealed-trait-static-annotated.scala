@@ -1,6 +1,12 @@
 package scala.pickling.test.sealedtraitstaticannotated
 
-import scala.pickling.{PicklingException, directSubclasses, Pickler, Unpickler, Defaults}
+import scala.pickling.{
+  PicklingException,
+  directSubclasses,
+  Pickler,
+  Unpickler,
+  Defaults
+}
 import scala.pickling.static._
 import scala.pickling.json._
 import Defaults.{stringPickler, intPickler, refUnpickler, nullPickler}

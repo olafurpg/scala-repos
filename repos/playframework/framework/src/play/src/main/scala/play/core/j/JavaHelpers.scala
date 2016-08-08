@@ -8,7 +8,14 @@ import java.util.concurrent.CompletionStage
 import play.api.libs.iteratee.Execution.trampoline
 import play.api.mvc._
 import play.mvc.{Result => JResult}
-import play.mvc.Http.{Context => JContext, Request => JRequest, RequestImpl => JRequestImpl, RequestHeader => JRequestHeader, Cookies => JCookies, Cookie => JCookie}
+import play.mvc.Http.{
+  Context => JContext,
+  Request => JRequest,
+  RequestImpl => JRequestImpl,
+  RequestHeader => JRequestHeader,
+  Cookies => JCookies,
+  Cookie => JCookie
+}
 import play.mvc.Http.RequestBody
 
 import scala.compat.java8.{FutureConverters, OptionConverters}
@@ -130,7 +137,8 @@ trait JavaHelpers {
     val javaContext = createJavaContext(request)
     try {
       JContext.current.set(javaContext)
-      Option(f(javaContext.request())).map(cs =>
+      Option(f(javaContext.request())).map(
+          cs =>
             FutureConverters
               .toScala(cs)
               .map(createResult(javaContext, _))(trampoline))
@@ -214,7 +222,8 @@ class RequestHeaderImpl(header: RequestHeader) extends JRequestHeader {
 
   def getQueryString(key: String): String = {
     if (queryString().containsKey(key) && queryString().get(key).length > 0)
-      queryString().get(key)(0) else null
+      queryString().get(key)(0)
+    else null
   }
 
   def cookie(name: String): JCookie = {

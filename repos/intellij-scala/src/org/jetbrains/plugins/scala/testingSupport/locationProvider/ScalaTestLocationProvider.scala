@@ -10,7 +10,10 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.plugins.scala.caches.ScalaShortNamesCacheManager
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 
@@ -42,14 +45,16 @@ class ScalaTestLocationProvider extends SMTestLocator {
             val clazzes = ScalaShortNamesCacheManager
               .getInstance(project)
               .getClassesByFQName(className, scope)
-            val found = clazzes.find(
-                c => Option(c.getContainingFile).exists(_.name == fileName))
+            val found = clazzes.find(c =>
+              Option(c.getContainingFile).exists(_.name == fileName))
 
             found match {
               case Some(file) =>
                 val res = new ArrayList[Location[_ <: PsiElement]]()
-                res.add(createLocationFor(
-                        project, file.getContainingFile, lineNumber.toInt))
+                res.add(
+                    createLocationFor(project,
+                                      file.getContainingFile,
+                                      lineNumber.toInt))
                 res
               case _ => searchForClassByUnqualifiedName(project, className)
             }
@@ -65,13 +70,13 @@ class ScalaTestLocationProvider extends SMTestLocator {
             val clazz = classes
               .find(!_.isInstanceOf[ScObject])
               .orElse(classes.headOption)
-            clazz.foreach(
-                c => res.add(new PsiLocationWithName(project, c, testName)))
+            clazz.foreach(c =>
+              res.add(new PsiLocationWithName(project, c, testName)))
           case ScalaTestTopOfMethodPattern(classFqn, methodName, testName) =>
             val classes = ScalaShortNamesCacheManager
               .getInstance(project)
-              .getClassesByFQName(
-                  classFqn, GlobalSearchScope.allScope(project))
+              .getClassesByFQName(classFqn,
+                                  GlobalSearchScope.allScope(project))
             val methodOwner = classes
               .find(!_.isInstanceOf[ScObject])
               .orElse(classes.headOption)
@@ -79,8 +84,10 @@ class ScalaTestLocationProvider extends SMTestLocator {
               case Some(td: ScTypeDefinition) =>
                 td.signaturesByName(methodName).foreach {
                   case signature: PhysicalSignature =>
-                    res.add(new PsiLocationWithName(
-                            project, signature.method, testName))
+                    res.add(
+                        new PsiLocationWithName(project,
+                                                signature.method,
+                                                testName))
                 }
               case _ =>
             }
@@ -91,13 +98,15 @@ class ScalaTestLocationProvider extends SMTestLocator {
                 res.add(new PsiLocationWithName(project, method, testName))
               }
             }
-          case ScalaTestLineInFinePattern(
-              classFqn, fileName, lineNumber, testName) =>
+          case ScalaTestLineInFinePattern(classFqn,
+                                          fileName,
+                                          lineNumber,
+                                          testName) =>
             val clazzes = ScalaPsiManager
               .instance(project)
               .getCachedClass(GlobalSearchScope.allScope(project), classFqn)
-            val found = clazzes.find(
-                c => Option(c.getContainingFile).exists(_.name == fileName))
+            val found = clazzes.find(c =>
+              Option(c.getContainingFile).exists(_.name == fileName))
             found match {
               case Some(file) =>
                 res.add(
@@ -168,7 +177,8 @@ class ScalaTestLocationProvider extends SMTestLocator {
             testName)
       case _ =>
         PsiLocation.fromPsiElement(
-            project, if (elementAtLine != null) elementAtLine else psiFile)
+            project,
+            if (elementAtLine != null) elementAtLine else psiFile)
     }
   }
 }

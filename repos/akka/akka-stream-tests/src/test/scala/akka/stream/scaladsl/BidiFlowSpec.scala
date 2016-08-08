@@ -29,13 +29,13 @@ class BidiFlowSpec extends AkkaSpec {
       Flow[Long].map(x ⇒ x.toInt + 2).withAttributes(name("top")),
       Flow[String].map(ByteString(_)).withAttributes(name("bottom")))
 
-  val bidiMat = BidiFlow.fromGraph(
-      GraphDSL.create(Sink.head[Int]) { implicit b ⇒ s ⇒
-    Source.single(42) ~> s
+  val bidiMat = BidiFlow.fromGraph(GraphDSL.create(Sink.head[Int]) {
+    implicit b ⇒ s ⇒
+      Source.single(42) ~> s
 
-    val top = b.add(Flow[Int].map(x ⇒ x.toLong + 2))
-    val bottom = b.add(Flow[ByteString].map(_.decodeString("UTF-8")))
-    BidiShape(top.in, top.out, bottom.in, bottom.out)
+      val top = b.add(Flow[Int].map(x ⇒ x.toLong + 2))
+      val bottom = b.add(Flow[ByteString].map(_.decodeString("UTF-8")))
+      BidiShape(top.in, top.out, bottom.in, bottom.out)
   })
 
   val str = "Hello World"
@@ -47,13 +47,13 @@ class BidiFlowSpec extends AkkaSpec {
       val (top, bottom) = RunnableGraph
         .fromGraph(
             GraphDSL.create(Sink.head[Long], Sink.head[String])(Keep.both) {
-          implicit b ⇒ (st, sb) ⇒
-            val s = b.add(bidi)
+              implicit b ⇒ (st, sb) ⇒
+                val s = b.add(bidi)
 
-            Source.single(1) ~> s.in1; s.out1 ~> st
-            sb <~ s.out2; s.in2 <~ Source.single(bytes)
-            ClosedShape
-        })
+                Source.single(1) ~> s.in1; s.out1 ~> st
+                sb <~ s.out2; s.in2 <~ Source.single(bytes)
+                ClosedShape
+            })
         .run()
 
       Await.result(top, 1.second) should ===(3)
@@ -102,22 +102,23 @@ class BidiFlowSpec extends AkkaSpec {
     }
 
     "combine materialization values" in assertAllStagesStopped {
-      val left = Flow.fromGraph(
-          GraphDSL.create(Sink.head[Int]) { implicit b ⇒ sink ⇒
-        val bcast = b.add(Broadcast[Int](2))
-        val merge = b.add(Merge[Int](2))
-        val flow = b.add(Flow[String].map(Integer.valueOf(_).toInt))
-        bcast ~> sink
-        Source.single(1) ~> bcast ~> merge
-        flow ~> merge
-        FlowShape(flow.in, merge.out)
+      val left = Flow.fromGraph(GraphDSL.create(Sink.head[Int]) {
+        implicit b ⇒ sink ⇒
+          val bcast = b.add(Broadcast[Int](2))
+          val merge = b.add(Merge[Int](2))
+          val flow = b.add(Flow[String].map(Integer.valueOf(_).toInt))
+          bcast ~> sink
+          Source.single(1) ~> bcast ~> merge
+          flow ~> merge
+          FlowShape(flow.in, merge.out)
       })
-      val right = Flow.fromGraph(
-          GraphDSL.create(Sink.head[immutable.Seq[Long]]) { implicit b ⇒ sink ⇒
-        val flow = b.add(Flow[Long].grouped(10))
-        flow ~> sink
-        FlowShape(flow.in, b.add(Source.single(ByteString("10"))).out)
-      })
+      val right =
+        Flow.fromGraph(GraphDSL.create(Sink.head[immutable.Seq[Long]]) {
+          implicit b ⇒ sink ⇒
+            val flow = b.add(Flow[Long].grouped(10))
+            flow ~> sink
+            FlowShape(flow.in, b.add(Source.single(ByteString("10"))).out)
+        })
       val ((l, m), r) =
         left.joinMat(bidiMat)(Keep.both).joinMat(right)(Keep.both).run()
       Await.result(l, 1.second) should ===(1)

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -59,18 +59,16 @@ object VFSPathUtils extends Logging {
   }
 
   def escapePath(path: Path, toEscape: Set[String]) =
-    Path(
-        path.elements.map {
+    Path(path.elements.map {
       case needsEscape
           if toEscape.contains(needsEscape) ||
-          needsEscape.endsWith(escapeSuffix) =>
+            needsEscape.endsWith(escapeSuffix) =>
         needsEscape + escapeSuffix
       case fine => fine
     }.toList)
 
   def unescapePath(path: Path) =
-    Path(
-        path.elements.map {
+    Path(path.elements.map {
       case escaped if escaped.endsWith(escapeSuffix) =>
         escaped.substring(0, escaped.length - escapeSuffix.length)
       case fine => fine
@@ -95,8 +93,8 @@ object VFSPathUtils extends Logging {
     logger.debug(
         "Checking for children of path %s in dir %s".format(path, pathRoot))
     Option(pathRoot.listFiles(pathFileFilter)) map { files =>
-      logger.debug("Filtering children %s in path %s".format(
-              files.mkString("[", ", ", "]"), path))
+      logger.debug("Filtering children %s in path %s"
+        .format(files.mkString("[", ", ", "]"), path))
       val childMetadata =
         files.toList traverse { f =>
           val childPath = unescapePath(path / Path(f.getName))
@@ -121,7 +119,8 @@ object VFSPathUtils extends Logging {
   }
 
   def currentPathMetadata(
-      baseDir: File, path: Path): EitherT[IO, ResourceError, PathMetadata] = {
+      baseDir: File,
+      path: Path): EitherT[IO, ResourceError, PathMetadata] = {
     def containsNonemptyChild(dirs: List[File]): IO[Boolean] = dirs match {
       case f :: xs =>
         val childPath = unescapePath(path / Path(f.getName))
@@ -141,29 +140,29 @@ object VFSPathUtils extends Logging {
               currentVersionV.fold[IO[ResourceError \/ PathMetadata]]({
                 case NotFound(message) =>
                   // Recurse on children to find one that is nonempty
-                  containsNonemptyChild(Option(pathDir0.listFiles(
-                              pathFileFilter)).toList.flatten) map {
+                  containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
                     case true =>
                       \/.right(PathMetadata(path, PathMetadata.PathOnly))
                     case false =>
                       \/.left(NotFound("All subpaths of %s appear to be empty."
-                                .format(path.path)))
+                        .format(path.path)))
                   }
 
                 case otherError =>
                   IO(\/.left(otherError))
               }, {
                 case VersionEntry(uuid, dataType, timestamp) =>
-                  containsNonemptyChild(Option(pathDir0.listFiles(
-                              pathFileFilter)).toList.flatten) map {
+                  containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
                     case true =>
                       \/.right(PathMetadata(
-                              path,
-                              PathMetadata.DataDir(dataType.contentType)))
+                          path,
+                          PathMetadata.DataDir(dataType.contentType)))
                     case false =>
                       \/.right(PathMetadata(
-                              path,
-                              PathMetadata.DataOnly(dataType.contentType)))
+                          path,
+                          PathMetadata.DataOnly(dataType.contentType)))
                   }
               })
           }

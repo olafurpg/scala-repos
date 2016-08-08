@@ -42,7 +42,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class AxisSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.Axis[T], Axis[T]](
-        classOf[jfxsc.Axis[T]], classOf[Axis[T]]) with RunOnApplicationThread {
+        classOf[jfxsc.Axis[T]],
+        classOf[Axis[T]])
+    with RunOnApplicationThread {
 
   override def getScalaClassInstance = new Axis[T](getJavaClassInstance) {}
 

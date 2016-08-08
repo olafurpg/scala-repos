@@ -74,15 +74,15 @@ object ClusterShardingCustomShardAllocationSpec {
         requester: ActorRef,
         shardId: ShardRegion.ShardId,
         currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]])
-      : Future[ActorRef] = {
+            ActorRef,
+            immutable.IndexedSeq[ShardRegion.ShardId]]): Future[ActorRef] = {
       (ref ? AllocateReq).mapTo[ActorRef]
     }
 
-    override def rebalance(
-        currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]],
-        rebalanceInProgress: Set[ShardRegion.ShardId])
+    override def rebalance(currentShardAllocations: Map[
+                               ActorRef,
+                               immutable.IndexedSeq[ShardRegion.ShardId]],
+                           rebalanceInProgress: Set[ShardRegion.ShardId])
       : Future[Set[ShardRegion.ShardId]] = {
       (ref ? RebalanceReq).mapTo[Set[String]]
     }
@@ -136,7 +136,9 @@ class DDataClusterShardingCustomShardAllocationMultiJvmNode2
 
 abstract class ClusterShardingCustomShardAllocationSpec(
     config: ClusterShardingCustomShardAllocationSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config)
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterShardingCustomShardAllocationSpec._
   import config._
 
@@ -145,20 +147,20 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
@@ -171,14 +173,14 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   }
 
   def startSharding(): Unit = {
-    ClusterSharding(system).start(
-        typeName = "Entity",
-        entityProps = Props[Entity],
-        settings = ClusterShardingSettings(system),
-        extractEntityId = extractEntityId,
-        extractShardId = extractShardId,
-        allocationStrategy = TestAllocationStrategy(allocator),
-        handOffStopMessage = PoisonPill)
+    ClusterSharding(system).start(typeName = "Entity",
+                                  entityProps = Props[Entity],
+                                  settings = ClusterShardingSettings(system),
+                                  extractEntityId = extractEntityId,
+                                  extractShardId = extractShardId,
+                                  allocationStrategy =
+                                    TestAllocationStrategy(allocator),
+                                  handOffStopMessage = PoisonPill)
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
@@ -230,7 +232,8 @@ abstract class ClusterShardingCustomShardAllocationSpec(
       enterBarrier("second-started")
 
       runOn(first) {
-        system.actorSelection(node(second) / "system" / "sharding" / "Entity") ! Identify(
+        system
+          .actorSelection(node(second) / "system" / "sharding" / "Entity") ! Identify(
             None)
         val secondRegion = expectMsgType[ActorIdentity].ref.get
         allocator ! UseRegion(secondRegion)

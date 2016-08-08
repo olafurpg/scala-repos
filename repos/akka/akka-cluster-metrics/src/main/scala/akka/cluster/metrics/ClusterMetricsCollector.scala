@@ -47,7 +47,8 @@ case object CollectionStopMessage extends CollectionControlMessage {
   * Actor providing customizable metrics collection supervision.
   */
 private[metrics] class ClusterMetricsSupervisor
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   val metrics = ClusterMetricsExtension(context.system)
   import metrics.settings._
   import context._
@@ -63,8 +64,7 @@ private[metrics] class ClusterMetricsSupervisor
       self ! CollectionStartMessage
     } else {
       log.warning(
-          s"Metrics collection is disabled in configuration. Use subtypes of ${classOf[
-          CollectionControlMessage].getName} to manage collection at runtime.")
+          s"Metrics collection is disabled in configuration. Use subtypes of ${classOf[CollectionControlMessage].getName} to manage collection at runtime.")
     }
   }
 
@@ -113,9 +113,11 @@ private[metrics] trait ClusterMetricsMessage extends Serializable
   * Envelope adding a sender address to the cluster metrics gossip.
   */
 @SerialVersionUID(1L)
-private[metrics] final case class MetricsGossipEnvelope(
-    from: Address, gossip: MetricsGossip, reply: Boolean)
-    extends ClusterMetricsMessage with DeadLetterSuppression
+private[metrics] final case class MetricsGossipEnvelope(from: Address,
+                                                        gossip: MetricsGossip,
+                                                        reply: Boolean)
+    extends ClusterMetricsMessage
+    with DeadLetterSuppression
 
 /**
   * INTERNAL API.
@@ -123,7 +125,8 @@ private[metrics] final case class MetricsGossipEnvelope(
   * Actor responsible for periodic data sampling in the node and publication to the cluster.
   */
 private[metrics] class ClusterMetricsCollector
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import InternalClusterAction._
   // TODO collapse to ClusterEvent._ after akka-cluster metrics is gone
   import ClusterEvent.MemberEvent

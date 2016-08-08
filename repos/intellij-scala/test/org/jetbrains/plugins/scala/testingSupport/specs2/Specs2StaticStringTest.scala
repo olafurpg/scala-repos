@@ -23,8 +23,10 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
       |}
       |    """.stripMargin)
 
-    assert(checkConfigAndSettings(
-            createTestFromLocation(7, 7, valFileName), testClassName, "run"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(7, 7, valFileName),
+                               testClassName,
+                               "run"))
   }
 
   def testStringSum() = {
@@ -71,8 +73,9 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
       |}
     """.stripMargin)
 
-    assert(checkConfigAndSettings(
-            createTestFromLocation(6, 7, badFileName), testClassName))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(6, 7, badFileName),
+                               testClassName))
   }
 
   val methodsTestClassName = "SpecsMethodsTest"

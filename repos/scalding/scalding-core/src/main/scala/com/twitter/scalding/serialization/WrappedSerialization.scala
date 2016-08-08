@@ -15,11 +15,19 @@ limitations under the License.
  */
 package com.twitter.scalding.serialization
 
-import org.apache.hadoop.io.serializer.{Serialization => HSerialization, Deserializer, Serializer}
+import org.apache.hadoop.io.serializer.{
+  Serialization => HSerialization,
+  Deserializer,
+  Serializer
+}
 import org.apache.hadoop.conf.{Configurable, Configuration}
 
 import java.io.{InputStream, OutputStream}
-import com.twitter.bijection.{Injection, JavaSerializationInjection, Base64String}
+import com.twitter.bijection.{
+  Injection,
+  JavaSerializationInjection,
+  Base64String
+}
 import scala.collection.JavaConverters._
 
 /**
@@ -102,14 +110,14 @@ object WrappedSerialization {
   private val confKey =
     "com.twitter.scalding.serialization.WrappedSerialization"
 
-  def rawSetBinary(
-      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
+  def rawSetBinary(bufs: Iterable[ClassSerialization[_]],
+                   fn: (String, String) => Unit) = {
     fn(confKey, bufs.map {
       case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
     }.mkString(","))
   }
-  def setBinary(
-      conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
+  def setBinary(conf: Configuration,
+                bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =

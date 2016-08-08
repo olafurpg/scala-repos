@@ -38,8 +38,8 @@ private[sql] class MyDenseVector(val data: Array[Double])
 }
 
 @BeanInfo
-private[sql] case class MyLabeledPoint(
-    @BeanProperty label: Double, @BeanProperty features: MyDenseVector)
+private[sql] case class MyLabeledPoint(@BeanProperty label: Double,
+                                       @BeanProperty features: MyDenseVector)
 
 private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 
@@ -67,7 +67,9 @@ private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 }
 
 class UserDefinedTypeSuite
-    extends QueryTest with SharedSQLContext with ParquetTest {
+    extends QueryTest
+    with SharedSQLContext
+    with ParquetTest {
   import testImplicits._
 
   private lazy val pointsRDD =
@@ -92,7 +94,8 @@ class UserDefinedTypeSuite
 
   test("UDTs and UDFs") {
     sqlContext.udf.register(
-        "testType", (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
+        "testType",
+        (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
     pointsRDD.registerTempTable("points")
     checkAnswer(sql("SELECT testType(features) from points"),
                 Seq(Row(true), Row(true)))
@@ -152,7 +155,8 @@ class UserDefinedTypeSuite
     checkAnswer(
         jsonRDD,
         Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
-            2, new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
+            2,
+            new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
     )
   }
 

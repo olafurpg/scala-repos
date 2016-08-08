@@ -7,8 +7,9 @@ import java.util._
 import scala.collection.JavaConversions._
 
 class ConcurrentHashMap[K >: Null, V >: Null]
-    extends AbstractMap[K, V] with ConcurrentMap[K, V] with Serializable {
-  self =>
+    extends AbstractMap[K, V]
+    with ConcurrentMap[K, V]
+    with Serializable { self =>
 
   def this(initialCapacity: Int) =
     this()
@@ -137,9 +138,10 @@ class ConcurrentHashMap[K >: Null, V >: Null]
 
 object ConcurrentHashMap {
 
-  class KeySetView[K >: Null, V >: Null] private[ConcurrentHashMap](
+  class KeySetView[K >: Null, V >: Null] private[ConcurrentHashMap] (
       chm: ConcurrentHashMap[K, V])
-      extends Set[K] with Serializable {
+      extends Set[K]
+      with Serializable {
 
     def size(): Int = chm.size
 

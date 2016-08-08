@@ -18,8 +18,9 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/18/15.
   */
-class Cached(
-    synchronized: Boolean, modificationCount: ModCount, psiElement: Any)
+class Cached(synchronized: Boolean,
+             modificationCount: ModCount,
+             psiElement: Any)
     extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro Cached.cachedImpl
 }
@@ -85,7 +86,8 @@ object Cached {
           if (hasParameters) {
             q"""
             private val $mapName = _root_.com.intellij.util.containers.ContainerUtil.
-                newConcurrentMap[(..${flatParams.map(_.tpt)}), ($retTp, _root_.scala.Long)]()
+                newConcurrentMap[(..${flatParams
+              .map(_.tpt)}), ($retTp, _root_.scala.Long)]()
 
             ..$analyzeCachesField
           """
@@ -166,8 +168,8 @@ object Cached {
         else EmptyTree}
           $functionContentsInSynchronizedBlock
         """
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           ..$fields
           $updatedDef

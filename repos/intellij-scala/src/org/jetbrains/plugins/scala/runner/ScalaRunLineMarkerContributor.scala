@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala.runner
 
 import com.intellij.execution.application.ApplicationConfigurationType
 import com.intellij.execution.lineMarker.RunLineMarkerContributor.Info
-import com.intellij.execution.lineMarker.{ExecutorAction, RunLineMarkerContributor}
+import com.intellij.execution.lineMarker.{
+  ExecutorAction,
+  RunLineMarkerContributor
+}
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
@@ -17,12 +20,12 @@ class ScalaRunLineMarkerContributor extends RunLineMarkerContributor {
     if (element.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER)
       element.getParent match {
         case fun: ScFunctionDefinition
-            if ScalaApplicationConfigurationProducer.findMain(
-                fun, firstContMethodOnly = true) != null =>
+            if ScalaApplicationConfigurationProducer
+              .findMain(fun, firstContMethodOnly = true) != null =>
           createInfo(1)
         case obj: ScObject
-            if ScalaApplicationConfigurationProducer.getMainClass(
-                element, firstTemplateDefOnly = true) != null =>
+            if ScalaApplicationConfigurationProducer
+              .getMainClass(element, firstTemplateDefOnly = true) != null =>
           createInfo(0)
         case _ => null
       } else null

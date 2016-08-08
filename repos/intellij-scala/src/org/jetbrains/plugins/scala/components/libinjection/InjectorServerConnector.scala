@@ -5,7 +5,10 @@ import java.io.File
 import com.intellij.openapi.module.Module
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.Client
-import org.jetbrains.plugins.scala.compiler.{RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  RemoteServerConnectorBase,
+  RemoteServerRunner
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
@@ -40,8 +43,8 @@ class InjectorServerConnector(module: Module,
   }
 
   @tailrec
-  private def classfiles(
-      dir: File, namePrefix: String = ""): Array[(File, String)] =
+  private def classfiles(dir: File,
+                         namePrefix: String = ""): Array[(File, String)] =
     dir.listFiles() match {
       case Array(d) if d.isDirectory =>
         classfiles(d, s"$namePrefix${d.getName}.")
@@ -57,8 +60,9 @@ class InjectorServerConnector(module: Module,
     var result: Either[Array[(File, String)], Seq[String]] = Right(
         Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors)
-      else Left(classfiles(outputDir))
+      result =
+        if (errors.nonEmpty) Right(errors)
+        else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

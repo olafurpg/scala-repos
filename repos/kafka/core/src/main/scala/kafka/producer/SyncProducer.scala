@@ -28,7 +28,7 @@ import org.apache.kafka.common.utils.Utils._
 
 @deprecated(
     "This object has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 object SyncProducer {
   val RequestKey: Short = 0
@@ -41,7 +41,7 @@ object SyncProducer {
 @threadsafe
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 class SyncProducer(val config: SyncProducerConfig) extends Logging {
 
@@ -170,16 +170,17 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
     if (!blockingChannel.isConnected && !shutdown) {
       try {
         blockingChannel.connect()
-        info("Connected to " + formatAddress(config.host, config.port) +
-            " for producing")
+        info(
+            "Connected to " + formatAddress(config.host, config.port) +
+              " for producing")
       } catch {
         case e: Exception => {
-            disconnect()
-            error("Producer connection to " +
+          disconnect()
+          error("Producer connection to " +
                   formatAddress(config.host, config.port) + " unsuccessful",
-                  e)
-            throw e
-          }
+                e)
+          throw e
+        }
       }
     }
     blockingChannel

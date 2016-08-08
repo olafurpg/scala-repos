@@ -36,7 +36,8 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.SparkFunSuite
 
 class ClientDistributedCacheManagerSuite
-    extends SparkFunSuite with MockitoSugar {
+    extends SparkFunSuite
+    with MockitoSugar {
 
   class MockClientDistributedCacheManager
       extends ClientDistributedCacheManager {
@@ -144,7 +145,8 @@ class ClientDistributedCacheManagerSuite
     val resource2 = localResources("link2")
     assert(resource2.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
-        ConverterUtils.getPathFromYarnURL(resource2.getResource()) === destPath2)
+        ConverterUtils
+          .getPathFromYarnURL(resource2.getResource()) === destPath2)
     assert(resource2.getTimestamp() === 10)
     assert(resource2.getSize() === 20)
     assert(resource2.getType() === LocalResourceType.FILE)

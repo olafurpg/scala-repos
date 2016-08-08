@@ -179,8 +179,8 @@ class AnalysisSuite extends AnalysisTest {
     assertAnalysisError(UnresolvedRelation(TableIdentifier("tAbLe"), None),
                         Seq("Table not found: tAbLe"))
 
-    checkAnalysis(
-        UnresolvedRelation(TableIdentifier("TaBlE"), None), testRelation)
+    checkAnalysis(UnresolvedRelation(TableIdentifier("TaBlE"), None),
+                  testRelation)
 
     checkAnalysis(UnresolvedRelation(TableIdentifier("tAbLe"), None),
                   testRelation,
@@ -242,8 +242,8 @@ class AnalysisSuite extends AnalysisTest {
     checkAnalysis(plan, expected)
 
     // CreateStruct is a special case that we should not trim Alias for it.
-    plan = testRelation.select(
-        CreateStruct(Seq(a, (a + 1).as("a+1"))).as("col"))
+    plan =
+      testRelation.select(CreateStruct(Seq(a, (a + 1).as("a+1"))).as("col"))
     checkAnalysis(plan, plan)
     plan = testRelation.select(
         CreateStructUnsafe(Seq(a, (a + 1).as("a+1"))).as("col"))
@@ -288,8 +288,8 @@ class AnalysisSuite extends AnalysisTest {
     val plan = Project(
         Alias(In(Literal(null), Seq(Literal(true), Literal(1))), "a")() :: Nil,
         LocalRelation())
-    assertAnalysisError(
-        plan, Seq("data type mismatch: Arguments must be same type"))
+    assertAnalysisError(plan,
+                        Seq("data type mismatch: Arguments must be same type"))
   }
 
   test("SPARK-11725: correctly handle null inputs for ScalaUDF") {
@@ -311,14 +311,16 @@ class AnalysisSuite extends AnalysisTest {
     checkUDF(udf1, expected1)
 
     // only primitive parameter needs special null handling
-    val udf2 = ScalaUDF(
-        (s: String, d: Double) => "x", StringType, string :: double :: Nil)
+    val udf2 = ScalaUDF((s: String, d: Double) => "x",
+                        StringType,
+                        string :: double :: Nil)
     val expected2 = If(IsNull(double), nullResult, udf2)
     checkUDF(udf2, expected2)
 
     // special null handling should apply to all primitive parameters
-    val udf3 = ScalaUDF(
-        (s: Short, d: Double) => "x", StringType, short :: double :: Nil)
+    val udf3 = ScalaUDF((s: Short, d: Double) => "x",
+                        StringType,
+                        short :: double :: Nil)
     val expected3 = If(IsNull(short) || IsNull(double), nullResult, udf3)
     checkUDF(udf3, expected3)
 
@@ -357,8 +359,8 @@ class AnalysisSuite extends AnalysisTest {
   }
 
   test("SPARK-12102: Ignore nullablity when comparing two sides of case") {
-    val relation = LocalRelation(
-        'a.struct('x.int), 'b.struct('x.int.withNullability(false)))
+    val relation = LocalRelation('a.struct('x.int),
+                                 'b.struct('x.int.withNullability(false)))
     val plan =
       relation.select(CaseWhen(Seq((Literal(true), 'a.attr)), 'b).as("val"))
     assertAnalysisSuccess(plan)

@@ -20,8 +20,8 @@ import _root_.scala.collection.JavaConverters._
   * User: Dmitry Naydanov
   * Date: 2/11/14
   */
-class NonServerRunner(
-    project: Project, errorHandler: Option[ErrorHandler] = None) {
+class NonServerRunner(project: Project,
+                      errorHandler: Option[ErrorHandler] = None) {
   private val SERVER_CLASS_NAME =
     "org.jetbrains.jps.incremental.scala.remote.Main"
 
@@ -32,8 +32,8 @@ class NonServerRunner(
 
   private val jvmParameters = CompileServerLauncher.jvmParameters
 
-  def buildProcess(
-      args: Seq[String], listener: String => Unit): CompilationProcess = {
+  def buildProcess(args: Seq[String],
+                   listener: String => Unit): CompilationProcess = {
     val sdk =
       Option(ProjectRootManager.getInstance(project).getProjectSdk) getOrElse {
         val all =
@@ -58,7 +58,7 @@ class NonServerRunner(
       case Right(jdk) =>
         val commands =
           ((FileUtil toCanonicalPath jdk.executable.getPath) +: "-cp" +: classPath(
-                  jdk) +: jvmParameters :+ SERVER_CLASS_NAME).++(args)
+              jdk) +: jvmParameters :+ SERVER_CLASS_NAME).++(args)
 
         val builder = new ProcessBuilder(commands.asJava)
 
@@ -83,8 +83,7 @@ class NonServerRunner(
                 BaseOSProcessHandler.ExecutorServiceHolder.submit(task)
             })
 
-            processWaitFor.setTerminationCallback(
-                new Consumer[Integer] {
+            processWaitFor.setTerminationCallback(new Consumer[Integer] {
               override def consume(t: Integer) {
                 myCallbacks.foreach(c => c())
               }
@@ -103,8 +102,8 @@ class NonServerRunner(
     errorHandler.foreach(_.error(message))
   }
 
-  private class MyBase64StreamReader(
-      private val reader: Reader, listener: String => Unit)
+  private class MyBase64StreamReader(private val reader: Reader,
+                                     listener: String => Unit)
       extends BaseDataReader(null) {
     start()
 

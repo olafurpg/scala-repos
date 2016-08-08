@@ -58,8 +58,8 @@ class BlockingChannel(val host: String,
         channel.socket.setSoTimeout(readTimeoutMs)
         channel.socket.setKeepAlive(true)
         channel.socket.setTcpNoDelay(true)
-        channel.socket.connect(
-            new InetSocketAddress(host, port), connectTimeoutMs)
+        channel.socket
+          .connect(new InetSocketAddress(host, port), connectTimeoutMs)
 
         writeChannel = channel
         // Need to create a new ReadableByteChannel from input stream because SocketChannel doesn't implement read with timeout
@@ -71,7 +71,7 @@ class BlockingChannel(val host: String,
         val remoteHost = channel.socket.getInetAddress.getHostAddress
         val remotePort = channel.socket.getPort
         connectionId = localHost + ":" + localPort + "-" + remoteHost + ":" +
-        remotePort
+            remotePort
         // settings may not match what we requested above
         val msg =
           "Created socket with SO_TIMEOUT = %d (requested %d), SO_RCVBUF = %d (requested %d), SO_SNDBUF = %d (requested %d), connectTimeoutMs = %d."

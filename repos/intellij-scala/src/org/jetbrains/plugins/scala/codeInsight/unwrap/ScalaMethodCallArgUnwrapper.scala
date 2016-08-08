@@ -5,7 +5,11 @@ import java.util
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions.childOf
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpression, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList,
+  ScExpression,
+  ScMethodCall
+}
 
 import scala.annotation.tailrec
 
@@ -14,7 +18,8 @@ import scala.annotation.tailrec
   * 2014-06-26
   */
 class ScalaMethodCallArgUnwrapper
-    extends ScalaUnwrapper with ShortTextDescription {
+    extends ScalaUnwrapper
+    with ShortTextDescription {
 
   override def getDescription(e: PsiElement) = super.getDescription(e)
 
@@ -28,8 +33,8 @@ class ScalaMethodCallArgUnwrapper
     } {}
   }
 
-  override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = {
+  override def collectAffectedElements(e: PsiElement,
+                                       toExtract: util.List[PsiElement]) = {
     forMethodCallArg[PsiElement](e) { (expr, call) =>
       super.collectAffectedElements(e, toExtract)
       call

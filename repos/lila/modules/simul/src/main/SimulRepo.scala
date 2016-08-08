@@ -34,12 +34,13 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   private implicit val ApplicantBSONHandler = Macros.handler[SimulApplicant]
   private implicit val SimulPairingBSONHandler = new BSON[SimulPairing] {
     def reads(r: BSON.Reader) =
-      SimulPairing(
-          player = r.get[SimulPlayer]("player"),
-          gameId = r str "gameId",
-          status = r.get[Status]("status"),
-          wins = r boolO "wins",
-          hostColor = r.strO("hostColor").flatMap(chess.Color.apply) | chess.White)
+      SimulPairing(player = r.get[SimulPlayer]("player"),
+                   gameId = r str "gameId",
+                   status = r.get[Status]("status"),
+                   wins = r boolO "wins",
+                   hostColor = r
+                       .strO("hostColor")
+                       .flatMap(chess.Color.apply) | chess.White)
     def writes(w: BSON.Writer, o: SimulPairing) =
       BSONDocument("player" -> o.player,
                    "gameId" -> o.gameId,
@@ -149,6 +150,6 @@ private[simul] final class SimulRepo(simulColl: Coll) {
       .void
 
   def cleanup =
-    simulColl.remove(createdSelect ++ BSONDocument("createdAt" -> BSONDocument(
-                "$lt" -> (DateTime.now minusMinutes 60))))
+    simulColl.remove(createdSelect ++ BSONDocument(
+        "createdAt" -> BSONDocument("$lt" -> (DateTime.now minusMinutes 60))))
 }

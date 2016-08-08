@@ -45,7 +45,8 @@ object BinaryPickle {
 }
 
 class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
-    extends BinaryPBuilder with PickleTools {
+    extends BinaryPBuilder
+    with PickleTools {
   import format._
 
   private var output: BinaryOutput = out
@@ -53,8 +54,9 @@ class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
 
   @inline private[this] def mkOutput(knownSize: Int): Unit = {
     if (output == null)
-      output = if (knownSize != -1) new FixedByteArrayOutput(knownSize)
-      else new ByteArrayOutput
+      output =
+        if (knownSize != -1) new FixedByteArrayOutput(knownSize)
+        else new ByteArrayOutput
     else output.ensureCapacity(knownSize)
   }
 
@@ -171,7 +173,9 @@ abstract class AbstractBinaryReader() {
 }
 
 class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
-    extends AbstractBinaryReader() with PReader with PickleTools {
+    extends AbstractBinaryReader()
+    with PReader
+    with PickleTools {
   import format._
 
   def beginEntry: String = {
@@ -195,7 +199,7 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
             FastTypeTag.Null
           case ELIDED_TAG =>
             hints.elidedType.getOrElse(throw new PicklingException(
-                    s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
+                s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
           case REF_TAG =>
             FastTypeTag.Ref
           case _ =>

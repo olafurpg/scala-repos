@@ -9,7 +9,12 @@ import com.intellij.refactoring.listeners.RefactoringElementListener
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, ScFunctionWrapper, StaticPsiMethodWrapper, StaticPsiTypedDefinitionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiTypedDefinitionWrapper,
+  ScFunctionWrapper,
+  StaticPsiMethodWrapper,
+  StaticPsiTypedDefinitionWrapper
+}
 
 /**
   * User: Alexander Podkhalyuzin
@@ -38,8 +43,8 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     }
   }
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor): PsiElement = {
     val orig = originalElement(element)
     if (orig != null) {
       val processor = RenamePsiElementProcessor.forElement(orig)
@@ -71,7 +76,7 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(
-        element, newName, usages, listener)
+    ScalaRenameUtil
+      .doRenameGenericNamedElement(element, newName, usages, listener)
   }
 }

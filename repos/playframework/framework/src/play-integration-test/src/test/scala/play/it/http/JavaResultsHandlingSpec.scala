@@ -20,12 +20,15 @@ import play.mvc.Results
 import play.mvc.Results.Chunks
 
 object NettyJavaResultsHandlingSpec
-    extends JavaResultsHandlingSpec with NettyIntegrationSpecification
+    extends JavaResultsHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpJavaResultsHandlingSpec
-    extends JavaResultsHandlingSpec with AkkaHttpIntegrationSpecification
+    extends JavaResultsHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait JavaResultsHandlingSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -43,8 +46,7 @@ trait JavaResultsHandlingSpec
       }
     }
 
-    "treat headers case insensitively" in makeRequest(
-        new MockController {
+    "treat headers case insensitively" in makeRequest(new MockController {
       def action = {
         response.setHeader("Server", "foo")
         response.setHeader("server", "bar")
@@ -149,7 +151,8 @@ trait JavaResultsHandlingSpec
     }) { response =>
       response.header(CONTENT_TYPE) must beSome.like {
         case value =>
-          value.toLowerCase(java.util.Locale.ENGLISH) must_== "text/event-stream"
+          value
+            .toLowerCase(java.util.Locale.ENGLISH) must_== "text/event-stream"
       }
       response.header(TRANSFER_ENCODING) must beSome("chunked")
       response.header(CONTENT_LENGTH) must beNone
@@ -158,21 +161,21 @@ trait JavaResultsHandlingSpec
 
     "stream input stream responses as chunked" in makeRequest(
         new MockController {
-      def action = {
-        Results.ok(new ByteArrayInputStream("hello".getBytes("utf-8")))
-      }
-    }) { response =>
+          def action = {
+            Results.ok(new ByteArrayInputStream("hello".getBytes("utf-8")))
+          }
+        }) { response =>
       response.header(TRANSFER_ENCODING) must beSome("chunked")
       response.body must_== "hello"
     }
 
     "not chunk input stream results if a content length is set" in makeRequest(
         new MockController {
-      def action = {
-        // chunk size 2 to force more than one chunk
-        Results.ok(new ByteArrayInputStream("hello".getBytes("utf-8")), 5)
-      }
-    }) { response =>
+          def action = {
+            // chunk size 2 to force more than one chunk
+            Results.ok(new ByteArrayInputStream("hello".getBytes("utf-8")), 5)
+          }
+        }) { response =>
       response.header(CONTENT_LENGTH) must beSome("5")
       response.header(TRANSFER_ENCODING) must beNone
       response.body must_== "hello"

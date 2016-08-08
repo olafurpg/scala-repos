@@ -32,8 +32,9 @@ object SuperMethodTestUtil {
           }
           res.append(s + sign.namedElement.name + "\n")
         }
-        resa = if (res.toString == "") ""
-        else res.substring(0, res.length - 1).toString
+        resa =
+          if (res.toString == "") ""
+          else res.substring(0, res.length - 1).toString
       case _ => resa = "Not implemented test"
     }
     resa

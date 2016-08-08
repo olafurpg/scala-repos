@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -64,14 +64,15 @@ sealed trait CPathTraversal { self =>
         val rCols = makeCols(right)
 
         val comparators: Array[CPathComparator] = (for ((lPath, lCol) <- lCols;
-        (rPath, rCol) <- rCols) yield {
-          CPathComparator(lPath, lCol, rPath, rCol)
-        })(collection.breakOut)
+                                                        (rPath, rCol) <- rCols)
+          yield {
+            CPathComparator(lPath, lCol, rPath, rCol)
+          })(collection.breakOut)
 
         // Return the first column in the array defined at the row, or -1 if none are defined for that row
         @inline
-        def firstDefinedIndexFor(
-            columns: Array[(CPath, Column)], row: Int): Int = {
+        def firstDefinedIndexFor(columns: Array[(CPath, Column)],
+                                 row: Int): Int = {
           var i = 0
           while (i < columns.length && !columns(i)._2.isDefinedAt(row)) {
             i += 1
@@ -105,8 +106,8 @@ sealed trait CPathTraversal { self =>
           def compare(r1: Int, r2: Int, indices: Array[Int]): MaybeOrdering = {
             var i = 0
             var result: MaybeOrdering = NoComp
-            while ( (result == Eq || result == NoComp) &&
-            i < comparators.length) {
+            while ((result == Eq || result == NoComp) &&
+                   i < comparators.length) {
               val iResult = comparators(i).compare(r1, r2, indices)
               if (iResult != NoComp) {
                 result = iResult
@@ -224,8 +225,8 @@ object CPathTraversal {
     }
 
     // Joins (merges) a list of sorted traversals into a single traversal.
-    def join(
-        os: List[CPathTraversal], seq: List[CPathTraversal]): CPathTraversal =
+    def join(os: List[CPathTraversal],
+             seq: List[CPathTraversal]): CPathTraversal =
       os match {
         case Select(n, t) :: os =>
           val (ts, os2) = collectWhile(os) { case Select(`n`, t2) => t2 }
@@ -270,8 +271,9 @@ object CPathTraversal {
 
   private sealed trait CPathPosition
   private case class CPathPoint(node: CPathNode) extends CPathPosition
-  private case class CPathRange(
-      nodes: Set[CPathNode], start: Int, end: Option[Int])
+  private case class CPathRange(nodes: Set[CPathNode],
+                                start: Int,
+                                end: Option[Int])
       extends CPathPosition
 
   private object CPathPosition {
@@ -341,8 +343,10 @@ object CPathTraversal {
       case node => CPathPoint(node)
     }
 
-    private def overlaps(
-        l1: Int, r1: Option[Int], l2: Int, r2: Option[Int]): Boolean = {
+    private def overlaps(l1: Int,
+                         r1: Option[Int],
+                         l2: Int,
+                         r2: Option[Int]): Boolean = {
       (l2 >= l1 && l2 <= r1.getOrElse(l2)) ||
       (l1 >= l2 && l1 <= r2.getOrElse(l1))
     }
@@ -369,9 +373,8 @@ object CPathTraversal {
           case (p :: ps, q :: qs) if p == q =>
             loop(ps, qs, p :: is, rss)
 
-          case (
-              CPathPoint(n @ CPathIndex(i)) :: ps, CPathRange(ns, j, k) :: qs)
-              if i >= j && i <= k.getOrElse(i) =>
+          case (CPathPoint(n @ CPathIndex(i)) :: ps,
+                CPathRange(ns, j, k) :: qs) if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {
                 ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: qs) :: rss
@@ -384,8 +387,8 @@ object CPathTraversal {
 
             loop(ps, qs, CPathRange(ns + n, i, Some(i)) :: is, rss1)
 
-          case (
-              CPathRange(ns, j, k) :: ps, CPathPoint(n @ CPathIndex(i)) :: qs)
+          case (CPathRange(ns, j, k) :: ps,
+                CPathPoint(n @ CPathIndex(i)) :: qs)
               if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {

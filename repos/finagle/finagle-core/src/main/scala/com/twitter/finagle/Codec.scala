@@ -1,13 +1,21 @@
 package com.twitter.finagle
 
-import com.twitter.finagle.dispatch.{GenSerialClientDispatcher, SerialClientDispatcher, SerialServerDispatcher}
+import com.twitter.finagle.dispatch.{
+  GenSerialClientDispatcher,
+  SerialClientDispatcher,
+  SerialServerDispatcher
+}
 import com.twitter.finagle.netty3.transport.ChannelTransport
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.tracing.TraceInitializerFilter
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.Closable
 import java.net.{InetSocketAddress, SocketAddress}
-import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory}
+import org.jboss.netty.channel.{
+  Channel,
+  ChannelPipeline,
+  ChannelPipelineFactory
+}
 
 /**
   * Codecs provide protocol encoding and decoding via netty pipelines
@@ -52,8 +60,8 @@ trait Codec[Req, Rep] {
     * good understanding of finagle internals to implement correctly.
     * Proceed with care.
     */
-  def newClientTransport(
-      ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+  def newClientTransport(ch: Channel,
+                         statsReceiver: StatsReceiver): Transport[Any, Any] =
     new ChannelTransport(ch)
 
   final def newClientDispatcher(
@@ -74,8 +82,8 @@ trait Codec[Req, Rep] {
       transport: Transport[Any, Any],
       service: Service[Req, Rep]
   ): Closable =
-    new SerialServerDispatcher[Req, Rep](
-        Transport.cast[Rep, Req](transport), service)
+    new SerialServerDispatcher[Req, Rep](Transport.cast[Rep, Req](transport),
+                                         service)
 
   /**
     * Is this Codec OK for failfast? This is a temporary hack to

@@ -17,7 +17,12 @@
 
 package org.apache.spark.rdd
 
-import org.apache.spark.{LocalSparkContext, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext,
+  SparkContext,
+  SparkException,
+  SparkFunSuite
+}
 import org.apache.spark.storage.{RDDBlockId, StorageLevel}
 
 /**
@@ -214,7 +219,8 @@ class LocalCheckpointSuite extends SparkFunSuite with LocalSparkContext {
     * @param rdd an RDD that is both marked for caching and local checkpointing
     */
   private def testBasicLineageTruncationWithCaching[T](
-      rdd: RDD[T], targetStorageLevel: StorageLevel): Unit = {
+      rdd: RDD[T],
+      targetStorageLevel: StorageLevel): Unit = {
     require(targetStorageLevel !== StorageLevel.NONE)
     require(rdd.getStorageLevel !== StorageLevel.NONE)
     require(rdd.isLocallyCheckpointed)
@@ -238,7 +244,8 @@ class LocalCheckpointSuite extends SparkFunSuite with LocalSparkContext {
     * @param rdd a locally checkpointed RDD
     */
   private def testIndirectLineageTruncation[T](
-      rdd: RDD[T], targetStorageLevel: StorageLevel): Unit = {
+      rdd: RDD[T],
+      targetStorageLevel: StorageLevel): Unit = {
     require(targetStorageLevel !== StorageLevel.NONE)
     require(rdd.isLocallyCheckpointed)
     val rdd1 = rdd.map { i =>
@@ -321,7 +328,8 @@ class LocalCheckpointSuite extends SparkFunSuite with LocalSparkContext {
     * @param rdd a locally checkpointed RDD
     */
   private def testCheckpointBlocksExist[T](
-      rdd: RDD[T], targetStorageLevel: StorageLevel): Unit = {
+      rdd: RDD[T],
+      targetStorageLevel: StorageLevel): Unit = {
     val bmm = sc.env.blockManager.master
     val partitionIndices = rdd.partitions.map(_.index)
 

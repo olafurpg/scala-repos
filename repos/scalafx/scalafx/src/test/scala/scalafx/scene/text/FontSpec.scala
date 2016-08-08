@@ -42,8 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class FontSpec
-    extends SimpleSFXDelegateSpec[jfxst.Font, Font](
-        classOf[jfxst.Font], classOf[Font]) {
+    extends SimpleSFXDelegateSpec[jfxst.Font, Font](classOf[jfxst.Font],
+                                                    classOf[Font]) {
 
   override protected def getJavaClassInstance = jfxst.Font.getDefault
 }

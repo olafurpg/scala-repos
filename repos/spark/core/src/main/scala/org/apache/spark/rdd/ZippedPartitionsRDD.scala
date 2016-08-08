@@ -21,7 +21,12 @@ import java.io.{IOException, ObjectOutputStream}
 
 import scala.reflect.ClassTag
 
-import org.apache.spark.{OneToOneDependency, Partition, SparkContext, TaskContext}
+import org.apache.spark.{
+  OneToOneDependency,
+  Partition,
+  SparkContext,
+  TaskContext
+}
 import org.apache.spark.util.Utils
 
 private[spark] class ZippedPartitionsPartition(
@@ -43,7 +48,7 @@ private[spark] class ZippedPartitionsPartition(
     }
 }
 
-private[spark] abstract class ZippedPartitionsBaseRDD[V : ClassTag](
+private[spark] abstract class ZippedPartitionsBaseRDD[V: ClassTag](
     sc: SparkContext,
     var rdds: Seq[RDD[_]],
     preservesPartitioning: Boolean = false)
@@ -79,15 +84,17 @@ private[spark] abstract class ZippedPartitionsBaseRDD[V : ClassTag](
   }
 }
 
-private[spark] class ZippedPartitionsRDD2[
-    A : ClassTag, B : ClassTag, V : ClassTag](
+private[spark] class ZippedPartitionsRDD2[A: ClassTag,
+                                          B: ClassTag,
+                                          V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B]) => Iterator[V],
     var rdd1: RDD[A],
     var rdd2: RDD[B],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](
-        sc, List(rdd1, rdd2), preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](sc,
+                                       List(rdd1, rdd2),
+                                       preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions
@@ -103,16 +110,19 @@ private[spark] class ZippedPartitionsRDD2[
   }
 }
 
-private[spark] class ZippedPartitionsRDD3[
-    A : ClassTag, B : ClassTag, C : ClassTag, V : ClassTag](
+private[spark] class ZippedPartitionsRDD3[A: ClassTag,
+                                          B: ClassTag,
+                                          C: ClassTag,
+                                          V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B], Iterator[C]) => Iterator[V],
     var rdd1: RDD[A],
     var rdd2: RDD[B],
     var rdd3: RDD[C],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](
-        sc, List(rdd1, rdd2, rdd3), preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](sc,
+                                       List(rdd1, rdd2, rdd3),
+                                       preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions
@@ -130,8 +140,11 @@ private[spark] class ZippedPartitionsRDD3[
   }
 }
 
-private[spark] class ZippedPartitionsRDD4[
-    A : ClassTag, B : ClassTag, C : ClassTag, D : ClassTag, V : ClassTag](
+private[spark] class ZippedPartitionsRDD4[A: ClassTag,
+                                          B: ClassTag,
+                                          C: ClassTag,
+                                          D: ClassTag,
+                                          V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B], Iterator[C], Iterator[D]) => Iterator[V],
     var rdd1: RDD[A],
@@ -139,8 +152,9 @@ private[spark] class ZippedPartitionsRDD4[
     var rdd3: RDD[C],
     var rdd4: RDD[D],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](
-        sc, List(rdd1, rdd2, rdd3, rdd4), preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](sc,
+                                       List(rdd1, rdd2, rdd3, rdd4),
+                                       preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions

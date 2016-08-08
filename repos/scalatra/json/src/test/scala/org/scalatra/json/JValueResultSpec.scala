@@ -10,9 +10,8 @@ case class NamedThing(name: String = "tom")
 class Bottle(val of: String)
 
 class BottleSerializer
-    extends CustomSerializer[Bottle](
-        implicit formats =>
-          ({
+    extends CustomSerializer[Bottle](implicit formats =>
+      ({
         case json: JValue =>
           val b = for {
             of <- (json \ "of").extractOpt[String]

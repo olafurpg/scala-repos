@@ -25,7 +25,10 @@ import com.amazonaws.services.kinesis.model.Record
 import org.apache.spark.api.java.function.{Function => JFunction}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Duration, StreamingContext}
-import org.apache.spark.streaming.api.java.{JavaReceiverInputDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaReceiverInputDStream,
+  JavaStreamingContext
+}
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 
 object KinesisUtils {
@@ -59,7 +62,7 @@ object KinesisUtils {
     * @param messageHandler A custom message handler that can generate a generic output from a
     *                       Kinesis `Record`, which contains both message data, and metadata.
     */
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,
@@ -117,7 +120,7 @@ object KinesisUtils {
     * @param awsSecretKey  AWS SecretKey (if null, will use DefaultAWSCredentialsProviderChain)
     */
   // scalastyle:off
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,
@@ -500,7 +503,7 @@ private class KinesisUtilsPythonHelper {
       case _ =>
         throw new IllegalArgumentException(
             "Illegal InitialPositionInStream. Please use " +
-            "InitialPositionInStream.LATEST or InitialPositionInStream.TRIM_HORIZON")
+              "InitialPositionInStream.LATEST or InitialPositionInStream.TRIM_HORIZON")
     }
   }
 

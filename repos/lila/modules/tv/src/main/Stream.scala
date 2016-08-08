@@ -4,8 +4,10 @@ import com.roundeights.hasher.Implicits._
 import play.api.libs.json._
 import StreamerList.Streamer
 
-case class StreamOnAir(
-    streamer: Streamer, name: String, url: String, streamId: String) {
+case class StreamOnAir(streamer: Streamer,
+                       name: String,
+                       url: String,
+                       streamId: String) {
 
   def id = streamer.id
 
@@ -56,7 +58,7 @@ object Hitbox {
     def streamsOnAir(streamers: List[Streamer]) = livestream.flatMap { s =>
       for {
         streamer <- StreamerList.findHitbox(streamers)(s.media_user_name)
-                       if s.media_is_live == "1"
+        if s.media_is_live == "1"
       } yield
         StreamOnAir(streamer = streamer,
                     name = s.media_status,
@@ -72,15 +74,16 @@ object Hitbox {
 }
 
 object Youtube {
-  case class Snippet(
-      title: String, channelId: String, liveBroadcastContent: String)
+  case class Snippet(title: String,
+                     channelId: String,
+                     liveBroadcastContent: String)
   case class Id(videoId: String)
   case class Item(id: Id, snippet: Snippet)
   case class Result(items: List[Item]) {
     def streamsOnAir(streamers: List[Streamer]) = items.flatMap { item =>
       for {
         streamer <- StreamerList.findYoutube(streamers)(item.snippet.channelId)
-                       if item.snippet.liveBroadcastContent == "live"
+        if item.snippet.liveBroadcastContent == "live"
       } yield
         StreamOnAir(streamer = streamer,
                     name = item.snippet.title,

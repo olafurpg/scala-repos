@@ -26,7 +26,9 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.Utils
 
 class CreateTableAsSelectSuite
-    extends DataSourceTest with SharedSQLContext with BeforeAndAfter {
+    extends DataSourceTest
+    with SharedSQLContext
+    with BeforeAndAfter {
   protected override lazy val sql = caseInsensitiveContext.sql _
   private var path: File = null
 
@@ -126,8 +128,8 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a * 4 FROM jt
       """.stripMargin)
-    checkAnswer(
-        sql("SELECT * FROM jsonTable"), sql("SELECT a * 4 FROM jt").collect())
+    checkAnswer(sql("SELECT * FROM jsonTable"),
+                sql("SELECT a * 4 FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
     // Explicitly delete the data.
@@ -142,8 +144,8 @@ class CreateTableAsSelectSuite
         |SELECT b FROM jt
       """.stripMargin)
 
-    checkAnswer(
-        sql("SELECT * FROM jsonTable"), sql("SELECT b FROM jt").collect())
+    checkAnswer(sql("SELECT * FROM jsonTable"),
+                sql("SELECT b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
   }

@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 /**
   * @author ghik
   */
-abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](
+abstract class HoconManipulatorTest[T <: HoconPsiElement: ClassTag](
     name: String)
     extends HoconFileSetTestCase("manipulators/" + name) {
 

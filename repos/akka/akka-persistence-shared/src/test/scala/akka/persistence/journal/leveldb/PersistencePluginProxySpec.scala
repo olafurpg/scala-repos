@@ -11,7 +11,8 @@ import com.typesafe.config.ConfigFactory
 
 object PersistencePluginProxySpec {
   lazy val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
       akka {
         actor {
           provider = "akka.remote.RemoteActorRefProvider"
@@ -42,7 +43,8 @@ object PersistencePluginProxySpec {
     """)
 
   lazy val startTargetConfig =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
       |akka.extensions = ["akka.persistence.journal.PersistencePluginProxyExtension"]
       |akka.persistence {
       |  journal.proxy.start-target-journal = on
@@ -51,18 +53,17 @@ object PersistencePluginProxySpec {
     """.stripMargin)
 
   def targetAddressConfig(system: ActorSystem) =
-    ConfigFactory.parseString(
-        s"""
+    ConfigFactory.parseString(s"""
       |akka.extensions = ["akka.persistence.Persistence"]
       |akka.persistence.journal.auto-start-journals = [""]
       |akka.persistence.journal.proxy.target-journal-address = "${system
-         .asInstanceOf[ExtendedActorSystem]
-         .provider
-         .getDefaultAddress}"
+                                   .asInstanceOf[ExtendedActorSystem]
+                                   .provider
+                                   .getDefaultAddress}"
       |akka.persistence.snapshot-store.proxy.target-snapshot-store-address = "${system
-         .asInstanceOf[ExtendedActorSystem]
-         .provider
-         .getDefaultAddress}"
+                                   .asInstanceOf[ExtendedActorSystem]
+                                   .provider
+                                   .getDefaultAddress}"
     """.stripMargin)
 
   class ExamplePersistentActor(probe: ActorRef, name: String)

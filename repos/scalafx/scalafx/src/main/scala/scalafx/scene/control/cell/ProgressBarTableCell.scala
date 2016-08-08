@@ -72,8 +72,9 @@ object ProgressBarTableCell {
   *
   * @define PBTC `ProgressBarTableCell`
   */
-class ProgressBarTableCell[S](override val delegate: jfxscc.ProgressBarTableCell[
-        S] = new jfxscc.ProgressBarTableCell[S])
+class ProgressBarTableCell[S](
+    override val delegate: jfxscc.ProgressBarTableCell[S] =
+      new jfxscc.ProgressBarTableCell[S])
     extends TableCell[S, java.lang.Double](delegate)
     with UpdatableCell[jfxscc.ProgressBarTableCell[S], java.lang.Double]
     with SFXDelegate[jfxscc.ProgressBarTableCell[S]] {}

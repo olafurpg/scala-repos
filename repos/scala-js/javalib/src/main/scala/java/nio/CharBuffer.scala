@@ -26,11 +26,14 @@ object CharBuffer {
     TypedArrayCharBuffer.wrap(array)
 }
 
-abstract class CharBuffer private[nio](_capacity: Int,
-                                       private[nio] val _array: Array[Char],
-                                       private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[CharBuffer] with CharSequence
-    with Appendable with Readable {
+abstract class CharBuffer private[nio] (_capacity: Int,
+                                        private[nio] val _array: Array[Char],
+                                        private[nio] val _arrayOffset: Int)
+    extends Buffer(_capacity)
+    with Comparable[CharBuffer]
+    with CharSequence
+    with Appendable
+    with Readable {
 
   private[nio] type ElementType = Char
   private[nio] type BufferType = CharBuffer
@@ -155,12 +158,16 @@ abstract class CharBuffer private[nio](_capacity: Int,
   private[nio] def store(index: Int, elem: Char): Unit
 
   @inline
-  private[nio] def load(
-      startIndex: Int, dst: Array[Char], offset: Int, length: Int): Unit =
+  private[nio] def load(startIndex: Int,
+                        dst: Array[Char],
+                        offset: Int,
+                        length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  private[nio] def store(
-      startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
+  private[nio] def store(startIndex: Int,
+                         src: Array[Char],
+                         offset: Int,
+                         length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }

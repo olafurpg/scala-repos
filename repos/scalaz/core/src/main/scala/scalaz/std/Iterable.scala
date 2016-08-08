@@ -3,7 +3,7 @@ package std
 
 trait IterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A : Show]: Show[CC[A]] =
+  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] =
     new Show[CC[A]] {
       override def show(as: CC[A]) =
         "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq: _*) :+ "]"
@@ -30,7 +30,7 @@ trait IterableInstances {
       }
     }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A : Equal]: Equal[CC[A]] =
+  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] =
     new Equal[CC[A]] {
       def equal(a1: CC[A], a2: CC[A]) = {
         val i1 = a1.iterator

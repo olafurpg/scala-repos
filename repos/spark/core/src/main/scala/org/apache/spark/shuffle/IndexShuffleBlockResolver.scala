@@ -23,7 +23,10 @@ import com.google.common.io.ByteStreams
 
 import org.apache.spark.{SparkConf, SparkEnv}
 import org.apache.spark.internal.Logging
-import org.apache.spark.network.buffer.{FileSegmentManagedBuffer, ManagedBuffer}
+import org.apache.spark.network.buffer.{
+  FileSegmentManagedBuffer,
+  ManagedBuffer
+}
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.shuffle.IndexShuffleBlockResolver.NOOP_REDUCE_ID
 import org.apache.spark.storage._
@@ -40,9 +43,11 @@ import org.apache.spark.util.Utils
   */
 // Note: Changes to the format in this file should be kept in sync with
 // org.apache.spark.network.shuffle.ExternalShuffleBlockResolver#getSortBasedShuffleBlockData().
-private[spark] class IndexShuffleBlockResolver(
-    conf: SparkConf, _blockManager: BlockManager = null)
-    extends ShuffleBlockResolver with Logging {
+private[spark] class IndexShuffleBlockResolver(conf: SparkConf,
+                                               _blockManager: BlockManager =
+                                                 null)
+    extends ShuffleBlockResolver
+    with Logging {
 
   private lazy val blockManager =
     Option(_blockManager).getOrElse(SparkEnv.get.blockManager)
@@ -82,8 +87,9 @@ private[spark] class IndexShuffleBlockResolver(
     * Check whether the given index and data files match each other.
     * If so, return the partition lengths in the data file. Otherwise return null.
     */
-  private def checkIndexAndDataFile(
-      index: File, data: File, blocks: Int): Array[Long] = {
+  private def checkIndexAndDataFile(index: File,
+                                    data: File,
+                                    blocks: Int): Array[Long] = {
     // the index file should have `block + 1` longs as offset.
     if (index.length() != (blocks + 1) * 8) {
       return null

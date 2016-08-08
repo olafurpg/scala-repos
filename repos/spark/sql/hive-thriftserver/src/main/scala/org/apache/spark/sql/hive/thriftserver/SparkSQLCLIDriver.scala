@@ -27,12 +27,24 @@ import jline.console.history.FileHistory
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.logging.LogFactory
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hive.cli.{CliDriver, CliSessionState, OptionsProcessor}
-import org.apache.hadoop.hive.common.{HiveInterruptCallback, HiveInterruptUtils}
+import org.apache.hadoop.hive.cli.{
+  CliDriver,
+  CliSessionState,
+  OptionsProcessor
+}
+import org.apache.hadoop.hive.common.{
+  HiveInterruptCallback,
+  HiveInterruptUtils
+}
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.ql.Driver
 import org.apache.hadoop.hive.ql.exec.Utilities
-import org.apache.hadoop.hive.ql.processors.{AddResourceProcessor, CommandProcessor, CommandProcessorFactory, SetProcessor}
+import org.apache.hadoop.hive.ql.processors.{
+  AddResourceProcessor,
+  CommandProcessor,
+  CommandProcessorFactory,
+  SetProcessor
+}
 import org.apache.hadoop.hive.ql.session.SessionState
 import org.apache.thrift.transport.TSocket
 
@@ -127,8 +139,8 @@ private[hive] object SparkSQLCLIDriver extends Logging {
       var loader = conf.getClassLoader
       val auxJars = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEAUXJARS)
       if (StringUtils.isNotBlank(auxJars)) {
-        loader = Utilities.addToClassPath(
-            loader, StringUtils.split(auxJars, ","))
+        loader =
+          Utilities.addToClassPath(loader, StringUtils.split(auxJars, ","))
       }
       conf.setClassLoader(loader)
       Thread.currentThread().setContextClassLoader(loader)
@@ -187,13 +199,12 @@ private[hive] object SparkSQLCLIDriver extends Logging {
       } else {
         logWarning(
             "WARNING: Directory for Hive history file: " + historyDirectory +
-            " does not exist.   History will not be available during this session.")
+              " does not exist.   History will not be available during this session.")
       }
     } catch {
       case e: Exception =>
-        logWarning(
-            "WARNING: Encountered an error while trying to initialize Hive's " +
-            "history file.  History will not be available during this session.")
+        logWarning("WARNING: Encountered an error while trying to initialize Hive's " +
+          "history file.  History will not be available during this session.")
         logWarning(e.getMessage)
     }
 
@@ -205,8 +216,9 @@ private[hive] object SparkSQLCLIDriver extends Logging {
             h.flush()
           } catch {
             case e: IOException =>
-              logWarning("WARNING: Failed to write command history file: " +
-                  e.getMessage)
+              logWarning(
+                  "WARNING: Failed to write command history file: " +
+                    e.getMessage)
           }
         case _ =>
       }
@@ -232,7 +244,9 @@ private[hive] object SparkSQLCLIDriver extends Logging {
     def promptWithCurrentDB: String = s"$prompt$currentDB"
     def continuedPromptWithDBSpaces: String =
       continuedPrompt + ReflectionUtils.invokeStatic(
-          classOf[CliDriver], "spacesForString", classOf[String] -> currentDB)
+          classOf[CliDriver],
+          "spacesForString",
+          classOf[String] -> currentDB)
 
     var currentPrompt = promptWithCurrentDB
     var line = reader.readLine(currentPrompt + "> ")
@@ -344,8 +358,8 @@ private[hive] class SparkSQLCLIDriver extends CliDriver with Logging {
 
           val res = new JArrayList[String]()
 
-          if (HiveConf.getBoolVar(
-                  conf, HiveConf.ConfVars.HIVE_CLI_PRINT_HEADER)) {
+          if (HiveConf.getBoolVar(conf,
+                                  HiveConf.ConfVars.HIVE_CLI_PRINT_HEADER)) {
             // Print the column names.
             Option(driver.getSchema.getFieldSchemas).foreach { fields =>
               out.println(fields.asScala.map(_.getName).mkString("\t"))

@@ -4,8 +4,15 @@ package actions
 import java.util.Properties
 
 import com.intellij.ide.IdeView
-import com.intellij.ide.actions.{CreateFileFromTemplateDialog, CreateTemplateInPackageAction}
-import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager, JavaTemplateUtil}
+import com.intellij.ide.actions.{
+  CreateFileFromTemplateDialog,
+  CreateTemplateInPackageAction
+}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate,
+  FileTemplateManager,
+  JavaTemplateUtil
+}
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.ex.FileTypeManagerEx
@@ -32,7 +39,8 @@ class NewScalaTypeDefinitionAction
         ScalaBundle.message("newclass.menu.action.text"),
         ScalaBundle.message("newclass.menu.action.description"),
         Icons.CLASS,
-        JavaModuleSourceRootTypes.SOURCES) with DumbAware {
+        JavaModuleSourceRootTypes.SOURCES)
+    with DumbAware {
   protected def buildDialog(project: Project,
                             directory: PsiDirectory,
                             builder: CreateFileFromTemplateDialog.Builder) {
@@ -40,10 +48,12 @@ class NewScalaTypeDefinitionAction
     builder.addKind("Object", Icons.OBJECT, ScalaFileTemplateUtil.SCALA_OBJECT)
     builder.addKind("Trait", Icons.TRAIT, ScalaFileTemplateUtil.SCALA_TRAIT)
 
-    for (template <- FileTemplateManager.getInstance(project).getAllTemplates) {
+    for (template <- FileTemplateManager
+                      .getInstance(project)
+                      .getAllTemplates) {
       if (isScalaTemplate(template) && checkPackageExists(directory)) {
-        builder.addKind(
-            template.getName, Icons.FILE_TYPE_LOGO, template.getName)
+        builder
+          .addKind(template.getName, Icons.FILE_TYPE_LOGO, template.getName)
       }
     }
 

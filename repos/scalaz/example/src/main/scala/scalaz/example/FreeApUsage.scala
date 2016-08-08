@@ -24,7 +24,7 @@ object FreeApUsage extends App {
   def parseString(key: String) = FreeAp.lift(ParseString(key))
   def parseBool(key: String) = FreeAp.lift(ParseBool(key))
 
-  def parseOpt[A : ClassTag](a: Any): Option[A] =
+  def parseOpt[A: ClassTag](a: Any): Option[A] =
     a match {
       case a: A => Some(a)
       case _ => None
@@ -73,8 +73,8 @@ object FreeApUsage extends App {
         (_, _, _))
 
   // Test input for programs
-  val testInput: Map[String, Any] = Map(
-      "string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
+  val testInput: Map[String, Any] =
+    Map("string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
 
   // Run that baby
   println(successfulProg.foldMap(toOption(testInput)))

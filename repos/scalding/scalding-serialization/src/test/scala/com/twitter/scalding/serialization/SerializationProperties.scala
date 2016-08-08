@@ -27,7 +27,7 @@ import java.io._
 import scala.util.{Try, Success}
 
 object LawTester {
-  def apply[T : Arbitrary](base: String, laws: Iterable[Law[T]]): Properties =
+  def apply[T: Arbitrary](base: String, laws: Iterable[Law[T]]): Properties =
     new LawTester(implicitly[Arbitrary[T]].arbitrary, base, laws) {}
 }
 
@@ -62,8 +62,8 @@ object SerializationProperties extends Properties("SerializationProperties") {
   class IntWrapperClass(val x: Int)
 
   implicit val myIntWrapperOrdSer: OrderedSerialization[IntWrapperClass] =
-    OrderedSerialization.viaTransform[IntWrapperClass, Int](
-        _.x, new IntWrapperClass(_))
+    OrderedSerialization
+      .viaTransform[IntWrapperClass, Int](_.x, new IntWrapperClass(_))
 
   class IntTryWrapperClass(val x: Int)
 
@@ -80,11 +80,11 @@ object SerializationProperties extends Properties("SerializationProperties") {
     Arbitrary(
         implicitly[Arbitrary[Int]].arbitrary.map(new IntTryWrapperClass(_)))
 
-  implicit def tuple[A : OrderedSerialization,
-                     B : OrderedSerialization]: OrderedSerialization[(A, B)] =
+  implicit def tuple[A: OrderedSerialization, B: OrderedSerialization]
+    : OrderedSerialization[(A, B)] =
     new OrderedSerialization2[A, B](implicitly, implicitly)
 
-  def serializeSequenceCompare[T : OrderedSerialization](g: Gen[T]): Prop =
+  def serializeSequenceCompare[T: OrderedSerialization](g: Gen[T]): Prop =
     forAll(Gen.listOf(g)) { list =>
       // make sure the list is even in size:
       val pairList = (if (list.size % 2 == 1) list.tail else list).grouped(2)
@@ -101,16 +101,17 @@ object SerializationProperties extends Properties("SerializationProperties") {
       val in2 = baos2.toInputStream
       pairList.forall {
         case Seq(a, b) =>
-          OrderedSerialization.compareBinary[T](in1, in2) == OrderedSerialization
-            .resultFrom(OrderedSerialization.compare(a, b))
+          OrderedSerialization
+            .compareBinary[T](in1, in2) == OrderedSerialization.resultFrom(
+              OrderedSerialization.compare(a, b))
         case _ => sys.error("unreachable")
       }
     }
 
-  def serializeSequenceCompare[T : OrderedSerialization : Arbitrary]: Prop =
+  def serializeSequenceCompare[T: OrderedSerialization: Arbitrary]: Prop =
     serializeSequenceCompare[T](implicitly[Arbitrary[T]].arbitrary)
 
-  def serializeSequenceEquiv[T : Serialization](g: Gen[T]): Prop =
+  def serializeSequenceEquiv[T: Serialization](g: Gen[T]): Prop =
     forAll(Gen.listOf(g)) { list =>
       // make sure the list is even in size:
       val pairList = (if (list.size % 2 == 1) list.tail else list).grouped(2)
@@ -133,37 +134,38 @@ object SerializationProperties extends Properties("SerializationProperties") {
         case _ => sys.error("unreachable")
       }
     }
-  def serializeSequenceEquiv[T : Serialization : Arbitrary]: Prop =
+  def serializeSequenceEquiv[T: Serialization: Arbitrary]: Prop =
     serializeSequenceEquiv[T](implicitly[Arbitrary[T]].arbitrary)
 
   property("sequences compare well [Int]") = serializeSequenceCompare[Int]
   property("sequences equiv well [Int]") = serializeSequenceEquiv[Int]
-  property("sequences compare well [(Int, Int)]") = serializeSequenceCompare[
-      (Int, Int)]
-  property("sequences equiv well [(Int, Int)]") = serializeSequenceEquiv[
-      (Int, Int)]
+  property("sequences compare well [(Int, Int)]") =
+    serializeSequenceCompare[(Int, Int)]
+  property("sequences equiv well [(Int, Int)]") =
+    serializeSequenceEquiv[(Int, Int)]
 
-  property("sequences compare well [String]") = serializeSequenceCompare[
-      String]
+  property("sequences compare well [String]") =
+    serializeSequenceCompare[String]
   property("sequences equiv well [String]") = serializeSequenceEquiv[String]
-  property("sequences compare well [(String, String)]") = serializeSequenceCompare[
-      (String, String)]
-  property("sequences equiv well [(String, String)]") = serializeSequenceEquiv[
-      (String, String)]
+  property("sequences compare well [(String, String)]") =
+    serializeSequenceCompare[(String, String)]
+  property("sequences equiv well [(String, String)]") =
+    serializeSequenceEquiv[(String, String)]
 
-  property("sequences compare well [IntWrapperClass]") = serializeSequenceCompare[
-      IntWrapperClass]
-  property("sequences compare well [IntTryWrapperClass]") = serializeSequenceCompare[
-      IntTryWrapperClass]
-  property("sequences equiv well [IntWrapperClass]") = serializeSequenceEquiv[
-      IntWrapperClass]
-  property("sequences equiv well [IntTryWrapperClass]") = serializeSequenceEquiv[
-      IntTryWrapperClass]
+  property("sequences compare well [IntWrapperClass]") =
+    serializeSequenceCompare[IntWrapperClass]
+  property("sequences compare well [IntTryWrapperClass]") =
+    serializeSequenceCompare[IntTryWrapperClass]
+  property("sequences equiv well [IntWrapperClass]") =
+    serializeSequenceEquiv[IntWrapperClass]
+  property("sequences equiv well [IntTryWrapperClass]") =
+    serializeSequenceEquiv[IntTryWrapperClass]
 
   // Test the independent, non-sequenced, laws as well
   include(LawTester("Int Ordered", OrderedSerialization.allLaws[Int]))
-  include(LawTester(
-          "(Int, Int) Ordered", OrderedSerialization.allLaws[(Int, Int)]))
+  include(
+      LawTester("(Int, Int) Ordered",
+                OrderedSerialization.allLaws[(Int, Int)]))
   include(LawTester("String Ordered", OrderedSerialization.allLaws[String]))
   include(
       LawTester("(String, Int) Ordered",

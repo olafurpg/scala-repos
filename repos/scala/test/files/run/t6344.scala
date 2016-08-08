@@ -81,13 +81,15 @@ class C6[A] {
   def f1(x1: Val[A], x2: ValAny[A], x3: ValStr[A], x4: ValA[A]) = x4
 }
 class C7 extends C6[Int] {
-  override def f1(
-      x1: Val[Int], x2: ValAny[Int], x3: ValStr[Int], x4: ValA[Int]) =
+  override def f1(x1: Val[Int],
+                  x2: ValAny[Int],
+                  x3: ValStr[Int],
+                  x4: ValA[Int]) =
     super.f1(x1, x2, x3, x4)
 }
 
 object Test {
-  def show[A : ClassTag] = {
+  def show[A: ClassTag] = {
     println(classTag[A].runtimeClass.getName)
     classTag[A].runtimeClass.getDeclaredMethods.toList
       .sortBy(_.toString)

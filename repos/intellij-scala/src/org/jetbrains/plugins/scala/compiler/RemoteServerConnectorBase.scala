@@ -18,8 +18,9 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerSettings
   * Nikolay.Tropin
   * 2014-10-07
   */
-abstract class RemoteServerConnectorBase(
-    module: Module, filesToCompile: Seq[File], outputDir: File) {
+abstract class RemoteServerConnectorBase(module: Module,
+                                         filesToCompile: Seq[File],
+                                         outputDir: File) {
 
   checkFilesToCompile(filesToCompile)
 
@@ -39,9 +40,10 @@ abstract class RemoteServerConnectorBase(
 
   private val sbtData = SbtData.from(
       new URLClassLoader(
-          Array(new URL("jar:file:" +
-                  (if (libCanonicalPath startsWith "/") "" else "/") +
-                  libCanonicalPath + "/jps/sbt-interface.jar!/")),
+          Array(
+              new URL("jar:file:" +
+                (if (libCanonicalPath startsWith "/") "" else "/") +
+                libCanonicalPath + "/jps/sbt-interface.jar!/")),
           getClass.getClassLoader),
       new File(libRoot, "jps"),
       System.getProperty("java.class.version")
@@ -58,11 +60,11 @@ abstract class RemoteServerConnectorBase(
 
   private val compilerClasspath = scalaSdk.compilerClasspath
 
-  private val compilerSettingsJar = new File(
-      libCanonicalPath, "compiler-settings.jar")
+  private val compilerSettingsJar =
+    new File(libCanonicalPath, "compiler-settings.jar")
 
-  protected val runnersJar = new File(
-      libCanonicalPath, "scala-plugin-runners.jar")
+  protected val runnersJar =
+    new File(libCanonicalPath, "scala-plugin-runners.jar")
 
   val additionalCp =
     compilerClasspath :+ runnersJar :+ compilerSettingsJar :+ outputDir
@@ -72,7 +74,7 @@ abstract class RemoteServerConnectorBase(
   protected def classpath: String = {
     val classesRoots =
       assemblyClasspath().toSeq map
-      (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
+        (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
     (classesRoots ++ additionalCp).mkString("\n")
   }
 
@@ -144,7 +146,8 @@ abstract class RemoteServerConnectorBase(
     module.scalaCompilerSettings
 
   private def scalaSdk =
-    module.scalaSdk.getOrElse(configurationError(
+    module.scalaSdk.getOrElse(
+        configurationError(
             "No Scala SDK configured for module: " + module.getName))
 
   private def findJdk =
@@ -162,8 +165,8 @@ abstract class RemoteServerConnectorBase(
     files
       .find(!_.exists())
       .foreach(f =>
-            throw new IllegalArgumentException(
-                s"File ${f.getCanonicalPath} does not exists"))
+        throw new IllegalArgumentException(
+            s"File ${f.getCanonicalPath} does not exists"))
 
     if (files.map(_.getParent).distinct.size != 1)
       throw new IllegalArgumentException(

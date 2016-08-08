@@ -19,7 +19,7 @@ private[parser] trait LinkHeader {
 
   def `link-value` = rule {
     ws('<') ~ UriReference('>') ~ ws('>') ~ oneOrMore(ws(';') ~ `link-param`) ~>
-    (sanitize(_)) ~> (LinkValue(_, _: _*))
+      (sanitize(_)) ~> (LinkValue(_, _: _*))
   }
 
   def `link-param` =
@@ -30,14 +30,14 @@ private[parser] trait LinkHeader {
             "hreflang") ~ ws('=') ~ language ~> LinkParams.hreflang | ws(
             "media") ~ ws('=') ~ word ~> LinkParams.media | ws("title") ~ ws(
             '=') ~ word ~> LinkParams.title | ws("title*") ~ ws('=') ~ word ~> LinkParams.`title*` // support full `ext-value` notation from http://tools.ietf.org/html/rfc5987#section-3.2.1
-        | ws("type") ~ ws('=') ~
-        (ws('"') ~ `link-media-type` ~ ws('"') | `link-media-type`) ~> LinkParams.`type`)
+          | ws("type") ~ ws('=') ~
+            (ws('"') ~ `link-media-type` ~ ws('"') | `link-media-type`) ~> LinkParams.`type`)
   // TODO: support `link-extension`
 
   def `relation-types` =
     rule(
         ws('"') ~ oneOrMore(`relation-type`).separatedBy(oneOrMore(SP)) ~>
-        (_.mkString(" ")) ~ ws('"') | `relation-type` ~ OWS)
+          (_.mkString(" ")) ~ ws('"') | `relation-type` ~ OWS)
 
   def `relation-type` = rule { `reg-rel-type` | `ext-rel-type` }
 
@@ -53,12 +53,13 @@ private[parser] trait LinkHeader {
 
   def UriReference(terminationChar: Char) = rule {
     capture(oneOrMore(!terminationChar ~ VCHAR)) ~>
-    (newUriParser(_).parseUriReference())
+      (newUriParser(_).parseUriReference())
   }
 
   def URI = rule {
     capture(oneOrMore(!'"' ~ !';' ~ !',' ~ VCHAR)) ~> { s ⇒
-      try new UriParser(s).parseUriReference() catch {
+      try new UriParser(s).parseUriReference()
+      catch {
         case IllegalUriException(info) ⇒
           throw ParsingException(
               info.withSummaryPrepended("Illegal `Link` header relation-type"))
@@ -69,7 +70,7 @@ private[parser] trait LinkHeader {
 
   def `link-media-type` = rule {
     `media-type` ~>
-    ((mt, st, pm) ⇒ getMediaType(mt, st, pm contains "charset", pm.toMap))
+      ((mt, st, pm) ⇒ getMediaType(mt, st, pm contains "charset", pm.toMap))
   }
 
   // filter out subsequent `rel`, `media`, `title`, `type` and `type*` params

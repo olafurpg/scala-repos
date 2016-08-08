@@ -12,20 +12,18 @@ class CustomPersonXPickler(implicit val format: PickleFormat)
   def pickle(picklee: PersonX, builder: PBuilder) = {
     builder
       .beginEntry(picklee, tag)
-      .putField("name",
-                b =>
-                  {
-                    b.beginEntry(picklee.name, FastTypeTag.String)
-                    b.endEntry()
-                })
+      .putField("name", b => {
+        b.beginEntry(picklee.name, FastTypeTag.String)
+        b.endEntry()
+      })
     builder.endEntry()
   }
 }
 
 class GenericPickler extends FunSuite {
   test("stack-overflow-pickle-unpickle") {
-    def bar[T : Pickler](t: T) = t.pickle
-    def unbar[T : Unpickler](s: String) = JSONPickle(s).unpickle[T]
+    def bar[T: Pickler](t: T) = t.pickle
+    def unbar[T: Unpickler](s: String) = JSONPickle(s).unpickle[T]
 
     val p = PersonY("Philipp", 32)
     assert(bar(p).value == p.pickle.value)
@@ -38,7 +36,7 @@ class GenericPickler extends FunSuite {
   test("issue-4") {
     implicit def genCustomPersonXPickler[T <: PersonX](
         implicit format: PickleFormat) = new CustomPersonXPickler
-    def fn[T <: PersonX : Pickler](x: T) = x.pickle
+    def fn[T <: PersonX: Pickler](x: T) = x.pickle
 
     val p = PersonX("Philipp", 32, 99999999)
     val jsn = """JSONPickle({

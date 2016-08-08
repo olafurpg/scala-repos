@@ -30,7 +30,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class LinearRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   private val seed: Int = 42
@@ -232,7 +233,7 @@ class LinearRegressionSuite
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
-              features(1) * model1.coefficients(1) + model1.intercept
+                features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
         }
     }
@@ -283,10 +284,12 @@ class LinearRegressionSuite
       val coefficientsWithourInterceptR = Vectors.dense(4.70011, 7.19943)
 
       assert(modelWithoutIntercept1.intercept ~== 0 absTol 1E-3)
-      assert(modelWithoutIntercept1.coefficients ~=
+      assert(
+          modelWithoutIntercept1.coefficients ~=
             coefficientsWithourInterceptR relTol 1E-3)
       assert(modelWithoutIntercept2.intercept ~== 0 absTol 1E-3)
-      assert(modelWithoutIntercept2.coefficients ~=
+      assert(
+          modelWithoutIntercept2.coefficients ~=
             coefficientsWithourInterceptR relTol 1E-3)
     }
   }
@@ -352,7 +355,7 @@ class LinearRegressionSuite
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
-                features(1) * model1.coefficients(1) + model1.intercept
+                  features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
           }
       }
@@ -423,7 +426,7 @@ class LinearRegressionSuite
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
-                features(1) * model1.coefficients(1) + model1.intercept
+                  features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
           }
       }
@@ -483,7 +486,7 @@ class LinearRegressionSuite
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
-              features(1) * model1.coefficients(1) + model1.intercept
+                features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
         }
     }
@@ -545,7 +548,7 @@ class LinearRegressionSuite
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
-              features(1) * model1.coefficients(1) + model1.intercept
+                features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
         }
     }
@@ -613,7 +616,7 @@ class LinearRegressionSuite
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
-                features(1) * model1.coefficients(1) + model1.intercept
+                  features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
           }
       }
@@ -685,7 +688,7 @@ class LinearRegressionSuite
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
-                features(1) * model1.coefficients(1) + model1.intercept
+                  features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
           }
       }
@@ -713,8 +716,9 @@ class LinearRegressionSuite
           .setWeightCol("weight")
           .setSolver(solver)
           .fit(datasetWithWeightConstantLabel)
-        val actual1 = Vectors.dense(
-            model1.intercept, model1.coefficients(0), model1.coefficients(1))
+        val actual1 = Vectors.dense(model1.intercept,
+                                    model1.coefficients(0),
+                                    model1.coefficients(1))
         assert(actual1 ~== expected(idx) absTol 1e-4)
 
         val model2 = new LinearRegression()
@@ -722,8 +726,9 @@ class LinearRegressionSuite
           .setWeightCol("weight")
           .setSolver(solver)
           .fit(datasetWithWeightZeroLabel)
-        val actual2 = Vectors.dense(
-            model2.intercept, model2.coefficients(0), model2.coefficients(1))
+        val actual2 = Vectors.dense(model2.intercept,
+                                    model2.coefficients(0),
+                                    model2.coefficients(1))
         assert(actual2 ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1e-4)
         idx += 1
       }
@@ -787,15 +792,17 @@ class LinearRegressionSuite
       assert(modelNoPredictionCol.hasSummary)
 
       // Schema should be a superset of the input dataset
-      assert((datasetWithDenseFeature.schema.fieldNames.toSet + "prediction")
+      assert(
+          (datasetWithDenseFeature.schema.fieldNames.toSet + "prediction")
             .subsetOf(model.summary.predictions.schema.fieldNames.toSet))
       // Validate that we re-insert a prediction column for evaluation
       val modelNoPredictionColFieldNames =
         modelNoPredictionCol.summary.predictions.schema.fieldNames
-      assert((datasetWithDenseFeature.schema.fieldNames.toSet)
+      assert(
+          (datasetWithDenseFeature.schema.fieldNames.toSet)
             .subsetOf(modelNoPredictionColFieldNames.toSet))
-      assert(modelNoPredictionColFieldNames.exists(
-              s => s.startsWith("prediction_")))
+      assert(modelNoPredictionColFieldNames.exists(s =>
+        s.startsWith("prediction_")))
 
       // Residuals in [[LinearRegressionResults]] should equal those manually computed
       val expectedResiduals = datasetWithDenseFeature
@@ -805,7 +812,7 @@ class LinearRegressionSuite
           case Row(features: DenseVector, label: Double) =>
             val prediction =
               features(0) * model.coefficients(0) +
-              features(1) * model.coefficients(1) + model.intercept
+                features(1) * model.coefficients(1) + model.intercept
             label - prediction
         }
         .zip(model.summary.residuals.rdd.map(_.getDouble(0)))
@@ -862,7 +869,8 @@ class LinearRegressionSuite
       // objective history because it does not run through iterations.
       if (solver == "l-bfgs") {
         // Objective function should be monotonically decreasing for linear regression
-        assert(model.summary.objectiveHistory
+        assert(
+            model.summary.objectiveHistory
               .sliding(2)
               .forall(x => x(0) >= x(1)))
       } else {
@@ -896,7 +904,8 @@ class LinearRegressionSuite
 
       // Evaluating on training dataset should yield results summary equal to training summary
       val testSummary = model.evaluate(datasetWithDenseFeature)
-      assert(model.summary.meanSquaredError ~==
+      assert(
+          model.summary.meanSquaredError ~==
             testSummary.meanSquaredError relTol 1E-5)
       assert(model.summary.r2 ~== testSummary.r2 relTol 1E-5)
       model.summary.residuals
@@ -946,8 +955,14 @@ class LinearRegressionSuite
             )
         }
 
-        val noiseData = LinearDataGenerator.generateLinearInput(
-            2, Array(1, 3), Array(0.9, -1.3), Array(0.7, 1.2), 500, 1, 0.1)
+        val noiseData =
+          LinearDataGenerator.generateLinearInput(2,
+                                                  Array(1, 3),
+                                                  Array(0.9, -1.3),
+                                                  Array(0.7, 1.2),
+                                                  500,
+                                                  1,
+                                                  0.1)
         val weightedNoiseData = noiseData.map {
           case LabeledPoint(label, features) =>
             Instance(label, weight = 0, features)
@@ -1170,8 +1185,8 @@ class LinearRegressionSuite
   }
 
   test("read/write") {
-    def checkModelData(
-        model: LinearRegressionModel, model2: LinearRegressionModel): Unit = {
+    def checkModelData(model: LinearRegressionModel,
+                       model2: LinearRegressionModel): Unit = {
       assert(model.intercept === model2.intercept)
       assert(model.coefficients === model2.coefficients)
     }

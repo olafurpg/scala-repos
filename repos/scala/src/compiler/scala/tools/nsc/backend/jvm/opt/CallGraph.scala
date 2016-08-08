@@ -54,11 +54,12 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     * the method. Here the closure instantiations are already grouped by method.
     */
   val closureInstantiations: mutable.Map[
-      MethodNode, Map[InvokeDynamicInsnNode, ClosureInstantiation]] =
+      MethodNode,
+      Map[InvokeDynamicInsnNode, ClosureInstantiation]] =
     recordPerRunCache(concurrent.TrieMap.empty withDefaultValue Map.empty)
 
-  def removeCallsite(
-      invocation: MethodInsnNode, methodNode: MethodNode): Option[Callsite] = {
+  def removeCallsite(invocation: MethodInsnNode,
+                     methodNode: MethodNode): Option[Callsite] = {
     val methodCallsites = callsites(methodNode)
     val newCallsites = methodCallsites - invocation
     if (newCallsites.isEmpty) callsites.remove(methodNode)
@@ -69,7 +70,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
   def addCallsite(callsite: Callsite): Unit = {
     val methodCallsites = callsites(callsite.callsiteMethod)
     callsites(callsite.callsiteMethod) = methodCallsites +
-    (callsite.callsiteInstruction -> callsite)
+        (callsite.callsiteInstruction -> callsite)
   }
 
   def containsCallsite(callsite: Callsite): Boolean =
@@ -88,7 +89,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
   def addClosureInstantiation(closureInit: ClosureInstantiation) = {
     val methodClosureInits = closureInstantiations(closureInit.ownerMethod)
     closureInstantiations(closureInit.ownerMethod) = methodClosureInits +
-    (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
+        (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
   }
 
   def addClass(classNode: ClassNode): Unit = {
@@ -139,19 +140,24 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
           Map.empty[InvokeDynamicInsnNode, ClosureInstantiation]
 
         // lazy so it is only computed if actually used by computeArgInfos
-        lazy val prodCons = new ProdConsAnalyzer(
-            methodNode, definingClass.internalName)
+        lazy val prodCons =
+          new ProdConsAnalyzer(methodNode, definingClass.internalName)
 
         methodNode.instructions.iterator.asScala foreach {
           case call: MethodInsnNode if a.frameAt(call) != null =>
             // skips over unreachable code
             val callee: Either[OptimizerWarning, Callee] = for {
               (method, declarationClass) <- byteCodeRepository.methodNode(
-                  call.owner, call.name, call.desc): Either[
-                  OptimizerWarning, (MethodNode, InternalName)]
+                                               call.owner,
+                                               call.name,
+                                               call.desc): Either[
+                                               OptimizerWarning,
+                                               (MethodNode, InternalName)]
               (declarationClassNode, source) <- byteCodeRepository
-                .classNodeAndSource(declarationClass): Either[
-                  OptimizerWarning, (ClassNode, Source)]
+                                                 .classNodeAndSource(
+                                                     declarationClass): Either[
+                                                   OptimizerWarning,
+                                                   (ClassNode, Source)]
             } yield {
               val declarationClassBType =
                 classBTypeFromClassNode(declarationClassNode)
@@ -161,8 +167,11 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                                annotatedInline,
                                annotatedNoInline,
                                samParamTypes,
-                               warning) = analyzeCallsite(
-                  method, declarationClassBType, call.owner, source)
+                               warning) =
+                analyzeCallsite(method,
+                                declarationClassBType,
+                                call.owner,
+                                source)
               Callee(callee = method,
                      calleeDeclarationClass = declarationClassBType,
                      safeToInline = safeToInline,
@@ -190,17 +199,21 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                 argInfos = argInfos,
                 callsiteStackHeight = a.frameAt(call).getStackSize,
                 receiverKnownNotNull = receiverNotNull,
-                callsitePosition = callsitePositions.getOrElse(call,
-                                                               NoPosition),
+                callsitePosition =
+                  callsitePositions.getOrElse(call, NoPosition),
                 annotatedInline = inlineAnnotatedCallsites(call),
                 annotatedNoInline = noInlineAnnotatedCallsites(call)
             )
 
-          case LambdaMetaFactoryCall(
-              indy, samMethodType, implMethod, instantiatedMethodType)
+          case LambdaMetaFactoryCall(indy,
+                                     samMethodType,
+                                     implMethod,
+                                     instantiatedMethodType)
               if a.frameAt(indy) != null =>
-            val lmf = LambdaMetaFactoryCall(
-                indy, samMethodType, implMethod, instantiatedMethodType)
+            val lmf = LambdaMetaFactoryCall(indy,
+                                            samMethodType,
+                                            implMethod,
+                                            instantiatedMethodType)
             val capturedArgInfos = computeCapturedArgInfos(lmf, prodCons)
             methodClosureInstantiations +=
               indy -> ClosureInstantiation(lmf,
@@ -224,9 +237,11 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     else {
       lazy val numArgs =
         Type.getArgumentTypes(callsiteInsn.desc).length +
-        (if (callsiteInsn.getOpcode == Opcodes.INVOKESTATIC) 0 else 1)
-      argInfosForSams(
-          callee.get.samParamTypes, callsiteInsn, numArgs, prodCons)
+          (if (callsiteInsn.getOpcode == Opcodes.INVOKESTATIC) 0 else 1)
+      argInfosForSams(callee.get.samParamTypes,
+                      callsiteInsn,
+                      numArgs,
+                      prodCons)
     }
   }
 
@@ -258,8 +273,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     }
     sams flatMap {
       case (index, _) =>
-        val prods = prodConsI.initialProducersForValueAt(
-            consumerInsn, firstConsumedSlot + index)
+        val prods = prodConsI
+          .initialProducersForValueAt(consumerInsn, firstConsumedSlot + index)
         if (prods.size != 1) None
         else {
           val argInfo = prods.head match {
@@ -272,14 +287,14 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     }
   }
 
-  def samParamTypes(
-      methodNode: MethodNode, receiverType: ClassBType): IntMap[ClassBType] = {
+  def samParamTypes(methodNode: MethodNode,
+                    receiverType: ClassBType): IntMap[ClassBType] = {
     val paramTypes = {
       val params = Type
         .getMethodType(methodNode.desc)
         .getArgumentTypes
         .map(t =>
-              bTypeForDescriptorOrInternalNameFromClassfile(t.getDescriptor))
+          bTypeForDescriptorOrInternalNameFromClassfile(t.getDescriptor))
       val isStatic = BytecodeUtils.isStaticMethod(methodNode)
       if (isStatic) params else receiverType +: params
     }
@@ -335,7 +350,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
         case Some(methodInlineInfo) =>
           val canInlineFromSource =
             compilerSettings.YoptInlineGlobal ||
-            calleeSource == CompilationUnit
+              calleeSource == CompilationUnit
 
           val isAbstract = BytecodeUtils.isAbstractMethod(calleeMethodNode)
 
@@ -379,13 +394,14 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
           //     method to enable inlining.
           CallsiteInfo(
               safeToInline = canInlineFromSource && isStaticallyResolved &&
-                // (1)
-                !isAbstract &&
-                !BytecodeUtils.isConstructor(calleeMethodNode) &&
-                !BytecodeUtils.isNativeMethod(calleeMethodNode) &&
-                !BytecodeUtils.hasCallerSensitiveAnnotation(calleeMethodNode),
+                  // (1)
+                  !isAbstract &&
+                  !BytecodeUtils.isConstructor(calleeMethodNode) &&
+                  !BytecodeUtils.isNativeMethod(calleeMethodNode) &&
+                  !BytecodeUtils.hasCallerSensitiveAnnotation(
+                      calleeMethodNode),
               safeToRewrite = canInlineFromSource &&
-                isRewritableTraitCall, // (2)
+                  isRewritableTraitCall, // (2)
               canInlineFromSource = canInlineFromSource,
               annotatedInline = methodInlineInfo.annotatedInline,
               annotatedNoInline = methodInlineInfo.annotatedNoInline,
@@ -398,8 +414,13 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
               calleeMethodNode.name,
               calleeMethodNode.desc,
               calleeDeclarationClassBType.info.orThrow.inlineInfo.warning)
-          CallsiteInfo(
-              false, false, false, false, false, IntMap.empty, Some(warning))
+          CallsiteInfo(false,
+                       false,
+                       false,
+                       false,
+                       false,
+                       IntMap.empty,
+                       Some(warning))
       }
     } catch {
       case Invalid(noInfo: NoClassBTypeInfo) =>
@@ -408,8 +429,13 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             calleeMethodNode.name,
             calleeMethodNode.desc,
             noInfo)
-        CallsiteInfo(
-            false, false, false, false, false, IntMap.empty, Some(warning))
+        CallsiteInfo(false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     IntMap.empty,
+                     Some(warning))
     }
   }
 
@@ -446,13 +472,13 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
 
     override def toString =
       "Invocation of" +
-      s" ${callee.map(_.calleeDeclarationClass.internalName).getOrElse("?")}.${callsiteInstruction.name + callsiteInstruction.desc}" +
-      s"@${callsiteMethod.instructions.indexOf(callsiteInstruction)}" +
-      s" in ${callsiteClass.internalName}.${callsiteMethod.name}"
+        s" ${callee.map(_.calleeDeclarationClass.internalName).getOrElse("?")}.${callsiteInstruction.name + callsiteInstruction.desc}" +
+        s"@${callsiteMethod.instructions.indexOf(callsiteInstruction)}" +
+        s" in ${callsiteClass.internalName}.${callsiteMethod.name}"
   }
 
-  final case class ClonedCallsite(
-      callsite: Callsite, clonedWhenInlining: Callsite)
+  final case class ClonedCallsite(callsite: Callsite,
+                                  clonedWhenInlining: Callsite)
 
   /**
     * Information about invocation arguments, obtained through data flow analysis of the callsite method.
@@ -516,7 +542,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     val inlinedClones = mutable.Set.empty[ClosureInstantiation]
     override def toString =
       s"ClosureInstantiation($lambdaMetaFactoryCall, ${ownerMethod.name +
-      ownerMethod.desc}, $ownerClass)"
+        ownerMethod.desc}, $ownerClass)"
   }
   final case class LambdaMetaFactoryCall(indy: InvokeDynamicInsnNode,
                                          samMethodType: Type,
@@ -551,7 +577,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
       : Option[(InvokeDynamicInsnNode, Type, Handle, Type)] = insn match {
       case indy: InvokeDynamicInsnNode
           if indy.bsm == metafactoryHandle ||
-          indy.bsm == altMetafactoryHandle =>
+            indy.bsm == altMetafactoryHandle =>
         indy.bsmArgs match {
           case Array(samMethodType: Type,
                      implMethod: Handle,
@@ -595,21 +621,23 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             val expectedImplMethodType = {
               val paramTypes =
                 (if (isStatic)
-                   indyParamTypes else indyParamTypes.tail) ++ instantiatedMethodArgTypes
-              Type.getMethodType(
-                  instantiatedMethodType.getReturnType, paramTypes: _*)
+                   indyParamTypes
+                 else indyParamTypes.tail) ++ instantiatedMethodArgTypes
+              Type.getMethodType(instantiatedMethodType.getReturnType,
+                                 paramTypes: _*)
             }
 
             val isIndyLambda =
-              (Type.getType(implMethod.getDesc) == expectedImplMethodType // (1)
-                  &&
+              (Type
+                .getType(implMethod.getDesc) == expectedImplMethodType // (1)
+                &&
                   (isStatic ||
-                      implMethod.getOwner == indyParamTypes(0).getInternalName) // (2)
-                  && samMethodType.getArgumentTypes.corresponds(
-                      instantiatedMethodArgTypes)((samArgType, instArgType) =>
-                        samArgType == instArgType || isReference(samArgType) &&
-                        isReference(instArgType)) // (3)
-                  )
+                    implMethod.getOwner == indyParamTypes(0).getInternalName) // (2)
+                && samMethodType.getArgumentTypes.corresponds(
+                    instantiatedMethodArgTypes)((samArgType, instArgType) =>
+                  samArgType == instArgType || isReference(samArgType) &&
+                    isReference(instArgType)) // (3)
+              )
 
             if (isIndyLambda)
               Some((indy, samMethodType, implMethod, instantiatedMethodType))

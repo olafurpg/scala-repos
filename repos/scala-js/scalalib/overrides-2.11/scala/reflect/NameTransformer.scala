@@ -110,8 +110,8 @@ object NameTransformer {
           val ch2 = name.charAt(i + 2)
           if ('a' <= ch2 && ch2 <= 'z') {
             ops = code2op((ch1 - 'a') * 26 + ch2 - 'a')
-            while ( (ops ne null) &&
-            !name.startsWith(ops.code, i)) ops = ops.next
+            while ((ops ne null) &&
+                   !name.startsWith(ops.code, i)) ops = ops.next
             if (ops ne null) {
               if (buf eq null) {
                 buf = new StringBuilder()
@@ -125,7 +125,8 @@ object NameTransformer {
           } else if ((len - i) >= 6 &&
                      // Check that there are enough characters left
                      ch1 == 'u' &&
-                     ((Character.isDigit(ch2)) || ('A' <= ch2 && ch2 <= 'F'))) {
+                     ((Character
+                       .isDigit(ch2)) || ('A' <= ch2 && ch2 <= 'F'))) {
             /* Skip past "$u", next four should be hexadecimal */
             val hex = name.substring(i + 2, i + 6)
             try {

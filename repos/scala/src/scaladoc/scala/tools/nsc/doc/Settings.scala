@@ -12,8 +12,8 @@ import scala.language.postfixOps
 /** An extended version of compiler settings, with additional Scaladoc-specific options.
   * @param error A function that prints a string to the appropriate error stream
   * @param printMsg A function that prints the string, without any extra boilerplate of error */
-class Settings(
-    error: String => Unit, val printMsg: String => Unit = println(_))
+class Settings(error: String => Unit,
+               val printMsg: String => Unit = println(_))
     extends scala.tools.nsc.Settings(error) {
 
   // TODO 2.13 Remove
@@ -114,13 +114,13 @@ class Settings(
   val docImplicitsShowAll = BooleanSetting(
       "-implicits-show-all",
       "Show members inherited by implicit conversions that are impossible in the default scope. " +
-      "(for example conversions that require Numeric[String] to be in scope)"
+        "(for example conversions that require Numeric[String] to be in scope)"
   )
 
   val docImplicitsSoundShadowing = BooleanSetting(
       "-implicits-sound-shadowing",
       "Use a sound implicit shadowing calculation. Note: this interacts badly with usecases, so " +
-      "only use it if you haven't defined usecase for implicitly inherited members."
+        "only use it if you haven't defined usecase for implicitly inherited members."
   )
 
   val docImplicitsHide = MultiStringSetting(
@@ -303,42 +303,42 @@ class Settings(
       */
     val knownTypeClasses: Map[String, String => String] =
       Map() +
-      ("scala.math.Numeric" ->
+        ("scala.math.Numeric" ->
           ((tparam: String) =>
-                tparam +
-              " is a numeric class, such as Int, Long, Float or Double")) +
-      ("scala.math.Integral" ->
+             tparam +
+               " is a numeric class, such as Int, Long, Float or Double")) +
+        ("scala.math.Integral" ->
           ((tparam: String) =>
-                tparam +
-              " is an integral numeric class, such as Int or Long")) +
-      ("scala.math.Fractional" ->
+             tparam +
+               " is an integral numeric class, such as Int or Long")) +
+        ("scala.math.Fractional" ->
           ((tparam: String) =>
-                tparam +
-              " is a fractional numeric class, such as Float or Double")) +
-      ("scala.reflect.Manifest" ->
+             tparam +
+               " is a fractional numeric class, such as Float or Double")) +
+        ("scala.reflect.Manifest" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by a Manifest, which is a runtime representation of its type that survives erasure")) +
-      ("scala.reflect.ClassManifest" ->
+             tparam +
+               " is accompanied by a Manifest, which is a runtime representation of its type that survives erasure")) +
+        ("scala.reflect.ClassManifest" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by a ClassManifest, which is a runtime representation of its type that survives erasure")) +
-      ("scala.reflect.OptManifest" ->
+             tparam +
+               " is accompanied by a ClassManifest, which is a runtime representation of its type that survives erasure")) +
+        ("scala.reflect.OptManifest" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by an OptManifest, which can be either a runtime representation of its type or the NoManifest, which means the runtime type is not available")) +
-      ("scala.reflect.ClassTag" ->
+             tparam +
+               " is accompanied by an OptManifest, which can be either a runtime representation of its type or the NoManifest, which means the runtime type is not available")) +
+        ("scala.reflect.ClassTag" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by a ClassTag, which is a runtime representation of its type that survives erasure")) +
-      ("scala.reflect.api.TypeTags.WeakTypeTag" ->
+             tparam +
+               " is accompanied by a ClassTag, which is a runtime representation of its type that survives erasure")) +
+        ("scala.reflect.api.TypeTags.WeakTypeTag" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by a WeakTypeTag, which is a runtime representation of its type that survives erasure")) +
-      ("scala.reflect.api.TypeTags.TypeTag" ->
+             tparam +
+               " is accompanied by a WeakTypeTag, which is a runtime representation of its type that survives erasure")) +
+        ("scala.reflect.api.TypeTags.TypeTag" ->
           ((tparam: String) =>
-                tparam +
-              " is accompanied by a TypeTag, which is a runtime representation of its type that survives erasure"))
+             tparam +
+               " is accompanied by a TypeTag, which is a runtime representation of its type that survives erasure"))
 
     private val excludedClassnamePatterns =
       Set(
@@ -400,11 +400,11 @@ class Settings(
       val valueName = value.toLowerCase
       val otherValues = valueClassList.filterNot(_ == valueName)
 
-      for (prefix <- valueClassFilterPrefixes) if (conversionName.startsWith(
-                                                       prefix))
-        for (otherValue <- otherValues) if (conversionName.startsWith(
-                                                prefix + "." + otherValue))
-          return false
+      for (prefix <- valueClassFilterPrefixes)
+        if (conversionName.startsWith(prefix))
+          for (otherValue <- otherValues)
+            if (conversionName.startsWith(prefix + "." + otherValue))
+              return false
 
       true
     }

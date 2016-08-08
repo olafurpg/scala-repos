@@ -6,7 +6,10 @@ import com.intellij.psi._
 import com.intellij.util.text.CharArrayUtil
 import org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor
 import org.jetbrains.plugins.scala.extensions.ObjectExt
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList,
+  ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 
@@ -42,8 +45,9 @@ class ScalaMethodCallFixer extends ScalaFixer {
                     editor.getCaretModel.getOffset)
 
                 while (currentPsi != null &&
-                methodCall.getTextRange.contains(currentPsi.getTextRange) &&
-                !currentPsi.isInstanceOf[ScArgumentExprList]) {
+                       methodCall.getTextRange.contains(
+                           currentPsi.getTextRange) &&
+                       !currentPsi.isInstanceOf[ScArgumentExprList]) {
                   currentPsi = currentPsi.getParent
                 }
 
@@ -67,7 +71,8 @@ class ScalaMethodCallFixer extends ScalaFixer {
                         if cl.contains(resolvedCl) && resolvedCl != cl.last =>
                       moveToEnd(editor, args.getLastChild)
                       editor.getDocument.insertString(
-                          args.getLastChild.getTextRange.getEndOffset, "()")
+                          args.getLastChild.getTextRange.getEndOffset,
+                          "()")
                       return WithReformat(1)
                     case _ =>
                   }
@@ -106,7 +111,9 @@ class ScalaMethodCallFixer extends ScalaFixer {
       endOffset = args.getTextRange.getStartOffset + 1
 
     endOffset = CharArrayUtil.shiftBackward(
-        editor.getDocument.getCharsSequence, endOffset - 1, " \t\n") + 1
+          editor.getDocument.getCharsSequence,
+          endOffset - 1,
+          " \t\n") + 1
     editor.getDocument.insertString(endOffset, ")")
 
     WithReformat(1)

@@ -84,7 +84,8 @@ object SnapshotFailureRobustnessSpec {
 
   class DeleteFailingLocalSnapshotStore extends LocalSnapshotStore {
     override def deleteAsync(metadata: SnapshotMetadata): Future[Unit] = {
-      super.deleteAsync(metadata) // we actually delete it properly, but act as if it failed
+      super
+        .deleteAsync(metadata) // we actually delete it properly, but act as if it failed
       Future.failed(
           new IOException("Failed to delete snapshot for some reason!"))
     }
@@ -92,7 +93,8 @@ object SnapshotFailureRobustnessSpec {
     override def deleteAsync(
         persistenceId: String,
         criteria: SnapshotSelectionCriteria): Future[Unit] = {
-      super.deleteAsync(persistenceId, criteria) // we actually delete it properly, but act as if it failed
+      super
+        .deleteAsync(persistenceId, criteria) // we actually delete it properly, but act as if it failed
       Future.failed(
           new IOException("Failed to delete snapshot for some reason!"))
     }
@@ -105,10 +107,12 @@ class SnapshotFailureRobustnessSpec
             "leveldb",
             "SnapshotFailureRobustnessSpec",
             serialization = "off",
-            extraConfig = Some("""
+            extraConfig = Some(
+                """
   akka.persistence.snapshot-store.local.class = "akka.persistence.SnapshotFailureRobustnessSpec$FailingLocalSnapshotStore"
   akka.persistence.snapshot-store.local-delete-fail.class = "akka.persistence.SnapshotFailureRobustnessSpec$DeleteFailingLocalSnapshotStore"
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
 
   import SnapshotFailureRobustnessSpec._
 
@@ -124,7 +128,7 @@ class SnapshotFailureRobustnessSpec
       sPersistentActor ! Cmd("kablama")
       expectMsg(2)
       system.eventStream.publish(TestEvent.Mute(
-              EventFilter.error(start = "Error loading snapshot [")))
+          EventFilter.error(start = "Error loading snapshot [")))
       system.eventStream.subscribe(testActor, classOf[Logging.Error])
       try {
         val lPersistentActor = system.actorOf(
@@ -140,7 +144,7 @@ class SnapshotFailureRobustnessSpec
       } finally {
         system.eventStream.unsubscribe(testActor, classOf[Logging.Error])
         system.eventStream.publish(TestEvent.UnMute(
-                EventFilter.error(start = "Error loading snapshot [")))
+            EventFilter.error(start = "Error loading snapshot [")))
       }
     }
 
@@ -154,8 +158,10 @@ class SnapshotFailureRobustnessSpec
       expectMsg(1)
       p ! DeleteSnapshot(1)
       expectMsgPF() {
-        case DeleteSnapshotFailure(
-            SnapshotMetadata(`persistenceId`, 1, timestamp), cause) ⇒
+        case DeleteSnapshotFailure(SnapshotMetadata(`persistenceId`,
+                                                    1,
+                                                    timestamp),
+                                   cause) ⇒
           // ok, expected failure
           cause.getMessage should include("Failed to delete")
       }

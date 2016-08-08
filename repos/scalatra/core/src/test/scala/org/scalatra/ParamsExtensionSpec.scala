@@ -67,7 +67,8 @@ class ParamsExtensionSpec extends Specification {
 
       val params: Params = FakeParams(Map("a" -> "buffybuffy"))
 
-      params.getAs[Bogus]("a")((s: String) => Some(Bogus(s.toUpperCase))) must beSome(
+      params
+        .getAs[Bogus]("a")((s: String) => Some(Bogus(s.toUpperCase))) must beSome(
           Bogus("BUFFYBUFFY"))
     }
   }

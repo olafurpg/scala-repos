@@ -141,7 +141,7 @@ private[cors] trait AbstractCORSPolicy {
       if (corsConfig.exposedHeaders.nonEmpty) {
         headerBuilder +=
           HeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS -> corsConfig.exposedHeaders
-          .mkString(",")
+            .mkString(",")
       }
 
       import play.api.libs.iteratee.Execution.Implicits.trampoline
@@ -210,7 +210,8 @@ private[cors] trait AbstractCORSPolicy {
              * let header field-names be the empty list.
              */
             val accessControlRequestHeaders: List[String] = {
-              request.headers.get(HeaderNames.ACCESS_CONTROL_REQUEST_HEADERS) match {
+              request.headers
+                .get(HeaderNames.ACCESS_CONTROL_REQUEST_HEADERS) match {
                 case None => List.empty[String]
                 case Some(headerVal) =>
                   headerVal.trim
@@ -310,7 +311,7 @@ private[cors] trait AbstractCORSPolicy {
               if (!accessControlRequestHeaders.isEmpty) {
                 headerBuilder +=
                   HeaderNames.ACCESS_CONTROL_ALLOW_HEADERS -> accessControlRequestHeaders
-                  .mkString(",")
+                    .mkString(",")
               }
 
               Future.successful {
@@ -346,9 +347,10 @@ private[cors] trait AbstractCORSPolicy {
 
   private def isSameOrigin(origin: String, request: RequestHeader): Boolean = {
     val hostUri = new URI(origin.toLowerCase(Locale.ENGLISH))
-    val originUri = new URI((if (request.secure) "https://" else "http://") +
-        request.host.toLowerCase(Locale.ENGLISH))
+    val originUri = new URI(
+        (if (request.secure) "https://" else "http://") +
+          request.host.toLowerCase(Locale.ENGLISH))
     (hostUri.getScheme, hostUri.getHost, hostUri.getPort) ==
-    (originUri.getScheme, originUri.getHost, originUri.getPort)
+      (originUri.getScheme, originUri.getHost, originUri.getPort)
   }
 }

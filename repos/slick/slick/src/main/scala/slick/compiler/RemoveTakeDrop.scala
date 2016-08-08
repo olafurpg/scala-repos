@@ -10,8 +10,8 @@ import scala.collection.mutable
 
 /** Replace all occurrences of `Take` and `Drop` with row number computations based on
   * `zipWithIndex` operations. */
-class RemoveTakeDrop(
-    val translateTake: Boolean = true, val translateDrop: Boolean = true)
+class RemoveTakeDrop(val translateTake: Boolean = true,
+                     val translateDrop: Boolean = true)
     extends Phase {
   val name = "removeTakeDrop"
 
@@ -89,7 +89,8 @@ class RemoveTakeDrop(
             case Some((f, Some(t), None)) =>
               Some(
                   (f,
-                   Some(constOp[Long]("max")(math.max)(
+                   Some(
+                       constOp[Long]("max")(math.max)(
                            LiteralNode(0L).infer(),
                            constOp[Long]("-")(_ - _)(t, num))),
                    Some(num)))
@@ -98,7 +99,8 @@ class RemoveTakeDrop(
             case Some((f, Some(t), Some(d))) =>
               Some(
                   (f,
-                   Some(constOp[Long]("max")(math.max)(
+                   Some(
+                       constOp[Long]("max")(math.max)(
                            LiteralNode(0L).infer(),
                            constOp[Long]("-")(_ - _)(t, num))),
                    Some(constOp[Long]("+")(_ + _)(d, num))))

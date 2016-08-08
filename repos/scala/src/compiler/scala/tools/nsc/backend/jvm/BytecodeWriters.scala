@@ -6,7 +6,13 @@
 package scala.tools.nsc
 package backend.jvm
 
-import java.io.{DataOutputStream, FileOutputStream, IOException, OutputStream, File => JFile}
+import java.io.{
+  DataOutputStream,
+  FileOutputStream,
+  IOException,
+  OutputStream,
+  File => JFile
+}
 import scala.tools.nsc.io._
 import java.util.jar.Attributes.Name
 import scala.language.postfixOps
@@ -29,8 +35,9 @@ trait BytecodeWriters {
   /**
     * @param clsName cls.getName
     */
-  def getFile(
-      base: AbstractFile, clsName: String, suffix: String): AbstractFile = {
+  def getFile(base: AbstractFile,
+              clsName: String,
+              suffix: String): AbstractFile = {
     def ensureDirectory(dir: AbstractFile): AbstractFile =
       if (dir.isDirectory) dir
       else
@@ -39,7 +46,8 @@ trait BytecodeWriters {
             dir)
     var dir = base
     val pathParts = clsName.split("[./]").toList
-    for (part <- pathParts.init) dir = ensureDirectory(dir) subdirectoryNamed part
+    for (part <- pathParts.init)
+      dir = ensureDirectory(dir) subdirectoryNamed part
     ensureDirectory(dir) fileNamed pathParts.last + suffix
   }
   def getFile(sym: Symbol, clsName: String, suffix: String): AbstractFile =
@@ -82,7 +90,8 @@ trait BytecodeWriters {
       val path = jclassName + ".class"
       val out = writer.newOutputStream(path)
 
-      try out.write(jclassBytes, 0, jclassBytes.length) finally out.flush()
+      try out.write(jclassBytes, 0, jclassBytes.length)
+      finally out.flush()
 
       informProgress("added " + label + path + " to jar")
     }
@@ -140,8 +149,8 @@ trait BytecodeWriters {
           "Precisely this override requires its invoker to hand out a non-null AbstractFile.")
       val outstream = new DataOutputStream(outfile.bufferedOutput)
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
-        .close()
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream.close()
       informProgress("wrote '" + label + "' to " + outfile)
     }
   }
@@ -157,12 +166,14 @@ trait BytecodeWriters {
 
       val pathName = jclassName
       val dumpFile =
-        pathName.split("[./]").foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
+        pathName
+          .split("[./]")
+          .foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
       dumpFile.parent.createDirectory()
       val outstream = new DataOutputStream(new FileOutputStream(dumpFile.path))
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
-        .close()
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream.close()
     }
   }
 }

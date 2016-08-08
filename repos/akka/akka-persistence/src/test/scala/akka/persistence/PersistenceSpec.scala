@@ -21,9 +21,10 @@ import akka.actor.Props
 import akka.testkit.AkkaSpec
 
 abstract class PersistenceSpec(config: Config)
-    extends AkkaSpec(config) with BeforeAndAfterEach with Cleanup
-    with PersistenceMatchers {
-  this: AkkaSpec ⇒
+    extends AkkaSpec(config)
+    with BeforeAndAfterEach
+    with Cleanup
+    with PersistenceMatchers { this: AkkaSpec ⇒
   private var _name: String = _
 
   lazy val extension = Persistence(system)
@@ -42,7 +43,7 @@ abstract class PersistenceSpec(config: Config)
   /**
     * Creates a persistent actor with current name as constructor argument.
     */
-  def namedPersistentActor[T <: NamedPersistentActor : ClassTag] =
+  def namedPersistentActor[T <: NamedPersistentActor: ClassTag] =
     system.actorOf(Props(implicitly[ClassTag[T]].runtimeClass, name))
 
   override protected def beforeEach() {
@@ -71,13 +72,12 @@ object PersistenceSpec {
     """))
 }
 
-trait Cleanup {
-  this: AkkaSpec ⇒
+trait Cleanup { this: AkkaSpec ⇒
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     storageLocations.foreach(FileUtils.deleteDirectory)
@@ -92,8 +92,7 @@ abstract class NamedPersistentActor(name: String) extends PersistentActor {
   override def persistenceId: String = name
 }
 
-trait TurnOffRecoverOnStart {
-  this: Eventsourced ⇒
+trait TurnOffRecoverOnStart { this: Eventsourced ⇒
   override def recovery = Recovery.none
 }
 

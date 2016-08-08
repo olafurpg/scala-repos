@@ -30,19 +30,21 @@ object JsonRichSpec extends Specification {
       js must equalTo(
           JsObject(
               Seq(
-                  "key1" -> JsObject(Seq(
+                  "key1" -> JsObject(
+                      Seq(
                           "key11" -> JsString("value11"),
                           "key12" -> JsNumber(123L),
                           "key13" -> JsNull
                       )),
                   "key2" -> JsNumber(123),
                   "key3" -> JsBoolean(true),
-                  "key4" -> JsArray(Seq(
+                  "key4" -> JsArray(
+                      Seq(
                           JsString("value41"),
                           JsNumber(345.6),
                           JsString("test"),
                           JsObject(Seq("key411" -> JsObject(
-                                      Seq("key4111" -> JsNumber(987.654)))))
+                              Seq("key4111" -> JsNumber(987.654)))))
                       ))
               ))
       )

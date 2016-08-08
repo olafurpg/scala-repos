@@ -40,7 +40,14 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.{Font, Text}
 import scalafx.scene.transform.Rotate
-import scalafx.scene.{DepthTest, Group, Node, PerspectiveCamera, Scene, SceneAntialiasing}
+import scalafx.scene.{
+  DepthTest,
+  Group,
+  Node,
+  PerspectiveCamera,
+  Scene,
+  SceneAntialiasing
+}
 
 /**
   * The type VideoCubeDemo a demonstration of the JavaOne 2011 key note with
@@ -75,13 +82,13 @@ object VideoCubeDemo extends JFXApp {
 
   val folder = folderOption match {
     case Some(folderName) => {
-        val file = new File(folderName)
-        if (file.exists() && file.isDirectory) file
-        else
-          throw new IllegalArgumentException(
-              "System property `" + folderSysProperty + " = " + folderName +
+      val file = new File(folderName)
+      if (file.exists() && file.isDirectory) file
+      else
+        throw new IllegalArgumentException(
+            "System property `" + folderSysProperty + " = " + folderName +
               "` " + "has to point to an existing directory.")
-      }
+    }
     case None =>
       throw new IllegalArgumentException(
           "System property `" + folderSysProperty + "` is not defined.")
@@ -122,7 +129,7 @@ object VideoCubeDemo extends JFXApp {
   val highY = 700
   val starryBackground = new Group {
     val stars = (1 to 500).map(x =>
-          new Rectangle {
+      new Rectangle {
         x = lowX + scala.math.random * (highX - lowX)
         y = lowY + scala.math.random * (highY - lowY)
         //      printf("x=%5.1f, y=%5.1f\n", x.get(), y.get() )

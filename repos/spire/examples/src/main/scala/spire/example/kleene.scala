@@ -27,7 +27,7 @@ object KleeneDemo {
   object Show {
     def apply[A](implicit ev: Show[A]) = ev
   }
-  implicit class ShowOps[A : Show](a: A) {
+  implicit class ShowOps[A: Show](a: A) {
     def show: String = Show[A].show(a)
   }
 
@@ -68,13 +68,14 @@ object KleeneDemo {
     implicit def starRigHasRig[A](implicit ev: StarRig[A]): Rig[A] = ev
   }
 
-  implicit class StarRigOps[A : StarRig](a: A) {
+  implicit class StarRigOps[A: StarRig](a: A) {
     def kstar: A = StarRig[A].kstar(a)
     def kplus: A = StarRig[A].kplus(a)
   }
 
-  implicit def matrixHasStarRig[A](
-      implicit dim: Dim, sr: StarRig[A], ct: ClassTag[A]) =
+  implicit def matrixHasStarRig[A](implicit dim: Dim,
+                                   sr: StarRig[A],
+                                   ct: ClassTag[A]) =
     new StarRig[Matrix[A]] {
       def zero: Matrix[A] = Matrix.zero
       def one: Matrix[A] = Matrix.one
@@ -126,7 +127,7 @@ object KleeneDemo {
   trait Matrix[A] { lhs =>
     def dim: Dim
     def apply(x: Int, y: Int): A
-    def map[B : ClassTag](f: A => B): Matrix[B]
+    def map[B: ClassTag](f: A => B): Matrix[B]
     def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
     def *(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
   }
@@ -137,7 +138,7 @@ object KleeneDemo {
       * Builds a Matrix[A] given a function (Int, Int) => A and an implicit Dim
       * to provide the dimensions over which to run the function.
       */
-    def apply[A : ClassTag](f: (Int, Int) => A)(implicit dim: Dim): Matrix[A] = {
+    def apply[A: ClassTag](f: (Int, Int) => A)(implicit dim: Dim): Matrix[A] = {
       val n = dim.n
       val arr = new Array[A](n * n)
       cfor(0)(_ < n, _ + 1) { y =>
@@ -151,13 +152,13 @@ object KleeneDemo {
     /**
       * Given an implicit Dim, builds the zero matrix (all zeros).
       */
-    def zero[A : Rig : ClassTag](implicit dim: Dim): Matrix[A] =
+    def zero[A: Rig: ClassTag](implicit dim: Dim): Matrix[A] =
       apply((x, y) => Rig[A].zero)
 
     /**
       * Given an implicit Dim, builds the identity matrix (diagonal ones).
       */
-    def one[A : Rig : ClassTag](implicit dim: Dim): Matrix[A] =
+    def one[A: Rig: ClassTag](implicit dim: Dim): Matrix[A] =
       apply((x, y) => if (x == y) Rig[A].one else Rig[A].zero)
   }
 
@@ -170,14 +171,14 @@ object KleeneDemo {
     * The matrix also has naive implementations of addition and multiplication.
     * These are not optimized--do not use this class in the wild!
     */
-  case class ArrayMatrix[A](arr: Array[A])(
-      implicit val dim: Dim, ct: ClassTag[A])
+  case class ArrayMatrix[A](arr: Array[A])(implicit val dim: Dim,
+                                           ct: ClassTag[A])
       extends Matrix[A] { lhs =>
     def apply(x: Int, y: Int): A = arr(y * dim.n + x)
 
     def update(x: Int, y: Int, a: A): Unit = arr(y * dim.n + x) = a
 
-    def map[B : ClassTag](f: A => B): Matrix[B] =
+    def map[B: ClassTag](f: A => B): Matrix[B] =
       ArrayMatrix(arr.map(f))
 
     def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A] =
@@ -207,8 +208,9 @@ object KleeneDemo {
   }
 
   // type class instance for Kleene[Matrix[A]]
-  implicit def matrixHasKleene[A](
-      implicit dim: Dim, ka: Kleene[A], ct: ClassTag[A]) =
+  implicit def matrixHasKleene[A](implicit dim: Dim,
+                                  ka: Kleene[A],
+                                  ct: ClassTag[A]) =
     new Kleene[Matrix[A]] {
       def zero: Matrix[A] = Matrix.zero
       def one: Matrix[A] = Matrix.one
@@ -331,7 +333,7 @@ object KleeneDemo {
     def inf[A]: Tropical[A] = Infinity
   }
 
-  implicit def tropicalHasShow[A : Show] = new Show[Tropical[A]] {
+  implicit def tropicalHasShow[A: Show] = new Show[Tropical[A]] {
     def show(t: Tropical[A]) = t match {
       case Finite(a) => Show[A].show(a)
       case Infinity => "∞"
@@ -348,7 +350,7 @@ object KleeneDemo {
       }
     }
 
-  implicit def TropicalHasKleene[A : Order : Rig] = new Kleene[Tropical[A]] {
+  implicit def TropicalHasKleene[A: Order: Rig] = new Kleene[Tropical[A]] {
     def zero: Tropical[A] = Infinity
     def one: Tropical[A] = Tropical(Rig[A].zero)
     def plus(x: Tropical[A], y: Tropical[A]): Tropical[A] = (x, y) match {
@@ -375,13 +377,14 @@ object KleeneDemo {
   }
 
   // type class instance for Show[ShortestPath[A, B]]
-  implicit def spHasShow[A : Show, B : Show] = new Show[ShortestPath[A, B]] {
+  implicit def spHasShow[A: Show, B: Show] = new Show[ShortestPath[A, B]] {
     def show(p: ShortestPath[A, B]) = "%s[%s]" format (p.b.show, p.a.show)
   }
 
   // type class instance for Kleene[ShortestPath[A, B]]
-  implicit def shortestPathHasKleene[A, B](
-      implicit rig: Rig[Tropical[A]], ord: Order[Tropical[A]], kb: Kleene[B]) =
+  implicit def shortestPathHasKleene[A, B](implicit rig: Rig[Tropical[A]],
+                                           ord: Order[Tropical[A]],
+                                           kb: Kleene[B]) =
     new Kleene[ShortestPath[A, B]] {
       def zero = ShortestPath(rig.zero, kb.zero)
 
@@ -418,7 +421,7 @@ object KleeneDemo {
   type SS[W] = Stream[Stream[W]]
 
   // type class instance for Show[Language[W]]
-  implicit def languageHasShow[W : Show] = new Show[Language[W]] {
+  implicit def languageHasShow[W: Show] = new Show[Language[W]] {
     def show(l: Language[W]) = Show[SS[W]].show(l.wss)
   }
 
@@ -444,25 +447,25 @@ object KleeneDemo {
     *
     */
   trait Compact[+A] {
-    def map[B : Field](f: A => B): Compact[B] = this match {
+    def map[B: Field](f: A => B): Compact[B] = this match {
       case CompactReal(a) => CompactReal(f(a))
       case _ => CompactInf
     }
   }
   case object CompactInf extends Compact[Nothing]
-  case class CompactReal[A : Field](a: A) extends Compact[A]
+  case class CompactReal[A: Field](a: A) extends Compact[A]
   object Compact {
-    def apply[A : Field](a: A): Compact[A] = CompactReal(a)
+    def apply[A: Field](a: A): Compact[A] = CompactReal(a)
   }
 
-  implicit def compactHasShow[A : Show] = new Show[Compact[A]] {
+  implicit def compactHasShow[A: Show] = new Show[Compact[A]] {
     def show(c: Compact[A]) = c match {
       case CompactReal(a) => a.show
       case _ => "∞"
     }
   }
 
-  implicit def compactIsStarRig[A : Field] = new StarRig[Compact[A]] {
+  implicit def compactIsStarRig[A: Field] = new StarRig[Compact[A]] {
     val zero: Compact[A] = Compact(Field[A].zero)
     val one: Compact[A] = Compact(Field[A].one)
     def plus(x: Compact[A], y: Compact[A]): Compact[A] = (x, y) match {
@@ -566,7 +569,7 @@ object KleeneDemo {
     println("l-annotated:\n" + langed.show)
     println("l-shortest-path:\n" + langed.kstar.map(_.b.someWord).show)
 
-    def evalExpr[A, B : Kleene](expr: Expr[A])(f: A => B): B = expr match {
+    def evalExpr[A, B: Kleene](expr: Expr[A])(f: A => B): B = expr match {
       case Nul => Kleene[B].zero
       case Empty => Kleene[B].one
       case Var(a) => f(a)

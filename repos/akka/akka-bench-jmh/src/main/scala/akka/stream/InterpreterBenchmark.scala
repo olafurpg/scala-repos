@@ -3,7 +3,10 @@ package akka.stream
 import akka.event._
 import akka.stream.impl.fusing.{GraphInterpreterSpecKit, GraphStages}
 import akka.stream.impl.fusing.GraphStages
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic,
+  UpstreamBoundaryStageLogic
+}
 import akka.stream.stage._
 import org.openjdk.jmh.annotations._
 
@@ -88,8 +91,8 @@ object InterpreterBenchmark {
     override def subscribe(subscriber: Subscriber, to: Classifier): Boolean =
       true
     override def publish(event: Event): Unit = ()
-    override def unsubscribe(
-        subscriber: Subscriber, from: Classifier): Boolean = true
+    override def unsubscribe(subscriber: Subscriber,
+                             from: Classifier): Boolean = true
     override def unsubscribe(subscriber: Subscriber): Unit = ()
   }
 }

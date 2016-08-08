@@ -8,7 +8,15 @@
 
 package scala
 
-import java.io.{BufferedReader, InputStream, InputStreamReader, IOException, OutputStream, PrintStream, Reader}
+import java.io.{
+  BufferedReader,
+  InputStream,
+  InputStreamReader,
+  IOException,
+  OutputStream,
+  PrintStream,
+  Reader
+}
 import java.text.MessageFormat
 import scala.util.DynamicVariable
 

@@ -4,16 +4,29 @@ import java.io.File
 import java.util
 
 import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.externalSystem.model.{DataNode, ExternalSystemException, Key}
-import com.intellij.openapi.externalSystem.service.notification.{NotificationCategory, NotificationSource}
+import com.intellij.openapi.externalSystem.model.{
+  DataNode,
+  ExternalSystemException,
+  Key
+}
+import com.intellij.openapi.externalSystem.service.notification.{
+  NotificationCategory,
+  NotificationSource
+}
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable
-import org.jetbrains.plugins.gradle.model.data.{ScalaCompileOptionsData, ScalaModelData}
+import org.jetbrains.plugins.gradle.model.data.{
+  ScalaCompileOptionsData,
+  ScalaModelData
+}
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.scala.project.DebuggingInfoLevel
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 import org.jetbrains.sbt.UsefulTestCaseHelper
-import org.jetbrains.sbt.project.data.service.{ProjectDataServiceTestCase, ExternalSystemDataDsl}
+import org.jetbrains.sbt.project.data.service.{
+  ProjectDataServiceTestCase,
+  ExternalSystemDataDsl
+}
 import ExternalSystemDataDsl._
 import org.jetbrains.sbt.project.data._
 import org.jetbrains.sbt.project.SbtProjectSystem
@@ -25,7 +38,8 @@ import scala.collection.JavaConverters._
   * @since 6/4/15.
   */
 class ScalaGradleDataServiceTest
-    extends ProjectDataServiceTestCase with UsefulTestCaseHelper {
+    extends ProjectDataServiceTestCase
+    with UsefulTestCaseHelper {
 
   private def generateProject(scalaVersion: Option[String],
                               scalaCompilerClasspath: Set[File],
@@ -75,15 +89,19 @@ class ScalaGradleDataServiceTest
   }
 
   def testScalaCompilerClasspathWithoutScala(): Unit = {
-    importProjectData(generateProject(
-            None, Set(new File("/tmp/test/not-a-scala-library.jar")), None))
+    importProjectData(
+        generateProject(None,
+                        Set(new File("/tmp/test/not-a-scala-library.jar")),
+                        None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
   }
 
   def testWithoutScalaLibrary(): Unit = {
-    importProjectData(generateProject(
-            None, Set(new File("/tmp/test/scala-library-2.10.4.jar")), None))
+    importProjectData(
+        generateProject(None,
+                        Set(new File("/tmp/test/scala-library-2.10.4.jar")),
+                        None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
   }
@@ -151,8 +169,11 @@ class ScalaGradleDataServiceTest
     assert(
         compilerConfiguration.debuggingInfoLevel == DebuggingInfoLevel.Source)
     assert(compilerConfiguration.plugins == Seq("test-plugin.jar"))
-    assert(compilerConfiguration.additionalCompilerOptions == Seq(
-            "-encoding", "utf-8", "-target:jvm-1.5"))
+    assert(
+        compilerConfiguration.additionalCompilerOptions == Seq(
+            "-encoding",
+            "utf-8",
+            "-target:jvm-1.5"))
     assert(compilerConfiguration.experimental)
     assert(compilerConfiguration.continuations)
     assert(compilerConfiguration.deprecationWarnings)

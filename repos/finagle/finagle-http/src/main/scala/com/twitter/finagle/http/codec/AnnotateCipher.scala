@@ -1,6 +1,10 @@
 package com.twitter.finagle.http.codec
 
-import org.jboss.netty.channel.{ChannelHandlerContext, MessageEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext,
+  MessageEvent,
+  SimpleChannelHandler
+}
 import org.jboss.netty.handler.codec.http.HttpRequest
 import org.jboss.netty.handler.ssl.SslHandler
 
@@ -13,8 +17,8 @@ private[http] class AnnotateCipher(headerName: String)
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
     (e.getMessage, ctx.getPipeline.get(classOf[SslHandler])) match {
       case (req: HttpRequest, ssl: SslHandler) =>
-        req.headers.set(
-            headerName, ssl.getEngine().getSession().getCipherSuite())
+        req.headers
+          .set(headerName, ssl.getEngine().getSession().getCipherSuite())
       case _ =>
         ()
     }

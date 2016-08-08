@@ -15,10 +15,12 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val x = 42
          |0 ${START}to x - 1$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val x = 42
         |0 to x - 1
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val x = 42
         |0 until x
       """.stripMargin)
@@ -28,10 +30,12 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val x = 42
          |0.${START}to(x - 1)$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val x = 42
         |0.to(x - 1)
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val x = 42
         |0.until(x)
       """.stripMargin)

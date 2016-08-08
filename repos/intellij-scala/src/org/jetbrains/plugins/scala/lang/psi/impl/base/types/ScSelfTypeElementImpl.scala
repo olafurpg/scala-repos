@@ -15,7 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScSelfTypeElementStub
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -46,8 +49,9 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
         for {
           templateType <- parent.getType(ctx)
           selfType <- ste.getType(ctx)
-          ct = ScCompoundType(
-              Seq(templateType, selfType), Map.empty, Map.empty)
+          ct = ScCompoundType(Seq(templateType, selfType),
+                              Map.empty,
+                              Map.empty)
         } yield ct
       case None => parent.getType(ctx)
     }
@@ -56,12 +60,14 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
   def typeElement: Option[ScTypeElement] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScSelfTypeElementStub].getTypeElementText match {
+      return stub
+        .asInstanceOf[ScSelfTypeElementStub]
+        .getTypeElementText match {
         case "" => None
         case text =>
           Some(
-              ScalaPsiElementFactory.createTypeElementFromText(
-                  text, this, this))
+              ScalaPsiElementFactory
+                .createTypeElementFromText(text, this, this))
       }
     }
     findChild(classOf[ScTypeElement])

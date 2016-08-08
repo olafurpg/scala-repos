@@ -23,7 +23,9 @@ import org.scalatest.prop.PropertyChecks
 import impl.ordered_serialization.runtime_helpers.TraversableHelpers._
 
 class TraversableHelperLaws
-    extends FunSuite with PropertyChecks with ShouldMatchers {
+    extends FunSuite
+    with PropertyChecks
+    with ShouldMatchers {
   test("Iterator ordering should be Iterable ordering") {
     forAll { (l1: List[Int], l2: List[Int]) =>
       assert(iteratorCompare[Int](l1.iterator, l2.iterator) === Ordering[

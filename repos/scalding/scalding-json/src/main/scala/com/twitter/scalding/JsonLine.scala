@@ -41,7 +41,8 @@ case class JsonLine(p: String,
                     override val sinkMode: SinkMode = SinkMode.REPLACE,
                     override val transformInTest: Boolean = false,
                     failOnEmptyLines: Boolean = true)
-    extends FixedPathSource(p) with TextLineScheme {
+    extends FixedPathSource(p)
+    with TextLineScheme {
 
   import Dsl._
   import JsonLine._
@@ -53,8 +54,8 @@ case class JsonLine(p: String,
 
   override def transformForRead(pipe: Pipe) = {
     @scala.annotation.tailrec
-    def nestedRetrieval(
-        node: Option[Map[String, AnyRef]], path: List[String]): AnyRef = {
+    def nestedRetrieval(node: Option[Map[String, AnyRef]],
+                        path: List[String]): AnyRef = {
       (path, node) match {
         case (_, None) => null
         case (h :: Nil, Some(fs)) => fs.get(h).orNull
@@ -87,13 +88,18 @@ case class JsonLine(p: String,
   * was added to get mima to not report binary errors
   */
 object JsonLine
-    extends scala.runtime.AbstractFunction5[
-        String, Fields, SinkMode, Boolean, Boolean, JsonLine] with Serializable
+    extends scala.runtime.AbstractFunction5[String,
+                                            Fields,
+                                            SinkMode,
+                                            Boolean,
+                                            Boolean,
+                                            JsonLine]
+    with Serializable
     with scala.Serializable {
 
   val mapTypeReference = typeReference[Map[String, AnyRef]]
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 

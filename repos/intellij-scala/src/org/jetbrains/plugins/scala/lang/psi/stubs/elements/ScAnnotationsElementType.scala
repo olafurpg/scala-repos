@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotations
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScAnnotationsImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScAnnotationsStubImpl
@@ -28,10 +33,10 @@ class ScAnnotationsElementType[Func <: ScAnnotations]
     new ScAnnotationsStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAnnotationsStub = {
-    new ScAnnotationsStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAnnotationsStub = {
+    new ScAnnotationsStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                              this)
   }
 
   def indexStub(stub: ScAnnotationsStub, sink: IndexSink): Unit = {}

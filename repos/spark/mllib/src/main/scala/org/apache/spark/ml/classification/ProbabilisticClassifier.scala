@@ -29,7 +29,9 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * (private[classification])  Params for probabilistic classification.
   */
 private[classification] trait ProbabilisticClassifierParams
-    extends ClassifierParams with HasProbabilityCol with HasThresholds {
+    extends ClassifierParams
+    with HasProbabilityCol
+    with HasThresholds {
   override protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
@@ -54,7 +56,8 @@ abstract class ProbabilisticClassifier[
     FeaturesType,
     E <: ProbabilisticClassifier[FeaturesType, E, M],
     M <: ProbabilisticClassificationModel[FeaturesType, M]]
-    extends Classifier[FeaturesType, E, M] with ProbabilisticClassifierParams {
+    extends Classifier[FeaturesType, E, M]
+    with ProbabilisticClassifierParams {
 
   /** @group setParam */
   def setProbabilityCol(value: String): E =
@@ -104,8 +107,8 @@ abstract class ProbabilisticClassificationModel[
       require(
           $(thresholds).length == numClasses,
           this.getClass.getSimpleName +
-          ".transform() called with non-matching numClasses and thresholds.length." +
-          s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}")
+            ".transform() called with non-matching numClasses and thresholds.length." +
+            s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}")
     }
 
     // Output selected columns only.
@@ -116,8 +119,8 @@ abstract class ProbabilisticClassificationModel[
       val predictRawUDF = udf { (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
       }
-      outputData = outputData.withColumn(
-          getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
+      outputData = outputData
+        .withColumn(getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
     }
     if ($(probabilityCol).nonEmpty) {
@@ -152,7 +155,7 @@ abstract class ProbabilisticClassificationModel[
     if (numColsOutput == 0) {
       this.logWarning(
           s"$uid: ProbabilisticClassificationModel.transform() was called as NOOP" +
-          " since no output columns were set.")
+            " since no output columns were set.")
     }
     outputData
   }

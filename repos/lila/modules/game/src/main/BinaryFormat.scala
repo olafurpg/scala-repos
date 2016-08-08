@@ -59,9 +59,9 @@ object BinaryFormat {
       def enc(mt: MT) =
         encodeMap get mt orElse findClose(mt, encodeList) getOrElse (size - 1)
       (mts grouped 2 map {
-            case Vector(a, b) => (enc(a) << 4) + enc(b)
-            case Vector(a) => enc(a) << 4
-          }).map(_.toByte).toArray
+        case Vector(a, b) => (enc(a) << 4) + enc(b)
+        case Vector(a) => enc(a) << 4
+      }).map(_.toByte).toArray
     }
 
     def read(ba: ByteArray): Vector[MT] = {
@@ -186,11 +186,15 @@ object BinaryFormat {
 
     private def posAt(x: Int, y: Int) = Pos.posAt(x + 1, y + 1)
 
-    private def doRead(
-        b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Option[Int]) =
+    private def doRead(b1: Int,
+                       b2: Int,
+                       b3: Int,
+                       b4: Int,
+                       b5: Int,
+                       b6: Option[Int]) =
       CastleLastMoveTime(
-          castles = Castles(
-                b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
+          castles =
+            Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
           lastMove = for {
             from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
             to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
@@ -211,8 +215,7 @@ object BinaryFormat {
       def posInt(pos: Pos): Int = (pieces get pos).fold(0) { piece =>
         piece.color.fold(0, 8) + roleToInt(piece.role)
       }
-      ByteArray(
-          groupedPos map {
+      ByteArray(groupedPos map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
       })
     }
@@ -228,8 +231,8 @@ object BinaryFormat {
         }
       val pieceInts = ba.value flatMap splitInts
       (Pos.all zip pieceInts flatMap {
-            case (pos, int) => intPiece(int) map (pos -> _)
-          }).toMap
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }).toMap
     }
 
     // cache standard start position

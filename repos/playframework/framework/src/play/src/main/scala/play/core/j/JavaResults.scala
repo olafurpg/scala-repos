@@ -16,7 +16,12 @@ import play.api.http._
 import play.api.libs.iteratee._
 import play.api.libs.iteratee.Concurrent._
 import play.core.Execution.internalContext
-import play.mvc.Http.{Cookies => JCookies, Cookie => JCookie, Session => JSession, Flash => JFlash}
+import play.mvc.Http.{
+  Cookies => JCookies,
+  Cookie => JCookie,
+  Session => JSession,
+  Flash => JFlash
+}
 import play.mvc.{Result => JResult}
 import play.twirl.api.Content
 import scala.collection.JavaConverters._
@@ -28,9 +33,11 @@ import java.util.function.Consumer
   * Java compatible Results
   */
 object JavaResults
-    extends Results with DefaultWriteables with DefaultContentTypeOfs {
-  def writeContent(
-      mimeType: String)(implicit codec: Codec): Writeable[Content] =
+    extends Results
+    with DefaultWriteables
+    with DefaultContentTypeOfs {
+  def writeContent(mimeType: String)(
+      implicit codec: Codec): Writeable[Content] =
     Writeable((content: Content) => codec.encode(contentBody(content)),
               Some(ContentTypes.withCharset(mimeType)))
   def contentBody(content: Content): String = content match {
@@ -59,8 +66,8 @@ object JavaResults
     )(internalContext)
   }
   //play.api.libs.iteratee.Enumerator.imperative[A](onComplete = onDisconnected)
-  def chunked(
-      stream: java.io.InputStream, chunkSize: Int): Source[ByteString, _] =
+  def chunked(stream: java.io.InputStream,
+              chunkSize: Int): Source[ByteString, _] =
     enumToSource(Enumerator.fromStream(stream, chunkSize)(internalContext))
   def chunked(file: java.io.File, chunkSize: Int) =
     enumToSource(Enumerator.fromFile(file, chunkSize)(internalContext))
@@ -115,7 +122,7 @@ object JavaResultExtractor {
                 .fromSetCookieHeader(
                     responseHeader.headers.get(HeaderNames.SET_COOKIE))
                 .get(Session.COOKIE_NAME)
-            )
+          )
           .data
           .asJava)
 
@@ -127,7 +134,7 @@ object JavaResultExtractor {
                 .fromSetCookieHeader(
                     responseHeader.headers.get(HeaderNames.SET_COOKIE))
                 .get(Flash.COOKIE_NAME)
-            )
+          )
           .data
           .asJava)
 
@@ -137,8 +144,8 @@ object JavaResultExtractor {
     responseHeader.copy(headers = responseHeader.headers + (name -> value))
 
   @varargs
-  def withHeader(
-      responseHeader: ResponseHeader, nameValues: String*): ResponseHeader = {
+  def withHeader(responseHeader: ResponseHeader,
+                 nameValues: String*): ResponseHeader = {
     if (nameValues.length % 2 != 0) {
       throw new IllegalArgumentException(
           "Unmatched name - withHeaders must be invoked with an even number of string arguments")
@@ -147,8 +154,9 @@ object JavaResultExtractor {
     responseHeader.copy(headers = responseHeader.headers ++ toAdd)
   }
 
-  def getBody(
-      result: JResult, timeout: Long, materializer: Materializer): ByteString =
+  def getBody(result: JResult,
+              timeout: Long,
+              materializer: Materializer): ByteString =
     Await.result(
         FutureConverters.toScala(result.body.consumeData(materializer)),
         timeout.millis)

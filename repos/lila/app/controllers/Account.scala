@@ -35,12 +35,12 @@ object Account extends LilaController {
     negotiate(
         html = notFound,
         api = _ =>
-            ctx.me match {
+          ctx.me match {
             case None => fuccess(unauthorizedApiResult)
             case Some(me) =>
-              relationEnv.api.countFollowers(me.id) zip relationEnv.api.countFollowing(
-                  me.id) zip Env.pref.api.getPref(me) zip lila.game.GameRepo
-                .urgentGames(me) map {
+              relationEnv.api.countFollowers(me.id) zip relationEnv.api
+                .countFollowing(me.id) zip Env.pref.api
+                .getPref(me) zip lila.game.GameRepo.urgentGames(me) map {
                 case (((nbFollowers, nbFollowing), prefs), povs) =>
                   Env.current.bus.publish(lila.user.User.Active(me),
                                           'userActive)
@@ -100,7 +100,8 @@ object Account extends LilaController {
           fuccess(html.account.email(me, err))
         } { data =>
           val email =
-            Env.security.emailAddress.validate(data.email) err s"Invalid email ${data.email}"
+            Env.security.emailAddress
+              .validate(data.email) err s"Invalid email ${data.email}"
           for {
             ok ← UserRepo.checkPasswordById(me.id, data.passwd)
             _ ← ok ?? UserRepo.email(me.id, email)
@@ -134,10 +135,11 @@ object Account extends LilaController {
   }
 
   private[controllers] def doClose(user: UserModel) =
-    (UserRepo disable user) >>- env.onlineUserIdMemo.remove(user.id) >> relationEnv.api
-      .unfollowAll(user.id) >> Env.team.api.quitAll(user.id) >>- Env.challenge.api
+    (UserRepo disable user) >>- env.onlineUserIdMemo
+      .remove(user.id) >> relationEnv.api.unfollowAll(user.id) >> Env.team.api
+      .quitAll(user.id) >>- Env.challenge.api
       .removeByUserId(user.id) >>- Env.tournament.api.withdrawAll(user) >>
-    (Env.security disconnect user.id)
+      (Env.security disconnect user.id)
 
   def kid = Auth { implicit ctx => me =>
     Ok(html.account.kid(me)).fuccess
@@ -160,7 +162,8 @@ object Account extends LilaController {
 
   def signout(sessionId: String) = Auth { implicit ctx => me =>
     if (sessionId == "all")
-      lila.security.Store.closeUserExceptSessionId(me.id, currentSessionId) inject Redirect(
+      lila.security.Store
+        .closeUserExceptSessionId(me.id, currentSessionId) inject Redirect(
           routes.Account.security)
     else lila.security.Store.closeUserAndSessionId(me.id, sessionId)
   }

@@ -71,8 +71,8 @@ class ALS private (
     private var implicitPrefs: Boolean,
     private var alpha: Double,
     private var seed: Long = System.nanoTime()
-)
-    extends Serializable with Logging {
+) extends Serializable
+    with Logging {
 
   /**
     * Constructs an ALS instance with default parameters: {numBlocks: -1, rank: 10, iterations: 10,
@@ -240,8 +240,8 @@ class ALS private (
       }
 
     val (floatUserFactors, floatProdFactors) = NewALS.train[Int](
-        ratings = ratings.map(
-              r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
+        ratings =
+          ratings.map(r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
         rank = rank,
         numUserBlocks = numUserBlocks,
         numItemBlocks = numProductBlocks,

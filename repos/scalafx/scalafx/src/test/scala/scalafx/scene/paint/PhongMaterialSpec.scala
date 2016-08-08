@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PhongMaterialSpec
     extends SimpleSFXDelegateSpec[jfxsp.PhongMaterial, PhongMaterial](
-        classOf[jfxsp.PhongMaterial], classOf[PhongMaterial]) {
+        classOf[jfxsp.PhongMaterial],
+        classOf[PhongMaterial]) {
 
   override protected def getJavaClassInstance = new jfxsp.PhongMaterial()
 

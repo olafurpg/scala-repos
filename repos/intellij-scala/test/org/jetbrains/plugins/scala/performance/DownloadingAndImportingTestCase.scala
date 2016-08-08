@@ -28,7 +28,8 @@ import org.junit.Assert
   * Date: 11/17/2015
   */
 abstract class DownloadingAndImportingTestCase
-    extends ExternalSystemImportingTestCase with SbtStructureSetup {
+    extends ExternalSystemImportingTestCase
+    with SbtStructureSetup {
 
   implicit class IntExt(val i: Int) {
     def seconds: Int = i * 1000
@@ -66,8 +67,11 @@ abstract class DownloadingAndImportingTestCase
     val projectDir = new File(projectDirPath)
     if (!outputZipFile.exists() && !projectDir.exists()) {
       //don't download if zip file is already there
-      GithubDownloadUtil.downloadAtomically(
-          null, downloadURL, outputZipFile, githubUsername, githubRepoName)
+      GithubDownloadUtil.downloadAtomically(null,
+                                            downloadURL,
+                                            outputZipFile,
+                                            githubUsername,
+                                            githubRepoName)
     }
     if (!projectDir.exists()) {
       //don't unpack if the project is already unpacked
@@ -75,8 +79,8 @@ abstract class DownloadingAndImportingTestCase
     }
     Assert.assertTrue("Project dir does not exist. Download or unpack failed!",
                       projectDir.exists())
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
-        projectDir)
+    myProjectRoot =
+      LocalFileSystem.getInstance.refreshAndFindFileByIoFile(projectDir)
     setUpSbtLauncherAndStructure(myProject)
     extensions.inWriteAction {
       val internalSdk =

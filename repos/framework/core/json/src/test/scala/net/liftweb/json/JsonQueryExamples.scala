@@ -54,8 +54,8 @@ object JsonQueryExamples extends Specification {
 
   "List of IPs in cluster2" in {
     val ips = for {
-      cluster @ JObject(x) <- json \ "data_center" if
-                             (x contains JField("name", JString("cluster2")))
+      cluster @ JObject(x) <- json \ "data_center"
+      if (x contains JField("name", JString("cluster2")))
       JField("ip", JString(ip)) <- (cluster \\ "ip").obj
     } yield {
       ip
@@ -98,7 +98,7 @@ object JsonQueryExamples extends Specification {
     val clusters = for {
       JObject(cluster) <- json
       JField("admins", JArray(admins)) <- cluster
-                                             if admins contains JString("liza")
+      if admins contains JString("liza")
       JField("name", JString(name)) <- cluster
     } yield name
 
@@ -106,7 +106,8 @@ object JsonQueryExamples extends Specification {
   }
 
   val json =
-    parse("""
+    parse(
+        """
     { "data_center": [
       {
         "name": "cluster1",

@@ -52,13 +52,13 @@ object MediaRangeSpec extends Specification {
     "allow anything in a quoted string" in {
       MediaRange.parse("""foo/bar, foo2/bar2; p="v,/\"\\vv"; p2=v2""") must_==
         Seq(
-          new MediaRange("foo", "bar", Nil, None, Nil),
-          new MediaRange("foo2",
-                         "bar2",
-                         Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
-                         None,
-                         Nil)
-      )
+            new MediaRange("foo", "bar", Nil, None, Nil),
+            new MediaRange("foo2",
+                           "bar2",
+                           Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
+                           None,
+                           Nil)
+        )
     }
     "allow valueless parameters" in {
       MediaType.parse("foo/bar;param") must beSome(
@@ -70,7 +70,11 @@ object MediaRangeSpec extends Specification {
     }
     "differentiate between media type parameters and accept extensions" in {
       parseSingleMediaRange("foo/bar;p1;q=0.25;p2") must_== new MediaRange(
-          "foo", "bar", Seq("p1" -> None), Some(0.25f), Seq("p2" -> None))
+          "foo",
+          "bar",
+          Seq("p1" -> None),
+          Some(0.25f),
+          Seq("p2" -> None))
     }
     "support non spec compliant everything media ranges" in {
       parseSingleMediaRange("*") must_==
@@ -85,7 +89,8 @@ object MediaRangeSpec extends Specification {
           ).inOrder)
     }
     "order by q value" in {
-      MediaRange.parse("foo1/bar1;q=0.25, foo3/bar3, foo2/bar2;q=0.5") must contain(
+      MediaRange
+        .parse("foo1/bar1;q=0.25, foo3/bar3, foo2/bar2;q=0.5") must contain(
           exactly(
               new MediaRange("foo3", "bar3", Nil, None, Nil),
               new MediaRange("foo2", "bar2", Nil, Some(0.5f), Nil),
@@ -101,7 +106,8 @@ object MediaRangeSpec extends Specification {
           ).inOrder)
     }
     "order by parameters" in {
-      MediaRange.parse("foo/bar, foo/bar;p1=v1;p2=v2, foo/bar;p1=v1") must contain(
+      MediaRange
+        .parse("foo/bar, foo/bar;p1=v1;p2=v2, foo/bar;p1=v1") must contain(
           exactly(
               new MediaRange("foo",
                              "bar",
@@ -150,11 +156,11 @@ object MediaRangeSpec extends Specification {
       for {
         c <- "\u0000\u007F (){}\\\"".toSeq
         format <- Seq(
-            "fo%so/bar, text/plain;charset=utf-8",
-            "foo/ba%sr, text/plain;charset=utf-8",
-            "text/plain;pa%sram;charset=utf-8",
-            "text/plain;param=va%slue;charset=utf-8"
-        )
+                     "fo%so/bar, text/plain;charset=utf-8",
+                     "foo/ba%sr, text/plain;charset=utf-8",
+                     "text/plain;pa%sram;charset=utf-8",
+                     "text/plain;param=va%slue;charset=utf-8"
+                 )
       } yield {
         // Use URL encoder so we can see which ctl character it's using
         def description =
@@ -163,7 +169,11 @@ object MediaRangeSpec extends Specification {
 
         parsed aka description must haveSize(1)
         parsed.head aka description must_== new MediaRange(
-            "text", "plain", Seq("charset" -> Some("utf-8")), None, Nil)
+            "text",
+            "plain",
+            Seq("charset" -> Some("utf-8")),
+            None,
+            Nil)
       }
       success
     }

@@ -43,8 +43,8 @@ trait DB2Profile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.reverse -
-        JdbcCapabilities.insertOrUpdate - JdbcCapabilities.supportsByte -
-        JdbcCapabilities.booleanMetaData)
+      JdbcCapabilities.insertOrUpdate - JdbcCapabilities.supportsByte -
+      JdbcCapabilities.booleanMetaData)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
@@ -53,14 +53,16 @@ trait DB2Profile extends JdbcProfile {
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler.addAfter(
-            Phase.removeTakeDrop, Phase.expandSums) + Phase.rewriteBooleans)
+        Phase.removeTakeDrop,
+        Phase.expandSums) + Phase.rewriteBooleans)
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createSequenceDDLBuilder(
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
@@ -71,12 +73,13 @@ trait DB2Profile extends JdbcProfile {
       .getTables(None, None, None, Some(Seq("TABLE")))
       .map(_.filter(_.name.schema.filter(_ == "SYSTOOLS").isEmpty))
 
-  override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.TINYINT =>
-      "SMALLINT" // DB2 has no smaller binary integer type
-    case _ => super.defaultSqlTypeName(tmd, sym)
-  }
+  override def defaultSqlTypeName(tmd: JdbcType[_],
+                                  sym: Option[FieldSymbol]): String =
+    tmd.sqlType match {
+      case java.sql.Types.TINYINT =>
+        "SMALLINT" // DB2 has no smaller binary integer type
+      case _ => super.defaultSqlTypeName(tmd, sym)
+    }
 
   override val scalarFrom = Some("sysibm.sysdummy1")
 
@@ -149,7 +152,7 @@ trait DB2Profile extends JdbcProfile {
       appendOptions(sb)
       if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
         sb append " constraint " + quoteIdentifier(column.name + "__bool") +
-        " check (" append qname append " in (0, 1))"
+          " check (" append qname append " in (0, 1))"
       }
     }
   }

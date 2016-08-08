@@ -7,7 +7,7 @@ package types
 
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaration
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

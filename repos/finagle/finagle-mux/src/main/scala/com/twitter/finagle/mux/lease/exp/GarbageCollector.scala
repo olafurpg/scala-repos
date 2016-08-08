@@ -16,7 +16,7 @@ private[lease] object GarbageCollector {
     case exc: ClassNotFoundException =>
       log.log(Level.INFO,
               "Failed to resolve com.twitter.hotspot.System; falling " +
-              "back to full GC",
+                "back to full GC",
               exc)
       () =>
         System.gc()

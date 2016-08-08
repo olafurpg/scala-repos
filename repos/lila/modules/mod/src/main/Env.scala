@@ -58,8 +58,8 @@ final class Env(config: Config,
                                reportColl = reportColl,
                                historyColl = db(CollectionGamingHistory))
 
-  lazy val search = new UserSearch(
-      securityApi = securityApi, emailAddress = emailAddress)
+  lazy val search =
+    new UserSearch(securityApi = securityApi, emailAddress = emailAddress)
 
   // api actor
   private val actorApi = system.actorOf(Props(new Actor {

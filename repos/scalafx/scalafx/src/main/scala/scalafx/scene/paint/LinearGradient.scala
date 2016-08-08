@@ -99,7 +99,8 @@ object LinearGradient {
   *
   */
 class LinearGradient(override val delegate: jfxsp.LinearGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.LinearGradient] {
+    extends Paint(delegate)
+    with SFXDelegate[jfxsp.LinearGradient] {
 
   /**
     * Creates a new instance of LinearGradient.
@@ -127,8 +128,13 @@ class LinearGradient(override val delegate: jfxsp.LinearGradient)
            cycleMethod: CycleMethod = CycleMethod.NoCycle,
            stops: Seq[jfxsp.Stop] = Nil) =
     this(
-        new jfxsp.LinearGradient(
-            startX, startY, endX, endY, proportional, cycleMethod, stops))
+        new jfxsp.LinearGradient(startX,
+                                 startY,
+                                 endX,
+                                 endY,
+                                 proportional,
+                                 cycleMethod,
+                                 stops))
 
   /**
     * Defines which of the following cycle method is applied to the

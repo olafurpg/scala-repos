@@ -41,8 +41,9 @@ final class Env(config: Config,
   def version(challengeId: Challenge.ID): Fu[Int] =
     socketHub ? Ask(challengeId, GetVersion) mapTo manifest[Int]
 
-  lazy val socketHandler = new SocketHandler(
-      hub = hub, socketHub = socketHub, pingChallenge = api.ping)
+  lazy val socketHandler = new SocketHandler(hub = hub,
+                                             socketHub = socketHub,
+                                             pingChallenge = api.ping)
 
   lazy val api = new ChallengeApi(repo = repo,
                                   joiner = new Joiner(onStart = onStart),
@@ -51,8 +52,8 @@ final class Env(config: Config,
                                   userRegister = hub.actor.userRegister,
                                   lilaBus = system.lilaBus)
 
-  private lazy val repo = new ChallengeRepo(
-      coll = db(CollectionChallenge), maxPerUser = MaxPerUser)
+  private lazy val repo =
+    new ChallengeRepo(coll = db(CollectionChallenge), maxPerUser = MaxPerUser)
 
   lazy val jsonView = new JsonView(lightUser)
 

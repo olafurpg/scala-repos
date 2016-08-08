@@ -7,7 +7,11 @@ import akka.stream.Attributes._
 import akka.stream.testkit.Utils._
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
-import akka.stream.{BufferOverflowException, DelayOverflowStrategy, ActorMaterializer}
+import akka.stream.{
+  BufferOverflowException,
+  DelayOverflowStrategy,
+  ActorMaterializer
+}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
@@ -54,7 +58,11 @@ class FlowDelaySpec extends AkkaSpec {
       val c = TestSubscriber.manualProbe[Int]()
       val p = TestPublisher.manualProbe[Int]()
 
-      Source.fromPublisher(p).delay(300.millis).to(Sink.fromSubscriber(c)).run()
+      Source
+        .fromPublisher(p)
+        .delay(300.millis)
+        .to(Sink.fromSubscriber(c))
+        .run()
       val cSub = c.expectSubscription()
       val pSub = p.expectSubscription()
       cSub.request(100)
@@ -115,7 +123,7 @@ class FlowDelaySpec extends AkkaSpec {
         .runWith(TestSink.probe[Int])
         .request(100)
         .expectError(new BufferOverflowException(
-                "Buffer overflow for delay combinator (max capacity was: 16)!"))
+            "Buffer overflow for delay combinator (max capacity was: 16)!"))
     }
 
     "emit early when buffer is full and in EmitEarly mode" in assertAllStagesStopped {

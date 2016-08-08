@@ -3,7 +3,15 @@
  */
 package sbt
 
-import sbt.internal.util.{complete, AttributeEntry, AttributeKey, LineRange, MessageOnlyException, RangePosition, Settings}
+import sbt.internal.util.{
+  complete,
+  AttributeEntry,
+  AttributeKey,
+  LineRange,
+  MessageOnlyException,
+  RangePosition,
+  Settings
+}
 
 import java.io.File
 import compiler.{Eval, EvalImports}
@@ -31,8 +39,8 @@ object EvaluateConfigurations {
 
   type LazyClassLoaded[T] = ClassLoader => T
 
-  private[sbt] case class TrackedEvalResult[T](
-      generated: Seq[File], result: LazyClassLoaded[T])
+  private[sbt] case class TrackedEvalResult[T](generated: Seq[File],
+                                               result: LazyClassLoaded[T])
 
   /**
     * This represents the parsed expressions in a build sbt, as well as where they were defined.
@@ -88,8 +96,8 @@ object EvaluateConfigurations {
                                        lines: Seq[String],
                                        builtinImports: Seq[String],
                                        offset: Int): ParsedFile = {
-    val (importStatements, settingsAndDefinitions) = splitExpressions(
-        file, lines)
+    val (importStatements, settingsAndDefinitions) =
+      splitExpressions(file, lines)
     val allImports =
       builtinImports.map(s => (s, -1)) ++ addOffset(offset, importStatements)
     val (definitions, settings) = splitSettingsDefinitions(
@@ -140,14 +148,17 @@ object EvaluateConfigurations {
     val (importDefs, definitions) =
       if (parsed.definitions.isEmpty) (Nil, DefinedSbtValues.empty)
       else {
-        val definitions = evaluateDefinitions(
-            eval, name, parsed.imports, parsed.definitions, Some(file))
+        val definitions = evaluateDefinitions(eval,
+                                              name,
+                                              parsed.imports,
+                                              parsed.definitions,
+                                              Some(file))
         val imp = BuildUtil.importAllRoot(definitions.enclosingModule :: Nil)
         val projs = (loader: ClassLoader) =>
           definitions
             .values(loader)
             .map(p => resolveBase(file.getParentFile, p.asInstanceOf[Project]))
-          (imp, DefinedSbtValues(definitions))
+        (imp, DefinedSbtValues(definitions))
       }
     val allImports = importDefs.map(s => (s, -1)) ++ parsed.imports
     val dslEntries =
@@ -242,15 +253,10 @@ object EvaluateConfigurations {
         throw new MessageOnlyException(e.getMessage)
     }
     // TODO - keep track of configuration classes defined.
-    TrackedEvalResult(result.generated,
-                      loader =>
-                        {
-                          val pos = RangePosition(name, range shift 1)
-                          result
-                            .getValue(loader)
-                            .asInstanceOf[internals.DslEntry]
-                            .withPos(pos)
-                      })
+    TrackedEvalResult(result.generated, loader => {
+      val pos = RangePosition(name, range shift 1)
+      result.getValue(loader).asInstanceOf[internals.DslEntry].withPos(pos)
+    })
   }
 
   /**
@@ -375,8 +381,11 @@ object Index {
     // AttributeEntry + the checked type test 'value: Task[_]' ensures that the cast is correct.
     //  (scalac couldn't determine that 'key' is of type AttributeKey[Task[_]] on its own and a type match still required the cast)
     val pairs = for (scope <- data.scopes;
-    AttributeEntry(key, value: Task[_]) <- data.data(scope).entries) yield
-      (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
+                     AttributeEntry(key, value: Task[_]) <- data
+                                                             .data(scope)
+                                                             .entries)
+      yield
+        (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
     pairs.toMap[Task[_], ScopedKey[Task[_]]]
   }
   def allKeys(settings: Seq[Setting[_]]): Set[ScopedKey[_]] =
@@ -402,18 +411,18 @@ object Index {
     else
       sys.error(
           duplicates map {
-        case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
-      } mkString
-          ("Some keys were defined with the same name but different types: ",
-              ", ", ""))
+            case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
+          } mkString
+            ("Some keys were defined with the same name but different types: ",
+            ", ", ""))
   }
-  private[this] type TriggerMap = collection.mutable.HashMap[
-      Task[_], Seq[Task[_]]]
+  private[this] type TriggerMap =
+    collection.mutable.HashMap[Task[_], Seq[Task[_]]]
   def triggers(ss: Settings[Scope]): Triggers[Task] = {
     val runBefore = new TriggerMap
     val triggeredBy = new TriggerMap
     for ((_, amap) <- ss.data;
-    AttributeEntry(_, value: Task[_]) <- amap.entries) {
+         AttributeEntry(_, value: Task[_]) <- amap.entries) {
       val as = value.info.attributes
       update(runBefore, value, as get Keys.runBefore)
       update(triggeredBy, value, as get Keys.triggeredBy)
@@ -424,8 +433,9 @@ object Index {
       }
     new Triggers[Task](runBefore, triggeredBy, map => { onComplete(); map })
   }
-  private[this] def update(
-      map: TriggerMap, base: Task[_], tasksOpt: Option[Seq[Task[_]]]): Unit =
-    for (tasks <- tasksOpt; task <- tasks) map(task) = base +: map.getOrElse(
-        task, Nil)
+  private[this] def update(map: TriggerMap,
+                           base: Task[_],
+                           tasksOpt: Option[Seq[Task[_]]]): Unit =
+    for (tasks <- tasksOpt; task <- tasks)
+      map(task) = base +: map.getOrElse(task, Nil)
 }

@@ -9,7 +9,14 @@ package internal
 import scala.language.implicitConversions
 
 import java.lang.annotation.{Annotation => jAnnotation}
-import java.lang.reflect.{Member => jMember, Constructor => jConstructor, Method => jMethod, AnnotatedElement => jAnnotatedElement, Type => jType, TypeVariable => jTypeVariable}
+import java.lang.reflect.{
+  Member => jMember,
+  Constructor => jConstructor,
+  Method => jMethod,
+  AnnotatedElement => jAnnotatedElement,
+  Type => jType,
+  TypeVariable => jTypeVariable
+}
 
 /** This class tries to abstract over some of the duplication
   *  in java.lang.reflect.{ Method, Constructor }.

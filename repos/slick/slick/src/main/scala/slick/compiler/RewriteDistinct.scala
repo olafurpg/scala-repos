@@ -45,8 +45,9 @@ class RewriteDistinct extends Phase {
         case (Select(Ref(s), f), idx) if s == dist1.generator => (f, idx)
       }
       .toMap
-    logger.debug("Fields used directly in 'on' clause: " +
-        onFieldPos.keySet.mkString(", "))
+    logger.debug(
+        "Fields used directly in 'on' clause: " +
+          onFieldPos.keySet.mkString(", "))
     if ((refFields -- onFieldPos.keys).isEmpty) {
       // Only distinct fields referenced -> Create subquery and remove 'on' clause
       val onDefs = ConstArray.from(onNodes).map((new AnonSymbol, _))
@@ -63,8 +64,8 @@ class RewriteDistinct extends Phase {
         case Select(Ref(s), f) if s == s1 => Select(Ref(s), onLookup(f))
       }
       val ret = Subquery(inner, Subquery.AboveDistinct)
-      logger.debug(
-          "Removed 'on' clause from Distinct:", Ellipsis(ret, List(0, 0, 0)))
+      logger.debug("Removed 'on' clause from Distinct:",
+                   Ellipsis(ret, List(0, 0, 0)))
       (ret, sel2)
     } else {
       val sel2 = sel1.replace {

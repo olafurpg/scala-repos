@@ -55,7 +55,7 @@ object mapValues extends UFunc with mapValuesLowPrio {
   //
 
   class OpArray[@spec(Double, Int, Float, Long) A,
-                @spec(Double, Int, Float, Long) B : ClassTag]
+                @spec(Double, Int, Float, Long) B: ClassTag]
       extends Impl2[Array[A], A => B, Array[B]] {
 
     /**Maps all values from the given collection. */
@@ -68,7 +68,7 @@ object mapValues extends UFunc with mapValuesLowPrio {
     }
   }
 
-  implicit def opArray[@spec A, @spec B : ClassTag]: OpArray[A, B] =
+  implicit def opArray[@spec A, @spec B: ClassTag]: OpArray[A, B] =
     new OpArray[A, B]
 
   implicit object OpArrayII extends OpArray[Int, Int]
@@ -92,8 +92,7 @@ object mapValues extends UFunc with mapValuesLowPrio {
   implicit object OpArrayFD extends OpArray[Float, Double]
 }
 
-sealed trait mapValuesLowPrio {
-  this: mapValues.type =>
+sealed trait mapValuesLowPrio { this: mapValues.type =>
 
   /*implicit*/
   def canMapSelf[V, V2]: Impl2[V, V => V2, V2] = {

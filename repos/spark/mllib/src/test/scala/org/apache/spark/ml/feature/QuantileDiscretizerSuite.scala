@@ -24,7 +24,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{Row, SQLContext}
 
 class QuantileDiscretizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import org.apache.spark.ml.feature.QuantileDiscretizerSuite._
@@ -62,20 +63,26 @@ class QuantileDiscretizerSuite
         Array[Double]() -> Array(Double.NegativeInfinity,
                                  0,
                                  Double.PositiveInfinity),
-        Array(Double.NegativeInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
-        Array(Double.PositiveInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
+        Array(Double.NegativeInfinity) -> Array(Double.NegativeInfinity,
+                                                0,
+                                                Double.PositiveInfinity),
+        Array(Double.PositiveInfinity) -> Array(Double.NegativeInfinity,
+                                                0,
+                                                Double.PositiveInfinity),
         Array(Double.NegativeInfinity, Double.PositiveInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
+            Double.NegativeInfinity,
+            0,
+            Double.PositiveInfinity),
         Array(0.0) -> Array(Double.NegativeInfinity,
                             0,
                             Double.PositiveInfinity),
         Array(1.0) -> Array(Double.NegativeInfinity,
                             1,
                             Double.PositiveInfinity),
-        Array(0.0, 1.0) -> Array(
-            Double.NegativeInfinity, 0, 1, Double.PositiveInfinity)
+        Array(0.0, 1.0) -> Array(Double.NegativeInfinity,
+                                 0,
+                                 1,
+                                 Double.PositiveInfinity)
     )
     for ((ori, res) <- splitTestPoints) {
       assert(QuantileDiscretizer.getSplits(ori) === res,

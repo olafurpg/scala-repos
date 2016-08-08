@@ -7,7 +7,11 @@ import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.core.task.tracker.TaskTracker.TasksByApp
 import mesosphere.marathon.state.{PathId, Timestamp}
-import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonSchedulerDriverHolder,
+  MarathonSpec,
+  MarathonTestHelper
+}
 import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.apache.mesos.{Protos => MesosProtos, SchedulerDriver}
@@ -19,7 +23,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class KillOverdueTasksActorTest
-    extends MarathonSpec with GivenWhenThen with marathon.test.Mockito
+    extends MarathonSpec
+    with GivenWhenThen
+    with marathon.test.Mockito
     with ScalaFutures {
   implicit var actorSystem: ActorSystem = _
   var taskTracker: TaskTracker = _
@@ -126,8 +132,10 @@ class KillOverdueTasksActorTest
         stagedAt = now - 10.seconds
     )
 
-    val runningTask = MarathonTestHelper.runningTaskProto(
-        "running", stagedAt = now - 5.seconds, startedAt = now - 2.seconds)
+    val runningTask =
+      MarathonTestHelper.runningTaskProto("running",
+                                          stagedAt = now - 5.seconds,
+                                          startedAt = now - 2.seconds)
 
     Given("Several somehow overdue tasks plus some not overdue tasks")
     val appId = PathId("/ignored")
@@ -144,7 +152,8 @@ class KillOverdueTasksActorTest
     )
     taskTracker.tasksByAppSync returns TasksByApp.of(app)
 
-    When("We check which tasks should be killed because they're not yet staged or unconfirmed")
+    When(
+        "We check which tasks should be killed because they're not yet staged or unconfirmed")
     val testProbe = TestProbe()
     testProbe.send(checkActor,
                    KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
@@ -154,15 +163,18 @@ class KillOverdueTasksActorTest
     verify(taskTracker).tasksByAppSync
 
     And("All somehow overdue tasks are killed")
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(unconfirmedOverdueTask.getId)
           .build())
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(overdueUnstagedTask.getId)
           .build())
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(overdueStagedTask.getId)
           .build())

@@ -55,9 +55,13 @@ object AkkaSpec {
 }
 
 abstract class AkkaSpec(_system: ActorSystem)
-    extends TestKit(_system) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with WatchedByCoroner
-    with ConversionCheckedTripleEquals with ScalaFutures {
+    extends TestKit(_system)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with WatchedByCoroner
+    with ConversionCheckedTripleEquals
+    with ScalaFutures {
 
   implicit val patience = PatienceConfig(
       testKitSettings.DefaultTimeout.duration)
@@ -119,8 +123,8 @@ abstract class AkkaSpec(_system: ActorSystem)
       def areEqual(a: Class[A], b: Class[B]) = a == b
     }
 
-  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]: Constraint[
-      Set[A], T] =
+  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]
+    : Constraint[Set[A], T] =
     new Constraint[Set[A], T] {
       def areEqual(a: Set[A], b: T) = a == b
     }

@@ -8,8 +8,7 @@ package ast
 
 import java.io.{OutputStream, PrintWriter}
 
-trait Printers extends scala.reflect.internal.Printers {
-  this: Global =>
+trait Printers extends scala.reflect.internal.Printers { this: Global =>
 
   import treeInfo.{IsTrue, IsFalse}
 
@@ -18,22 +17,23 @@ trait Printers extends scala.reflect.internal.Printers {
     override def print(args: Any*): Unit = args foreach {
       case tree: Tree =>
         printPosition(tree)
-        printTree(if (tree.isDef && tree.symbol != NoSymbol &&
-                      tree.symbol.isInitialized) {
-          tree match {
-            case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
-                if (tree.symbol.thisSym != tree.symbol) =>
-              ClassDef(tree.symbol,
-                       Template(ps, ValDef(tree.symbol.thisSym), body))
-            case ClassDef(_, _, _, impl) => ClassDef(tree.symbol, impl)
-            case ModuleDef(_, _, impl) => ModuleDef(tree.symbol, impl)
-            case ValDef(_, _, _, rhs) => ValDef(tree.symbol, rhs)
-            case DefDef(_, _, _, vparamss, _, rhs) =>
-              DefDef(tree.symbol, vparamss, rhs)
-            case TypeDef(_, _, _, rhs) => TypeDef(tree.symbol, rhs)
-            case _ => tree
-          }
-        } else tree)
+        printTree(
+            if (tree.isDef && tree.symbol != NoSymbol &&
+                tree.symbol.isInitialized) {
+              tree match {
+                case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
+                    if (tree.symbol.thisSym != tree.symbol) =>
+                  ClassDef(tree.symbol,
+                           Template(ps, ValDef(tree.symbol.thisSym), body))
+                case ClassDef(_, _, _, impl) => ClassDef(tree.symbol, impl)
+                case ModuleDef(_, _, impl) => ModuleDef(tree.symbol, impl)
+                case ValDef(_, _, _, rhs) => ValDef(tree.symbol, rhs)
+                case DefDef(_, _, _, vparamss, _, rhs) =>
+                  DefDef(tree.symbol, vparamss, rhs)
+                case TypeDef(_, _, _, rhs) => TypeDef(tree.symbol, rhs)
+                case _ => tree
+              }
+            } else tree)
       case unit: CompilationUnit =>
         print("// Scala source: " + unit.source + "\n")
         if (unit.body == null) print("<null>")
@@ -67,8 +67,10 @@ trait Printers extends scala.reflect.internal.Printers {
     *  punctuation than the standard one.
     */
   class CompactTreePrinter(out: PrintWriter) extends TreePrinter(out) {
-    override def printRow(
-        ts: List[Tree], start: String, sep: String, end: String) {
+    override def printRow(ts: List[Tree],
+                          start: String,
+                          sep: String,
+                          end: String) {
       print(start)
       printSeq(ts)(print(_))(print(sep))
       print(end)

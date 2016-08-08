@@ -42,8 +42,8 @@ final case class ChildRestartStats(child: ActorRef,
     retriesWindow match {
       case (Some(retries), _) if retries < 1 ⇒ false
       case (Some(retries), None) ⇒ {
-          maxNrOfRetriesCount += 1; maxNrOfRetriesCount <= retries
-        }
+        maxNrOfRetriesCount += 1; maxNrOfRetriesCount <= retries
+      }
       case (x, Some(window)) ⇒
         retriesInWindowOkay(if (x.isDefined) x.get else 1, window)
       case (None, _) ⇒ true
@@ -94,8 +94,7 @@ final class StoppingSupervisorStrategy extends SupervisorStrategyConfigurator {
     SupervisorStrategy.stoppingStrategy
 }
 
-trait SupervisorStrategyLowPriorityImplicits {
-  this: SupervisorStrategy.type ⇒
+trait SupervisorStrategyLowPriorityImplicits { this: SupervisorStrategy.type ⇒
 
   /**
     * Implicit conversion from `Seq` of Cause-Directive pairs to a `Decider`. See makeDecider(causeDirective).
@@ -255,7 +254,8 @@ object SupervisorStrategy extends SupervisorStrategyLowPriorityImplicits {
   private[akka] def withinTimeRangeOption(
       withinTimeRange: Duration): Option[Duration] =
     if (withinTimeRange.isFinite && withinTimeRange >= Duration.Zero)
-      Some(withinTimeRange) else None
+      Some(withinTimeRange)
+    else None
 
   private[akka] def maxNrOfRetriesOption(maxNrOfRetries: Int): Option[Int] =
     if (maxNrOfRetries < 0) None else Some(maxNrOfRetries)
@@ -371,14 +371,15 @@ abstract class SupervisorStrategy {
           publish(context, Warning(child.path.toString, getClass, logMessage))
         case Escalate ⇒ // don't log here
         case _ ⇒
-          publish(
-              context, Error(cause, child.path.toString, getClass, logMessage))
+          publish(context,
+                  Error(cause, child.path.toString, getClass, logMessage))
       }
     }
 
   // logging is not the main purpose, and if it fails there’s nothing we can do
   private def publish(context: ActorContext, logEvent: LogEvent): Unit =
-    try context.system.eventStream.publish(logEvent) catch {
+    try context.system.eventStream.publish(logEvent)
+    catch {
       case NonFatal(_) ⇒
     }
 
@@ -400,8 +401,9 @@ abstract class SupervisorStrategy {
     * currently failing one, then it did not request this treatment and is
     * therefore not prepared to be resumed without prior suspend.
     */
-  final def restartChild(
-      child: ActorRef, cause: Throwable, suspendFirst: Boolean): Unit = {
+  final def restartChild(child: ActorRef,
+                         cause: Throwable,
+                         suspendFirst: Boolean): Unit = {
     val c = child.asInstanceOf[InternalActorRef]
     if (suspendFirst) c.suspend()
     c.restart(cause)
@@ -503,9 +505,10 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
       if (restart &&
           children.forall(_.requestRestartPermission(retriesWindow)))
         children foreach
-        (crs ⇒
-              restartChild(
-                  crs.child, cause, suspendFirst = (crs.child != child)))
+          (crs ⇒
+             restartChild(crs.child,
+                          cause,
+                          suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

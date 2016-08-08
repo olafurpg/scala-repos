@@ -48,7 +48,8 @@ object SwaggerCommandSupport {
   }
 
   private[this] def addModelFromCommand[T <: Command](
-      obj: T, pars: List[Parameter])(implicit mf: Manifest[T]) = {
+      obj: T,
+      pars: List[Parameter])(implicit mf: Manifest[T]) = {
     val (fields, parameters) = pars.partition(_.paramType == ParamType.Body)
     if (fields.nonEmpty) {
       val model = modelFromCommand(obj, fields)
@@ -62,8 +63,8 @@ object SwaggerCommandSupport {
     } else (parameters, None)
   }
 
-  private[this] def modelFromCommand[T <: Command](
-      cmd: T, fields: List[Parameter]) = {
+  private[this] def modelFromCommand[T <: Command](cmd: T,
+                                                   fields: List[Parameter]) = {
     val modelFields =
       fields map { f =>
         f.name -> ModelProperty(f.`type`,
@@ -79,11 +80,12 @@ object SwaggerCommandSupport {
   }
 
   class CommandOperationBuilder[B <: SwaggerOperationBuilder[_]](
-      registerModel: Model => Unit, underlying: B) {
-    def parametersFromCommand[C <: Command : Manifest]: B =
+      registerModel: Model => Unit,
+      underlying: B) {
+    def parametersFromCommand[C <: Command: Manifest]: B =
       parametersFromCommand(manifest[C].erasure.newInstance().asInstanceOf[C])
 
-    def parametersFromCommand[C <: Command : Manifest](cmd: => C): B = {
+    def parametersFromCommand[C <: Command: Manifest](cmd: => C): B = {
       SwaggerCommandSupport.parametersFromCommand(cmd) match {
         case (parameters, None) =>
           underlying.parameters(parameters: _*)
@@ -96,18 +98,21 @@ object SwaggerCommandSupport {
   }
 }
 trait SwaggerCommandSupport {
-  this: ScalatraBase with SwaggerSupportBase with SwaggerSupportSyntax with CommandSupport =>
+  this: ScalatraBase
+    with SwaggerSupportBase
+    with SwaggerSupportSyntax
+    with CommandSupport =>
 
   @deprecated(
       "Use the `apiOperation.parameters` and `operation` methods to build swagger descriptions of endpoints",
       "2.2")
-  protected def parameters[T <: CommandType : Manifest] =
+  protected def parameters[T <: CommandType: Manifest] =
     swaggerMeta(Symbols.Parameters, parametersFromCommand[T])
 
   @deprecated(
       "Use the `apiOperation.parameters` and `operation` methods to build swagger descriptions of endpoints",
       "2.2")
-  protected def parameters[T <: CommandType : Manifest](cmd: => T) =
+  protected def parameters[T <: CommandType: Manifest](cmd: => T) =
     swaggerMeta(Symbols.Parameters, parametersFromCommand(cmd))
 
   protected implicit def operationBuilder2commandOpBuilder[

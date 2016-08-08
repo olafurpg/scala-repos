@@ -11,7 +11,11 @@ import akka.stream.Materializer
 import play.api._
 import play.api.http._
 import play.api.libs.Files.{DefaultTemporaryFileCreator, TemporaryFileCreator}
-import play.api.libs.concurrent.{ActorSystemProvider, ExecutionContextProvider, MaterializerProvider}
+import play.api.libs.concurrent.{
+  ActorSystemProvider,
+  ExecutionContextProvider,
+  MaterializerProvider
+}
 import play.api.libs.crypto._
 import play.api.routing.Router
 import play.core.j.JavaRouterAdapter
@@ -26,11 +30,11 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
   * application.
   */
 class BuiltinModule extends Module {
-  def bindings(
-      env: Environment, configuration: Configuration): Seq[Binding[_]] = {
+  def bindings(env: Environment,
+               configuration: Configuration): Seq[Binding[_]] = {
     def dynamicBindings(
         factories: ((Environment, Configuration) => Seq[Binding[_]])*) = {
-      factories.flatMap(_ (env, configuration))
+      factories.flatMap(_(env, configuration))
     }
 
     Seq(

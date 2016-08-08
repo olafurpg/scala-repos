@@ -45,7 +45,10 @@ import scala.collection._
   * TODO: Give an overview here
   */
 trait ModelFactoryImplicitSupport {
-  thisFactory: ModelFactory with ModelFactoryTypeSupport with CommentFactory with TreeFactory =>
+  thisFactory: ModelFactory
+    with ModelFactoryTypeSupport
+    with CommentFactory
+    with TreeFactory =>
 
   import global._
   import global.analyzer._
@@ -84,7 +87,8 @@ trait ModelFactoryImplicitSupport {
     *  future we might want to extend this to more complex scopes.
     */
   def makeImplicitConversions(
-      sym: Symbol, inTpl: DocTemplateImpl): List[ImplicitConversionImpl] =
+      sym: Symbol,
+      inTpl: DocTemplateImpl): List[ImplicitConversionImpl] =
     // Nothing and Null are somewhat special -- they can be transformed by any implicit conversion available in scope.
     // But we don't want that, so we'll simply refuse to find implicit conversions on for Nothing and Null
     if (!(sym.isClass || sym.isTrait || sym == AnyRefClass) ||
@@ -94,10 +98,11 @@ trait ModelFactoryImplicitSupport {
         global.analyzer.rootContext(NoCompilationUnit)
 
       val results =
-        global.analyzer.allViewsFrom(sym.tpe_*, context, sym.typeParams) ++ global.analyzer
+        global.analyzer
+          .allViewsFrom(sym.tpe_*, context, sym.typeParams) ++ global.analyzer
           .allViewsFrom(byNameType(sym.tpe_*), context, sym.typeParams)
       var conversions = results.flatMap(result =>
-            makeImplicitConversion(sym, result._1, result._2, context, inTpl))
+        makeImplicitConversion(sym, result._1, result._2, context, inTpl))
       //debug(results.mkString("All views\n  ", "\n  ", "\n"))
       //debug(conversions.mkString("Conversions\n  ", "\n  ", "\n"))
 
@@ -118,8 +123,8 @@ trait ModelFactoryImplicitSupport {
       if (isPrimitiveValueType(sym.tpe_*))
         conversions = conversions.filter(
             (ic: ImplicitConversionImpl) =>
-              hardcoded.valueClassFilter(
-                  sym.nameString, ic.conversionQualifiedName))
+              hardcoded.valueClassFilter(sym.nameString,
+                                         ic.conversionQualifiedName))
 
       // Put the visible conversions in front
       val (ownConversions, commonConversions) =
@@ -194,7 +199,8 @@ trait ModelFactoryImplicitSupport {
         val newContext = context.makeImplicit(context.ambiguousErrors)
         newContext.macrosEnabled = false
         val newTyper = global.analyzer.newTyper(newContext)
-        newTyper.silent(_.typed(appliedTree), reportAmbiguousErrors = false) match {
+        newTyper
+          .silent(_.typed(appliedTree), reportAmbiguousErrors = false) match {
 
           case global.analyzer.SilentResultValue(t: Tree) => t
           case global.analyzer.SilentTypeError(err) =>
@@ -209,17 +215,21 @@ trait ModelFactoryImplicitSupport {
 
       try {
         // Transform bound constraints into scaladoc constraints
-        val implParamConstraints = makeImplicitConstraints(
-            viewImplicitTypes, sym, context, inTpl)
-        val boundsConstraints = makeBoundedConstraints(
-            sym.typeParams, constrs, inTpl)
+        val implParamConstraints =
+          makeImplicitConstraints(viewImplicitTypes, sym, context, inTpl)
+        val boundsConstraints =
+          makeBoundedConstraints(sym.typeParams, constrs, inTpl)
         // TODO: no substitution constraints appear in the library and compiler scaladoc. Maybe they can be removed?
         val substConstraints = makeSubstitutionConstraints(result.subst, inTpl)
         val constraints =
           implParamConstraints ::: boundsConstraints ::: substConstraints
 
-        List(new ImplicitConversionImpl(
-                sym, result.tree.symbol, toType, constraints, inTpl))
+        List(
+            new ImplicitConversionImpl(sym,
+                                       result.tree.symbol,
+                                       toType,
+                                       constraints,
+                                       inTpl))
       } catch {
         case i: ImplicitNotFound =>
           //debug(s"  Eliminating: $toType")
@@ -231,93 +241,92 @@ trait ModelFactoryImplicitSupport {
                               sym: Symbol,
                               context: Context,
                               inTpl: DocTemplateImpl): List[Constraint] =
-    types.flatMap((tpe: Type) =>
-          {
-        // TODO: Before creating constraints, map typeVarToOriginOrWildcard on the implicitTypes
-        val implType = typeVarToOriginOrWildcard(tpe)
-        val qualifiedName = makeQualifiedName(implType.typeSymbol)
+    types.flatMap((tpe: Type) => {
+      // TODO: Before creating constraints, map typeVarToOriginOrWildcard on the implicitTypes
+      val implType = typeVarToOriginOrWildcard(tpe)
+      val qualifiedName = makeQualifiedName(implType.typeSymbol)
 
-        var available: Option[Boolean] = None
+      var available: Option[Boolean] = None
 
-        // see: https://groups.google.com/forum/?hl=en&fromgroups#!topic/scala-internals/gm_fr0RKzC4
-        //
-        // println(implType + " => " + implType.isTrivial)
-        // var tpes: List[Type] = List(implType)
-        // while (!tpes.isEmpty) {
-        //   val tpe = tpes.head
-        //   tpes = tpes.tail
-        //   tpe match {
-        //     case TypeRef(pre, sym, args) =>
-        //       tpes = pre :: args ::: tpes
-        //       println(tpe + " => " + tpe.isTrivial)
-        //     case _ =>
-        //       println(tpe + " (of type" + tpe.getClass + ") => " + tpe.isTrivial)
-        //   }
-        // }
-        // println("\n")
+      // see: https://groups.google.com/forum/?hl=en&fromgroups#!topic/scala-internals/gm_fr0RKzC4
+      //
+      // println(implType + " => " + implType.isTrivial)
+      // var tpes: List[Type] = List(implType)
+      // while (!tpes.isEmpty) {
+      //   val tpe = tpes.head
+      //   tpes = tpes.tail
+      //   tpe match {
+      //     case TypeRef(pre, sym, args) =>
+      //       tpes = pre :: args ::: tpes
+      //       println(tpe + " => " + tpe.isTrivial)
+      //     case _ =>
+      //       println(tpe + " (of type" + tpe.getClass + ") => " + tpe.isTrivial)
+      //   }
+      // }
+      // println("\n")
 
-        // look for type variables in the type. If there are none, we can decide if the implicit is there or not
-        if (implType.isTrivial) {
-          try {
-            // TODO: Not sure if `owner = sym.owner` is the right thing to do -- seems similar to what scalac should be doing
-            val silentContext = context
-              .make(owner = sym.owner)
-              .makeSilent(reportAmbiguousErrors = false)
-            val search =
-              inferImplicit(EmptyTree, tpe, false, false, silentContext, false)
-            available = Some(search.tree != EmptyTree)
-          } catch {
-            case _: TypeError =>
+      // look for type variables in the type. If there are none, we can decide if the implicit is there or not
+      if (implType.isTrivial) {
+        try {
+          // TODO: Not sure if `owner = sym.owner` is the right thing to do -- seems similar to what scalac should be doing
+          val silentContext = context
+            .make(owner = sym.owner)
+            .makeSilent(reportAmbiguousErrors = false)
+          val search =
+            inferImplicit(EmptyTree, tpe, false, false, silentContext, false)
+          available = Some(search.tree != EmptyTree)
+        } catch {
+          case _: TypeError =>
+        }
+      }
+
+      available match {
+        case Some(true) =>
+          Nil
+        case Some(false) if !settings.docImplicitsShowAll =>
+          // if -implicits-show-all is not set, we get rid of impossible conversions (such as Numeric[String])
+          throw new ImplicitNotFound(implType)
+        case _ =>
+          val typeParamNames = sym.typeParams.map(_.name)
+
+          // TODO: This is maybe the worst hack I ever did - it's as dirty as hell, but it seems to work, so until I
+          // learn more about symbols, it'll have to do.
+          implType match {
+            case TypeRef(pre, sym, List(TypeRef(NoPrefix, targ, Nil)))
+                if (typeParamNames contains targ.name) =>
+              hardcoded.knownTypeClasses.get(qualifiedName) match {
+                case Some(explanation) =>
+                  List(new KnownTypeClassConstraint {
+                    val typeParamName = targ.nameString
+                    lazy val typeExplanation = explanation
+                    lazy val typeClassEntity = makeTemplate(sym)
+                    lazy val implicitType: TypeEntity =
+                      makeType(implType, inTpl)
+                  })
+                case None =>
+                  List(new TypeClassConstraint {
+                    val typeParamName = targ.nameString
+                    lazy val typeClassEntity = makeTemplate(sym)
+                    lazy val implicitType: TypeEntity =
+                      makeType(implType, inTpl)
+                  })
+              }
+            case _ =>
+              List(new ImplicitInScopeConstraint {
+                lazy val implicitType: TypeEntity = makeType(implType, inTpl)
+              })
           }
-        }
-
-        available match {
-          case Some(true) =>
-            Nil
-          case Some(false) if !settings.docImplicitsShowAll =>
-            // if -implicits-show-all is not set, we get rid of impossible conversions (such as Numeric[String])
-            throw new ImplicitNotFound(implType)
-          case _ =>
-            val typeParamNames = sym.typeParams.map(_.name)
-
-            // TODO: This is maybe the worst hack I ever did - it's as dirty as hell, but it seems to work, so until I
-            // learn more about symbols, it'll have to do.
-            implType match {
-              case TypeRef(pre, sym, List(TypeRef(NoPrefix, targ, Nil)))
-                  if (typeParamNames contains targ.name) =>
-                hardcoded.knownTypeClasses.get(qualifiedName) match {
-                  case Some(explanation) =>
-                    List(new KnownTypeClassConstraint {
-                      val typeParamName = targ.nameString
-                      lazy val typeExplanation = explanation
-                      lazy val typeClassEntity = makeTemplate(sym)
-                      lazy val implicitType: TypeEntity =
-                        makeType(implType, inTpl)
-                    })
-                  case None =>
-                    List(new TypeClassConstraint {
-                      val typeParamName = targ.nameString
-                      lazy val typeClassEntity = makeTemplate(sym)
-                      lazy val implicitType: TypeEntity =
-                        makeType(implType, inTpl)
-                    })
-                }
-              case _ =>
-                List(new ImplicitInScopeConstraint {
-                  lazy val implicitType: TypeEntity = makeType(implType, inTpl)
-                })
-            }
-        }
+      }
     })
 
-  def makeSubstitutionConstraints(
-      subst: TreeTypeSubstituter, inTpl: DocTemplateImpl): List[Constraint] =
+  def makeSubstitutionConstraints(subst: TreeTypeSubstituter,
+                                  inTpl: DocTemplateImpl): List[Constraint] =
     (subst.from zip subst.to) map {
       case (from, to) =>
         new EqualTypeParamConstraint {
           error(
               "Scaladoc implicits: Unexpected type substitution constraint from: " +
-              from + " to: " + to)
+                from + " to: " + to)
           val typeParamName = from.toString
           val rhs = makeType(to, inTpl)
         }
@@ -328,45 +337,41 @@ trait ModelFactoryImplicitSupport {
                              inTpl: DocTemplateImpl): List[Constraint] =
     (tparams zip constrs) flatMap {
       case (tparam, constr) => {
-          uniteConstraints(constr) match {
-            case (loBounds, upBounds) =>
-              (loBounds filter (_ != NothingTpe),
-               upBounds filter (_ != AnyTpe)) match {
-                case (Nil, Nil) =>
-                  Nil
-                case (List(lo), List(up)) if (lo == up) =>
-                  List(
-                      new EqualTypeParamConstraint {
-                    val typeParamName = tparam.nameString
-                    lazy val rhs = makeType(lo, inTpl)
-                  })
-                case (List(lo), List(up)) =>
-                  List(
-                      new BoundedTypeParamConstraint {
-                    val typeParamName = tparam.nameString
-                    lazy val lowerBound = makeType(lo, inTpl)
-                    lazy val upperBound = makeType(up, inTpl)
-                  })
-                case (List(lo), Nil) =>
-                  List(
-                      new LowerBoundedTypeParamConstraint {
-                    val typeParamName = tparam.nameString
-                    lazy val lowerBound = makeType(lo, inTpl)
-                  })
-                case (Nil, List(up)) =>
-                  List(
-                      new UpperBoundedTypeParamConstraint {
-                    val typeParamName = tparam.nameString
-                    lazy val upperBound = makeType(up, inTpl)
-                  })
-                case other =>
-                  // this is likely an error on the lub/glb side
-                  error("Scaladoc implicits: Error computing lub/glb for: " +
+        uniteConstraints(constr) match {
+          case (loBounds, upBounds) =>
+            (loBounds filter (_ != NothingTpe), upBounds filter (_ != AnyTpe)) match {
+              case (Nil, Nil) =>
+                Nil
+              case (List(lo), List(up)) if (lo == up) =>
+                List(new EqualTypeParamConstraint {
+                  val typeParamName = tparam.nameString
+                  lazy val rhs = makeType(lo, inTpl)
+                })
+              case (List(lo), List(up)) =>
+                List(new BoundedTypeParamConstraint {
+                  val typeParamName = tparam.nameString
+                  lazy val lowerBound = makeType(lo, inTpl)
+                  lazy val upperBound = makeType(up, inTpl)
+                })
+              case (List(lo), Nil) =>
+                List(new LowerBoundedTypeParamConstraint {
+                  val typeParamName = tparam.nameString
+                  lazy val lowerBound = makeType(lo, inTpl)
+                })
+              case (Nil, List(up)) =>
+                List(new UpperBoundedTypeParamConstraint {
+                  val typeParamName = tparam.nameString
+                  lazy val upperBound = makeType(up, inTpl)
+                })
+              case other =>
+                // this is likely an error on the lub/glb side
+                error(
+                    "Scaladoc implicits: Error computing lub/glb for: " +
                       ((tparam, constr)) + ":\n" + other)
-                  Nil
-              }
-          }
+                Nil
+            }
         }
+      }
     }
 
   /* ============== IMPLEMENTATION PROVIDING ENTITY TYPES ============== */
@@ -430,7 +435,7 @@ trait ModelFactoryImplicitSupport {
       }
       debug("   -> members:")
       memberSyms foreach
-      (sym => debug("      - " + sym.decodedName + " : " + sym.info))
+        (sym => debug("      - " + sym.decodedName + " : " + sym.info))
       debug("")
 
       memberSyms.flatMap({ aSym =>
@@ -451,7 +456,7 @@ trait ModelFactoryImplicitSupport {
 
     override def toString =
       "Implicit conversion from " + sym.tpe + " to " + toType + " done by " +
-      convSym
+        convSym
   }
 
   /* ========================= HELPER METHODS ========================== */
@@ -478,7 +483,7 @@ trait ModelFactoryImplicitSupport {
     for (conv <- convs) {
       val otherConvMembers: Map[Name, List[MemberImpl]] =
         convs filterNot (_ == conv) flatMap (_.memberImpls) groupBy
-        (_.sym.name)
+          (_.sym.name)
 
       for (member <- conv.memberImpls) {
         val sym1 = member.sym
@@ -628,10 +633,9 @@ trait ModelFactoryImplicitSupport {
     // (p: AnyRef)AnyRef matches ((t: String)AnyRef returns false -- but we want that to be true
     // !(t1 matches t2)
     if (t1.paramss.map(_.length) == t2.paramss.map(_.length)) {
-      for ((t1p, t2p) <- t1.paramss.flatten zip t2.paramss.flatten) if (!isSubType(
-                                                                            t1 memberInfo t1p,
-                                                                            t2 memberInfo t2p))
-        return true // if on the corresponding parameter you give a type that is in t1 but not in t2
+      for ((t1p, t2p) <- t1.paramss.flatten zip t2.paramss.flatten)
+        if (!isSubType(t1 memberInfo t1p, t2 memberInfo t2p))
+          return true // if on the corresponding parameter you give a type that is in t1 but not in t2
       // def foo(a: Either[Int, Double]): Int = 3
       // def foo(b: Left[T1]): Int = 6
       // a.foo(Right(4.5d)) prints out 3 :)

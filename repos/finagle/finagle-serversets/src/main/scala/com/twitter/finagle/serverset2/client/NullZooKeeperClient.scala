@@ -40,11 +40,13 @@ trait NullZooKeeperWriter extends ZooKeeperWriter with NullZooKeeperClient {
   ): Future[String] = Future.never
 
   def delete(path: String, version: Option[Int]): Future[Unit] = Future.never
-  def setData(
-      path: String, data: Option[Buf], version: Option[Int]): Future[Stat] =
+  def setData(path: String,
+              data: Option[Buf],
+              version: Option[Int]): Future[Stat] =
     Future.never
-  def setACL(
-      path: String, acl: Seq[Data.ACL], version: Option[Int]): Future[Stat] =
+  def setACL(path: String,
+             acl: Seq[Data.ACL],
+             version: Option[Int]): Future[Stat] =
     Future.never
 }
 
@@ -53,9 +55,13 @@ trait NullZooKeeperMulti extends ZooKeeperMulti with NullZooKeeperClient {
 }
 
 trait NullZooKeeperRW
-    extends ZooKeeperRW with NullZooKeeperReader with NullZooKeeperWriter
+    extends ZooKeeperRW
+    with NullZooKeeperReader
+    with NullZooKeeperWriter
 trait NullZooKeeperRWMulti
-    extends ZooKeeperRWMulti with NullZooKeeperReader with NullZooKeeperWriter
+    extends ZooKeeperRWMulti
+    with NullZooKeeperReader
+    with NullZooKeeperWriter
     with NullZooKeeperMulti
 
 object NullZooKeeperClient extends NullZooKeeperClient

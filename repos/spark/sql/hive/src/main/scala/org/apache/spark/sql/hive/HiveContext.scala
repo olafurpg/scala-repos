@@ -51,7 +51,10 @@ import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.command.{ExecutedCommand, SetCommand}
 import org.apache.spark.sql.execution.ui.SQLListener
 import org.apache.spark.sql.hive.client._
-import org.apache.spark.sql.hive.execution.{DescribeHiveTableCommand, HiveNativeCommand}
+import org.apache.spark.sql.hive.execution.{
+  DescribeHiveTableCommand,
+  HiveNativeCommand
+}
 import org.apache.spark.sql.internal.SQLConf.SQLConfEntry
 import org.apache.spark.sql.internal.SQLConf.SQLConfEntry._
 import org.apache.spark.sql.types._
@@ -62,7 +65,8 @@ import org.apache.spark.util.Utils
   * Returns the current database of metadataHive.
   */
 private[hive] case class CurrentDatabase(ctx: HiveContext)
-    extends LeafExpression with CodegenFallback {
+    extends LeafExpression
+    with CodegenFallback {
   override def dataType: DataType = StringType
   override def foldable: Boolean = true
   override def nullable: Boolean = false
@@ -77,7 +81,7 @@ private[hive] case class CurrentDatabase(ctx: HiveContext)
   *
   * @since 1.0.0
   */
-class HiveContext private[hive](
+class HiveContext private[hive] (
     sc: SparkContext,
     cacheManager: CacheManager,
     listener: SQLListener,
@@ -85,8 +89,7 @@ class HiveContext private[hive](
     @transient private val metaHive: HiveClient,
     isRootContext: Boolean)
     extends SQLContext(sc, cacheManager, listener, isRootContext)
-    with Logging {
-  self =>
+    with Logging { self =>
 
   def this(sc: SparkContext) = {
     this(sc,
@@ -122,7 +125,8 @@ class HiveContext private[hive](
   // The Hive UDF current_database() is foldable, will be evaluated by optimizer,
   // but the optimizer can't access the SessionState of metadataHive.
   sessionState.functionRegistry.registerFunction(
-      "current_database", (e: Seq[Expression]) => new CurrentDatabase(self))
+      "current_database",
+      (e: Seq[Expression]) => new CurrentDatabase(self))
 
   /**
     * When true, enables an experimental feature where metastore tables that use the parquet SerDe
@@ -251,8 +255,8 @@ class HiveContext private[hive](
 
       // We instantiate a HiveConf here to read in the hive-site.xml file and then pass the options
       // into the isolated client loader
-      val metadataConf = new HiveConf(
-          sc.hadoopConfiguration, classOf[HiveConf])
+      val metadataConf =
+        new HiveConf(sc.hadoopConfiguration, classOf[HiveConf])
 
       val defaultWarehouseLocation =
         metadataConf.get("hive.metastore.warehouse.dir")
@@ -260,16 +264,18 @@ class HiveContext private[hive](
 
       // `configure` goes second to override other settings.
       val allConfig =
-        metadataConf.asScala.map(e => e.getKey -> e.getValue).toMap ++ configure
+        metadataConf.asScala
+          .map(e => e.getKey -> e.getValue)
+          .toMap ++ configure
 
       val isolatedLoader =
         if (hiveMetastoreJars == "builtin") {
           if (hiveExecutionVersion != hiveMetastoreVersion) {
             throw new IllegalArgumentException(
                 "Builtin jars can only be used when hive execution version == hive metastore version. " +
-                s"Execution: ${hiveExecutionVersion} != Metastore: ${hiveMetastoreVersion}. " +
-                "Specify a vaild path to the correct hive jars using $HIVE_METASTORE_JARS " +
-                s"or change ${HIVE_METASTORE_VERSION.key} to $hiveExecutionVersion.")
+                  s"Execution: ${hiveExecutionVersion} != Metastore: ${hiveMetastoreVersion}. " +
+                  "Specify a vaild path to the correct hive jars using $HIVE_METASTORE_JARS " +
+                  s"or change ${HIVE_METASTORE_VERSION.key} to $hiveExecutionVersion.")
           }
 
           // We recursively find all jars in the class loader chain,
@@ -287,7 +293,7 @@ class HiveContext private[hive](
           if (jars.length == 0) {
             throw new IllegalArgumentException(
                 "Unable to locate hive jars to connect to metastore. " +
-                "Please set spark.sql.hive.metastore.jars.")
+                  "Please set spark.sql.hive.metastore.jars.")
           }
 
           logInfo(
@@ -333,7 +339,7 @@ class HiveContext private[hive](
 
           logInfo(
               s"Initializing HiveMetastoreConnection version $hiveMetastoreVersion " +
-              s"using ${jars.mkString(":")}")
+                s"using ${jars.mkString(":")}")
           new IsolatedClientLoader(
               version = metaVersion,
               sparkConf = sc.conf,
@@ -433,7 +439,7 @@ class HiveContext private[hive](
             case e: Exception =>
               logWarning(
                   s"Failed to get the size of table ${table.getTableName} in the " +
-                  s"database ${table.getDbName} because of ${e.toString}",
+                    s"database ${table.getDbName} because of ${e.toString}",
                   e)
               size = 0L
           }
@@ -453,7 +459,7 @@ class HiveContext private[hive](
         if (newTotalSize > 0 && newTotalSize != oldTotalSize) {
           sessionState.catalog.client.alterTable(
               relation.table.copy(properties = relation.table.properties +
-                    (StatsSetupConst.TOTAL_SIZE -> newTotalSize.toString)))
+                  (StatsSetupConst.TOTAL_SIZE -> newTotalSize.toString)))
         }
       case otherRelation =>
         throw new UnsupportedOperationException(
@@ -473,8 +479,8 @@ class HiveContext private[hive](
     hiveconf.set(key, value)
   }
 
-  override private[sql] def setConf[T](
-      entry: SQLConfEntry[T], value: T): Unit = {
+  override private[sql] def setConf[T](entry: SQLConfEntry[T],
+                                       value: T): Unit = {
     setConf(entry.key, entry.stringConverter(value))
   }
 
@@ -641,7 +647,7 @@ private[hive] object HiveContext {
       "spark.sql.hive.metastore.version",
       defaultValue = Some(hiveExecutionVersion),
       doc = "Version of the Hive metastore. Available options are " +
-        s"<code>0.12.0</code> through <code>$hiveExecutionVersion</code>.")
+          s"<code>0.12.0</code> through <code>$hiveExecutionVersion</code>.")
 
   val HIVE_EXECUTION_VERSION = stringConf(
       key = "spark.sql.hive.version",
@@ -666,29 +672,29 @@ private[hive] object HiveContext {
       "spark.sql.hive.convertMetastoreParquet",
       defaultValue = Some(true),
       doc = "When set to false, Spark SQL will use the Hive SerDe for parquet tables instead of " +
-        "the built in support.")
+          "the built in support.")
 
   val CONVERT_METASTORE_PARQUET_WITH_SCHEMA_MERGING = booleanConf(
       "spark.sql.hive.convertMetastoreParquet.mergeSchema",
       defaultValue = Some(false),
       doc = "When true, also tries to merge possibly different but compatible Parquet schemas in " +
-        "different Parquet data files. This configuration is only effective " +
-        "when \"spark.sql.hive.convertMetastoreParquet\" is true.")
+          "different Parquet data files. This configuration is only effective " +
+          "when \"spark.sql.hive.convertMetastoreParquet\" is true.")
 
   val CONVERT_CTAS = booleanConf(
       "spark.sql.hive.convertCTAS",
       defaultValue = Some(false),
       doc = "When true, a table created by a Hive CTAS statement (no USING clause) will be " +
-        "converted to a data source table, using the data source set by spark.sql.sources.default.")
+          "converted to a data source table, using the data source set by spark.sql.sources.default.")
 
   val HIVE_METASTORE_SHARED_PREFIXES = stringSeqConf(
       "spark.sql.hive.metastore.sharedPrefixes",
       defaultValue = Some(jdbcPrefixes),
       doc = "A comma separated list of class prefixes that should be loaded using the classloader " +
-        "that is shared between Spark SQL and a specific version of Hive. An example of classes " +
-        "that should be shared is JDBC drivers that are needed to talk to the metastore. Other " +
-        "classes that need to be shared are those that interact with classes that are already " +
-        "shared. For example, custom appenders that are used by log4j.")
+          "that is shared between Spark SQL and a specific version of Hive. An example of classes " +
+          "that should be shared is JDBC drivers that are needed to talk to the metastore. Other " +
+          "classes that need to be shared are those that interact with classes that are already " +
+          "shared. For example, custom appenders that are used by log4j.")
 
   private def jdbcPrefixes =
     Seq("com.mysql.jdbc",
@@ -700,13 +706,14 @@ private[hive] object HiveContext {
       "spark.sql.hive.metastore.barrierPrefixes",
       defaultValue = Some(Seq()),
       doc = "A comma separated list of class prefixes that should explicitly be reloaded for each " +
-        "version of Hive that Spark SQL is communicating with. For example, Hive UDFs that are " +
-        "declared in a prefix that typically would be shared (i.e. <code>org.apache.spark.*</code>).")
+          "version of Hive that Spark SQL is communicating with. For example, Hive UDFs that are " +
+          "declared in a prefix that typically would be shared (i.e. <code>org.apache.spark.*</code>).")
 
   val HIVE_THRIFT_SERVER_ASYNC = booleanConf(
       "spark.sql.hive.thriftServer.async",
       defaultValue = Some(true),
-      doc = "When set to true, Hive Thrift server executes SQL queries in an asynchronous way.")
+      doc =
+        "When set to true, Hive Thrift server executes SQL queries in an asynchronous way.")
 
   /** Constructs a configuration for hive, where the metastore is located in a temp directory. */
   def newTemporaryConfiguration(
@@ -777,7 +784,7 @@ private[hive] object HiveContext {
       map.map {
         case (key, value) =>
           toHiveStructString((key, kType)) + ":" +
-          toHiveStructString((value, vType))
+            toHiveStructString((value, vType))
       }.toSeq.sorted.mkString("{", ",", "}")
     case (null, _) => "NULL"
     case (d: Int, DateType) => new DateWritable(d).toString
@@ -806,7 +813,7 @@ private[hive] object HiveContext {
       map.map {
         case (key, value) =>
           toHiveStructString((key, kType)) + ":" +
-          toHiveStructString((value, vType))
+            toHiveStructString((value, vType))
       }.toSeq.sorted.mkString("{", ",", "}")
     case (null, _) => "null"
     case (s: String, StringType) => "\"" + s + "\""

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,7 +30,11 @@ import blueeyes.core.service._
 import blueeyes.json._
 import blueeyes.json.serialization.{Extractor, Decomposer, IsoSerialization}
 import blueeyes.json.serialization.IsoSerialization._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeDecomposer => _,
+  DateTimeExtractor => _,
+  _
+}
 import blueeyes.json.serialization.Extractor._
 import blueeyes.util.Clock
 
@@ -53,8 +57,8 @@ import scalaz.syntax.std.option._
 import shapeless._
 
 class SecurityServiceHandlers(
-    val apiKeyManager: APIKeyManager[Future], val clock: Clock)(
-    implicit executor: ExecutionContext) {
+    val apiKeyManager: APIKeyManager[Future],
+    val clock: Clock)(implicit executor: ExecutionContext) {
   import com.precog.common.security.service.v1
   type R = HttpResponse[JValue]
 
@@ -89,8 +93,8 @@ class SecurityServiceHandlers(
         Success { (authAPIKey: APIKey) =>
           for {
             content <- request.content
-              .toSuccess(badRequest(missingContentMessage))
-              .sequence[Future, JValue]
+                        .toSuccess(badRequest(missingContentMessage))
+                        .sequence[Future, JValue]
             response <- content.map(create(authAPIKey, _)).sequence[Future, R]
           } yield {
             response.toEither.merge
@@ -125,10 +129,11 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("The API key request body \n" +
-              requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest(
-              "Invalid new API key request body.", Some(e.message))
+          logger.warn(
+              "The API key request body \n" +
+                requestBody.renderPretty + "\n was invalid: " + e)
+          Promise successful badRequest("Invalid new API key request body.",
+                                        Some(e.message))
       }
     }
 
@@ -139,7 +144,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadAPIKeyDetailsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         // since having an api key means you can see the details, we don't check perms.
@@ -161,7 +167,8 @@ class SecurityServiceHandlers(
   }
 
   object DeleteAPIKeyHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('apikey) map { apiKey =>
@@ -178,7 +185,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadAPIKeyGrantsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('apikey) map { apiKey =>
@@ -197,7 +205,8 @@ class SecurityServiceHandlers(
   }
 
   object CreateAPIKeyGrantHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     private def create(apiKey: APIKey, requestBody: JValue): Future[R] = {
       requestBody.validated[GrantId]("grantId") match {
         case Success(grantId) =>
@@ -209,8 +218,9 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("Unable to parse grant ID from \n" +
-              requestBody.renderPretty + "\n: " + e)
+          logger.warn(
+              "Unable to parse grant ID from \n" +
+                requestBody.renderPretty + "\n: " + e)
           Promise successful badRequest(
               "Invalid add grant request body.",
               Some("Invalid add grant request body: " + e))
@@ -224,10 +234,11 @@ class SecurityServiceHandlers(
           .toSuccess(badRequest("Missing API key from request URL"))
         for {
           contentV <- request.content
-            .toSuccess(badRequest("Missing body content for grant creation."))
-            .sequence[Future, JValue]
-          response <- (for (apiKey <- apiKeyV; content <- contentV) yield
-                       create(apiKey, content)).sequence[Future, R]
+                       .toSuccess(badRequest(
+                           "Missing body content for grant creation."))
+                       .sequence[Future, JValue]
+          response <- (for (apiKey <- apiKeyV; content <- contentV)
+                       yield create(apiKey, content)).sequence[Future, R]
         } yield response.toEither.merge
     }
 
@@ -236,7 +247,8 @@ class SecurityServiceHandlers(
   }
 
   object DeleteAPIKeyGrantHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         Apply[Option].apply2(request.parameters.get('apikey),
@@ -247,7 +259,7 @@ class SecurityServiceHandlers(
               else
                 badRequest("Invalid remove grant request.",
                            Some("Unable to remove grant " + grantId +
-                               " from API key " + apiKey))
+                             " from API key " + apiKey))
             }
         } getOrElse {
           Promise successful badRequest(
@@ -289,10 +301,11 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("The grant creation request body \n" +
-              requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest(
-              "Invalid new grant request body.", Some(e.message))
+          logger.warn(
+              "The grant creation request body \n" +
+                requestBody.renderPretty + "\n was invalid: " + e)
+          Promise successful badRequest("Invalid new grant request body.",
+                                        Some(e.message))
       }
     }
 
@@ -303,7 +316,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadGrantDetailsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('grantId) map { grantId =>
@@ -321,7 +335,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadGrantChildrenHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('grantId) map { grantId =>
@@ -359,7 +374,8 @@ class SecurityServiceHandlers(
 
         case Failure(e) =>
           Promise successful badRequest(
-              "Invalid new child grant request body.", Some(e.message))
+              "Invalid new child grant request body.",
+              Some(e.message))
       }
     }
 
@@ -370,11 +386,12 @@ class SecurityServiceHandlers(
           .toSuccess(badRequest("Missing grant ID from request URL"))
         for {
           contentV <- request.content
-            .toSuccess(badRequest("Missing body content for grant creation."))
-            .sequence[Future, JValue]
-          response <- (for (parentId <- parentIdV; content <- contentV) yield
-                       create(authAPIKey, parentId, content))
-            .sequence[Future, R]
+                       .toSuccess(badRequest(
+                           "Missing body content for grant creation."))
+                       .sequence[Future, JValue]
+          response <- (for (parentId <- parentIdV; content <- contentV)
+                       yield create(authAPIKey, parentId, content))
+                       .sequence[Future, R]
         } yield response.toEither.merge
     }
 
@@ -406,7 +423,7 @@ class SecurityServiceHandlers(
                     else
                       Promise successful badRequest(
                           "Requestor does not have permission to delete grant " +
-                          grantId)
+                            grantId)
                 }
               }
 
@@ -443,7 +460,8 @@ class SecurityServiceHandlers(
           case Failure(e) =>
             logger.warn("The 'at paramter was not a valid DateTime: " + e)
             Promise successful badRequest(
-                "Invalid date provided to 'at parameter.", Some(e.message))
+                "Invalid date provided to 'at parameter.",
+                Some(e.message))
         }
     }
 

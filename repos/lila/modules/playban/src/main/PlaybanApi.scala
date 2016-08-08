@@ -62,8 +62,8 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
   def bans(userId: String): Fu[List[TempBan]] =
     coll
       .find(
-          BSONDocument(
-              "_id" -> userId, "b.0" -> BSONDocument("$exists" -> true)),
+          BSONDocument("_id" -> userId,
+                       "b.0" -> BSONDocument("$exists" -> true)),
           BSONDocument("_id" -> false, "b" -> true)
       )
       .one[BSONDocument]
@@ -88,22 +88,20 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
       }
 
   private def save(outcome: Outcome): String => Funit =
-    userId =>
-      {
-        coll
-          .findAndUpdate(
-              selector = BSONDocument("_id" -> userId),
-              update = BSONDocument("$push" -> BSONDocument(
-                        "o" -> BSONDocument("$each" -> List(outcome),
-                                            "$slice" -> -20)
-                    )),
-              fetchNewObject = true,
-              upsert = true)
-          .map(_.value)
-      } map2 UserRecordBSONHandler.read flatMap {
-        case None => fufail(s"can't find record for user $userId")
-        case Some(record) => legiferate(record)
-      } logFailure lila.log("playban")
+    userId => {
+      coll
+        .findAndUpdate(
+            selector = BSONDocument("_id" -> userId),
+            update = BSONDocument("$push" -> BSONDocument(
+                "o" -> BSONDocument("$each" -> List(outcome), "$slice" -> -20)
+            )),
+            fetchNewObject = true,
+            upsert = true)
+        .map(_.value)
+    } map2 UserRecordBSONHandler.read flatMap {
+      case None => fufail(s"can't find record for user $userId")
+      case Some(record) => legiferate(record)
+    } logFailure lila.log("playban")
 
   private def legiferate(record: UserRecord): Funit = record.newBan ?? { ban =>
     coll

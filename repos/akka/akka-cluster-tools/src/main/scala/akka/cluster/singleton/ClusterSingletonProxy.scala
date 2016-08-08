@@ -36,8 +36,8 @@ object ClusterSingletonProxySettings {
         singletonName = config.getString("singleton-name"),
         role = roleOption(config.getString("role")),
         singletonIdentificationInterval = config
-            .getDuration("singleton-identification-interval", MILLISECONDS)
-            .millis,
+          .getDuration("singleton-identification-interval", MILLISECONDS)
+          .millis,
         bufferSize = config.getInt("buffer-size"))
 
   /**
@@ -99,10 +99,13 @@ final class ClusterSingletonProxySettings(
   private def copy(
       singletonName: String = singletonName,
       role: Option[String] = role,
-      singletonIdentificationInterval: FiniteDuration = singletonIdentificationInterval,
+      singletonIdentificationInterval: FiniteDuration =
+        singletonIdentificationInterval,
       bufferSize: Int = bufferSize): ClusterSingletonProxySettings =
-    new ClusterSingletonProxySettings(
-        singletonName, role, singletonIdentificationInterval, bufferSize)
+    new ClusterSingletonProxySettings(singletonName,
+                                      role,
+                                      singletonIdentificationInterval,
+                                      bufferSize)
 }
 
 object ClusterSingletonProxy {
@@ -140,9 +143,10 @@ object ClusterSingletonProxy {
   * Note that this is a best effort implementation: messages can always be lost due to the distributed nature of the
   * actors involved.
   */
-final class ClusterSingletonProxy(
-    singletonManagerPath: String, settings: ClusterSingletonProxySettings)
-    extends Actor with ActorLogging {
+final class ClusterSingletonProxy(singletonManagerPath: String,
+                                  settings: ClusterSingletonProxySettings)
+    extends Actor
+    with ActorLogging {
   import settings._
   val singletonPath =
     (singletonManagerPath + "/" + settings.singletonName).split("/")
@@ -184,7 +188,8 @@ final class ClusterSingletonProxy(
 
   def handleInitial(state: CurrentClusterState): Unit = {
     trackChange { () ⇒
-      membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members.collect {
+      membersByAge = immutable.SortedSet
+          .empty(ageOrdering) union state.members.collect {
         case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
       }
     }
@@ -245,7 +250,7 @@ final class ClusterSingletonProxy(
     case MemberUp(m) ⇒ add(m)
     case mEvent: MemberEvent
         if mEvent.isInstanceOf[MemberExited] ||
-        mEvent.isInstanceOf[MemberRemoved] ⇒
+          mEvent.isInstanceOf[MemberRemoved] ⇒
       remove(mEvent.member)
     case _: MemberEvent ⇒ // do nothing
 

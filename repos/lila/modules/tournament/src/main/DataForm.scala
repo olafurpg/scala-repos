@@ -29,8 +29,8 @@ final class DataForm {
     clockIncrements ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
-  val clockIncrementPrivateChoices = options(
-      clockIncrementsPrivate, "%d second{s}")
+  val clockIncrementPrivateChoices =
+    options(clockIncrementsPrivate, "%d second{s}")
 
   val minutes = (20 to 60 by 5) ++ (70 to 120 by 10)
   val minutesPrivate = minutes ++ (150 to 360 by 30)

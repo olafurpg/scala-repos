@@ -24,8 +24,8 @@ case class Utils[C <: Context](c: C) {
   }
 }
 object QueryableMacros {
-  def _helper[C <: Context, S : c.WeakTypeTag](c: C)(
-      name: String, projection: c.Expr[_]) = {
+  def _helper[C <: Context, S: c.WeakTypeTag](c: C)(name: String,
+                                                    projection: c.Expr[_]) = {
     import c.universe._
     import internal._
     val element_type = implicitly[c.WeakTypeTag[S]].tpe
@@ -39,17 +39,17 @@ object QueryableMacros {
                                     List(projection.tree))
                           )
                           .asInstanceOf[Tree]
-                      )))
+                    )))
     c.universe.reify { Queryable.factory[S](foo.splice) }
   }
-  def map[T : c.WeakTypeTag, S : c.WeakTypeTag](c: Context)(
+  def map[T: c.WeakTypeTag, S: c.WeakTypeTag](c: Context)(
       projection: c.Expr[T => S]): c.Expr[Queryable[S]] =
     _helper[c.type, S](c)("_map", projection)
 }
 class Queryable[T] {
   def _map[S](projection: T => S): Queryable[S] = ???
-  def map[S](projection: T => S): Queryable[S] = macro QueryableMacros
-    .map[T, S]
+  def map[S](projection: T => S): Queryable[S] =
+    macro QueryableMacros.map[T, S]
 }
 object Queryable {
   def factory[S](projection: ru.Expr[Queryable[S]]): Queryable[S] = null

@@ -16,7 +16,10 @@
  */
 package org.apache.hive.service.server
 
-import org.apache.hive.service.server.HiveServer2.{ServerOptionsProcessor, StartOptionExecutor}
+import org.apache.hive.service.server.HiveServer2.{
+  ServerOptionsProcessor,
+  StartOptionExecutor
+}
 
 /**
   * Class to upgrade a package-private class to public, and

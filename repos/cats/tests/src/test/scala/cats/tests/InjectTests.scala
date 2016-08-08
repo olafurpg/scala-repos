@@ -36,13 +36,15 @@ class InjectTests extends CatsSuite {
   implicit def test1Arbitrary[A](
       implicit seqArb: Arbitrary[Int],
       intAArb: Arbitrary[Int => A]): Arbitrary[Test1[A]] =
-    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
+    Arbitrary(
+        for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
           Test1(s, f))
 
   implicit def test2Arbitrary[A](
       implicit seqArb: Arbitrary[Int],
       intAArb: Arbitrary[Int => A]): Arbitrary[Test2[A]] =
-    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
+    Arbitrary(
+        for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
           Test2(s, f))
 
   object Test1Interpreter extends (Test1Algebra ~> Id) {

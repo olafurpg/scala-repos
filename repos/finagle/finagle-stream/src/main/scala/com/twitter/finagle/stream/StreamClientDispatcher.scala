@@ -8,15 +8,21 @@ import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.transport.Transport
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Promise, Return, Throw}
-import org.jboss.netty.handler.codec.http.{HttpRequest, HttpChunk, HttpResponse}
+import org.jboss.netty.handler.codec.http.{
+  HttpRequest,
+  HttpChunk,
+  HttpResponse
+}
 
 /**
   * Stream chunks into StreamResponses.
   */
-private[twitter] class StreamClientDispatcher[Req : RequestType](
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+private[twitter] class StreamClientDispatcher[Req: RequestType](
+    trans: Transport[Any, Any],
+    statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Req, StreamResponse, Any, Any](
-        trans, statsReceiver) {
+        trans,
+        statsReceiver) {
   import Bijections._
   import GenSerialClientDispatcher.wrapWriteException
 
@@ -31,11 +37,13 @@ private[twitter] class StreamClientDispatcher[Req : RequestType](
         Future.Done
 
       case chunk: HttpChunk =>
-        out.send(ChannelBufferBuf.Owned(chunk.getContent)).sync() before readChunks(
-            out)
+        out
+          .send(ChannelBufferBuf.Owned(chunk.getContent))
+          .sync() before readChunks(out)
 
       case invalid =>
-        Future.exception(new IllegalArgumentException(
+        Future.exception(
+            new IllegalArgumentException(
                 "invalid message \"%s\"".format(invalid)))
     }
 
@@ -77,7 +85,7 @@ private[twitter] class StreamClientDispatcher[Req : RequestType](
 
           case invalid =>
             Future.exception(new IllegalArgumentException(
-                    "invalid message \"%s\"".format(invalid)))
+                "invalid message \"%s\"".format(invalid)))
         }
       }
 }

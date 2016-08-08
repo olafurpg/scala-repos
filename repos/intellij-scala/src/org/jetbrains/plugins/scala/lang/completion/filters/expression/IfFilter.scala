@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
@@ -42,7 +42,7 @@ class IfFilter extends ElementFilter {
             val text = clause.getText
             while (text(position - 1).isWhitespace) position -= 1
             return leaf.getTextRange.getEndOffset == clause.getTextRange.getStartOffset +
-            position
+              position
           case _ =>
         }
         parent = parent.getParent

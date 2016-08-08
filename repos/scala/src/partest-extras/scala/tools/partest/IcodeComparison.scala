@@ -54,8 +54,9 @@ abstract class IcodeComparison extends DirectTest {
     // here depends on it (collectIcode will be called multiple times, and we can't allow crosstalk
     // between calls).  So we are careful to use `slurp` which does call `close`, and careful to
     // check that `delete` returns true indicating successful deletion.
-    try icodeFiles sortBy (_.name) flatMap (f => f.slurp().lines.toList) finally icodeFiles foreach
-    (f => require(f.delete()))
+    try icodeFiles sortBy (_.name) flatMap (f => f.slurp().lines.toList)
+    finally icodeFiles foreach
+      (f => require(f.delete()))
   }
 
   /** Collect icode at the default phase, `printIcodeAfterPhase`. */
@@ -70,8 +71,8 @@ abstract class IcodeComparison extends DirectTest {
     */
   def showComparison() = {
     val lines1 = collectIcode(s"-Xprint-icode:$printSuboptimalIcodeAfterPhase")
-    val lines2 = collectIcode(
-        "-optimise", s"-Xprint-icode:$printIcodeAfterPhase")
+    val lines2 =
+      collectIcode("-optimise", s"-Xprint-icode:$printIcodeAfterPhase")
 
     println(compareContents(lines1, lines2))
   }

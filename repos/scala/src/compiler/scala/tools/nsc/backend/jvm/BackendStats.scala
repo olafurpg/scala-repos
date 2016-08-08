@@ -20,6 +20,7 @@ object BackendStats {
 
   def timed[T](timer: Statistics.Timer)(body: => T): T = {
     val start = Statistics.startTimer(timer)
-    try body finally Statistics.stopTimer(timer, start)
+    try body
+    finally Statistics.stopTimer(timer, start)
   }
 }

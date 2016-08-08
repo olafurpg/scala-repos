@@ -6,7 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.event.EventStream
 import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon._
-import mesosphere.marathon.api.{TestGroupManagerFixture, JsonTestHelper, TaskKiller, TestAuthFixture}
+import mesosphere.marathon.api.{
+  TestGroupManagerFixture,
+  JsonTestHelper,
+  TaskKiller,
+  TestAuthFixture
+}
 import mesosphere.marathon.core.appinfo.AppInfo.Embed
 import mesosphere.marathon.core.appinfo._
 import mesosphere.marathon.core.base.ConstantClock
@@ -19,7 +24,10 @@ import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
+import mesosphere.util.{
+  CapConcurrentExecutions,
+  CapConcurrentExecutionsMetrics
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsNumber, JsObject, Json}
 
@@ -30,7 +38,10 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class AppsResourceTest
-    extends MarathonSpec with MarathonActorSupport with Matchers with Mockito
+    extends MarathonSpec
+    with MarathonActorSupport
+    with Matchers
+    with Mockito
     with GivenWhenThen {
 
   import mesosphere.marathon.api.v2.json.Formats._
@@ -216,7 +227,7 @@ class AppsResourceTest
     val appJson = Json.toJson(app).as[JsObject]
     val appJsonWithOnlyPorts =
       appJson - "uris" - "portDefinitions" - "version" +
-      ("ports" -> Json.parse("""[1000, 1001]"""))
+        ("ports" -> Json.parse("""[1000, 1001]"""))
     val body = Json.stringify(appJsonWithOnlyPorts).getBytes("UTF-8")
 
     When("The application is updated")
@@ -355,8 +366,8 @@ class AppsResourceTest
       .successful(Seq(appInfo))
 
     When("The the index is fetched without any filters")
-    val response = appsResource.index(
-        null, null, null, new java.util.HashSet(), auth.request)
+    val response = appsResource
+      .index(null, null, null, new java.util.HashSet(), auth.request)
 
     Then("The response holds counts and deployments")
     val appJson = Json.parse(response.getEntity.asInstanceOf[String])
@@ -508,13 +519,12 @@ class AppsResourceTest
 
   test("access with limited authorization gives a filtered apps listing") {
     Given("An authorized identity with limited ACL's")
-    auth.authFn = (resource: Any) =>
-      {
-        val id = resource match {
-          case app: AppDefinition => app.id.toString
-          case _ => resource.asInstanceOf[Group].id.toString
-        }
-        id.startsWith("/visible")
+    auth.authFn = (resource: Any) => {
+      val id = resource match {
+        case app: AppDefinition => app.id.toString
+        case _ => resource.asInstanceOf[Group].id.toString
+      }
+      id.startsWith("/visible")
     }
     implicit val identity = auth.identity
     val selector = appsResource.selectAuthorized(AppSelector.forall(Seq.empty))

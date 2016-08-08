@@ -23,7 +23,11 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.classification.LogisticRegressionModel
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.optimization.{LBFGS, LogisticGradient, SquaredL2Updater}
+import org.apache.spark.mllib.optimization.{
+  LBFGS,
+  LogisticGradient,
+  SquaredL2Updater
+}
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
@@ -66,8 +70,9 @@ object LBFGSExample {
         initialWeightsWithIntercept)
 
     val model = new LogisticRegressionModel(
-        Vectors.dense(weightsWithIntercept.toArray.slice(
-                0, weightsWithIntercept.size - 1)),
+        Vectors.dense(
+            weightsWithIntercept.toArray.slice(0,
+                                               weightsWithIntercept.size - 1)),
         weightsWithIntercept(weightsWithIntercept.size - 1))
 
     // Clear the default threshold.

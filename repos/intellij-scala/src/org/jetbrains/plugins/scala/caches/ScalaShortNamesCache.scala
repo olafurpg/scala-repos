@@ -9,7 +9,11 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.containers.HashSet
 import com.intellij.util.{ArrayUtil, Processor}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 import scala.collection.mutable.ArrayBuffer
@@ -18,8 +22,8 @@ import scala.collection.mutable.ArrayBuffer
   * @author ilyas
   */
 class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
-  def getClassesByName(
-      name: String, scope: GlobalSearchScope): Array[PsiClass] = {
+  def getClassesByName(name: String,
+                       scope: GlobalSearchScope): Array[PsiClass] = {
     def isOkForJava(elem: ScalaPsiElement): Boolean = {
       var res = true
       var element = elem.getParent
@@ -120,8 +124,8 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
     dest.addAll(keys)
   }
 
-  def getMethodsByName(
-      name: String, scope: GlobalSearchScope): Array[PsiMethod] = {
+  def getMethodsByName(name: String,
+                       scope: GlobalSearchScope): Array[PsiMethod] = {
     PsiMethod.EMPTY_ARRAY //todo:
   }
 
@@ -139,8 +143,8 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
     //todo:
   }
 
-  def getFieldsByName(
-      name: String, scope: GlobalSearchScope): Array[PsiField] = {
+  def getFieldsByName(name: String,
+                      scope: GlobalSearchScope): Array[PsiField] = {
     PsiField.EMPTY_ARRAY //todo:
   }
 

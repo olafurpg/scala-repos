@@ -136,7 +136,8 @@ object ThreadPoolsSpec extends PlaySpecification {
 
     "allow a synchronous thread pool" in {
       val config =
-        ConfigFactory.parseString("""#highly-synchronous
+        ConfigFactory.parseString(
+            """#highly-synchronous
       akka {
         actor {
           default-dispatcher {
@@ -211,8 +212,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
   }
 
-  def runningWithConfig[T : AsResult](config: String)(
-      block: Application => T) = {
+  def runningWithConfig[T: AsResult](config: String)(block: Application => T) = {
     val parsed: java.util.Map[String, Object] =
       ConfigFactory.parseString(config).root.unwrapped
     running(_.configure(Configuration(ConfigFactory.parseString(config))))(

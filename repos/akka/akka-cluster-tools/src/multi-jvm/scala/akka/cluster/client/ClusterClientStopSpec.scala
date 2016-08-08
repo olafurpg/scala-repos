@@ -17,7 +17,9 @@ object ClusterClientStopSpec extends MultiNodeConfig {
   val client = role("client")
   val first = role("first")
   val second = role("second")
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -43,7 +45,8 @@ class ClusterClientStopMultiJvmNode2 extends ClusterClientStopSpec
 class ClusterClientStopMultiJvmNode3 extends ClusterClientStopSpec
 
 class ClusterClientStopSpec
-    extends MultiNodeSpec(ClusterClientStopSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterClientStopSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import ClusterClientStopSpec._
@@ -89,7 +92,7 @@ class ClusterClientStopSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client1")
         c ! ClusterClient.Send("/user/testService",
                                "hello",
@@ -100,9 +103,9 @@ class ClusterClientStopSpec
         watch(c)
 
         expectTerminated(c, 10.seconds)
-        EventFilter.warning(
-            start = "Receptionist reconnect not successful within",
-            occurrences = 1)
+        EventFilter.warning(start =
+                              "Receptionist reconnect not successful within",
+                            occurrences = 1)
       }
 
       runOn(first, second) {

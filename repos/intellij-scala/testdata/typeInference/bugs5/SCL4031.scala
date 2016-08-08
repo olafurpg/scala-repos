@@ -8,7 +8,8 @@ trait TypeInferenceBug {
 
     as1.foldLeft(bs) {
       case (b, (a, i: Int)) =>
-        /*start*/ b /*end*/
+        /*start*/
+        b /*end*/
     }
   }
 }

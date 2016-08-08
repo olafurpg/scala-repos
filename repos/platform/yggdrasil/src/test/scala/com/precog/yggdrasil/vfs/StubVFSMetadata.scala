@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -64,7 +64,8 @@ class StubVFSMetadata[M[+ _]](
             PathMetadata(
                 Path(key.components(path.length)),
                 if (key.length == path.length + 1)
-                  DataOnly(FileContent.XQuirrelData) else PathOnly
+                  DataOnly(FileContent.XQuirrelData)
+                else PathOnly
             )
         }
       }
@@ -72,7 +73,8 @@ class StubVFSMetadata[M[+ _]](
 
   private def getPathMeta(
       path: Path): EitherT[M, ResourceError, Map[ColumnRef, Long]] = EitherT {
-    M.point(projectionMetadata.get(path) \/> NotFound(
+    M.point(
+        projectionMetadata.get(path) \/> NotFound(
             "No metadata found for path %s".format(path.path)))
   }
 
@@ -83,17 +85,18 @@ class StubVFSMetadata[M[+ _]](
       version: Version): EitherT[M, ResourceError, PathStructure] = {
     for {
       types <- getPathMeta(path) map {
-        _ collect {
-          case (ColumnRef(`property`, ctype), count) => (ctype, count)
-        }
-      }
+                _ collect {
+                  case (ColumnRef(`property`, ctype), count) => (ctype, count)
+                }
+              }
 
       children <- getPathMeta(path) map {
-        _ flatMap {
-          case t @ (ColumnRef(s, ctype), count) =>
-            if (s.hasPrefix(property)) s.take(property.length + 1) else None
-        }
-      }
+                   _ flatMap {
+                     case t @ (ColumnRef(s, ctype), count) =>
+                       if (s.hasPrefix(property)) s.take(property.length + 1)
+                       else None
+                   }
+                 }
     } yield PathStructure(types, children.toSet)
   }
 

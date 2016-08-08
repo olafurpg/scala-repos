@@ -71,7 +71,8 @@ trait PdfIsUFunc[U <: UFunc, T, P <: PdfIsUFunc[U, T, P]] { self: P =>
 }
 
 trait ContinuousDistributionUFuncProvider[T, D <: ContinuousDistr[T]]
-    extends UFunc with MappingUFunc { self: UFunc =>
+    extends UFunc
+    with MappingUFunc { self: UFunc =>
   implicit object basicImpl
       extends Impl2[ContinuousDistrUFuncWrapper, T, Double] {
     def apply(w: ContinuousDistrUFuncWrapper, v: T) = w.dist.pdf(v)

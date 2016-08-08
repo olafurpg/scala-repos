@@ -5,8 +5,11 @@ final case class ScopeMask(project: Boolean = true,
                            config: Boolean = true,
                            task: Boolean = true,
                            extra: Boolean = true) {
-  def concatShow(
-      p: String, c: String, t: String, sep: String, x: String): String = {
+  def concatShow(p: String,
+                 c: String,
+                 t: String,
+                 sep: String,
+                 x: String): String = {
     val sb = new StringBuilder
     if (project) sb.append(p)
     if (config) sb.append(c)

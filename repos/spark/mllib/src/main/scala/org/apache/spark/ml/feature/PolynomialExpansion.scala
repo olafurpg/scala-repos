@@ -110,8 +110,12 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
       var i = 0
       var curStart = curPolyIdx
       while (i <= degree && alpha != 0.0) {
-        curStart = expandDense(
-            values, lastIdx1, degree - i, alpha, polyValues, curStart)
+        curStart = expandDense(values,
+                               lastIdx1,
+                               degree - i,
+                               alpha,
+                               polyValues,
+                               curStart)
         i += 1
         alpha *= v
       }

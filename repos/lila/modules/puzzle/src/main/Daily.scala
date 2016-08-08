@@ -10,8 +10,9 @@ import reactivemongo.bson.BSONDocument
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types.Coll
 
-private[puzzle] final class Daily(
-    coll: Coll, renderer: ActorSelection, scheduler: Scheduler) {
+private[puzzle] final class Daily(coll: Coll,
+                                  renderer: ActorSelection,
+                                  scheduler: Scheduler) {
 
   private val cache = lila.memo.AsyncCache
     .single[Option[DailyPuzzle]](f = find, timeToLive = 30 minutes)
@@ -48,7 +49,7 @@ private[puzzle] final class Daily(
     coll
       .find(
           BSONDocument("day" -> BSONDocument(
-                  "$gt" -> DateTime.now.minusMinutes(24 * 60 - 15)))
+              "$gt" -> DateTime.now.minusMinutes(24 * 60 - 15)))
       )
       .one[Puzzle]
 

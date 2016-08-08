@@ -55,15 +55,16 @@ final class Env(config: Config,
                                  )),
                              name = ActorName)
 
-  lazy val socketHandler = new SocketHandler(
-      hub = hub, lobby = lobby, socket = socket, blocking = blocking)
+  lazy val socketHandler = new SocketHandler(hub = hub,
+                                             lobby = lobby,
+                                             socket = socket,
+                                             blocking = blocking)
 
   lazy val history = new History[actorApi.Messadata](ttl = MessageTtl)
 
   private val abortListener = new AbortListener(seekApi = seekApi)
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'abortGame)
     def receive = {
       case lila.game.actorApi.AbortedBy(pov) if pov.game.isCorrespondence =>

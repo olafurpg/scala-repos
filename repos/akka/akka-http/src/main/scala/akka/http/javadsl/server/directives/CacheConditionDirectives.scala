@@ -29,7 +29,8 @@ abstract class CacheConditionDirectives extends BasicDirectives {
                   innerRoute: Route,
                   moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(entityTag = Some(entityTag))(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   /**
     * Wraps its inner route with support for Conditional Requests as defined
@@ -47,7 +48,8 @@ abstract class CacheConditionDirectives extends BasicDirectives {
                   innerRoute: Route,
                   moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(lastModified = Some(lastModified))(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   /**
     * Wraps its inner route with support for Conditional Requests as defined
@@ -66,5 +68,6 @@ abstract class CacheConditionDirectives extends BasicDirectives {
                   innerRoute: Route,
                   moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(Some(entityTag), Some(lastModified))(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 }

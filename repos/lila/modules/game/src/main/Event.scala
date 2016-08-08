@@ -6,7 +6,16 @@ import play.api.libs.json._
 import chess.Pos
 import chess.Pos.{piotr, allPiotrs}
 import chess.variant.Crazyhouse
-import chess.{PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop, Clock => ChessClock, Status}
+import chess.{
+  PromotableRole,
+  Pos,
+  Color,
+  Situation,
+  Move => ChessMove,
+  Drop => ChessDrop,
+  Clock => ChessClock,
+  Status
+}
 import JsonView._
 import lila.chat.{Line, UserLine, PlayerLine}
 import lila.common.Maths.truncateAt
@@ -30,9 +39,8 @@ object Event {
     def typ = "start"
   }
 
-  private def withCrazyData(
-      data: Option[Crazyhouse.Data], drops: Option[List[Pos]])(
-      js: JsObject): JsObject =
+  private def withCrazyData(data: Option[Crazyhouse.Data],
+                            drops: Option[List[Pos]])(js: JsObject): JsObject =
     data.fold(js) { d =>
       val js1 = js + ("crazyhouse" -> crazyhouseDataWriter.writes(d))
       drops.fold(js1) { squares =>
@@ -251,8 +259,8 @@ object Event {
   case class Clock(white: Float, black: Float) extends Event {
     def typ = "clock"
     def data =
-      Json.obj(
-          "white" -> truncateAt(white, 2), "black" -> truncateAt(black, 2))
+      Json
+        .obj("white" -> truncateAt(white, 2), "black" -> truncateAt(black, 2))
   }
   object Clock {
     def apply(clock: ChessClock): Clock =

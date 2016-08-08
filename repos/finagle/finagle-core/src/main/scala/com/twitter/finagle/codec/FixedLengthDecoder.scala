@@ -15,8 +15,8 @@ import scala.reflect.ClassTag
   *       This implies a use-case where a single thread exclusively processes a
   *       byte stream.
   */
-private[finagle] class FixedLengthDecoder[T : ClassTag](
-    frameSize: Int, decodeFrame: Buf => T)
+private[finagle] class FixedLengthDecoder[T: ClassTag](frameSize: Int,
+                                                       decodeFrame: Buf => T)
     extends FrameDecoder[T] {
 
   if (frameSize < 1)

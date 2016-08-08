@@ -54,7 +54,7 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery =
       x.join(y,
               condition = Some(("x.a".attr === "y.a".attr) &&
-                    ("x.a".attr === 1) && ("y.c".attr > 5)))
+                ("x.a".attr === 1) && ("y.c".attr > 5)))
         .analyze
     val left = x.where(IsNotNull('a) && "x.a".attr === 1)
     val right = y.where(
@@ -71,7 +71,7 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery =
       x.join(y,
               condition = Some(("x.a".attr =!= "y.a".attr) &&
-                    ("x.b".attr === 1) && ("y.c".attr > 5)))
+                ("x.b".attr === 1) && ("y.c".attr > 5)))
         .analyze
     val left = x.where(IsNotNull('a) && IsNotNull('b) && "x.b".attr === 1)
     val right = y.where(IsNotNull('a) && IsNotNull('c) && "y.c".attr > 5)
@@ -88,15 +88,15 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery = x
       .where('b > 5)
       .join(y.where('a === 10),
-            condition = Some(
-                  "x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
+            condition =
+              Some("x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
       .analyze
     val left = x.where(IsNotNull('a) && 'a === 10 && IsNotNull('b) && 'b > 5)
     val right = y.where(IsNotNull('a) && IsNotNull('b) && 'a === 10 && 'b > 5)
     val correctAnswer = left
       .join(right,
-            condition = Some(
-                  "x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
+            condition =
+              Some("x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)

@@ -13,8 +13,7 @@ import org.junit.Assert._
 /**
   * @author ghik
   */
-trait HoconIncludeResolutionTest {
-  this: UsefulTestCase =>
+trait HoconIncludeResolutionTest { this: UsefulTestCase =>
 
   protected def project: Project
 
@@ -43,7 +42,7 @@ trait HoconIncludeResolutionTest {
           .map(_.parent.map(_.nonWhitespaceChildren).getOrElse(Iterator.empty))
           .getOrElse(Iterator.empty)
           .takeWhile(e =>
-                e.getNode.getElementType == HoconTokenType.HashComment)
+            e.getNode.getElementType == HoconTokenType.HashComment)
           .toVector
 
         val references = it.getFileReferences
@@ -76,8 +75,8 @@ trait HoconIncludeResolutionTest {
 
           assertEquals(parentText, expectedFiles, actualFiles)
         } else {
-          assertTrue(
-              "Expected no references in " + parentText, references.isEmpty)
+          assertTrue("Expected no references in " + parentText,
+                     references.isEmpty)
         }
       case _ =>
     }

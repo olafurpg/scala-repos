@@ -28,7 +28,9 @@ import scala.util.{Failure, Success, Try}
   * This is the type that should be fed to cascading to enable binary comparators
   */
 class CascadingBinaryComparator[T](ob: OrderedSerialization[T])
-    extends Comparator[T] with StreamComparator[InputStream] with CHasher[T]
+    extends Comparator[T]
+    with StreamComparator[InputStream]
+    with CHasher[T]
     with Serializable {
 
   override def compare(a: T, b: T) = ob.compare(a, b)

@@ -20,7 +20,9 @@ import akka.http.impl.util.StreamUtils
 import scala.util.Random
 
 class HttpEntitySpec
-    extends FreeSpec with MustMatchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with MustMatchers
+    with BeforeAndAfterAll {
   val tpe: ContentType = ContentTypes.`application/octet-stream`
   val abc = ByteString("abc")
   val de = ByteString("de")
@@ -28,7 +30,8 @@ class HttpEntitySpec
   val ijk = ByteString("ijk")
 
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
   akka.event-handlers = ["akka.testkit.TestEventListener"]
   akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -55,11 +58,15 @@ class HttpEntitySpec
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must collectBytesTo(
-            abc, fgh, ijk)
+            abc,
+            fgh,
+            ijk)
       }
       "Chunked with LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)) must collectBytesTo(
-            abc, fgh, ijk)
+            abc,
+            fgh,
+            ijk)
       }
     }
     "support contentLength" - {
@@ -252,8 +259,8 @@ class HttpEntitySpec
     }
 
   def duplicateBytesTransformer(): Flow[ByteString, ByteString, NotUsed] =
-    Flow[ByteString].transform(
-        () ⇒ StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
+    Flow[ByteString].transform(() ⇒
+      StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
 
   def trailer: ByteString = ByteString("--dup")
   def doubleChars(bs: ByteString): ByteString =

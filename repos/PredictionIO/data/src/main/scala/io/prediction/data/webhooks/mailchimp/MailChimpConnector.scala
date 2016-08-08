@@ -75,7 +75,7 @@ private[prediction] object MailChimpConnector extends FormConnector {
     "data[merges][LNAME]": "API",
     "data[merges][INTERESTS]": "Group1,Group2",
     "data[ip_opt]": "10.20.10.30",
-    "data[ip_signup]": "10.20.10.30"    
+    "data[ip_signup]": "10.20.10.30"
      */
 
     // convert to ISO8601 format
@@ -85,18 +85,18 @@ private[prediction] object MailChimpConnector extends FormConnector {
     // TODO: handle optional fields
     val json =
       ("event" -> "subscribe") ~ ("entityType" -> "user") ~
-      ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
-      ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
+        ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("email" -> data("data[email]")) ~
-              ("email_type" -> data("data[email_type]")) ~
-              ("merges" ->
-                  (("EMAIL" -> data("data[merges][EMAIL]")) ~
-                      ("FNAME" -> data("data[merges][FNAME]"))) ~
-                  ("LNAME" -> data("data[merges][LNAME]")) ~
-                  ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
-          ("ip_opt" -> data("data[ip_opt]")) ~
-          ("ip_signup" -> data("data[ip_signup]")))
+            ("email_type" -> data("data[email_type]")) ~
+            ("merges" ->
+              (("EMAIL" -> data("data[merges][EMAIL]")) ~
+                ("FNAME" -> data("data[merges][FNAME]"))) ~
+                ("LNAME" -> data("data[merges][LNAME]")) ~
+                ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
+            ("ip_opt" -> data("data[ip_opt]")) ~
+            ("ip_signup" -> data("data[ip_signup]")))
 
     json
   }
@@ -131,20 +131,20 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     val json =
       ("event" -> "unsubscribe") ~ ("entityType" -> "user") ~
-      ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
-      ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
+        ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("action" -> data("data[action]")) ~
-              ("reason" -> data("data[reason]")) ~
-              ("email" -> data("data[email]")) ~
-              ("email_type" -> data("data[email_type]")) ~
-              ("merges" ->
-                  (("EMAIL" -> data("data[merges][EMAIL]")) ~
-                      ("FNAME" -> data("data[merges][FNAME]"))) ~
-                  ("LNAME" -> data("data[merges][LNAME]")) ~
-                  ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
-          ("ip_opt" -> data("data[ip_opt]")) ~
-          ("campaign_id" -> data("data[campaign_id]")))
+            ("reason" -> data("data[reason]")) ~
+            ("email" -> data("data[email]")) ~
+            ("email_type" -> data("data[email_type]")) ~
+            ("merges" ->
+              (("EMAIL" -> data("data[merges][EMAIL]")) ~
+                ("FNAME" -> data("data[merges][FNAME]"))) ~
+                ("LNAME" -> data("data[merges][LNAME]")) ~
+                ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
+            ("ip_opt" -> data("data[ip_opt]")) ~
+            ("campaign_id" -> data("data[campaign_id]")))
 
     json
   }
@@ -173,17 +173,17 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     val json =
       ("event" -> "profile") ~ ("entityType" -> "user") ~
-      ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
-      ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
+        ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("email" -> data("data[email]")) ~
-              ("email_type" -> data("data[email_type]")) ~
-              ("merges" ->
-                  (("EMAIL" -> data("data[merges][EMAIL]")) ~
-                      ("FNAME" -> data("data[merges][FNAME]"))) ~
-                  ("LNAME" -> data("data[merges][LNAME]")) ~
-                  ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
-          ("ip_opt" -> data("data[ip_opt]")))
+            ("email_type" -> data("data[email_type]")) ~
+            ("merges" ->
+              (("EMAIL" -> data("data[merges][EMAIL]")) ~
+                ("FNAME" -> data("data[merges][FNAME]"))) ~
+                ("LNAME" -> data("data[merges][LNAME]")) ~
+                ("INTERESTS" -> data.get("data[merges][INTERESTS]")))) ~
+            ("ip_opt" -> data("data[ip_opt]")))
 
     json
   }
@@ -193,11 +193,11 @@ private[prediction] object MailChimpConnector extends FormConnector {
     import org.json4s.JsonDSL._
 
     /*
-    "type": "upemail", 
-    "fired_at": "2009-03-26 22:15:09", 
+    "type": "upemail",
+    "fired_at": "2009-03-26 22:15:09",
     "data[list_id]": "a6b5da1054",
-    "data[new_id]": "51da8c3259", 
-    "data[new_email]": "api+new@mailchimp.com", 
+    "data[new_id]": "51da8c3259",
+    "data[new_email]": "api+new@mailchimp.com",
     "data[old_email]": "api+old@mailchimp.com"
      */
 
@@ -207,11 +207,11 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     val json =
       ("event" -> "upemail") ~ ("entityType" -> "user") ~
-      ("entityId" -> data("data[new_id]")) ~ ("targetEntityType" -> "list") ~
-      ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[new_id]")) ~ ("targetEntityType" -> "list") ~
+        ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("new_email" -> data("data[new_email]")) ~
-              ("old_email" -> data("data[old_email]"))))
+            ("old_email" -> data("data[old_email]"))))
 
     json
   }
@@ -222,8 +222,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     /*
     Reason will be one of "hard" (for hard bounces) or "abuse"
-    "type": "cleaned", 
-    "fired_at": "2009-03-26 22:01:00", 
+    "type": "cleaned",
+    "fired_at": "2009-03-26 22:01:00",
     "data[list_id]": "a6b5da1054",
     "data[campaign_id]": "4fjk2ma9xd",
     "data[reason]": "hard",
@@ -236,11 +236,11 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     val json =
       ("event" -> "cleaned") ~ ("entityType" -> "list") ~
-      ("entityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("campaignId" -> data("data[campaign_id]")) ~
-              ("reason" -> data("data[reason]")) ~
-              ("email" -> data("data[email]"))))
+            ("reason" -> data("data[reason]")) ~
+            ("email" -> data("data[email]"))))
 
     json
   }
@@ -250,12 +250,12 @@ private[prediction] object MailChimpConnector extends FormConnector {
     import org.json4s.JsonDSL._
 
     /*
-    "type": "campaign", 
-    "fired_at": "2009-03-26 21:31:21", 
+    "type": "campaign",
+    "fired_at": "2009-03-26 21:31:21",
     "data[id]": "5aa2102003",
-    "data[subject]": "Test Campaign Subject", 
+    "data[subject]": "Test Campaign Subject",
     "data[status]": "sent",
-    "data[reason]": "", 
+    "data[reason]": "",
     "data[list_id]": "a6b5da1054"
      */
 
@@ -265,12 +265,12 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     val json =
       ("event" -> "campaign") ~ ("entityType" -> "campaign") ~
-      ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
-      ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
-      ("properties" ->
+        ("entityId" -> data("data[id]")) ~ ("targetEntityType" -> "list") ~
+        ("targetEntityId" -> data("data[list_id]")) ~ ("eventTime" -> eventTime) ~
+        ("properties" ->
           (("subject" -> data("data[subject]")) ~
-              ("status" -> data("data[status]")) ~
-              ("reason" -> data("data[reason]"))))
+            ("status" -> data("data[status]")) ~
+            ("reason" -> data("data[reason]"))))
 
     json
   }

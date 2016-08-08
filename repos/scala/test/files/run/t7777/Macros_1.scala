@@ -3,7 +3,8 @@ import scala.language.dynamics
 import scala.reflect.macros.whitebox.Context
 
 class DynMacro extends Dynamic {
-  def applyDynamic(s: String)(xs: Any*): DynMacro = macro DynMacro.applyDynamicMacro
+  def applyDynamic(s: String)(xs: Any*): DynMacro =
+    macro DynMacro.applyDynamicMacro
 }
 
 object DynMacro extends DynMacro {

@@ -58,8 +58,7 @@ private[netty4] object Netty4Transporter {
         case _ => nettyConnectF.cancel(true /* mayInterruptIfRunning */ )
       }
 
-      nettyConnectF.addListener(
-          new GenericFutureListener[ChannelPromise] {
+      nettyConnectF.addListener(new GenericFutureListener[ChannelPromise] {
         def operationComplete(channelP: ChannelPromise): Unit =
           if (channelP.cause != null)
             transportP.updateIfEmpty(Throw(channelP.cause))
@@ -78,8 +77,9 @@ private[netty4] object Netty4Transporter {
       params: Stack.Params
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
-    val init = new RawNetty4ClientChannelInitializer[In, Out](
-        transportP, params, pipeCb)
+    val init = new RawNetty4ClientChannelInitializer[In, Out](transportP,
+                                                              params,
+                                                              pipeCb)
 
     build(init, params, transportP)
   }
@@ -94,8 +94,10 @@ private[netty4] object Netty4Transporter {
       params: Stack.Params
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
-    val init = new Netty4ClientChannelInitializer[In, Out](
-        transportP, params, enc, decoderFactory)
+    val init = new Netty4ClientChannelInitializer[In, Out](transportP,
+                                                           params,
+                                                           enc,
+                                                           decoderFactory)
 
     build(init, params, transportP)
   }

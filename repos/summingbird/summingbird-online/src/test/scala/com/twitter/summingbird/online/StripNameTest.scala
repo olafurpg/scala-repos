@@ -2,7 +2,14 @@ package com.twitter.summingbird.online
 
 import com.twitter.summingbird.memory.Memory
 import com.twitter.summingbird.planner.StripNamedNode
-import com.twitter.summingbird.{Dependants, Producer, OptionMappedProducer, NamedProducer, Source, Summer}
+import com.twitter.summingbird.{
+  Dependants,
+  Producer,
+  OptionMappedProducer,
+  NamedProducer,
+  Source,
+  Summer
+}
 import org.scalatest.FunSuite
 import scala.collection.mutable.{Map => MMap}
 

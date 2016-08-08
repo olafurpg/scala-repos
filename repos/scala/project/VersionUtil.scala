@@ -91,7 +91,8 @@ object VersionUtil {
 
       val date = executeTool("get-scala-commit-date")
       val sha =
-        executeTool("get-scala-commit-sha").substring(0, 7) // The script produces 10 digits at the moment
+        executeTool("get-scala-commit-sha")
+          .substring(0, 7) // The script produces 10 digits at the moment
 
       val (canonicalV, mavenV, osgiV, release) = suffix match {
         case "SNAPSHOT" =>
@@ -116,7 +117,7 @@ object VersionUtil {
       Task[File]] = Def.task {
     writeProps(
         versionProperties.value.toMap +
-        ("copyright.string" -> copyrightString.value),
+          ("copyright.string" -> copyrightString.value),
         (resourceManaged in Compile).value / s"${thisProject.value.id}.properties")
   }
 
@@ -142,7 +143,8 @@ object VersionUtil {
   lazy val versionProps: Map[String, String] = {
     val props = new Properties()
     val in = new FileInputStream(file("versions.properties"))
-    try props.load(in) finally in.close()
+    try props.load(in)
+    finally in.close()
     props.asScala.toMap.map {
       case (k, v) =>
         (k, sys.props.getOrElse(k, v)) // allow system properties to override versions.properties

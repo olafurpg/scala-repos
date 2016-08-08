@@ -34,8 +34,8 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
     loop(Set(sub), Set())
   }
 
-  private def subargs(
-      args1: List[OptManifest[_]], args2: List[OptManifest[_]]) =
+  private def subargs(args1: List[OptManifest[_]],
+                      args2: List[OptManifest[_]]) =
     (args1 corresponds args2) {
       // !!! [Martin] this is wrong, need to take variance into account
       case (x: ClassManifest[_], y: ClassManifest[_]) => x <:< y
@@ -135,7 +135,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
     java.lang.reflect.Array
       .newInstance(
           arrayClass[Array[Array[Array[T]]]](arrayClass[Array[Array[T]]](
-                  arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
+              arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
           len)
       .asInstanceOf[Array[Array[Array[Array[Array[T]]]]]]
 
@@ -277,5 +277,5 @@ private class ClassTypeManifest[T](
     extends ClassManifest[T] {
   override def toString =
     (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
-    (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
+      (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
 }

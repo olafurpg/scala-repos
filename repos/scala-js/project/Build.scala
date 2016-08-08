@@ -7,9 +7,17 @@ import bintray.Plugin.bintrayPublishSettings
 import bintray.Keys.{repository, bintrayOrganization, bintray}
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{previousArtifact, binaryIssueFilters}
+import com.typesafe.tools.mima.plugin.MimaKeys.{
+  previousArtifact,
+  binaryIssueFilters
+}
 
-import java.io.{BufferedOutputStream, FileOutputStream, BufferedWriter, FileWriter}
+import java.io.{
+  BufferedOutputStream,
+  FileOutputStream,
+  BufferedWriter,
+  FileWriter
+}
 
 import scala.collection.mutable
 import scala.util.Properties
@@ -49,13 +57,13 @@ object Build extends sbt.Build {
   val previousBinaryCrossVersion =
     CrossVersion.binaryMapped(v => s"sjs${previousSJSBinaryVersion}_$v")
 
-  val scalaVersionsUsedForPublishing: Set[String] = Set(
-      "2.10.6", "2.11.8", "2.12.0-M3")
+  val scalaVersionsUsedForPublishing: Set[String] =
+    Set("2.10.6", "2.11.8", "2.12.0-M3")
   val newScalaBinaryVersionsInThisRelease: Set[String] = Set()
 
   val javaVersion = settingKey[Int](
       "The major Java SDK version that should be assumed for compatibility. " +
-      "Defaults to what sbt is running with.")
+        "Defaults to what sbt is running with.")
 
   val javaDocBaseURL: String = "http://docs.oracle.com/javase/8/docs/api/"
 
@@ -95,7 +103,8 @@ object Build extends sbt.Build {
           (thisProjectID.organization % thisProjectID.name % previousVersion)
             .cross(previousCrossVersion)
             .extra(prevExtraAttributes.toSeq: _*)
-        Some(CrossVersion(scalaV, scalaBinaryV)(prevProjectID)
+        Some(
+            CrossVersion(scalaV, scalaBinaryV)(prevProjectID)
               .cross(CrossVersion.Disabled))
       }
     }
@@ -111,12 +120,13 @@ object Build extends sbt.Build {
         },
         homepage := Some(url("http://scala-js.org/")),
         licenses +=
-        ("BSD New",
-            url("https://github.com/scala-js/scala-js/blob/master/LICENSE")),
+          ("BSD New",
+          url("https://github.com/scala-js/scala-js/blob/master/LICENSE")),
         scmInfo :=
-          Some(ScmInfo(url("https://github.com/scala-js/scala-js"),
-                       "scm:git:git@github.com:scala-js/scala-js.git",
-                       Some("scm:git:git@github.com:scala-js/scala-js.git"))),
+          Some(
+              ScmInfo(url("https://github.com/scala-js/scala-js"),
+                      "scm:git:git@github.com:scala-js/scala-js.git",
+                      Some("scm:git:git@github.com:scala-js/scala-js.git"))),
         shouldPartest := {
           val testListDir =
             ((resourceDirectory in (partestSuite, Test)).value / "scala" / "tools" / "partest" / "scalajs" / scalaVersion.value)
@@ -228,9 +238,9 @@ object Build extends sbt.Build {
 
   val noClassFilesSettings: Setting[_] =
     (scalacOptions in (Compile, compile) ++= {
-          if (isGeneratingEclipse) Seq()
-          else Seq("-Yskip:cleanup,icode,jvm")
-        })
+      if (isGeneratingEclipse) Seq()
+      else Seq("-Yskip:cleanup,icode,jvm")
+    })
 
   val publishSettings = Seq(
       publishMavenStyle := true,
@@ -329,8 +339,8 @@ object Build extends sbt.Build {
             Seq(
                 // Link source maps to github sources
                 "-P:scalajs:mapSourceURI:" + root.base.toURI +
-                "->https://raw.githubusercontent.com/scala-js/scala-js/v" +
-                scalaJSVersion + "/"
+                  "->https://raw.githubusercontent.com/scala-js/scala-js/v" +
+                  scalaJSVersion + "/"
             )
         }
     )
@@ -364,7 +374,7 @@ object Build extends sbt.Build {
       } else {
         project.settings(
             unmanagedSourceDirectories in Compile +=
-            (scalaSource in (dependency, Compile)).value
+              (scalaSource in (dependency, Compile)).value
         )
       }
     }
@@ -467,7 +477,7 @@ object Build extends sbt.Build {
       settings = commonIrProjectSettings ++ myScalaJSSettings ++ Seq(
             crossVersion := ScalaJSCrossVersion.binary,
             unmanagedSourceDirectories in Compile +=
-            (scalaSource in Compile in irProject).value
+              (scalaSource in Compile in irProject).value
         )
   ).withScalaJSCompiler.dependsOn(javalibEx)
 
@@ -486,9 +496,10 @@ object Build extends sbt.Build {
             val testOutDir =
               (streams.value.cacheDirectory / "scalajs-compiler-test")
             IO.createDirectory(testOutDir)
-            sys.props("scala.scalajs.compiler.test.output") = testOutDir.getAbsolutePath
+            sys.props("scala.scalajs.compiler.test.output") =
+              testOutDir.getAbsolutePath
             sys.props("scala.scalajs.compiler.test.scalajslib") =
-            (packageBin in (library, Compile)).value.getAbsolutePath
+              (packageBin in (library, Compile)).value.getAbsolutePath
             sys.props("scala.scalajs.compiler.test.scalalib") = {
 
               def isScalaLib(att: Attributed[File]) = {
@@ -503,7 +514,7 @@ object Build extends sbt.Build {
               lib.map(_.data.getAbsolutePath).getOrElse {
                 streams.value.log.error(
                     "Couldn't find Scala library on the classpath. CP: " +
-                    (managedClasspath in Test).value); ""
+                      (managedClasspath in Test).value); ""
               }
             }
           },
@@ -533,7 +544,7 @@ object Build extends sbt.Build {
             libraryDependencies ++= Seq(
                 "com.google.javascript" % "closure-compiler" % "v20130603",
                 "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-                ("junit", "junit"),
+                  ("junit", "junit"),
                 "com.novocode" % "junit-interface" % "0.9" % "test"
             )
         )
@@ -562,8 +573,8 @@ object Build extends sbt.Build {
           val irFiles = dirs.flatMap(dir => (dir ** "*.sjsir").get)
 
           val irPaths = {
-            for (f <- jars ++ irFiles) yield
-              s""""${escapeJS(f.getAbsolutePath)}""""
+            for (f <- jars ++ irFiles)
+              yield s""""${escapeJS(f.getAbsolutePath)}""""
           }
 
           val code = {
@@ -654,14 +665,14 @@ object Build extends sbt.Build {
 
   lazy val delambdafySetting = {
     scalacOptions ++=
-    (if (isGeneratingEclipse) Seq()
-     else if (scalaBinaryVersion.value == "2.10") Seq()
-     else Seq("-Ydelambdafy:method"))
+      (if (isGeneratingEclipse) Seq()
+       else if (scalaBinaryVersion.value == "2.10") Seq()
+       else Seq("-Ydelambdafy:method"))
   }
 
-  private def serializeHardcodedIR(base: File,
-                                   infoAndTree: (ir.Infos.ClassInfo,
-                                   ir.Trees.ClassDef)): File = {
+  private def serializeHardcodedIR(
+      base: File,
+      infoAndTree: (ir.Infos.ClassInfo, ir.Trees.ClassDef)): File = {
     // We assume that there are no weird characters in the full name
     val fullName = ir.Definitions.decodeClassName(infoAndTree._1.encodedName)
     val output = base / (fullName.replace('.', '/') + ".sjsir")
@@ -718,8 +729,8 @@ object Build extends sbt.Build {
              */
             scalacOptions += {
             "-P:scalajs:mapSourceURI:" + (artifactPath in fetchScalaSource).value.toURI +
-            "->https://raw.githubusercontent.com/scala/scala/v" +
-            scalaVersion.value + "/src/library/"
+              "->https://raw.githubusercontent.com/scala/scala/v" +
+              scalaVersion.value + "/src/library/"
           }
         ) ++ myScalaJSSettings ++ Seq(
             name := "Scala library for Scala.js",
@@ -728,8 +739,8 @@ object Build extends sbt.Build {
             noClassFilesSettings,
             // The Scala lib is full of warnings we don't want to see
             scalacOptions ~=
-            (_.filterNot(
-                    Set("-deprecation", "-unchecked", "-feature") contains _)),
+              (_.filterNot(
+                  Set("-deprecation", "-unchecked", "-feature") contains _)),
             // Tell the plugin to hack-fix bad classOf trees
             scalacOptions += "-P:scalajs:fixClassOf",
             artifactPath in fetchScalaSource :=
@@ -811,7 +822,7 @@ object Build extends sbt.Build {
               val path = normSrc.substring(normSrcDir.length)
               val useless =
                 path.contains("/scala/collection/parallel/") ||
-                path.contains("/scala/util/parsing/")
+                  path.contains("/scala/util/parsing/")
               if (!useless) {
                 if (paths.add(path)) sources += src
                 else streams.value.log.debug(s"not including $src")
@@ -826,7 +837,7 @@ object Build extends sbt.Build {
             val ver = scalaVersion.value
             if (ver.startsWith("2.10."))
               Seq(compilerPlugin(
-                      "org.scala-lang.plugins" % "continuations" % ver))
+                  "org.scala-lang.plugins" % "continuations" % ver))
             else Nil
           },
             scalacOptions ++= {
@@ -861,35 +872,35 @@ object Build extends sbt.Build {
             libraryDependencies +=
               "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
         ) ++ (scalaJSExternalCompileSettings) ++ inConfig(Compile)(Seq(
-                /* Add the .sjsir files from other lib projects
-                 * (but not .class files)
-                 */
-                mappings in packageBin := {
+            /* Add the .sjsir files from other lib projects
+             * (but not .class files)
+             */
+            mappings in packageBin := {
             /* From library, we must take everyting, except the
              * java.nio.TypedArrayBufferBridge object, whose actual
              * implementation is in javalib.
              */
             val superMappings = (mappings in packageBin).value
-            val libraryMappings = superMappings.filter(
-                _._2.replace('\\', '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
+            val libraryMappings = superMappings.filter(_._2
+              .replace('\\', '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
 
             val filter = ("*.sjsir": NameFilter)
 
             val javalibProducts = (products in javalib).value
-            val javalibMappings = javalibProducts.flatMap(
-                base => Path.selectSubpaths(base, filter))
+            val javalibMappings = javalibProducts.flatMap(base =>
+              Path.selectSubpaths(base, filter))
             val javalibFilteredMappings = javalibMappings.filter(
                 _._2.replace('\\', '/') != "java/lang/MathJDK8Bridge$.sjsir")
 
             val otherProducts =
               ((products in javalanglib).value ++ (products in scalalib).value ++
-                  (products in libraryAux).value)
+                (products in libraryAux).value)
             val otherMappings =
               otherProducts.flatMap(base => Path.selectSubpaths(base, filter))
 
             libraryMappings ++ otherMappings ++ javalibFilteredMappings
           }
-            ))
+        ))
   ).withScalaJSCompiler
 
   lazy val javalibEx: Project = Project(
@@ -1044,11 +1055,12 @@ object Build extends sbt.Build {
               val baseArgs = Seq("nodejs", "typedarray")
               if (env.sourceMap) {
                 if (!env.hasSourceMapSupport) {
-                  sys.error("You must install Node.js source map support to " +
-                      "run the full Scala.js test suite (npm install " +
-                      "source-map-support). To deactivate source map " +
-                      "tests, do: set jsEnv in " + thisProject.value.id +
-                      " := NodeJSEnv().value.withSourceMap(false)")
+                  sys.error(
+                      "You must install Node.js source map support to " +
+                        "run the full Scala.js test suite (npm install " +
+                        "source-map-support). To deactivate source map " +
+                        "tests, do: set jsEnv in " + thisProject.value.id +
+                        " := NodeJSEnv().value.withSourceMap(false)")
                 }
                 baseArgs :+ "source-maps"
               } else {
@@ -1064,7 +1076,7 @@ object Build extends sbt.Build {
             case _ =>
               throw new AssertionError(
                   s"Unknown JSEnv of class ${env.getClass.getName}: " +
-                  "don't know what tags to specify for the test suite")
+                    "don't know what tags to specify for the test suite")
           }
 
           val envTags = envTagsFor((resolvedJSEnv in Test).value)
@@ -1080,13 +1092,13 @@ object Build extends sbt.Build {
             (if (sems.asInstanceOfs == CheckedBehavior.Compliant)
                Seq("compliant-asinstanceofs")
              else Seq()) ++
-            (if (sems.moduleInit == CheckedBehavior.Compliant)
-               Seq("compliant-moduleinit")
-             else Seq()) ++
-            (if (sems.strictFloats) Seq("strict-floats")
-             else Seq()) ++
-            (if (sems.productionMode) Seq("production-mode")
-             else Seq("development-mode"))
+              (if (sems.moduleInit == CheckedBehavior.Compliant)
+                 Seq("compliant-moduleinit")
+               else Seq()) ++
+              (if (sems.strictFloats) Seq("strict-floats")
+               else Seq()) ++
+              (if (sems.productionMode) Seq("production-mode")
+               else Seq("development-mode"))
 
           val stageTag = stage match {
             case FastOptStage => "fastopt-stage"
@@ -1099,7 +1111,8 @@ object Build extends sbt.Build {
           def scalaJSProp(name: String): String =
             s"-Dscalajs.$name=true"
 
-          testOptionTags.value.map(scalaJSProp) :+ "-Dscalajs.testsuite.testtag=testtag.value"
+          testOptionTags.value
+            .map(scalaJSProp) :+ "-Dscalajs.testsuite.testtag=testtag.value"
         },
         testOptions in Test ++= {
           def testArgument(arg: String): Tests.Argument =
@@ -1129,7 +1142,8 @@ object Build extends sbt.Build {
         List(sharedTestDir / "scala") ++ includeIf(
             sharedTestDir / "require-jdk7",
             javaVersion.value >= 7) ++ includeIf(
-            sharedTestDir / "require-jdk8", javaVersion.value >= 8)
+            sharedTestDir / "require-jdk8",
+            javaVersion.value >= 8)
       },
       sources in Test ++= {
         /* Can't add require-sam as unmanagedSourceDirectories because of the use
@@ -1156,12 +1170,12 @@ object Build extends sbt.Build {
             jsDependencies +=
               ProvidedJS / "ScalaJSDefinedTestNatives.js" % "test",
             scalaJSSemantics ~=
-            (_.withRuntimeClassName(_.fullName match {
-                case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
-                  "renamed.test.Class"
-                case fullName =>
-                  fullName
-              })),
+              (_.withRuntimeClassName(_.fullName match {
+              case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
+                "renamed.test.Class"
+              case fullName =>
+                fullName
+            })),
             /* Generate a scala source file that throws exceptions in
              * various places (while attaching the source line to the
              * exception). When we catch the exception, we can then
@@ -1182,20 +1196,19 @@ object Build extends sbt.Build {
 
             var i = 0
             val pat = "/\\*{2,3}/".r
-            val replaced = pat.replaceAllIn(template, {
-              mat =>
-                val lNo = lineNo(mat.before)
-                val res =
-                  if (mat.end - mat.start == 5)
-                    // matching a /***/
-                    s"if (TC.is($i)) { throw new TestException($lNo) } else "
-                  else
-                    // matching a /**/
-                    s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
+            val replaced = pat.replaceAllIn(template, { mat =>
+              val lNo = lineNo(mat.before)
+              val res =
+                if (mat.end - mat.start == 5)
+                  // matching a /***/
+                  s"if (TC.is($i)) { throw new TestException($lNo) } else "
+                else
+                  // matching a /**/
+                  s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
 
-                i += 1
+              i += 1
 
-                res
+              res
             })
 
             val outFile = dir / "SourceMapTest.scala"
@@ -1239,7 +1252,7 @@ object Build extends sbt.Build {
       settings = commonSettings ++ myScalaJSSettings ++ testTagSettings ++ Seq(
             name := "Scala.js not IR checked tests",
             scalaJSOptimizerOptions ~=
-            (_.withCheckScalaJSIR(false).withBypassLinkingErrors(true)),
+              (_.withCheckScalaJSIR(false).withBypassLinkingErrors(true)),
             publishArtifact in Compile := false
         )
   ).withScalaJSCompiler.dependsOn(library, jasmineTestFramework % "test")
@@ -1299,7 +1312,7 @@ object Build extends sbt.Build {
                   "com.google.javascript" % "closure-compiler" % "v20130603",
                   "io.apigee" % "rhino" % "1.7R5pre4",
                   "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-                  ("junit", "junit")
+                    ("junit", "junit")
               )
             else Seq()
           },
@@ -1317,8 +1330,8 @@ object Build extends sbt.Build {
                 val scalaFilter: FileFilter = "*.scala"
                 val files =
                   ((jsenvBase * scalaFilter) +++
-                      (jsenvBase / "nodejs" ** scalaFilter) +++
-                      (jsenvBase / "rhino" ** scalaFilter))
+                    (jsenvBase / "nodejs" ** scalaFilter) +++
+                    (jsenvBase / "rhino" ** scalaFilter))
 
                 files.get
               }
@@ -1347,14 +1360,15 @@ object Build extends sbt.Build {
             if (shouldPartest.value)
               Def.task {
                 val _ = (fetchScalaSource in partest).value
-                Seq(new sbt.TestDefinition(
+                Seq(
+                    new sbt.TestDefinition(
                         s"partest-${scalaVersion.value}",
                         // marker fingerprint since there are no test classes
                         // to be discovered by sbt:
                         new sbt.testing.AnnotatedFingerprint {
-                      def isModule = true
-                      def annotationName = "partest"
-                    },
+                          def isModule = true
+                          def annotationName = "partest"
+                        },
                         true,
                         Array()
                     ))

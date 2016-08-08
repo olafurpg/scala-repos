@@ -9,7 +9,7 @@ import scala.util._
 /* Tests various ranges by making sure they all agree on the same answers. */
 @RunWith(classOf[JUnit4])
 class RangeConsistencyTest {
-  def r2nr[T : Integral](
+  def r2nr[T: Integral](
       r: Range,
       puff: T,
       stride: T,
@@ -48,11 +48,12 @@ class RangeConsistencyTest {
                                                      List(NR(sp1, end, step))
                                                    else
                                                      Nil) ::: (if (en1 < end)
-                                                                 List(NR(start,
-                                                                         en1,
-                                                                         step))
+                                                                 List(
+                                                                     NR(start,
+                                                                        en1,
+                                                                        step))
                                                                else Nil) :::
-    (if (end < ep1) List(NR(start, ep1, step)) else Nil)
+      (if (end < ep1) List(NR(start, ep1, step)) else Nil)
   }
 
   // Motivated by SI-4370: Wrong result for Long.MinValue to Long.MaxValue by Int.MaxValue
@@ -148,7 +149,7 @@ class RangeConsistencyTest {
   def testSI6736() {
     // These operations on overfull ranges should all succeed.
     assert((0 to Int.MaxValue).contains(4))
-    assert(!( (Int.MinValue to 0).contains(4)))
+    assert(!((Int.MinValue to 0).contains(4)))
     assert((Int.MinValue to 0).last == 0)
     assert((Int.MinValue until 5).last == 4)
     assert((-7 to -99 by -4).last == -99 && (-7 until -99 by -4).last == -95)
@@ -158,8 +159,7 @@ class RangeConsistencyTest {
     assert((-3 to Int.MaxValue).dropRight(4).length == Int.MaxValue)
     assert((-3 to Int.MaxValue).takeRight(1234).length == 1234)
     assert((-3 to Int.MaxValue).dropWhile(_ <= 0).length == Int.MaxValue)
-    assert(
-        (-3 to Int.MaxValue).span(_ <= 0) match {
+    assert((-3 to Int.MaxValue).span(_ <= 0) match {
       case (a, b) => a.length == 4 && b.length == Int.MaxValue
     })
   }

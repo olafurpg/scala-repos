@@ -6,7 +6,9 @@ import scala.collection.mutable
 import scala.collection.JavaConversions._
 
 class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
-    extends ju.Dictionary[K, V] with ju.Map[K, V] with Cloneable
+    extends ju.Dictionary[K, V]
+    with ju.Map[K, V]
+    with Cloneable
     with Serializable {
 
   def this() =

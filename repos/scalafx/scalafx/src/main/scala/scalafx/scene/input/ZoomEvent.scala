@@ -48,8 +48,8 @@ object ZoomEvent {
     * This event occurs when user performs a zooming gesture such as dragging two fingers apart.
     */
   val Zoom: EventType[jfxsi.ZoomEvent] = jfxsi.ZoomEvent.ZOOM
-  @deprecated(
-      "Use Zoom; ZOOM will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Zoom; ZOOM will be removed in a future release",
+              "8.0.60-R10")
   val ZOOM = Zoom
 
   /**
@@ -75,7 +75,8 @@ object ZoomEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ZoomEvent.html]]
   */
 class ZoomEvent(override val delegate: jfxsi.ZoomEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ZoomEvent] {
+    extends GestureEvent(delegate)
+    with SFXDelegate[jfxsi.ZoomEvent] {
 
   /**
     * Gets the zooming amount of this gesture.

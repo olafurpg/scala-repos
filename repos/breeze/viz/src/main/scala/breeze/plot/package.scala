@@ -197,7 +197,8 @@ package object plot {
 
   /** Plots a histogram of the given data into the given number of bins */
   def hist[D, K, V](data: D, bins: HistogramBins = 10, name: String = null)(
-      implicit xv: DomainFunction[D, Int, V], vv: V => Double): Series =
+      implicit xv: DomainFunction[D, Int, V],
+      vv: V => Double): Series =
     new Series {
       val values = xv.domain(data).map(xv(data, _)).map(vv)
       val (min, max) = (values.min, values.max)
@@ -225,7 +226,7 @@ package object plot {
                 name = if (name == null) defaultName(0) else name,
                 items = IndexedSeq.range(0, counts.length),
                 x = (i: Int) =>
-                    if (i == binner.splits.length) {
+                  if (i == binner.splits.length) {
                     binner.splits(i - 1) + width / 2.0
                   } else {
                     binner.splits(i) - width / 2.0
@@ -267,10 +268,10 @@ package object plot {
       scale: GradientPaintScale[Double] = null,
       name: String = null,
       offset: (Int, Int) = (0, 0),
-      labels: PartialFunction[(Int, Int), String] = null
-          .asInstanceOf[PartialFunction[(Int, Int), String]],
-      tips: PartialFunction[(Int, Int), String] = null
-          .asInstanceOf[PartialFunction[(Int, Int), String]]): Series =
+      labels: PartialFunction[(Int, Int), String] =
+        null.asInstanceOf[PartialFunction[(Int, Int), String]],
+      tips: PartialFunction[(Int, Int), String] =
+        null.asInstanceOf[PartialFunction[(Int, Int), String]]): Series =
     new Series {
 
       val mt = img
@@ -292,10 +293,10 @@ package object plot {
             y = (k: (Int, Int)) => k._1 + offset._1,
             z = (k: (Int, Int)) => mt(k._1, k._2),
             label = (k: (Int, Int)) =>
-                if (labels != null && labels.isDefinedAt(k)) labels(k)
-                else null,
+              if (labels != null && labels.isDefinedAt(k)) labels(k)
+              else null,
             tip = (k: (Int, Int)) =>
-                if (tips != null && tips.isDefinedAt(k)) tips(k) else null
+              if (tips != null && tips.isDefinedAt(k)) tips(k) else null
         )
 
         // initialize renderer

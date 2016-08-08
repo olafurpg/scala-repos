@@ -93,7 +93,8 @@ trait NormedModule[V, S] extends Module[V, S] with Normed[V] {
 }
 
 trait MutableNormedModule[V, S]
-    extends MutableModule[V, S] with NormedModule[V, S]
+    extends MutableModule[V, S]
+    with NormedModule[V, S]
 
 /**
   * An LP Module is a module equipped with a p-norm (named after LPSpace)
@@ -112,7 +113,8 @@ trait InnerProductModule[V, S] extends NormedModule[V, S] {
 }
 
 trait MutableInnerProductModule[V, S]
-    extends MutableModule[V, S] with InnerProductModule[V, S]
+    extends MutableModule[V, S]
+    with InnerProductModule[V, S]
 
 // Vector Spaces
 trait VectorSpace[V, S] extends Module[V, S] {
@@ -121,25 +123,30 @@ trait VectorSpace[V, S] extends Module[V, S] {
 }
 
 trait MutableVectorSpace[V, S]
-    extends MutableModule[V, S] with VectorSpace[V, S] {
+    extends MutableModule[V, S]
+    with VectorSpace[V, S] {
   implicit def divIntoVS: OpDiv.InPlaceImpl2[V, S]
 }
 
 trait NormedVectorSpace[V, S] extends VectorSpace[V, S] with NormedModule[V, S]
 
 trait MutableNormedVectorSpace[V, S]
-    extends MutableVectorSpace[V, S] with NormedVectorSpace[V, S]
+    extends MutableVectorSpace[V, S]
+    with NormedVectorSpace[V, S]
 
 trait LPSpace[V, S] extends VectorSpace[V, S] with LPModule[V, S]
 
 trait MutableLPSpace[V, S]
-    extends MutableVectorSpace[V, S] with MutableLPModule[V, S]
+    extends MutableVectorSpace[V, S]
+    with MutableLPModule[V, S]
 
 trait InnerProductVectorSpace[V, S]
-    extends NormedVectorSpace[V, S] with InnerProductModule[V, S]
+    extends NormedVectorSpace[V, S]
+    with InnerProductModule[V, S]
 
 trait MutableInnerProductVectorSpace[V, S]
-    extends MutableVectorSpace[V, S] with MutableInnerProductModule[V, S]
+    extends MutableVectorSpace[V, S]
+    with MutableInnerProductModule[V, S]
     with InnerProductVectorSpace[V, S]
 
 // Groups over vectors under element-wise operations.
@@ -151,17 +158,20 @@ trait VectorRing[V, S] extends InnerProductModule[V, S] {
 }
 
 trait MutableVectorRing[V, S]
-    extends VectorRing[V, S] with MutableInnerProductModule[V, S] {
+    extends VectorRing[V, S]
+    with MutableInnerProductModule[V, S] {
   implicit def mulIntoVV: OpMulScalar.InPlaceImpl2[V, V]
 }
 
 trait VectorField[V, S]
-    extends InnerProductVectorSpace[V, S] with VectorRing[V, S] {
+    extends InnerProductVectorSpace[V, S]
+    with VectorRing[V, S] {
   implicit def divVV: OpDiv.Impl2[V, V, V]
 }
 
 trait MutableVectorField[V, S]
-    extends VectorField[V, S] with MutableVectorRing[V, S]
+    extends VectorField[V, S]
+    with MutableVectorRing[V, S]
     with MutableInnerProductVectorSpace[V, S] {
   implicit def divIntoVV: OpDiv.InPlaceImpl2[V, V]
 }
@@ -170,17 +180,20 @@ trait MutableVectorField[V, S]
 trait LPVectorField[V, S] extends VectorField[V, S] with LPSpace[V, S]
 
 trait MutableLPVectorField[V, S]
-    extends LPVectorField[V, S] with MutableVectorRing[V, S]
+    extends LPVectorField[V, S]
+    with MutableVectorRing[V, S]
     with MutableInnerProductVectorSpace[V, S] {
   implicit def divIntoVV: OpDiv.InPlaceImpl2[V, V]
 }
 
 // Same idea as VectorField, but with explicit key type specified.
 trait CoordinateField[V, S]
-    extends LPVectorField[V, S] with Coordinated[V, S] {}
+    extends LPVectorField[V, S]
+    with Coordinated[V, S] {}
 
 trait MutableCoordinateField[V, S]
-    extends CoordinateField[V, S] with MutableVectorField[V, S]
+    extends CoordinateField[V, S]
+    with MutableVectorField[V, S]
 
 /**
   * A CoordinateField that has an addressable index set. This set may not be finite, and it may
@@ -284,32 +297,32 @@ trait MutableOptimizationSpace[M, V, S]
 }
 
 object VectorField {
-  def make[V, S](
-      implicit _norm: norm.Impl[V, Double],
-      _field: Field[S],
-      _mulVV: OpMulScalar.Impl2[V, V, V],
-      _divVV: OpDiv.Impl2[V, V, V],
-      _zeroLike: CanCreateZerosLike[V, V],
-      _mulVS: OpMulScalar.Impl2[V, S, V],
-      _divVS: OpDiv.Impl2[V, S, V],
-      _addVV: OpAdd.Impl2[V, V, V],
-      _subVV: OpSub.Impl2[V, V, V],
-      _dotVV: OpMulInner.Impl2[V, V, S],
-      _neg: OpNeg.Impl[V, V],
-      _ops: V <:< NumericOps[V]): VectorField[V, S] = new VectorField[V, S] {
-    def scalars: Field[S] = _field
-    override implicit def hasOps(v: V): NumericOps[V] = _ops(v)
-    override implicit def normImpl: norm.Impl[V, Double] = _norm
-    override implicit def dotVV: OpMulInner.Impl2[V, V, S] = _dotVV
-    override implicit def zeroLike: CanCreateZerosLike[V, V] = _zeroLike
-    override implicit def mulVV: OpMulScalar.Impl2[V, V, V] = _mulVV
-    override implicit def divVV: OpDiv.Impl2[V, V, V] = _divVV
-    override implicit def mulVS: OpMulScalar.Impl2[V, S, V] = _mulVS
-    override implicit def divVS: OpDiv.Impl2[V, S, V] = _divVS
-    override implicit def addVV: OpAdd.Impl2[V, V, V] = _addVV
-    override implicit def subVV: OpSub.Impl2[V, V, V] = _subVV
-    override implicit def neg: OpNeg.Impl[V, V] = _neg
-  }
+  def make[V, S](implicit _norm: norm.Impl[V, Double],
+                 _field: Field[S],
+                 _mulVV: OpMulScalar.Impl2[V, V, V],
+                 _divVV: OpDiv.Impl2[V, V, V],
+                 _zeroLike: CanCreateZerosLike[V, V],
+                 _mulVS: OpMulScalar.Impl2[V, S, V],
+                 _divVS: OpDiv.Impl2[V, S, V],
+                 _addVV: OpAdd.Impl2[V, V, V],
+                 _subVV: OpSub.Impl2[V, V, V],
+                 _dotVV: OpMulInner.Impl2[V, V, S],
+                 _neg: OpNeg.Impl[V, V],
+                 _ops: V <:< NumericOps[V]): VectorField[V, S] =
+    new VectorField[V, S] {
+      def scalars: Field[S] = _field
+      override implicit def hasOps(v: V): NumericOps[V] = _ops(v)
+      override implicit def normImpl: norm.Impl[V, Double] = _norm
+      override implicit def dotVV: OpMulInner.Impl2[V, V, S] = _dotVV
+      override implicit def zeroLike: CanCreateZerosLike[V, V] = _zeroLike
+      override implicit def mulVV: OpMulScalar.Impl2[V, V, V] = _mulVV
+      override implicit def divVV: OpDiv.Impl2[V, V, V] = _divVV
+      override implicit def mulVS: OpMulScalar.Impl2[V, S, V] = _mulVS
+      override implicit def divVS: OpDiv.Impl2[V, S, V] = _divVS
+      override implicit def addVV: OpAdd.Impl2[V, V, V] = _addVV
+      override implicit def subVV: OpSub.Impl2[V, V, V] = _subVV
+      override implicit def neg: OpNeg.Impl[V, V] = _neg
+    }
 }
 
 object MutableModule {
@@ -757,9 +770,8 @@ object MutableEnumeratedCoordinateField {
 object MutableOptimizationSpace {
 
   object SparseFieldOptimizationSpace {
-    implicit def sparseOptSpace[
-        S : Field : Zero : ClassTag]: MutableOptimizationSpace[
-        CSCMatrix[S], SparseVector[S], S] = {
+    implicit def sparseOptSpace[S: Field: Zero: ClassTag]
+      : MutableOptimizationSpace[CSCMatrix[S], SparseVector[S], S] = {
       val norms = EntrywiseMatrixNorms.make[CSCMatrix[S], S]
       import norms._
       make[CSCMatrix[S], SparseVector[S], S](_.asCscRow, _.flatten())
@@ -767,8 +779,8 @@ object MutableOptimizationSpace {
   }
 
   object DenseFieldOptimizationSpace {
-    implicit def denseOptSpace[S : Field : ClassTag]: MutableOptimizationSpace[
-        DenseMatrix[S], DenseVector[S], S] = {
+    implicit def denseOptSpace[S: Field: ClassTag]
+      : MutableOptimizationSpace[DenseMatrix[S], DenseVector[S], S] = {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[S], S]
       import norms._
       import DenseMatrix.canMapValues
@@ -778,22 +790,26 @@ object MutableOptimizationSpace {
 
   object DenseDoubleOptimizationSpace {
     implicit def denseDoubleOptSpace: MutableOptimizationSpace[
-        DenseMatrix[Double], DenseVector[Double], Double] = {
+        DenseMatrix[Double],
+        DenseVector[Double],
+        Double] = {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
       import DenseMatrix.canMapValues
-      make[DenseMatrix[Double], DenseVector[Double], Double](
-          _.asDenseMatrix, _.flatten())
+      make[DenseMatrix[Double], DenseVector[Double], Double](_.asDenseMatrix,
+                                                             _.flatten())
     }
   }
 
   object SparseDoubleOptimizationSpace {
     implicit def sparseDoubleOptSpace: MutableOptimizationSpace[
-        CSCMatrix[Double], SparseVector[Double], Double] = {
+        CSCMatrix[Double],
+        SparseVector[Double],
+        Double] = {
       val norms = EntrywiseMatrixNorms.make[CSCMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
-      make[CSCMatrix[Double], SparseVector[Double], Double](
-          _.asCscRow, _.flatten())
+      make[CSCMatrix[Double], SparseVector[Double], Double](_.asCscRow,
+                                                            _.flatten())
     }
   }
 
@@ -924,8 +940,12 @@ object MutableOptimizationSpace {
       implicit def mulIntoVV: OpMulScalar.InPlaceImpl2[V, V] = _mulIntoVV
       implicit def setIntoVS: OpSet.InPlaceImpl2[V, S] = _setIntoVS
       implicit def zipMapValues: CanZipMapValues[V, S, S, V] = _zipMapVals
-      override implicit def zipMapKeyValues: CanZipMapKeyValues[
-          V, Int, S, S, V] = _zipMapKeyVals
+      override implicit def zipMapKeyValues: CanZipMapKeyValues[V,
+                                                                Int,
+                                                                S,
+                                                                S,
+                                                                V] =
+        _zipMapKeyVals
       implicit def iterateValues: CanTraverseValues[V, S] = _traverseVals
       implicit def mapValues: CanMapValues[V, S, S, V] = _mapVals
 

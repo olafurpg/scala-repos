@@ -16,5 +16,6 @@ object Typechecking {
   import blackbox.Context
 
   def typeError(code: String): Unit = macro TypecheckingMacros.typeError
-  def typeErrorWithMsg(code: String, msg: String): Unit = macro TypecheckingMacros.typeErrorWithMsg
+  def typeErrorWithMsg(code: String, msg: String): Unit =
+    macro TypecheckingMacros.typeErrorWithMsg
 }

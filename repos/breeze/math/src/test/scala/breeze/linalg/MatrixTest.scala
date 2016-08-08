@@ -29,10 +29,12 @@ class MatrixTest extends FunSuite with Checkers {
     val b = Matrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
     val bd = DenseMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
     val c = DenseVector(6.0, 2.0, 3.0)
-    assert((a * b: Matrix[Double]) === Matrix((37.0, -8.0, 25.0),
-                                              (85.0, -23.0, 67.0)))
-    assert((ad * b: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
-                                                         (85.0, -23.0, 67.0)))
+    assert(
+        (a * b: Matrix[Double]) === Matrix((37.0, -8.0, 25.0),
+                                           (85.0, -23.0, 67.0)))
+    assert(
+        (ad * b: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
+                                                      (85.0, -23.0, 67.0)))
     assert(a * c === DenseVector(19.0, 52.0))
     assert(b * c === DenseVector(62.0, -21.0, 87.0))
 //    assert(b.t * c === DenseVector(72.0, -18.0, 65.0))
@@ -97,10 +99,14 @@ class MatrixTest extends FunSuite with Checkers {
     assert(
         value === Matrix((Complex(0, 74), Complex(0, -16), Complex(0, 50)),
                          (Complex(0, 170), Complex(0, -46), Complex(0, 134))))
-    assert(b * c === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
-    assert(b * cs === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
+    assert(
+        b * c === DenseVector(Complex(62, 62),
+                              Complex(-21, -21),
+                              Complex(87, 87)))
+    assert(
+        b * cs === DenseVector(Complex(62, 62),
+                               Complex(-21, -21),
+                               Complex(87, 87)))
 //    assert(b.t * c === DenseVector(Complex(72,-72), Complex(-18,18), Complex(65,-65)))
   }
 
@@ -110,13 +116,15 @@ class MatrixTest extends FunSuite with Checkers {
 
     a += Complex(1, 1)
 
-    assert(a === Matrix((Complex(2, 2), Complex(3, 3), Complex(4, 4)),
-                        (Complex(5, 5), Complex(6, 6), Complex(7, 7))))
+    assert(
+        a === Matrix((Complex(2, 2), Complex(3, 3), Complex(4, 4)),
+                     (Complex(5, 5), Complex(6, 6), Complex(7, 7))))
 
     a -= Complex(1, 1)
 
-    assert(a === Matrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
-                        (Complex(4, 4), Complex(5, 5), Complex(6, 6))))
+    assert(
+        a === Matrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
+                     (Complex(4, 4), Complex(5, 5), Complex(6, 6))))
   }
 
   test("hashcode") {

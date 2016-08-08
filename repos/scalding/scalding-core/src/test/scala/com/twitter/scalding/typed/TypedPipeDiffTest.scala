@@ -32,8 +32,8 @@ class TypedPipeDiffTest extends FunSuite {
 
   val left = List("hi", "hi", "bye", "foo", "bar")
   val right = List("hi", "bye", "foo", "baz")
-  val expectedSortedDiff = List(
-      ("bar", (1, 0)), ("baz", (0, 1)), ("hi", (2, 1))).sorted
+  val expectedSortedDiff =
+    List(("bar", (1, 0)), ("baz", (0, 1)), ("hi", (2, 1))).sorted
 
   val leftArr = List(Array[Byte](3, 3, 5, 3, 2),
                      Array[Byte](2, 2, 2),
@@ -105,14 +105,12 @@ class TypedPipeDiffTest extends FunSuite {
 
   test(
       "diffArrayPipesWithoutOrdering works for arrays of objects with no ordering") {
-    val pipe1 = TypedPipe.from(
-        leftArr.map { arr =>
+    val pipe1 = TypedPipe.from(leftArr.map { arr =>
       arr.map { b =>
         new NoOrdering(b.toString)
       }
     })
-    val pipe2 = TypedPipe.from(
-        rightArr.map { arr =>
+    val pipe2 = TypedPipe.from(rightArr.map { arr =>
       arr.map { b =>
         new NoOrdering(b.toString)
       }
@@ -133,9 +131,10 @@ object TypedPipeDiffLaws {
                    diff: List[(T, (Long, Long))]): Boolean = {
     val noDuplicates = diff.size == diff.map(_._1).toSet.size
     val expected = MapAlgebra
-      .sumByKey(left.map((_, (1L, 0L))).iterator ++ right
-            .map((_, (0L, 1L)))
-            .iterator)
+      .sumByKey(
+          left
+            .map((_, (1L, 0L)))
+            .iterator ++ right.map((_, (0L, 1L))).iterator)
       .filter { case (t, (rCount, lCount)) => rCount != lCount }
 
     noDuplicates && expected == diff.toMap
@@ -147,7 +146,7 @@ object TypedPipeDiffLaws {
     checkDiff(left.map(_.toSeq), right.map(_.toSeq), diff)
   }
 
-  def diffLaw[T : Ordering : Arbitrary]: Prop = Prop.forAll {
+  def diffLaw[T: Ordering: Arbitrary]: Prop = Prop.forAll {
     (left: List[T], right: List[T]) =>
       val diff = TypedPipe
         .from(left)
@@ -157,8 +156,8 @@ object TypedPipeDiffLaws {
       checkDiff(left, right, diff)
   }
 
-  def diffArrayLaw[T](
-      implicit arb: Arbitrary[List[Array[T]]], ct: ClassTag[T]): Prop =
+  def diffArrayLaw[T](implicit arb: Arbitrary[List[Array[T]]],
+                      ct: ClassTag[T]): Prop =
     Prop.forAll { (left: List[Array[T]], right: List[Array[T]]) =>
       val diff = TypedPipe
         .from(left)
@@ -168,7 +167,7 @@ object TypedPipeDiffLaws {
       checkArrayDiff(left, right, diff)
     }
 
-  def diffByGroupLaw[T : Arbitrary]: Prop = Prop.forAll {
+  def diffByGroupLaw[T: Arbitrary]: Prop = Prop.forAll {
     (left: List[T], right: List[T]) =>
       val diff = TypedPipe
         .from(left)

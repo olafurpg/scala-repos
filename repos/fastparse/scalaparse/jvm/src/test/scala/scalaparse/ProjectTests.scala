@@ -30,7 +30,8 @@ object ProjectTests extends TestSuite {
       } yield
         Future {
           if (filename.endsWith(".scala") && filter(filename)) {
-            val code = new String(java.nio.file.Files
+            val code = new String(
+                java.nio.file.Files
                   .readAllBytes(java.nio.file.Paths.get(filename)))
             if (!ScalacParser.checkParseFails(code)) {
               print(".")

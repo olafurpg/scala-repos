@@ -36,8 +36,9 @@ private[prediction] class FakeEngine
     throw new StopAfterReadInterruption()
   }
 
-  def eval(
-      sc: SparkContext, engineParams: EngineParams, params: WorkflowParams)
+  def eval(sc: SparkContext,
+           engineParams: EngineParams,
+           params: WorkflowParams)
     : Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])] = {
     return Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])]()
   }
@@ -45,14 +46,19 @@ private[prediction] class FakeEngine
 
 @Experimental
 private[prediction] class FakeRunner(f: (SparkContext => Unit))
-    extends BaseEvaluator[
-        EmptyParams, EmptyParams, EmptyParams, EmptyParams, FakeEvalResult] {
+    extends BaseEvaluator[EmptyParams,
+                          EmptyParams,
+                          EmptyParams,
+                          EmptyParams,
+                          FakeEvalResult] {
   @transient private lazy val logger = Logger[this.type]
-  def evaluateBase(sc: SparkContext,
-                   evaluation: Evaluation,
-                   engineEvalDataSet: Seq[(EngineParams, Seq[(EmptyParams, RDD[
-                               (EmptyParams, EmptyParams, EmptyParams)])])],
-                   params: WorkflowParams): FakeEvalResult = {
+  def evaluateBase(
+      sc: SparkContext,
+      evaluation: Evaluation,
+      engineEvalDataSet: Seq[
+          (EngineParams,
+           Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])])],
+      params: WorkflowParams): FakeEvalResult = {
     f(sc)
     FakeEvalResult()
   }
@@ -64,24 +70,24 @@ private[prediction] case class FakeEvalResult() extends BaseEvaluatorResult {
 }
 
 /** FakeRun allows user to implement custom function under the exact enviroment
-  * as other PredictionIO workflow. 
+  * as other PredictionIO workflow.
   *
-  * Useful for developing new features. Only need to extend this trait and 
-  * implement a function: (SparkContext => Unit). For example, the code below 
+  * Useful for developing new features. Only need to extend this trait and
+  * implement a function: (SparkContext => Unit). For example, the code below
   * can be run with `pio eval HelloWorld`.
   *
   * {{{
   * object HelloWorld extends FakeRun {
   *   // func defines the function pio runs, must have signature (SparkContext => Unit).
   *   func = f
-  * 
+  *
   *   def f(sc: SparkContext): Unit {
   *     val logger = Logger[this.type]
   *     logger.info("HelloWorld")
   *   }
   * }
-  * }}} 
-  * 
+  * }}}
+  *
   */
 @Experimental
 trait FakeRun extends Evaluation with EngineParamsGenerator {

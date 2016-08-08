@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -68,19 +68,20 @@ object VersionLog {
         if (currentFile.exists) {
           for {
             jv <- JParser
-              .parseFromFile(currentFile)
-              .leftMap(ioError)
-              .disjunction
+                   .parseFromFile(currentFile)
+                   .leftMap(ioError)
+                   .disjunction
             version <- jv match {
-              case JString(`unsetSentinel`) =>
-                \/.left(
-                    NotFound("No current data for the path %s exists; it has been archived."
-                          .format(dir)))
-              case other =>
-                other.validated[VersionEntry].disjunction leftMap { err =>
-                  Corrupt(err.message)
-                }
-            }
+                        case JString(`unsetSentinel`) =>
+                          \/.left(NotFound(
+                              "No current data for the path %s exists; it has been archived."
+                                .format(dir)))
+                        case other =>
+                          other.validated[VersionEntry].disjunction leftMap {
+                            err =>
+                              Corrupt(err.message)
+                          }
+                      }
           } yield version
         } else {
           \/.left(NotFound("No data found for path %s.".format(dir)))
@@ -111,9 +112,9 @@ object VersionLog {
         for {
           jv <- JParser.parseFromFile(headFile).leftMap(Error.thrown)
           version <- jv match {
-            case JString(`unsetSentinel`) => Success(None)
-            case other => other.validated[VersionEntry].map(Some(_))
-          }
+                      case JString(`unsetSentinel`) => Success(None)
+                      case other => other.validated[VersionEntry].map(Some(_))
+                    }
         } yield version
       } else {
         Success(None)
@@ -124,8 +125,8 @@ object VersionLog {
         for {
           jvs <- JParser.parseManyFromFile(logFile).leftMap(Error.thrown)
           versions <- jvs.toList
-            .traverse[({ type λ[α] = Validation[Error, α] })#λ, VersionEntry](
-              _.validated[VersionEntry])
+                       .traverse[({ type λ[α] = Validation[Error, α] })#λ,
+                                 VersionEntry](_.validated[VersionEntry])
         } yield versions
       } else {
         Success(Nil)
@@ -136,8 +137,8 @@ object VersionLog {
         for {
           jvs <- JParser.parseManyFromFile(completedFile).leftMap(Error.thrown)
           versions <- jvs.toList
-            .traverse[({ type λ[α] = Validation[Error, α] })#λ, UUID](
-              _.validated[UUID])
+                       .traverse[({ type λ[α] = Validation[Error, α] })#λ,
+                                 UUID](_.validated[UUID])
         } yield versions.toSet
       } else {
         Success(Set.empty)
@@ -180,7 +181,8 @@ class VersionLog(logFiles: VersionLog.LogFiles,
       IO(PrecogUnit)
     } getOrElse {
       logger.debug("Adding version entry: " + entry)
-      IOUtils.writeToFile(entry.serialize.renderCompact + "\n", logFile, true) map {
+      IOUtils
+        .writeToFile(entry.serialize.renderCompact + "\n", logFile, true) map {
         _ =>
           allVersions = allVersions :+ entry
           PrecogUnit
@@ -197,7 +199,8 @@ class VersionLog(logFiles: VersionLog.LogFiles,
         PrecogUnit
       }
     } else {
-      IO.throwIO(new IllegalStateException(
+      IO.throwIO(
+          new IllegalStateException(
               "Cannot make nonexistent version %s current" format version))
     }
   }
@@ -206,13 +209,14 @@ class VersionLog(logFiles: VersionLog.LogFiles,
     currentVersion.exists(_.id == newHead) unlessM {
       allVersions.find(_.id == newHead) traverse { entry =>
         logger.debug("Setting HEAD to " + newHead)
-        IOUtils.writeToFile(entry.serialize.renderCompact + "\n", headFile) map {
+        IOUtils
+          .writeToFile(entry.serialize.renderCompact + "\n", headFile) map {
           _ =>
             currentVersion = Some(entry);
         }
       } flatMap {
         _.isEmpty.whenM(IO.throwIO(new IllegalStateException(
-                    "Attempt to set head to nonexistent version %s" format newHead)))
+            "Attempt to set head to nonexistent version %s" format newHead)))
       }
     } map { _ =>
       PrecogUnit
@@ -224,8 +228,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
   }
 }
 
-case class VersionEntry(
-    id: UUID, typeName: PathData.DataType, timestamp: Instant)
+case class VersionEntry(id: UUID,
+                        typeName: PathData.DataType,
+                        timestamp: Instant)
 
 object VersionEntry {
   implicit val versionEntryIso =
@@ -233,8 +238,8 @@ object VersionEntry {
 
   val schemaV1 = "id" :: "typeName" :: "timestamp" :: HNil
 
-  implicit val Decomposer: Decomposer[VersionEntry] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val Extractor: Extractor[VersionEntry] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val Decomposer: Decomposer[VersionEntry] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val Extractor: Extractor[VersionEntry] =
+    extractorV(schemaV1, Some("1.0".v))
 }

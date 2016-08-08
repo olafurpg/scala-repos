@@ -10,14 +10,14 @@ final case class Orange(ripeness: String) extends Fruit
 class SealedTraitHierarchyTest extends FunSuite {
 
   // TODO: this should not need a FastTypeTag
-  def unpickleWrapper[T](s: String)(
-      implicit unpickler1: Unpickler[T], tag: FastTypeTag[T]): T = {
+  def unpickleWrapper[T](s: String)(implicit unpickler1: Unpickler[T],
+                                    tag: FastTypeTag[T]): T = {
     import scala.pickling.json._
     JSONPickle(s).unpickle[T]
   }
 
-  def pickleWrapper[T](s: T)(
-      implicit pickler1: Pickler[T], tag1: FastTypeTag[T]): String = {
+  def pickleWrapper[T](s: T)(implicit pickler1: Pickler[T],
+                             tag1: FastTypeTag[T]): String = {
     import scala.pickling.json._
     s.pickle.value
   }

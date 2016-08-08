@@ -16,8 +16,8 @@ trait PaintScaleFactory[T] extends (Traversable[T] => PaintScale[T])
   *
   * @author dramage
   */
-case class GradientPaintScaleFactory[T](
-    gradient: Array[Color] = PaintScale.WhiteToBlack)(
+case class GradientPaintScaleFactory[T](gradient: Array[Color] =
+                                          PaintScale.WhiteToBlack)(
     implicit view: T => Double)
     extends PaintScaleFactory[T] {
   override def apply(items: Traversable[T]): PaintScale[T] = {
@@ -47,9 +47,9 @@ case class CategoricalPaintScaleFactory[T]() extends PaintScaleFactory[T] {
     val distinct = items.toList.distinct
     CategoricalPaintScale[T](
         Map() ++
-        (distinct zip Stream
-              .continually(PaintScale.Category20.values.toList)
-              .flatten))
+          (distinct zip Stream
+            .continually(PaintScale.Category20.values.toList)
+            .flatten))
   }
 }
 

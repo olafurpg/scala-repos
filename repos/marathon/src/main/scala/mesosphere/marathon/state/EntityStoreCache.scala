@@ -21,7 +21,9 @@ import scala.concurrent.Future
   *    - clear everything
   */
 class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
-    extends EntityStore[T] with LeadershipCallback with VersionedEntry {
+    extends EntityStore[T]
+    with LeadershipCallback
+    with VersionedEntry {
 
   @volatile
   private[state] var cacheOpt: Option[TrieMap[String, Option[T]]] = None
@@ -64,8 +66,8 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
       Future.successful(cache.keySet.toSeq)
   }
 
-  override def expunge(
-      key: String, onSuccess: () => Unit = () => ()): Future[Boolean] =
+  override def expunge(key: String,
+                       onSuccess: () => Unit = () => ()): Future[Boolean] =
     directOrCached(store.expunge(key, onSuccess)) { cache =>
       def onExpunged(): Unit = {
         cache.remove(key)

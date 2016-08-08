@@ -12,7 +12,12 @@ import spray.json._
 import akka.actor.ActorSystem
 
 import akka.stream.ActorMaterializer
-import akka.stream.stage.{TerminationDirective, Context, SyncDirective, PushStage}
+import akka.stream.stage.{
+  TerminationDirective,
+  Context,
+  SyncDirective,
+  PushStage
+}
 import akka.stream.scaladsl._
 
 import akka.http.scaladsl.Http
@@ -141,14 +146,12 @@ object WSClientAutobahnTest extends App {
       println()
       println("Not OK tests: ")
       println()
-      results
-        .filterNot(_.status.behavior == "OK")
-        .foreach { r ⇒
-          println(
-              f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
-        }
+      results.filterNot(_.status.behavior == "OK").foreach { r ⇒
+        println(
+            f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
+      }
 
-        ()
+      ()
     }.onComplete(completion)
   }
 
@@ -190,7 +193,8 @@ object WSClientAutobahnTest extends App {
           super.onDownstreamFinish(ctx)
         }
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+            cause: Throwable,
+            ctx: Context[T]): TerminationDirective = {
           p.failure(cause)
           super.onUpstreamFailure(cause, ctx)
         }
@@ -215,7 +219,7 @@ object WSClientAutobahnTest extends App {
             s"unexpected element of type ${other.getClass}")
     }
   }
-  def runToSingleJsonValue[T : JsonReader](uri: Uri): Future[T] =
+  def runToSingleJsonValue[T: JsonReader](uri: Uri): Future[T] =
     runToSingleText(uri).map(_.parseJson.convertTo[T])
 
   case class IndexedCaseInfo(index: Int, caseInfo: CaseInfo)

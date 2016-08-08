@@ -4,7 +4,7 @@ class FunTypeParam {
     /*start*/
     x
     y
-/*end*/
+    /*end*/
   }
 }
 /*

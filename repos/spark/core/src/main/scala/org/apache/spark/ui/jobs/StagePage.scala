@@ -91,8 +91,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
   def render(request: HttpServletRequest): Seq[Node] = {
     progressListener.synchronized {
       val parameterId = request.getParameter("id")
-      require(
-          parameterId != null && parameterId.nonEmpty, "Missing id parameter")
+      require(parameterId != null && parameterId.nonEmpty,
+              "Missing id parameter")
 
       val parameterAttempt = request.getParameter("attempt")
       require(parameterAttempt != null && parameterAttempt.nonEmpty,
@@ -264,7 +264,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         </div>
 
       val dagViz = UIUtils.showDagVizForStage(
-          stageId, operationGraphListener.getOperationGraphForStage(stageId))
+          stageId,
+          operationGraphListener.getOperationGraphForStage(stageId))
 
       val accumulableHeaders: Seq[String] = Seq("Accumulable", "Value")
       def accumulableRow(acc: AccumulableInfo): Seq[Node] = {
@@ -292,7 +293,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         val _taskTable = new TaskPagedTable(
             parent.conf,
             UIUtils.prependBaseUri(parent.basePath) +
-            s"/stages/stage?id=${stageId}&attempt=${stageAttemptId}",
+              s"/stages/stage?id=${stageId}&attempt=${stageAttemptId}",
             tasks,
             hasAccumulators,
             stageData.hasInput,
@@ -337,8 +338,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         else taskTable.dataSource.slicedTaskIds
 
       // Excludes tasks which failed and have incomplete metrics
-      val validTasks = tasks.filter(
-          t => t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
+      val validTasks = tasks.filter(t =>
+        t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
 
       val summaryTable: Option[Seq[Node]] =
         if (validTasks.size == 0) {
@@ -352,8 +353,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             }
           }
           def getFormattedSizeQuantiles(data: Seq[Double]): Seq[Elem] = {
-            getDistributionQuantiles(data).map(
-                d => <td>{Utils.bytesToString(d.toLong)}</td>)
+            getDistributionQuantiles(data).map(d =>
+              <td>{Utils.bytesToString(d.toLong)}</td>)
           }
 
           val deserializationTimes = validTasks.map {
@@ -431,10 +432,11 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           val schedulerDelayQuantiles =
             schedulerDelayTitle +: getFormattedTimeQuantiles(schedulerDelays)
           def getFormattedSizeQuantilesWithRecords(
-              data: Seq[Double], records: Seq[Double]): Seq[Elem] = {
+              data: Seq[Double],
+              records: Seq[Double]): Seq[Elem] = {
             val recordDist = getDistributionQuantiles(records).iterator
             getDistributionQuantiles(data).map(d =>
-                  <td>{s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"}</td>)
+              <td>{s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"}</td>)
           }
 
           val inputSizes = validTasks.map {
@@ -452,7 +454,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val inputQuantiles =
             <td>Input Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-                inputSizes, inputRecords)
+                inputSizes,
+                inputRecords)
 
           val outputSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -472,7 +475,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val outputQuantiles =
             <td>Output Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-                outputSizes, outputRecords)
+                outputSizes,
+                outputRecords)
 
           val shuffleReadBlockedTimes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -509,7 +513,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                 Shuffle Read Size / Records
               </span>
             </td> +: getFormattedSizeQuantilesWithRecords(
-                shuffleReadTotalSizes, shuffleReadTotalRecords)
+                shuffleReadTotalSizes,
+                shuffleReadTotalRecords)
 
           val shuffleReadRemoteSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -543,7 +548,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val shuffleWriteQuantiles =
             <td>Shuffle Write Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-                shuffleWriteSizes, shuffleWriteRecords)
+                shuffleWriteSizes,
+                shuffleWriteRecords)
 
           val memoryBytesSpilledSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -593,11 +599,14 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                 Nil
               },
               if (stageData.hasShuffleWrite)
-                <tr>{shuffleWriteQuantiles}</tr> else Nil,
+                <tr>{shuffleWriteQuantiles}</tr>
+              else Nil,
               if (stageData.hasBytesSpilled)
-                <tr>{memoryBytesSpilledQuantiles}</tr> else Nil,
+                <tr>{memoryBytesSpilledQuantiles}</tr>
+              else Nil,
               if (stageData.hasBytesSpilled)
-                <tr>{diskBytesSpilledQuantiles}</tr> else Nil)
+                <tr>{diskBytesSpilledQuantiles}</tr>
+              else Nil)
 
           val quantileHeaders = Seq("Metric",
                                     "Min",
@@ -625,11 +634,13 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val content =
         summary ++ dagViz ++ showAdditionalMetrics ++ makeTimeline(
             // Only show the tasks in the table
-            stageData.taskData.values.toSeq
-              .filter(t => taskIdsInPage.contains(t.taskInfo.taskId)),
+            stageData.taskData.values.toSeq.filter(t =>
+              taskIdsInPage.contains(t.taskInfo.taskId)),
             currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{summaryTable.getOrElse("No tasks have reported metrics yet.")}</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
-      UIUtils.headerSparkPage(
-          stageHeader, content, parent, showVisualization = true)
+      UIUtils.headerSparkPage(stageHeader,
+                              content,
+                              parent,
+                              showVisualization = true)
     }
   }
 
@@ -662,8 +673,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           .getOrElse(0L)
         val shuffleReadTimeProportion = toProportion(shuffleReadTime)
         val shuffleWriteTime = (metricsOpt
-              .flatMap(_.shuffleWriteMetrics.map(_.writeTime))
-              .getOrElse(0L) / 1e6).toLong
+          .flatMap(_.shuffleWriteMetrics.map(_.writeTime))
+          .getOrElse(0L) / 1e6).toLong
         val shuffleWriteTimeProportion = toProportion(shuffleWriteTime)
 
         val serializationTime =
@@ -694,8 +705,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           executorRunTime - shuffleReadTime - shuffleWriteTime
         val executorComputingTimeProportion =
           (100 - schedulerDelayProportion - shuffleReadTimeProportion -
-              shuffleWriteTimeProportion - serializationTimeProportion -
-              deserializationTimeProportion - gettingResultTimeProportion)
+            shuffleWriteTimeProportion - serializationTimeProportion -
+            deserializationTimeProportion - gettingResultTimeProportion)
 
         val schedulerDelayProportionPos = 0
         val deserializationTimeProportionPos =
@@ -750,7 +761,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                  |data-toggle="tooltip" data-placement="top"
                  |data-html="true" data-container="body"
                  |data-title="${s"Task " + index + " (attempt " + attempt +
-                                ")"}<br>
+                                  ")"}<br>
                  |Status: ${taskInfo.status}<br>
                  |Launch Time: ${UIUtils.formatDate(new Date(launchTime))}
                  |${if (!taskInfo.running) {
@@ -821,8 +832,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 }
 
 private[ui] object StagePage {
-  private[ui] def getGettingResultTime(
-      info: TaskInfo, currentTime: Long): Long = {
+  private[ui] def getGettingResultTime(info: TaskInfo,
+                                       currentTime: Long): Long = {
     if (info.gettingResult) {
       if (info.finished) {
         info.finishTime - info.gettingResultTime
@@ -835,15 +846,16 @@ private[ui] object StagePage {
     }
   }
 
-  private[ui] def getSchedulerDelay(
-      info: TaskInfo, metrics: TaskMetrics, currentTime: Long): Long = {
+  private[ui] def getSchedulerDelay(info: TaskInfo,
+                                    metrics: TaskMetrics,
+                                    currentTime: Long): Long = {
     if (info.finished) {
       val totalExecutionTime = info.finishTime - info.launchTime
       val executorOverhead =
         (metrics.executorDeserializeTime + metrics.resultSerializationTime)
       math.max(0,
                totalExecutionTime - metrics.executorRunTime -
-               executorOverhead - getGettingResultTime(info, currentTime))
+                 executorOverhead - getGettingResultTime(info, currentTime))
     } else {
       // The task is still running and the metrics like executorRunTime are not available.
       0L
@@ -851,11 +863,11 @@ private[ui] object StagePage {
   }
 }
 
-private[ui] case class TaskTableRowInputData(
-    inputSortable: Long, inputReadable: String)
+private[ui] case class TaskTableRowInputData(inputSortable: Long,
+                                             inputReadable: String)
 
-private[ui] case class TaskTableRowOutputData(
-    outputSortable: Long, outputReadable: String)
+private[ui] case class TaskTableRowOutputData(outputSortable: Long,
+                                              outputReadable: String)
 
 private[ui] case class TaskTableRowShuffleReadData(
     shuffleReadBlockedTimeSortable: Long,
@@ -971,7 +983,7 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
     val inputSortable = maybeInput.map(_.bytesRead).getOrElse(0L)
     val inputReadable = maybeInput
       .map(m =>
-            s"${Utils.bytesToString(m.bytesRead)} (${m.readMethod.toString.toLowerCase()})")
+        s"${Utils.bytesToString(m.bytesRead)} (${m.readMethod.toString.toLowerCase()})")
       .getOrElse("")
     val inputRecords = maybeInput.map(_.recordsRead.toString).getOrElse("")
 
@@ -1033,16 +1045,18 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
 
     val input =
       if (hasInput) {
-        Some(TaskTableRowInputData(
-                inputSortable, s"$inputReadable / $inputRecords"))
+        Some(
+            TaskTableRowInputData(inputSortable,
+                                  s"$inputReadable / $inputRecords"))
       } else {
         None
       }
 
     val output =
       if (hasOutput) {
-        Some(TaskTableRowOutputData(
-                outputSortable, s"$outputReadable / $outputRecords"))
+        Some(
+            TaskTableRowOutputData(outputSortable,
+                                   s"$outputReadable / $outputRecords"))
       } else {
         None
       }
@@ -1088,38 +1102,38 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
         None
       }
 
-    new TaskTableRowData(
-        info.index,
-        info.taskId,
-        info.attemptNumber,
-        info.speculative,
-        info.status,
-        info.taskLocality.toString,
-        s"${info.executorId} / ${info.host}",
-        info.launchTime,
-        duration,
-        formatDuration,
-        schedulerDelay,
-        taskDeserializationTime,
-        gcTime,
-        serializationTime,
-        gettingResultTime,
-        peakExecutionMemoryUsed,
-        if (hasAccumulators)
-          Some(externalAccumulableReadable.mkString("<br/>")) else None,
-        input,
-        output,
-        shuffleRead,
-        shuffleWrite,
-        bytesSpilled,
-        errorMessage.getOrElse(""))
+    new TaskTableRowData(info.index,
+                         info.taskId,
+                         info.attemptNumber,
+                         info.speculative,
+                         info.status,
+                         info.taskLocality.toString,
+                         s"${info.executorId} / ${info.host}",
+                         info.launchTime,
+                         duration,
+                         formatDuration,
+                         schedulerDelay,
+                         taskDeserializationTime,
+                         gcTime,
+                         serializationTime,
+                         gettingResultTime,
+                         peakExecutionMemoryUsed,
+                         if (hasAccumulators)
+                           Some(externalAccumulableReadable.mkString("<br/>"))
+                         else None,
+                         input,
+                         output,
+                         shuffleRead,
+                         shuffleWrite,
+                         bytesSpilled,
+                         errorMessage.getOrElse(""))
   }
 
   /**
     * Return Ordering according to sortColumn and desc
     */
-  private def ordering(
-      sortColumn: String, desc: Boolean): Ordering[TaskTableRowData] = {
+  private def ordering(sortColumn: String,
+                       desc: Boolean): Ordering[TaskTableRowData] = {
     val ordering = sortColumn match {
       case "Index" =>
         new Ordering[TaskTableRowData] {
@@ -1169,8 +1183,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Task Deserialization Time" =>
         new Ordering[TaskTableRowData] {
           override def compare(x: TaskTableRowData, y: TaskTableRowData): Int =
-            Ordering.Long.compare(
-                x.taskDeserializationTime, y.taskDeserializationTime)
+            Ordering.Long
+              .compare(x.taskDeserializationTime, y.taskDeserializationTime)
         }
       case "GC Time" =>
         new Ordering[TaskTableRowData] {
@@ -1190,14 +1204,14 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Peak Execution Memory" =>
         new Ordering[TaskTableRowData] {
           override def compare(x: TaskTableRowData, y: TaskTableRowData): Int =
-            Ordering.Long.compare(
-                x.peakExecutionMemoryUsed, y.peakExecutionMemoryUsed)
+            Ordering.Long
+              .compare(x.peakExecutionMemoryUsed, y.peakExecutionMemoryUsed)
         }
       case "Accumulators" =>
         if (hasAccumulators) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.String.compare(x.accumulators.get, y.accumulators.get)
           }
         } else {
@@ -1207,10 +1221,10 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Input Size / Records" =>
         if (hasInput) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
-              Ordering.Long.compare(
-                  x.input.get.inputSortable, y.input.get.inputSortable)
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
+              Ordering.Long
+                .compare(x.input.get.inputSortable, y.input.get.inputSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1219,10 +1233,10 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Output Size / Records" =>
         if (hasOutput) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
-              Ordering.Long.compare(
-                  x.output.get.outputSortable, y.output.get.outputSortable)
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
+              Ordering.Long.compare(x.output.get.outputSortable,
+                                    y.output.get.outputSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1232,8 +1246,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Read Blocked Time" =>
         if (hasShuffleRead) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(
                   x.shuffleRead.get.shuffleReadBlockedTimeSortable,
                   y.shuffleRead.get.shuffleReadBlockedTimeSortable)
@@ -1245,8 +1259,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Read Size / Records" =>
         if (hasShuffleRead) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(x.shuffleRead.get.shuffleReadSortable,
                                     y.shuffleRead.get.shuffleReadSortable)
           }
@@ -1257,8 +1271,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Remote Reads" =>
         if (hasShuffleRead) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(
                   x.shuffleRead.get.shuffleReadRemoteSortable,
                   y.shuffleRead.get.shuffleReadRemoteSortable)
@@ -1271,8 +1285,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Write Time" =>
         if (hasShuffleWrite) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(x.shuffleWrite.get.writeTimeSortable,
                                     y.shuffleWrite.get.writeTimeSortable)
           }
@@ -1283,8 +1297,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Write Size / Records" =>
         if (hasShuffleWrite) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(x.shuffleWrite.get.shuffleWriteSortable,
                                     y.shuffleWrite.get.shuffleWriteSortable)
           }
@@ -1296,8 +1310,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Spill (Memory)" =>
         if (hasBytesSpilled) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(
                   x.bytesSpilled.get.memoryBytesSpilledSortable,
                   y.bytesSpilled.get.memoryBytesSpilledSortable)
@@ -1309,8 +1323,8 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
       case "Shuffle Spill (Disk)" =>
         if (hasBytesSpilled) {
           new Ordering[TaskTableRowData] {
-            override def compare(
-                x: TaskTableRowData, y: TaskTableRowData): Int =
+            override def compare(x: TaskTableRowData,
+                                 y: TaskTableRowData): Int =
               Ordering.Long.compare(
                   x.bytesSpilled.get.diskBytesSpilledSortable,
                   y.bytesSpilled.get.diskBytesSpilledSortable)
@@ -1380,8 +1394,8 @@ private[ui] class TaskPagedTable(conf: SparkConf,
   override def pageLink(page: Int): String = {
     val encodedSortColumn = URLEncoder.encode(sortColumn, "UTF-8")
     basePath + s"&$pageNumberFormField=$page" +
-    s"&task.sort=$encodedSortColumn" + s"&task.desc=$desc" +
-    s"&$pageSizeFormField=$pageSize"
+      s"&task.sort=$encodedSortColumn" + s"&task.desc=$desc" +
+      s"&$pageSizeFormField=$pageSize"
   }
 
   override def goButtonFormPath: String = {
@@ -1446,9 +1460,10 @@ private[ui] class TaskPagedTable(conf: SparkConf,
       taskHeadersAndCssClasses.map {
         case (header, cssClass) =>
           if (header == sortColumn) {
-            val headerLink = Unparsed(basePath +
-                s"&task.sort=${URLEncoder.encode(header, "UTF-8")}" +
-                s"&task.desc=${!desc}" + s"&task.pageSize=$pageSize")
+            val headerLink = Unparsed(
+                basePath +
+                  s"&task.sort=${URLEncoder.encode(header, "UTF-8")}" +
+                  s"&task.desc=${!desc}" + s"&task.pageSize=$pageSize")
             val arrow = if (desc) "&#x25BE;" else "&#x25B4;" // UP or DOWN
             <th class={cssClass}>
             <a href={headerLink}>
@@ -1457,9 +1472,10 @@ private[ui] class TaskPagedTable(conf: SparkConf,
             </a>
           </th>
           } else {
-            val headerLink = Unparsed(basePath +
-                s"&task.sort=${URLEncoder.encode(header, "UTF-8")}" +
-                s"&task.pageSize=$pageSize")
+            val headerLink = Unparsed(
+                basePath +
+                  s"&task.sort=${URLEncoder.encode(header, "UTF-8")}" +
+                  s"&task.pageSize=$pageSize")
             <th class={cssClass}>
             <a href={headerLink}>
               {header}
@@ -1534,8 +1550,7 @@ private[ui] class TaskPagedTable(conf: SparkConf,
   private def errorMessageCell(error: String): Seq[Node] = {
     val isMultiline = error.indexOf('\n') >= 0
     // Display the first line by default
-    val errorSummary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val errorSummary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       error.substring(0, error.indexOf('\n'))
     } else {
       error

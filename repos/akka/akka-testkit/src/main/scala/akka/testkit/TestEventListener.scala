@@ -10,7 +10,15 @@ import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 import akka.actor.{DeadLetter, ActorSystem, UnhandledMessage}
 import akka.dispatch.sysmsg.{SystemMessage, Terminate}
-import akka.event.Logging.{Warning, LogEvent, InitializeLogger, Info, Error, Debug, LoggerInitialized}
+import akka.event.Logging.{
+  Warning,
+  LogEvent,
+  InitializeLogger,
+  Info,
+  Error,
+  Debug,
+  LoggerInitialized
+}
 import akka.event.Logging
 import akka.actor.NoSerializationVerificationNeeded
 import akka.japi.Util.immutableSeq
@@ -43,7 +51,8 @@ object TestEvent {
       new Mute(filter +: filters.to[immutable.Seq])
   }
   final case class Mute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent
+      with NoSerializationVerificationNeeded {
 
     /**
       * Java API: create a Mute command from a list of filters
@@ -55,7 +64,8 @@ object TestEvent {
       new UnMute(filter +: filters.to[immutable.Seq])
   }
   final case class UnMute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent
+      with NoSerializationVerificationNeeded {
 
     /**
       * Java API: create an UnMute command from a list of filters
@@ -140,9 +150,9 @@ abstract class EventFilter(occurrences: Int) {
     val msgstr = if (msg != null) msg.toString else "null"
     (source.isDefined && source.get == src || source.isEmpty) &&
     (message match {
-          case Left(s) ⇒ if (complete) msgstr == s else msgstr.startsWith(s)
-          case Right(p) ⇒ p.findFirstIn(msgstr).isDefined
-        })
+      case Left(s) ⇒ if (complete) msgstr == s else msgstr.startsWith(s)
+      case Right(p) ⇒ p.findFirstIn(msgstr).isDefined
+    })
   }
 }
 
@@ -180,7 +190,7 @@ object EventFilter {
     * `null` does NOT work (passing `null` disables the
     * source filter).''
     */
-  def apply[A <: Throwable : ClassTag](
+  def apply[A <: Throwable: ClassTag](
       message: String = null,
       source: String = null,
       start: String = "",
@@ -319,8 +329,8 @@ final case class ErrorFilter(throwable: Class[_],
     event match {
       case Error(cause, src, _, msg) if throwable isInstance cause ⇒
         (msg == null && cause.getMessage == null &&
-            cause.getStackTrace.length == 0) || doMatch(src, msg) ||
-        doMatch(src, cause.getMessage)
+          cause.getStackTrace.length == 0) || doMatch(src, msg) ||
+          doMatch(src, cause.getMessage)
       case _ ⇒ false
     }
   }
@@ -507,8 +517,8 @@ final case class DebugFilter(override val source: Option[String],
   *
   * If the partial function is defined and returns true, filter the event.
   */
-final case class CustomEventFilter(
-    test: PartialFunction[LogEvent, Boolean])(occurrences: Int)
+final case class CustomEventFilter(test: PartialFunction[LogEvent, Boolean])(
+    occurrences: Int)
     extends EventFilter(occurrences) {
   def matches(event: LogEvent) = {
     test.isDefinedAt(event) && test(event)
@@ -590,13 +600,13 @@ class TestEventListener extends Logging.DefaultLogger {
 
   def removeFilter(filter: EventFilter) {
     @scala.annotation.tailrec
-    def removeFirst(
-        list: List[EventFilter],
-        zipped: List[EventFilter] = Nil): List[EventFilter] = list match {
-      case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
-      case head :: tail ⇒ removeFirst(tail, head :: zipped)
-      case Nil ⇒ filters // filter not found, just return original list
-    }
+    def removeFirst(list: List[EventFilter],
+                    zipped: List[EventFilter] = Nil): List[EventFilter] =
+      list match {
+        case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
+        case head :: tail ⇒ removeFirst(tail, head :: zipped)
+        case Nil ⇒ filters // filter not found, just return original list
+      }
     filters = removeFirst(filters)
   }
 }

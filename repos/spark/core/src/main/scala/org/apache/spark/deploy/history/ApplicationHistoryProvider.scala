@@ -30,7 +30,9 @@ private[spark] case class ApplicationAttemptInfo(attemptId: Option[String],
                                                  completed: Boolean = false)
 
 private[spark] case class ApplicationHistoryInfo(
-    id: String, name: String, attempts: List[ApplicationAttemptInfo]) {
+    id: String,
+    name: String,
+    attempts: List[ApplicationAttemptInfo]) {
 
   /**
     * Has this application completed?
@@ -64,8 +66,8 @@ private[history] abstract class HistoryUpdateProbe {
   * @param ui Spark UI
   * @param updateProbe probe to call to check on the update state of this application attempt
   */
-private[history] case class LoadedAppUI(
-    ui: SparkUI, updateProbe: () => Boolean)
+private[history] case class LoadedAppUI(ui: SparkUI,
+                                        updateProbe: () => Boolean)
 
 private[history] abstract class ApplicationHistoryProvider {
 

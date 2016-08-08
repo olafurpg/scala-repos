@@ -7,7 +7,10 @@ package scala.tools.nsc.interpreter.jline
 
 import scala.tools.nsc.interpreter
 
-import _root_.jline.console.completer.ArgumentCompleter.{ArgumentDelimiter, ArgumentList}
+import _root_.jline.console.completer.ArgumentCompleter.{
+  ArgumentDelimiter,
+  ArgumentList
+}
 
 // implements a jline interface
 class JLineDelimiter extends ArgumentDelimiter {

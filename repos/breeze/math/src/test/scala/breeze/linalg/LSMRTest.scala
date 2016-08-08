@@ -71,7 +71,9 @@ class LSMRTest extends FunSuite {
       }
     }
     GradientTester.test[Int, DenseVector[Double]](
-        obj, DenseVector.rand[Double](mat.cols, gen), 1.0)
+        obj,
+        DenseVector.rand[Double](mat.cols, gen),
+        1.0)
 
     new LBFGS[DenseVector[Double]](tolerance = 1E-9)
       .minimize(obj, DenseVector.rand[Double](mat.cols, gen))
@@ -108,16 +110,18 @@ class LSMRTest extends FunSuite {
     case object A {
 
       implicit object mulADV
-          extends OpMulMatrix.Impl2[
-              A.type, DenseVector[Double], DenseVector[Double]] {
-        override def apply(
-            v: A.type, v2: DenseVector[Double]): DenseVector[Double] = {
+          extends OpMulMatrix.Impl2[A.type,
+                                    DenseVector[Double],
+                                    DenseVector[Double]] {
+        override def apply(v: A.type,
+                           v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == n)
           val d = DenseVector.range(1, n + 1).map(_.toDouble)
           val y1 =
-            (DenseVector.tabulate(n + 1)(i => if (i < n) v2(i) * d(i) else 0.0) +
-                DenseVector.tabulate(n + 1)(
-                    i => if (i > 0) v2(i - 1) * d(i - 1) else 0.0))
+            (DenseVector
+              .tabulate(n + 1)(i => if (i < n) v2(i) * d(i) else 0.0) +
+              DenseVector.tabulate(n + 1)(i =>
+                if (i > 0) v2(i - 1) * d(i - 1) else 0.0))
 
           if (m <= n + 1) {
             y1(0 until m)
@@ -128,15 +132,16 @@ class LSMRTest extends FunSuite {
       }
 
       implicit object mulATDV
-          extends OpMulMatrix.Impl2[
-              Transpose[A.type], DenseVector[Double], DenseVector[Double]] {
+          extends OpMulMatrix.Impl2[Transpose[A.type],
+                                    DenseVector[Double],
+                                    DenseVector[Double]] {
         override def apply(v: Transpose[A.type],
                            v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == m)
           val d = DenseVector.range(1, m + 1).map(_.toDouble)
           val y1 =
-            ((d :* v2) + DenseVector.tabulate(m)(
-                    i => if (i < m - 1) d(i) * v2(i + 1) else 0.0))
+            ((d :* v2) + DenseVector.tabulate(m)(i =>
+              if (i < m - 1) d(i) * v2(i + 1) else 0.0))
 
           if (m >= n) {
             y1(0 until n)

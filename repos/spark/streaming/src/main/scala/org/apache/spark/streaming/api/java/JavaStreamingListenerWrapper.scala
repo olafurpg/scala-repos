@@ -81,7 +81,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         batchInfo.outputOperationInfos
           .mapValues(toJavaOutputOperationInfo(_))
           .asJava
-      )
+    )
   }
 
   override def onReceiverStarted(
@@ -114,7 +114,8 @@ private[streaming] class JavaStreamingListenerWrapper(
 
   override def onBatchStarted(
       batchStarted: StreamingListenerBatchStarted): Unit = {
-    javaStreamingListener.onBatchStarted(new JavaStreamingListenerBatchStarted(
+    javaStreamingListener.onBatchStarted(
+        new JavaStreamingListenerBatchStarted(
             toJavaBatchInfo(batchStarted.batchInfo)))
   }
 

@@ -4,14 +4,19 @@ import com.twitter.concurrent.NamedPoolThreadFactory
 import com.twitter.conversions.time._
 import com.twitter.util._
 import java.lang.management.ManagementFactory
-import java.util.concurrent.{ConcurrentHashMap, Executors, ScheduledExecutorService, TimeUnit}
+import java.util.concurrent.{
+  ConcurrentHashMap,
+  Executors,
+  ScheduledExecutorService,
+  TimeUnit
+}
 import java.util.logging.{Level, Logger}
 import scala.collection.JavaConverters._
 
 /**
   * Information about the Heap
   *
-  * @param allocated Estimated number of bytes 
+  * @param allocated Estimated number of bytes
   * that have been allocated so far (into eden)
   *
   * @param tenuringThreshold How many times an Object
@@ -28,30 +33,31 @@ case class Heap(
 
 /**
   * Information about the JVM's safepoint
-  * 
-  * @param syncTimeMillis Cumulative time, in milliseconds, spent 
+  *
+  * @param syncTimeMillis Cumulative time, in milliseconds, spent
   * getting all threads to safepoint states
-  * 
-  * @param totalTimeMillis Cumulative time, in milliseconds, that the 
+  *
+  * @param totalTimeMillis Cumulative time, in milliseconds, that the
   * application has been stopped for safepoint operations
-  * 
-  * @param count The number of safepoints taken place since 
+  *
+  * @param count The number of safepoints taken place since
   * the JVM started
   */
 case class Safepoint(syncTimeMillis: Long, totalTimeMillis: Long, count: Long)
 
-case class PoolState(
-    numCollections: Long, capacity: StorageUnit, used: StorageUnit) {
+case class PoolState(numCollections: Long,
+                     capacity: StorageUnit,
+                     used: StorageUnit) {
   def -(other: PoolState) = PoolState(
       numCollections = this.numCollections - other.numCollections,
       capacity = other.capacity,
       used = this.used + other.capacity - other.used + other.capacity *
-        (this.numCollections - other.numCollections - 1)
+          (this.numCollections - other.numCollections - 1)
   )
 
   override def toString =
-    "PoolState(n=%d,remaining=%s[%s of %s])".format(
-        numCollections, capacity - used, used, capacity)
+    "PoolState(n=%d,remaining=%s[%s of %s])"
+      .format(numCollections, capacity - used, used, capacity)
 }
 
 /**
@@ -127,7 +133,7 @@ trait Jvm {
   def metaspaceUsage: Option[Jvm.MetaspaceUsage]
 
   /**
-    * Gets the time spent at safepoints (totalTimeMillis), the time getting 
+    * Gets the time spent at safepoints (totalTimeMillis), the time getting
     * to safepoints (syncTimeMillis), and safepoints reached (count).
     */
   def safepoint: Safepoint
@@ -161,8 +167,9 @@ trait Jvm {
           missedCollections += count - 1 - lastCount
           if (missedCollections > 0 && Time.now - lastLog > LogPeriod) {
             if (log.isLoggable(Level.FINE)) {
-              log.fine("Missed %d collections for %s due to sampling".format(
-                      missedCollections, name))
+              log.fine(
+                  "Missed %d collections for %s due to sampling"
+                    .format(missedCollections, name))
             }
             lastLog = Time.now
             missedCollections = 0
@@ -213,11 +220,12 @@ trait Jvm {
   def mainClassName: String = {
     val mainClass = for {
       (_, stack) <- Thread.getAllStackTraces().asScala.find {
-        case (t, s) => t.getName == "main"
-      }
+                     case (t, s) => t.getName == "main"
+                   }
       frame <- stack.reverse.find { elem =>
-        !(elem.getClassName.startsWith("scala.tools.nsc.MainGenericRunner"))
-      }
+                !(elem.getClassName.startsWith(
+                    "scala.tools.nsc.MainGenericRunner"))
+              }
     } yield frame.getClassName
 
     mainClass.getOrElse("unknown")
@@ -246,9 +254,11 @@ object Jvm {
   }
 
   private lazy val executor = Executors.newScheduledThreadPool(
-      1, new NamedPoolThreadFactory("util-jvm-timer", true))
+      1,
+      new NamedPoolThreadFactory("util-jvm-timer", true))
 
-  private lazy val _jvm = try new Hotspot catch {
+  private lazy val _jvm = try new Hotspot
+  catch {
     case NonFatal(_) => NilJvm
   }
 

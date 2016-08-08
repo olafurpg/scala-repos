@@ -70,7 +70,9 @@ class DataTypeSuite extends SparkFunSuite {
             "b",
             LongType,
             false) :: StructField("c", StringType, true) :: StructField(
-            "d", FloatType, true) :: Nil)
+            "d",
+            FloatType,
+            true) :: Nil)
 
     assert(StructField("b", LongType, false) === struct("b"))
 
@@ -79,8 +81,10 @@ class DataTypeSuite extends SparkFunSuite {
     }
 
     val expectedStruct =
-      StructType(StructField("b", LongType, false) :: StructField(
-              "d", FloatType, true) :: Nil)
+      StructType(
+          StructField("b", LongType, false) :: StructField("d",
+                                                           FloatType,
+                                                           true) :: Nil)
 
     assert(expectedStruct === struct(Set("b", "d")))
     intercept[IllegalArgumentException] {
@@ -106,8 +110,8 @@ class DataTypeSuite extends SparkFunSuite {
 
     val mapped = StructType.fieldsMap(struct.fields)
 
-    val expected = Map(
-        "a" -> StructField("a", LongType), "b" -> StructField("b", FloatType))
+    val expected = Map("a" -> StructField("a", LongType),
+                       "b" -> StructField("b", FloatType))
 
     assert(mapped === expected)
   }
@@ -120,9 +124,11 @@ class DataTypeSuite extends SparkFunSuite {
     val merged = left.merge(right)
 
     assert(DataType.equalsIgnoreCompatibleNullability(merged, left))
-    assert(merged("a").metadata
+    assert(
+        merged("a").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-    assert(merged("b").metadata
+    assert(
+        merged("b").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
   }
 
@@ -136,9 +142,11 @@ class DataTypeSuite extends SparkFunSuite {
     val merged = left.merge(right)
 
     assert(DataType.equalsIgnoreCompatibleNullability(merged, right))
-    assert(merged("a").metadata
+    assert(
+        merged("a").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-    assert(merged("b").metadata
+    assert(
+        merged("b").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
   }
 
@@ -149,16 +157,20 @@ class DataTypeSuite extends SparkFunSuite {
     val right = StructType(StructField("c", LongType) :: Nil)
 
     val expected = StructType(StructField("a", LongType) :: StructField(
-            "b", FloatType) :: StructField("c", LongType) :: Nil)
+        "b",
+        FloatType) :: StructField("c", LongType) :: Nil)
 
     val merged = left.merge(right)
 
     assert(DataType.equalsIgnoreCompatibleNullability(merged, expected))
-    assert(merged("a").metadata
+    assert(
+        merged("a").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-    assert(merged("b").metadata
+    assert(
+        merged("b").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-    assert(merged("c").metadata
+    assert(
+        merged("c").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
   }
 
@@ -254,8 +266,9 @@ class DataTypeSuite extends SparkFunSuite {
   checkDefaultSize(MapType(IntegerType, ArrayType(DoubleType), false), 80400)
   checkDefaultSize(structType, 812)
 
-  def checkEqualsIgnoreCompatibleNullability(
-      from: DataType, to: DataType, expected: Boolean): Unit = {
+  def checkEqualsIgnoreCompatibleNullability(from: DataType,
+                                             to: DataType,
+                                             expected: Boolean): Unit = {
     val testName =
       s"equalsIgnoreCompatibleNullability: (from: ${from}, to: ${to})"
     test(testName) {
@@ -335,10 +348,14 @@ class DataTypeSuite extends SparkFunSuite {
       expected = false)
   checkEqualsIgnoreCompatibleNullability(
       from = StructType(
-            StructField("a", StringType, nullable = false) :: StructField(
-                "b", StringType, nullable = true) :: Nil),
+          StructField("a", StringType, nullable = false) :: StructField(
+              "b",
+              StringType,
+              nullable = true) :: Nil),
       to = StructType(
-            StructField("a", StringType, nullable = false) :: StructField(
-                "b", StringType, nullable = false) :: Nil),
+          StructField("a", StringType, nullable = false) :: StructField(
+              "b",
+              StringType,
+              nullable = false) :: Nil),
       expected = false)
 }

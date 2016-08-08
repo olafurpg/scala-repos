@@ -41,8 +41,8 @@ object TcpHelper {
       .withDispatcher("akka.test.stream-dispatcher")
 
   class TestClient(connection: ActorRef) extends Actor {
-    connection ! Tcp.Register(
-        self, keepOpenOnPeerClosed = true, useResumeWriting = false)
+    connection ! Tcp
+      .Register(self, keepOpenOnPeerClosed = true, useResumeWriting = false)
 
     var queuedWrites = Queue.empty[ByteString]
     var writePending = false
@@ -118,12 +118,11 @@ object TcpHelper {
   }
 }
 
-trait TcpHelper {
-  this: TestKitBase ⇒
+trait TcpHelper { this: TestKitBase ⇒
   import akka.stream.io.TcpHelper._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 4, maxSize = 4)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 4, maxSize = 4)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -155,8 +154,8 @@ trait TcpHelper {
     def expectClosed(expected: ConnectionClosed): Unit =
       expectClosed(_ == expected)
 
-    def expectClosed(
-        p: (ConnectionClosed) ⇒ Boolean, max: Duration = 3.seconds): Unit = {
+    def expectClosed(p: (ConnectionClosed) ⇒ Boolean,
+                     max: Duration = 3.seconds): Unit = {
       connectionActor ! PingClose(connectionProbe.ref)
       connectionProbe.fishForMessage(max) {
         case c: ConnectionClosed if p(c) ⇒ true

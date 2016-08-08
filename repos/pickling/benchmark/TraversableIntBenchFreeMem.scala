@@ -7,7 +7,12 @@ import scala.pickling.binary._
 import java.lang.{Runtime => JRuntime}
 
 // for Java Serialization:
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectOutputStream,
+  ObjectInputStream
+}
 
 object TraversableIntBenchFreeMem
     extends scala.pickling.testing.PicklingBenchmark {

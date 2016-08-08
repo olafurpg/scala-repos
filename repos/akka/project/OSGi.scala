@@ -61,8 +61,8 @@ object OSGi {
   val parsing = exports(Seq("akka.parboiled2.*", "akka.shapeless.*"),
                         imports = Seq(optionalResolution("scala.quasiquotes")))
 
-  val httpCore = exports(
-      Seq("akka.http.*"), imports = Seq(scalaJava8CompatImport()))
+  val httpCore =
+    exports(Seq("akka.http.*"), imports = Seq(scalaJava8CompatImport()))
 
   val http = exports(Seq("akka.http.impl.server",
                          "akka.http.scaladsl.server.*",
@@ -85,8 +85,8 @@ object OSGi {
 
   val httpJackson = exports(Seq("akka.http.javadsl.marshallers.jackson"))
 
-  val stream = exports(
-      Seq("akka.stream.*"), imports = Seq(scalaJava8CompatImport()))
+  val stream =
+    exports(Seq("akka.stream.*"), imports = Seq(scalaJava8CompatImport()))
 
   val streamTestkit = exports(Seq("akka.stream.testkit.*"))
 
@@ -126,8 +126,9 @@ object OSGi {
     val packageName = "scala.*"
     val ScalaVersion = """(\d+)\.(\d+)\..*""".r
     val ScalaVersion(epoch, major) = version
-    versionedImport(
-        packageName, s"$epoch.$major", s"$epoch.${major.toInt + 1}")
+    versionedImport(packageName,
+                    s"$epoch.$major",
+                    s"$epoch.${major.toInt + 1}")
   }
   def scalaJava8CompatImport(packageName: String = "scala.compat.java8.*") =
     versionedImport(packageName, "0.7.0", "1.0.0")

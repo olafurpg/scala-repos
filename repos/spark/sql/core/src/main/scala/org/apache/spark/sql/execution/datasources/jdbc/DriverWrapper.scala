@@ -17,7 +17,12 @@
 
 package org.apache.spark.sql.execution.datasources.jdbc
 
-import java.sql.{Connection, Driver, DriverPropertyInfo, SQLFeatureNotSupportedException}
+import java.sql.{
+  Connection,
+  Driver,
+  DriverPropertyInfo,
+  SQLFeatureNotSupportedException
+}
 import java.util.Properties
 
 /**
@@ -31,8 +36,8 @@ class DriverWrapper(val wrapped: Driver) extends Driver {
 
   override def jdbcCompliant(): Boolean = wrapped.jdbcCompliant()
 
-  override def getPropertyInfo(
-      url: String, info: Properties): Array[DriverPropertyInfo] = {
+  override def getPropertyInfo(url: String,
+                               info: Properties): Array[DriverPropertyInfo] = {
     wrapped.getPropertyInfo(url, info)
   }
 

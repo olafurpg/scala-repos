@@ -49,7 +49,7 @@ object Test {
     abstract class A extends Seq[U forSome { type U <: Int }]; List[A]()
   }
 
-  def m[T : Manifest](x: T) = println(manifest[T])
+  def m[T: Manifest](x: T) = println(manifest[T])
 
   // manifests don't work for f10/g10
   def main(args: Array[String]): Unit = {

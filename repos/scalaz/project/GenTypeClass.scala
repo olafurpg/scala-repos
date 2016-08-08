@@ -15,9 +15,10 @@ case class TypeClass(name: String,
   def fqn = (pack :+ name).mkString(".")
   def doc =
     "[[" + fqn + "]]" +
-    (if (extendsList.nonEmpty)
-       " extends " +
-       extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
+      (if (extendsList.nonEmpty)
+         " extends " +
+           extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
+       else "")
 }
 
 object TypeClass {
@@ -31,28 +32,28 @@ object TypeClass {
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
-  lazy val functor = TypeClass(
-      "Functor", *->*, extendsList = Seq(invariantFunctor))
-  lazy val apply: TypeClass = TypeClass(
-      "Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass(
-      "Applicative", *->*, extendsList = Seq(apply))
+  lazy val functor =
+    TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val apply: TypeClass =
+    TypeClass("Apply", *->*, extendsList = Seq(functor))
+  lazy val applicative =
+    TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
-  lazy val monad = TypeClass(
-      "Monad", *->*, extendsList = Seq(applicative, bind))
+  lazy val monad =
+    TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
-  lazy val foldable1 = TypeClass(
-      "Foldable1", *->*, extendsList = Seq(foldable))
-  lazy val traverse = TypeClass(
-      "Traverse", *->*, extendsList = Seq(functor, foldable))
-  lazy val traverse1 = TypeClass(
-      "Traverse1", *->*, extendsList = Seq(traverse, foldable1))
+  lazy val foldable1 =
+    TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
+  lazy val traverse =
+    TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
+  lazy val traverse1 =
+    TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
-  lazy val contravariant = TypeClass(
-      "Contravariant", *->*, extendsList = Seq(invariantFunctor))
+  lazy val contravariant =
+    TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant))
   lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
@@ -64,51 +65,57 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
-  lazy val applicativePlus = TypeClass(
-      "ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
-  lazy val monadPlus = TypeClass(
-      "MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
+  lazy val applicativePlus = TypeClass("ApplicativePlus",
+                                       *->*,
+                                       extendsList =
+                                         Seq(applicative, plusEmpty))
+  lazy val monadPlus =
+    TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val associative = TypeClass("Associative", *^*->*)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
-  lazy val bitraverse = TypeClass(
-      "Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
+  lazy val bitraverse =
+    TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
-  lazy val nondeterminism = TypeClass(
-      "Nondeterminism", *->*, extendsList = Seq(monad))
+  lazy val nondeterminism =
+    TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(compose))
   lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
   lazy val strong = TypeClass("Strong", *^*->*, extendsList = Seq(profunctor))
-  lazy val proChoice = TypeClass(
-      "ProChoice", *^*->*, extendsList = Seq(profunctor))
-  lazy val arrow = TypeClass(
-      "Arrow", *^*->*, extendsList = Seq(split, strong, category))
+  lazy val proChoice =
+    TypeClass("ProChoice", *^*->*, extendsList = Seq(profunctor))
+  lazy val arrow =
+    TypeClass("Arrow", *^*->*, extendsList = Seq(split, strong, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO",
                                *->*,
                                extendsList = Seq(liftIO, monad),
                                pack = Seq("scalaz", "effect"))
-  lazy val liftControlIO = TypeClass(
-      "LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
+  lazy val liftControlIO =
+    TypeClass("LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadControlIO = TypeClass("MonadControlIO",
                                       *->*,
                                       extendsList = Seq(liftControlIO, monad),
                                       pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
-  lazy val monadState = TypeClass(
-      "MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass(
-      "MonadError", |*->*|->*, extendsList = Seq(monad))
-  lazy val monadTell = TypeClass(
-      "MonadTell", |*->*|->*, extendsList = Seq(monad))
-  lazy val monadReader = TypeClass(
-      "MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
+  lazy val monadState = TypeClass("MonadState",
+                                  |*->*|->*,
+                                  extendsList = Seq(monad),
+                                  createSyntax = false)
+  lazy val monadError =
+    TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadTell =
+    TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadReader = TypeClass("MonadReader",
+                                   |*->*|->*,
+                                   extendsList = Seq(monad),
+                                   createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore",
                                     |*->*|->*,
                                     extendsList = Seq(comonad),
@@ -196,13 +203,14 @@ object FileStatus {
 object GenTypeClass {
   val useDependentMethodTypes = true
 
-  case class SourceFile(
-      packages: Seq[String], fileName: String, source: String) {
+  case class SourceFile(packages: Seq[String],
+                        fileName: String,
+                        source: String) {
     def file(scalaSource: File): File =
       packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
-    def createOrUpdate(
-        scalaSource: File, log: Logger): (FileStatus, sbt.File) = {
+    def createOrUpdate(scalaSource: File,
+                       log: Logger): (FileStatus, sbt.File) = {
       val f = file(scalaSource)
       val (status, updatedSource) =
         if (f.exists()) {
@@ -246,8 +254,8 @@ object GenTypeClass {
     }
   }
 
-  case class TypeClassSource(
-      mainFile: SourceFile, syntaxFile: Option[SourceFile]) {
+  case class TypeClassSource(mainFile: SourceFile,
+                             syntaxFile: Option[SourceFile]) {
     def sources: List[SourceFile] = mainFile :: syntaxFile.toList
   }
 
@@ -290,11 +298,11 @@ object GenTypeClass {
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
         "extends To" + typeClassName + "Ops0" +
-        (extendsList match {
-              case Seq() => ""
-              case es =>
-                es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
-            })
+          (extendsList match {
+            case Seq() => ""
+            case es =>
+              es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
+          })
       case _ =>
         extendsList match {
           case Seq() => ""
@@ -306,8 +314,8 @@ object GenTypeClass {
 
     val syntaxPackString =
       tc.syntaxPack.map("package " + _).mkString("\n") +
-      (if (tc.pack == Seq("scalaz")) ""
-       else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
+        (if (tc.pack == Seq("scalaz")) ""
+         else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember =
       if (tc.createSyntax) {
@@ -347,8 +355,8 @@ object $typeClassName {
   ////
 }
 """
-    val mainSourceFile = SourceFile(
-        tc.pack, typeClassName + ".scala", mainSource)
+    val mainSourceFile =
+      SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {
       case Kind.* =>
@@ -498,8 +506,10 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
     }
     val syntaxSourceFile =
       if (tc.createSyntax) {
-        Some(SourceFile(
-                tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource))
+        Some(
+            SourceFile(tc.syntaxPack,
+                       typeClassName + "Syntax.scala",
+                       syntaxSource))
       } else None
 
     TypeClassSource(mainSourceFile, syntaxSourceFile)

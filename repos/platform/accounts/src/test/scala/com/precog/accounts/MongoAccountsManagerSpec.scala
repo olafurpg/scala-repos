@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -48,7 +48,8 @@ import scalaz._
 import scalaz.syntax.comonad._
 
 object MongoAccountManagerSpec
-    extends Specification with RealMongoSpecSupport {
+    extends Specification
+    with RealMongoSpecSupport {
   val timeout = Duration(30, "seconds")
 
   "MongoAccountManager" should {
@@ -85,8 +86,7 @@ object MongoAccountManagerSpec
     }
 
     "move an Account to the deleted collection" in new AccountManager {
-      type Results = (Option[Account], Option[Account],
-      Option[Account]) //, Option[Account])
+      type Results = (Option[Account], Option[Account], Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
@@ -103,8 +103,10 @@ object MongoAccountManagerSpec
     }
 
     "succeed in deleting a previously deleted Account" in new AccountManager {
-      type Results = (Option[Account], Option[Account], Option[Account],
-      Option[Account]) //, Option[Account])
+      type Results = (Option[Account],
+                      Option[Account],
+                      Option[Account],
+                      Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
@@ -125,7 +127,8 @@ object MongoAccountManagerSpec
       (for {
         tokenId <- accountManager.generateResetToken(account)
         resolvedAccount <- accountManager.findAccountByResetToken(
-            account.accountId, tokenId)
+                              account.accountId,
+                              tokenId)
       } yield resolvedAccount).copoint must beLike {
         case \/-(resolvedAccount) =>
           resolvedAccount.accountId must_== account.accountId
@@ -135,9 +138,11 @@ object MongoAccountManagerSpec
     "not locate expired password reset tokens" in new AccountManager {
       (for {
         tokenId <- accountManager.generateResetToken(
-            account, (new DateTime).minusMinutes(5))
+                      account,
+                      (new DateTime).minusMinutes(5))
         resolvedAccount <- accountManager.findAccountByResetToken(
-            account.accountId, tokenId)
+                              account.accountId,
+                              tokenId)
       } yield resolvedAccount).copoint must beLike {
         case -\/(_) => ok
       }
@@ -200,8 +205,8 @@ object MongoAccountManagerSpec
     val defaultActorSystem = ActorSystem("AccountManagerTest")
     implicit val execContext =
       ExecutionContext.defaultExecutionContext(defaultActorSystem)
-    implicit val M = new UnsafeFutureComonad(
-        execContext, Duration(60, "seconds"))
+    implicit val M =
+      new UnsafeFutureComonad(execContext, Duration(60, "seconds"))
 
     val accountManager = new MongoAccountManager(
         mongo,
@@ -214,10 +219,11 @@ object MongoAccountManagerSpec
     val origPassword = "test password"
 
     val account = (accountManager
-      .createAccount(
-          "test@precog.com", origPassword, new DateTime, AccountPlan.Free) {
-        _ =>
-          M.point("testapikey")
+      .createAccount("test@precog.com",
+                     origPassword,
+                     new DateTime,
+                     AccountPlan.Free) { _ =>
+        M.point("testapikey")
       })
       .copoint
 

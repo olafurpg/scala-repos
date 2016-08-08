@@ -22,11 +22,17 @@ import breeze.linalg.{DenseMatrix => BDM, Matrix => BM}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.internal.Logging
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.stat.correlation.{Correlations, PearsonCorrelation, SpearmanCorrelation}
+import org.apache.spark.mllib.stat.correlation.{
+  Correlations,
+  PearsonCorrelation,
+  SpearmanCorrelation
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class CorrelationSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Logging {
 
   // test input data
   val xData = Array(1.0, 0.0, -2.0)
@@ -142,13 +148,14 @@ class CorrelationSuite
     }
   }
 
-  def matrixApproxEqual(
-      A: BM[Double], B: BM[Double], threshold: Double = 1e-6): Boolean = {
+  def matrixApproxEqual(A: BM[Double],
+                        B: BM[Double],
+                        threshold: Double = 1e-6): Boolean = {
     for (i <- 0 until A.rows; j <- 0 until A.cols) {
       if (!approxEqual(A(i, j), B(i, j), threshold)) {
         logInfo(
             "i, j = " + i + ", " + j + " actual: " + A(i, j) + " expected:" +
-            B(i, j))
+              B(i, j))
         return false
       }
     }

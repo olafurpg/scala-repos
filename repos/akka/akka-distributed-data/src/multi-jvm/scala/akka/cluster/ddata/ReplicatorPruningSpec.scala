@@ -19,7 +19,9 @@ object ReplicatorPruningSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -31,7 +33,8 @@ class ReplicatorPruningSpecMultiJvmNode2 extends ReplicatorPruningSpec
 class ReplicatorPruningSpecMultiJvmNode3 extends ReplicatorPruningSpec
 
 class ReplicatorPruningSpec
-    extends MultiNodeSpec(ReplicatorPruningSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatorPruningSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatorPruningSpec._
   import Replicator._
@@ -41,7 +44,8 @@ class ReplicatorPruningSpec
   implicit val cluster = Cluster(system)
   val maxPruningDissemination = 3.seconds
   val replicator = system.actorOf(
-      Replicator.props(ReplicatorSettings(system)
+      Replicator.props(
+          ReplicatorSettings(system)
             .withGossipInterval(1.second)
             .withPruning(pruningInterval = 1.second, maxPruningDissemination)),
       "replicator")

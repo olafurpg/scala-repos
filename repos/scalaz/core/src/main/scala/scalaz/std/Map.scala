@@ -5,39 +5,38 @@ import collection.immutable.{Map, MapLike} // Just so we're clear.
 import collection.generic.CanBuildFrom
 
 trait MapSub {
-  type XMap [K, V] <: Map[K, V] with MapLike[K, V, XMap[K, V]]
+  type XMap[K, V] <: Map[K, V] with MapLike[K, V, XMap[K, V]]
 
   /** Evidence on key needed to construct new maps. */
-  type BuildKeyConstraint [K]
-  protected implicit def buildXMap[
-      K, V, K2 : BuildKeyConstraint, V2]: CanBuildFrom[
-      XMap[K, V], (K2, V2), XMap[K2, V2]]
+  type BuildKeyConstraint[K]
+  protected implicit def buildXMap[K, V, K2: BuildKeyConstraint, V2]
+    : CanBuildFrom[XMap[K, V], (K2, V2), XMap[K2, V2]]
 
   /** How `MapLike#updated` might be typed in a sane world.  A world
     * that embraced higher kinds, instead of shunning them.
     */
-  protected def ab_+[K : BuildKeyConstraint, V](
-      m: XMap[K, V], k: K, v: V): XMap[K, V]
+  protected def ab_+[K: BuildKeyConstraint, V](m: XMap[K, V],
+                                               k: K,
+                                               v: V): XMap[K, V]
 
   /** As with `ab_+, but with `MapLike#-`. */
-  protected def ab_-[K : BuildKeyConstraint, V](
-      m: XMap[K, V], k: K): XMap[K, V]
+  protected def ab_-[K: BuildKeyConstraint, V](m: XMap[K, V], k: K): XMap[K, V]
 
-  private[std] def fromSeq[K : BuildKeyConstraint, V](
-      as: (K, V)*): XMap[K, V] =
+  private[std] def fromSeq[K: BuildKeyConstraint, V](as: (K, V)*): XMap[K, V] =
     buildXMap[K, V, K, V].apply().++=(as).result()
 }
 
 sealed trait MapSubMap extends MapSub {
   type XMap[K, V] = Map[K, V]
   type BuildKeyConstraint[K] = DummyImplicit
-  protected final def buildXMap[K, V, K2 : BuildKeyConstraint, V2] = implicitly
+  protected final def buildXMap[K, V, K2: BuildKeyConstraint, V2] = implicitly
 
-  protected final def ab_+[K : BuildKeyConstraint, V](
-      m: XMap[K, V], k: K, v: V): XMap[K, V] =
+  protected final def ab_+[K: BuildKeyConstraint, V](m: XMap[K, V],
+                                                     k: K,
+                                                     v: V): XMap[K, V] =
     m updated (k, v)
-  protected final def ab_-[K : BuildKeyConstraint, V](
-      m: XMap[K, V], k: K): XMap[K, V] =
+  protected final def ab_-[K: BuildKeyConstraint, V](m: XMap[K, V],
+                                                     k: K): XMap[K, V] =
     m - k
 }
 
@@ -74,7 +73,7 @@ trait MapSubInstances0 extends MapSub {
       fa.valuesIterator.exists(f)
   }
 
-  implicit def mapEqual[K : Order, V : Equal]: Equal[XMap[K, V]] =
+  implicit def mapEqual[K: Order, V: Equal]: Equal[XMap[K, V]] =
     new MapEqual[K, V] {
       def OK = Order[K]
       def OV = Equal[V]
@@ -90,10 +89,10 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K : BuildKeyConstraint]: Traverse[XMap[K, ?]] with IsEmpty[
+  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[XMap[K, ?]] with IsEmpty[
       XMap[K, ?]] with Bind[XMap[K, ?]] with Align[XMap[K, ?]] =
-    new Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]]
-    with Bind[XMap[K, ?]] with MapFoldable[K] with Align[XMap[K, ?]] {
+    new Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]] with Bind[XMap[K, ?]]
+    with MapFoldable[K] with Align[XMap[K, ?]] {
       def empty[V] = fromSeq[K, V]()
       def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
       def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
@@ -113,8 +112,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
         case (a, b) if b.isEmpty => map(a)(v => f(This(v)))
         case (a, b) if a.isEmpty => map(b)(v => f(That(v)))
         case (a, b) =>
-          map(
-              unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)) {
+          map(unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)) {
             case (This(aa), That(bb)) => Both(aa, bb)
             case _ => sys.error("Map alignWith")
           })(f)
@@ -131,8 +129,8 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
     }
 
   /** Map union monoid, unifying values with `V`'s `append`. */
-  implicit def mapMonoid[K : BuildKeyConstraint, V : Semigroup]: Monoid[XMap[
-          K, V]] =
+  implicit def mapMonoid[K: BuildKeyConstraint, V: Semigroup]
+    : Monoid[XMap[K, V]] =
     new Monoid[XMap[K, V]] {
       def zero = fromSeq[K, V]()
       def append(m1: XMap[K, V], m2: => XMap[K, V]) = {
@@ -152,15 +150,14 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
       }
     }
 
-  implicit def mapShow[K, V](
-      implicit K: Show[K], V: Show[V]): Show[XMap[K, V]] =
-    Show.show(
-        m =>
-          "Map[" +: Cord.mkCord(", ", m.toSeq.view.map {
+  implicit def mapShow[K, V](implicit K: Show[K],
+                             V: Show[V]): Show[XMap[K, V]] =
+    Show.show(m =>
+      "Map[" +: Cord.mkCord(", ", m.toSeq.view.map {
         case (k, v) => Cord(K show k, "->", V show v)
       }: _*) :+ "]")
 
-  implicit def mapOrder[K : Order, V : Order]: Order[XMap[K, V]] =
+  implicit def mapOrder[K: Order, V: Order]: Order[XMap[K, V]] =
     new Order[XMap[K, V]] with MapEqual[K, V] {
       def OK = Order[K]
       def OV = Equal[V]
@@ -180,13 +177,14 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
 trait MapSubFunctions extends MapSub {
 
   /** Vary the value of `m get k`. */
-  final def alter[K : BuildKeyConstraint, A](m: XMap[K, A], k: K)(
+  final def alter[K: BuildKeyConstraint, A](m: XMap[K, A], k: K)(
       f: (Option[A] => Option[A])): XMap[K, A] =
     f(m get k) map (ab_+(m, k, _)) getOrElse ab_-(m, k)
 
   /** Like `intersectWith`, but tell `f` about the key. */
-  final def intersectWithKey[K : BuildKeyConstraint, A, B, C](
-      m1: XMap[K, A], m2: XMap[K, B])(f: (K, A, B) => C): XMap[K, C] =
+  final def intersectWithKey[K: BuildKeyConstraint, A, B, C](
+      m1: XMap[K, A],
+      m2: XMap[K, B])(f: (K, A, B) => C): XMap[K, C] =
     m1 collect {
       case (k, v) if m2 contains k => k -> f(k, v, m2(k))
     }
@@ -194,21 +192,23 @@ trait MapSubFunctions extends MapSub {
   /** Collect only elements with matching keys, joining their
     * associated values with `f`.
     */
-  final def intersectWith[K : BuildKeyConstraint, A, B, C](
-      m1: XMap[K, A], m2: XMap[K, B])(f: (A, B) => C): XMap[K, C] =
+  final def intersectWith[K: BuildKeyConstraint, A, B, C](
+      m1: XMap[K, A],
+      m2: XMap[K, B])(f: (A, B) => C): XMap[K, C] =
     intersectWithKey(m1, m2)((_, x, y) => f(x, y))
 
   /** Exchange keys of `m` according to `f`.  Result may be smaller if
     * `f` maps two or more `K`s to the same `K2`, in which case the
     * resulting associated value is an arbitrary choice.
     */
-  final def mapKeys[K, K2 : BuildKeyConstraint, A](m: XMap[K, A])(
+  final def mapKeys[K, K2: BuildKeyConstraint, A](m: XMap[K, A])(
       f: K => K2): XMap[K2, A] =
     m map { case (k, v) => f(k) -> v }
 
   /** Like `unionWith`, but telling `f` about the key. */
-  final def unionWithKey[K : BuildKeyConstraint, A](
-      m1: XMap[K, A], m2: XMap[K, A])(f: (K, A, A) => A): XMap[K, A] = {
+  final def unionWithKey[K: BuildKeyConstraint, A](
+      m1: XMap[K, A],
+      m2: XMap[K, A])(f: (K, A, A) => A): XMap[K, A] = {
     val diff = m2 -- m1.keySet
     val aug =
       m1 map {
@@ -222,14 +222,15 @@ trait MapSubFunctions extends MapSub {
     *
     * @note iff `f` gives rise to a [[scalaz.Semigroup]], so does
     *       `unionWith(_, _)(f)`.*/
-  final def unionWith[K : BuildKeyConstraint, A](
-      m1: XMap[K, A], m2: XMap[K, A])(f: (A, A) => A): XMap[K, A] =
+  final def unionWith[K: BuildKeyConstraint, A](
+      m1: XMap[K, A],
+      m2: XMap[K, A])(f: (A, A) => A): XMap[K, A] =
     unionWithKey(m1, m2)((_, x, y) => f(x, y))
 
   /** As with `Map.updated`, but resolve a collision with `f`.  The
     * first argument is guaranteed to be from `m1`.
     */
-  final def insertWith[K : BuildKeyConstraint, A](m1: XMap[K, A], k: K, v: A)(
+  final def insertWith[K: BuildKeyConstraint, A](m1: XMap[K, A], k: K, v: A)(
       f: (A, A) => A): XMap[K, A] =
     if (m1 contains k) ab_+(m1, k, f(m1(k), v)) else ab_+(m1, k, v)
 

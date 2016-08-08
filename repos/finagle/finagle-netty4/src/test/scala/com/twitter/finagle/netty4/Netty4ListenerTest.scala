@@ -23,7 +23,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4ListenerTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   // a Transport whose reads and writes never complete
   private[netty4] class NullTransport[In, Out] extends Transport[In, Out] {
@@ -79,9 +81,10 @@ class Netty4ListenerTest
 
     object StringServerInit extends (ChannelPipeline => Unit) {
       def apply(pipeline: ChannelPipeline): Unit = {
-        pipeline.addLast("line",
-                         new DelimiterBasedFrameDecoder(
-                             100, Delimiters.lineDelimiter(): _*))
+        pipeline.addLast(
+            "line",
+            new DelimiterBasedFrameDecoder(100,
+                                           Delimiters.lineDelimiter(): _*))
         pipeline.addLast("stringDecoder", new StringDecoder(Charsets.Utf8))
         pipeline.addLast("stringEncoder", new StringEncoder(Charsets.Utf8))
       }

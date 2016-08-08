@@ -33,8 +33,8 @@ object Test extends App {
     val (o, e) = ten.partition(_ % 2 == 0)
     assert(o.size == e.size)
     val gs = ten groupBy (x => x / 4)
-    val vs1 = (for (k <- gs.keysIterator; v <- gs(k).toIterable.iterator) yield
-      v).toList.sorted
+    val vs1 = (for (k <- gs.keysIterator; v <- gs(k).toIterable.iterator)
+      yield v).toList.sorted
     val vs2 = gs.values.toList.flatten.sorted
 //    val vs2 = gs.values.toList flatMap (xs => xs)
     assert(ten.head == 1)
@@ -66,7 +66,8 @@ object Test extends App {
     assert(ten.toStream == ten)
     assert(ten.toString endsWith "(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)")
     assert(
-        ten.mkString("[", "; ", "]") endsWith "[1; 2; 3; 4; 5; 6; 7; 8; 9; 10]")
+        ten
+          .mkString("[", "; ", "]") endsWith "[1; 2; 3; 4; 5; 6; 7; 8; 9; 10]")
   }
 
   def orderedIterableTest(empty: Iterable[Int]) {
@@ -90,7 +91,7 @@ object Test extends App {
     assert(ten(0) == 1 && ten(9) == 10)
     assert(
         (ten lengthCompare 10) == 0 && (ten lengthCompare 1) > 0 &&
-        (ten lengthCompare 11) < 0)
+          (ten lengthCompare 11) < 0)
     assert((ten isDefinedAt 0) && (ten isDefinedAt 9))
     assert(!(ten isDefinedAt -1));
     assert(!(ten isDefinedAt 10))
@@ -114,22 +115,36 @@ object Test extends App {
     assert(ten.reverse startsWith List(10, 9, 8), ten.reverse.take(10).toList)
     assert(ten.reverse.length == 10)
     assert(ten.reverse.reverse == ten)
-    assert(
-        ten.reverseIterator.toList.reverse == ten, ten.reverseIterator.toList)
+    assert(ten.reverseIterator.toList.reverse == ten,
+           ten.reverseIterator.toList)
     assert(ten.startsWith(List(1)))
     assert(ten.startsWith(List(3, 4), 2))
     assert(ten.endsWith(List(9, 10)))
     assert(ten.endsWith(List()))
-    assert(
-        ten.indexOfSlice(List(3, 4, 5)) == 2, ten.indexOfSlice(List(3, 4, 5)))
+    assert(ten.indexOfSlice(List(3, 4, 5)) == 2,
+           ten.indexOfSlice(List(3, 4, 5)))
     assert(ten.lastIndexOfSlice(List(8, 9, 10)) == 7)
     assert(ten.lastIndexOfSlice(List(1, 2, 3)) == 0)
     assert(ten.lastIndexOfSlice(List(9, 10, 11)) == -1)
     assert(ten contains 1)
     assert(ten contains 10)
     assert(!(ten contains 0))
-    assert((empty ++ (1 to 7) union empty ++ (3 to 10)) == List(
-            1, 2, 3, 4, 5, 6, 7, 3, 4, 5, 6, 7, 8, 9, 10))
+    assert(
+        (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(1,
+                                                             2,
+                                                             3,
+                                                             4,
+                                                             5,
+                                                             6,
+                                                             7,
+                                                             3,
+                                                             4,
+                                                             5,
+                                                             6,
+                                                             7,
+                                                             8,
+                                                             9,
+                                                             10))
     assert((ten diff ten).isEmpty)
     assert((ten diff List()) == ten)
     assert(

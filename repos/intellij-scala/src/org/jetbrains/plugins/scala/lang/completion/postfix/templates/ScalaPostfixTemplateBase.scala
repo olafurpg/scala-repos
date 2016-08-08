@@ -12,8 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
   */
 abstract class ScalaPostfixTemplateBase(val name: String, val example: String)
     extends PostfixTemplate(name, example) {
-  override def isApplicable(
-      context: PsiElement, copyDocument: Document, newOffset: Int): Boolean = {
+  override def isApplicable(context: PsiElement,
+                            copyDocument: Document,
+                            newOffset: Int): Boolean = {
     ScalaPsiUtil.getParentOfType(context, classOf[ScExpression]) match {
       case expr: ScExpression => expr.getTextRange.getEndOffset == newOffset
       case _ => false

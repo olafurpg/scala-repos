@@ -27,7 +27,8 @@ import akka.protobuf.MessageLite
   */
 private[akka] class ClusterShardingMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
   import ShardCoordinator.Internal._
   import Shard.{GetShardStats, ShardStats}
   import Shard.{State ⇒ EntityState, EntityStarted, EntityStopped}
@@ -340,7 +341,8 @@ private[akka] class ClusterShardingMessageSerializer(
   private def compress(msg: MessageLite): Array[Byte] = {
     val bos = new ByteArrayOutputStream(BufferSize)
     val zip = new GZIPOutputStream(bos)
-    try msg.writeTo(zip) finally zip.close()
+    try msg.writeTo(zip)
+    finally zip.close()
     bos.toByteArray
   }
 
@@ -356,7 +358,8 @@ private[akka] class ClusterShardingMessageSerializer(
         readChunk()
     }
 
-    try readChunk() finally in.close()
+    try readChunk()
+    finally in.close()
     out.toByteArray
   }
 }

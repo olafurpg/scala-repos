@@ -32,7 +32,13 @@ import scalafx.ensemble.commons.EnsembleExample
 import scalafx.geometry.{HPos, Insets, Pos}
 import scalafx.scene.control.{Button, Label, Separator, TextField}
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.layout.{ColumnConstraints, GridPane, Priority, RowConstraints, VBox}
+import scalafx.scene.layout.{
+  ColumnConstraints,
+  GridPane,
+  Priority,
+  RowConstraints,
+  VBox
+}
 
 /**
   * An example of a GridPane layout. There is more than one approach to using a
@@ -50,7 +56,8 @@ class EnsembleGridPane extends EnsembleExample {
   def getContent = {
     // grid1 places the children by specifying the rows and columns in GridPane.setConstraints()
     val grid1Caption = new Label {
-      text = "The example below shows GridPane content placement by specifying rows and columns:"
+      text =
+        "The example below shows GridPane content placement by specifying rows and columns:"
       wrapText = true
     }
 
@@ -87,7 +94,8 @@ class EnsembleGridPane extends EnsembleExample {
     // via GridRowInfo and GridColumnInfo. This grid uses the preferred
     // width/height and max/min width/height.
     val grid2Caption = new Label {
-      text = "The example below shows GridPane content placement by influencing the rows and columns themselves."
+      text =
+        "The example below shows GridPane content placement by influencing the rows and columns themselves."
       wrapText = true
     }
 
@@ -138,10 +146,10 @@ class EnsembleGridPane extends EnsembleExample {
     }
     GridPane.setConstraints(imageView, 2, 1)
 
-    val rowInfo = new RowConstraints(
-        minHeight = 50, prefHeight = 50, maxHeight = 50)
-    val colInfo = new ColumnConstraints(
-        minWidth = 140, prefWidth = 140, maxWidth = 140)
+    val rowInfo =
+      new RowConstraints(minHeight = 50, prefHeight = 50, maxHeight = 50)
+    val colInfo =
+      new ColumnConstraints(minWidth = 140, prefWidth = 140, maxWidth = 140)
 
     val grid2 = new GridPane {
       padding = Insets(18)
@@ -161,7 +169,10 @@ class EnsembleGridPane extends EnsembleExample {
     // grid3 places the child by influencing the rows and columns
     // via GridRowInfo and GridColumnInfo. This grid uses the percentages
     val grid3Caption = new Label {
-      text = "The example below shows GridPane content placement by " + "influencing row and column percentages.  " + "Also, grid lines are made visible in this example.  " + "The lines can be helpful in debugging."
+      text = "The example below shows GridPane content placement by " +
+          "influencing row and column percentages.  " +
+          "Also, grid lines are made visible in this example.  " +
+          "The lines can be helpful in debugging."
       wrapText = true
     }
 

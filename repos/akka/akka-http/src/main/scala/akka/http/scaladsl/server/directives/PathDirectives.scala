@@ -10,7 +10,8 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri.Path
 
 trait PathDirectives
-    extends PathMatchers with ImplicitPathMatcherConstruction
+    extends PathMatchers
+    with ImplicitPathMatcherConstruction
     with ToNameReceptacleEnhancements {
   import BasicDirectives._
   import RouteDirectives._

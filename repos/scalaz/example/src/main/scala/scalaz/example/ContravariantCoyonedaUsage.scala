@@ -52,7 +52,7 @@ object ContravariantCoyonedaUsage extends App {
 
   def parseCommaNum(s: String): Long \/ String =
     ("""-?[0-9,]+""".r findFirstIn s flatMap
-        (_.filter(_ != ',').parseLong.toOption)) <\/ s
+      (_.filter(_ != ',').parseLong.toOption)) <\/ s
 
   def caseInsensitively(s: String): String =
     s.toUpperCase.toLowerCase
@@ -135,8 +135,8 @@ object ContravariantCoyonedaUsage extends App {
   // Fails to compile with the given type error.  That’s because the
   // type of that list of sort key functions and indexes is:
 
-  val untypedSortKeys: List[(String => java.io.Serializable, Int)] = List(
-      (caseInsensitively _, 0), (parseDate _, 1), (parseCommaNum _, 2))
+  val untypedSortKeys: List[(String => java.io.Serializable, Int)] =
+    List((caseInsensitively _, 0), (parseDate _, 1), (parseCommaNum _, 2))
 
   // The problem is that the return type for each sort key is different,
   // and is an absolutely essential part of the sort process.  Check
@@ -210,8 +210,8 @@ object ContravariantCoyonedaUsage extends App {
   val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
     (ccord, i) <- decomposedSortKeys
   } yield
-    (schwartzian[Vector[String], ccord.I](unstructuredData)(
-        v => ccord.k(v(i)))(ccord.fi))
+    (schwartzian[Vector[String], ccord.I](unstructuredData)(v =>
+      ccord.k(v(i)))(ccord.fi))
 
   // `I' is the “pivot”, how the function `k' result type and `fi'
   // order type relate to each other.  As seen above, this existential
@@ -244,8 +244,8 @@ object ContravariantCoyonedaUsage extends App {
   // With a sample specification that sorts the columns left-to-right,
   // with the sort key associations we’ve been using.
 
-  val mainLtoRsort: SortSpec = List(
-      (SortType.CI, 0), (SortType.Dateish, 1), (SortType.Num, 2))
+  val mainLtoRsort: SortSpec =
+    List((SortType.CI, 0), (SortType.Dateish, 1), (SortType.Num, 2))
 
   // It’s simple enough to “interpret” each `SortType' to a
   // contravariant co-Yoneda Order.
@@ -259,8 +259,8 @@ object ContravariantCoyonedaUsage extends App {
   // And then, similarly to `bySchwartzianListSorts', to combine one
   // of these `k's with a Vector lookup to produce a sort of records.
 
-  def recItemOrd(
-      i: Int, o: CtCoyo[Order, String]): CtCoyo[Order, Vector[String]] =
+  def recItemOrd(i: Int,
+                 o: CtCoyo[Order, String]): CtCoyo[Order, Vector[String]] =
     o contramap (v => v(i))
 
   // Now what?  A `SortSpec' has several such values in it; how do we
@@ -320,13 +320,13 @@ object ContravariantCoyonedaUsage extends App {
     schwartzian(xs)(coyo.k)(coyo.fi)
   }
 
-  val sortedBySpec: List[Vector[String]] = sortDataBy(
-      unstructuredData, mainLtoRsort)
+  val sortedBySpec: List[Vector[String]] =
+    sortDataBy(unstructuredData, mainLtoRsort)
 
   println("sortedBySpec: " |+| sortedBySpec.shows)
 
-  val sortedByNonCity: List[Vector[String]] = sortDataBy(
-      unstructuredData, mainLtoRsort.tail)
+  val sortedByNonCity: List[Vector[String]] =
+    sortDataBy(unstructuredData, mainLtoRsort.tail)
 
   println("sortedByNonCity: " |+| sortedByNonCity.shows)
 
@@ -476,11 +476,11 @@ object ContravariantCoyonedaUsage extends App {
     implicit val descUnit: Binfmt[Unit] = Binfmt("")
     implicit def descOption[A](implicit a: Binfmt[A]): Binfmt[Option[A]] =
       Binfmt("?<" |+| a.describe |+| ">")
-    implicit def desc_\/[A, B](
-        implicit a: Binfmt[A], b: Binfmt[B]): Binfmt[A \/ B] =
+    implicit def desc_\/[A, B](implicit a: Binfmt[A],
+                               b: Binfmt[B]): Binfmt[A \/ B] =
       Binfmt("<" |+| a.describe |+| "\\/" |+| b.describe |+| ">")
-    implicit def desc2Tuple[A, B](
-        implicit a: Binfmt[A], b: Binfmt[B]): Binfmt[(A, B)] =
+    implicit def desc2Tuple[A, B](implicit a: Binfmt[A],
+                                  b: Binfmt[B]): Binfmt[(A, B)] =
       Binfmt(a.describe |+| b.describe)
   }
 
@@ -499,8 +499,8 @@ object ContravariantCoyonedaUsage extends App {
 
   type BinOrd[A] = (Binfmt[A], Order[A])
 
-  def CCBinOrd[A, B](f: A => B)(
-      implicit b: Binfmt[B], o: Order[B]): CtCoyo.Aux[BinOrd, A, B] =
+  def CCBinOrd[A, B](f: A => B)(implicit b: Binfmt[B],
+                                o: Order[B]): CtCoyo.Aux[BinOrd, A, B] =
     CtCoyo[BinOrd, A, B]((b, o))(f)
 
   def sortTypeBinOrd(s: SortType): CtCoyo[BinOrd, String] = s match {

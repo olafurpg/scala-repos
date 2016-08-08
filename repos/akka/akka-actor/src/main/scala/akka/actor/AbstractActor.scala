@@ -59,7 +59,7 @@ abstract class AbstractActor extends Actor {
     else
       throw IllegalActorStateException(
           "Actor behavior has already been set with receive(...), " +
-          "use context().become(...) to change it later")
+            "use context().become(...) to change it later")
 
   /**
     * Returns this AbstractActor's AbstractActorContext
@@ -142,7 +142,8 @@ abstract class AbstractActorWithStash extends AbstractActor with Stash
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractActorWithUnboundedStash
-    extends AbstractActor with UnboundedStash
+    extends AbstractActor
+    with UnboundedStash
 
 /**
   * Java API: compatible with lambda expressions
@@ -153,4 +154,5 @@ abstract class AbstractActorWithUnboundedStash
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractActorWithUnrestrictedStash
-    extends AbstractActor with UnrestrictedStash
+    extends AbstractActor
+    with UnrestrictedStash

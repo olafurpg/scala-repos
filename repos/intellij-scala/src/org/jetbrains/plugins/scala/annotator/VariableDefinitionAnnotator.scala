@@ -16,8 +16,9 @@ trait VariableDefinitionAnnotator {
                                  highlightErrors: Boolean) {
     if (highlightErrors && definition.pList.allPatternsSimple) {
       for (expr <- definition.expr;
-      element <- definition.children.findByType(classOf[ScSimpleTypeElement])) checkConformance(
-          expr, element, holder)
+           element <- definition.children.findByType(
+                         classOf[ScSimpleTypeElement]))
+        checkConformance(expr, element, holder)
     }
   }
 }

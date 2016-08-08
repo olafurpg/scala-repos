@@ -171,13 +171,9 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("FP-Growth using Int type") {
-    val transactions = Seq("1 2 3",
-                           "1 2 3 4",
-                           "5 4 3 2 1",
-                           "6 5 4 3 2 1",
-                           "2 4",
-                           "1 3",
-                           "1 7").map(_.split(" ").map(_.toInt).toArray)
+    val transactions =
+      Seq("1 2 3", "1 2 3 4", "5 4 3 2 1", "6 5 4 3 2 1", "2 4", "1 3", "1 7")
+        .map(_.split(" ").map(_.toInt).toArray)
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val fpg = new FPGrowth()
@@ -291,13 +287,9 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("model save/load with Int type") {
-    val transactions = Seq("1 2 3",
-                           "1 2 3 4",
-                           "5 4 3 2 1",
-                           "6 5 4 3 2 1",
-                           "2 4",
-                           "1 3",
-                           "1 7").map(_.split(" ").map(_.toInt).toArray)
+    val transactions =
+      Seq("1 2 3", "1 2 3 4", "5 4 3 2 1", "6 5 4 3 2 1", "2 4", "1 3", "1 7")
+        .map(_.split(" ").map(_.toInt).toArray)
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val model3 = new FPGrowth().setMinSupport(0.5).setNumPartitions(2).run(rdd)

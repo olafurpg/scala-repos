@@ -173,8 +173,8 @@ object Test {
                            binDir.path,
                            zipsDir.path + "/Bin.zip",
                            jarsDir.path + "/Bin.jar")
-    val sourcePath = mkPath(
-        srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
+    val sourcePath =
+      mkPath(srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
 
     compiler.process(
         Array(classPathImplFlag,
@@ -200,14 +200,15 @@ object Test {
     createSources(
         RootPackage,
         srcDir,
-        DirRep("",
-               nestedDirs = Seq(
-                     DirRep("nested",
-                            sourceFiles = Seq("Nested" + baseFileName))),
-               sourceFiles = Seq(baseFileName)))
+        DirRep(
+            "",
+            nestedDirs = Seq(
+                DirRep("nested", sourceFiles = Seq("Nested" + baseFileName))),
+            sourceFiles = Seq(baseFileName)))
 
-  private def createSources(
-      pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {
+  private def createSources(pkg: String,
+                            dirFile: JFile,
+                            dirRep: DirRep): Unit = {
     dirRep.nestedDirs foreach { rep =>
       val nestedDir = dirFile createDir rep.name
       val nestedPkg = PackageNameUtils.packagePrefix(pkg) + rep.name
@@ -222,8 +223,8 @@ object Test {
     }
   }
 
-  private def compileSrc(
-      baseFileName: String, destination: JFile = outDir): Unit = {
+  private def compileSrc(baseFileName: String,
+                         destination: JFile = outDir): Unit = {
     val srcDirPath = srcDir.path
     compiler.process(
         Array(classPathImplFlag,

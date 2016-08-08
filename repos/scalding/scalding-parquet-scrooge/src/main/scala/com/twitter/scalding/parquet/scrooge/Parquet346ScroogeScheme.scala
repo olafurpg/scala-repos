@@ -40,7 +40,8 @@ class Parquet346ScroogeScheme[T <: ThriftStruct](
 
     // Use the fixed record converter instead of the one set in super
     ThriftReadSupport.setRecordConverterClass(
-        jobConf, classOf[Parquet346ScroogeRecordConverter[_]])
+        jobConf,
+        classOf[Parquet346ScroogeRecordConverter[_]])
   }
 }
 
@@ -71,7 +72,9 @@ object Parquet346ScroogeRecordConverter {
   * used.
   */
 class Parquet346ScroogeRecordConverter[T <: ThriftStruct](
-    thriftClass: Class[T], parquetSchema: MessageType, thriftType: StructType)
+    thriftClass: Class[T],
+    parquetSchema: MessageType,
+    thriftType: StructType)
     extends ThriftRecordConverter[T](
         // this is a little confusing because it's all being passed to the super constructor
 

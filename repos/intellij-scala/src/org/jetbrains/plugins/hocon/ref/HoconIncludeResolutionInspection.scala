@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.hocon.ref
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool,
+  ProblemHighlightType,
+  ProblemsHolder
+}
 import com.intellij.psi.{PsiElement, PsiElementVisitor}
 import org.jetbrains.plugins.hocon.psi.HIncludeTarget
 

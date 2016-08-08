@@ -30,8 +30,8 @@ object InterpolatedStringFormatter extends StringFormatter {
     s"$prefix$quote$content$quote"
   }
 
-  def formatContent(
-      parts: Seq[StringPart], toMultiline: Boolean = false): String = {
+  def formatContent(parts: Seq[StringPart],
+                    toMultiline: Boolean = false): String = {
     val strings = parts.collect {
       case Text(s) if toMultiline => s.replace("\r", "")
       case Text(s) =>
@@ -42,8 +42,9 @@ object InterpolatedStringFormatter extends StringFormatter {
         else {
           val presentation =
             if ((it.isComplexBlock ||
-                    (!it.isLiteral && it.isAlphanumericIdentifier)) &&
-                noBraces(parts, it)) "$" + text else "${" + text + "}"
+                (!it.isLiteral && it.isAlphanumericIdentifier)) &&
+                noBraces(parts, it)) "$" + text
+            else "${" + text + "}"
           if (it.isFormattingRequired) presentation + it.format
           else presentation
         }
@@ -57,8 +58,8 @@ object InterpolatedStringFormatter extends StringFormatter {
       parts(ind + 1) match {
         case Text(s) =>
           return s.isEmpty ||
-          !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
-          s.startsWith("`") || s.exists(_ == '$')
+            !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
+            s.startsWith("`") || s.exists(_ == '$')
         case _ =>
       }
     }

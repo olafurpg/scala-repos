@@ -23,9 +23,9 @@ class MemberOrderingSpec extends WordSpec with Matchers {
     "order members by host:port" in {
       val members =
         SortedSet.empty[Member] +
-        m(AddressFromURIString("akka://sys@darkstar:1112"), Up) +
-        m(AddressFromURIString("akka://sys@darkstar:1113"), Joining) +
-        m(AddressFromURIString("akka://sys@darkstar:1111"), Up)
+          m(AddressFromURIString("akka://sys@darkstar:1112"), Up) +
+          m(AddressFromURIString("akka://sys@darkstar:1113"), Joining) +
+          m(AddressFromURIString("akka://sys@darkstar:1111"), Up)
 
       val seq = members.toSeq
       seq.size should ===(3)
@@ -99,11 +99,11 @@ class MemberOrderingSpec extends WordSpec with Matchers {
       (SortedSet(m(address1, Joining)) - m(address1, Up)) should ===(
           SortedSet.empty[Member])
       (SortedSet(m(address1, Exiting)) -
-          m(address1, Removed)) should ===(SortedSet.empty[Member])
+        m(address1, Removed)) should ===(SortedSet.empty[Member])
       (SortedSet(m(address1, Up)) -
-          m(address1, Exiting)) should ===(SortedSet.empty[Member])
+        m(address1, Exiting)) should ===(SortedSet.empty[Member])
       (SortedSet(m(address2, Up), m(address3, Joining), m(address1, Exiting)) -
-          m(address1, Removed)) should ===(
+        m(address1, Removed)) should ===(
           SortedSet(m(address2, Up), m(address3, Joining)))
     }
   }
@@ -113,10 +113,10 @@ class MemberOrderingSpec extends WordSpec with Matchers {
     "order addresses by port" in {
       val addresses =
         SortedSet.empty[Address] +
-        AddressFromURIString("akka://sys@darkstar:1112") +
-        AddressFromURIString("akka://sys@darkstar:1113") +
-        AddressFromURIString("akka://sys@darkstar:1110") +
-        AddressFromURIString("akka://sys@darkstar:1111")
+          AddressFromURIString("akka://sys@darkstar:1112") +
+          AddressFromURIString("akka://sys@darkstar:1113") +
+          AddressFromURIString("akka://sys@darkstar:1110") +
+          AddressFromURIString("akka://sys@darkstar:1111")
 
       val seq = addresses.toSeq
       seq.size should ===(4)
@@ -129,10 +129,10 @@ class MemberOrderingSpec extends WordSpec with Matchers {
     "order addresses by hostname" in {
       val addresses =
         SortedSet.empty[Address] +
-        AddressFromURIString("akka://sys@darkstar2:1110") +
-        AddressFromURIString("akka://sys@darkstar1:1110") +
-        AddressFromURIString("akka://sys@darkstar3:1110") +
-        AddressFromURIString("akka://sys@darkstar0:1110")
+          AddressFromURIString("akka://sys@darkstar2:1110") +
+          AddressFromURIString("akka://sys@darkstar1:1110") +
+          AddressFromURIString("akka://sys@darkstar3:1110") +
+          AddressFromURIString("akka://sys@darkstar0:1110")
 
       val seq = addresses.toSeq
       seq.size should ===(4)
@@ -145,10 +145,10 @@ class MemberOrderingSpec extends WordSpec with Matchers {
     "order addresses by hostname and port" in {
       val addresses =
         SortedSet.empty[Address] +
-        AddressFromURIString("akka://sys@darkstar2:1110") +
-        AddressFromURIString("akka://sys@darkstar0:1111") +
-        AddressFromURIString("akka://sys@darkstar2:1111") +
-        AddressFromURIString("akka://sys@darkstar0:1110")
+          AddressFromURIString("akka://sys@darkstar2:1110") +
+          AddressFromURIString("akka://sys@darkstar0:1111") +
+          AddressFromURIString("akka://sys@darkstar2:1111") +
+          AddressFromURIString("akka://sys@darkstar0:1110")
 
       val seq = addresses.toSeq
       seq.size should ===(4)

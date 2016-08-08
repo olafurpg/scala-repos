@@ -50,7 +50,8 @@ final class QaApi(questionColl: Coll,
           val q2 = q
             .copy(title = data.title, body = data.body, tags = data.tags)
             .editNow
-          questionColl.update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
+          questionColl
+            .update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
         }
       }
 
@@ -78,22 +79,22 @@ final class QaApi(questionColl: Coll,
                           page: Int,
                           perPage: Int): Fu[Paginator[Question]] =
       Paginator(adapter = new BSONAdapter[Question](
-                      collection = questionColl,
-                      selector = selector,
-                      projection = BSONDocument(),
-                      sort = sort
-                  ),
+                    collection = questionColl,
+                    selector = selector,
+                    projection = BSONDocument(),
+                    sort = sort
+                ),
                 currentPage = page,
                 maxPerPage = perPage)
 
     private def popularCache =
       mongoCache(prefix = "qa:popular",
                  f = (nb: Int) =>
-                     questionColl
-                       .find(BSONDocument())
-                       .sort(BSONDocument("vote.score" -> -1))
-                       .cursor[Question]()
-                       .collect[List](nb),
+                   questionColl
+                     .find(BSONDocument())
+                     .sort(BSONDocument("vote.score" -> -1))
+                     .cursor[Question]()
+                     .collect[List](nb),
                  timeToLive = 3 hour)
 
     def popular(max: Int): Fu[List[Question]] = popularCache(max)
@@ -108,7 +109,7 @@ final class QaApi(questionColl: Coll,
     def byTags(tags: List[String], max: Int): Fu[List[Question]] =
       questionColl
         .find(BSONDocument(
-                "tags" -> BSONDocument("$in" -> tags.map(_.toLowerCase))))
+            "tags" -> BSONDocument("$in" -> tags.map(_.toLowerCase))))
         .cursor[Question]()
         .collect[List](max)
 
@@ -150,7 +151,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(id: QuestionId) =
       questionColl.remove(BSONDocument("_id" -> id)) >>
-      (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
+        (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
 
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
         BSONDocument("_id" -> id),
@@ -233,7 +234,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(a: Answer): Fu[Unit] =
       answerColl.remove(BSONDocument("_id" -> a.id)) >>
-      (question recountAnswers a.questionId).void
+        (question recountAnswers a.questionId).void
 
     def remove(id: AnswerId): Fu[Unit] = findById(id) flatMap { _ ?? remove }
 
@@ -295,8 +296,8 @@ final class QaApi(questionColl: Coll,
     }
 
     def remove(questionId: QuestionId, commentId: CommentId) =
-      question.removeComment(questionId, commentId) >> answer.removeComment(
-          questionId, commentId)
+      question.removeComment(questionId, commentId) >> answer
+        .removeComment(questionId, commentId)
 
     private implicit val commentBSONHandler = Macros.handler[Comment]
   }
@@ -309,13 +310,19 @@ final class QaApi(questionColl: Coll,
     // list all tags found in questions collection
     def all: Fu[List[Tag]] = cache(true) {
       val col = questionColl
-      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{AddToSet, Group, Project, Unwind}
+      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+        AddToSet,
+        Group,
+        Project,
+        Unwind
+      }
 
       col
         .aggregate(Project(BSONDocument("tags" -> BSONBoolean(true))),
                    List(Unwind("tags"),
                         Group(BSONBoolean(true))("tags" -> AddToSet("tags"))))
-        .map(_.documents.headOption
+        .map(
+            _.documents.headOption
               .flatMap(_.getAs[List[String]]("tags"))
               .getOrElse(List.empty[String])
               .map(_.toLowerCase)

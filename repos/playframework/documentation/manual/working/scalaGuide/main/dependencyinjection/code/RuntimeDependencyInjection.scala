@@ -24,7 +24,9 @@ object RuntimeDependencyInjection extends PlaySpecification {
       cleanup.MessageQueue.stopped must_== true
     }
     "support implemented by annotation" in new WithApplication() {
-      app.injector.instanceOf[implemented.Hello].sayHello("world") must_== "Hello world"
+      app.injector
+        .instanceOf[implemented.Hello]
+        .sayHello("world") must_== "Hello world"
     }
   }
 }

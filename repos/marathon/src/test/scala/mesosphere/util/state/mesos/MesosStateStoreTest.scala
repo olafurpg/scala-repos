@@ -10,7 +10,9 @@ import org.scalatest.{ConfigMap, Matchers}
 import scala.concurrent.duration._
 
 class MesosStateStoreTest
-    extends PersistentStoreTest with StartedZookeeper with Matchers {
+    extends PersistentStoreTest
+    with StartedZookeeper
+    with Matchers {
 
   //
   // See PersistentStoreTests for general store tests
@@ -29,6 +31,7 @@ class MesosStateStoreTest
 
   override protected def beforeAll(configMap: ConfigMap): Unit = {
     super.beforeAll(configMap + ("zkPort" -> "2186"))
-    Thread.sleep(1000) //zookeeper is up and running. if I try to connect immediately, it will fail
+    Thread
+      .sleep(1000) //zookeeper is up and running. if I try to connect immediately, it will fail
   }
 }

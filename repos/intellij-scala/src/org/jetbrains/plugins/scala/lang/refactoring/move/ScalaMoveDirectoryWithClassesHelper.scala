@@ -8,7 +8,10 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.{FileTypeUtils, PsiTreeUtil}
 import com.intellij.refactoring.listeners.RefactoringElementListener
-import com.intellij.refactoring.move.moveClassesOrPackages.{MoveClassesOrPackagesUtil, MoveDirectoryWithClassesHelper}
+import com.intellij.refactoring.move.moveClassesOrPackages.{
+  MoveClassesOrPackagesUtil,
+  MoveDirectoryWithClassesHelper
+}
 import com.intellij.refactoring.util.MoveRenameUsageInfo
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.Function
@@ -42,8 +45,10 @@ class ScalaMoveDirectoryWithClassesHelper
 
           for {
             aClass <- classes
-            usage <- MoveClassesOrPackagesUtil.findUsages(
-                aClass, searchInComments, searchInNonJavaFiles, aClass.name)
+            usage <- MoveClassesOrPackagesUtil.findUsages(aClass,
+                                                          searchInComments,
+                                                          searchInNonJavaFiles,
+                                                          aClass.name)
           } {
             usages.add(usage)
           }
@@ -79,8 +84,9 @@ class ScalaMoveDirectoryWithClassesHelper
         if (remainsNothing) {
           import scala.collection.JavaConversions._
           for (reference <- ReferencesSearch
-            .search(aPackage, GlobalSearchScope.projectScope(project))
-            .findAll()) {
+                             .search(aPackage,
+                                     GlobalSearchScope.projectScope(project))
+                             .findAll()) {
             val element: PsiElement = reference.getElement
             val importStmt =
               PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt])

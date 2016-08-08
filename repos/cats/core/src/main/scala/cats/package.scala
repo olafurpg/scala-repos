@@ -38,8 +38,8 @@ package object cats {
     override def lift[A, B](f: A => B): A => B = f
     override def imap[A, B](fa: A)(f: A => B)(fi: B => A): B = f(fa)
     def foldLeft[A, B](a: A, b: B)(f: (B, A) => B) = f(b, a)
-    def foldRight[A, B](a: A, lb: Eval[B])(
-        f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](a: A, lb: Eval[B])(f: (A,
+                                               Eval[B]) => Eval[B]): Eval[B] =
       f(a, lb)
     def traverse[G[_], A, B](a: A)(f: A => G[B])(
         implicit G: Applicative[G]): G[B] =

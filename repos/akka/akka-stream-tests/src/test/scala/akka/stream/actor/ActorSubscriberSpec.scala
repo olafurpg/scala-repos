@@ -49,8 +49,8 @@ object ActorSubscriberSpec {
     }
   }
 
-  def requestStrategySubscriberProps(
-      probe: ActorRef, strat: RequestStrategy): Props =
+  def requestStrategySubscriberProps(probe: ActorRef,
+                                     strat: RequestStrategy): Props =
     Props(new RequestStrategySubscriber(probe, strat))
       .withDispatcher("akka.test.stream-dispatcher")
 
@@ -80,7 +80,8 @@ object ActorSubscriberSpec {
 
     val router = {
       val routees = Vector.fill(3) {
-        ActorRefRoutee(context.actorOf(
+        ActorRefRoutee(
+            context.actorOf(
                 Props[Worker].withDispatcher(context.props.dispatcher)))
       }
       Router(RoundRobinRoutingLogic(), routees)
@@ -194,17 +195,17 @@ class ActorSubscriberSpec extends AkkaSpec with ImplicitSender {
     }
 
     "work with OneByOneRequestStrategy" in {
-      Source(1 to 17)
-        .runWith(Sink.actorSubscriber(requestStrategySubscriberProps(
-                  testActor, OneByOneRequestStrategy)))
+      Source(1 to 17).runWith(Sink.actorSubscriber(
+          requestStrategySubscriberProps(testActor, OneByOneRequestStrategy)))
       for (n ← 1 to 17) expectMsg(OnNext(n))
       expectMsg(OnComplete)
     }
 
     "work with WatermarkRequestStrategy" in {
-      Source(1 to 17)
-        .runWith(Sink.actorSubscriber(requestStrategySubscriberProps(
-                  testActor, WatermarkRequestStrategy(highWatermark = 10))))
+      Source(1 to 17).runWith(
+          Sink.actorSubscriber(requestStrategySubscriberProps(
+              testActor,
+              WatermarkRequestStrategy(highWatermark = 10))))
       for (n ← 1 to 17) expectMsg(OnNext(n))
       expectMsg(OnComplete)
     }

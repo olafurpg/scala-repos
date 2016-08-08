@@ -21,8 +21,8 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
       def key(): AttributeKey[AtomicInteger] = ???
       def getAndRemove(): AtomicInteger = ???
       def remove(): Unit = ???
-      def compareAndSet(
-          oldValue: AtomicInteger, newValue: AtomicInteger): Boolean = ???
+      def compareAndSet(oldValue: AtomicInteger,
+                        newValue: AtomicInteger): Boolean = ???
       def setIfAbsent(value: AtomicInteger): AtomicInteger = ???
       def getAndSet(value: AtomicInteger): AtomicInteger = ???
     }

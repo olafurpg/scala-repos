@@ -32,15 +32,10 @@ object Tail extends DispatchSnippet {
 
 /**
   * The 'head' snippet.  Use this snippet to move
-  * a chunk of 
+  * a chunk of
   */
 object Head extends DispatchSnippet {
-  lazy val valid = Set("title",
-                       "base",
-                       "link",
-                       "meta",
-                       "style",
-                       "script")
+  lazy val valid = Set("title", "base", "link", "meta", "style", "script")
 
   def dispatch: DispatchIt = {
     case _ => render _
@@ -51,13 +46,13 @@ object Head extends DispatchSnippet {
       in flatMap {
         case Group(ns) => validHeadTagsOnly(ns)
         case e: Elem if (null eq e.prefix) && valid.contains(e.label) => {
-            new Elem(e.prefix,
-                     e.label,
-                     e.attributes,
-                     e.scope,
-                     e.minimizeEmpty,
-                     validHeadTagsOnly(e.child): _*)
-          }
+          new Elem(e.prefix,
+                   e.label,
+                   e.attributes,
+                   e.scope,
+                   e.minimizeEmpty,
+                   validHeadTagsOnly(e.child): _*)
+        }
         case e: Elem if (null eq e.prefix) => NodeSeq.Empty
         case x => x
       }

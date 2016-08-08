@@ -17,8 +17,8 @@ object NodeDowningAndBeingRemovedMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false).withFallback(ConfigFactory
-            .parseString("akka.cluster.auto-down-unreachable-after = off")
-            .withFallback(MultiNodeClusterSpec.clusterConfig)))
+        .parseString("akka.cluster.auto-down-unreachable-after = off")
+        .withFallback(MultiNodeClusterSpec.clusterConfig)))
 }
 
 class NodeDowningAndBeingRemovedMultiJvmNode1
@@ -57,9 +57,9 @@ abstract class NodeDowningAndBeingRemovedSpec
           // verify that the nodes are no longer part of the 'members' set
           awaitAssert {
             clusterView.members.map(_.address) should not contain
-            (address(second))
+              (address(second))
             clusterView.members.map(_.address) should not contain
-            (address(third))
+              (address(third))
           }
         }
       }

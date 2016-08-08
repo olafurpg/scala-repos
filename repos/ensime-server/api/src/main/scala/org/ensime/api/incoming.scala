@@ -38,8 +38,7 @@ sealed trait RpcAnalyserRequest extends RpcRequest
 case class ImplicitInfoReq(
     file: Either[File, SourceFileInfo],
     range: OffsetRange
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `VoidResponse`.
@@ -87,8 +86,7 @@ sealed trait RpcSearchRequest extends RpcRequest
 case class PublicSymbolSearchReq(
     keywords: List[String],
     maxResults: Int
-)
-    extends RpcSearchRequest
+) extends RpcSearchRequest
 
 /**
   * Responds with [ImportSuggestions].
@@ -98,8 +96,7 @@ case class ImportSuggestionsReq(
     point: Int,
     names: List[String],
     maxResults: Int
-)
-    extends RpcSearchRequest
+) extends RpcSearchRequest
 
 /**
   * Responds with `ERangePositions`.
@@ -107,8 +104,7 @@ case class ImportSuggestionsReq(
 case class UsesOfSymbolAtPointReq(
     file: Either[File, SourceFileInfo],
     point: Int
-)
-    extends RpcAnalyserRequest // will probably become a search request
+) extends RpcAnalyserRequest // will probably become a search request
 
 /**
   * Responds with a `StringResponse` for the URL of the documentation if valid,
@@ -117,8 +113,7 @@ case class UsesOfSymbolAtPointReq(
 case class DocUriAtPointReq(
     file: Either[File, SourceFileInfo],
     point: OffsetRange
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `StringResponse` for the URL of the documentation if valid,
@@ -128,8 +123,7 @@ case class DocUriForSymbolReq(
     typeFullName: String,
     memberName: Option[String],
     signatureString: Option[String]
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `CompletionInfoList`.
@@ -140,8 +134,7 @@ case class CompletionsReq(
     maxResults: Int,
     caseSens: Boolean,
     reload: Boolean
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `List[CompletionInfo]`.
@@ -149,8 +142,7 @@ case class CompletionsReq(
 case class PackageMemberCompletionReq(
     path: String,
     prefix: String
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with `TypeInfo` if valid, or `FalseResponse`.
@@ -164,8 +156,7 @@ case class TypeByNameAtPointReq(
     name: String,
     file: Either[File, SourceFileInfo],
     range: OffsetRange
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with `TypeInfo` if valid, or `FalseResponse`.
@@ -173,8 +164,7 @@ case class TypeByNameAtPointReq(
 case class TypeAtPointReq(
     file: Either[File, SourceFileInfo],
     range: OffsetRange
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Request detailed type information about the item at the given file
@@ -186,8 +176,8 @@ case class TypeAtPointReq(
   * @param file source.
   * @param range in the file to inspect.
   */
-case class InspectTypeAtPointReq(
-    file: Either[File, SourceFileInfo], range: OffsetRange)
+case class InspectTypeAtPointReq(file: Either[File, SourceFileInfo],
+                                 range: OffsetRange)
     extends RpcAnalyserRequest
 
 /**
@@ -219,8 +209,7 @@ case class SymbolByNameReq(
     typeFullName: String,
     memberName: Option[String],
     signatureString: Option[String]
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with `PackageInfo`.
@@ -235,8 +224,7 @@ case class PrepareRefactorReq(
     tpe: Symbol, // tpe is ignored but part of the legacy wire format
     params: RefactorDesc,
     interactive: Boolean
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `RefactorFailure` or a `RefactorDiffEffect`.
@@ -245,8 +233,7 @@ case class RefactorReq(
     procId: Int,
     params: RefactorDesc,
     interactive: Boolean
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `RefactorFailure` or a `RefactorEffect`.
@@ -275,8 +262,7 @@ case class SymbolDesignationsReq(
     start: Int,
     end: Int,
     requestedTypes: List[SourceSymbol]
-)
-    extends RpcAnalyserRequest
+) extends RpcAnalyserRequest
 
 /**
   * Responds with a `FileRange`.

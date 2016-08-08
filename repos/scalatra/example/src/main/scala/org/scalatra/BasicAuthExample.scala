@@ -10,8 +10,8 @@ object BasicAuthExample {
 
   case class MyUser(id: String)
 
-  class OurBasicAuthStrategy(
-      protected override val app: ScalatraBase, realm: String)
+  class OurBasicAuthStrategy(protected override val app: ScalatraBase,
+                             realm: String)
       extends BasicAuthStrategy[MyUser](app, realm) {
 
     protected def validate(userName: String, password: String)(
@@ -28,8 +28,8 @@ object BasicAuthExample {
   }
 
   trait AuthenticationSupport
-      extends ScentrySupport[MyUser] with BasicAuthSupport[MyUser] {
-    self: ScalatraBase =>
+      extends ScentrySupport[MyUser]
+      with BasicAuthSupport[MyUser] { self: ScalatraBase =>
 
     val realm = "Scalatra Basic Auth Example"
 
@@ -59,8 +59,8 @@ class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
         <p><a href="/auth/linked">click</a></p>
     )
 
-    Template.page(
-        "Basic Auth Example", nodes, url(_, includeServletPath = false))
+    Template
+      .page("Basic Auth Example", nodes, url(_, includeServletPath = false))
   }
 
   get("/linked") {
@@ -70,7 +70,7 @@ class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
         <p><a href="/">back</a></p>
     )
 
-    Template.page(
-        "Basic Auth Example", nodes, url(_, includeServletPath = false))
+    Template
+      .page("Basic Auth Example", nodes, url(_, includeServletPath = false))
   }
 }

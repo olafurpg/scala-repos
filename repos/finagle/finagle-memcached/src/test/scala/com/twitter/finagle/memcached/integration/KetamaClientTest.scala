@@ -1,7 +1,11 @@
 package com.twitter.finagle.memcached.integration
 
 import com.twitter.finagle.cacheresolver.CacheNodeGroup
-import com.twitter.finagle.memcached.{KetamaClientBuilder, KetamaPartitionedClient, KetamaClientKey}
+import com.twitter.finagle.memcached.{
+  KetamaClientBuilder,
+  KetamaPartitionedClient,
+  KetamaClientKey
+}
 import com.twitter.finagle.{Address, Group, Name}
 import com.twitter.io.Buf
 import com.twitter.util.{Await, Future}
@@ -72,8 +76,10 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
       .asInstanceOf[KetamaPartitionedClient]
 
     assert(client.ketamaNodeGrp().size == 2)
-    assert(client.ketamaNodeGrp().map(_._1) == Set(
-            KetamaClientKey(key1.toString), KetamaClientKey(key2.toString)))
+    assert(
+        client.ketamaNodeGrp().map(_._1) == Set(
+            KetamaClientKey(key1.toString),
+            KetamaClientKey(key2.toString)))
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)
@@ -98,8 +104,8 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
 
   test("using custom keys doesn't blow up") {
     val client = KetamaClientBuilder()
-      .nodes("localhost:%d:1:key1,localhost:%d:1:key2".format(
-              address1.getPort, address2.getPort))
+      .nodes("localhost:%d:1:key1,localhost:%d:1:key2"
+        .format(address1.getPort, address2.getPort))
       .build()
 
     Await.result(client.delete("foo"))

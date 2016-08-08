@@ -30,7 +30,9 @@ import scala.collection.generic.Growable
   */
 private[spark] class BoundedPriorityQueue[A](maxSize: Int)(
     implicit ord: Ordering[A])
-    extends Iterable[A] with Growable[A] with Serializable {
+    extends Iterable[A]
+    with Growable[A]
+    with Serializable {
 
   private val underlying = new JPriorityQueue[A](maxSize, ord)
 

@@ -18,8 +18,16 @@
 package org.apache.spark.sql.catalyst.analysis
 
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, AggregateFunction, Complete}
-import org.apache.spark.sql.catalyst.plans.logical.{Aggregate, Expand, LogicalPlan}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression,
+  AggregateFunction,
+  Complete
+}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  Aggregate,
+  Expand,
+  LogicalPlan
+}
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.types.IntegerType
 
@@ -213,7 +221,8 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       // Construct the regular aggregate input projection only if we need one.
       val regularAggProjection =
         if (regularAggExprs.nonEmpty) {
-          Seq(a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
+          Seq(
+              a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
                   regularGroupId) ++ regularAggChildren)
         } else {
           Seq.empty[Seq[Expression]]
@@ -243,8 +252,8 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
       // Construct the second aggregate
       val transformations: Map[Expression, Expression] =
-        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(
-                e => (e._1, e._3))).toMap
+        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(e =>
+          (e._1, e._3))).toMap
 
       val patchedAggExpressions = a.aggregateExpressions.map { e =>
         e.transformDown {

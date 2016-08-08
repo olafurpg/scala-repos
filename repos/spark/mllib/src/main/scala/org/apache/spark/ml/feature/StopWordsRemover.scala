@@ -365,7 +365,9 @@ private[spark] object StopWords {
   */
 @Experimental
 class StopWordsRemover(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("stopWords"))
@@ -381,8 +383,8 @@ class StopWordsRemover(override val uid: String)
     * Default: [[StopWords.English]]
     * @group param
     */
-  val stopWords: StringArrayParam = new StringArrayParam(
-      this, "stopWords", "stop words")
+  val stopWords: StringArrayParam =
+    new StringArrayParam(this, "stopWords", "stop words")
 
   /** @group setParam */
   def setStopWords(value: Array[String]): this.type = set(stopWords, value)
@@ -432,8 +434,10 @@ class StopWordsRemover(override val uid: String)
     val inputType = schema($(inputCol)).dataType
     require(inputType.sameType(ArrayType(StringType)),
             s"Input type must be ArrayType(StringType) but got $inputType.")
-    SchemaUtils.appendColumn(
-        schema, $(outputCol), inputType, schema($(inputCol)).nullable)
+    SchemaUtils.appendColumn(schema,
+                             $(outputCol),
+                             inputType,
+                             schema($(inputCol)).nullable)
   }
 
   override def copy(extra: ParamMap): StopWordsRemover = defaultCopy(extra)

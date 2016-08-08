@@ -23,7 +23,8 @@ final class StringClientServerIntegrationSuite
     withRedisClient { client =>
       assert(
           Await.result(client(Append("append1", "Hello"))) == IntegerReply(5))
-      assert(Await.result(client(Append("append1", " World"))) == IntegerReply(
+      assert(
+          Await.result(client(Append("append1", " World"))) == IntegerReply(
               11))
       assertBulkReply(client(Get("append1")), "Hello World")
     }
@@ -34,9 +35,9 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(BitCount("bitcount"))) == IntegerReply(0L))
       assert(Await.result(client(Set("bitcount", "bar"))) == StatusReply("OK"))
       assert(Await.result(client(BitCount("bitcount"))) == IntegerReply(10L))
-      assert(
-          Await.result(client(BitCount("bitcount", Some(2), Some(4)))) == IntegerReply(
-              4L))
+      assert(Await
+        .result(client(BitCount("bitcount", Some(2), Some(4)))) == IntegerReply(
+          4L))
     }
   }
 
@@ -55,11 +56,9 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(GetBit("bitop3", 0))) == IntegerReply(0L))
       assert(Await.result(client(GetBit("bitop3", 3))) == IntegerReply(1L))
 
-      assert(
-          Await.result(client(BitOp(BitOp.Or,
-                                    "bitop3",
-                                    Seq("bitop1", "bitop2")))) == IntegerReply(
-              1L))
+      assert(Await.result(client(
+          BitOp(BitOp.Or, "bitop3", Seq("bitop1", "bitop2")))) == IntegerReply(
+          1L))
       assert(Await.result(client(GetBit("bitop3", 0))) == IntegerReply(1L))
       assert(Await.result(client(GetBit("bitop3", 1))) == IntegerReply(0L))
 
@@ -71,9 +70,9 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(GetBit("bitop3", 0))) == IntegerReply(1L))
       assert(Await.result(client(GetBit("bitop3", 1))) == IntegerReply(0L))
 
-      assert(
-          Await.result(client(BitOp(BitOp.Not, "bitop3", Seq("bitop1")))) == IntegerReply(
-              1L))
+      assert(Await
+        .result(client(BitOp(BitOp.Not, "bitop3", Seq("bitop1")))) == IntegerReply(
+          1L))
       assert(Await.result(client(GetBit("bitop3", 0))) == IntegerReply(0L))
       assert(Await.result(client(GetBit("bitop3", 1))) == IntegerReply(1L))
       assert(Await.result(client(GetBit("bitop3", 4))) == IntegerReply(1L))
@@ -195,12 +194,15 @@ final class StringClientServerIntegrationSuite
       )
       assert(Await.result(client(MSet(input))) == StatusReply("OK"))
       val req = client(
-          MGet(List(StringToChannelBuffer("thing"),
-                    foo,
-                    StringToChannelBuffer("noexists"),
-                    StringToChannelBuffer("stuff"))))
-      val expects = List(
-          "thang", "bar", BytesToString(RedisCodec.NIL_VALUE_BA.array), "bleh")
+          MGet(
+              List(StringToChannelBuffer("thing"),
+                   foo,
+                   StringToChannelBuffer("noexists"),
+                   StringToChannelBuffer("stuff"))))
+      val expects = List("thang",
+                         "bar",
+                         BytesToString(RedisCodec.NIL_VALUE_BA.array),
+                         "bleh")
       assertMBulkReply(req, expects)
     }
   }
@@ -219,9 +221,10 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(MSetNx(input2))) == IntegerReply(0))
       val expects =
         List("Hello", "there", BytesToString(RedisCodec.NIL_VALUE_BA.array))
-      assertMBulkReply(client(MGet(List(StringToChannelBuffer("msnx.key1"),
-                                        StringToChannelBuffer("msnx.key2"),
-                                        StringToChannelBuffer("msnx.key3")))),
+      assertMBulkReply(client(
+                           MGet(List(StringToChannelBuffer("msnx.key1"),
+                                     StringToChannelBuffer("msnx.key2"),
+                                     StringToChannelBuffer("msnx.key3")))),
                        expects)
     }
   }
@@ -239,9 +242,9 @@ final class StringClientServerIntegrationSuite
       intercept[ClientError] {
         Await.result(client(PSetEx("psetex1", 0L, "value")))
       }
-      assert(
-          Await.result(client(PSetEx("psetex1", 300000L, "value"))) == StatusReply(
-              "OK"))
+      assert(Await
+        .result(client(PSetEx("psetex1", 300000L, "value"))) == StatusReply(
+          "OK"))
     }
   }
 

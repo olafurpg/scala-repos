@@ -19,20 +19,16 @@ sealed abstract class STRef[S, A] {
 
   /**Modifies the value at this reference with the given function. */
   def mod[B](f: A => A): ST[S, STRef[S, A]] =
-    st(
-        (s: Tower[S]) =>
-          {
-        value = f(value);
-        (s, this)
+    st((s: Tower[S]) => {
+      value = f(value);
+      (s, this)
     })
 
   /**Associates this reference with the given value. */
   def write(a: => A): ST[S, STRef[S, A]] =
-    st(
-        (s: Tower[S]) =>
-          {
-        value = a;
-        (s, this)
+    st((s: Tower[S]) => {
+      value = a;
+      (s, this)
     })
 
   /**Synonym for write*/
@@ -83,11 +79,9 @@ sealed abstract class STArray[S, A] {
 
   /**Writes the given value to the array, at the given offset. */
   def write(i: Int, a: A): ST[S, STArray[S, A]] =
-    st(
-        s =>
-          {
-        value(i) = a;
-        (s, this)
+    st(s => {
+      value(i) = a;
+      (s, this)
     })
 
   /**Turns a mutable array into an immutable one which is safe to return. */
@@ -114,7 +108,7 @@ sealed abstract class STArray[S, A] {
 }
 
 object STArray {
-  def apply[S, A : ClassTag](s: Int, a: A): STArray[S, A] = stArray(s, a)
+  def apply[S, A: ClassTag](s: Int, a: A): STArray[S, A] = stArray(s, a)
 
   def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] =
     new STArray[S, A] {
@@ -134,16 +128,14 @@ sealed abstract class ST[S, A] {
   import ST._
 
   def flatMap[B](g: A => ST[S, B]): ST[S, B] =
-    st(
-        s =>
-          apply(s) match {
+    st(s =>
+      apply(s) match {
         case (ns, a) => g(a)(ns)
     })
 
   def map[B](g: A => B): ST[S, B] =
-    st(
-        s =>
-          apply(s) match {
+    st(s =>
+      apply(s) match {
         case (ns, a) => (ns, g(a))
     })
 }
@@ -175,27 +167,26 @@ object ST extends STInstances {
     }
 
   /**Allocates a fresh mutable array. */
-  def newArr[S, A : ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
+  def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
     returnST(stArray[S, A](size, z))
 
   /**Allows the result of a state transformer computation to be used lazily inside the computation. */
   def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] =
-    st(
-        s =>
-          {
-        lazy val ans: (Tower[S], A) = k(r)(s)
-        lazy val (_, r) = ans
-        ans
+    st(s => {
+      lazy val ans: (Tower[S], A) = k(r)(s)
+      lazy val (_, r) = ans
+      ans
     })
 
   /**Accumulates an integer-associated list into an immutable array. */
-  def accumArray[F[_], A : ClassTag, B](
-      size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(
-      implicit F: Foldable[F]): ImmutableArray[A] = {
+  def accumArray[F[_], A: ClassTag, B](
+      size: Int,
+      f: (A, B) => A,
+      z: A,
+      ivs: F[(Int, B)])(implicit F: Foldable[F]): ImmutableArray[A] = {
     import std.anyVal.unitInstance
     type STA[S] = ST[S, ImmutableArray[A]]
-    runST(
-        new Forall[STA] {
+    runST(new Forall[STA] {
       def apply[S] =
         for {
           a <- newArr(size, z)

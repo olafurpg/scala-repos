@@ -42,11 +42,11 @@ object Receiver {
       extends Command[T]
 
   sealed trait Replies[T]
-  final case class GetOneResult[T](
-      receiver: ActorRef[Command[T]], msg: Option[T])
+  final case class GetOneResult[T](receiver: ActorRef[Command[T]],
+                                   msg: Option[T])
       extends Replies[T]
-  final case class GetAllResult[T](
-      receiver: ActorRef[Command[T]], msgs: immutable.Seq[T])
+  final case class GetAllResult[T](receiver: ActorRef[Command[T]],
+                                   msgs: immutable.Seq[T])
       extends Replies[T]
 
   private final case class Enqueue[T](msg: T) extends Command[T]
@@ -54,8 +54,7 @@ object Receiver {
   def behavior[T]: Behavior[Command[T]] =
     ContextAware[Any] { ctx ⇒
       SynchronousSelf { syncself ⇒
-        Or(
-            empty(ctx).widen {
+        Or(empty(ctx).widen {
           case c: Command[t] ⇒ c.asInstanceOf[Command[T]]
         }, Static[Any] {
           case msg ⇒ syncself ! Enqueue(msg)
@@ -67,16 +66,16 @@ object Receiver {
     Total {
       case ExternalAddress(replyTo) ⇒ { replyTo ! ctx.self; Same }
       case g @ GetOne(d) if d <= Duration.Zero ⇒ {
-          g.replyTo ! GetOneResult(ctx.self, None); Same
-        }
+        g.replyTo ! GetOneResult(ctx.self, None); Same
+      }
       case g @ GetOne(d) ⇒
         asked(ctx, Queue(Asked(g.replyTo, Deadline.now + d)))
       case g @ GetAll(d) if d <= Duration.Zero ⇒ {
-          g.replyTo ! GetAllResult(ctx.self, Nil); Same
-        }
+        g.replyTo ! GetAllResult(ctx.self, Nil); Same
+      }
       case g @ GetAll(d) ⇒ {
-          ctx.schedule(d, ctx.self, GetAll(Duration.Zero)(g.replyTo)); Same
-        }
+        ctx.schedule(d, ctx.self, GetAll(Duration.Zero)(g.replyTo)); Same
+      }
       case Enqueue(msg) ⇒ queued(ctx, msg)
     }
 
@@ -102,10 +101,10 @@ object Receiver {
     }
   }
 
-  private case class Asked[T](
-      replyTo: ActorRef[GetOneResult[T]], deadline: Deadline)
-  private def asked[T](
-      ctx: ActorContext[Any], queue: Queue[Asked[T]]): Behavior[Command[T]] = {
+  private case class Asked[T](replyTo: ActorRef[GetOneResult[T]],
+                              deadline: Deadline)
+  private def asked[T](ctx: ActorContext[Any],
+                       queue: Queue[Asked[T]]): Behavior[Command[T]] = {
     ctx.setReceiveTimeout(queue.map(_.deadline).min.timeLeft)
 
     Full {

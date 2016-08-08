@@ -1,7 +1,14 @@
 package docs.stream.cookbook
 
 import akka.NotUsed
-import akka.stream.{Graph, FlowShape, Inlet, Outlet, Attributes, OverflowStrategy}
+import akka.stream.{
+  Graph,
+  FlowShape,
+  Inlet,
+  Outlet,
+  Attributes,
+  OverflowStrategy
+}
 import akka.stream.scaladsl._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -32,7 +39,9 @@ class RecipeReduceByKey extends RecipeSpec {
         .mergeSubstreams
       //#word-count
 
-      Await.result(counts.limit(10).runWith(Sink.seq), 3.seconds).toSet should be(
+      Await
+        .result(counts.limit(10).runWith(Sink.seq), 3.seconds)
+        .toSet should be(
           Set(("hello", 2),
               ("world", 1),
               ("and", 1),
@@ -64,11 +73,13 @@ class RecipeReduceByKey extends RecipeSpec {
       val wordCounts = words.via(
           reduceByKey(MaximumDistinctWords,
                       groupKey = (word: String) => word,
-                      map = (word: String) =>
-                          1)((left: Int, right: Int) => left + right))
+                      map = (word: String) => 1)((left: Int, right: Int) =>
+            left + right))
       //#reduce-by-key-general
 
-      Await.result(wordCounts.limit(10).runWith(Sink.seq), 3.seconds).toSet should be(
+      Await
+        .result(wordCounts.limit(10).runWith(Sink.seq), 3.seconds)
+        .toSet should be(
           Set(("hello", 2),
               ("world", 1),
               ("and", 1),

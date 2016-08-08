@@ -46,7 +46,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableSetSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableSet[T], ObservableSet[T]](
-        classOf[jfxc.ObservableSet[T]], classOf[ObservableSet[T]]) {
+        classOf[jfxc.ObservableSet[T]],
+        classOf[ObservableSet[T]]) {
 
   /**
     * Verifies if a generated Set is the same instance than a original Set. If it should not be,
@@ -63,8 +64,8 @@ class ObservableSetSpec[T]
       generatedSet should be theSameInstanceAs (originalSet)
     } else {
       generatedSet should not be theSameInstanceAs(originalSet)
-      generatedSet.getClass.getInterfaces.contains(classOf[ObservableSet[Int]]) should be(
-          true)
+      generatedSet.getClass.getInterfaces
+        .contains(classOf[ObservableSet[Int]]) should be(true)
     }
   }
 
@@ -164,12 +165,12 @@ class ObservableSetSpec[T]
     (set add 1) should be(false)
     set(2) = true
 
-    // Verification 
+    // Verification
     addedValues should equal((0 to 7).toBuffer)
   }
 
   it should "notify each remotion individually" in {
-    // Preparation 
+    // Preparation
     val set = ObservableSet((0 to 15))
     val removedValues = Buffer.empty[Int]
     set onChange { (sourceSet, change) =>

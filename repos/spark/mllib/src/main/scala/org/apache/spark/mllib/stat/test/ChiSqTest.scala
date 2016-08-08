@@ -50,12 +50,10 @@ private[stat] object ChiSqTest extends Logging {
   case class Method(name: String, chiSqFunc: (Double, Double) => Double)
 
   // Pearson's chi-squared test: http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
-  val PEARSON = new Method("pearson",
-                           (observed: Double, expected: Double) =>
-                             {
-                               val dev = observed - expected
-                               dev * dev / expected
-                           })
+  val PEARSON = new Method("pearson", (observed: Double, expected: Double) => {
+    val dev = observed - expected
+    dev * dev / expected
+  })
 
   // Null hypothesis for the two different types of chi-squared tests to be included in the result.
   object NullHypothesis extends Enumeration {
@@ -100,8 +98,8 @@ private[stat] object ChiSqTest extends Logging {
       val pairCounts = data.mapPartitions { iter =>
         val distinctLabels = mutable.HashSet.empty[Double]
         val allDistinctFeatures: Map[Int, mutable.HashSet[Double]] =
-          Map((startCol until endCol).map(
-                  col => (col, mutable.HashSet.empty[Double])): _*)
+          Map((startCol until endCol).map(col =>
+            (col, mutable.HashSet.empty[Double])): _*)
         var i = 1
         iter.flatMap {
           case LabeledPoint(label, features) =>
@@ -109,14 +107,14 @@ private[stat] object ChiSqTest extends Logging {
               if (distinctLabels.size > maxCategories) {
                 throw new SparkException(
                     s"Chi-square test expect factors (categorical values) but " +
-                    s"found more than $maxCategories distinct label values.")
+                      s"found more than $maxCategories distinct label values.")
               }
               allDistinctFeatures.foreach {
                 case (col, distinctFeatures) =>
                   if (distinctFeatures.size > maxCategories) {
                     throw new SparkException(
                         s"Chi-square test expect factors (categorical values) but " +
-                        s"found more than $maxCategories distinct values in column $col.")
+                          s"found more than $maxCategories distinct values in column $col.")
                   }
               }
             }
@@ -154,8 +152,8 @@ private[stat] object ChiSqTest extends Logging {
               val j = labels(label)
               contingency(i, j) += pairCounts((col, feature, label))
           }
-          results(col) = chiSquaredMatrix(
-              Matrices.fromBreeze(contingency), methodName)
+          results(col) =
+            chiSquaredMatrix(Matrices.fromBreeze(contingency), methodName)
       }
       batch += 1
     }
@@ -180,7 +178,7 @@ private[stat] object ChiSqTest extends Logging {
     if (size > 1000) {
       logWarning(
           "Chi-squared approximation may not be accurate due to low expected frequencies " +
-          s" as a result of a large number of categories: $size.")
+            s" as a result of a large number of categories: $size.")
     }
     val obsArr = observed.toArray
     val expArr =
@@ -207,7 +205,7 @@ private[stat] object ChiSqTest extends Logging {
           if (obs == 0.0) {
             throw new IllegalArgumentException(
                 "Chi-squared statistic undefined for input vectors due" +
-                " to 0.0 values in both observed and expected.")
+                  " to 0.0 values in both observed and expected.")
           } else {
             return new ChiSqTestResult(0.0,
                                        size - 1,
@@ -236,8 +234,8 @@ private[stat] object ChiSqTest extends Logging {
    * Pearson's independence test on the input contingency matrix.
    * TODO: optimize for SparseMatrix when it becomes supported.
    */
-  def chiSquaredMatrix(
-      counts: Matrix, methodName: String = PEARSON.name): ChiSqTestResult = {
+  def chiSquaredMatrix(counts: Matrix,
+                       methodName: String = PEARSON.name): ChiSqTestResult = {
     val method = methodFromString(methodName)
     val numRows = counts.numRows
     val numCols = counts.numCols
@@ -270,14 +268,14 @@ private[stat] object ChiSqTest extends Logging {
       if (colSum == 0.0) {
         throw new IllegalArgumentException(
             "Chi-squared statistic undefined for input matrix due to" +
-            s"0 sum in column [$col].")
+              s"0 sum in column [$col].")
       }
       val row = j % numRows
       val rowSum = rowSums(row)
       if (rowSum == 0.0) {
         throw new IllegalArgumentException(
             "Chi-squared statistic undefined for input matrix due to" +
-            s"0 sum in row [$row].")
+              s"0 sum in row [$row].")
       }
       val expected = colSum * rowSum / total
       statistic += method.chiSqFunc(colMajorArr(j), expected)
@@ -287,8 +285,11 @@ private[stat] object ChiSqTest extends Logging {
     if (df == 0) {
       // 1 column or 1 row. Constant distribution is independent of anything.
       // pValue = 1.0 and statistic = 0.0 in this case.
-      new ChiSqTestResult(
-          1.0, 0, 0.0, methodName, NullHypothesis.independence.toString)
+      new ChiSqTestResult(1.0,
+                          0,
+                          0.0,
+                          methodName,
+                          NullHypothesis.independence.toString)
     } else {
       val pValue =
         1.0 - new ChiSquaredDistribution(df).cumulativeProbability(statistic)

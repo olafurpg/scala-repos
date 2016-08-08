@@ -1,6 +1,12 @@
 package com.twitter.finagle.service
 
-import com.twitter.finagle.{Status, ClientConnection, Service, ServiceFactory, Failure}
+import com.twitter.finagle.{
+  Status,
+  ClientConnection,
+  Service,
+  ServiceFactory,
+  Failure
+}
 import com.twitter.util._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -91,7 +97,7 @@ class DelayedFactoryTest extends FunSuite {
 
       test(
           ("%s: an incomplete buffered factory should satisfy closures with exceptions if they're " +
-              "interrupted").format(name)
+            "interrupted").format(name)
       ) {
         val ctx = helpFn()
         import ctx._
@@ -215,7 +221,8 @@ class DelayedFactoryTest extends FunSuite {
         assert(!factory.isAvailable)
       }
 
-      test("%s: a factory that's closed prematurely should still close".format(
+      test(
+          "%s: a factory that's closed prematurely should still close".format(
               name)) {
         val ctx = helpFn()
         import ctx._
@@ -229,7 +236,8 @@ class DelayedFactoryTest extends FunSuite {
         assert(!underlying.isAvailable)
       }
 
-      test("%s: a factory that's closed prematurely should close the underlying on satisfaction"
+      test(
+          "%s: a factory that's closed prematurely should close the underlying on satisfaction"
             .format(name)) {
         val ctx = helpFn()
         import ctx._

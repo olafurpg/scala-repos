@@ -24,7 +24,7 @@ import common._
 /**
   * Abstracts the management of asynchronous HTTP requests in order
   * to allow requests to be suspended and resumed later on.
-  *  
+  *
   */
 trait ServletAsyncProvider {
 
@@ -33,14 +33,14 @@ trait ServletAsyncProvider {
     */
   def suspendResumeSupport_? : Boolean
 
-  /** 
-    * @return the reference that was provided in the resume call 
+  /**
+    * @return the reference that was provided in the resume call
     */
   def resumeInfo: Option[(Req, LiftResponse)]
 
   /**
     * Suspends this request for a given period of time
-    * 
+    *
     * @param timeout
     * @return a RetryState
     */

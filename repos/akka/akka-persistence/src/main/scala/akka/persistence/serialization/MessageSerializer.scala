@@ -98,7 +98,7 @@ class MessageSerializer(val system: ExtendedActorSystem)
           .setDeliveryId(unconfirmed.deliveryId)
           .setDestination(unconfirmed.destination.toString)
           .setPayload(persistentPayloadBuilder(
-                  unconfirmed.message.asInstanceOf[AnyRef]))
+              unconfirmed.message.asInstanceOf[AnyRef]))
       builder.addUnconfirmedDeliveries(unconfirmedBuilder)
     }
     builder
@@ -138,8 +138,10 @@ class MessageSerializer(val system: ExtendedActorSystem)
     : StateChangeEvent = {
     StateChangeEvent(persistentStateChange.getStateIdentifier,
                      if (persistentStateChange.hasTimeout)
-                       Some(Duration(persistentStateChange.getTimeout)
-                             .asInstanceOf[duration.FiniteDuration]) else None)
+                       Some(
+                           Duration(persistentStateChange.getTimeout)
+                             .asInstanceOf[duration.FiniteDuration])
+                     else None)
   }
 
   private def atomicWriteBuilder(a: AtomicWrite) = {
@@ -210,11 +212,14 @@ class MessageSerializer(val system: ExtendedActorSystem)
         payload(persistentMessage.getPayload),
         persistentMessage.getSequenceNr,
         if (persistentMessage.hasPersistenceId)
-          persistentMessage.getPersistenceId else Undefined,
+          persistentMessage.getPersistenceId
+        else Undefined,
         if (persistentMessage.hasManifest)
-          persistentMessage.getManifest else Undefined,
+          persistentMessage.getManifest
+        else Undefined,
         if (persistentMessage.hasDeleted)
-          persistentMessage.getDeleted else false,
+          persistentMessage.getDeleted
+        else false,
         if (persistentMessage.hasSender)
           system.provider.resolveActorRef(persistentMessage.getSender)
         else Actor.noSender,
@@ -232,7 +237,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
   private def payload(persistentPayload: mf.PersistentPayload): Any = {
     val manifest =
       if (persistentPayload.hasPayloadManifest)
-        persistentPayload.getPayloadManifest.toStringUtf8 else ""
+        persistentPayload.getPayloadManifest.toStringUtf8
+      else ""
 
     serialization
       .deserialize(persistentPayload.getPayload.toByteArray,

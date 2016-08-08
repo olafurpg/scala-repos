@@ -24,8 +24,8 @@ class ClusterConfigSpec extends AkkaSpec {
       FailureDetectorConfig.getInt("max-sample-size") should ===(1000)
       FailureDetectorConfig.getMillisDuration("min-std-deviation") should ===(
           100 millis)
-      FailureDetectorConfig.getMillisDuration("acceptable-heartbeat-pause") should ===(
-          3 seconds)
+      FailureDetectorConfig
+        .getMillisDuration("acceptable-heartbeat-pause") should ===(3 seconds)
       FailureDetectorImplementationClass should ===(
           classOf[PhiAccrualFailureDetector].getName)
       SeedNodes should ===(Vector.empty[Address])

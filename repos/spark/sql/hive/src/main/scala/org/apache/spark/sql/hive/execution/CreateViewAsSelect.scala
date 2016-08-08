@@ -63,10 +63,9 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
       case true =>
         // Handles `CREATE VIEW v0 AS SELECT ...`. Throws exception when the target view already
         // exists.
-        throw new AnalysisException(
-            s"View $tableIdentifier already exists. " +
-            "If you want to update the view definition, please use ALTER VIEW AS or " +
-            "CREATE OR REPLACE VIEW AS")
+        throw new AnalysisException(s"View $tableIdentifier already exists. " +
+          "If you want to update the view definition, please use ALTER VIEW AS or " +
+          "CREATE OR REPLACE VIEW AS")
 
       case false =>
         hiveContext.sessionState.catalog.client
@@ -79,7 +78,8 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
   private def prepareTable(sqlContext: SQLContext): CatalogTable = {
     val expandedText =
       if (sqlContext.conf.canonicalView) {
-        try rebuildViewQueryString(sqlContext) catch {
+        try rebuildViewQueryString(sqlContext)
+        catch {
           case NonFatal(e) => wrapViewTextWithSelect
         }
       } else {

@@ -12,9 +12,25 @@ import sbt.io.Path._
 import sbt.io.IO
 
 import sbinary.DefaultProtocol.FileFormat
-import sbt.internal.util.Cache.{defaultEquiv, hConsCache, hNilCache, seqCache, seqFormat, streamFormat, StringFormat, UnitFormat, wrapIn}
+import sbt.internal.util.Cache.{
+  defaultEquiv,
+  hConsCache,
+  hNilCache,
+  seqCache,
+  seqFormat,
+  streamFormat,
+  StringFormat,
+  UnitFormat,
+  wrapIn
+}
 import sbt.internal.util.Tracked.{inputChanged, outputChanged}
-import sbt.internal.util.{FilesInfo, HashFileInfo, HNil, ModifiedFileInfo, PlainFileInfo}
+import sbt.internal.util.{
+  FilesInfo,
+  HashFileInfo,
+  HNil,
+  ModifiedFileInfo,
+  PlainFileInfo
+}
 import sbt.internal.util.FilesInfo.{exists, hash, lastModified}
 import xsbti.Reporter
 
@@ -48,11 +64,10 @@ object Doc {
            prepare(label + " Java API documentation",
                    filterSources(javaSourcesOnly,
                                  (sources: Seq[File], classpath: Seq[File],
-                                 outputDirectory: File, options: Seq[String],
-                                 maxErrors: Int, log: Logger) =>
-                                   {
-                                     // doc.doc
-                                     ???
+                                  outputDirectory: File, options: Seq[String],
+                                  maxErrors: Int, log: Logger) => {
+                                   // doc.doc
+                                   ???
                                  })))
 
   val javaSourcesOnly: File => Boolean = _.getName.endsWith(".java")
@@ -63,8 +78,8 @@ object Doc {
   // @deprecated("Use `javadoc`", "0.13.0")
   // def apply(maximumErrors: Int, compiler: sbt.compiler.Javadoc) = new Javadoc(maximumErrors, compiler)
 
-  private[sbt] final class Scaladoc(
-      maximumErrors: Int, compiler: AnalyzingCompiler)
+  private[sbt] final class Scaladoc(maximumErrors: Int,
+                                    compiler: AnalyzingCompiler)
       extends Doc {
     def apply(label: String,
               sources: Seq[File],
@@ -83,8 +98,8 @@ object Doc {
                log)
     }
   }
-  private[sbt] final class Javadoc(
-      maximumErrors: Int, doc: sbt.internal.inc.Javadoc)
+  private[sbt] final class Javadoc(maximumErrors: Int,
+                                   doc: sbt.internal.inc.Javadoc)
       extends Doc {
     def apply(label: String,
               sources: Seq[File],
@@ -124,8 +139,9 @@ sealed trait Doc {
     if (sources.isEmpty)
       log.info("No sources available, skipping " + logSnip + "...")
     else {
-      log.info("Generating " + logSnip + " for " + label + " sources to " +
-          outputDirectory.absolutePath + "...")
+      log.info(
+          "Generating " + logSnip + " for " + label + " sources to " +
+            outputDirectory.absolutePath + "...")
       IO.delete(outputDirectory)
       IO.createDirectory(outputDirectory)
       docf(sources, classpath, outputDirectory, options, maxErrors, log)

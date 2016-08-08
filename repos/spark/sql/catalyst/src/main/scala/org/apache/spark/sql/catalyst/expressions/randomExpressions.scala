@@ -20,7 +20,10 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.types.{DataType, DoubleType}
 import org.apache.spark.util.Utils
 import org.apache.spark.util.random.XORShiftRandom
@@ -62,8 +65,7 @@ case class Rand(seed: Long) extends RDG {
   def this() = this(Utils.random.nextLong())
 
   def this(seed: Expression) =
-    this(
-        seed match {
+    this(seed match {
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(
@@ -92,8 +94,7 @@ case class Randn(seed: Long) extends RDG {
   def this() = this(Utils.random.nextLong())
 
   def this(seed: Expression) =
-    this(
-        seed match {
+    this(seed match {
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(

@@ -17,7 +17,10 @@
 
 package org.apache.spark.sql.catalyst.optimizer
 
-import org.apache.spark.sql.catalyst.analysis.{EliminateSubqueryAliases, UnresolvedAttribute}
+import org.apache.spark.sql.catalyst.analysis.{
+  EliminateSubqueryAliases,
+  UnresolvedAttribute
+}
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions._
@@ -94,8 +97,9 @@ class OptimizeInSuite extends PlanTest {
     comparePlans(optimized, correctAnswer)
   }
 
-  test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute)") {
+  test(
+      "OptimizedIn test: Inset optimization disabled as " +
+        "list expression contains attribute)") {
     val originalQuery = testRelation
       .where(In(Literal.create(null, StringType),
                 Seq(Literal(1), UnresolvedAttribute("b"))))
@@ -108,8 +112,9 @@ class OptimizeInSuite extends PlanTest {
     comparePlans(optimized, correctAnswer)
   }
 
-  test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute - select)") {
+  test(
+      "OptimizedIn test: Inset optimization disabled as " +
+        "list expression contains attribute - select)") {
     val originalQuery = testRelation
       .select(In(Literal.create(null, StringType),
                  Seq(Literal(1), UnresolvedAttribute("b"))).as("a"))

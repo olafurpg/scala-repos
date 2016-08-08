@@ -5,10 +5,16 @@ import akka.event.LoggingReceive
 import akka.pattern.pipe
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps,
+  TaskOpWithSource
+}
 import mesosphere.marathon.core.matcher.base.util.ActorOfferMatcher
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManagerConfig
-import mesosphere.marathon.core.matcher.manager.impl.OfferMatcherManagerActor.{MatchTimeout, OfferData}
+import mesosphere.marathon.core.matcher.manager.impl.OfferMatcherManagerActor.{
+  MatchTimeout,
+  OfferData
+}
 import mesosphere.marathon.core.task.Task.LocalVolumeId
 import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
@@ -42,8 +48,12 @@ private[manager] object OfferMatcherManagerActor {
             clock: Clock,
             offerMatcherConfig: OfferMatcherManagerConfig,
             offersWanted: Observer[Boolean]): Props = {
-    Props(new OfferMatcherManagerActor(
-            metrics, random, clock, offerMatcherConfig, offersWanted))
+    Props(
+        new OfferMatcherManagerActor(metrics,
+                                     random,
+                                     clock,
+                                     offerMatcherConfig,
+                                     offersWanted))
   }
 
   private val log = LoggerFactory.getLogger(getClass)
@@ -85,14 +95,16 @@ private[impl] class OfferMatcherManagerActor private (
     clock: Clock,
     conf: OfferMatcherManagerConfig,
     offersWantedObserver: Observer[Boolean])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[this] var launchTokens: Int = 0
 
   private[this] var matchers: Set[OfferMatcher] = Set.empty
 
-  private[this] var offerQueues: Map[
-      OfferID, OfferMatcherManagerActor.OfferData] = Map.empty
+  private[this] var offerQueues: Map[OfferID,
+                                     OfferMatcherManagerActor.OfferData] =
+    Map.empty
 
   override def receive: Receive = LoggingReceive {
     Seq[Receive](
@@ -145,8 +157,8 @@ private[impl] class OfferMatcherManagerActor private (
     //we use this information as filter criteria
     val appReservations = offer.getResourcesList.asScala
       .filter(r =>
-            r.hasDisk && r.getDisk.hasPersistence &&
-            r.getDisk.getPersistence.hasId)
+        r.hasDisk && r.getDisk.hasPersistence &&
+          r.getDisk.getPersistence.hasId)
       .map(_.getDisk.getPersistence.getId)
       .collect { case LocalVolumeId(volumeId) => volumeId.appId }
       .toSet
@@ -162,16 +174,16 @@ private[impl] class OfferMatcherManagerActor private (
     case ActorOfferMatcher.MatchOffer(deadline, offer: Offer)
         if !offersWanted =>
       log.debug(s"Ignoring offer ${offer.getId.getValue}: No one interested.")
-      sender() ! OfferMatcher.MatchedTaskOps(
-          offer.getId, Seq.empty, resendThisOffer = false)
+      sender() ! OfferMatcher
+        .MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = false)
 
     case ActorOfferMatcher.MatchOffer(deadline, offer: Offer) =>
       log.debug(s"Start processing offer ${offer.getId.getValue}")
 
       // setup initial offer data
       val randomizedMatchers = offerMatchers(offer)
-      val data = OfferMatcherManagerActor.OfferData(
-          offer, deadline, sender(), randomizedMatchers, Seq.empty)
+      val data = OfferMatcherManagerActor
+        .OfferData(offer, deadline, sender(), randomizedMatchers, Seq.empty)
       offerQueues += offer.getId -> data
       metrics.currentOffersGauge.setValue(offerQueues.size)
 
@@ -195,7 +207,7 @@ private[impl] class OfferMatcherManagerActor private (
                   conf.maxTasksPerOffer() - data.ops.size).min)
 
           rejectedOps.foreach(_.reject(
-                  "not enough launch tokens OR already scheduled sufficient tasks on offer"))
+              "not enough launch tokens OR already scheduled sufficient tasks on offer"))
 
           val newData: OfferData = data.addTasks(acceptedOps)
           launchTokens -= acceptedOps.size
@@ -253,11 +265,12 @@ private[impl] class OfferMatcherManagerActor private (
       } else if (data.ops.size >= conf.maxTasksPerOffer()) {
         log.info(
             s"Already scheduled the maximum number of ${data.ops.size} tasks on this offer. " +
-            s"Increase with --${conf.maxTasksPerOffer.name}.")
+              s"Increase with --${conf.maxTasksPerOffer.name}.")
         None
       } else if (launchTokens <= 0) {
-        log.info(s"No launch tokens left for ${data.offer.getId.getValue}. " +
-            s"Tune with --launch_tokens/launch_token_refresh_interval.")
+        log.info(
+            s"No launch tokens left for ${data.offer.getId.getValue}. " +
+              s"Tune with --launch_tokens/launch_token_refresh_interval.")
         None
       } else {
         data.nextMatcherOpt
@@ -274,25 +287,26 @@ private[impl] class OfferMatcherManagerActor private (
           .recover {
             case NonFatal(e) =>
               log.warning("Received error from {}", e)
-              MatchedTaskOps(
-                  data.offer.getId, Seq.empty, resendThisOffer = true)
+              MatchedTaskOps(data.offer.getId,
+                             Seq.empty,
+                             resendThisOffer = true)
           }
           .pipeTo(self)
       case None => sendMatchResult(data, data.resendThisOffer)
     }
   }
 
-  private[this] def sendMatchResult(
-      data: OfferData, resendThisOffer: Boolean): Unit = {
-    data.sender ! OfferMatcher.MatchedTaskOps(
-        data.offer.getId, data.ops, resendThisOffer)
+  private[this] def sendMatchResult(data: OfferData,
+                                    resendThisOffer: Boolean): Unit = {
+    data.sender ! OfferMatcher
+      .MatchedTaskOps(data.offer.getId, data.ops, resendThisOffer)
     offerQueues -= data.offer.getId
     metrics.currentOffersGauge.setValue(offerQueues.size)
     //scalastyle:off magic.number
     val maxRanges = if (log.isDebugEnabled) 1000 else 10
     //scalastyle:on magic.number
     log.info(s"Finished processing ${data.offer.getId.getValue}. " +
-        s"Matched ${data.ops.size} ops after ${data.matchPasses} passes. " +
-        s"${ResourceUtil.displayResources(data.offer.getResourcesList.asScala, maxRanges)} left.")
+      s"Matched ${data.ops.size} ops after ${data.matchPasses} passes. " +
+      s"${ResourceUtil.displayResources(data.offer.getResourcesList.asScala, maxRanges)} left.")
   }
 }

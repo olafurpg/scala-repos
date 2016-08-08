@@ -6,7 +6,10 @@ package expr
 
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{Instruction, ScControlFlowPolicy}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  Instruction,
+  ScControlFlowPolicy
+}
 
 /**
   * @author Alexander Podkhalyuzin

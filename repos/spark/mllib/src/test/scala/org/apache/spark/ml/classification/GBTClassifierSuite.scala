@@ -24,7 +24,10 @@ import org.apache.spark.ml.tree.LeafNode
 import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, GradientBoostedTrees => OldGBT}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper,
+  GradientBoostedTrees => OldGBT
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
@@ -39,8 +42,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
   import GBTClassifierSuite.compareAPIs
 
   // Combinations for estimators, learning rates and subsamplingRate
-  private val testCombinations = Array(
-      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  private val testCombinations =
+    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   private var data: RDD[LabeledPoint] = _
   private var trainData: RDD[LabeledPoint] = _
@@ -63,8 +66,10 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
     ParamsSuite.checkParams(new GBTClassifier)
     val model = new GBTClassificationModel(
         "gbtc",
-        Array(new DecisionTreeRegressionModel(
-                "dtr", new LeafNode(0.0, 0.0, null), 1)),
+        Array(
+            new DecisionTreeRegressionModel("dtr",
+                                            new LeafNode(0.0, 0.0, null),
+                                            1)),
         Array(1.0),
         1)
     ParamsSuite.checkParams(model)

@@ -12,7 +12,12 @@ import akka.http.javadsl.model.{RemoteAddress, HttpMethod}
 import akka.http.scaladsl.server
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives._
-import akka.http.impl.server.{UnmarshallerImpl, ExtractingStandaloneExtractionImpl, RequestContextImpl, StandaloneExtractionImpl}
+import akka.http.impl.server.{
+  UnmarshallerImpl,
+  ExtractingStandaloneExtractionImpl,
+  RequestContextImpl,
+  StandaloneExtractionImpl
+}
 import akka.http.scaladsl.util.FastFuture
 import akka.http.impl.util.JavaMapping.Implicits._
 
@@ -97,7 +102,8 @@ object RequestVals {
   def clientIP(): RequestVal[RemoteAddress] =
     new StandaloneExtractionImpl[RemoteAddress] {
       def directive: Directive1[RemoteAddress] =
-        MiscDirectives.extractClientIP.map(x ⇒ x: RemoteAddress) // missing covariance of Directive
+        MiscDirectives.extractClientIP
+          .map(x ⇒ x: RemoteAddress) // missing covariance of Directive
     }
 
   /**
@@ -105,8 +111,9 @@ object RequestVals {
     * The new RequestVal represents the existing value as looked up in the map. If the key doesn't
     * exist the request is rejected.
     */
-  def lookupInMap[T, U](
-      key: RequestVal[T], clazz: Class[U], map: ju.Map[T, U]): RequestVal[U] =
+  def lookupInMap[T, U](key: RequestVal[T],
+                        clazz: Class[U],
+                        map: ju.Map[T, U]): RequestVal[U] =
     new StandaloneExtractionImpl[U]()(ClassTag(clazz)) {
       import BasicDirectives._
       import RouteDirectives._

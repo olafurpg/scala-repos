@@ -45,8 +45,7 @@ class MdnsTest extends FunSuite with Eventually with IntegrationPatience {
         eventually(timeout(5 seconds)) {
           Var.sample(addr) match {
             case Addr.Bound(addrs, _) =>
-              assert(
-                  addrs.exists {
+              assert(addrs.exists {
                 case Address.Inet(ia1: InetSocketAddress, _) =>
                   ia1.getPort == ia.getPort
                 case _ => false

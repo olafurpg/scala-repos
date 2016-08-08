@@ -1,6 +1,12 @@
 package com.twitter.finagle.filter
 
-import com.twitter.finagle.{Service, ServiceFactory, SimpleFilter, Stack, Stackable}
+import com.twitter.finagle.{
+  Service,
+  ServiceFactory,
+  SimpleFilter,
+  Stack,
+  Stackable
+}
 import com.twitter.util.Future
 
 object MaskCancelFilter {

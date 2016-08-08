@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -26,12 +26,19 @@ import kafka.security.auth._
 import kafka.server._
 import kafka.utils._
 
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecord, ConsumerConfig}
+import org.apache.kafka.clients.consumer.{
+  Consumer,
+  ConsumerRecord,
+  ConsumerConfig
+}
 import org.apache.kafka.clients.producer.{ProducerRecord, ProducerConfig}
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 import org.apache.kafka.common.{TopicPartition}
 import org.apache.kafka.common.protocol.SecurityProtocol
-import org.apache.kafka.common.errors.{GroupAuthorizationException, TopicAuthorizationException}
+import org.apache.kafka.common.errors.{
+  GroupAuthorizationException,
+  TopicAuthorizationException
+}
 import org.junit.Assert._
 import org.junit.{Test, After, Before}
 
@@ -61,9 +68,11 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
   override val serverCount = 3
   override val setClusterAcl = Some { () =>
     AclCommand.main(clusterAclArgs)
-    servers.foreach(s =>
-          TestUtils.waitAndVerifyAcls(
-              ClusterActionAcl, s.apis.authorizer.get, clusterResource))
+    servers.foreach(
+        s =>
+          TestUtils.waitAndVerifyAcls(ClusterActionAcl,
+                                      s.apis.authorizer.get,
+                                      clusterResource))
   }
   val numRecords = 1
   val group = "group"
@@ -208,15 +217,13 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
   def testProduceConsume {
     AclCommand.main(produceAclArgs)
     AclCommand.main(consumeAclArgs)
-    servers.foreach(
-        s =>
-          {
-        TestUtils.waitAndVerifyAcls(
-            TopicReadAcl ++ TopicWriteAcl ++ TopicDescribeAcl,
-            s.apis.authorizer.get,
-            topicResource)
-        TestUtils.waitAndVerifyAcls(
-            GroupReadAcl, s.apis.authorizer.get, groupResource)
+    servers.foreach(s => {
+      TestUtils.waitAndVerifyAcls(
+          TopicReadAcl ++ TopicWriteAcl ++ TopicDescribeAcl,
+          s.apis.authorizer.get,
+          topicResource)
+      TestUtils
+        .waitAndVerifyAcls(GroupReadAcl, s.apis.authorizer.get, groupResource)
     })
     //Produce records
     debug("Starting to send records")
@@ -252,14 +259,13 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
   def testNoConsumeAcl {
     AclCommand.main(produceAclArgs)
     AclCommand.main(groupAclArgs)
-    servers.foreach(
-        s =>
-          {
-        TestUtils.waitAndVerifyAcls(TopicWriteAcl ++ TopicDescribeAcl,
-                                    s.apis.authorizer.get,
-                                    topicResource)
-        TestUtils.waitAndVerifyAcls(
-            GroupReadAcl, servers.head.apis.authorizer.get, groupResource)
+    servers.foreach(s => {
+      TestUtils.waitAndVerifyAcls(TopicWriteAcl ++ TopicDescribeAcl,
+                                  s.apis.authorizer.get,
+                                  topicResource)
+      TestUtils.waitAndVerifyAcls(GroupReadAcl,
+                                  servers.head.apis.authorizer.get,
+                                  groupResource)
     })
     //Produce records
     debug("Starting to send records")
@@ -303,8 +309,10 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
 
   private def sendRecords(numRecords: Int, tp: TopicPartition) {
     val futures = (0 until numRecords).map { i =>
-      val record = new ProducerRecord(
-          tp.topic(), tp.partition(), s"$i".getBytes, s"$i".getBytes)
+      val record = new ProducerRecord(tp.topic(),
+                                      tp.partition(),
+                                      s"$i".getBytes,
+                                      s"$i".getBytes)
       debug(s"Sending this record: $record")
       this.producers.head.send(record)
     }
@@ -330,7 +338,7 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
       if (iters > maxIters)
         throw new IllegalStateException(
             "Failed to consume the expected records after " + iters +
-            " iterations.")
+              " iterations.")
       iters += 1
     }
     for (i <- 0 until numRecords) {

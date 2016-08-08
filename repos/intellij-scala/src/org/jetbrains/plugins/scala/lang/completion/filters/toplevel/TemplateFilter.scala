@@ -7,7 +7,10 @@ import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.{PsiElement, _}
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScStableReferenceElementPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScStableReferenceElementPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
@@ -28,19 +31,18 @@ class TemplateFilter extends ElementFilter {
         case _: ScReferenceExpression =>
           parent.getParent match {
             case y: ScStableReferenceElementPattern => {
-                y.getParent match {
-                  case x: ScCaseClause => {
-                      x.getParent.getParent match {
-                        case _: ScMatchStmt
-                            if (x.getParent.getFirstChild == x) =>
-                          return false
-                        case _: ScMatchStmt => return true
-                        case _ => return true
-                      }
-                    }
-                  case _ =>
+              y.getParent match {
+                case x: ScCaseClause => {
+                  x.getParent.getParent match {
+                    case _: ScMatchStmt if (x.getParent.getFirstChild == x) =>
+                      return false
+                    case _: ScMatchStmt => return true
+                    case _ => return true
+                  }
                 }
+                case _ =>
               }
+            }
             case _ =>
           }
         case _ =>

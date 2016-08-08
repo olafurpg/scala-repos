@@ -64,8 +64,9 @@ case class Time(private val millis: Long) {
 
   def floor(that: Duration, zeroTime: Time): Time = {
     val t = that.milliseconds
-    new Time(((this.millis - zeroTime.milliseconds) / t) * t +
-        zeroTime.milliseconds)
+    new Time(
+        ((this.millis - zeroTime.milliseconds) / t) * t +
+          zeroTime.milliseconds)
   }
 
   def isMultipleOf(that: Duration): Boolean =
@@ -77,12 +78,12 @@ case class Time(private val millis: Long) {
 
   def until(that: Time, interval: Duration): Seq[Time] = {
     (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map
-    (new Time(_))
+      (new Time(_))
   }
 
   def to(that: Time, interval: Duration): Seq[Time] = {
     (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map
-    (new Time(_))
+      (new Time(_))
   }
 
   override def toString: String = (millis.toString + " ms")

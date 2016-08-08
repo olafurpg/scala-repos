@@ -46,7 +46,8 @@ object RRunner {
       // but kept here for backward compatibility.
       var cmd = sys.props.getOrElse("spark.sparkr.r.command", "Rscript")
       cmd = sys.props.getOrElse("spark.r.command", cmd)
-      if (sys.props.getOrElse("spark.submit.deployMode", "client") == "client") {
+      if (sys.props
+            .getOrElse("spark.submit.deployMode", "client") == "client") {
         cmd = sys.props.getOrElse("spark.r.driver.command", cmd)
       }
       cmd
@@ -90,11 +91,13 @@ object RRunner {
         env.put("R_PROFILE_USER",
                 Seq(rPackageDir(0), "SparkR", "profile", "general.R")
                   .mkString(File.separator))
-        builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
+        builder
+          .redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
         val process = builder.start()
 
-        new RedirectThread(
-            process.getInputStream, System.out, "redirect R output").start()
+        new RedirectThread(process.getInputStream,
+                           System.out,
+                           "redirect R output").start()
 
         process.waitFor()
       } finally {

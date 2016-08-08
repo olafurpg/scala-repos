@@ -24,7 +24,8 @@ object Completion {
   case class Candidates(cursor: Int, candidates: List[String]) {}
   val NoCandidates = Candidates(-1, Nil)
 
-  def looksLikeInvocation(code: String) = ((code != null) &&
+  def looksLikeInvocation(code: String) =
+    ((code != null) &&
       (code startsWith ".") && !(code == ".") && !(code startsWith "./") &&
       !(code startsWith ".."))
 }

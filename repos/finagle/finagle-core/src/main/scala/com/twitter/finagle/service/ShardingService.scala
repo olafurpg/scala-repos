@@ -2,7 +2,12 @@ package com.twitter.finagle.service
 
 import com.twitter.util.{Future, Closable, Time}
 import com.twitter.hashing._
-import com.twitter.finagle.{Service, Status, NotShardableException, ShardNotAvailableException}
+import com.twitter.finagle.{
+  Service,
+  Status,
+  NotShardableException,
+  ShardNotAvailableException
+}
 
 /**
   * ShardingService takes a `Distributor` where the handle is a service.
@@ -21,8 +26,7 @@ import com.twitter.finagle.{Service, Status, NotShardableException, ShardNotAvai
 class ShardingService[Req, Rep](
     distributor: Distributor[Service[Req, Rep]],
     hash: Req => Option[Long]
-)
-    extends Service[Req, Rep] {
+) extends Service[Req, Rep] {
 
   def apply(request: Req): Future[Rep] = {
     hash(request) map { hash =>

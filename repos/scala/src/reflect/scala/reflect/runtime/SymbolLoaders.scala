@@ -15,7 +15,8 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  is found, a package is created instead.
     */
   class TopClassCompleter(clazz: Symbol, module: Symbol)
-      extends SymLoader with FlagAssigningCompleter {
+      extends SymLoader
+      with FlagAssigningCompleter {
     markFlagsCompleted(clazz, module)(mask = ~TopLevelPickledFlags)
     override def complete(sym: Symbol) = {
       debugInfo("completing " + sym + "/" + clazz.fullName)
@@ -40,7 +41,7 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
   protected def initAndEnterClassAndModule(owner: Symbol,
                                            name: TypeName,
                                            completer: (Symbol,
-                                           Symbol) => LazyType) = {
+                                                       Symbol) => LazyType) = {
     assert(!(name.toString endsWith "[]"), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)
@@ -58,8 +59,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     List(clazz, module, module.moduleClass) foreach (_ setInfo info)
   }
 
-  protected def initClassAndModule(
-      clazz: Symbol, module: Symbol, completer: LazyType) =
+  protected def initClassAndModule(clazz: Symbol,
+                                   module: Symbol,
+                                   completer: LazyType) =
     setAllInfos(clazz, module, completer)
 
   /** The type completer for packages.
@@ -139,8 +141,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
             val loadingMirror = currentMirror.mirrorDefining(cls)
             val (_, module) =
               if (loadingMirror eq currentMirror) {
-                initAndEnterClassAndModule(
-                    pkgClass, name.toTypeName, new TopClassCompleter(_, _))
+                initAndEnterClassAndModule(pkgClass,
+                                           name.toTypeName,
+                                           new TopClassCompleter(_, _))
               } else {
                 val origOwner =
                   loadingMirror.packageNameToScala(pkgClass.fullName)

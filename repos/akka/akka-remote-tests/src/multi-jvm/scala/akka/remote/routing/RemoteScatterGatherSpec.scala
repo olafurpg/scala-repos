@@ -46,8 +46,10 @@ class RemoteScatterGatherMultiJvmNode3 extends RemoteScatterGatherSpec
 class RemoteScatterGatherMultiJvmNode4 extends RemoteScatterGatherSpec
 
 class RemoteScatterGatherSpec
-    extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteScatterGatherMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -79,7 +81,8 @@ class RemoteScatterGatherSpec
         }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5.seconds, messages = connectionCount * iterationCount) {
+            5.seconds,
+            messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,

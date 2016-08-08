@@ -2,11 +2,19 @@ package org.jetbrains.plugins.scala
 package annotator.gutter
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScIfStmt, ScNewTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScIfStmt,
+  ScNewTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait
+}
 
 /**
   * Pavel.Fatin, 20.01.2010
@@ -39,8 +47,8 @@ trait ScalaSeparatorProvider {
   }
 
   def getGroup(element: PsiElement) = {
-    for (g <- groupOf(element)) yield
-      if (isMultiline(element)) MultilineLevel + g else g
+    for (g <- groupOf(element))
+      yield if (isMultiline(element)) MultilineLevel + g else g
   }
 
   def groupOf(element: PsiElement): Option[Int] = {

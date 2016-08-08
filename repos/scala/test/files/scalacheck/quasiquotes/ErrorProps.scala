@@ -1,9 +1,8 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 
 object ErrorProps extends QuasiquoteProperties("errors") {
-  property("can't extract two .. rankinalities in a row") = fails(
-      "Can't extract with .. here",
-      """
+  property("can't extract two .. rankinalities in a row") =
+    fails("Can't extract with .. here", """
       val xs = List(q"x1", q"x2")
       val q"f(..$xs1, ..$xs2)" = xs
     """)
@@ -26,9 +25,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
         TypeDef(Modifiers(), T1, List(T2), t)
     """)
 
-  property("can't unquote annotations with ... rank") = fails(
-      "Can't unquote with ... here",
-      """
+  property("can't unquote annotations with ... rank") =
+    fails("Can't unquote with ... here", """
       val annots = List(List(q"Foo"))
       q"@...$annots def foo"
     """)
@@ -40,9 +38,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       StringContext(s).q()
     """)
 
-  property("don't know how to unquote inside of strings") = fails(
-      "Don't know how to unquote here",
-      """
+  property("don't know how to unquote inside of strings") =
+    fails("Don't know how to unquote here", """
       val x: Tree = EmptyTree
       StringContext("\"", "\"").q(x)
     """)
@@ -162,52 +159,55 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       q"$n"
     """)
 
-  property("SI-8211: check unbound placeholder parameters") = fails(
-      "unbound placeholder parameter", """
+  property("SI-8211: check unbound placeholder parameters") =
+    fails("unbound placeholder parameter", """
       q"_"
     """)
 
-  property("SI-8211: check unbound wildcard types") = fails(
-      "unbound wildcard type", """
+  property("SI-8211: check unbound wildcard types") =
+    fails("unbound wildcard type", """
       tq"_"
     """)
 
   property(
-      "SI-8420: don't crash on splicing of non-unliftable native type (1)") = fails(
-      "Can't unquote List[reflect.runtime.universe.Symbol] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.Symbol]",
-      """
+      "SI-8420: don't crash on splicing of non-unliftable native type (1)") =
+    fails(
+        "Can't unquote List[reflect.runtime.universe.Symbol] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.Symbol]",
+        """
       val l: List[Symbol] = Nil
       q"f(..$l)"
     """)
 
   property(
-      "SI-8420: don't crash on splicing of non-unliftable native type (2)") = fails(
-      "Can't unquote List[reflect.runtime.universe.FlagSet] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.FlagSet]",
-      """
+      "SI-8420: don't crash on splicing of non-unliftable native type (2)") =
+    fails(
+        "Can't unquote List[reflect.runtime.universe.FlagSet] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.FlagSet]",
+        """
       val l: List[FlagSet] = Nil
       q"f(..$l)"
     """)
 
   property(
-      "SI-8420: don't crash on splicing of non-unliftable native type (3)") = fails(
-      "Can't unquote List[reflect.runtime.universe.Modifiers] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.Modifiers]",
-      """
+      "SI-8420: don't crash on splicing of non-unliftable native type (3)") =
+    fails(
+        "Can't unquote List[reflect.runtime.universe.Modifiers] with .., consider omitting the dots or providing an implicit instance of Liftable[reflect.runtime.universe.Modifiers]",
+        """
       val l: List[Modifiers] = Nil
       q"f(..$l)"
     """)
 
   property(
-      "SI-8451 construction: disallow everything except for constructor calls in secondary constructor bodies") = fails(
-      "'this' expected but unquotee found",
-      """
+      "SI-8451 construction: disallow everything except for constructor calls in secondary constructor bodies") =
+    fails("'this' expected but unquotee found",
+          """
       val rhs1 = q"this(0)"
       val ctor1 = q"def this(x: Int) = $rhs1"
     """)
 
   property(
-      "SI-8451 deconstruction: disallow everything except for constructor calls in secondary constructor bodies") = fails(
-      "'this' expected but unquotee found",
-      """
+      "SI-8451 deconstruction: disallow everything except for constructor calls in secondary constructor bodies") =
+    fails("'this' expected but unquotee found",
+          """
       val q"def this(..$params) = $rhs2" = q"def this(x: Int) = this(0)"
     """)
 

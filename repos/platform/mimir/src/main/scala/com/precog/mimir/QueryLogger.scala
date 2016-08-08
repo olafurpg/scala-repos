@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -80,12 +80,12 @@ trait QueryLogger[M[+ _], -P] { self =>
     *
     * Please note the following:
     *
-    * kx = 303 seconds 
+    * kx = 303 seconds
     *   where
     *     2^63 - 1 = sum i from 0 to k, x^2
     *     x > 0
     *     k = 10000    (an arbitrary, plausible iteration count)
-    * 
+    *
     * This is to say that, for a particular position which is hit 10,000 times,
     * the total time spent in that particular position must be bounded by 303
     * seconds to avoid signed Long value overflow.  Conveniently, our query timeout
@@ -113,8 +113,9 @@ trait JobQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   protected def mkMessage(pos: P, msg: String): JValue = {
     JObject(
         JField("message", JString(msg)) :: JField(
-            "timestamp", clock.now().serialize) :: JField(
-            "position", decomposer.decompose(pos)) :: Nil)
+            "timestamp",
+            clock.now().serialize) :: JField("position",
+                                             decomposer.decompose(pos)) :: Nil)
   }
 
   private def send(channel: String, pos: P, msg: String): M[Unit] =
@@ -201,14 +202,21 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
         case (pos, stats) =>
           log(pos,
               """{"count":%d,"sum":%d,"sumSq":%d,"min":%d,"max":%d}""".format(
-                  stats.count, stats.sum, stats.sumSq, stats.min, stats.max))
+                  stats.count,
+                  stats.sum,
+                  stats.sumSq,
+                  stats.min,
+                  stats.max))
       }
 
     logging reduceOption { _ >> _ } getOrElse (M point ())
   }
 
-  private case class Stats(
-      count: Long, sum: Long, sumSq: Long, min: Long, max: Long) {
+  private case class Stats(count: Long,
+                           sum: Long,
+                           sumSq: Long,
+                           min: Long,
+                           max: Long) {
     final def derive(nanos: Long): Stats = {
       copy(count = count + 1,
            sum = sum + nanos,

@@ -40,7 +40,8 @@ object MenuBar {
 }
 
 class MenuBar(override val delegate: jfxsc.MenuBar = new jfxsc.MenuBar())
-    extends Control(delegate) with SFXDelegate[jfxsc.MenuBar] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.MenuBar] {
 
   /**
     * Gets the list of Menus for this instance.

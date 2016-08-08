@@ -22,8 +22,11 @@ import rx.lang.scala.Observer
 import scala.util.Random
 
 class OfferMatcherManagerActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with GivenWhenThen with Mockito {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
 
   test("The list of OfferMatchers is random without precedence") {
     Given("OfferMatcher with num normal matchers")
@@ -78,8 +81,8 @@ class OfferMatcherManagerActorTest
     object Config extends ScallopConf with OfferMatcherManagerConfig
     Config.afterInit()
     val offerMatcherManager = TestActorRef[OfferMatcherManagerActor](
-        OfferMatcherManagerActor.props(
-            metrics, random, clock, Config, observer))
+        OfferMatcherManagerActor
+          .props(metrics, random, clock, Config, observer))
 
     def matcher(precedence: Option[PathId] = None): OfferMatcher = {
       val matcher = mock[OfferMatcher]

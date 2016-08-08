@@ -17,9 +17,11 @@ import play.doc.{FileRepository, PlayDoc, RenderedPage, PageIndex}
   * Documentation is located in the given repository - either a JAR file or directly from
   * the filesystem.
   */
-class DocumentationHandler(
-    repo: FileRepository, apiRepo: FileRepository, toClose: Closeable)
-    extends BuildDocHandler with Closeable {
+class DocumentationHandler(repo: FileRepository,
+                           apiRepo: FileRepository,
+                           toClose: Closeable)
+    extends BuildDocHandler
+    with Closeable {
 
   def this(repo: FileRepository, toClose: Closeable) =
     this(repo, repo, toClose)
@@ -69,7 +71,7 @@ class DocumentationHandler(
                 MimeTypes
                   .forFileName(handle.name)
                   .orElse(Some(ContentTypes.BINARY))
-              ))
+            ))
       }
     }
 
@@ -93,17 +95,19 @@ class DocumentationHandler(
             sendFileInline(repo, path)
               .orElse(sendFileInline(apiRepo, path))
               .getOrElse(NotFound("Resource not found [" + path + "]"))
-          )
+        )
       case wikiPage(page) =>
         Some(
             playDoc.renderPage(page) match {
               case None =>
                 NotFound(views.html.play20.manual(page, None, None, locator))
               case Some(RenderedPage(mainPage, None, _)) =>
-                Ok(views.html.play20
+                Ok(
+                    views.html.play20
                       .manual(page, Some(mainPage), None, locator))
               case Some(RenderedPage(mainPage, Some(sidebar), _)) =>
-                Ok(views.html.play20
+                Ok(
+                    views.html.play20
                       .manual(page, Some(mainPage), Some(sidebar), locator))
             }
         )

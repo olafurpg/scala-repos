@@ -11,7 +11,12 @@ import com.intellij.psi.search.{FilenameIndex, GlobalSearchScope}
 import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScMethodCall, ScNewTemplateDefinition, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr,
+  ScMethodCall,
+  ScNewTemplateDefinition,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScClassParents
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
@@ -23,7 +28,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
 class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
 
   def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     if (element.getContainingFile.getFileType.getName != Sbt.Name)
       return Array.empty
     extractSubprojectPath(element).flatMap { path =>
@@ -32,11 +38,12 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
     }.toArray
   }
 
-  private def findBuildFile(
-      subprojectPath: String, project: Project): Option[PsiFile] = {
+  private def findBuildFile(subprojectPath: String,
+                            project: Project): Option[PsiFile] = {
     FilenameIndex
-      .getFilesByName(
-          project, "build.sbt", GlobalSearchScope.allScope(project))
+      .getFilesByName(project,
+                      "build.sbt",
+                      GlobalSearchScope.allScope(project))
       .find { file =>
         val relativeToProjectPath =
           project.getBasePath + File.separator + subprojectPath
@@ -62,8 +69,8 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
     }
   }
 
-  private def extractSubprojectPathFromProjectCall(
-      call: ScMethodCall, element: PsiElement) = {
+  private def extractSubprojectPathFromProjectCall(call: ScMethodCall,
+                                                   element: PsiElement) = {
     var result: Option[String] = None
     val visitor = new ScalaRecursiveElementVisitor {
       override def visitMethodCallExpression(call: ScMethodCall) = call match {
@@ -141,8 +148,8 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
   }.flatten
 }
 
-private class SbtSubprojectReference[T <: PsiElement](
-    val element: T, val sbtFile: PsiFile)
+private class SbtSubprojectReference[T <: PsiElement](val element: T,
+                                                      val sbtFile: PsiFile)
     extends PsiReferenceBase.Immediate[T](
         element,
         TextRange.create(

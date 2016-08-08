@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -59,7 +59,12 @@ import scalaz.std.function._
 import scalaz.syntax.monad._
 import scalaz.syntax.std.option._
 
-import java.util.concurrent.{ArrayBlockingQueue, ExecutorService, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  ExecutorService,
+  ThreadPoolExecutor,
+  TimeUnit
+}
 import com.precog.common.Path
 
 object EventService {
@@ -85,24 +90,24 @@ object EventService {
 
   object ServiceConfig {
     def fromConfiguration(config: Configuration) = {
-      (ServiceLocation.fromConfig(config.detach("eventService")) |@| ServiceLocation
-            .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
+      (ServiceLocation
+        .fromConfig(config.detach("eventService")) |@| ServiceLocation
+        .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
         ServiceConfig(
             serviceLocation = serviceLoc,
             shardLocation = shardLoc,
-            ingestTimeout = akka.util
-                .Timeout(config[Long]("insert.timeout", 10000l)),
+            ingestTimeout =
+              akka.util.Timeout(config[Long]("insert.timeout", 10000l)),
             ingestBatchSize = config[Int]("ingest.batch_size", 500),
             ingestMaxFields = config[Int]("ingest.max_fields", 1024),
             ingestTmpDir = config
-                .get[String]("ingest.tmpdir")
-                .map(new File(_))
-                .orElse(Option(File
-                          .createTempFile("ingest.tmpfile", null)
-                          .getParentFile))
-                .get, //fail fast 
-            deleteTimeout = akka.util.Timeout(
-                  config[Long]("delete.timeout", 10000l))
+              .get[String]("ingest.tmpdir")
+              .map(new File(_))
+              .orElse(Option(
+                  File.createTempFile("ingest.tmpfile", null).getParentFile))
+              .get, //fail fast
+            deleteTimeout =
+              akka.util.Timeout(config[Long]("delete.timeout", 10000l))
         )
       }
     }
@@ -110,8 +115,10 @@ object EventService {
 }
 
 trait EventService
-    extends BlueEyesServiceBuilder with EitherServiceCombinators
-    with PathServiceCombinators with APIKeyServiceCombinators {
+    extends BlueEyesServiceBuilder
+    with EitherServiceCombinators
+    with PathServiceCombinators
+    with APIKeyServiceCombinators {
   import EventService._
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
@@ -145,8 +152,10 @@ trait EventService
                                                ingestMaxFields,
                                                ingestTmpDir,
                                                AccessMode.Create)
-    val archiveHandler = new ArchiveServiceHandler[ByteChunk](
-        apiKeyFinder, eventStore, Clock.System, deleteTimeout)
+    val archiveHandler = new ArchiveServiceHandler[ByteChunk](apiKeyFinder,
+                                                              eventStore,
+                                                              Clock.System,
+                                                              deleteTimeout)
     val createHandler = new FileStoreHandler(serviceLocation,
                                              permissionsFinder,
                                              jobManager,
@@ -208,11 +217,11 @@ trait EventService
       dataPath("/fs") {
         post(state.ingestHandler) ~ delete(state.archiveHandler)
       } ~ //legacy handler
-      path("/(?<sync>a?sync)") {
-        dataPath("/fs") {
-          post(state.ingestHandler) ~ delete(state.archiveHandler)
+        path("/(?<sync>a?sync)") {
+          dataPath("/fs") {
+            post(state.ingestHandler) ~ delete(state.archiveHandler)
+          }
         }
-      }
     }
   }
 

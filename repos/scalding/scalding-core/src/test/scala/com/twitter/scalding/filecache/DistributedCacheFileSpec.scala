@@ -26,7 +26,8 @@ import scala.collection.mutable
 // TODO: fix? is it worth having the dep on mockito just for this?
 class DistributedCacheFileSpec extends WordSpec with Matchers {
   case class UnknownMode(buffers: Map[Source, mutable.Buffer[Tuple]])
-      extends TestMode with CascadingLocal
+      extends TestMode
+      with CascadingLocal
   /*
   val conf = smartMock[Configuration]
 

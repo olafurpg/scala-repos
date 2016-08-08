@@ -27,11 +27,12 @@ import com.twitter.util.Future
 import scala.collection.breakOut
 
 object ClientMergeable {
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
-                      (K, BatchID), V],
-                  batchesToKeep: Int)(
-      implicit batcher: Batcher, monoid: Semigroup[V]): ClientMergeable[K, V] =
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID),
+                                                                 V],
+      batchesToKeep: Int)(implicit batcher: Batcher,
+                          monoid: Semigroup[V]): ClientMergeable[K, V] =
     new ClientMergeable[K, V](offlineStore,
                               onlineStore,
                               batcher,
@@ -44,9 +45,10 @@ object ClientMergeable {
   * This is like a ClientStore except that it can perform
   * a merge into the online store and return the total sum.
   */
-class ClientMergeable[K, V : Semigroup](
+class ClientMergeable[K, V: Semigroup](
     offlineStore: ReadableStore[K, (BatchID, V)],
-    onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID), V],
+    onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID),
+                                                               V],
     batcher: Batcher,
     batchesToKeep: Int,
     onlineKeyFilter: K => Boolean,
@@ -122,7 +124,7 @@ class ClientMergeable[K, V : Semigroup](
           .multiMerge(kvs)
           .map { case ((k, _), v) => (k, v) }(breakOut)
 
-          (batch, mm.plus(existing, preMerge))
+        (batch, mm.plus(existing, preMerge))
     }.flatMap {
       case (b, kvs) =>
         kvs.iterator.map { case (k, v) => ((k, b), v) }

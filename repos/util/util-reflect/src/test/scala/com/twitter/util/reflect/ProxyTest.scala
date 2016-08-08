@@ -73,7 +73,7 @@ class ProxyTest extends WordSpec {
     }
 
     "must not throw UndeclaredThrowableException" in {
-      val pf = new ProxyFactory[TestImpl](_ ())
+      val pf = new ProxyFactory[TestImpl](_())
       val proxied = pf(new TestImpl)
 
       intercept[RuntimeException] {
@@ -121,7 +121,7 @@ class ProxyTest extends WordSpec {
     }
 
     "MethodCall throws an exception when invoked without a target" in {
-      val pf = new ProxyFactory[TestImpl](_ ())
+      val pf = new ProxyFactory[TestImpl](_())
       val targetless = pf()
 
       intercept[NonexistentTargetException] {
@@ -172,10 +172,10 @@ class ProxyTest extends WordSpec {
     }
 
     val reflectConstructor = { () =>
-      new ReferenceProxyFactory[TestInterface](_ ())
+      new ReferenceProxyFactory[TestInterface](_())
     }
     val cglibConstructor = { () =>
-      new ProxyFactory[TestInterface](_ ())
+      new ProxyFactory[TestInterface](_())
     }
     /*
     "maintains proxy creation speed" in {
@@ -223,7 +223,7 @@ class ProxyTest extends WordSpec {
     }
   }
 
-  class ReferenceProxyFactory[I <: AnyRef : Manifest](
+  class ReferenceProxyFactory[I <: AnyRef: Manifest](
       f: (() => AnyRef) => AnyRef) {
     import java.lang.reflect
 
@@ -237,15 +237,18 @@ class ProxyTest extends WordSpec {
 
     def apply[T <: I](instance: T) = {
       proxyConstructor
-        .newInstance(new reflect.InvocationHandler {
-          def invoke(p: AnyRef, method: reflect.Method, args: Array[AnyRef]) = {
-            try {
-              f.apply(() => method.invoke(instance, args: _*))
-            } catch {
-              case e: reflect.InvocationTargetException => throw e.getCause
-            }
-          }
-        })
+        .newInstance(
+            new reflect.InvocationHandler {
+              def invoke(p: AnyRef,
+                         method: reflect.Method,
+                         args: Array[AnyRef]) = {
+                try {
+                  f.apply(() => method.invoke(instance, args: _*))
+                } catch {
+                  case e: reflect.InvocationTargetException => throw e.getCause
+                }
+              }
+            })
         .asInstanceOf[I]
     }
   }

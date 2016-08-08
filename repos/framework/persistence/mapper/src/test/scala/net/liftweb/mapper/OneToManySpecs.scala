@@ -58,11 +58,13 @@ package net.liftweb {
     }
 
     class Contact
-        extends LongKeyedMapper[Contact] with IdPK
+        extends LongKeyedMapper[Contact]
+        with IdPK
         with OneToMany[Long, Contact] {
       def getSingleton = Contact
       object phones
-          extends MappedOneToMany(Phone, Phone.contact) with Cascade[Phone]
+          extends MappedOneToMany(Phone, Phone.contact)
+          with Cascade[Phone]
     }
     object Contact extends Contact with LongKeyedMetaMapper[Contact]
 

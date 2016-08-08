@@ -24,14 +24,18 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.{DefaultReadWriteTest, MLTestingUtils}
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{DecisionTree => OldDecisionTree, DecisionTreeSuite => OldDecisionTreeSuite}
+import org.apache.spark.mllib.tree.{
+  DecisionTree => OldDecisionTree,
+  DecisionTreeSuite => OldDecisionTreeSuite
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
 
 class DecisionTreeClassifierSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import DecisionTreeClassifierSuite.compareAPIs
@@ -46,8 +50,8 @@ class DecisionTreeClassifierSuite
 
   override def beforeAll() {
     super.beforeAll()
-    categoricalDataPointsRDD = sc.parallelize(
-        OldDecisionTreeSuite.generateCategoricalDataPoints())
+    categoricalDataPointsRDD =
+      sc.parallelize(OldDecisionTreeSuite.generateCategoricalDataPoints())
     orderedLabeledPointsWithLabel0RDD = sc.parallelize(
         OldDecisionTreeSuite.generateOrderedLabeledPointsWithLabel0())
     orderedLabeledPointsWithLabel1RDD = sc.parallelize(
@@ -63,8 +67,11 @@ class DecisionTreeClassifierSuite
 
   test("params") {
     ParamsSuite.checkParams(new DecisionTreeClassifier)
-    val model = new DecisionTreeClassificationModel(
-        "dtc", new LeafNode(0.0, 0.0, null), 1, 2)
+    val model =
+      new DecisionTreeClassificationModel("dtc",
+                                          new LeafNode(0.0, 0.0, null),
+                                          1,
+                                          2)
     ParamsSuite.checkParams(model)
   }
 
@@ -90,8 +97,10 @@ class DecisionTreeClassifierSuite
       rdd =>
         DecisionTreeClassifier.supportedImpurities.foreach { impurity =>
           dt.setImpurity(impurity)
-          compareAPIs(
-              rdd, dt, categoricalFeatures = Map.empty[Int, Int], numClasses)
+          compareAPIs(rdd,
+                      dt,
+                      categoricalFeatures = Map.empty[Int, Int],
+                      numClasses)
         }
     }
   }
@@ -128,10 +137,13 @@ class DecisionTreeClassifierSuite
     compareAPIs(rdd, dt, categoricalFeatures = Map.empty[Int, Int], numClasses)
   }
 
-  test("Multiclass classification stump with unordered categorical features," +
-      " with just enough bins") {
+  test(
+      "Multiclass classification stump with unordered categorical features," +
+        " with just enough bins") {
     val maxBins =
-      2 * (math.pow(2, 3 - 1).toInt - 1) // just enough bins to allow unordered features
+      2 * (math
+        .pow(2, 3 - 1)
+        .toInt - 1) // just enough bins to allow unordered features
     val rdd = categoricalDataPointsForMulticlassRDD
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")
@@ -178,7 +190,7 @@ class DecisionTreeClassifierSuite
 
   test(
       "Multiclass classification tree with 10-ary (ordered) categorical features," +
-      " with just enough bins") {
+        " with just enough bins") {
     val rdd = categoricalDataPointsForMulticlassForOrderedFeaturesRDD
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")
@@ -365,14 +377,18 @@ class DecisionTreeClassifierSuite
     // Categorical splits with tree depth 2
     val categoricalData: DataFrame =
       TreeTests.setMetadata(rdd, Map(0 -> 2, 1 -> 3), numClasses = 2)
-    testEstimatorAndModelReadWrite(
-        dt, categoricalData, allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(dt,
+                                   categoricalData,
+                                   allParamSettings,
+                                   checkModelData)
 
     // Continuous splits with tree depth 2
     val continuousData: DataFrame =
       TreeTests.setMetadata(rdd, Map.empty[Int, Int], numClasses = 2)
-    testEstimatorAndModelReadWrite(
-        dt, continuousData, allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(dt,
+                                   continuousData,
+                                   allParamSettings,
+                                   checkModelData)
 
     // Continuous splits with tree depth 0
     testEstimatorAndModelReadWrite(dt,

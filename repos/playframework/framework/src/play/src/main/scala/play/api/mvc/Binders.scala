@@ -75,8 +75,8 @@ trait QueryStringBindable[A] { self =>
     * @return `None` if the parameter was not present in the query string data. Otherwise, returns `Some` of either
     * `Right` of the parameter value, or `Left` of an error message if the binding failed.
     */
-  def bind(
-      key: String, params: Map[String, Seq[String]]): Option[Either[String, A]]
+  def bind(key: String,
+           params: Map[String, Seq[String]]): Option[Either[String, A]]
 
   /**
     * Unbind a query string parameter.
@@ -344,7 +344,10 @@ object QueryStringBindable {
     */
   implicit def bindableString = new QueryStringBindable[String] {
     def bind(key: String, params: Map[String, Seq[String]]) =
-      params.get(key).flatMap(_.headOption).map(Right(_)) // No need to URL decode from query string since netty already does that
+      params
+        .get(key)
+        .flatMap(_.headOption)
+        .map(Right(_)) // No need to URL decode from query string since netty already does that
     // Use an option here in case users call index(null) in the routes -- see #818
     def unbind(key: String, value: String) =
       key + "=" + URLEncoder.encode(Option(value).getOrElse(""), "utf-8")
@@ -473,7 +476,7 @@ object QueryStringBindable {
   /**
     * QueryString binder for Option.
     */
-  implicit def bindableOption[T : QueryStringBindable] =
+  implicit def bindableOption[T: QueryStringBindable] =
     new QueryStringBindable[Option[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
@@ -494,8 +497,8 @@ object QueryStringBindable {
   /**
     * QueryString binder for Java Optional.
     */
-  implicit def bindableJavaOption[
-      T : QueryStringBindable]: QueryStringBindable[Optional[T]] =
+  implicit def bindableJavaOption[T: QueryStringBindable]
+    : QueryStringBindable[Optional[T]] =
     new QueryStringBindable[Optional[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
@@ -520,8 +523,8 @@ object QueryStringBindable {
   /**
     * QueryString binder for Seq
     */
-  implicit def bindableSeq[T : QueryStringBindable]: QueryStringBindable[
-      Seq[T]] = new QueryStringBindable[Seq[T]] {
+  implicit def bindableSeq[T: QueryStringBindable]
+    : QueryStringBindable[Seq[T]] = new QueryStringBindable[Seq[T]] {
     def bind(key: String, params: Map[String, Seq[String]]) =
       bindSeq[T](key, params)
     def unbind(key: String, values: Seq[T]) = unbindSeq(key, values)
@@ -532,33 +535,36 @@ object QueryStringBindable {
   /**
     * QueryString binder for List
     */
-  implicit def bindableList[T : QueryStringBindable]: QueryStringBindable[
-      List[T]] =
+  implicit def bindableList[T: QueryStringBindable]
+    : QueryStringBindable[List[T]] =
     bindableSeq[T].transform(_.toList, _.toSeq)
 
   /**
     * QueryString binder for java.util.List
     */
-  implicit def bindableJavaList[T : QueryStringBindable]: QueryStringBindable[
-      java.util.List[T]] = new QueryStringBindable[java.util.List[T]] {
-    def bind(key: String, params: Map[String, Seq[String]]) =
-      bindSeq[T](key, params).map(_.right.map(_.asJava))
-    def unbind(key: String, values: java.util.List[T]) =
-      unbindSeq(key, values.asScala)
-    override def javascriptUnbind =
-      javascriptUnbindSeq(implicitly[QueryStringBindable[T]].javascriptUnbind)
-  }
+  implicit def bindableJavaList[T: QueryStringBindable]
+    : QueryStringBindable[java.util.List[T]] =
+    new QueryStringBindable[java.util.List[T]] {
+      def bind(key: String, params: Map[String, Seq[String]]) =
+        bindSeq[T](key, params).map(_.right.map(_.asJava))
+      def unbind(key: String, values: java.util.List[T]) =
+        unbindSeq(key, values.asScala)
+      override def javascriptUnbind =
+        javascriptUnbindSeq(
+            implicitly[QueryStringBindable[T]].javascriptUnbind)
+    }
 
-  private def bindSeq[T : QueryStringBindable](
+  private def bindSeq[T: QueryStringBindable](
       key: String,
       params: Map[String, Seq[String]]): Option[Either[String, Seq[T]]] = {
     @tailrec
-    def collectResults(
-        values: List[String], results: List[T]): Either[String, Seq[T]] = {
+    def collectResults(values: List[String],
+                       results: List[T]): Either[String, Seq[T]] = {
       values match {
         case Nil => Right(results.reverse) // to preserve the original order
         case head :: rest =>
-          implicitly[QueryStringBindable[T]].bind(key, Map(key -> Seq(head))) match {
+          implicitly[QueryStringBindable[T]]
+            .bind(key, Map(key -> Seq(head))) match {
             case None => collectResults(rest, results)
             case Some(Right(result)) => collectResults(rest, result :: results)
             case Some(Left(err)) => collectErrs(rest, err :: Nil)
@@ -567,12 +573,13 @@ object QueryStringBindable {
     }
 
     @tailrec
-    def collectErrs(
-        values: List[String], errs: List[String]): Left[String, Seq[T]] = {
+    def collectErrs(values: List[String],
+                    errs: List[String]): Left[String, Seq[T]] = {
       values match {
         case Nil => Left(errs.reverse.mkString("\n"))
         case head :: rest =>
-          implicitly[QueryStringBindable[T]].bind(key, Map(key -> Seq(head))) match {
+          implicitly[QueryStringBindable[T]]
+            .bind(key, Map(key -> Seq(head))) match {
             case Some(Left(err)) => collectErrs(rest, err :: errs)
             case Some(Right(_)) | None => collectErrs(rest, errs)
           }
@@ -585,8 +592,9 @@ object QueryStringBindable {
     }
   }
 
-  private def unbindSeq[T : QueryStringBindable](
-      key: String, values: Iterable[T]): String = {
+  private def unbindSeq[T: QueryStringBindable](
+      key: String,
+      values: Iterable[T]): String = {
     (for (value <- values) yield {
       implicitly[QueryStringBindable[T]].unbind(key, value)
     }).mkString("&")
@@ -594,7 +602,7 @@ object QueryStringBindable {
 
   private def javascriptUnbindSeq(jsUnbindT: String) =
     "function(k,vs){var l=vs&&vs.length,r=[],i=0;for(;i<l;i++){r[i]=(" +
-    jsUnbindT + ")(k,vs[i])}return r.join('&')}"
+      jsUnbindT + ")(k,vs[i])}return r.join('&')}"
 
   /**
     * QueryString binder for QueryStringBindable.

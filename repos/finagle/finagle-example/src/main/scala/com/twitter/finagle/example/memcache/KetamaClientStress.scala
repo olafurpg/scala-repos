@@ -71,8 +71,8 @@ object KetamaClientStress extends App {
         PartitionedClient
           .parseHostPortWeights(hosts)
           .map {
-        case (host, port, weight) => new CacheNode(host, port, weight)
-      }
+            case (host, port, weight) => new CacheNode(host, port, weight)
+          }
           .toSet)
   }
 
@@ -126,35 +126,35 @@ object KetamaClientStress extends App {
               val (key, value) = nextKeyValue
               ketamaClient.set(key, value)
             }
-          case "getHit" =>
+        case "getHit" =>
           keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.get(key)
             }
-          case "getMiss" =>
+        case "getMiss" =>
           keyValueSet foreach { case (k, _) => ketamaClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.get(key)
             }
-          case "gets" =>
+        case "gets" =>
           keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.gets(key)
             }
-          case "getsMiss" =>
+        case "getsMiss" =>
           keyValueSet foreach { case (k, _) => ketamaClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.gets(key)
             }
-          case "getsThenCas" =>
+        case "getsThenCas" =>
           keyValueSet.map { case (k, v) => ketamaClient.set(k, v)() }
           val casMap = mutable.Map.empty[String, (Buf, Buf)]
 
@@ -170,13 +170,13 @@ object KetamaClientStress extends App {
                   }
               }
             }
-          case "add" =>
+        case "add" =>
           val (key, value) = (randomString(config.keysize()),
                               Buf.Utf8(randomString(config.valuesize())))
           () =>
-            ketamaClient.add(
-                key + load_count.getAndIncrement().toString, value)
-          case "replace" =>
+            ketamaClient
+              .add(key + load_count.getAndIncrement().toString, value)
+        case "replace" =>
           keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
@@ -200,35 +200,35 @@ object KetamaClientStress extends App {
               val (key, value) = nextKeyValue
               replicationClient.set(key, value)
             }
-          case "getAllHit" =>
+        case "getAllHit" =>
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getAll(key)
             }
-          case "getAllMiss" =>
+        case "getAllMiss" =>
           keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getAll(key)
             }
-          case "getOneHit" =>
+        case "getOneHit" =>
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getOne(key, false)
             }
-          case "getOneMiss" =>
+        case "getOneMiss" =>
           keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getOne(key, false)
             }
-          case "getSetMix" =>
+        case "getSetMix" =>
           assert(config.rwRatio() >= 0 && config.rwRatio() < 100)
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
@@ -239,24 +239,25 @@ object KetamaClientStress extends App {
                 replicationClient.set(key, value)
               else replicationClient.getOne(key, false)
             }
-          case "getsAll" =>
+        case "getsAll" =>
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getsAll(key)
             }
-          case "getsAllMiss" =>
+        case "getsAllMiss" =>
           keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getsAll(key)
             }
-          case "getsAllThenCas" =>
+        case "getsAllThenCas" =>
           keyValueSet.map { case (k, v) => replicationClient.set(k, v)() }
           val casMap: scala.collection.mutable.Map[
-              String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
+              String,
+              ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
             scala.collection.mutable.Map()
 
           () =>
@@ -279,15 +280,15 @@ object KetamaClientStress extends App {
                   replicationClient.getsAll(key).map { casMap(key) = _ }
               }
             }
-          case "add" =>
+        case "add" =>
           val (key, value) = (randomString(config.keysize()),
                               Buf.Utf8(randomString(config.valuesize())))
           () =>
             {
-              replicationClient.add(
-                  key + load_count.getAndIncrement().toString, value)
+              replicationClient
+                .add(key + load_count.getAndIncrement().toString, value)
             }
-          case "replace" =>
+        case "replace" =>
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {

@@ -15,7 +15,12 @@ import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{GroupManager, PathId}
-import mesosphere.marathon.{UnknownGroupException, MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  UnknownGroupException,
+  MarathonConf,
+  MarathonSchedulerService,
+  UnknownAppException
+}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
@@ -56,7 +61,8 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
           val maybeGroup = result(groupManager.group(groupPath))
           withAuthorization(ViewGroup, maybeGroup, unknownGroup(groupPath)) {
             group =>
-              ok(jsonObjString(
+              ok(
+                  jsonObjString(
                       "tasks" -> runningTasks(group.transitiveApps.map(_.id))))
           }
         case _ =>
@@ -127,8 +133,8 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
         deploymentResult(result(deploymentF))
       } else {
         reqToResponse(taskKiller.kill(pathId, findToKill)) { tasks =>
-          tasks.headOption.fold(unknownTask(id))(
-              task => ok(jsonObjString("task" -> task)))
+          tasks.headOption.fold(unknownTask(id))(task =>
+            ok(jsonObjString("task" -> task)))
         }
       }
   }

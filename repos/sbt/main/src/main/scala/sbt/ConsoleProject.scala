@@ -7,7 +7,11 @@ import sbt.util.Logger
 import java.io.File
 import sbt.librarymanagement.Resolver
 import sbt.internal.librarymanagement.{InlineIvyConfiguration, IvyPaths}
-import sbt.internal.inc.{AnalyzingCompiler, ClasspathOptions, IncrementalCompilerImpl}
+import sbt.internal.inc.{
+  AnalyzingCompiler,
+  ClasspathOptions,
+  IncrementalCompilerImpl
+}
 
 object ConsoleProject {
   def apply(state: State,
@@ -18,13 +22,13 @@ object ConsoleProject {
     val cpImports = new Imports(extracted, state)
     val bindings =
       ("currentState" -> state) :: ("extracted" -> extracted) ::
-      ("cpHelpers" -> cpImports) :: Nil
+        ("cpHelpers" -> cpImports) :: Nil
     val unit = extracted.currentUnit
     val localOnly = false
     val lock = None
     val checksums = Nil
-    val ivyPaths = new IvyPaths(
-        unit.unit.localBase, bootIvyHome(state.configuration))
+    val ivyPaths =
+      new IvyPaths(unit.unit.localBase, bootIvyHome(state.configuration))
     val ivyConfiguration = new InlineIvyConfiguration(
         ivyPaths,
         Resolver.withDefaultResolvers(Nil),
@@ -37,7 +41,8 @@ object ConsoleProject {
         log)
     val compiler: AnalyzingCompiler =
       Compiler.compilers(ClasspathOptions.repl, ivyConfiguration)(
-          state.configuration, log) match {
+          state.configuration,
+          log) match {
         case IncrementalCompilerImpl.Compilers(scalac, _) => scalac
       }
     val imports =
@@ -55,14 +60,14 @@ object ConsoleProject {
   }
 
   /** Conveniences for consoleProject that shouldn't normally be used for builds. */
-  final class Imports private[sbt](extracted: Extracted, state: State) {
+  final class Imports private[sbt] (extracted: Extracted, state: State) {
     import extracted._
     implicit def taskKeyEvaluate[T](t: TaskKey[T]): Evaluate[T] =
       new Evaluate(runTask(t, state)._2)
     implicit def settingKeyEvaluate[T](s: SettingKey[T]): Evaluate[T] =
       new Evaluate(get(s))
   }
-  final class Evaluate[T] private[sbt](val eval: T)
+  final class Evaluate[T] private[sbt] (val eval: T)
   private def bootIvyHome(app: xsbti.AppConfiguration): Option[File] =
     try { Option(app.provider.scalaProvider.launcher.ivyHome) } catch {
       case _: NoSuchMethodError => None

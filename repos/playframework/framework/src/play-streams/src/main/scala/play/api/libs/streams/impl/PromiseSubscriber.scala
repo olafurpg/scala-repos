@@ -69,7 +69,8 @@ private[streams] class PromiseSubscriber[T](prom: Promise[T])
 
   override def onComplete(): Unit = exclusive {
     case AwaitingSubscription | Subscribed =>
-      prom.failure(new IllegalStateException(
+      prom.failure(
+          new IllegalStateException(
               "Can't handle onComplete until an element has been received"))
       state = Completed
     case Completed =>

@@ -18,8 +18,8 @@ import com.twitter.finagle.Addr
   * [[com.twitter.finagle.addr.WeightedAddress]], which pertains to load balancing.
   * @param key An optional unique identifier for the cache node (e.g.  shard ID).
   */
-private[cacheresolver] case class CacheNodeMetadata(
-    weight: Int, key: Option[String])
+private[cacheresolver] case class CacheNodeMetadata(weight: Int,
+                                                    key: Option[String])
 
 private[cacheresolver] object CacheNodeMetadata {
   private val key = "cache_node_metadata"

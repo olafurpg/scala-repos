@@ -48,7 +48,8 @@ abstract class Origins {
   private def total = origins.values.foldLeft(0L)(_ + _)
 
   // Create a stack and whittle it down to the interesting part.
-  def readStack(): Array[StackTraceElement] = (Thread.currentThread.getStackTrace dropWhile
+  def readStack(): Array[StackTraceElement] =
+    (Thread.currentThread.getStackTrace dropWhile
       (x => !isCutoff(x)) dropWhile isCutoff drop 1)
 
   def apply[T](body: => T): T = {
@@ -79,7 +80,8 @@ object Origins {
   }
 
   case class OriginId(className: String, methodName: String) {
-    def matches(el: StackTraceElement) = ((methodName == el.getMethodName) &&
+    def matches(el: StackTraceElement) =
+      ((methodName == el.getMethodName) &&
         (className startsWith el.getClassName))
   }
 
@@ -92,7 +94,7 @@ object Origins {
 
   private def preCutoff(el: StackTraceElement) =
     ((el.getClassName == thisClass) ||
-        (el.getClassName startsWith "java.lang."))
+      (el.getClassName startsWith "java.lang."))
   private def findCutoff() = {
     val cutoff = (Thread.currentThread.getStackTrace dropWhile preCutoff).head
     OriginId(cutoff.getClassName, cutoff.getMethodName)

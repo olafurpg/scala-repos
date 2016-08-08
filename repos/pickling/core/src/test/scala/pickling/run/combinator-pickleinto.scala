@@ -39,14 +39,13 @@ class CombinatorPickleIntoTest extends FunSuite {
         def pickle(p: Person, builder: PBuilder): Unit = {
           // let's say we only want to pickle id, since we can look up name and age based on id
           // then we can make use of a size hint, so that a fixed-size array can be used for pickling
-          builder.hintKnownSize(100) // FIXME: if the value is too small, we can get java.lang.ArrayIndexOutOfBoundsException
+          builder
+            .hintKnownSize(100) // FIXME: if the value is too small, we can get java.lang.ArrayIndexOutOfBoundsException
           builder.beginEntry(p, implicitly[FastTypeTag[Person]])
-          builder.putField("id",
-                           b =>
-                             {
-                               b.hintElidedType(FastTypeTag.Int)
-                               intp.pickle(p.id, b)
-                           })
+          builder.putField("id", b => {
+            b.hintElidedType(FastTypeTag.Int)
+            intp.pickle(p.id, b)
+          })
           builder.endEntry()
         }
       }

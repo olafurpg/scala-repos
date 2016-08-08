@@ -23,13 +23,17 @@ import scala.util.{Failure, Success, Try}
  * https://github.com/ensime/ensime-server/issues/834
  */
 
-case class SwankRPCFormatException(
-    msg: String, callId: Int, cause: Throwable = null)
+case class SwankRPCFormatException(msg: String,
+                                   callId: Int,
+                                   cause: Throwable = null)
     extends Exception(msg, cause)
 
 object SwankProtocolConversions
-    extends DefaultSexpProtocol with SymbolAltFormat with OptionAltFormat
-    with FamilyFormats with CamelCaseToDashes {
+    extends DefaultSexpProtocol
+    with SymbolAltFormat
+    with OptionAltFormat
+    with FamilyFormats
+    with CamelCaseToDashes {
   override def skipNilValues: Boolean = true
 }
 
@@ -132,15 +136,15 @@ object SwankProtocolCommon {
 
   implicit val DebugThreadIdFormat: SexpFormat[DebugThreadId] = viaString(
       new ViaString[DebugThreadId] {
-    def toSexpString(id: DebugThreadId) = id.id.toString
-    def fromSexpString(s: String) = DebugThreadId(s)
-  })
+        def toSexpString(id: DebugThreadId) = id.id.toString
+        def fromSexpString(s: String) = DebugThreadId(s)
+      })
 
   implicit val DebugObjectIdFormat: SexpFormat[DebugObjectId] = viaString(
       new ViaString[DebugObjectId] {
-    def toSexpString(id: DebugObjectId) = id.id.toString
-    def fromSexpString(s: String) = DebugObjectId(s)
-  })
+        def toSexpString(id: DebugObjectId) = id.id.toString
+        def fromSexpString(s: String) = DebugObjectId(s)
+      })
 
   implicit val DebugObjectReferenceHint =
     TypeHint[DebugObjectReference](SexpSymbol("reference"))
@@ -640,8 +644,9 @@ object SwankProtocolResponse {
       case RpcResponseEnvelope(Some(callId), EnsimeServerError(detail)) =>
         SexpList(
             SexpSymbol(":return"),
-            SexpList(
-                SexpSymbol(":abort"), SexpNumber(666), SexpString(detail)),
+            SexpList(SexpSymbol(":abort"),
+                     SexpNumber(666),
+                     SexpString(detail)),
             SexpNumber(callId)
         )
       case RpcResponseEnvelope(Some(callId), payload) =>
@@ -777,8 +782,8 @@ object SwankProtocolRequest {
   // higher priority than labelledProductFormat, so SexpFormat[T]
   // should pick up on this instead, also private so we don't
   // accidentally export it.
-  private implicit def tupledProductFormat[
-      T <: RpcRequest, R <: shapeless.HList](
+  private implicit def tupledProductFormat[T <: RpcRequest,
+                                           R <: shapeless.HList](
       implicit g: shapeless.Generic.Aux[T, R],
       r: HListFormat[R]
   ): SexpFormat[T] = new SexpFormat[T] {
@@ -840,8 +845,10 @@ object SwankProtocolRequest {
               (Loc.NewName, SexpString(newName)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            RenameRefactorDesc(
-                newName, File(f).canon, start.intValue, end.intValue)
+            RenameRefactorDesc(newName,
+                               File(f).canon,
+                               start.intValue,
+                               end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -849,8 +856,10 @@ object SwankProtocolRequest {
               (Loc.MethodName, SexpString(methodName)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            ExtractMethodRefactorDesc(
-                methodName, File(f).canon, start.intValue, end.intValue)
+            ExtractMethodRefactorDesc(methodName,
+                                      File(f).canon,
+                                      start.intValue,
+                                      end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -858,16 +867,19 @@ object SwankProtocolRequest {
               (Loc.Name, SexpString(name)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            ExtractLocalRefactorDesc(
-                name, File(f).canon, start.intValue, end.intValue)
+            ExtractLocalRefactorDesc(name,
+                                     File(f).canon,
+                                     start.intValue,
+                                     end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
               (Loc.File, SexpString(f)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            InlineLocalRefactorDesc(
-                File(f).canon, start.intValue, end.intValue)
+            InlineLocalRefactorDesc(File(f).canon,
+                                    start.intValue,
+                                    end.intValue)
 
           case List(
               (Loc.File, SexpString(f))
@@ -1056,7 +1068,9 @@ object SwankProtocolRequest {
             // we failed to parse to a valid s, but we have a call id - so we
             // should return an rpc abort rather than :reader-error as emacs tends to bork.
             throw new SwankRPCFormatException(
-                s"Invalid rpc request ${form.compactPrint}", callId, ex)
+                s"Invalid rpc request ${form.compactPrint}",
+                callId,
+                ex)
         }
 
       case _ => deserializationError(sexp)

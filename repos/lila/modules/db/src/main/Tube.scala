@@ -20,8 +20,8 @@ case class BsTube[Doc](handler: BSONHandler[BSONDocument, Doc])
   def read(bson: BSONDocument): Option[Doc] = handler readTry bson match {
     case Success(doc) => Some(doc)
     case Failure(err) =>
-      logger.error(
-          s"[tube] Cannot read ${lila.db.BSON.debug(bson)}\n$err\n", err)
+      logger
+        .error(s"[tube] Cannot read ${lila.db.BSON.debug(bson)}\n$err\n", err)
       None
   }
 
@@ -34,7 +34,9 @@ case class BsTube[Doc](handler: BSONHandler[BSONDocument, Doc])
 case class JsTube[Doc](reader: Reads[Doc],
                        writer: Writes[Doc],
                        flags: Seq[JsTube.Flag.type => JsTube.Flag] = Seq.empty)
-    extends Tube[Doc] with Reads[Doc] with Writes[Doc] {
+    extends Tube[Doc]
+    with Reads[Doc]
+    with Writes[Doc] {
 
   import play.modules.reactivemongo.json._
 
@@ -73,7 +75,7 @@ case class JsTube[Doc](reader: Reads[Doc],
   def inColl(c: Coll): JsTubeInColl[Doc] =
     new JsTube[Doc](reader, writer, flags) with InColl[Doc] { def coll = c }
 
-  private lazy val flagSet = flags.map(_ (JsTube.Flag)).toSet
+  private lazy val flagSet = flags.map(_(JsTube.Flag)).toSet
 
   private def flag[A](f: JsTube.Flag.type => JsTube.Flag)(x: => A, y: => A) =
     flagSet contains f(JsTube.Flag) fold (x, y)
@@ -104,8 +106,7 @@ object JsTube {
     // Explodes on failure
     implicit final class LilaTubePimpedWrites[A](writes: Writes[A]) {
       def andThen(transformer: Reads[JsObject]): Writes[A] =
-        writes.transform(
-            Writes[JsValue] { origin =>
+        writes.transform(Writes[JsValue] { origin =>
           origin transform transformer match {
             case err: JsError =>
               throw LilaException(
@@ -117,7 +118,7 @@ object JsTube {
 
     def rename(from: Symbol, to: Symbol) =
       __.json update ((__ \ to).json copyFrom (__ \ from).json.pick) andThen
-      (__ \ from).json.prune
+        (__ \ from).json.prune
 
     def readDate(field: Symbol) =
       (__ \ field).json.update(of[JsObject] map { o =>

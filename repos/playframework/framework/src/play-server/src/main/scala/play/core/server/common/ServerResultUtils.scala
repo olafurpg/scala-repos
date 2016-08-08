@@ -15,8 +15,8 @@ object ServerResultUtils {
   /**
     * Determine whether the connection should be closed, and what header, if any, should be added to the response.
     */
-  def determineConnectionHeader(
-      request: RequestHeader, result: Result): ConnectionHeader = {
+  def determineConnectionHeader(request: RequestHeader,
+                                result: Result): ConnectionHeader = {
     if (request.version == HttpProtocol.HTTP_1_1) {
       if (result.header.headers
             .get(CONNECTION)
@@ -24,7 +24,7 @@ object ServerResultUtils {
         // Close connection, header already exists
         DefaultClose
       } else if ((result.body.isInstanceOf[HttpEntity.Streamed] &&
-                     result.body.contentLength.isEmpty) || request.headers
+                 result.body.contentLength.isEmpty) || request.headers
                    .get(CONNECTION)
                    .exists(_.equalsIgnoreCase(CLOSE))) {
         // We need to close the connection and set the header
@@ -38,7 +38,7 @@ object ServerResultUtils {
             .exists(_.equalsIgnoreCase(CLOSE))) {
         DefaultClose
       } else if ((result.body.isInstanceOf[HttpEntity.Streamed] &&
-                     result.body.contentLength.isEmpty) || request.headers
+                 result.body.contentLength.isEmpty) || request.headers
                    .get(CONNECTION)
                    .forall(!_.equalsIgnoreCase(KEEP_ALIVE))) {
         DefaultClose

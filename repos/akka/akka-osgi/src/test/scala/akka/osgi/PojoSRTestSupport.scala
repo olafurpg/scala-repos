@@ -3,7 +3,11 @@
   */
 package akka.osgi
 
-import de.kalpatec.pojosr.framework.launch.{BundleDescriptor, PojoServiceRegistryFactory, ClasspathScanner}
+import de.kalpatec.pojosr.framework.launch.{
+  BundleDescriptor,
+  PojoServiceRegistryFactory,
+  ClasspathScanner
+}
 
 import scala.collection.JavaConversions.seqAsJavaList
 import org.apache.commons.io.IOUtils.copy
@@ -83,8 +87,8 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
   def awaitReference[T](serviceType: Class[T]): ServiceReference[T] =
     awaitReference(serviceType, SleepyTime)
 
-  def awaitReference[T](
-      serviceType: Class[T], wait: FiniteDuration): ServiceReference[T] = {
+  def awaitReference[T](serviceType: Class[T],
+                        wait: FiniteDuration): ServiceReference[T] = {
 
     @tailrec
     def poll(step: Duration, deadline: Deadline): ServiceReference[T] =
@@ -109,7 +113,8 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
     builders map (_.build)
 
   def filterErrors()(block: ⇒ Unit): Unit =
-    try block catch {
+    try block
+    catch {
       case e: Throwable ⇒
         System.err.write(bufferedLoadingErrors.toByteArray); throw e
     }
@@ -172,8 +177,8 @@ class BundleDescriptorBuilder(name: String) {
     val headers = new HashMap[String, String]()
     val jis = new JarInputStream(new FileInputStream(file))
     try {
-      for (entry ← jis.getManifest.getMainAttributes.entrySet.asScala) headers
-        .put(entry.getKey.toString, entry.getValue.toString)
+      for (entry ← jis.getManifest.getMainAttributes.entrySet.asScala)
+        headers.put(entry.getKey.toString, entry.getValue.toString)
     } finally jis.close()
 
     headers
@@ -182,7 +187,8 @@ class BundleDescriptorBuilder(name: String) {
   def tinybundleToJarFile(name: String): File = {
     val file = new File("target/%s-%tQ.jar".format(name, new Date()))
     val fos = new FileOutputStream(file)
-    try copy(tinybundle.build(), fos) finally fos.close()
+    try copy(tinybundle.build(), fos)
+    finally fos.close()
 
     file
   }

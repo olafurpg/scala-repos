@@ -55,8 +55,8 @@ private class PartitionIdPassthrough(override val numPartitions: Int)
   *   parent with 5 partitions, and partitionStartIndices is [0, 2, 4], we get three output
   *   partitions, corresponding to partition ranges [0, 1], [2, 3] and [4] of the parent partitioner.
   */
-class CoalescedPartitioner(
-    val parent: Partitioner, val partitionStartIndices: Array[Int])
+class CoalescedPartitioner(val parent: Partitioner,
+                           val partitionStartIndices: Array[Int])
     extends Partitioner {
 
   @transient private lazy val parentPartitionMapping: Array[Int] = {
@@ -83,7 +83,7 @@ class CoalescedPartitioner(
   override def equals(other: Any): Boolean = other match {
     case c: CoalescedPartitioner =>
       c.parent == parent &&
-      Arrays.equals(c.partitionStartIndices, partitionStartIndices)
+        Arrays.equals(c.partitionStartIndices, partitionStartIndices)
     case _ =>
       false
   }
@@ -135,8 +135,8 @@ class ShuffledRowRDD(
         (0 until numPreShufflePartitions).toArray
     }
 
-  private[this] val part: Partitioner = new CoalescedPartitioner(
-      dependency.partitioner, partitionStartIndices)
+  private[this] val part: Partitioner =
+    new CoalescedPartitioner(dependency.partitioner, partitionStartIndices)
 
   override def getDependencies: Seq[Dependency[_]] = List(dependency)
 
@@ -163,8 +163,8 @@ class ShuffledRowRDD(
     tracker.getPreferredLocationsForShuffle(dep, partition.index)
   }
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[InternalRow] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[InternalRow] = {
     val shuffledRowPartition = split.asInstanceOf[ShuffledRowRDDPartition]
     // The range of pre-shuffle partitions that we are fetching at here is
     // [startPreShufflePartitionIndex, endPreShufflePartitionIndex - 1].

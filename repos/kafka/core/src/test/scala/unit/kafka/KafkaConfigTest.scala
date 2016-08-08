@@ -61,23 +61,26 @@ class KafkaTest {
     assertEquals(1, config1.brokerId)
 
     // We should be able to override given property on command line
-    val config2 = KafkaConfig.fromProps(Kafka.getPropsFromArgs(
+    val config2 = KafkaConfig.fromProps(
+        Kafka.getPropsFromArgs(
             Array(propertiesFile, "--override", "broker.id=2")))
     assertEquals(2, config2.brokerId)
 
     // We should be also able to set completely new property
-    val config3 = KafkaConfig.fromProps(Kafka.getPropsFromArgs(
+    val config3 = KafkaConfig.fromProps(
+        Kafka.getPropsFromArgs(
             Array(propertiesFile, "--override", "log.cleanup.policy=compact")))
     assertEquals(1, config3.brokerId)
     assertEquals("compact", config3.logCleanupPolicy)
 
     // We should be also able to set several properties
     val config4 = KafkaConfig.fromProps(
-        Kafka.getPropsFromArgs(Array(propertiesFile,
-                                     "--override",
-                                     "log.cleanup.policy=compact",
-                                     "--override",
-                                     "broker.id=2")))
+        Kafka.getPropsFromArgs(
+            Array(propertiesFile,
+                  "--override",
+                  "log.cleanup.policy=compact",
+                  "--override",
+                  "broker.id=2")))
     assertEquals(2, config4.brokerId)
     assertEquals("compact", config4.logCleanupPolicy)
   }
@@ -92,21 +95,24 @@ class KafkaTest {
   @Test(expected = classOf[ExitCalled])
   def testGetKafkaConfigFromArgsNonArgsAtTheEnd(): Unit = {
     val propertiesFile = prepareDefaultConfig()
-    KafkaConfig.fromProps(Kafka.getPropsFromArgs(
+    KafkaConfig.fromProps(
+        Kafka.getPropsFromArgs(
             Array(propertiesFile, "--override", "broker.id=1", "broker.id=2")))
   }
 
   @Test(expected = classOf[ExitCalled])
   def testGetKafkaConfigFromArgsNonArgsOnly(): Unit = {
     val propertiesFile = prepareDefaultConfig()
-    KafkaConfig.fromProps(Kafka.getPropsFromArgs(
+    KafkaConfig.fromProps(
+        Kafka.getPropsFromArgs(
             Array(propertiesFile, "broker.id=1", "broker.id=2")))
   }
 
   @Test(expected = classOf[ExitCalled])
   def testGetKafkaConfigFromArgsNonArgsAtTheBegging(): Unit = {
     val propertiesFile = prepareDefaultConfig()
-    KafkaConfig.fromProps(Kafka.getPropsFromArgs(
+    KafkaConfig.fromProps(
+        Kafka.getPropsFromArgs(
             Array(propertiesFile, "broker.id=1", "--override", "broker.id=2")))
   }
 

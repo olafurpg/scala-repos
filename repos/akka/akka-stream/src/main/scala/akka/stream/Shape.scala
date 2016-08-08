@@ -247,8 +247,8 @@ object ClosedShape extends ClosedShape {
   * implementation of the [[Graph]] builders and typically replaced by a more
   * meaningful type of Shape when the building is finished.
   */
-case class AmorphousShape(
-    inlets: immutable.Seq[Inlet[_]], outlets: immutable.Seq[Outlet[_]])
+case class AmorphousShape(inlets: immutable.Seq[Inlet[_]],
+                          outlets: immutable.Seq[Outlet[_]])
     extends Shape {
   override def deepCopy() =
     AmorphousShape(inlets.map(_.carbonCopy()), outlets.map(_.carbonCopy()))
@@ -290,8 +290,8 @@ object SourceShape {
   * outside like a pipe (but it can be a complex topology of streams within of
   * course).
   */
-final case class FlowShape[-I, +O](
-    in: Inlet[I @uncheckedVariance], out: Outlet[O @uncheckedVariance])
+final case class FlowShape[-I, +O](in: Inlet[I @uncheckedVariance],
+                                   out: Outlet[O @uncheckedVariance])
     extends Shape {
   override val inlets: immutable.Seq[Inlet[_]] = List(in)
   override val outlets: immutable.Seq[Outlet[_]] = List(out)

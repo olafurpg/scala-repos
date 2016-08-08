@@ -56,8 +56,14 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * are considered part of Spark's public api.
   */
 class HistoryServerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with MockitoSugar
-    with JsonTestUtils with Eventually with WebBrowser with LocalSparkContext
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with MockitoSugar
+    with JsonTestUtils
+    with Eventually
+    with WebBrowser
+    with LocalSparkContext
     with ResetSystemProperties {
 
   private val logDir = new File("src/test/resources/spark-events")
@@ -160,10 +166,11 @@ class HistoryServerSuite
             jsonOrg
           }
 
-        val exp = IOUtils.toString(new FileInputStream(
+        val exp = IOUtils.toString(
+            new FileInputStream(
                 new File(expRoot,
                          HistoryServerSuite.sanitizePath(name) +
-                         "_expectation.json")))
+                           "_expectation.json")))
         // compare the ASTs so formatting differences don't cause failures
         import org.json4s._
         import org.json4s.jackson.JsonMethods._
@@ -214,8 +221,8 @@ class HistoryServerSuite
           new File(logDir, entry.getName)
         }
         val expected = Files.toString(expectedFile, StandardCharsets.UTF_8)
-        val actual = new String(
-            ByteStreams.toByteArray(zipStream), StandardCharsets.UTF_8)
+        val actual = new String(ByteStreams.toByteArray(zipStream),
+                                StandardCharsets.UTF_8)
         actual should be(expected)
         filesCompared += 1
       }
@@ -250,7 +257,7 @@ class HistoryServerSuite
     badQuantiles._1 should be(HttpServletResponse.SC_BAD_REQUEST)
     badQuantiles._3 should be(
         Some("Bad value for parameter \"quantiles\".  Expected a double, " +
-            "got \"foo\""))
+          "got \"foo\""))
 
     getContentAndCode("foobar")._1 should be(HttpServletResponse.SC_NOT_FOUND)
   }
@@ -265,8 +272,8 @@ class HistoryServerSuite
     // when
     System.setProperty("spark.ui.proxyBase", uiRoot)
     val response = page.render(request)
-    System.setProperty(
-        "spark.ui.proxyBase", Option(proxyBaseBeforeTest).getOrElse(""))
+    System.setProperty("spark.ui.proxyBase",
+                       Option(proxyBaseBeforeTest).getOrElse(""))
 
     // then
     val urls = response \\ "@href" map (_.toString)
@@ -303,8 +310,8 @@ class HistoryServerSuite
 
     def listDir(dir: Path): Seq[FileStatus] = {
       val statuses = fs.listStatus(dir)
-      statuses.flatMap(
-          stat => if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
+      statuses.flatMap(stat =>
+        if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
     }
 
     def dumpLogDir(msg: String = ""): Unit = {
@@ -330,8 +337,9 @@ class HistoryServerSuite
       val actual = counter.getCount
       if (actual != expected) {
         // this is here because Scalatest loses stack depth
-        fail(s"Wrong $name value - expected $expected but got $actual" +
-            s" in metrics\n$metrics")
+        fail(
+            s"Wrong $name value - expected $expected but got $actual" +
+              s" in metrics\n$metrics")
       }
     }
 
@@ -396,15 +404,14 @@ class HistoryServerSuite
         case JNothing => Seq()
         case apps: JArray =>
           apps
-            .filter(app =>
-                  {
-                (app \ "attempts") match {
-                  case attempts: JArray =>
-                    val state = (attempts.children.head \ "completed")
-                      .asInstanceOf[JBool]
-                    state.value == completed
-                  case _ => false
-                }
+            .filter(app => {
+              (app \ "attempts") match {
+                case attempts: JArray =>
+                  val state =
+                    (attempts.children.head \ "completed").asInstanceOf[JBool]
+                  state.value == completed
+                case _ => false
+              }
             })
             .map(app => (app \ "id").asInstanceOf[JString].values)
         case _ => Seq()
@@ -424,8 +431,8 @@ class HistoryServerSuite
     getNumJobs("") should be(1)
     getNumJobs("/jobs") should be(1)
     getNumJobsRestful() should be(1)
-    assert(
-        metrics.lookupCount.getCount > 1, s"lookup count too low in $metrics")
+    assert(metrics.lookupCount.getCount > 1,
+           s"lookup count too low in $metrics")
 
     // dump state before the next bit of test, which is where update
     // checking really gets stressed
@@ -498,7 +505,8 @@ class HistoryServerSuite
   def generateExpectation(name: String, path: String): Unit = {
     val json = getUrl(path)
     val file = new File(
-        expRoot, HistoryServerSuite.sanitizePath(name) + "_expectation.json")
+        expRoot,
+        HistoryServerSuite.sanitizePath(name) + "_expectation.json")
     val out = new FileWriter(file)
     out.write(json)
     out.close()
@@ -562,7 +570,7 @@ object HistoryServerSuite {
     } else {
       throw new RuntimeException(
           "got code: " + code + " when getting " + path + " w/ error: " +
-          error)
+            error)
     }
   }
 }

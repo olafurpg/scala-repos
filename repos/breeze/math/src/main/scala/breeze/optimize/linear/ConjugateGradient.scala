@@ -26,7 +26,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
   def minimize(a: T, B: M, initX: T): T =
     minimizeAndReturnResidual(a, B, initX)._1
 
-  case class State private[ConjugateGradient](
+  case class State private[ConjugateGradient] (
       x: T,
       residual: T,
       private[ConjugateGradient] val direction: T,
@@ -81,7 +81,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
 
           assert(!alphaNext.isNaN,
                  xtd + " " + normSquare + " " + xtx + "  " + xtd + " " +
-                 radius + " " + dtd)
+                   radius + " " + dtd)
           axpy(alphaNext, d, x)
           axpy(-alphaNext, Bd + (d :* normSquaredPenalty), r)
 

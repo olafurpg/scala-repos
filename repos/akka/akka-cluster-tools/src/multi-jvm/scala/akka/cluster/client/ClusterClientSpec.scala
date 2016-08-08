@@ -31,7 +31,8 @@ object ClusterClientSpec extends MultiNodeConfig {
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -71,7 +72,8 @@ class ClusterClientMultiJvmNode4 extends ClusterClientSpec
 class ClusterClientMultiJvmNode5 extends ClusterClientSpec
 
 class ClusterClientSpec
-    extends MultiNodeSpec(ClusterClientSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterClientSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ClusterClientSpec._
 
@@ -126,7 +128,7 @@ class ClusterClientSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client1")
         c ! ClusterClient.Send("/user/testService",
                                "hello",
@@ -167,7 +169,7 @@ class ClusterClientSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client")
         c ! ClusterClient.Send("/user/serviceA", "hello", localAffinity = true)
         c ! ClusterClient.SendToAll("/user/serviceB", "hi")
@@ -210,7 +212,7 @@ class ClusterClientSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client2")
 
         c ! ClusterClient.Send("/user/service2",
@@ -247,7 +249,7 @@ class ClusterClientSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client3")
 
         c ! ClusterClient.Send("/user/service2",
@@ -303,7 +305,7 @@ class ClusterClientSpec
         }
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(remainingContacts)),
+                           .withInitialContacts(remainingContacts)),
                          "client4")
 
         c ! ClusterClient.Send("/user/service2",
@@ -341,7 +343,7 @@ class ClusterClientSpec
         val sys2 = ActorSystem(system.name,
                                ConfigFactory
                                  .parseString("akka.remote.netty.tcp.port=" +
-                                     Cluster(system).selfAddress.port.get)
+                                   Cluster(system).selfAddress.port.get)
                                  .withFallback(system.settings.config))
         Cluster(sys2).join(Cluster(sys2).selfAddress)
         val service2 =

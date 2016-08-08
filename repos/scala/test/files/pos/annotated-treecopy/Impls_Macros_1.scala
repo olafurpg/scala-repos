@@ -12,7 +12,7 @@ object Macros {
 
   def tree[T, U](f: Function1[T, U]): Function1[T, U] = macro tree_impl[T, U]
 
-  def tree_impl[T : c.WeakTypeTag, U : c.WeakTypeTag](c: Context)(
+  def tree_impl[T: c.WeakTypeTag, U: c.WeakTypeTag](c: Context)(
       f: c.Expr[Function1[T, U]]): c.Expr[Function1[T, U]] = {
     import c.universe._
     import internal._
@@ -42,7 +42,7 @@ object Macros {
         val template = c.universe.reify(new (T => U) with TypedFunction {
           override def toString =
             c.Expr[String](q"""${tp + " => " + ttag.tpe +
-              " { " + b1.toString + " } "}""")
+                " { " + b1.toString + " } "}""")
               .splice // DEBUG
           def tree = reifiedExpr.splice.tree
           val typeIn = c.Expr[String](q"${tp.toString}").splice

@@ -22,7 +22,7 @@ import java.util.Properties
 // this class will be removed once we fully rolled out 0.9
 @deprecated(
     "This trait has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 trait BaseProducer {
   def send(topic: String, key: Array[Byte], value: Array[Byte])
@@ -31,7 +31,7 @@ trait BaseProducer {
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 class NewShinyProducer(producerProps: Properties) extends BaseProducer {
   import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
@@ -60,7 +60,7 @@ class NewShinyProducer(producerProps: Properties) extends BaseProducer {
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 class OldProducer(producerProps: Properties) extends BaseProducer {
 

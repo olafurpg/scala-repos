@@ -4,14 +4,26 @@ import _root_.java.io.ByteArrayOutputStream
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.ServerSet.EndpointStatus
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets,
+  ZooKeeperClient,
+  ZooKeeperUtils
+}
 import com.twitter.concurrent.Spool
 import com.twitter.concurrent.Spool.*::
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.{ClientBuilder, Cluster}
-import com.twitter.finagle.cacheresolver.{CachePoolConfig, CacheNode, CachePoolCluster}
+import com.twitter.finagle.cacheresolver.{
+  CachePoolConfig,
+  CacheNode,
+  CachePoolCluster
+}
 import com.twitter.finagle.memcached.protocol.text.Memcached
-import com.twitter.finagle.memcached.{Client, KetamaClientBuilder, PartitionedClient}
+import com.twitter.finagle.memcached.{
+  Client,
+  KetamaClientBuilder,
+  PartitionedClient
+}
 import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
 import com.twitter.finagle.{Name, Resolver}
 import com.twitter.io.Buf
@@ -24,7 +36,9 @@ import scala.collection.mutable
 
 @RunWith(classOf[JUnitRunner])
 class ClusterClientTest
-    extends FunSuite with BeforeAndAfter with Eventually
+    extends FunSuite
+    with BeforeAndAfter
+    with Eventually
     with IntegrationPatience {
 
   /**
@@ -57,8 +71,9 @@ class ClusterClientTest
 
     // create serverset
     val serverSet = boundedWait(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+                          zkPath)
     )
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
@@ -90,8 +105,9 @@ class ClusterClientTest
           ZooKeeperClient.digestCredentials("user", "pass"))
 
       // destination of the test cache endpoints
-      dest = Resolver.eval("twcache!localhost:" +
-          zookeeperServer.getPort.toString + "!" + zkPath)
+      dest = Resolver.eval(
+          "twcache!localhost:" +
+            zookeeperServer.getPort.toString + "!" + zkPath)
     }
   }
 
@@ -116,8 +132,10 @@ class ClusterClientTest
 
   test("Simple ClusterClient using finagle load balancing - many keys") {
     // create simple cluster client
-    val mycluster = new ZookeeperServerSetCluster(ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath))
+    val mycluster = new ZookeeperServerSetCluster(
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+                          zkPath))
     Await.result(mycluster.ready, TimeOut) // give it sometime for the cluster to get the initial set of memberships
     val client = Client(mycluster)
 
@@ -290,7 +308,8 @@ class ClusterClientTest
       // the cache pool cluster should pickup backup pools
       // the underlying pool will continue trying to connect to zk
       val myPool = initializePool(2,
-                                  Some(scala.collection.immutable.Set(
+                                  Some(
+                                      scala.collection.immutable.Set(
                                           new CacheNode("host1", 11211, 1),
                                           new CacheNode("host2", 11212, 1))))
 
@@ -324,7 +343,8 @@ class ClusterClientTest
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined) {
     test("Ketama ClusterClient using a distributor - set & get") {
       val client = KetamaClientBuilder()
-        .clientBuilder(ClientBuilder()
+        .clientBuilder(
+            ClientBuilder()
               .hostConnectionLimit(1)
               .codec(Memcached())
               .failFast(false))
@@ -343,7 +363,8 @@ class ClusterClientTest
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined) {
     test("Ketama ClusterClient using a distributor - many keys") {
       val client = KetamaClientBuilder()
-        .clientBuilder(ClientBuilder()
+        .clientBuilder(
+            ClientBuilder()
               .hostConnectionLimit(1)
               .codec(Memcached())
               .failFast(false))
@@ -373,22 +394,24 @@ class ClusterClientTest
   test("Ketama ClusterClient using a distributor - use custom keys") {
     // create my cluster client solely based on a zk client and a path
     val mycluster = CachePoolCluster.newZkCluster(zkPath, zookeeperClient)
-    mycluster.ready() // give it sometime for the cluster to get the initial set of memberships
+    mycluster
+      .ready() // give it sometime for the cluster to get the initial set of memberships
 
     val customKey = "key-"
     var shardId = -1
     val myClusterWithCustomKey =
       mycluster map {
         case node: CacheNode => {
-            shardId += 1
-            CacheNode(node.host,
-                      node.port,
-                      node.weight,
-                      Some(customKey + shardId.toString))
-          }
+          shardId += 1
+          CacheNode(node.host,
+                    node.port,
+                    node.weight,
+                    Some(customKey + shardId.toString))
+        }
       }
     val client = KetamaClientBuilder()
-      .clientBuilder(ClientBuilder()
+      .clientBuilder(
+          ClientBuilder()
             .hostConnectionLimit(1)
             .codec(Memcached())
             .failFast(false))
@@ -405,7 +428,8 @@ class ClusterClientTest
       val mycluster = initializePool(5)
 
       val client = KetamaClientBuilder()
-        .clientBuilder(ClientBuilder()
+        .clientBuilder(
+            ClientBuilder()
               .hostConnectionLimit(1)
               .codec(Memcached())
               .failFast(false))
@@ -514,7 +538,8 @@ class ClusterClientTest
       val mycluster = initializePool(5, ignoreConfigData = true)
 
       val client = KetamaClientBuilder()
-        .clientBuilder(ClientBuilder()
+        .clientBuilder(
+            ClientBuilder()
               .hostConnectionLimit(1)
               .codec(Memcached())
               .failFast(false))
@@ -580,8 +605,8 @@ class ClusterClientTest
   ): Cluster[CacheNode] = {
     val myCachePool =
       if (!ignoreConfigData)
-        CachePoolCluster.newZkCluster(
-            zkPath, zookeeperClient, backupPool = backupPool)
+        CachePoolCluster
+          .newZkCluster(zkPath, zookeeperClient, backupPool = backupPool)
       else CachePoolCluster.newUnmanagedZkCluster(zkPath, zookeeperClient)
 
     Await.result(myCachePool.ready, TimeOut) // wait until the pool is ready
@@ -644,7 +669,7 @@ class ClusterClientTest
 
   def trackCacheShards(client: PartitionedClient) =
     mutable.Set.empty[Client] ++
-    ((0 until 100).map { n =>
-          client.clientOf("foo" + n)
-        })
+      ((0 until 100).map { n =>
+        client.clientOf("foo" + n)
+      })
 }

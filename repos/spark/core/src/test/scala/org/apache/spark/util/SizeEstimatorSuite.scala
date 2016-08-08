@@ -67,7 +67,9 @@ class DummyClass8 extends KnownSizeEstimation {
 }
 
 class SizeEstimatorSuite
-    extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with PrivateMethodTester
     with ResetSystemProperties {
 
   override def beforeEach() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,8 @@ class ConversionTests {
       new HListSyntax[A, F](a)
 
     val res =
-      (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) => (s * i, d * i)) // Function argument types inferred
+      (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) =>
+                                           (s * i, d * i)) // Function argument types inferred
 
     assert((res: (String, Double)) == ("aa", 2.6))
   }

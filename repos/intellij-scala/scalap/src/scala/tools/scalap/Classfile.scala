@@ -41,8 +41,11 @@ class Classfile(in: ByteArrayReader) {
     var members: List[Member] = Nil
     var i = 0
     while (i < n) {
-      members = Member(
-          field, in.nextChar, in.nextChar, in.nextChar, readAttribs) :: members
+      members = Member(field,
+                       in.nextChar,
+                       in.nextChar,
+                       in.nextChar,
+                       readAttribs) :: members
       i = i + 1
     }
     members
@@ -95,8 +98,9 @@ class Classfile(in: ByteArrayReader) {
         val tag = in.nextByte
         // Double sized entry
         if (tag == CONSTANT_LONG || tag == CONSTANT_DOUBLE) {
-          pool(i) = if (tag == CONSTANT_LONG) LongConst(in.nextLong)
-          else DoubleConst(in.nextDouble)
+          pool(i) =
+            if (tag == CONSTANT_LONG) LongConst(in.nextLong)
+            else DoubleConst(in.nextDouble)
           i = i + 1
           pool(i) = Empty
         } else
@@ -123,8 +127,8 @@ class Classfile(in: ByteArrayReader) {
     def apply(x: Int) = entries(x)
     def stringOf(x: Int) = apply(x).toString
     override def toString =
-      (for ((x, i) <- entries.zipWithIndex; if x != null) yield
-        "const #%d = %s\t%s\n".format(i + 1, x.typeString, x)).mkString
+      (for ((x, i) <- entries.zipWithIndex; if x != null)
+        yield "const #%d = %s\t%s\n".format(i + 1, x.typeString, x)).mkString
   }
 
   /** **/

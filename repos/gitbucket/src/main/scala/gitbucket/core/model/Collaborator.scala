@@ -6,15 +6,16 @@ trait CollaboratorComponent extends TemplateComponent { self: Profile =>
   lazy val Collaborators = TableQuery[Collaborators]
 
   class Collaborators(tag: Tag)
-      extends Table[Collaborator](tag, "COLLABORATOR") with BasicTemplate {
+      extends Table[Collaborator](tag, "COLLABORATOR")
+      with BasicTemplate {
     val collaboratorName = column[String]("COLLABORATOR_NAME")
     def * =
       (userName, repositoryName, collaboratorName) <>
-      (Collaborator.tupled, Collaborator.unapply)
+        (Collaborator.tupled, Collaborator.unapply)
 
     def byPrimaryKey(owner: String, repository: String, collaborator: String) =
       byRepository(owner, repository) &&
-      (collaboratorName === collaborator.bind)
+        (collaboratorName === collaborator.bind)
   }
 }
 

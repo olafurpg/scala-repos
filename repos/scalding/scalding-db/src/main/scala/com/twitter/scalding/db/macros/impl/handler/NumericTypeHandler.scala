@@ -35,7 +35,8 @@ object NumericTypeHandler {
         case WithSize(s) if s > 0 =>
           Success(List(ColumnFormat(c)(accessorTree, numericType, Some(s))))
         case WithSize(s) =>
-          Failure(new Exception(
+          Failure(
+              new Exception(
                   s"Int field $fieldName, has a size defined that is <= 0."))
         case WithoutSize =>
           Success(List(ColumnFormat(c)(accessorTree, numericType, None)))

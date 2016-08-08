@@ -45,7 +45,8 @@ private[concurrent] trait BatchingExecutor extends Executor {
   private val _tasksLocal = new ThreadLocal[List[Runnable]]()
 
   private class Batch(val initial: List[Runnable])
-      extends Runnable with BlockContext {
+      extends Runnable
+      with BlockContext {
     private var parentBlockContext: BlockContext = _
     // this method runs in the delegate ExecutionContext's thread
     override def run(): Unit = {
@@ -109,7 +110,8 @@ private[concurrent] trait BatchingExecutor extends Executor {
         case null =>
           unbatchedExecute(new Batch(List(runnable))) // If we aren't in batching mode yet, enqueue batch
         case some =>
-          _tasksLocal.set(runnable :: some) // If we are already in batching mode, add to batch
+          _tasksLocal
+            .set(runnable :: some) // If we are already in batching mode, add to batch
       }
     } else
       unbatchedExecute(runnable) // If not batchable, just delegate to underlying

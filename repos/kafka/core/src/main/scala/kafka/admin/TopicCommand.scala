@@ -40,7 +40,8 @@ object TopicCommand extends Logging {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          opts.parser, "Create, delete, describe, or change a topic.")
+          opts.parser,
+          "Create, delete, describe, or change a topic.")
 
     // should have exactly one action
     val actions = Seq(opts.createOpt,
@@ -77,8 +78,8 @@ object TopicCommand extends Logging {
     }
   }
 
-  private def getTopics(
-      zkUtils: ZkUtils, opts: TopicCommandOptions): Seq[String] = {
+  private def getTopics(zkUtils: ZkUtils,
+                        opts: TopicCommandOptions): Seq[String] = {
     val allTopics = zkUtils.getAllTopics().sorted
     if (opts.options.has(opts.topicOpt)) {
       val topicsSpec = opts.options.valueOf(opts.topicOpt)
@@ -100,10 +101,14 @@ object TopicCommand extends Logging {
       if (opts.options.has(opts.replicaAssignmentOpt)) {
         val assignment = parseReplicaAssignment(
             opts.options.valueOf(opts.replicaAssignmentOpt))
-        warnOnMaxMessagesChange(
-            configs, assignment.valuesIterator.next().length)
-        AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-            zkUtils, topic, assignment, configs, update = false)
+        warnOnMaxMessagesChange(configs,
+                                assignment.valuesIterator.next().length)
+        AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(zkUtils,
+                                                                  topic,
+                                                                  assignment,
+                                                                  configs,
+                                                                  update =
+                                                                    false)
       } else {
         CommandLineUtils.checkRequiredArgs(opts.parser,
                                            opts.options,
@@ -115,8 +120,12 @@ object TopicCommand extends Logging {
         val rackAwareMode =
           if (opts.options.has(opts.disableRackAware)) RackAwareMode.Disabled
           else RackAwareMode.Enforced
-        AdminUtils.createTopic(
-            zkUtils, topic, partitions, replicas, configs, rackAwareMode)
+        AdminUtils.createTopic(zkUtils,
+                               topic,
+                               partitions,
+                               replicas,
+                               configs,
+                               rackAwareMode)
       }
       println("Created topic \"%s\".".format(topic))
     } catch {
@@ -159,12 +168,12 @@ object TopicCommand extends Logging {
         }
         println(
             "WARNING: If partitions are increased for a topic that has a key, the partition " +
-            "logic or ordering of the messages will be affected")
+              "logic or ordering of the messages will be affected")
         val nPartitions = opts.options.valueOf(opts.partitionsOpt).intValue
         val replicaAssignmentStr =
           opts.options.valueOf(opts.replicaAssignmentOpt)
-        AdminUtils.addPartitions(
-            zkUtils, topic, nPartitions, replicaAssignmentStr)
+        AdminUtils
+          .addPartitions(zkUtils, topic, nPartitions, replicaAssignmentStr)
         println("Adding partitions succeeded!")
       }
     }
@@ -242,10 +251,10 @@ object TopicCommand extends Logging {
               println(
                   "Topic:%s\tPartitionCount:%d\tReplicationFactor:%d\tConfigs:%s"
                     .format(
-                      topic,
-                      numPartitions,
-                      replicationFactor,
-                      configs.map(kv => kv._1 + "=" + kv._2).mkString(",")))
+                        topic,
+                        numPartitions,
+                        replicationFactor,
+                        configs.map(kv => kv._1 + "=" + kv._2).mkString(",")))
             }
           }
           if (describePartitions) {
@@ -254,17 +263,17 @@ object TopicCommand extends Logging {
                 zkUtils.getInSyncReplicasForPartition(topic, partitionId)
               val leader = zkUtils.getLeaderForPartition(topic, partitionId)
               if ((!reportUnderReplicatedPartitions &&
-                      !reportUnavailablePartitions) ||
+                  !reportUnavailablePartitions) ||
                   (reportUnderReplicatedPartitions &&
-                      inSyncReplicas.size < assignedReplicas.size) ||
+                  inSyncReplicas.size < assignedReplicas.size) ||
                   (reportUnavailablePartitions &&
-                      (!leader.isDefined ||
-                          !liveBrokers.contains(leader.get)))) {
+                  (!leader.isDefined ||
+                  !liveBrokers.contains(leader.get)))) {
                 print("\tTopic: " + topic)
                 print("\tPartition: " + partitionId)
                 print(
                     "\tLeader: " +
-                    (if (leader.isDefined) leader.get else "none"))
+                      (if (leader.isDefined) leader.get else "none"))
                 print("\tReplicas: " + assignedReplicas.mkString(","))
                 println("\tIsr: " + inSyncReplicas.mkString(","))
               }
@@ -283,14 +292,14 @@ object TopicCommand extends Logging {
         configsToBeAdded.forall(config => config.length == 2),
         "Invalid topic config: all configs to be added must be in the format \"key=val\".")
     val props = new Properties
-    configsToBeAdded.foreach(
-        pair => props.setProperty(pair(0).trim, pair(1).trim))
+    configsToBeAdded.foreach(pair =>
+      props.setProperty(pair(0).trim, pair(1).trim))
     LogConfig.validate(props)
     if (props.containsKey(LogConfig.MessageFormatVersionProp)) {
       println(
           s"WARNING: The configuration ${LogConfig.MessageFormatVersionProp}=${props
-        .getProperty(LogConfig.MessageFormatVersionProp)} is specified. " +
-          s"This configuration will be ignored if the version is newer than the inter.broker.protocol.version specified in the broker.")
+            .getProperty(LogConfig.MessageFormatVersionProp)} is specified. " +
+            s"This configuration will be ignored if the version is newer than the inter.broker.protocol.version specified in the broker.")
     }
     props
   }
@@ -321,7 +330,7 @@ object TopicCommand extends Logging {
       if (ret(i).size != ret(0).size)
         throw new AdminOperationException(
             "Partition " + i + " has different replication factor: " +
-            brokerList)
+              brokerList)
     }
     ret.toMap
   }
@@ -332,7 +341,7 @@ object TopicCommand extends Logging {
       .accepts(
           "zookeeper",
           "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
-          "Multiple URLS can be given to allow fail-over.")
+            "Multiple URLS can be given to allow fail-over.")
       .withRequiredArg
       .describedAs("urls")
       .ofType(classOf[String])
@@ -349,7 +358,7 @@ object TopicCommand extends Logging {
       .accepts(
           "topic",
           "The topic to be create, alter or describe. Can also accept a regular " +
-          "expression except for --create option")
+            "expression except for --create option")
       .withRequiredArg
       .describedAs("topic")
       .ofType(classOf[String])
@@ -358,9 +367,9 @@ object TopicCommand extends Logging {
       .accepts(
           "config",
           "A topic configuration override for the topic being created or altered." +
-          "The following is a list of valid configurations: " +
-          nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
-          "See the Kafka documentation for full details on the topic configs.")
+            "The following is a list of valid configurations: " +
+            nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
+            "See the Kafka documentation for full details on the topic configs.")
       .withRequiredArg
       .describedAs("name=value")
       .ofType(classOf[String])
@@ -375,7 +384,7 @@ object TopicCommand extends Logging {
       .accepts(
           "partitions",
           "The number of partitions for the topic being created or " +
-          "altered (WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected")
+            "altered (WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected")
       .withRequiredArg
       .describedAs("# of partitions")
       .ofType(classOf[java.lang.Integer])
@@ -393,7 +402,7 @@ object TopicCommand extends Logging {
       .withRequiredArg
       .describedAs(
           "broker_id_for_part1_replica1 : broker_id_for_part1_replica2 , " +
-          "broker_id_for_part2_replica1 : broker_id_for_part2_replica2 , ...")
+            "broker_id_for_part2_replica1 : broker_id_for_part2_replica2 , ...")
       .ofType(classOf[String])
     val reportUnderReplicatedPartitionsOpt = parser.accepts(
         "under-replicated-partitions",
@@ -411,12 +420,12 @@ object TopicCommand extends Logging {
         "if-not-exists",
         "if set when creating topics, the action will only execute if the topic does not already exist")
 
-    val disableRackAware = parser.accepts(
-        "disable-rack-aware", "Disable rack aware replica assignment")
+    val disableRackAware = parser
+      .accepts("disable-rack-aware", "Disable rack aware replica assignment")
     val options = parser.parse(args: _*)
 
-    val allTopicLevelOpts: Set[OptionSpec[_]] = Set(
-        alterOpt, createOpt, describeOpt, listOpt, deleteOpt)
+    val allTopicLevelOpts: Set[OptionSpec[_]] =
+      Set(alterOpt, createOpt, describeOpt, listOpt, deleteOpt)
 
     def checkArgs() {
       // check required args
@@ -430,8 +439,10 @@ object TopicCommand extends Logging {
           options,
           configOpt,
           allTopicLevelOpts -- Set(alterOpt, createOpt))
-      CommandLineUtils.checkInvalidArgs(
-          parser, options, deleteConfigOpt, allTopicLevelOpts -- Set(alterOpt))
+      CommandLineUtils.checkInvalidArgs(parser,
+                                        options,
+                                        deleteConfigOpt,
+                                        allTopicLevelOpts -- Set(alterOpt))
       CommandLineUtils.checkInvalidArgs(
           parser,
           options,
@@ -457,26 +468,28 @@ object TopicCommand extends Logging {
           options,
           reportUnderReplicatedPartitionsOpt,
           allTopicLevelOpts -- Set(describeOpt) +
-          reportUnavailablePartitionsOpt + topicsWithOverridesOpt)
+            reportUnavailablePartitionsOpt + topicsWithOverridesOpt)
       CommandLineUtils.checkInvalidArgs(
           parser,
           options,
           reportUnavailablePartitionsOpt,
           allTopicLevelOpts -- Set(describeOpt) +
-          reportUnderReplicatedPartitionsOpt + topicsWithOverridesOpt)
+            reportUnderReplicatedPartitionsOpt + topicsWithOverridesOpt)
       CommandLineUtils.checkInvalidArgs(
           parser,
           options,
           topicsWithOverridesOpt,
           allTopicLevelOpts -- Set(describeOpt) +
-          reportUnderReplicatedPartitionsOpt + reportUnavailablePartitionsOpt)
+            reportUnderReplicatedPartitionsOpt + reportUnavailablePartitionsOpt)
       CommandLineUtils.checkInvalidArgs(
           parser,
           options,
           ifExistsOpt,
           allTopicLevelOpts -- Set(alterOpt, deleteOpt))
-      CommandLineUtils.checkInvalidArgs(
-          parser, options, ifNotExistsOpt, allTopicLevelOpts -- Set(createOpt))
+      CommandLineUtils.checkInvalidArgs(parser,
+                                        options,
+                                        ifNotExistsOpt,
+                                        allTopicLevelOpts -- Set(createOpt))
     }
   }
   def warnOnMaxMessagesChange(configs: Properties, replicas: Integer): Unit = {
@@ -501,30 +514,30 @@ object TopicCommand extends Logging {
 
   def shortMessageSizeWarning(maxMessageBytes: Int): String = {
     "\n\n" +
-    "*****************************************************************************************************\n" +
-    "*** WARNING: you are creating a topic where the the max.message.bytes is greater than the consumer ***\n" +
-    "*** default. This operation is potentially dangerous. Consumers will get failures if their        ***\n" +
-    "*** fetch.message.max.bytes < the value you are using.                                            ***\n" +
-    "*****************************************************************************************************\n" +
-    s"- value set here: $maxMessageBytes\n" +
-    s"- Default Consumer fetch.message.max.bytes: ${ConsumerConfig.FetchSize}\n" +
-    s"- Default Broker max.message.bytes: ${kafka.server.Defaults.MessageMaxBytes}\n\n"
+      "*****************************************************************************************************\n" +
+      "*** WARNING: you are creating a topic where the the max.message.bytes is greater than the consumer ***\n" +
+      "*** default. This operation is potentially dangerous. Consumers will get failures if their        ***\n" +
+      "*** fetch.message.max.bytes < the value you are using.                                            ***\n" +
+      "*****************************************************************************************************\n" +
+      s"- value set here: $maxMessageBytes\n" +
+      s"- Default Consumer fetch.message.max.bytes: ${ConsumerConfig.FetchSize}\n" +
+      s"- Default Broker max.message.bytes: ${kafka.server.Defaults.MessageMaxBytes}\n\n"
   }
 
   def longMessageSizeWarning(maxMessageBytes: Int): String = {
     "\n\n" +
-    "****************************************************************************************************\n" +
-    "*** WARNING: you are creating a topic where the max.message.bytes is greater than the broker      ***\n" +
-    "*** default. This operation is dangerous. There are two potential side effects:                  ***\n" +
-    "*** - Consumers will get failures if their fetch.message.max.bytes < the value you are using     ***\n" +
-    "*** - Producer requests larger than replica.fetch.max.bytes will not replicate and hence have    ***\n" +
-    "***   a higher risk of data loss                                                                 ***\n" +
-    "*** You should ensure both of these settings are greater than the value set here before using    ***\n" +
-    "*** this topic.                                                                                  ***\n" +
-    "****************************************************************************************************\n" +
-    s"- value set here: $maxMessageBytes\n" +
-    s"- Default Broker replica.fetch.max.bytes: ${kafka.server.Defaults.ReplicaFetchMaxBytes}\n" +
-    s"- Default Broker max.message.bytes: ${kafka.server.Defaults.MessageMaxBytes}\n" +
-    s"- Default Consumer fetch.message.max.bytes: ${ConsumerConfig.FetchSize}\n\n"
+      "****************************************************************************************************\n" +
+      "*** WARNING: you are creating a topic where the max.message.bytes is greater than the broker      ***\n" +
+      "*** default. This operation is dangerous. There are two potential side effects:                  ***\n" +
+      "*** - Consumers will get failures if their fetch.message.max.bytes < the value you are using     ***\n" +
+      "*** - Producer requests larger than replica.fetch.max.bytes will not replicate and hence have    ***\n" +
+      "***   a higher risk of data loss                                                                 ***\n" +
+      "*** You should ensure both of these settings are greater than the value set here before using    ***\n" +
+      "*** this topic.                                                                                  ***\n" +
+      "****************************************************************************************************\n" +
+      s"- value set here: $maxMessageBytes\n" +
+      s"- Default Broker replica.fetch.max.bytes: ${kafka.server.Defaults.ReplicaFetchMaxBytes}\n" +
+      s"- Default Broker max.message.bytes: ${kafka.server.Defaults.MessageMaxBytes}\n" +
+      s"- Default Consumer fetch.message.max.bytes: ${ConsumerConfig.FetchSize}\n\n"
   }
 }

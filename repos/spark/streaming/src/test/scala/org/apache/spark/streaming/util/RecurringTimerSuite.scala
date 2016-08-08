@@ -33,13 +33,9 @@ class RecurringTimerSuite extends SparkFunSuite with PrivateMethodTester {
   test("basic") {
     val clock = new ManualClock()
     val results = new ConcurrentLinkedQueue[Long]()
-    val timer = new RecurringTimer(clock,
-                                   100,
-                                   time =>
-                                     {
-                                       results.add(time)
-                                   },
-                                   "RecurringTimerSuite-basic")
+    val timer = new RecurringTimer(clock, 100, time => {
+      results.add(time)
+    }, "RecurringTimerSuite-basic")
     timer.start(0)
     eventually(timeout(10.seconds), interval(10.millis)) {
       assert(results.asScala.toSeq === Seq(0L))
@@ -58,13 +54,9 @@ class RecurringTimerSuite extends SparkFunSuite with PrivateMethodTester {
   test("SPARK-10224: call 'callback' after stopping") {
     val clock = new ManualClock()
     val results = new ConcurrentLinkedQueue[Long]
-    val timer = new RecurringTimer(clock,
-                                   100,
-                                   time =>
-                                     {
-                                       results.add(time)
-                                   },
-                                   "RecurringTimerSuite-SPARK-10224")
+    val timer = new RecurringTimer(clock, 100, time => {
+      results.add(time)
+    }, "RecurringTimerSuite-SPARK-10224")
     timer.start(0)
     eventually(timeout(10.seconds), interval(10.millis)) {
       assert(results.asScala.toSeq === Seq(0L))

@@ -32,7 +32,11 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty}
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.geometry.Side
 
 object TabPane {
@@ -41,8 +45,8 @@ object TabPane {
     if (v != null) v.delegate else null
 
   object TabClosingPolicy
-      extends SFXEnumDelegateCompanion[
-          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy] {
+      extends SFXEnumDelegateCompanion[jfxsc.TabPane.TabClosingPolicy,
+                                       TabClosingPolicy] {
 
     /**
       * All tabs will have the option to be closed.
@@ -89,7 +93,8 @@ object TabPane {
 }
 
 class TabPane(override val delegate: jfxsc.TabPane = new jfxsc.TabPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.TabPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TabPane] {
 
   /**
     * The rotatedGraphic state of the tabs in the TabPane.

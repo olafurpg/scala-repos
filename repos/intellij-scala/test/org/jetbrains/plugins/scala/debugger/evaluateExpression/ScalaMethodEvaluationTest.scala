@@ -1,16 +1,22 @@
 package org.jetbrains.plugins.scala.debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * User: Alefas
   * Date: 17.10.11
   */
 class ScalaMethodEvaluationTest
-    extends ScalaMethodEvaluationTestBase with ScalaVersion_2_11
+    extends ScalaMethodEvaluationTestBase
+    with ScalaVersion_2_11
 
 class ScalaMethodEvaluationTest_212
-    extends ScalaMethodEvaluationTestBase with ScalaVersion_2_12
+    extends ScalaMethodEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
 
@@ -245,8 +251,8 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
   def testLibraryFunctions() {
     runDebugger() {
       waitForBreakpoint()
-      evalStartsWith(
-          "scala.collection.mutable.ArrayBuffer.newBuilder", "ArrayBuffer()")
+      evalStartsWith("scala.collection.mutable.ArrayBuffer.newBuilder",
+                     "ArrayBuffer()")
       evalStartsWith("\"test\".substring(0, 2)", "te")
       evalStartsWith("\"test\".substring(2)", "st")
       evalEquals("List[Int](1, 2)", "List(1, 2)")

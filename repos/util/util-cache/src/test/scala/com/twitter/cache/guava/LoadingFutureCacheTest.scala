@@ -28,7 +28,7 @@ class LoadingFutureCacheTest extends FunSuite {
                 }
               }
           )
-      )
+    )
   }
 
   test("return CacheLoader result for unset keys") {

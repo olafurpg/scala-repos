@@ -32,7 +32,12 @@ import javafx.{collections => jfxc, event => jfxe, scene => jfxs, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ObjectProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.delegate.SFXDelegate.delegateOrNull
@@ -278,7 +283,8 @@ object TableView {
   */
 class TableView[S](
     override val delegate: jfxsc.TableView[S] = new jfxsc.TableView[S])
-    extends Control(delegate) with SFXDelegate[jfxsc.TableView[S]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TableView[S]] {
 
   /**
     * Creates a TableView with the content provided in the items ObservableBuffer.
@@ -308,12 +314,12 @@ class TableView[S](
   def columnResizePolicy: ObjectProperty[
       TableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TableView.ResizeFeatures[S]) =>
-          delegate.columnResizePolicyProperty.value.call(features))
+      delegate.columnResizePolicyProperty.value.call(features))
   def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
     delegate
       .columnResizePolicyProperty()
-      .setValue(new jfxu.Callback[
-              jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean] {
+      .setValue(new jfxu.Callback[jfxsc.TableView.ResizeFeatures[_],
+                                  java.lang.Boolean] {
         def call(v: jfxsc.TableView.ResizeFeatures[_]): java.lang.Boolean = {
           p(v)
         }
@@ -383,10 +389,10 @@ class TableView[S](
   def rowFactory_=(factory: TableView[S] => TableRow[S]) {
     delegate.rowFactoryProperty.setValue(
         new jfxu.Callback[jfxsc.TableView[S], jfxsc.TableRow[S]] {
-      def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] = {
-        factory(v)
-      }
-    })
+          def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] = {
+            factory(v)
+          }
+        })
   }
 
   /**
@@ -440,7 +446,8 @@ class TableView[S](
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]](
-        onScrollTo, v)
+          onScrollTo,
+          v)
   }
 
   /**
@@ -451,8 +458,8 @@ class TableView[S](
     delegate.onScrollToColumnProperty
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]) {
-    ObjectProperty.fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[
-                jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
+    ObjectProperty.fillProperty[jfxe.EventHandler[
+        jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
   }
 
   /** Called when there's a request to sort the control. */
@@ -462,7 +469,8 @@ class TableView[S](
   def onSort_=(v: jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]](
-        onSort, v)
+          onSort,
+          v)
   }
 
   /** Scrolls the TableView so that the given object is visible within the viewport. */
@@ -477,6 +485,7 @@ class TableView[S](
   def sortPolicy_=(v: jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]) {
     ObjectProperty
       .fillProperty[jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]](
-        sortPolicy, v)
+          sortPolicy,
+          v)
   }
 }

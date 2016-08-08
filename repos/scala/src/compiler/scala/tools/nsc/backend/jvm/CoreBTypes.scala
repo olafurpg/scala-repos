@@ -31,7 +31,12 @@ import scala.tools.nsc.backend.jvm.BTypes.InternalName
 class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   import bTypes._
   import global._
-  import rootMirror.{requiredClass, requiredModule, getRequiredClass, getClassIfDefined}
+  import rootMirror.{
+    requiredClass,
+    requiredModule,
+    getRequiredClass,
+    getClassIfDefined
+  }
   import definitions._
 
   /**
@@ -71,17 +76,18 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     * method symbol for `Byte.box()` is mapped to the ClassBType `java/lang/Byte`.
     */
   lazy val boxResultType: Map[Symbol, ClassBType] = {
-    for ((valueClassSym, boxMethodSym) <- currentRun.runDefinitions.boxMethod) yield
-      boxMethodSym -> boxedClassOfPrimitive(
-          primitiveTypeToBType(valueClassSym))
+    for ((valueClassSym, boxMethodSym) <- currentRun.runDefinitions.boxMethod)
+      yield
+        boxMethodSym -> boxedClassOfPrimitive(
+            primitiveTypeToBType(valueClassSym))
   }
 
   /**
     * Maps the method symbol for an unbox method to the primitive type of the result.
     * For example, the method symbol for `Byte.unbox()`) is mapped to the PrimitiveBType BYTE. */
   lazy val unboxResultType: Map[Symbol, PrimitiveBType] = {
-    for ((valueClassSym, unboxMethodSym) <- currentRun.runDefinitions.unboxMethod) yield
-      unboxMethodSym -> primitiveTypeToBType(valueClassSym)
+    for ((valueClassSym, unboxMethodSym) <- currentRun.runDefinitions.unboxMethod)
+      yield unboxMethodSym -> primitiveTypeToBType(valueClassSym)
   }
 
   /*
@@ -126,7 +132,7 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
       requiredClass[java.lang.invoke.MethodHandles])
   lazy val jliMethodHandlesLookupRef: ClassBType = classBTypeFromSymbol(
       exitingPickler(getRequiredClass(
-              "java.lang.invoke.MethodHandles.Lookup"))) // didn't find a reliable non-stringly-typed way that works for inner classes in the backend
+          "java.lang.invoke.MethodHandles.Lookup"))) // didn't find a reliable non-stringly-typed way that works for inner classes in the backend
   lazy val jliMethodTypeRef: ClassBType = classBTypeFromSymbol(
       requiredClass[java.lang.invoke.MethodType])
   lazy val jliCallSiteRef: ClassBType = classBTypeFromSymbol(
@@ -144,11 +150,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   lazy val srBoxedUnitRef: ClassBType = classBTypeFromSymbol(
       requiredClass[scala.runtime.BoxedUnit])
 
-  private def methodNameAndType(cls: Symbol,
-                                name: Name,
-                                static: Boolean = false,
-                                filterOverload: Symbol => Boolean = _ =>
-                                    true): MethodNameAndType = {
+  private def methodNameAndType(
+      cls: Symbol,
+      name: Name,
+      static: Boolean = false,
+      filterOverload: Symbol => Boolean = _ => true): MethodNameAndType = {
     val holder = if (static) cls.companionModule.moduleClass else cls
     val method = holder.info.member(name).suchThat(filterOverload)
     assert(!method.isOverloaded, method)
@@ -157,13 +163,12 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
 
   private def srBoxesRuntimeMethods(
       getName: (String, String) => String): Map[BType, MethodNameAndType] = {
-    ScalaValueClassesNoUnit.map(
-        primitive =>
-          {
-        val bType = primitiveTypeToBType(primitive)
-        val name = newTermName(getName(primitive.name.toString,
-                                       boxedClass(primitive).name.toString))
-        (bType, methodNameAndType(BoxesRunTimeClass, name))
+    ScalaValueClassesNoUnit.map(primitive => {
+      val bType = primitiveTypeToBType(primitive)
+      val name = newTermName(
+          getName(primitive.name.toString,
+                  boxedClass(primitive).name.toString))
+      (bType, methodNameAndType(BoxesRunTimeClass, name))
     })(collection.breakOut)
   }
 
@@ -184,40 +189,34 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
 
   // java/lang/Boolean -> MethodNameAndType(valueOf,(Z)Ljava/lang/Boolean;)
   lazy val javaBoxMethods: Map[InternalName, MethodNameAndType] = {
-    ScalaValueClassesNoUnit.map(
-        primitive =>
-          {
-        val boxed = boxedClass(primitive)
-        val method =
-          methodNameAndType(boxed,
-                            newTermName("valueOf"),
-                            static = true,
-                            filterOverload = singleParamOfClass(primitive))
-        (classBTypeFromSymbol(boxed).internalName, method)
+    ScalaValueClassesNoUnit.map(primitive => {
+      val boxed = boxedClass(primitive)
+      val method =
+        methodNameAndType(boxed,
+                          newTermName("valueOf"),
+                          static = true,
+                          filterOverload = singleParamOfClass(primitive))
+      (classBTypeFromSymbol(boxed).internalName, method)
     })(collection.breakOut)
   }
 
   // java/lang/Boolean -> MethodNameAndType(booleanValue,()Z)
   lazy val javaUnboxMethods: Map[InternalName, MethodNameAndType] = {
-    ScalaValueClassesNoUnit.map(
-        primitive =>
-          {
-        val boxed = boxedClass(primitive)
-        val name = primitive.name.toString.toLowerCase + "Value"
-        (classBTypeFromSymbol(boxed).internalName,
-         methodNameAndType(boxed, newTermName(name)))
+    ScalaValueClassesNoUnit.map(primitive => {
+      val boxed = boxedClass(primitive)
+      val name = primitive.name.toString.toLowerCase + "Value"
+      (classBTypeFromSymbol(boxed).internalName,
+       methodNameAndType(boxed, newTermName(name)))
     })(collection.breakOut)
   }
 
   private def predefBoxingMethods(
       getName: (String, String) => String): Map[String, MethodBType] = {
-    ScalaValueClassesNoUnit.map(
-        primitive =>
-          {
-        val boxed = boxedClass(primitive)
-        val name = getName(primitive.name.toString, boxed.name.toString)
-        (name,
-         methodNameAndType(PredefModule.moduleClass, newTermName(name)).methodType)
+    ScalaValueClassesNoUnit.map(primitive => {
+      val boxed = boxedClass(primitive)
+      val name = getName(primitive.name.toString, boxed.name.toString)
+      (name,
+       methodNameAndType(PredefModule.moduleClass, newTermName(name)).methodType)
     })(collection.breakOut)
   }
 
@@ -234,9 +233,8 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   private def staticRefMethods(
       name: Name): Map[InternalName, MethodNameAndType] = {
     allRefClasses.map(refClass =>
-          (classBTypeFromSymbol(refClass).internalName,
-           methodNameAndType(refClass, name, static = true)))(
-        collection.breakOut)
+      (classBTypeFromSymbol(refClass).internalName,
+       methodNameAndType(refClass, name, static = true)))(collection.breakOut)
   }
 
   // scala/runtime/BooleanRef -> MethodNameAndType(create,(Z)Lscala/runtime/BooleanRef;)
@@ -249,20 +247,19 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
 
   // java/lang/Boolean -> MethodNameAndType(<init>,(Z)V)
   lazy val primitiveBoxConstructors: Map[InternalName, MethodNameAndType] = {
-    ScalaValueClassesNoUnit.map(
-        primitive =>
-          {
-        val boxed = boxedClass(primitive)
-        (classBTypeFromSymbol(boxed).internalName,
-         methodNameAndType(boxed,
-                           nme.CONSTRUCTOR,
-                           filterOverload = singleParamOfClass(primitive)))
+    ScalaValueClassesNoUnit.map(primitive => {
+      val boxed = boxedClass(primitive)
+      (classBTypeFromSymbol(boxed).internalName,
+       methodNameAndType(boxed,
+                         nme.CONSTRUCTOR,
+                         filterOverload = singleParamOfClass(primitive)))
     })(collection.breakOut)
   }
 
   private def nonOverloadedConstructors(
       classes: Iterable[Symbol]): Map[InternalName, MethodNameAndType] = {
-    classes.map(cls =>
+    classes.map(
+        cls =>
           (classBTypeFromSymbol(cls).internalName,
            methodNameAndType(cls, nme.CONSTRUCTOR)))(collection.breakOut)
   }
@@ -303,11 +300,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
         primitives.map(base + "0$mc" + _ + "$sp") // Function0
       } ++ {
         // return type specializations appear first in the name string (alphabetical sorting)
-        for (r <- ijfdzv; a <- ijfd) yield
-          base + "1$mc" + r + a + "$sp" // Function1
+        for (r <- ijfdzv; a <- ijfd)
+          yield base + "1$mc" + r + a + "$sp" // Function1
       } ++ {
-        for (r <- ijfdzv; a <- ijd; b <- ijd) yield
-          base + "2$mc" + r + a + b + "$sp" // Function2
+        for (r <- ijfdzv; a <- ijd; b <- ijd)
+          yield base + "2$mc" + r + a + b + "$sp" // Function2
       }
     classNames map getRequiredClass
   }
@@ -320,14 +317,14 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     import scalaPrimitives._
     Map(
         (List(ZARRAY_LENGTH, ZARRAY_GET, ZARRAY_SET) map (_ -> BOOL)) ++
-        (List(BARRAY_LENGTH, BARRAY_GET, BARRAY_SET) map (_ -> BYTE)) ++
-        (List(SARRAY_LENGTH, SARRAY_GET, SARRAY_SET) map (_ -> SHORT)) ++
-        (List(CARRAY_LENGTH, CARRAY_GET, CARRAY_SET) map (_ -> CHAR)) ++
-        (List(IARRAY_LENGTH, IARRAY_GET, IARRAY_SET) map (_ -> INT)) ++
-        (List(LARRAY_LENGTH, LARRAY_GET, LARRAY_SET) map (_ -> LONG)) ++
-        (List(FARRAY_LENGTH, FARRAY_GET, FARRAY_SET) map (_ -> FLOAT)) ++
-        (List(DARRAY_LENGTH, DARRAY_GET, DARRAY_SET) map (_ -> DOUBLE)) ++
-        (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET) map (_ -> ObjectRef)): _*
+          (List(BARRAY_LENGTH, BARRAY_GET, BARRAY_SET) map (_ -> BYTE)) ++
+          (List(SARRAY_LENGTH, SARRAY_GET, SARRAY_SET) map (_ -> SHORT)) ++
+          (List(CARRAY_LENGTH, CARRAY_GET, CARRAY_SET) map (_ -> CHAR)) ++
+          (List(IARRAY_LENGTH, IARRAY_GET, IARRAY_SET) map (_ -> INT)) ++
+          (List(LARRAY_LENGTH, LARRAY_GET, LARRAY_SET) map (_ -> LONG)) ++
+          (List(FARRAY_LENGTH, FARRAY_GET, FARRAY_SET) map (_ -> FLOAT)) ++
+          (List(DARRAY_LENGTH, DARRAY_GET, DARRAY_SET) map (_ -> DOUBLE)) ++
+          (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET) map (_ -> ObjectRef)): _*
     )
   }
 
@@ -344,11 +341,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   /* The Object => String overload. */
   lazy val String_valueOf: Symbol = {
     getMember(StringModule, nme.valueOf) filter
-    (sym =>
-          sym.info.paramTypes match {
-            case List(pt) => pt.typeSymbol == ObjectClass
-            case _ => false
-        })
+      (sym =>
+         sym.info.paramTypes match {
+           case List(pt) => pt.typeSymbol == ObjectClass
+           case _ => false
+         })
   }
 
   lazy val lambdaMetaFactoryBootstrapHandle = new asm.Handle(

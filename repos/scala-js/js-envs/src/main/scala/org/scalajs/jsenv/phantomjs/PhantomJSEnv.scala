@@ -33,40 +33,43 @@ class PhantomJSEnv(
     addEnv: Map[String, String] = Map.empty,
     val autoExit: Boolean = true,
     jettyClassLoader: ClassLoader = null
-)
-    extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
+) extends ExternalJSEnv(addArgs, addEnv)
+    with ComJSEnv {
 
   import PhantomJSEnv._
 
   protected def vmName: String = "PhantomJS"
   protected def executable: String = phantomjsPath
 
-  override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+  override def jsRunner(libs: Seq[ResolvedJSDependency],
+                        code: VirtualJSFile): JSRunner = {
     new PhantomRunner(libs, code)
   }
 
-  override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+  override def asyncRunner(libs: Seq[ResolvedJSDependency],
+                           code: VirtualJSFile): AsyncJSRunner = {
     new AsyncPhantomRunner(libs, code)
   }
 
-  override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+  override def comRunner(libs: Seq[ResolvedJSDependency],
+                         code: VirtualJSFile): ComJSRunner = {
     new ComPhantomRunner(libs, code)
   }
 
-  protected class PhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends ExtRunner(libs, code) with AbstractPhantomRunner
+  protected class PhantomRunner(libs: Seq[ResolvedJSDependency],
+                                code: VirtualJSFile)
+      extends ExtRunner(libs, code)
+      with AbstractPhantomRunner
 
-  protected class AsyncPhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncExtRunner(libs, code) with AbstractPhantomRunner
+  protected class AsyncPhantomRunner(libs: Seq[ResolvedJSDependency],
+                                     code: VirtualJSFile)
+      extends AsyncExtRunner(libs, code)
+      with AbstractPhantomRunner
 
-  protected class ComPhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncPhantomRunner(libs, code) with ComJSRunner {
+  protected class ComPhantomRunner(libs: Seq[ResolvedJSDependency],
+                                   code: VirtualJSFile)
+      extends AsyncPhantomRunner(libs, code)
+      with ComJSRunner {
 
     private var mgrIsRunning: Boolean = false
 
@@ -329,7 +332,7 @@ class PhantomJSEnv(
           val fname = htmlEscape(fixFileURI(file.file.toURI).toASCIIString)
           writer.write(
               s"""<script type="text/javascript" src="$fname"></script>""" +
-              "\n")
+                "\n")
         case _ =>
           writer.write("""<script type="text/javascript">""" + "\n")
           writer.write(s"// Virtual File: ${file.path}\n")

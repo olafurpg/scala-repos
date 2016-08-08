@@ -40,8 +40,11 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
                                     _routerDispatcher: MessageDispatcher,
                                     val routeeProps: Props,
                                     _supervisor: InternalActorRef)
-    extends ActorCell(
-        _system, _ref, _routerProps, _routerDispatcher, _supervisor) {
+    extends ActorCell(_system,
+                      _ref,
+                      _routerProps,
+                      _routerDispatcher,
+                      _supervisor) {
 
   private[akka] val routerConfig = _routerProps.routerConfig
 
@@ -69,8 +72,8 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
     * Remove routees from the `Router`. Messages in flight may still be routed to
     * the old `Router` instance containing the old routees.
     */
-  def removeRoutees(
-      routees: immutable.Iterable[Routee], stopChild: Boolean): Unit = {
+  def removeRoutees(routees: immutable.Iterable[Routee],
+                    stopChild: Boolean): Unit = {
     val r = _router
     val newRoutees = routees.foldLeft(r.routees) { (xs, x) ⇒
       unwatch(x); xs.filterNot(_ == x)
@@ -161,14 +164,14 @@ private[akka] class RouterActor extends Actor {
     case _ ⇒
       throw ActorInitializationException(
           "Router actor can only be used in RoutedActorRef, not in " +
-          context.getClass)
+            context.getClass)
   }
 
   val routingLogicController: Option[ActorRef] = cell.routerConfig
     .routingLogicController(cell.router.logic)
     .map(props ⇒
-          context.actorOf(props.withDispatcher(context.props.dispatcher),
-                          name = "routingLogicController"))
+      context.actorOf(props.withDispatcher(context.props.dispatcher),
+                      name = "routingLogicController"))
 
   def receive = {
     case GetRoutees ⇒

@@ -10,7 +10,7 @@ package scala
 package collection
 package mutable
 
-/** A common supertrait of `ArrayOps` and `WrappedArray` that factors out the 
+/** A common supertrait of `ArrayOps` and `WrappedArray` that factors out the
   * `deep` method for arrays and wrapped arrays and serves as a marker trait
   * for array wrappers.
   *

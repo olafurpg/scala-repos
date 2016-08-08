@@ -15,7 +15,8 @@ import scala.reflect.ClassTag
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class PersistentFSMSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentFSMSpec._
 
   //Dummy report actor, for tests that don't need it
@@ -367,8 +368,8 @@ object PersistentFSMSpec {
       case (from, to) ⇒ reportActor ! s"$from -> $to"
     }
 
-    override def applyEvent(
-        domainEvent: DomainEvent, currentData: ShoppingCart): ShoppingCart =
+    override def applyEvent(domainEvent: DomainEvent,
+                            currentData: ShoppingCart): ShoppingCart =
       currentData
   }
   object SimpleTransitionFSM {
@@ -434,8 +435,8 @@ object PersistentFSMSpec {
       * @param cartBeforeEvent state data of the previous state
       */
     //#customer-apply-event
-    override def applyEvent(
-        event: DomainEvent, cartBeforeEvent: ShoppingCart): ShoppingCart = {
+    override def applyEvent(event: DomainEvent,
+                            cartBeforeEvent: ShoppingCart): ShoppingCart = {
       event match {
         case ItemAdded(item) ⇒ cartBeforeEvent.addItem(item)
         case OrderExecuted ⇒ cartBeforeEvent

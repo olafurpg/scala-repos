@@ -49,7 +49,8 @@ object ConsistentHashingRouter {
     */
   @SerialVersionUID(1L)
   final case class ConsistentHashableEnvelope(message: Any, hashKey: Any)
-      extends ConsistentHashable with RouterEnvelope {
+      extends ConsistentHashable
+      with RouterEnvelope {
     override def consistentHashKey: Any = hashKey
   }
 
@@ -140,7 +141,8 @@ object ConsistentHashingRoutingLogic {
 final case class ConsistentHashingRoutingLogic(
     system: ActorSystem,
     virtualNodesFactor: Int = 0,
-    hashMapping: ConsistentHashingRouter.ConsistentHashMapping = ConsistentHashingRouter.emptyConsistentHashMapping)
+    hashMapping: ConsistentHashingRouter.ConsistentHashMapping =
+      ConsistentHashingRouter.emptyConsistentHashMapping)
     extends RoutingLogic {
 
   import ConsistentHashingRouter._
@@ -177,11 +179,11 @@ final case class ConsistentHashingRoutingLogic(
 
   // tuple of routees and the ConsistentHash, updated together in updateConsistentHash
   private val consistentHashRef =
-    new AtomicReference[(immutable.IndexedSeq[Routee], ConsistentHash[
-            ConsistentRoutee])]((null, null))
+    new AtomicReference[(immutable.IndexedSeq[Routee],
+                         ConsistentHash[ConsistentRoutee])]((null, null))
 
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else {
 
@@ -199,8 +201,8 @@ final case class ConsistentHashingRoutingLogic(
               ConsistentHash(routees.map(ConsistentRoutee(_, selfAddress)),
                              vnodes) // re-hash
           // ignore, don't update, in case of CAS failure
-          consistentHashRef.compareAndSet(
-              oldConsistentHashTuple, (routees, consistentHash))
+          consistentHashRef
+            .compareAndSet(oldConsistentHashTuple, (routees, consistentHash))
           consistentHash
         } else oldConsistentHash
       }
@@ -285,11 +287,14 @@ final case class ConsistentHashingPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
     val virtualNodesFactor: Int = 0,
-    val hashMapping: ConsistentHashingRouter.ConsistentHashMapping = ConsistentHashingRouter.emptyConsistentHashMapping,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    val hashMapping: ConsistentHashingRouter.ConsistentHashMapping =
+      ConsistentHashingRouter.emptyConsistentHashMapping,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[ConsistentHashingPool] {
+    extends Pool
+    with PoolOverrideUnsetConfig[ConsistentHashingPool] {
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -380,7 +385,8 @@ final case class ConsistentHashingPool(
 final case class ConsistentHashingGroup(
     override val paths: immutable.Iterable[String],
     val virtualNodesFactor: Int = 0,
-    val hashMapping: ConsistentHashingRouter.ConsistentHashMapping = ConsistentHashingRouter.emptyConsistentHashMapping,
+    val hashMapping: ConsistentHashingRouter.ConsistentHashMapping =
+      ConsistentHashingRouter.emptyConsistentHashMapping,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
     extends Group {
 
@@ -443,8 +449,8 @@ final case class ConsistentHashingGroup(
   * isn't a good representation, because LocalActorRef doesn't include the
   * host and port.
   */
-private[akka] final case class ConsistentRoutee(
-    routee: Routee, selfAddress: Address) {
+private[akka] final case class ConsistentRoutee(routee: Routee,
+                                                selfAddress: Address) {
 
   override def toString: String = routee match {
     case ActorRefRoutee(ref) ⇒ toStringWithfullAddress(ref.path)

@@ -36,9 +36,7 @@ private[spire] trait Fuser[C <: Context, A] {
       val (apx0, mes0, ind0, exact0) = freshApproxNames()
       val indValDef = ind.fold(t => q"val $ind0 = $t" :: Nil, _ => Nil)
       val stats1 =
-        List(q"val $apx0 = $apx",
-             q"val $mes0 = $mes",
-             q"def $exact0 = $exact") ++ indValDef
+        List(q"val $apx0 = $apx", q"val $mes0 = $mes", q"def $exact0 = $exact") ++ indValDef
       Fused(stats0 ++ stats1, apx0, mes0, ind.left.map(_ => ind0), exact0)
     }
   }
@@ -115,14 +113,14 @@ private[spire] trait Fuser[C <: Context, A] {
   private def isExactLift(tree: Tree): Boolean = tree match {
     case q"$lift($exact)($ev)" =>
       (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-      (typeCheck(c)(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
+        (typeCheck(c)(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
     case _ => false
   }
 
   private def isApproxLift(tree: Tree): Boolean = tree match {
     case q"$lift($approx)($ev)" =>
       (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-      (typeCheck(c)(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
+        (typeCheck(c)(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
     case _ => false
   }
 
@@ -154,7 +152,8 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   private def zipInd(a: Either[Tree, Int], b: Either[Tree, Int])(
-      f: (Tree, Tree) => Tree, g: (Int, Int) => Int): Either[Tree, Int] = {
+      f: (Tree, Tree) => Tree,
+      g: (Int, Int) => Int): Either[Tree, Int] = {
     (a, b) match {
       case (Right(n), Right(m)) => Right(g(n, m))
       case (Right(n), Left(t)) => Left(f(intLit(n), t))
@@ -163,15 +162,15 @@ private[spire] trait Fuser[C <: Context, A] {
     }
   }
 
-  private def fuse2(lhs: Tree, rhs: Tree)(
-      f: (Approx, Approx) => Approx): Fused = {
+  private def fuse2(lhs: Tree, rhs: Tree)(f: (Approx,
+                                              Approx) => Approx): Fused = {
     val lfused = extract(lhs)
     val rfused = extract(rhs)
     f(lfused.approx, rfused.approx).fused(lfused.stats ++ rfused.stats)
   }
 
-  private def resign(sub: Tree)(
-      f: (TermName, TermName) => (Tree, Tree)): Fused = {
+  private def resign(sub: Tree)(f: (TermName,
+                                    TermName) => (Tree, Tree)): Fused = {
     val fused = extract(sub)
     val (apx, _, _, exact) = freshApproxNames
     val (apx0, exact0) = f(fused.apx, fused.exact)
@@ -193,13 +192,15 @@ private[spire] trait Fuser[C <: Context, A] {
     val fused = extract(tree)
     val (apx, mes, ind, exact) = freshApproxNames
     val indValDef = fused.ind.fold(n => q"val $ind = $n + 1" :: Nil, _ => Nil)
-    val stats = List(q"val $apx = ${sqrt(fused.apx)}", q"""val $mes =
+    val stats = List(q"val $apx = ${sqrt(fused.apx)}",
+                     q"""val $mes =
         if (${fused.apx} < 0) {
           ${sqrt(fused.mes)} * (1 << 26)
         } else {
           (${fused.mes} / ${fused.apx}) * $apx
         }
-      """, q"def $exact = $ev.sqrt(${fused.exact})") ++ indValDef
+      """,
+                     q"def $exact = $ev.sqrt(${fused.exact})") ++ indValDef
     val ind0 = fused.ind.fold(_ => Left(ind), n => Right(n + 1))
     val result = Fused(fused.stats ++ stats, apx, mes, ind0, exact)
     result
@@ -207,10 +208,10 @@ private[spire] trait Fuser[C <: Context, A] {
 
   //private def mix(a: Either[Tree, Int], b: Either[Tree, Int]): Either[(Tree, Tree), (Int, Int)] = {
   def plus(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
-    case (
-        Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
-      val ind = zipInd(lind, rind)(
-          (l, r) => q"${max(l, r)} + 1", (l, r) => spire.math.max(l, r) + 1)
+    case (Approx(lapx, lmes, lind, lexact),
+          Approx(rapx, rmes, rind, rexact)) =>
+      val ind = zipInd(lind, rind)((l, r) => q"${max(l, r)} + 1",
+                                   (l, r) => spire.math.max(l, r) + 1)
       Approx(q"$lapx + $rapx",
              q"$lmes + $rmes",
              ind,
@@ -218,10 +219,10 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   def minus(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
-    case (
-        Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
-      val ind = zipInd(lind, rind)(
-          (l, r) => q"${max(l, r)} + 1", (l, r) => spire.math.max(l, r) + 1)
+    case (Approx(lapx, lmes, lind, lexact),
+          Approx(rapx, rmes, rind, rexact)) =>
+      val ind = zipInd(lind, rind)((l, r) => q"${max(l, r)} + 1",
+                                   (l, r) => spire.math.max(l, r) + 1)
       Approx(q"$lapx - $rapx",
              q"$lmes + $rmes",
              ind,
@@ -229,8 +230,8 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   def times(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
-    case (
-        Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
+    case (Approx(lapx, lmes, lind, lexact),
+          Approx(rapx, rmes, rind, rexact)) =>
       val ind =
         zipInd(lind, rind)((l, r) => q"$l + $r + 1", (l, r) => l + r + 1)
       Approx(q"$lapx * $rapx",
@@ -240,8 +241,8 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   def divide(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
-    case (
-        Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
+    case (Approx(lapx, lmes, lind, lexact),
+          Approx(rapx, rmes, rind, rexact)) =>
       val tmp = freshTermName(c)("fpf$tmp$")
       val rindp1 = rind.fold(rind0 => q"$rind0 + 1", n => q"${intLit(n)} + 1")
       Approx(q"$lapx / $rapx",
@@ -283,7 +284,7 @@ private[spire] trait Fuser[C <: Context, A] {
 }
 
 private[spire] object Fuser {
-  def apply[C <: Context, A : ctx.WeakTypeTag](ctx: C): Fuser[C, A] =
+  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C): Fuser[C, A] =
     new Fuser[C, A] {
       val c = ctx
       val A = c.weakTypeTag[A]

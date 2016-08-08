@@ -60,16 +60,16 @@ private[sql] object InferSchema {
         } catch {
           case _: JsonParseException if shouldHandleCorruptRecord =>
             Some(StructType(
-                    Seq(StructField(columnNameOfCorruptRecords, StringType))))
+                Seq(StructField(columnNameOfCorruptRecords, StringType))))
           case _: JsonParseException =>
             None
         }
       }
     }.treeAggregate[DataType](StructType(Seq()))(
-        compatibleRootType(
-            columnNameOfCorruptRecords, shouldHandleCorruptRecord),
-        compatibleRootType(
-            columnNameOfCorruptRecords, shouldHandleCorruptRecord))
+        compatibleRootType(columnNameOfCorruptRecords,
+                           shouldHandleCorruptRecord),
+        compatibleRootType(columnNameOfCorruptRecords,
+                           shouldHandleCorruptRecord))
 
     canonicalizeType(rootType) match {
       case Some(st: StructType) => st
@@ -82,8 +82,8 @@ private[sql] object InferSchema {
   /**
     * Infer the type of a json document from the parser's token stream
     */
-  private def inferField(
-      parser: JsonParser, configOptions: JSONOptions): DataType = {
+  private def inferField(parser: JsonParser,
+                         configOptions: JSONOptions): DataType = {
     import com.fasterxml.jackson.core.JsonToken._
     parser.getCurrentToken match {
       case null | VALUE_NULL => NullType
@@ -118,8 +118,8 @@ private[sql] object InferSchema {
         // the type as we pass through all JSON objects.
         var elementType: DataType = NullType
         while (nextUntil(parser, END_ARRAY)) {
-          elementType = compatibleType(
-              elementType, inferField(parser, configOptions))
+          elementType =
+            compatibleType(elementType, inferField(parser, configOptions))
         }
 
         ArrayType(elementType)
@@ -185,7 +185,8 @@ private[sql] object InferSchema {
   }
 
   private def withCorruptField(
-      struct: StructType, columnNameOfCorruptRecords: String): StructType = {
+      struct: StructType,
+      columnNameOfCorruptRecords: String): StructType = {
     if (!struct.fieldNames.contains(columnNameOfCorruptRecords)) {
       // If this given struct does not have a column used for corrupt records,
       // add this field.
@@ -205,11 +206,11 @@ private[sql] object InferSchema {
     // Since we support array of json objects at the top level,
     // we need to check the element type and find the root level data type.
     case (ArrayType(ty1, _), ty2) =>
-      compatibleRootType(
-          columnNameOfCorruptRecords, shouldHandleCorruptRecord)(ty1, ty2)
+      compatibleRootType(columnNameOfCorruptRecords,
+                         shouldHandleCorruptRecord)(ty1, ty2)
     case (ty1, ArrayType(ty2, _)) =>
-      compatibleRootType(
-          columnNameOfCorruptRecords, shouldHandleCorruptRecord)(ty1, ty2)
+      compatibleRootType(columnNameOfCorruptRecords,
+                         shouldHandleCorruptRecord)(ty1, ty2)
     // If we see any other data type at the root level, we get records that cannot be
     // parsed. So, we use the struct as the data type and add the corrupt field to the schema.
     case (struct: StructType, NullType) => struct

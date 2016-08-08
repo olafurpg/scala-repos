@@ -49,10 +49,14 @@ class MessageTest extends JUnitSuite {
     val timestamps = Array(Message.NoTimestamp, 0L, 1L)
     val magicValues = Array(Message.MagicValue_V0, Message.MagicValue_V1)
     for (k <- keys; v <- vals; codec <- codecs; t <- timestamps;
-    mv <- magicValues) {
+         mv <- magicValues) {
       val timestamp = ensureValid(mv, t)
-      messages += new MessageTestVal(
-          k, v, codec, timestamp, mv, new Message(v, k, timestamp, codec, mv))
+      messages += new MessageTestVal(k,
+                                     v,
+                                     codec,
+                                     timestamp,
+                                     mv,
+                                     new Message(v, k, timestamp, codec, mv))
     }
 
     def ensureValid(magicValue: Byte, timestamp: Long): Long =
@@ -72,8 +76,9 @@ class MessageTest extends JUnitSuite {
       }
       // check timestamp
       if (v.magicValue > Message.MagicValue_V0)
-        assertEquals(
-            "Timestamp should be the same", v.timestamp, v.message.timestamp)
+        assertEquals("Timestamp should be the same",
+                     v.timestamp,
+                     v.message.timestamp)
       else
         assertEquals("Timestamp should be the NoTimestamp",
                      Message.NoTimestamp,
@@ -97,8 +102,8 @@ class MessageTest extends JUnitSuite {
       // garble checksum
       val badChecksum: Int = (v.message.checksum + 1 % Int.MaxValue).toInt
       Utils.writeUnsignedInt(v.message.buffer, Message.CrcOffset, badChecksum)
-      assertFalse(
-          "Message with invalid checksum should be invalid", v.message.isValid)
+      assertFalse("Message with invalid checksum should be invalid",
+                  v.message.isValid)
     }
   }
 
@@ -121,8 +126,9 @@ class MessageTest extends JUnitSuite {
   @Test
   def testMessageFormatConversion() {
 
-    def convertAndVerify(
-        v: MessageTestVal, fromMessageFormat: Byte, toMessageFormat: Byte) {
+    def convertAndVerify(v: MessageTestVal,
+                         fromMessageFormat: Byte,
+                         toMessageFormat: Byte) {
       assertEquals(
           "Message should be the same when convert to the same version.",
           v.message.toFormatVersion(fromMessageFormat),

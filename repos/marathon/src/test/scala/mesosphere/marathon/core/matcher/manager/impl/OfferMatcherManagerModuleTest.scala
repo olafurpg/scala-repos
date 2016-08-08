@@ -7,8 +7,15 @@ import mesosphere.marathon.core.launcher.TaskOp
 import mesosphere.marathon.core.launcher.impl.TaskOpFactoryHelper
 import mesosphere.marathon.core.leadership.AlwaysElectedLeadershipModule
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpSource, TaskOpWithSource}
-import mesosphere.marathon.core.matcher.manager.{OfferMatcherManagerConfig, OfferMatcherManagerModule}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps,
+  TaskOpSource,
+  TaskOpWithSource
+}
+import mesosphere.marathon.core.matcher.manager.{
+  OfferMatcherManagerConfig,
+  OfferMatcherManagerModule
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.Timestamp
@@ -24,7 +31,9 @@ import scala.util.Random
 import scala.collection.JavaConverters._
 
 class OfferMatcherManagerModuleTest
-    extends FunSuite with BeforeAndAfter with MarathonShutdownHookSupport
+    extends FunSuite
+    with BeforeAndAfter
+    with MarathonShutdownHookSupport
     with Matchers {
 
   // FIXME: Missing Tests
@@ -169,8 +178,11 @@ class OfferMatcherManagerModuleTest
     val actorSystem = AlwaysElectedLeadershipModule(shutdownHooks)
     val config = new OfferMatcherManagerConfig {}
     config.afterInit()
-    module = new OfferMatcherManagerModule(
-        clock, random, new Metrics(new MetricRegistry), config, actorSystem)
+    module = new OfferMatcherManagerModule(clock,
+                                           random,
+                                           new Metrics(new MetricRegistry),
+                                           config,
+                                           actorSystem)
   }
 
   /**
@@ -186,16 +198,16 @@ class OfferMatcherManagerModuleTest
       tasks.map { task =>
         task.toBuilder
           .setTaskId(task.getTaskId.toBuilder.setValue(
-                  task.getTaskId.getValue + "_" + processCycle))
+              task.getTaskId.getValue + "_" + processCycle))
           .build()
       }
     }
 
-    protected def matchTasks(
-        deadline: Timestamp, offer: Offer): Seq[TaskInfo] = numberedTasks()
+    protected def matchTasks(deadline: Timestamp,
+                             offer: Offer): Seq[TaskInfo] = numberedTasks()
 
-    override def matchOffer(
-        deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+    override def matchOffer(deadline: Timestamp,
+                            offer: Offer): Future[MatchedTaskOps] = {
       val opsWithSources = matchTasks(deadline, offer).map { task =>
         val launch =
           f.launch(task, MarathonTestHelper.makeTaskFromTaskInfo(task, offer))

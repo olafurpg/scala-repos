@@ -43,8 +43,8 @@ private[debugger] object BytecodeUtil {
   val twoBytesLoadCodes = twoBytesCodes.values.toSet
   val twoBytesStoreCodes = twoBytesCodes.keySet
 
-  val returnCodes = Set(
-      areturn, dreturn, freturn, ireturn, lreturn, voidReturn)
+  val returnCodes =
+    Set(areturn, dreturn, freturn, ireturn, lreturn, voidReturn)
 
   def iloadCode(istoreCode: Seq[Byte]): Seq[Byte] = {
     istoreCode match {

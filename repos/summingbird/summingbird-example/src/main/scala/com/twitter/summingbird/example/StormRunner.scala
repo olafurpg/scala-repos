@@ -21,7 +21,11 @@ import com.twitter.summingbird.Options
 import com.twitter.summingbird.option.CacheSize
 import com.twitter.summingbird.online.MergeableStoreFactory
 import com.twitter.summingbird.storm.{Storm, Executor, StormExecutionConfig}
-import com.twitter.summingbird.online.option.{FlatMapParallelism, SummerParallelism, SourceParallelism}
+import com.twitter.summingbird.online.option.{
+  FlatMapParallelism,
+  SummerParallelism,
+  SourceParallelism
+}
 import backtype.storm.{Config => BTConfig}
 import com.twitter.scalding.Args
 import com.twitter.tormenta.spout.TwitterSpout
@@ -129,7 +133,7 @@ object StormRunner {
             .set(FlatMapParallelism(80))
             .set(SourceParallelism(16))
             .set(CacheSize(100))
-        )
+      )
       override def graph = wordCount[Storm](spout, storeSupplier)
     }
   }

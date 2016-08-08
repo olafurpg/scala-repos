@@ -28,20 +28,20 @@ object HttpEventActor {
   case class NotificationFailed(url: String)
   case class NotificationSuccess(url: String)
 
-  case class EventNotificationLimit(
-      failedCount: Long, backoffUntil: Option[Deadline]) {
+  case class EventNotificationLimit(failedCount: Long,
+                                    backoffUntil: Option[Deadline]) {
     def nextFailed: EventNotificationLimit = {
       val next = failedCount + 1
-      EventNotificationLimit(
-          next, Some(math.pow(2, next.toDouble).seconds.fromNow))
+      EventNotificationLimit(next,
+                             Some(math.pow(2, next.toDouble).seconds.fromNow))
     }
     def notLimited: Boolean = backoffUntil.fold(true)(_.isOverdue())
     def limited: Boolean = !notLimited
   }
   val NoLimit = EventNotificationLimit(0, None)
 
-  private case class Broadcast(
-      event: MarathonEvent, subscribers: EventSubscribers)
+  private case class Broadcast(event: MarathonEvent,
+                               subscribers: EventSubscribers)
 
   class HttpEventActorMetrics @Inject()(metrics: Metrics) {
     private val pre = MetricPrefixes.SERVICE
@@ -67,7 +67,9 @@ class HttpEventActor(conf: HttpEventConfiguration,
                      subscribersKeeper: ActorRef,
                      metrics: HttpEventActorMetrics,
                      clock: Clock)
-    extends Actor with ActorLogging with PlayJsonSupport {
+    extends Actor
+    with ActorLogging
+    with PlayJsonSupport {
 
   implicit val timeout = HttpEventModule.timeout
   def pipeline(
@@ -106,7 +108,7 @@ class HttpEventActor(conf: HttpEventConfiguration,
     if (limited.nonEmpty) {
       log.info(
           s"""Will not send event ${event.eventType} to unresponsive hosts: ${limited
-        .mkString(" ")}""")
+            .mkString(" ")}""")
     }
     //remove all unsubscribed callback listener
     limiter = limiter
@@ -137,7 +139,7 @@ class HttpEventActor(conf: HttpEventConfiguration,
       case Success(res) if res.status.isSuccess =>
         val inTime = start.until(clock.now()) < conf.slowConsumerTimeout
         eventActor !
-        (if (inTime) NotificationSuccess(url) else NotificationFailed(url))
+          (if (inTime) NotificationSuccess(url) else NotificationFailed(url))
       case Success(res) =>
         log.warning(s"No success response for post $event to $url")
         metrics.failedCallbacks.mark()

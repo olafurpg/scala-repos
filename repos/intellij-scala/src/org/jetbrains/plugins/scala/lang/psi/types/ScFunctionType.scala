@@ -8,9 +8,16 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 
 import scala.annotation.tailrec
@@ -20,7 +27,8 @@ import scala.annotation.tailrec
   */
 object ScFunctionType {
   def apply(returnType: ScType, params: Seq[ScType])(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+      project: Project,
+      scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -48,7 +56,8 @@ object ScFunctionType {
 
 object ScPartialFunctionType {
   def apply(returnType: ScType, param: ScType)(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+      project: Project,
+      scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -63,7 +72,8 @@ object ScPartialFunctionType {
   }
 
   def unapply(tp: ScType): Option[(ScType, ScType)] = {
-    ScSynteticSugarClassesUtil.extractForPrefix(tp, "scala.PartialFunction") match {
+    ScSynteticSugarClassesUtil
+      .extractForPrefix(tp, "scala.PartialFunction") match {
       case Some((clazz, typeArgs)) if typeArgs.length == 2 =>
         Some(typeArgs(1), typeArgs(0))
       case _ => None
@@ -74,8 +84,8 @@ object ScPartialFunctionType {
 }
 
 object ScTupleType {
-  def apply(components: Seq[ScType])(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+  def apply(components: Seq[ScType])(project: Project,
+                                     scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -113,7 +123,7 @@ object ScSynteticSugarClassesUtil {
           case p: ScParameterizedType =>
             def startsWith(clazz: PsiClass, qualNamePrefix: String) =
               clazz.qualifiedName != null &&
-              clazz.qualifiedName.startsWith(qualNamePrefix)
+                clazz.qualifiedName.startsWith(qualNamePrefix)
 
             ScType.extractClassType(p.designator) match {
               case Some((clazz: ScTypeDefinition, sub))

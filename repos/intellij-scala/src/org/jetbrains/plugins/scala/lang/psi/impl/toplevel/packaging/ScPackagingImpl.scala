@@ -34,8 +34,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
                                nodeType: IElementType,
                                node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScPackaging
-    with ScImportsHolder with ScDeclarationSequenceHolder {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScPackaging
+    with ScImportsHolder
+    with ScDeclarationSequenceHolder {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScPackageContainerStub) = {
@@ -168,12 +170,14 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     }
 
     if (lastParent != null && lastParent.getContext == this) {
-      if (!super [ScImportsHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+      if (!super[ScImportsHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
 
       if (ScalaFileImpl.isProcessLocalClasses(lastParent) &&
-          !super [ScDeclarationSequenceHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+          !super[ScDeclarationSequenceHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
     }
 
     true
@@ -190,7 +194,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     if (isExplicit) {
       val startOffset =
         findChildByType[PsiElement](ScalaTokenTypes.tLBRACE).getTextRange.getEndOffset -
-        getTextRange.getStartOffset
+          getTextRange.getStartOffset
       val text = getText
       val endOffset =
         if (text.apply(text.length - 1) == '}') { text.length - 1 } else

@@ -84,8 +84,8 @@ object LambdaDeserializer {
                    implMethodSig)
       } catch {
         case e: ReflectiveOperationException =>
-          throw new IllegalArgumentException(
-              "Illegal lambda deserialization", e)
+          throw new IllegalArgumentException("Illegal lambda deserialization",
+                                             e)
       }
 
       val flags: Int =
@@ -124,8 +124,8 @@ object LambdaDeserializer {
           case target => target
         }
 
-    val captures = Array.tabulate(serialized.getCapturedArgCount)(
-        n => serialized.getCapturedArg(n))
+    val captures = Array.tabulate(serialized.getCapturedArgCount)(n =>
+      serialized.getCapturedArg(n))
     factory.invokeWithArguments(captures: _*)
   }
 

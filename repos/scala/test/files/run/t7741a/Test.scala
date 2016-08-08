@@ -35,8 +35,8 @@ object Test extends DirectTest {
     //   final static def closure = { x -> "banana" }
     //
     // }
-    writeFile(
-        GroovyInterfaceDump.dump(), new File(outdir, "GroovyInterface.class"))
+    writeFile(GroovyInterfaceDump.dump(),
+              new File(outdir, "GroovyInterface.class"))
     writeFile(GroovyInterface$1Dump.dump(),
               new File(outdir, "GroovyInterface$1.class"))
     compileCode("object Test { def foo(g: GroovyInterface) = g.toString }")

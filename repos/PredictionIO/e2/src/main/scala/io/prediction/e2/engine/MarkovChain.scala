@@ -56,8 +56,8 @@ object MarkovChain {
   * @param transitionVectors transition vectors
   * @param n top N used to construct the model
   */
-case class MarkovChainModel(
-    transitionVectors: RDD[(Int, SparseVector)], n: Int) {
+case class MarkovChainModel(transitionVectors: RDD[(Int, SparseVector)],
+                            n: Int) {
 
   /**
     * Calculate the probabilities of the next state

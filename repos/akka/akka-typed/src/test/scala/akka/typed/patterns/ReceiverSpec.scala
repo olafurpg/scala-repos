@@ -64,13 +64,14 @@ class ReceiverSpec extends TypedSpec {
       .message(ctx, GetAll(1.nano)(dummyInbox.ref))
       .message(ctx, GetAll(Duration.Zero)(dummyInbox.ref))
 
-  private def setup(
-      name: String, behv: Behavior[Command[Msg]] = behavior[Msg])(
+  private def setup(name: String,
+                    behv: Behavior[Command[Msg]] = behavior[Msg])(
       proc: (EffectfulActorContext[Command[Msg]], EffectfulActorContext[Msg],
-      Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
+             Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
     for (Setup(description, behv, messages, effects) ← startingPoints) {
-      val ctx = new EffectfulActorContext(
-          "ctx", Props(ScalaDSL.ContextAware(behv)), system)
+      val ctx = new EffectfulActorContext("ctx",
+                                          Props(ScalaDSL.ContextAware(behv)),
+                                          system)
       withClue(
           s"[running for starting point '$description' (${ctx.currentBehavior})]: ") {
         dummyInbox.receiveAll() should have size messages
@@ -180,7 +181,8 @@ class ReceiverSpec extends TypedSpec {
         int.run(GetOne(Duration.Zero)(inbox.ref))
         inbox.receiveAll() should be(
             GetOneResult(int.self, Some(Msg(3))) :: GetOneResult(
-                int.self, Some(Msg(4))) :: Nil)
+                int.self,
+                Some(Msg(4))) :: Nil)
         int.hasEffects should be(false)
       }
 
@@ -201,8 +203,8 @@ class ReceiverSpec extends TypedSpec {
         int.hasEffects should be(false)
       }
 
-    private def assertScheduled[T, U](
-        s: Scheduled[T], target: ActorRef[U]): U = {
+    private def assertScheduled[T, U](s: Scheduled[T],
+                                      target: ActorRef[U]): U = {
       s.target should be(target)
       // unfortunately Scala cannot automatically transfer the hereby established type knowledge
       s.msg.asInstanceOf[U]

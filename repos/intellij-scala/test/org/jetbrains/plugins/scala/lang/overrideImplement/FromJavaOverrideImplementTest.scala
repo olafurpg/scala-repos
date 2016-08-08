@@ -3,7 +3,10 @@ package lang.overrideImplement
 
 import com.intellij.testFramework.IdeaTestUtil
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
-import com.intellij.testFramework.fixtures.{JavaCodeInsightFixtureTestCase, ModuleFixture}
+import com.intellij.testFramework.fixtures.{
+  JavaCodeInsightFixtureTestCase,
+  ModuleFixture
+}
 import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import org.junit.Assert.assertEquals
@@ -27,10 +30,12 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
               needsInferType: Boolean = true) {
     myFixture.addFileToProject("JavaDummy.java", javaText.stripMargin.trim)
     val scalaFile = myFixture.configureByText(
-        "ScalaDummy.scala", scalaText.replace("\r", "").stripMargin.trim)
+        "ScalaDummy.scala",
+        scalaText.replace("\r", "").stripMargin.trim)
     val oldSpecifyRetType =
       ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = needsInferType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      needsInferType
     ScalaOIUtil.invokeOverrideImplement(myFixture.getProject,
                                         myFixture.getEditor,
                                         scalaFile,
@@ -38,7 +43,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
                                         methodName)
     assertEquals(expectedText.replace("\r", "").stripMargin.trim,
                  scalaFile.getText.stripMargin.trim)
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyRetType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      oldSpecifyRetType
   }
 
   def testDefaultImplementations(): Unit = {

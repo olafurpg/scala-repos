@@ -50,14 +50,10 @@ class PersistenceEngineSuite extends SparkFunSuite {
     // starting zkTestServer. But the failure possibility should be very low.
     val zkTestServer = new TestingServer(findFreePort(conf))
     try {
-      testPersistenceEngine(
-          conf,
-          serializer =>
-            {
-              conf.set("spark.deploy.zookeeper.url",
-                       zkTestServer.getConnectString)
-              new ZooKeeperPersistenceEngine(conf, serializer)
-          })
+      testPersistenceEngine(conf, serializer => {
+        conf.set("spark.deploy.zookeeper.url", zkTestServer.getConnectString)
+        new ZooKeeperPersistenceEngine(conf, serializer)
+      })
     } finally {
       zkTestServer.stop()
     }
@@ -82,8 +78,8 @@ class PersistenceEngineSuite extends SparkFunSuite {
       assert(persistenceEngine.read[String]("test_").isEmpty)
 
       // Test deserializing objects that contain RpcEndpointRef
-      val testRpcEnv = RpcEnv.create(
-          "test", "localhost", 12345, conf, new SecurityManager(conf))
+      val testRpcEnv = RpcEnv
+        .create("test", "localhost", 12345, conf, new SecurityManager(conf))
       try {
         // Create a real endpoint so that we can test RpcEndpointRef deserialization
         val workerEndpoint =
@@ -91,14 +87,14 @@ class PersistenceEngineSuite extends SparkFunSuite {
             override val rpcEnv: RpcEnv = testRpcEnv
           })
 
-        val workerToPersist = new WorkerInfo(
-            id = "test_worker",
-            host = "127.0.0.1",
-            port = 10000,
-            cores = 0,
-            memory = 0,
-            endpoint = workerEndpoint,
-            webUiAddress = "http://localhost:80")
+        val workerToPersist = new WorkerInfo(id = "test_worker",
+                                             host = "127.0.0.1",
+                                             port = 10000,
+                                             cores = 0,
+                                             memory = 0,
+                                             endpoint = workerEndpoint,
+                                             webUiAddress =
+                                               "http://localhost:80")
 
         persistenceEngine.addWorker(workerToPersist)
 
@@ -131,14 +127,11 @@ class PersistenceEngineSuite extends SparkFunSuite {
   private def findFreePort(conf: SparkConf): Int = {
     val candidatePort = RandomUtils.nextInt(1024, 65536)
     Utils
-      .startServiceOnPort(candidatePort,
-                          (trialPort: Int) =>
-                            {
-                              val socket = new ServerSocket(trialPort)
-                              socket.close()
-                              (null, trialPort)
-                          },
-                          conf)
+      .startServiceOnPort(candidatePort, (trialPort: Int) => {
+        val socket = new ServerSocket(trialPort)
+        socket.close()
+        (null, trialPort)
+      }, conf)
       ._2
   }
 }

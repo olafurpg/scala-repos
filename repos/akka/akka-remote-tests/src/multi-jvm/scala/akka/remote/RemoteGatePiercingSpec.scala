@@ -10,7 +10,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociateExplicitly,
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,16 +28,19 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.transport-failure-detector.acceptable-heartbeat-pause = 5 s
                               """)))
 
-  nodeConfig(first)(ConfigFactory.parseString(
+  nodeConfig(first)(
+      ConfigFactory.parseString(
           "akka.remote.retry-gate-closed-for  = 1 d # Keep it long"))
 
-  nodeConfig(second)(ConfigFactory.parseString(
+  nodeConfig(second)(
+      ConfigFactory.parseString(
           "akka.remote.retry-gate-closed-for  = 1 s # Keep it short"))
 
   testTransport(on = true)
@@ -49,7 +56,8 @@ class RemoteGatePiercingSpecMultiJvmNode1 extends RemoteGatePiercingSpec
 class RemoteGatePiercingSpecMultiJvmNode2 extends RemoteGatePiercingSpec
 
 abstract class RemoteGatePiercingSpec
-    extends MultiNodeSpec(RemoteGatePiercingSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteGatePiercingSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteGatePiercingSpec._

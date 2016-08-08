@@ -43,11 +43,13 @@ class ParametersAnnotatorTest extends SimpleTestCase {
     }
     assertMatches(messages("def f(a: A*, b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*", "*-parameter must come last") :: Nil =>
+          "b: B*",
+          "*-parameter must come last") :: Nil =>
     }
     assertMatches(messages("def f(a: A*, c: C)(b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*", "*-parameter must come last") :: Nil =>
+          "b: B*",
+          "*-parameter must come last") :: Nil =>
     }
   }
 

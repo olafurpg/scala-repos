@@ -3,7 +3,10 @@ package mesosphere.mesos.scale
 import java.io.File
 
 import mesosphere.marathon.api.v2.json.{AppUpdate}
-import mesosphere.marathon.integration.facades.{ITDeploymentResult, MarathonFacade}
+import mesosphere.marathon.integration.facades.{
+  ITDeploymentResult,
+  MarathonFacade
+}
 import mesosphere.marathon.integration.setup._
 import MarathonFacade._
 import mesosphere.marathon.state.{AppDefinition, PathId}
@@ -19,8 +22,11 @@ object SingleAppScalingTest {
 }
 
 class SingleAppScalingTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -52,8 +58,8 @@ class SingleAppScalingTest
   private[this] def createStopApp(instances: Int): Unit = {
     Given("a new app")
     val appIdPath: PathId = testBasePath / "/test/app"
-    val app = appProxy(
-        appIdPath, "v1", instances = instances, withHealth = false)
+    val app =
+      appProxy(appIdPath, "v1", instances = instances, withHealth = false)
 
     When("the app gets posted")
     val createdApp: RestResult[AppDefinition] = marathon.createAppV2(app)
@@ -121,10 +127,10 @@ class SingleAppScalingTest
           marathon.metrics().entityJson)
     }
 
-    ScalingTestResultFiles.writeJson(
-        SingleAppScalingTest.appInfosFile, appInfos.result())
-    ScalingTestResultFiles.writeJson(
-        SingleAppScalingTest.metricsFile, metrics.result())
+    ScalingTestResultFiles.writeJson(SingleAppScalingTest.appInfosFile,
+                                     appInfos.result())
+    ScalingTestResultFiles.writeJson(SingleAppScalingTest.metricsFile,
+                                     metrics.result())
 
     log.info("XXX suspend")
     val result = marathon

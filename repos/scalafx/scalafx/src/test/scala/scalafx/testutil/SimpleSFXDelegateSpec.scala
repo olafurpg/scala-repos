@@ -47,10 +47,10 @@ import scalafx.delegate.SFXDelegate
   *                it has to be resolved automatically by the compiler.
   *
   */
-abstract class SimpleSFXDelegateSpec[
-    J <: Object, S <: SFXDelegate[J]] protected (
-    javaClass: Class[J], scalaClass: Class[S])(
-    implicit jfx2sfx: J => S = null, sfx2jfx: S => J = null)
+abstract class SimpleSFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
+    javaClass: Class[J],
+    scalaClass: Class[S])(implicit jfx2sfx: J => S = null,
+                          sfx2jfx: S => J = null)
     extends SFXDelegateSpec[J, S](javaClass, scalaClass)
     with PropertyComparator {
 

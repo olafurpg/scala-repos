@@ -38,5 +38,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class HTMLEditorSpec
     extends SimpleSFXDelegateSpec[jfxsw.HTMLEditor, HTMLEditor](
-        classOf[jfxsw.HTMLEditor], classOf[HTMLEditor])
+        classOf[jfxsw.HTMLEditor],
+        classOf[HTMLEditor])
     with RunOnApplicationThread {}

@@ -8,7 +8,7 @@ package patterns
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, ScTupleType}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

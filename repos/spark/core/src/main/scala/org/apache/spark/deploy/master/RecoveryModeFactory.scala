@@ -30,8 +30,8 @@ import org.apache.spark.serializer.Serializer
   *
   */
 @DeveloperApi
-abstract class StandaloneRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer) {
+abstract class StandaloneRecoveryModeFactory(conf: SparkConf,
+                                             serializer: Serializer) {
 
   /**
     * PersistenceEngine defines how the persistent data(Information about worker, driver etc..)
@@ -50,9 +50,10 @@ abstract class StandaloneRecoveryModeFactory(
   * LeaderAgent in this case is a no-op. Since leader is forever leader as the actual
   * recovery is made by restoring from filesystem.
   */
-private[master] class FileSystemRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer)
-    extends StandaloneRecoveryModeFactory(conf, serializer) with Logging {
+private[master] class FileSystemRecoveryModeFactory(conf: SparkConf,
+                                                    serializer: Serializer)
+    extends StandaloneRecoveryModeFactory(conf, serializer)
+    with Logging {
 
   val RECOVERY_DIR = conf.get("spark.deploy.recoveryDirectory", "")
 
@@ -66,8 +67,8 @@ private[master] class FileSystemRecoveryModeFactory(
   }
 }
 
-private[master] class ZooKeeperRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer)
+private[master] class ZooKeeperRecoveryModeFactory(conf: SparkConf,
+                                                   serializer: Serializer)
     extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   def createPersistenceEngine(): PersistenceEngine = {

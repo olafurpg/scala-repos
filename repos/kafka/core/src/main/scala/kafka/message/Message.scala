@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -50,10 +50,10 @@ object Message {
 
   private val MessageHeaderSizeMap = Map(
       (0: Byte) ->
-      (CrcLength +
+        (CrcLength +
           MagicLength + AttributesLength + KeySizeLength + ValueSizeLength),
       (1: Byte) ->
-      (CrcLength + MagicLength + AttributesLength + TimestampLength +
+        (CrcLength + MagicLength + AttributesLength + TimestampLength +
           KeySizeLength + ValueSizeLength))
 
   /**
@@ -130,10 +130,10 @@ object Message {
   * @param wrapperMessageTimestampType the wrapper message timestamp type, which is only defined when the message is an
   *                                    inner message of a compressed message.
   */
-class Message(
-    val buffer: ByteBuffer,
-    private val wrapperMessageTimestamp: Option[Long] = None,
-    private val wrapperMessageTimestampType: Option[TimestampType] = None) {
+class Message(val buffer: ByteBuffer,
+              private val wrapperMessageTimestamp: Option[Long] = None,
+              private val wrapperMessageTimestampType: Option[TimestampType] =
+                None) {
 
   import kafka.message.Message._
 
@@ -157,14 +157,15 @@ class Message(
            payloadSize: Int,
            magicValue: Byte) = {
     this(
-        ByteBuffer.allocate(Message.CrcLength + Message.MagicLength +
-            Message.AttributesLength +
-            (if (magicValue == Message.MagicValue_V0) 0
-             else Message.TimestampLength) + Message.KeySizeLength +
-            (if (key == null) 0 else key.length) + Message.ValueSizeLength +
-            (if (bytes == null) 0
-             else if (payloadSize >= 0) payloadSize
-             else bytes.length - payloadOffset)))
+        ByteBuffer.allocate(
+            Message.CrcLength + Message.MagicLength +
+              Message.AttributesLength +
+              (if (magicValue == Message.MagicValue_V0) 0
+               else Message.TimestampLength) + Message.KeySizeLength +
+              (if (key == null) 0 else key.length) + Message.ValueSizeLength +
+              (if (bytes == null) 0
+               else if (payloadSize >= 0) payloadSize
+               else bytes.length - payloadOffset)))
     validateTimestampAndMagicValue(timestamp, magicValue)
     // skip crc, we will fill that in at the end
     buffer.position(MagicOffset)
@@ -380,16 +381,16 @@ class Message(
     }
   }
 
-  def convertToBuffer(
-      toMagicValue: Byte,
-      byteBuffer: ByteBuffer,
-      now: Long,
-      timestampType: TimestampType = wrapperMessageTimestampType.getOrElse(
-            TimestampType.forAttributes(attributes))) {
+  def convertToBuffer(toMagicValue: Byte,
+                      byteBuffer: ByteBuffer,
+                      now: Long,
+                      timestampType: TimestampType =
+                        wrapperMessageTimestampType.getOrElse(
+                            TimestampType.forAttributes(attributes))) {
     if (byteBuffer.remaining() < size + headerSizeDiff(magic, toMagicValue))
       throw new IndexOutOfBoundsException(
           "The byte buffer does not have enough capacity to hold new message format " +
-          s"version $toMagicValue")
+            s"version $toMagicValue")
     if (toMagicValue == Message.MagicValue_V1) {
       // Up-conversion, reserve CRC and update magic byte
       byteBuffer.position(Message.MagicOffset)
@@ -414,8 +415,9 @@ class Message(
     }
     // update crc value
     val newMessage = new Message(byteBuffer)
-    Utils.writeUnsignedInt(
-        byteBuffer, Message.CrcOffset, newMessage.computeChecksum)
+    Utils.writeUnsignedInt(byteBuffer,
+                           Message.CrcOffset,
+                           newMessage.computeChecksum)
     byteBuffer.rewind()
   }
 

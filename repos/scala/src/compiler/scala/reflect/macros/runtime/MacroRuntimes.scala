@@ -35,7 +35,8 @@ trait MacroRuntimes extends JavaReflectionRuntimes {
       fastTrack(macroDef)
     } else {
       macroRuntimesCache.getOrElseUpdate(
-          macroDef, new MacroRuntimeResolver(macroDef).resolveRuntime())
+          macroDef,
+          new MacroRuntimeResolver(macroDef).resolveRuntime())
     }
   }
 
@@ -62,8 +63,8 @@ trait MacroRuntimes extends JavaReflectionRuntimes {
     def resolveRuntime(): MacroRuntime = {
       if (className == Predef_???.owner.javaClassName &&
           methName == Predef_???.name.encoded) { args =>
-        throw new AbortMacroException(
-            args.c.enclosingPosition, "macro implementation is missing")
+        throw new AbortMacroException(args.c.enclosingPosition,
+                                      "macro implementation is missing")
       } else {
         try {
           macroLogVerbose(

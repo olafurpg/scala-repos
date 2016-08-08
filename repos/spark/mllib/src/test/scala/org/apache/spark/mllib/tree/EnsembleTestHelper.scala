@@ -84,8 +84,8 @@ object EnsembleTestHelper {
         s"validateRegressor calculated $metricName $metric but required $required.")
   }
 
-  def generateOrderedLabeledPoints(
-      numFeatures: Int, numInstances: Int): Array[LabeledPoint] = {
+  def generateOrderedLabeledPoints(numFeatures: Int,
+                                   numInstances: Int): Array[LabeledPoint] = {
     val arr = new Array[LabeledPoint](numInstances)
     for (i <- 0 until numInstances) {
       val label =

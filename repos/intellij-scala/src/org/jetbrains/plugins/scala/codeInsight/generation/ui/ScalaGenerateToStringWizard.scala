@@ -20,8 +20,8 @@ import scala.collection.JavaConversions._
   *
   * @author Rado Buransky (buransky.com)
   */
-class ScalaGenerateToStringWizard(
-    project: Project, classMembers: Seq[ScNamedElement])
+class ScalaGenerateToStringWizard(project: Project,
+                                  classMembers: Seq[ScNamedElement])
     extends AbstractWizard[Step](
         ScalaBundle.message(
             "org.jetbrains.plugins.scala.codeInsight.generation.ui.toString.title"),

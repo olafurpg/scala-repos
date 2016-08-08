@@ -20,7 +20,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 @RunWith(classOf[JUnitRunner])
 class ClientBuilderTest
-    extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with MockitoSugar
     with IntegrationBase {
 
   trait ClientBuilderHelper {
@@ -33,8 +36,9 @@ class ClientBuilderTest
       .asInstanceOf[ServiceFactory[Any, Nothing]]
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                    any[Stack.Params]))
+    when(
+        m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
+                                   any[Stack.Params]))
       .thenReturn(preparedFactory)
   }
 
@@ -43,8 +47,8 @@ class ClientBuilderTest
       val client = m.build()
       val requestFuture = client("123")
 
-      verify(m.codec).prepareConnFactory(
-          any[ServiceFactory[String, String]], any[Stack.Params])
+      verify(m.codec).prepareConnFactory(any[ServiceFactory[String, String]],
+                                         any[Stack.Params])
       verify(preparedFactory)()
 
       assert(!requestFuture.isDefined)

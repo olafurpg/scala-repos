@@ -19,8 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScAnnotationStubImpl.EMPT
   */
 class ScAnnotationStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement],
     name: StringRef = EMPTY_STRING_REF,
     typeText: StringRef = EMPTY_STRING_REF)
     extends StubBaseWrapper[ScAnnotation](parent, elemType)
@@ -36,8 +36,8 @@ class ScAnnotationStubImpl[ParentPsi <: PsiElement](
       if (typeElement != null && (typeElement.getContext eq getPsi))
         return typeElement
     }
-    val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
-        getTypeText, getPsi, null)
+    val res: ScTypeElement = ScalaPsiElementFactory
+      .createTypeElementFromText(getTypeText, getPsi, null)
     myTypeElement = new SofterReference[ScTypeElement](res)
     res
   }

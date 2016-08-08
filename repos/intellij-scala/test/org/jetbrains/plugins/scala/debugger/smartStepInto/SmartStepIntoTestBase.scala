@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala.debugger.smartStepInto
 
 import com.intellij.debugger.actions.SmartStepTarget
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.junit.Assert
 
@@ -13,13 +17,16 @@ import scala.collection.JavaConverters._
 class SmartStepIntoTest extends SmartStepIntoTestBase with ScalaVersion_2_11
 
 class SmartStepIntoTest_212
-    extends SmartStepIntoTestBase with ScalaVersion_2_12 {
+    extends SmartStepIntoTestBase
+    with ScalaVersion_2_12 {
   override def testByNameArgument(): Unit = {
     runDebugger() {
       waitForBreakpoint()
       checkSmartStepTargets("inTryBlock(String)", "u: => String")
-      checkSmartStepInto(
-          "inTryBlock(String)", "ByNameArgument.scala", "inTryBlock", 5)
+      checkSmartStepInto("inTryBlock(String)",
+                         "ByNameArgument.scala",
+                         "inTryBlock",
+                         5)
     }
     runDebugger() {
       waitForBreakpoint()
@@ -49,8 +56,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
                         targets.map(_.getPresentation))
   }
 
-  def checkSmartStepInto(
-      target: String, source: String, methodName: String, line: Int) = {
+  def checkSmartStepInto(target: String,
+                         source: String,
+                         methodName: String,
+                         line: Int) = {
     if (targets == null) targets = availableSmartStepTargets()
     val sst = targets.find(_.getPresentation == target)
     Assert.assertTrue(s"Cannot find such target: $target", sst.isDefined)
@@ -131,8 +140,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     runDebugger() {
       waitForBreakpoint()
       checkSmartStepTargets("new A(int)", "id1()", "asString()")
-      checkSmartStepInto(
-          "new A(int)", "InnerClassAndConstructor.scala", "<init>", 6)
+      checkSmartStepInto("new A(int)",
+                         "InnerClassAndConstructor.scala",
+                         "<init>",
+                         6)
     }
     runDebugger() {
       waitForBreakpoint()
@@ -228,8 +239,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     runDebugger() {
       waitForBreakpoint()
       checkSmartStepTargets("D.unapply(D)", "foo()")
-      checkSmartStepInto(
-          "D.unapply(D)", "PostfixAndUnapply.scala", "unapply", 16)
+      checkSmartStepInto("D.unapply(D)",
+                         "PostfixAndUnapply.scala",
+                         "unapply",
+                         16)
     }
     //    runDebugger("Sample") {  //should work after cleaning up match statements
     //      waitForBreakpoint()
@@ -260,10 +273,13 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
   def testAnonymousClassFromTrait(): Unit = {
     runDebugger() {
       waitForBreakpoint()
-      checkSmartStepTargets(
-          "execute(Processor)", "new Processor()", "new Processor.execute()")
-      checkSmartStepInto(
-          "new Processor()", "AnonymousClassFromTrait.scala", "<init>", 6)
+      checkSmartStepTargets("execute(Processor)",
+                            "new Processor()",
+                            "new Processor.execute()")
+      checkSmartStepInto("new Processor()",
+                         "AnonymousClassFromTrait.scala",
+                         "<init>",
+                         6)
     }
     runDebugger() {
       waitForBreakpoint()
@@ -300,8 +316,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
       checkSmartStepTargets("execute(ProcessorClass)",
                             "new ProcessorClass()",
                             "new ProcessorClass.execute()")
-      checkSmartStepInto(
-          "new ProcessorClass()", "AnonymousClassFromClass.scala", "<init>", 6)
+      checkSmartStepInto("new ProcessorClass()",
+                         "AnonymousClassFromClass.scala",
+                         "<init>",
+                         6)
     }
     runDebugger() {
       waitForBreakpoint()
@@ -336,8 +354,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     runDebugger() {
       waitForBreakpoint()
       checkSmartStepTargets("inTryBlock(String)", "u: => String")
-      checkSmartStepInto(
-          "inTryBlock(String)", "ByNameArgument.scala", "inTryBlock", 5)
+      checkSmartStepInto("inTryBlock(String)",
+                         "ByNameArgument.scala",
+                         "inTryBlock",
+                         5)
     }
     runDebugger() {
       waitForBreakpoint()
@@ -410,8 +430,10 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     runDebugger() {
       waitForBreakpoint()
       checkSmartStepTargets("charAt(int)", "implicit toOption()")
-      checkSmartStepInto(
-          "implicit toOption()", "ImplicitClass.scala", "toOption", 6)
+      checkSmartStepInto("implicit toOption()",
+                         "ImplicitClass.scala",
+                         "toOption",
+                         6)
     }
   }
 

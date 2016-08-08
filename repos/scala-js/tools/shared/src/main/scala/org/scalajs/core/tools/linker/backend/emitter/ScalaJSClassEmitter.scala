@@ -234,8 +234,9 @@ private[scalajs] final class ScalaJSClassEmitter(
       js.Block(
           inheritedCtorDef,
           js.Assign(typeVar.prototype, js.New(inheritedCtorRef, Nil)),
-          genAddToPrototype(
-              className, js.StringLiteral("constructor"), typeVar)
+          genAddToPrototype(className,
+                            js.StringLiteral("constructor"),
+                            typeVar)
       )
     }
 
@@ -306,8 +307,11 @@ private[scalajs] final class ScalaJSClassEmitter(
   def genMethod(className: String, method: MethodDef): js.Tree = {
     implicit val pos = method.pos
 
-    val methodFun0 = desugarToFunction(
-        this, className, method.args, method.body, method.resultType == NoType)
+    val methodFun0 = desugarToFunction(this,
+                                       className,
+                                       method.args,
+                                       method.body,
+                                       method.resultType == NoType)
 
     val methodFun =
       if (Definitions.isConstructorName(method.name.name)) {
@@ -373,13 +377,13 @@ private[scalajs] final class ScalaJSClassEmitter(
     }
   }
 
-  private def genPropertyES5(
-      className: String, property: PropertyDef): js.Tree = {
+  private def genPropertyES5(className: String,
+                             property: PropertyDef): js.Tree = {
     implicit val pos = property.pos
 
     // defineProperty method
-    val defProp = genIdentBracketSelect(
-        js.VarRef(js.Ident("Object")), "defineProperty")
+    val defProp =
+      genIdentBracketSelect(js.VarRef(js.Ident("Object")), "defineProperty")
 
     // class prototype
     val proto = encodeClassVar(className).prototype
@@ -406,8 +410,11 @@ private[scalajs] final class ScalaJSClassEmitter(
       val wget = {
         if (property.getterBody == EmptyTree) base
         else {
-          val fun = desugarToFunction(
-              this, className, Nil, property.getterBody, isStat = false)
+          val fun = desugarToFunction(this,
+                                      className,
+                                      Nil,
+                                      property.getterBody,
+                                      isStat = false)
           js.StringLiteral("get") -> fun :: base
         }
       }
@@ -427,8 +434,8 @@ private[scalajs] final class ScalaJSClassEmitter(
     js.Apply(defProp, proto :: name :: descriptor :: Nil)
   }
 
-  private def genPropertyES6(
-      className: String, property: PropertyDef): js.Tree = {
+  private def genPropertyES6(className: String,
+                             property: PropertyDef): js.Tree = {
     implicit val pos = property.pos
 
     val propName = genPropertyName(property.name)
@@ -436,8 +443,11 @@ private[scalajs] final class ScalaJSClassEmitter(
     val getter = {
       if (property.getterBody == EmptyTree) js.Skip()
       else {
-        val fun = desugarToFunction(
-            this, className, Nil, property.getterBody, isStat = false)
+        val fun = desugarToFunction(this,
+                                    className,
+                                    Nil,
+                                    property.getterBody,
+                                    isStat = false)
         js.GetterDef(static = false, propName, fun.body)
       }
     }
@@ -458,9 +468,9 @@ private[scalajs] final class ScalaJSClassEmitter(
   }
 
   /** Generate `classVar.prototype.name = value` */
-  def genAddToPrototype(
-      className: String, name: js.PropertyName, value: js.Tree)(
-      implicit pos: Position): js.Tree = {
+  def genAddToPrototype(className: String,
+                        name: js.PropertyName,
+                        value: js.Tree)(implicit pos: Position): js.Tree = {
     val proto = encodeClassVar(className).prototype
     val select = name match {
       case name: js.Ident => js.DotSelect(proto, name)
@@ -526,20 +536,21 @@ private[scalajs] final class ScalaJSClassEmitter(
               case _ =>
                 var test = {
                   genIsScalaJSObject(obj) && genIsClassNameInAncestors(
-                      className, obj DOT "$classData" DOT "ancestors")
+                      className,
+                      obj DOT "$classData" DOT "ancestors")
                 }
 
                 if (isAncestorOfString)
                   test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
                           "string"))
                 if (isAncestorOfHijackedNumberClass)
                   test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
                           "number"))
                 if (isAncestorOfBoxedBooleanClass)
                   test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
                           "boolean"))
 
                 !(!test)
@@ -568,7 +579,7 @@ private[scalajs] final class ScalaJSClassEmitter(
                     throwError
                   } else {
                     js.If(js.Apply(envField("is", className), List(obj)) ||
-                          (obj === js.Null()), {
+                            (obj === js.Null()), {
                             obj
                           }, {
                             throwError
@@ -620,10 +631,9 @@ private[scalajs] final class ScalaJSClassEmitter(
                   // Array[A] </: Array[Array[A]]
                   !js.BinaryOp(JSBinaryOp.<, arrayDepth, depth) &&
                   (// Array[Array[A]] <: Array[Object]
-                      js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
-                      // Array[Int] </: Array[Object]
-                      !genIdentBracketSelect(data DOT "arrayBase",
-                                             "isPrimitive"))
+                  js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
+                  // Array[Int] </: Array[Object]
+                  !genIdentBracketSelect(data DOT "arrayBase", "isPrimitive"))
                 })
               }))
 
@@ -785,8 +795,8 @@ private[scalajs] final class ScalaJSClassEmitter(
     require(tree.kind.hasModuleAccessor,
             s"genModuleAccessor called with non-module class: $className")
 
-    val createModuleInstanceField = envFieldDef(
-        "n", className, js.Undefined(), mutable = true)
+    val createModuleInstanceField =
+      envFieldDef("n", className, js.Undefined(), mutable = true)
 
     val createAccessor = {
       val moduleInstanceVar = envField("n", className)
@@ -823,7 +833,7 @@ private[scalajs] final class ScalaJSClassEmitter(
               Definitions.decodeClassName(className).stripSuffix("$")
             val msg =
               s"Initializer of $decodedName called before completion " +
-              "of its super constructor"
+                "of its super constructor"
             val obj =
               js.New(encodeClassVar("sjsr_UndefinedBehaviorError"), Nil)
             val ctor = obj DOT js.Ident("init___T")
@@ -873,8 +883,8 @@ private[scalajs] final class ScalaJSClassEmitter(
     js.Block(exports)(tree.pos)
   }
 
-  def genConstructorExportDef(
-      cd: LinkedClass, tree: ConstructorExportDef): js.Tree = {
+  def genConstructorExportDef(cd: LinkedClass,
+                              tree: ConstructorExportDef): js.Tree = {
     import TreeDSL._
 
     implicit val pos = tree.pos
@@ -885,8 +895,12 @@ private[scalajs] final class ScalaJSClassEmitter(
 
     val thisIdent = js.Ident("$thiz")
 
-    val js.Function(ctorParams, ctorBody) = desugarToFunction(
-        this, cd.encodedName, Some(thisIdent), args, body, isStat = true)
+    val js.Function(ctorParams, ctorBody) = desugarToFunction(this,
+                                                              cd.encodedName,
+                                                              Some(thisIdent),
+                                                              args,
+                                                              body,
+                                                              isStat = true)
 
     val exportedCtor = js.Function(
         ctorParams,
@@ -924,8 +938,9 @@ private[scalajs] final class ScalaJSClassEmitter(
   }
 
   private def genClassOrModuleExportDef(
-      cd: LinkedClass, exportFullName: String, exportedValue: js.Tree)(
-      implicit pos: Position): js.Tree = {
+      cd: LinkedClass,
+      exportFullName: String,
+      exportedValue: js.Tree)(implicit pos: Position): js.Tree = {
     import TreeDSL._
 
     val (createNamespace, expAccessorVar) = genCreateNamespaceInExports(
@@ -965,6 +980,6 @@ private[scalajs] final class ScalaJSClassEmitter(
 private object ScalaJSClassEmitter {
   private val ClassesWhoseDataReferToTheirInstanceTests = {
     Definitions.AncestorsOfHijackedClasses + Definitions.ObjectClass +
-    Definitions.StringClass
+      Definitions.StringClass
   }
 }

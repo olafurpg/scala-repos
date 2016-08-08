@@ -29,20 +29,24 @@ class ReplicatedDataSerializerSpec
     extends TestKit(
         ActorSystem(
             "ReplicatedDataSerializerSpec",
-            ConfigFactory.parseString("""
+            ConfigFactory.parseString(
+                """
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
-    """))) with WordSpecLike with Matchers with BeforeAndAfterAll {
+    """)))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val serializer = new ReplicatedDataSerializer(
       system.asInstanceOf[ExtendedActorSystem])
 
-  val address1 = UniqueAddress(
-      Address("akka.tcp", system.name, "some.host.org", 4711), 1)
-  val address2 = UniqueAddress(
-      Address("akka.tcp", system.name, "other.host.org", 4711), 2)
-  val address3 = UniqueAddress(
-      Address("akka.tcp", system.name, "some.host.org", 4712), 3)
+  val address1 =
+    UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4711), 1)
+  val address2 =
+    UniqueAddress(Address("akka.tcp", system.name, "other.host.org", 4711), 2)
+  val address3 =
+    UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4712), 3)
 
   override def afterAll {
     shutdown()
@@ -146,7 +150,8 @@ class ReplicatedDataSerializerSpec
           PNCounter().increment(address1, 3).decrement(address1, 1))
       checkSerialization(
           PNCounter().increment(address1, 2).increment(address2, 5))
-      checkSerialization(PNCounter()
+      checkSerialization(
+          PNCounter()
             .increment(address1, 2)
             .increment(address2, 5)
             .decrement(address1, 1))
@@ -173,7 +178,8 @@ class ReplicatedDataSerializerSpec
     "serialize ORMap" in {
       checkSerialization(ORMap())
       checkSerialization(ORMap().put(address1, "a", GSet() + "A"))
-      checkSerialization(ORMap()
+      checkSerialization(
+          ORMap()
             .put(address1, "a", GSet() + "A")
             .put(address2, "b", GSet() + "B"))
     }
@@ -182,7 +188,8 @@ class ReplicatedDataSerializerSpec
       checkSerialization(LWWMap())
       checkSerialization(
           LWWMap().put(address1, "a", "value1", LWWRegister.defaultClock[Any]))
-      checkSerialization(LWWMap()
+      checkSerialization(
+          LWWMap()
             .put(address1, "a", "value1", LWWRegister.defaultClock[Any])
             .put(address2, "b", 17, LWWRegister.defaultClock[Any]))
     }
@@ -190,7 +197,8 @@ class ReplicatedDataSerializerSpec
     "serialize PNCounterMap" in {
       checkSerialization(PNCounterMap())
       checkSerialization(PNCounterMap().increment(address1, "a", 3))
-      checkSerialization(PNCounterMap()
+      checkSerialization(
+          PNCounterMap()
             .increment(address1, "a", 3)
             .decrement(address2, "a", 2)
             .increment(address2, "b", 5))

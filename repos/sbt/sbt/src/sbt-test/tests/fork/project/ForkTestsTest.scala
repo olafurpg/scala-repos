@@ -21,14 +21,16 @@ object ForkTestsTest extends Build {
             scalaVersion := "2.9.2",
             testGrouping in Test <<= definedTests in Test map { tests =>
             assert(tests.size == 3)
-            for (idx <- 0 until groups) yield
-              new Group(groupId(idx),
-                        tests,
-                        SubProcess(Seq("-Dgroup.prefix=" + groupPrefix(idx))))
+            for (idx <- 0 until groups)
+              yield
+                new Group(
+                    groupId(idx),
+                    tests,
+                    SubProcess(Seq("-Dgroup.prefix=" + groupPrefix(idx))))
           },
             check := {
-            val files = for (i <- 0 until groups; j <- 1 to groupSize) yield
-              file(groupPrefix(i) + j)
+            val files = for (i <- 0 until groups; j <- 1 to groupSize)
+              yield file(groupPrefix(i) + j)
             val (exist, absent) = files.partition(_.exists)
             exist.foreach(_.delete())
             if (absent.nonEmpty)

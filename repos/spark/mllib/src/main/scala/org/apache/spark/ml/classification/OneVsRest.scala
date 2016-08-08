@@ -51,8 +51,8 @@ private[ml] trait OneVsRestParams extends PredictorParams {
     * the ones specified in [[OneVsRest]].
     * @group param
     */
-  val classifier: Param[ClassifierType] = new Param(
-      this, "classifier", "base binary classifier")
+  val classifier: Param[ClassifierType] =
+    new Param(this, "classifier", "base binary classifier")
 
   /** @group getParam */
   def getClassifier: ClassifierType = $(classifier)
@@ -73,16 +73,18 @@ private[ml] trait OneVsRestParams extends PredictorParams {
   */
 @Since("1.4.0")
 @Experimental
-final class OneVsRestModel private[ml](
+final class OneVsRestModel private[ml] (
     @Since("1.4.0") override val uid: String,
     @Since("1.4.0") labelMetadata: Metadata,
     @Since("1.4.0") val models: Array[_ <: ClassificationModel[_, _]])
-    extends Model[OneVsRestModel] with OneVsRestParams {
+    extends Model[OneVsRestModel]
+    with OneVsRestParams {
 
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
-    validateAndTransformSchema(
-        schema, fitting = false, getClassifier.featuresDataType)
+    validateAndTransformSchema(schema,
+                               fitting = false,
+                               getClassifier.featuresDataType)
   }
 
   @Since("1.4.0")
@@ -122,7 +124,8 @@ final class OneVsRestModel private[ml](
           }
           val transformedDataset = model.transform(df).select(columns: _*)
           val updatedDataset = transformedDataset.withColumn(
-              tmpColName, updateUDF(col(accColName), col(rawPredictionCol)))
+              tmpColName,
+              updateUDF(col(accColName), col(rawPredictionCol)))
           val newColumns = origCols ++ List(col(tmpColName))
 
           // switch out the intermediate column with the accumulator column
@@ -168,7 +171,8 @@ final class OneVsRestModel private[ml](
 @Since("1.4.0")
 @Experimental
 final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[OneVsRestModel] with OneVsRestParams {
+    extends Estimator[OneVsRestModel]
+    with OneVsRestParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("oneVsRest"))
@@ -193,19 +197,19 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
 
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
-    validateAndTransformSchema(
-        schema, fitting = true, getClassifier.featuresDataType)
+    validateAndTransformSchema(schema,
+                               fitting = true,
+                               getClassifier.featuresDataType)
   }
 
   @Since("1.4.0")
   override def fit(dataset: DataFrame): OneVsRestModel = {
     // determine number of classes either from metadata if provided, or via computation.
     val labelSchema = dataset.schema($(labelCol))
-    val computeNumClasses: () => Int = () =>
-      {
-        val Row(maxLabelIndex: Double) = dataset.agg(max($(labelCol))).head()
-        // classes are assumed to be numbered from 0,...,maxLabelIndex
-        maxLabelIndex.toInt + 1
+    val computeNumClasses: () => Int = () => {
+      val Row(maxLabelIndex: Double) = dataset.agg(max($(labelCol))).head()
+      // classes are assumed to be numbered from 0,...,maxLabelIndex
+      maxLabelIndex.toInt + 1
     }
     val numClasses = MetadataUtils
       .getNumClasses(labelSchema)

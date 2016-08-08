@@ -27,10 +27,12 @@ object InstructionStackEffect {
     * This method requires the `frame` to be in the state **before** executing / interpreting the
     * `insn`.
     */
-  def forAsmAnalysis[V <: Value](
-      insn: AbstractInsnNode, frame: Frame[V]): Int =
-    computeConsProd(
-        insn, forClassfile = false, conservative = false, frame = frame)
+  def forAsmAnalysis[V <: Value](insn: AbstractInsnNode,
+                                 frame: Frame[V]): Int =
+    computeConsProd(insn,
+                    forClassfile = false,
+                    conservative = false,
+                    frame = frame)
 
   /**
     * Returns the maximal possible growth of the stack when executing `insn`. The returned value
@@ -44,8 +46,8 @@ object InstructionStackEffect {
     * allows looking up the sizes of values on the stack.
     */
   def maxStackGrowth(insn: AbstractInsnNode): Int = {
-    val prodCons = computeConsProd(
-        insn, forClassfile = false, conservative = true)
+    val prodCons =
+      computeConsProd(insn, forClassfile = false, conservative = true)
     prod(prodCons) - cons(prodCons)
   }
 
@@ -70,7 +72,7 @@ object InstructionStackEffect {
     } else {
       val cons =
         Type.getArgumentTypes(methodDesc).length +
-        (if (consumesReceiver) 1 else 0)
+          (if (consumesReceiver) 1 else 0)
       val prod = if (Type.getReturnType(methodDesc) == Type.VOID_TYPE) 0 else 1
       t(cons, prod)
     }
@@ -239,12 +241,14 @@ object InstructionStackEffect {
         t(cons, 0)
 
       case INVOKEVIRTUAL | INVOKESPECIAL | INVOKESTATIC | INVOKEINTERFACE =>
-        invokeConsProd(
-            insn.asInstanceOf[MethodInsnNode].desc, insn, forClassfile)
+        invokeConsProd(insn.asInstanceOf[MethodInsnNode].desc,
+                       insn,
+                       forClassfile)
 
       case INVOKEDYNAMIC =>
-        invokeConsProd(
-            insn.asInstanceOf[InvokeDynamicInsnNode].desc, insn, forClassfile)
+        invokeConsProd(insn.asInstanceOf[InvokeDynamicInsnNode].desc,
+                       insn,
+                       forClassfile)
 
       case NEW => t(0, 1)
 

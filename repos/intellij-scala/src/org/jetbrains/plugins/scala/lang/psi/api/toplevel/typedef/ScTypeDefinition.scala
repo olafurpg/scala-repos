@@ -21,9 +21,15 @@ import scala.collection.Seq
   * @author AlexanderPodkhalyuzin
   */
 trait ScTypeDefinition
-    extends ScTemplateDefinition with ScMember with NavigationItem
-    with PsiClass with ScTypeParametersOwner with Iconable
-    with ScDocCommentOwner with ScAnnotationsHolder with ScCommentOwner {
+    extends ScTemplateDefinition
+    with ScMember
+    with NavigationItem
+    with PsiClass
+    with ScTypeParametersOwner
+    with Iconable
+    with ScDocCommentOwner
+    with ScAnnotationsHolder
+    with ScCommentOwner {
   private var synthNavElement: Option[PsiElement] = None
   var syntheticContainingClass: Option[ScTypeDefinition] = None
   def setSynthetic(navElement: PsiElement) {
@@ -104,19 +110,18 @@ trait ScTypeDefinition
               val typeElementText =
                 clazz.constructor.get.effectiveParameterClauses.map { clause =>
                   clause.effectiveParameters
-                    .map(parameter =>
-                          {
-                        val parameterText = parameter.typeElement.fold(
-                            "_root_.scala.Nothing")(_.getText)
-                        if (parameter.isRepeatedParameter)
-                          s"_root_.scala.Seq[$parameterText]"
-                        else parameterText
+                    .map(parameter => {
+                      val parameterText = parameter.typeElement.fold(
+                          "_root_.scala.Nothing")(_.getText)
+                      if (parameter.isRepeatedParameter)
+                        s"_root_.scala.Seq[$parameterText]"
+                      else parameterText
                     })
                     .mkString("(", ", ", ")")
                 }.mkString("(", " => ", s" => $name)")
               val typeElement =
-                ScalaPsiElementFactory.createTypeElementFromText(
-                    typeElementText, getManager)
+                ScalaPsiElementFactory
+                  .createTypeElementFromText(typeElementText, getManager)
               s" extends ${typeElement.getText}"
             } else {
               ""
@@ -137,7 +142,9 @@ trait ScTypeDefinition
 
     val next = ScalaPsiUtil.getNextStubOrPsiElement(this)
     val obj: ScObject = ScalaPsiElementFactory.createObjectWithContext(
-        objText, getContext, if (next != null) next else this)
+        objText,
+        getContext,
+        if (next != null) next else this)
     import org.jetbrains.plugins.scala.extensions._
     val objOption: Option[ScObject] = obj.toOption
     objOption.foreach { (obj: ScObject) =>

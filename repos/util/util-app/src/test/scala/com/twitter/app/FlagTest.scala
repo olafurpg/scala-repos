@@ -41,7 +41,8 @@ class FlagTest extends FunSuite {
 
     assert(Flaggable.ofInetSocketAddress.show(local) == s":$port")
     assert(
-        Flaggable.ofInetSocketAddress.show(remote) == s"${remote.getHostName}:$port")
+        Flaggable.ofInetSocketAddress
+          .show(remote) == s"${remote.getHostName}:$port")
   }
 
   test("Flaggable: parse seqs") {
@@ -53,13 +54,17 @@ class FlagTest extends FunSuite {
   }
 
   test("Flaggable: parse maps with comma-separated values") {
-    assert(Flaggable.ofMap[String, Seq[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Seq(1, 2, 3, 3), "b" -> Seq(4, 5)))
+    assert(
+        Flaggable.ofMap[String, Seq[Int]].parse("a=1,2,3,3,b=4,5") == Map(
+            "a" -> Seq(1, 2, 3, 3),
+            "b" -> Seq(4, 5)))
   }
 
   test("Flaggable: parse maps of sets with comma-separated values") {
-    assert(Flaggable.ofMap[String, Set[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Set(1, 2, 3), "b" -> Set(4, 5)))
+    assert(
+        Flaggable.ofMap[String, Set[Int]].parse("a=1,2,3,3,b=4,5") == Map(
+            "a" -> Set(1, 2, 3),
+            "b" -> Set(4, 5)))
   }
 
   test("Flaggable: parse tuples") {
@@ -87,7 +92,8 @@ class FlagTest extends FunSuite {
   test("Flag: add and parse flags") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags
+    assert(
+        flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags
           .Ok(Nil))
     flag.finishParsing()
     assert(fooFlag() == 973)
@@ -126,7 +132,8 @@ class FlagTest extends FunSuite {
       intercept[IllegalArgumentException] {
         bazFlag()
       }
-      assert(naive.toSet == Set(
+      assert(
+          naive.toSet == Set(
               Entry(Seq("flags", "baz"), Flag.EmptyRequired),
               Entry(Seq("flags", "help"), "false")
           ))
@@ -141,7 +148,8 @@ class FlagTest extends FunSuite {
       assert(flag.parseArgs(Array()) == Flags.Ok(Nil))
       flag.finishParsing()
       assert(fooFlag() == 123)
-      assert(naive.toSet == Set(
+      assert(
+          naive.toSet == Set(
               Entry(Seq("flags", "foo"), "123"),
               Entry(Seq("flags", "help"), "false")
           ))
@@ -155,8 +163,8 @@ class FlagTest extends FunSuite {
     val allFlags = flag.getAll().toSet
 
     flag.finishParsing()
-    assert(!allFlags.exists(_ () == 1), "original flag was not overridden")
-    assert(allFlags.exists(_ () == 2),
+    assert(!allFlags.exists(_() == 1), "original flag was not overridden")
+    assert(allFlags.exists(_() == 2),
            "overriding flag was not present in flags set")
   }
 
@@ -227,21 +235,24 @@ class FlagTest extends FunSuite {
   test("Flag: handle remainders (sequential)") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("-foo", "333", "arg0", "arg1")) == Flags.Ok(
+    assert(
+        flag.parseArgs(Array("-foo", "333", "arg0", "arg1")) == Flags.Ok(
             Seq("arg0", "arg1")))
   }
 
   test("Flag: handle remainders (interpspersed)") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("arg0", "-foo", "333", "arg1")) == Flags.Ok(
+    assert(
+        flag.parseArgs(Array("arg0", "-foo", "333", "arg1")) == Flags.Ok(
             Seq("arg0", "arg1")))
   }
 
   test("Flag: stop parsing at '--'") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("arg0", "--", "-foo", "333")) == Flags.Ok(
+    assert(
+        flag.parseArgs(Array("arg0", "--", "-foo", "333")) == Flags.Ok(
             Seq("arg0", "-foo", "333")))
   }
 
@@ -267,7 +278,8 @@ class FlagTest extends FunSuite {
     val ctx = new Ctx
     import ctx._
     assert(flag.parseArgs(Array("-undefined")).isInstanceOf[Flags.Error])
-    assert(flag.parseArgs(Array("-undefined"), true) == Flags.Ok(
+    assert(
+        flag.parseArgs(Array("-undefined"), true) == Flags.Ok(
             Seq("-undefined")))
   }
 
@@ -366,15 +378,17 @@ class FlagTest extends FunSuite {
     val flagWithGlobal = new Flags("my", includeGlobal = true)
     flagWithGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithGlobal("flag.with.single.quote",
+                   "i'm so cool",
+                   "why would you do this?")
     flagWithGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val flagWithoutGlobal = new Flags("my", includeGlobal = false)
     flagWithoutGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithoutGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithoutGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithoutGlobal("flag.with.single.quote",
+                      "i'm so cool",
+                      "why would you do this?")
     flagWithoutGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val localOnly = """|Set flags:
@@ -412,7 +426,8 @@ class FlagTest extends FunSuite {
     assert(
         flagWithGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
     assert(
-        flagWithoutGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
+        flagWithoutGlobal
+          .formattedFlagValuesString(WithoutGlobal) == localOnly)
 
     assert(matchesGlobal(flagWithGlobal.formattedFlagValuesString()))
     assert(flagWithoutGlobal.formattedFlagValuesString() == localOnly)

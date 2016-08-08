@@ -1,6 +1,12 @@
 package com.typesafe.slick.testkit.util
 
-import java.io.{PrintWriter, OutputStreamWriter, BufferedWriter, FileOutputStream, FileWriter}
+import java.io.{
+  PrintWriter,
+  OutputStreamWriter,
+  BufferedWriter,
+  FileOutputStream,
+  FileWriter
+}
 
 import slick.basic.BasicProfile
 import slick.jdbc.{JdbcCapabilities, JdbcProfile}
@@ -47,12 +53,12 @@ object BuildCapabilitiesTable extends App {
 
   val capabilities = for {
     (caps, linkBase) <- profileCapabilities
-    cap <- caps.toVector
-      .sortBy(c => if (c.toString.endsWith(".other")) "" else c.toString)
+    cap <- caps.toVector.sortBy(c =>
+            if (c.toString.endsWith(".other")) "" else c.toString)
   } yield
     (cap,
      linkBase + cap.toString.replaceFirst(".*\\.", "") +
-     ":slick.basic.Capability")
+       ":slick.basic.Capability")
 
   val out = new FileOutputStream(args(0))
   try {
@@ -62,8 +68,9 @@ object BuildCapabilitiesTable extends App {
         "Capability," + profileNames.map(n => s":api:`$n`").mkString(","))
     for ((cap, link) <- capabilities) {
       val flags = profiles.map(d => d.capabilities.contains(cap))
-      wr.println(s":api:`$cap <$link>`," +
-          flags.map(b => if (b) "Yes" else "").mkString(","))
+      wr.println(
+          s":api:`$cap <$link>`," +
+            flags.map(b => if (b) "Yes" else "").mkString(","))
     }
     wr.flush()
   } finally out.close()

@@ -2,7 +2,12 @@ package org.jetbrains.plugins.scala
 package conversion
 
 import com.intellij.notification.{NotificationDisplayType, NotificationType}
-import com.intellij.openapi.actionSystem.{CommonDataKeys, AnAction, AnActionEvent, LangDataKeys}
+import com.intellij.openapi.actionSystem.{
+  CommonDataKeys,
+  AnAction,
+  AnActionEvent,
+  LangDataKeys
+}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.codeStyle.{CodeStyleManager, CodeStyleSettingsManager}
 import com.intellij.psi.{PsiDocumentManager, PsiJavaFile}
@@ -107,8 +112,10 @@ class RenameJavaToScalaAction extends AnAction {
                   manager.reformatText(file, 0, file.getTextLength)
                 } finally {
                   settings.KEEP_BLANK_LINES_IN_CODE = keep_blank_lines_in_code
-                  settings.KEEP_BLANK_LINES_IN_DECLARATIONS = keep_blank_lines_in_declarations
-                  settings.KEEP_BLANK_LINES_BEFORE_RBRACE = keep_blank_lines_before_rbrace
+                  settings.KEEP_BLANK_LINES_IN_DECLARATIONS =
+                    keep_blank_lines_in_declarations
+                  settings.KEEP_BLANK_LINES_BEFORE_RBRACE =
+                    keep_blank_lines_before_rbrace
                 }
                 file.navigate(true)
               }

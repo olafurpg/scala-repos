@@ -20,8 +20,9 @@ class TransactionFilter extends Filter {
 
   def destroy(): Unit = {}
 
-  def doFilter(
-      req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
+  def doFilter(req: ServletRequest,
+               res: ServletResponse,
+               chain: FilterChain): Unit = {
     if (req
           .asInstanceOf[HttpServletRequest]
           .getServletPath()

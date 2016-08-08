@@ -40,7 +40,8 @@ object MediaMarkerEvent {
 }
 
 class MediaMarkerEvent(override val delegate: jfxsm.MediaMarkerEvent)
-    extends ActionEvent(delegate) with SFXDelegate[jfxsm.MediaMarkerEvent] {
+    extends ActionEvent(delegate)
+    with SFXDelegate[jfxsm.MediaMarkerEvent] {
 
   /**
     * Retrieves the marker the event represents.

@@ -43,7 +43,7 @@ final class PostApi(env: Env,
             $insert(post) >> $update(topic withPost post) >> {
               shouldHideOnPost(topic) ?? TopicRepo.hide(topic.id, true)
             } >> $update(categ withTopic post) >>- (indexer ! InsertPost(post)) >>
-            (env.recent.invalidate inject post) >>- ctx.userId.?? { userId =>
+              (env.recent.invalidate inject post) >>- ctx.userId.?? { userId =>
               shutup ! post.isTeam.fold(
                   lila.hub.actorApi.shutup.RecordTeamForumMessage(userId,
                                                                   post.text),
@@ -51,12 +51,14 @@ final class PostApi(env: Env,
                                                                     post.text))
             } >>- {
               (ctx.userId ifFalse post.troll) ?? { userId =>
-                timeline ! Propagate(ForumPost(
-                        userId, topic.id.some, topic.name, post.id)).|>(prop =>
-                      post.isStaff.fold(
-                          prop toStaffFriendsOf userId,
-                          prop toFollowersOf userId toUsers topicUserIds exceptUser userId
-                    ))
+                timeline ! Propagate(ForumPost(userId,
+                                               topic.id.some,
+                                               topic.name,
+                                               post.id)).|>(prop =>
+                  post.isStaff.fold(
+                      prop toStaffFriendsOf userId,
+                      prop toFollowersOf userId toUsers topicUserIds exceptUser userId
+                ))
               }
               lila.mon.forum.post.create()
             } inject post
@@ -154,20 +156,21 @@ final class PostApi(env: Env,
       post ← optionT(PostRepo(true).byCategAndId(categSlug, postId))
       view ← optionT(view(post))
       _ ← optionT(for {
-        first ← PostRepo.isFirstPost(view.topic.id, view.post.id)
-        _ ← first.fold(
-            env.topicApi.delete(view.categ, view.topic),
-            $remove[Post](view.post) >> (env.topicApi denormalize view.topic) >>
-            (env.categApi denormalize view.categ) >> env.recent.invalidate >>-
-            (indexer ! RemovePost(post)))
-        _ ← MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
-            mod,
-            post.userId,
-            post.author,
-            post.ip,
-            text = "%s / %s / %s".format(
-                  view.categ.name, view.topic.name, post.text))
-      } yield true.some)
+           first ← PostRepo.isFirstPost(view.topic.id, view.post.id)
+           _ ← first.fold(
+                  env.topicApi.delete(view.categ, view.topic),
+                  $remove[Post](view.post) >> (env.topicApi denormalize view.topic) >>
+                    (env.categApi denormalize view.categ) >> env.recent.invalidate >>-
+                    (indexer ! RemovePost(post)))
+           _ ← MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
+                  mod,
+                  post.userId,
+                  post.author,
+                  post.ip,
+                  text = "%s / %s / %s".format(view.categ.name,
+                                               view.topic.name,
+                                               post.text))
+         } yield true.some)
     } yield ()).run.void
 
   def nbByUser(userId: String) = $count[Post](Json.obj("userId" -> userId))

@@ -27,8 +27,9 @@ private[spark] class ExecutorLossReason(val message: String)
   override def toString: String = message
 }
 
-private[spark] case class ExecutorExited(
-    exitCode: Int, exitCausedByApp: Boolean, reason: String)
+private[spark] case class ExecutorExited(exitCode: Int,
+                                         exitCausedByApp: Boolean,
+                                         reason: String)
     extends ExecutorLossReason(reason)
 
 private[spark] object ExecutorExited {

@@ -26,13 +26,13 @@ class DIMSUMModel(
     val similarities: RDD[(Int, SparseVector)],
     val itemStringIntMap: BiMap[String, Int],
     val items: Map[Int, Item]
-)
-    extends IPersistentModel[DIMSUMAlgorithmParams] {
+) extends IPersistentModel[DIMSUMAlgorithmParams] {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
-  def save(
-      id: String, params: DIMSUMAlgorithmParams, sc: SparkContext): Boolean = {
+  def save(id: String,
+           params: DIMSUMAlgorithmParams,
+           sc: SparkContext): Boolean = {
 
     similarities.saveAsObjectFile(s"/tmp/${id}/similarities")
     sc.parallelize(Seq(itemStringIntMap))
@@ -43,22 +43,23 @@ class DIMSUMModel(
 
   override def toString = {
     s"similarities: [${similarities.count()}]" +
-    s"(${similarities.take(2).toList}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
+      s"(${similarities.take(2).toList}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]" +
+      s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
   }
 }
 
 object DIMSUMModel
     extends IPersistentModelLoader[DIMSUMAlgorithmParams, DIMSUMModel] {
-  def apply(
-      id: String, params: DIMSUMAlgorithmParams, sc: Option[SparkContext]) = {
+  def apply(id: String,
+            params: DIMSUMAlgorithmParams,
+            sc: Option[SparkContext]) = {
     new DIMSUMModel(
         similarities = sc.get.objectFile(s"/tmp/${id}/similarities"),
         itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+          .first,
         items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
   }
 }
@@ -89,11 +90,11 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+          " to Int index.")
 
       (uindex, (iindex, 1.0))
     }.filter {
@@ -130,8 +131,8 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
     val reversedEntries: RDD[MatrixEntry] =
       scores.entries.map(e => new MatrixEntry(e.j, e.i, e.value))
     val combined = new CoordinateMatrix(scores.entries.union(reversedEntries))
-    val similarities = combined.toIndexedRowMatrix.rows
-      .map(row => (row.index.toInt, row.vector.asInstanceOf[SparseVector]))
+    val similarities = combined.toIndexedRowMatrix.rows.map(row =>
+      (row.index.toInt, row.vector.asInstanceOf[SparseVector]))
 
     new DIMSUMModel(
         similarities = similarities,
@@ -142,10 +143,10 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
 
   def predict(model: DIMSUMModel, query: Query): PredictedResult = {
     // convert the white and black list items to Int index
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+      set.map(model.itemStringIntMap.get(_)).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+      set.map(model.itemStringIntMap.get(_)).flatten)
 
     val queryList: Set[Int] =
       query.items.map(model.itemStringIntMap.get(_)).flatten.toSet
@@ -163,19 +164,19 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
             sims.indices.zip(sims.values).filter {
               case (i, v) =>
                 whiteList.map(_.contains(i)).getOrElse(true) &&
-                blackList.map(!_.contains(i)).getOrElse(true) &&
-                // discard items in query as well
-                (!queryList.contains(i)) && // filter categories
-                query.categories.map { cat =>
-                  model
-                    .items(i)
-                    .categories
-                    .map { itemCat =>
-                      // keep this item if has ovelap categories with the query
-                      !(itemCat.toSet.intersect(cat).isEmpty)
-                    }
-                    .getOrElse(false) // discard this item if it has no categories
-                }.getOrElse(true)
+                  blackList.map(!_.contains(i)).getOrElse(true) &&
+                  // discard items in query as well
+                  (!queryList.contains(i)) && // filter categories
+                  query.categories.map { cat =>
+                    model
+                      .items(i)
+                      .categories
+                      .map { itemCat =>
+                        // keep this item if has ovelap categories with the query
+                        !(itemCat.toSet.intersect(cat).isEmpty)
+                      }
+                      .getOrElse(false) // discard this item if it has no categories
+                  }.getOrElse(true)
             }
           }
         }

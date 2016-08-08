@@ -36,7 +36,8 @@ object LiftedEmbedding extends App {
 //#foreignkey
   class Suppliers(tag: Tag)
       extends Table[(Int, String, String, String, String, String)](
-          tag, "SUPPLIERS") {
+          tag,
+          "SUPPLIERS") {
     def id = column[Int]("SUP_ID", O.PrimaryKey)
     //...
 //#foreignkey
@@ -99,8 +100,9 @@ object LiftedEmbedding extends App {
   {
     //#schemaname
     class Coffees(tag: Tag)
-        extends Table[(String, Int, Double, Int, Int)](
-            tag, Some("MYSCHEMA"), "COFFEES") {
+        extends Table[(String, Int, Double, Int, Int)](tag,
+                                                       Some("MYSCHEMA"),
+                                                       "COFFEES") {
       //...
       //#schemaname
       def * = ???
@@ -137,11 +139,11 @@ object LiftedEmbedding extends App {
     users.map(
         u =>
           (u.first, u.last).shaped <>
-          ({ t =>
-        User(None, t._1, t._2)
-      }, { (u: User) =>
-        Some((u.first, u.last))
-      }))
+            ({ t =>
+              User(None, t._1, t._2)
+            }, { (u: User) =>
+              Some((u.first, u.last))
+            }))
 //#insert2
 
 //#index
@@ -215,7 +217,8 @@ object LiftedEmbedding extends App {
         List(
             criteriaColombian.map(coffee.name === _),
             criteriaEspresso.map(coffee.name === _),
-            criteriaRoast.map(coffee.name === _) // not a condition as `criteriaRoast` evaluates to `None`
+            criteriaRoast
+              .map(coffee.name === _) // not a condition as `criteriaRoast` evaluates to `None`
         ).collect({ case Some(criteria) => criteria })
           .reduceLeftOption(_ || _)
           .getOrElse(true: Rep[Boolean])
@@ -296,7 +299,7 @@ object LiftedEmbedding extends App {
           coffees filter { coffee =>
             // You can do any subquery here - this example uses the foreign key relation in coffees.
             coffee.supID in
-            (coffee.supplier filter { _.name === "Delete Me" } map { _.id })
+              (coffee.supplier filter { _.name === "Delete Me" } map { _.id })
           }
         val action = q.delete
         val affectedRowsCount: Future[Int] = db.run(action)
@@ -334,7 +337,7 @@ object LiftedEmbedding extends App {
           ),
           // "sales" and "total" will use the default value 0:
           coffees.map(c => (c.name, c.supID, c.price)) +=
-          ("Colombian_Decaf", 101, 8.99)
+            ("Colombian_Decaf", 101, 8.99)
       )
 
       // Get the statement without having to specify a value to insert:
@@ -348,10 +351,10 @@ object LiftedEmbedding extends App {
       Await.result(db.run(
                        DBIO.seq(
                            (suppliers ++= Seq(
-                                   (101, "", "", "", "", ""),
-                                   (49, "", "", "", "", ""),
-                                   (150, "", "", "", "", "")
-                               )),
+                               (101, "", "", "", "", ""),
+                               (49, "", "", "", "", ""),
+                               (150, "", "", "", "", "")
+                           )),
                            insertActions
                        )),
                    Duration.Inf)
@@ -365,7 +368,7 @@ object LiftedEmbedding extends App {
       //#insert3b
       val userWithId =
         (users returning users.map(_.id) into
-            ((user, id) => user.copy(id = Some(id)))) +=
+          ((user, id) => user.copy(id = Some(id)))) +=
           User(None, "Stefan", "Zeiger")
       //#insert3b
       val userWithIdRes =
@@ -383,9 +386,9 @@ object LiftedEmbedding extends App {
       val actions = DBIO.seq(
           users2.schema.create,
           users2 forceInsertQuery
-          (users.map { u =>
-                (u.id, u.first ++ " " ++ u.last)
-              }),
+            (users.map { u =>
+              (u.id, u.first ++ " " ++ u.last)
+            }),
           users2 forceInsertExpr (users.length + 1, "admin")
       )
       //#insert4
@@ -443,8 +446,8 @@ object LiftedEmbedding extends App {
       {
         //#compiled2
         val userPaged = Compiled(
-            (d: ConstColumn[Long],
-            t: ConstColumn[Long]) => users.drop(d).take(t))
+            (d: ConstColumn[Long], t: ConstColumn[Long]) =>
+              users.drop(d).take(t))
 
         val usersAction1 = userPaged(2, 1).result
         val usersAction2 = userPaged(1, 3).result
@@ -484,8 +487,8 @@ object LiftedEmbedding extends App {
       // Use the lifted function in a query to group by day of week
       val q1 = for {
         (dow, q) <- salesPerDay
-          .map(s => (dayOfWeek(s.day), s.count))
-          .groupBy(_._1)
+                     .map(s => (dayOfWeek(s.day), s.count))
+                     .groupBy(_._1)
       } yield (dow, q.map(_._2).sum)
       //#simplefunction1
 
@@ -498,7 +501,7 @@ object LiftedEmbedding extends App {
         Await
           .result(db.run(
                       salesPerDay.schema.create >>
-                      (salesPerDay += ((new Date(999999999), 999))) >> {
+                        (salesPerDay += ((new Date(999999999), 999))) >> {
                         //#simpleliteral
                         val current_date =
                           SimpleLiteral[java.sql.Date]("CURRENT_DATE")
@@ -519,12 +522,13 @@ object LiftedEmbedding extends App {
       case object False extends Bool
 
       // And a ColumnType that maps it to Int values 1 and 0
-      implicit val boolColumnType = MappedColumnType.base[Bool, Int]({ b =>
-        if (b == True) 1 else 0
-      }, // map Bool to Int
-      { i =>
-        if (i == 1) True else False
-      } // map Int to Bool
+      implicit val boolColumnType = MappedColumnType.base[Bool, Int](
+          { b =>
+            if (b == True) 1 else 0
+          }, // map Bool to Int
+          { i =>
+            if (i == 1) True else False
+          } // map Int to Bool
       )
 
       // You can now use Bool like any built-in column type (in tables, queries, etc.)
@@ -550,8 +554,8 @@ object LiftedEmbedding extends App {
       case class Pair[A, B](a: A, b: B)
 
       // A Shape implementation for Pair
-      final class PairShape[Level <: ShapeLevel, M <: Pair[_, _], U <: Pair[
-              _, _]: ClassTag, P <: Pair[_, _]](
+      final class PairShape[Level <: ShapeLevel, M <: Pair[_, _],
+      U <: Pair[_, _]: ClassTag, P <: Pair[_, _]](
           val shapes: Seq[Shape[_, _, _, _]])
           extends MappedScalaProductShape[Level, Pair[_, _], M, U, P] {
         def buildValue(elems: IndexedSeq[Any]) = Pair(elems(0), elems(1))

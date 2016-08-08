@@ -27,7 +27,8 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 
 class ParquetHiveCompatibilitySuite
-    extends ParquetCompatibilityTest with TestHiveSingleton {
+    extends ParquetCompatibilityTest
+    with TestHiveSingleton {
 
   /**
     * Set the staging directory (and hence path to ignore Parquet files under)
@@ -45,8 +46,8 @@ class ParquetHiveCompatibilitySuite
        """.stripMargin)
   }
 
-  private def testParquetHiveCompatibility(
-      row: Row, hiveTypes: String*): Unit = {
+  private def testParquetHiveCompatibility(row: Row,
+                                           hiveTypes: String*): Unit = {
     withTable("parquet_compat") {
       withTempPath { dir =>
         val path = dir.getCanonicalPath
@@ -109,8 +110,8 @@ class ParquetHiveCompatibilitySuite
   }
 
   test("SPARK-10177 timestamp") {
-    testParquetHiveCompatibility(
-        Row(Timestamp.valueOf("2015-08-24 00:31:00")), "TIMESTAMP")
+    testParquetHiveCompatibility(Row(Timestamp.valueOf("2015-08-24 00:31:00")),
+                                 "TIMESTAMP")
   }
 
   test("array") {
@@ -133,7 +134,8 @@ class ParquetHiveCompatibilitySuite
   // HIVE-11625: Parquet map entries with null keys are dropped by Hive
   ignore("map entries with null keys") {
     testParquetHiveCompatibility(
-        Row(Map[Integer, String](null.asInstanceOf[Integer] -> "bar",
+        Row(
+            Map[Integer, String](null.asInstanceOf[Integer] -> "bar",
                                  null.asInstanceOf[Integer] -> null)),
         "MAP<INT, STRING>")
   }

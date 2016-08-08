@@ -9,7 +9,8 @@ import com.wix.accord.dsl._
 import com.wix.accord._
 
 case class PathId(path: List[String], absolute: Boolean = true)
-    extends Ordered[PathId] with plugin.PathId {
+    extends Ordered[PathId]
+    with plugin.PathId {
 
   def root: String = path.headOption.getOrElse("")
 

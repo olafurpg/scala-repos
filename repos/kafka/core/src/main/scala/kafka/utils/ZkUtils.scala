@@ -21,12 +21,26 @@ import java.util.concurrent.CountDownLatch
 import kafka.admin._
 import kafka.api.{ApiVersion, KAFKA_0_10_0_IV0, LeaderAndIsr}
 import kafka.cluster._
-import kafka.common.{KafkaException, NoEpochForPartitionException, TopicAndPartition}
+import kafka.common.{
+  KafkaException,
+  NoEpochForPartitionException,
+  TopicAndPartition
+}
 import kafka.consumer.{ConsumerThreadId, TopicCount}
-import kafka.controller.{KafkaController, LeaderIsrAndControllerEpoch, ReassignedPartitionsContext}
+import kafka.controller.{
+  KafkaController,
+  LeaderIsrAndControllerEpoch,
+  ReassignedPartitionsContext
+}
 import kafka.server.ConfigType
 import kafka.utils.ZkUtils._
-import org.I0Itec.zkclient.exception.{ZkBadVersionException, ZkException, ZkMarshallingError, ZkNoNodeException, ZkNodeExistsException}
+import org.I0Itec.zkclient.exception.{
+  ZkBadVersionException,
+  ZkException,
+  ZkMarshallingError,
+  ZkNoNodeException,
+  ZkNodeExistsException
+}
 import org.I0Itec.zkclient.serialize.ZkSerializer
 import org.I0Itec.zkclient.{ZkClient, ZkConnection}
 import org.apache.kafka.common.config.ConfigException
@@ -56,8 +70,8 @@ object ZkUtils {
             sessionTimeout: Int,
             connectionTimeout: Int,
             isZkSecurityEnabled: Boolean): ZkUtils = {
-    val (zkClient, zkConnection) = createZkClientAndConnection(
-        zkUrl, sessionTimeout, connectionTimeout)
+    val (zkClient, zkConnection) =
+      createZkClientAndConnection(zkUrl, sessionTimeout, connectionTimeout)
     new ZkUtils(zkClient, zkConnection, isZkSecurityEnabled)
   }
 
@@ -68,10 +82,13 @@ object ZkUtils {
     new ZkUtils(zkClient, null, isZkSecurityEnabled)
   }
 
-  def createZkClient(
-      zkUrl: String, sessionTimeout: Int, connectionTimeout: Int): ZkClient = {
-    val zkClient = new ZkClient(
-        zkUrl, sessionTimeout, connectionTimeout, ZKStringSerializer)
+  def createZkClient(zkUrl: String,
+                     sessionTimeout: Int,
+                     connectionTimeout: Int): ZkClient = {
+    val zkClient = new ZkClient(zkUrl,
+                                sessionTimeout,
+                                connectionTimeout,
+                                ZKStringSerializer)
     zkClient
   }
 
@@ -80,8 +97,8 @@ object ZkUtils {
       sessionTimeout: Int,
       connectionTimeout: Int): (ZkClient, ZkConnection) = {
     val zkConnection = new ZkConnection(zkUrl, sessionTimeout)
-    val zkClient = new ZkClient(
-        zkConnection, connectionTimeout, ZKStringSerializer)
+    val zkClient =
+      new ZkClient(zkConnection, connectionTimeout, ZKStringSerializer)
     (zkClient, zkConnection)
   }
 
@@ -119,8 +136,8 @@ object ZkUtils {
   def getTopicPartitionPath(topic: String, partitionId: Int): String =
     getTopicPartitionsPath(topic) + "/" + partitionId
 
-  def getTopicPartitionLeaderAndIsrPath(
-      topic: String, partitionId: Int): String =
+  def getTopicPartitionLeaderAndIsrPath(topic: String,
+                                        partitionId: Int): String =
     getTopicPartitionPath(topic, partitionId) + "/" + "state"
 
   def getEntityConfigRootPath(entityType: String): String =
@@ -179,8 +196,8 @@ class ZkUtils(val zkClient: ZkClient,
     getAllBrokersInCluster().map(_.getBrokerEndPoint(protocolType))
   }
 
-  def getLeaderAndIsrForPartition(
-      topic: String, partition: Int): Option[LeaderAndIsr] = {
+  def getLeaderAndIsrForPartition(topic: String,
+                                  partition: Int): Option[LeaderAndIsr] = {
     ReplicationUtils
       .getLeaderIsrAndEpochForPartition(this, topic, partition)
       .map(_.leaderAndIsr)
@@ -231,8 +248,8 @@ class ZkUtils(val zkClient: ZkClient,
         }
       case None =>
         throw new NoEpochForPartitionException(
-            "No epoch, ISR path for partition [%s,%d] is empty".format(
-                topic, partition))
+            "No epoch, ISR path for partition [%s,%d] is empty"
+              .format(topic, partition))
     }
   }
 
@@ -332,8 +349,8 @@ class ZkUtils(val zkClient: ZkClient,
     registerBrokerInZk(brokerIdPath, brokerInfo)
 
     info(
-        "Registered broker %d at path %s with addresses: %s".format(
-            id, brokerIdPath, advertisedEndpoints.mkString(",")))
+        "Registered broker %d at path %s with addresses: %s"
+          .format(id, brokerIdPath, advertisedEndpoints.mkString(",")))
   }
 
   private def registerBrokerInZk(brokerIdPath: String, brokerInfo: String) {
@@ -348,21 +365,22 @@ class ZkUtils(val zkClient: ZkClient,
       case e: ZkNodeExistsException =>
         throw new RuntimeException(
             "A broker is already registered on the path " + brokerIdPath +
-            ". This probably " +
-            "indicates that you either have configured a brokerid that is already in use, or " +
-            "else you have shutdown this broker and restarted it faster than the zookeeper " +
-            "timeout so it appears to be re-registering.")
+              ". This probably " +
+              "indicates that you either have configured a brokerid that is already in use, or " +
+              "else you have shutdown this broker and restarted it faster than the zookeeper " +
+              "timeout so it appears to be re-registering.")
     }
   }
 
-  def getConsumerPartitionOwnerPath(
-      group: String, topic: String, partition: Int): String = {
+  def getConsumerPartitionOwnerPath(group: String,
+                                    topic: String,
+                                    partition: Int): String = {
     val topicDirs = new ZKGroupTopicDirs(group, topic)
     topicDirs.consumerOwnerDir + "/" + partition
   }
 
-  def leaderAndIsrZkData(
-      leaderAndIsr: LeaderAndIsr, controllerEpoch: Int): String = {
+  def leaderAndIsrZkData(leaderAndIsr: LeaderAndIsr,
+                         controllerEpoch: Int): String = {
     Json.encode(
         Map("version" -> 1,
             "leader" -> leaderAndIsr.leader,
@@ -381,8 +399,8 @@ class ZkUtils(val zkClient: ZkClient,
   /**
     *  make sure a persistent path exists in ZK. Create the path if not exist.
     */
-  def makeSurePersistentPathExists(
-      path: String, acls: java.util.List[ACL] = DefaultAcls) {
+  def makeSurePersistentPathExists(path: String,
+                                   acls: java.util.List[ACL] = DefaultAcls) {
     //Consumer path is kept open as different consumers will write under this node.
     val acl =
       if (path == null || path.isEmpty || path.equals(ConsumersPath)) {
@@ -390,14 +408,16 @@ class ZkUtils(val zkClient: ZkClient,
       } else acls
 
     if (!zkClient.exists(path))
-      ZkPath.createPersistent(zkClient, path, true, acl) //won't throw NoNodeException or NodeExistsException
+      ZkPath
+        .createPersistent(zkClient, path, true, acl) //won't throw NoNodeException or NodeExistsException
   }
 
   /**
     *  create the parent path
     */
   private def createParentPath(
-      path: String, acls: java.util.List[ACL] = DefaultAcls): Unit = {
+      path: String,
+      acls: java.util.List[ACL] = DefaultAcls): Unit = {
     val parentDir = path.substring(0, path.lastIndexOf('/'))
     if (parentDir.length != 0) {
       ZkPath.createPersistent(zkClient, parentDir, true, acls)
@@ -415,9 +435,9 @@ class ZkUtils(val zkClient: ZkClient,
       ZkPath.createEphemeral(zkClient, path, data, acls)
     } catch {
       case e: ZkNoNodeException => {
-          createParentPath(path)
-          ZkPath.createEphemeral(zkClient, path, data, acls)
-        }
+        createParentPath(path)
+        ZkPath.createEphemeral(zkClient, path, data, acls)
+      }
     }
   }
 
@@ -433,25 +453,27 @@ class ZkUtils(val zkClient: ZkClient,
       createEphemeralPath(path, data, acls)
     } catch {
       case e: ZkNodeExistsException => {
-          // this can happen when there is connection loss; make sure the data is what we intend to write
-          var storedData: String = null
-          try {
-            storedData = readData(path)._1
-          } catch {
-            case e1: ZkNoNodeException =>
-            // the node disappeared; treat as if node existed and let caller handles this
-            case e2: Throwable => throw e2
-          }
-          if (storedData == null || storedData != data) {
-            info("conflict in " + path + " data: " + data + " stored data: " +
-                storedData)
-            throw e
-          } else {
-            // otherwise, the creation succeeded, return normally
-            info(path + " exists with value " + data +
-                " during connection loss; this is ok")
-          }
+        // this can happen when there is connection loss; make sure the data is what we intend to write
+        var storedData: String = null
+        try {
+          storedData = readData(path)._1
+        } catch {
+          case e1: ZkNoNodeException =>
+          // the node disappeared; treat as if node existed and let caller handles this
+          case e2: Throwable => throw e2
         }
+        if (storedData == null || storedData != data) {
+          info(
+              "conflict in " + path + " data: " + data + " stored data: " +
+                storedData)
+          throw e
+        } else {
+          // otherwise, the creation succeeded, return normally
+          info(
+              path + " exists with value " + data +
+                " during connection loss; this is ok")
+        }
+      }
       case e2: Throwable => throw e2
     }
   }
@@ -466,9 +488,9 @@ class ZkUtils(val zkClient: ZkClient,
       ZkPath.createPersistent(zkClient, path, data, acls)
     } catch {
       case e: ZkNoNodeException => {
-          createParentPath(path)
-          ZkPath.createPersistent(zkClient, path, data, acls)
-        }
+        createParentPath(path)
+        ZkPath.createPersistent(zkClient, path, data, acls)
+      }
     }
   }
 
@@ -484,21 +506,22 @@ class ZkUtils(val zkClient: ZkClient,
     * create parent directory if necessary. Never throw NodeExistException.
     * Return the updated path zkVersion
     */
-  def updatePersistentPath(
-      path: String, data: String, acls: java.util.List[ACL] = DefaultAcls) = {
+  def updatePersistentPath(path: String,
+                           data: String,
+                           acls: java.util.List[ACL] = DefaultAcls) = {
     try {
       zkClient.writeData(path, data)
     } catch {
       case e: ZkNoNodeException => {
-          createParentPath(path)
-          try {
-            ZkPath.createPersistent(zkClient, path, data, acls)
-          } catch {
-            case e: ZkNodeExistsException =>
-              zkClient.writeData(path, data)
-            case e2: Throwable => throw e2
-          }
+        createParentPath(path)
+        try {
+          ZkPath.createPersistent(zkClient, path, data, acls)
+        } catch {
+          case e: ZkNodeExistsException =>
+            zkClient.writeData(path, data)
+          case e2: Throwable => throw e2
         }
+      }
       case e2: Throwable => throw e2
     }
   }
@@ -515,8 +538,8 @@ class ZkUtils(val zkClient: ZkClient,
       path: String,
       data: String,
       expectVersion: Int,
-      optionalChecker: Option[(ZkUtils, String, String) => (Boolean, Int)] = None)
-    : (Boolean, Int) = {
+      optionalChecker: Option[(ZkUtils, String, String) => (Boolean, Int)] =
+        None): (Boolean, Int) = {
     try {
       val stat = zkClient.writeDataReturnStat(path, data, expectVersion)
       debug(
@@ -546,7 +569,9 @@ class ZkUtils(val zkClient: ZkClient,
     * version is not the expected version, etc.) return (false, -1). If path doesn't exist, throws ZkNoNodeException
     */
   def conditionalUpdatePersistentPathIfExists(
-      path: String, data: String, expectVersion: Int): (Boolean, Int) = {
+      path: String,
+      data: String,
+      expectVersion: Int): (Boolean, Int) = {
     try {
       val stat = zkClient.writeDataReturnStat(path, data, expectVersion)
       debug(
@@ -574,9 +599,9 @@ class ZkUtils(val zkClient: ZkClient,
       zkClient.writeData(path, data)
     } catch {
       case e: ZkNoNodeException => {
-          createParentPath(path)
-          ZkPath.createEphemeral(zkClient, path, data, acls)
-        }
+        createParentPath(path)
+        ZkPath.createEphemeral(zkClient, path, data, acls)
+      }
       case e2: Throwable => throw e2
     }
   }
@@ -670,13 +695,16 @@ class ZkUtils(val zkClient: ZkClient,
   }
 
   def getPartitionLeaderAndIsrForTopics(
-      zkClient: ZkClient, topicAndPartitions: Set[TopicAndPartition])
+      zkClient: ZkClient,
+      topicAndPartitions: Set[TopicAndPartition])
     : mutable.Map[TopicAndPartition, LeaderIsrAndControllerEpoch] = {
     val ret =
       new mutable.HashMap[TopicAndPartition, LeaderIsrAndControllerEpoch]
     for (topicAndPartition <- topicAndPartitions) {
       ReplicationUtils.getLeaderIsrAndEpochForPartition(
-          this, topicAndPartition.topic, topicAndPartition.partition) match {
+          this,
+          topicAndPartition.topic,
+          topicAndPartition.partition) match {
         case Some(leaderIsrAndControllerEpoch) =>
           ret.put(topicAndPartition, leaderIsrAndControllerEpoch)
         case None =>
@@ -698,8 +726,8 @@ class ZkUtils(val zkClient: ZkClient,
                 case Some(repl) =>
                   val replicaMap = repl.asInstanceOf[Map[String, Seq[Int]]]
                   for ((partition, replicas) <- replicaMap) {
-                    ret.put(
-                        TopicAndPartition(topic, partition.toInt), replicas)
+                    ret.put(TopicAndPartition(topic, partition.toInt),
+                            replicas)
                     debug(
                         "Replicas assigned to topic [%s], partition [%s] are [%s]"
                           .format(topic, partition, replicas))
@@ -733,8 +761,9 @@ class ZkUtils(val zkClient: ZkClient,
           }
         case None => Map[Int, Seq[Int]]()
       }
-      debug("Partition map for /brokers/topics/%s is %s".format(topic,
-                                                                partitionMap))
+      debug(
+          "Partition map for /brokers/topics/%s is %s".format(topic,
+                                                              partitionMap))
       ret += (topic -> partitionMap)
     }
     ret
@@ -745,8 +774,9 @@ class ZkUtils(val zkClient: ZkClient,
     getPartitionAssignmentForTopics(topics).map { topicAndPartitionMap =>
       val topic = topicAndPartitionMap._1
       val partitionMap = topicAndPartitionMap._2
-      debug("partition assignment of /brokers/topics/%s is %s".format(
-              topic, partitionMap))
+      debug(
+          "partition assignment of /brokers/topics/%s is %s"
+            .format(topic, partitionMap))
       (topic -> partitionMap.keys.toSeq.sortWith((s, t) => s < t))
     }
   }
@@ -759,8 +789,8 @@ class ZkUtils(val zkClient: ZkClient,
       case Some(jsonPartitionMap) =>
         val reassignedPartitions = parsePartitionReassignmentData(
             jsonPartitionMap)
-        reassignedPartitions.map(
-            p => (p._1 -> new ReassignedPartitionsContext(p._2)))
+        reassignedPartitions.map(p =>
+          (p._1 -> new ReassignedPartitionsContext(p._2)))
       case None => Map.empty[TopicAndPartition, ReassignedPartitionsContext]
     }
   }
@@ -774,13 +804,12 @@ class ZkUtils(val zkClient: ZkClient,
           case Some(partitionsSeq) =>
             partitionsSeq
               .asInstanceOf[Seq[Map[String, Any]]]
-              .map(p =>
-                    {
-                  val topic = p.get("topic").get.asInstanceOf[String]
-                  val partition = p.get("partition").get.asInstanceOf[Int]
-                  val newReplicas =
-                    p.get("replicas").get.asInstanceOf[Seq[Int]]
-                  TopicAndPartition(topic, partition) -> newReplicas
+              .map(p => {
+                val topic = p.get("topic").get.asInstanceOf[String]
+                val partition = p.get("partition").get.asInstanceOf[Int]
+                val newReplicas =
+                  p.get("replicas").get.asInstanceOf[Seq[Int]]
+                TopicAndPartition(topic, partition) -> newReplicas
               })
           case None =>
             Seq.empty
@@ -803,11 +832,9 @@ class ZkUtils(val zkClient: ZkClient,
           case Some(partitionsSeq) =>
             val mapPartitionSeq =
               partitionsSeq.asInstanceOf[Seq[Map[String, Any]]]
-            mapPartitionSeq.foreach(
-                p =>
-                  {
-                val topic = p.get("topic").get.asInstanceOf[String]
-                topics ++= List(topic)
+            mapPartitionSeq.foreach(p => {
+              val topic = p.get("topic").get.asInstanceOf[String]
+              topics ++= List(topic)
             })
           case None =>
         }
@@ -821,9 +848,9 @@ class ZkUtils(val zkClient: ZkClient,
     Json.encode(
         Map("version" -> 1,
             "partitions" -> partitionsToBeReassigned.map(e =>
-                  Map("topic" -> e._1.topic,
-                      "partition" -> e._1.partition,
-                      "replicas" -> e._2))))
+              Map("topic" -> e._1.topic,
+                  "partition" -> e._1.partition,
+                  "replicas" -> e._2))))
   }
 
   def updatePartitionReassignmentData(
@@ -843,8 +870,9 @@ class ZkUtils(val zkClient: ZkClient,
         } catch {
           case nne: ZkNoNodeException =>
             createPersistentPath(zkPath, jsonData)
-            debug("Created path %s with %s for partition reassignment".format(
-                    zkPath, jsonData))
+            debug(
+                "Created path %s with %s for partition reassignment"
+                  .format(zkPath, jsonData))
           case e2: Throwable => throw new AdminOperationException(e2.toString)
         }
     }
@@ -883,19 +911,19 @@ class ZkUtils(val zkClient: ZkClient,
     val consumersPerTopicMap =
       new mutable.HashMap[String, List[ConsumerThreadId]]
     for (consumer <- consumers) {
-      val topicCount = TopicCount.constructTopicCount(
-          group, consumer, this, excludeInternalTopics)
+      val topicCount = TopicCount
+        .constructTopicCount(group, consumer, this, excludeInternalTopics)
       for ((topic, consumerThreadIdSet) <- topicCount.getConsumerThreadIdsPerTopic) {
-        for (consumerThreadId <- consumerThreadIdSet) consumersPerTopicMap.get(
-            topic) match {
-          case Some(curConsumers) =>
-            consumersPerTopicMap.put(topic, consumerThreadId :: curConsumers)
-          case _ => consumersPerTopicMap.put(topic, List(consumerThreadId))
-        }
+        for (consumerThreadId <- consumerThreadIdSet)
+          consumersPerTopicMap.get(topic) match {
+            case Some(curConsumers) =>
+              consumersPerTopicMap.put(topic, consumerThreadId :: curConsumers)
+            case _ => consumersPerTopicMap.put(topic, List(consumerThreadId))
+          }
       }
     }
-    for ((topic, consumerList) <- consumersPerTopicMap) consumersPerTopicMap
-      .put(topic, consumerList.sortWith((s, t) => s < t))
+    for ((topic, consumerList) <- consumersPerTopicMap)
+      consumersPerTopicMap.put(topic, consumerList.sortWith((s, t) => s < t))
     consumersPerTopicMap
   }
 
@@ -918,24 +946,24 @@ class ZkUtils(val zkClient: ZkClient,
     * It uses the stat returned by the zookeeper and return the version. Every time
     * client updates the path stat.version gets incremented
     */
-  def getSequenceId(
-      path: String, acls: java.util.List[ACL] = DefaultAcls): Int = {
+  def getSequenceId(path: String,
+                    acls: java.util.List[ACL] = DefaultAcls): Int = {
     try {
       val stat = zkClient.writeDataReturnStat(path, "", -1)
       stat.getVersion
     } catch {
       case e: ZkNoNodeException => {
-          createParentPath(BrokerSequenceIdPath, acls)
-          try {
-            zkClient.createPersistent(BrokerSequenceIdPath, "", acls)
-            0
-          } catch {
-            case e: ZkNodeExistsException =>
-              val stat =
-                zkClient.writeDataReturnStat(BrokerSequenceIdPath, "", -1)
-              stat.getVersion
-          }
+        createParentPath(BrokerSequenceIdPath, acls)
+        try {
+          zkClient.createPersistent(BrokerSequenceIdPath, "", acls)
+          0
+        } catch {
+          case e: ZkNodeExistsException =>
+            val stat =
+              zkClient.writeDataReturnStat(BrokerSequenceIdPath, "", -1)
+            stat.getVersion
         }
+      }
     }
   }
 
@@ -1107,10 +1135,7 @@ class ZKCheckedEphemeral(path: String,
   var result: Code = Code.OK
 
   private class CreateCallback extends StringCallback {
-    def processResult(rc: Int,
-                      path: String,
-                      ctx: Object,
-                      name: String) {
+    def processResult(rc: Int, path: String, ctx: Object, name: String) {
       Code.get(rc) match {
         case Code.OK =>
           setResult(Code.OK)
@@ -1131,8 +1156,8 @@ class ZKCheckedEphemeral(path: String,
           setResult(Code.INVALIDACL)
         case _ =>
           warn(
-              "ZooKeeper event while creating registration node: %s %s".format(
-                  path, Code.get(rc)))
+              "ZooKeeper event while creating registration node: %s %s"
+                .format(path, Code.get(rc)))
           setResult(Code.get(rc))
       }
     }
@@ -1162,8 +1187,8 @@ class ZKCheckedEphemeral(path: String,
           setResult(Code.INVALIDACL)
         case _ =>
           warn(
-              "ZooKeeper event while getting znode data: %s %s".format(
-                  path, Code.get(rc)))
+              "ZooKeeper event while getting znode data: %s %s"
+                .format(path, Code.get(rc)))
           setResult(Code.get(rc))
       }
     }
@@ -1201,7 +1226,8 @@ class ZKCheckedEphemeral(path: String,
                   val suffix = ctx.asInstanceOf[String]
                   createRecursive(path, suffix)
                 case Code.NONODE =>
-                  error("No node for path %s (could be the parent missing)"
+                  error(
+                      "No node for path %s (could be the parent missing)"
                         .format(path))
                   setResult(Code.get(rc))
                 case Code.SESSIONEXPIRED =>

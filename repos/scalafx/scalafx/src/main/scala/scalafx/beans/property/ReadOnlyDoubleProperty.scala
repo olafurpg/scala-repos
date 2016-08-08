@@ -40,11 +40,11 @@ object ReadOnlyDoubleProperty {
 
 class ReadOnlyDoubleProperty(
     override val delegate: jfxbp.ReadOnlyDoubleProperty)
-    extends NumberExpression(delegate) with ReadOnlyProperty[Double, Number]
+    extends NumberExpression(delegate)
+    with ReadOnlyProperty[Double, Number]
     with SFXDelegate[jfxbp.ReadOnlyDoubleProperty] {
   def this(bean: Object, name: String, value: Double) =
-    this(
-        new jfxbp.ReadOnlyDoublePropertyBase() {
+    this(new jfxbp.ReadOnlyDoublePropertyBase() {
       def getBean = bean
       def getName = name
       def get = value

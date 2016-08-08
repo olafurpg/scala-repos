@@ -29,13 +29,15 @@ import Seq.fill
   */
 trait SeqViewLike[
     +A, +Coll, +This <: SeqView[A, Coll] with SeqViewLike[A, Coll, This]]
-    extends Seq[A] with SeqLike[A, This]
-    with IterableView[A, Coll] with IterableViewLike[A, Coll, This] {
-  self =>
+    extends Seq[A]
+    with SeqLike[A, This]
+    with IterableView[A, Coll]
+    with IterableViewLike[A, Coll, This] { self =>
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
-      extends Seq[B] with super [IterableViewLike].Transformed[B]
+      extends Seq[B]
+      with super[IterableViewLike].Transformed[B]
       with Transformed[B]
 
   trait Transformed[+B] extends SeqView[B, Coll] with super.Transformed[B] {
@@ -75,7 +77,7 @@ trait SeqViewLike[
       val index = new Array[Int](self.length + 1)
       index(0) = 0
       for (i <- 0 until self.length) // note that if the mapping returns a list, performance is bad, bad
-      index(i + 1) = index(i) + mapping(self(i)).seq.size
+        index(i + 1) = index(i) + mapping(self(i)).seq.size
       index
     }
     protected[this] def findRow(idx: Int, lo: Int, hi: Int): Int = {
@@ -148,7 +150,8 @@ trait SeqViewLike[
   }
 
   trait ZippedAll[A1 >: A, B]
-      extends super.ZippedAll[A1, B] with Transformed[(A1, B)] {
+      extends super.ZippedAll[A1, B]
+      with Transformed[(A1, B)] {
     protected[this] lazy val thatSeq = other.seq.toSeq
     def length: Int = self.length max thatSeq.length
     def apply(idx: Int) =
@@ -233,8 +236,9 @@ trait SeqViewLike[
     } with AbstractTransformed[(A1, B)] with ZippedAll[A1, B]
   protected def newReversed: Transformed[A] =
     new AbstractTransformed[A] with Reversed
-  protected def newPatched[B >: A](
-      _from: Int, _patch: GenSeq[B], _replaced: Int): Transformed[B] =
+  protected def newPatched[B >: A](_from: Int,
+                                   _patch: GenSeq[B],
+                                   _replaced: Int): Transformed[B] =
     new {
       val from = _from
       val patch = _patch

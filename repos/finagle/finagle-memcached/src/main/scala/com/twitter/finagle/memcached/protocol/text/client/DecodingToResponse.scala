@@ -1,7 +1,12 @@
 package com.twitter.finagle.memcached.protocol.text.client
 
 import com.twitter.finagle.memcached.protocol._
-import com.twitter.finagle.memcached.protocol.text.{StatLines, TokensWithData, ValueLines, Tokens}
+import com.twitter.finagle.memcached.protocol.text.{
+  StatLines,
+  TokensWithData,
+  ValueLines,
+  Tokens
+}
 import com.twitter.io.Buf
 import org.jboss.netty.channel.{Channel, ChannelHandlerContext}
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder

@@ -32,9 +32,9 @@ trait MultipartUnmarshallers {
     : FromEntityUnmarshaller[Multipart.General] =
     multipartGeneralUnmarshaller(`UTF-8`)
 
-  def multipartGeneralUnmarshaller(
-      defaultCharset: HttpCharset)(implicit log: LoggingAdapter = NoLogging,
-                                   parserSettings: ParserSettings = null)
+  def multipartGeneralUnmarshaller(defaultCharset: HttpCharset)(
+      implicit log: LoggingAdapter = NoLogging,
+      parserSettings: ParserSettings = null)
     : FromEntityUnmarshaller[Multipart.General] =
     multipartUnmarshaller[Multipart.General,
                           Multipart.General.BodyPart,
@@ -56,13 +56,13 @@ trait MultipartUnmarshallers {
         mediaRange = `multipart/form-data`,
         defaultContentType = ContentTypes.`text/plain(UTF-8)`,
         createBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart(entity, headers).toFormDataBodyPart.get,
+          Multipart.General.BodyPart(entity, headers).toFormDataBodyPart.get,
         createStreamed = (_, parts) ⇒ Multipart.FormData(parts),
         createStrictBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart
-              .Strict(entity, headers)
-              .toFormDataBodyPart
-              .get,
+          Multipart.General.BodyPart
+            .Strict(entity, headers)
+            .toFormDataBodyPart
+            .get,
         createStrict = (_, parts) ⇒ Multipart.FormData.Strict(parts))
 
   implicit def defaultMultipartByteRangesUnmarshaller(
@@ -71,9 +71,9 @@ trait MultipartUnmarshallers {
     : FromEntityUnmarshaller[Multipart.ByteRanges] =
     multipartByteRangesUnmarshaller(`UTF-8`)
 
-  def multipartByteRangesUnmarshaller(
-      defaultCharset: HttpCharset)(implicit log: LoggingAdapter = NoLogging,
-                                   parserSettings: ParserSettings = null)
+  def multipartByteRangesUnmarshaller(defaultCharset: HttpCharset)(
+      implicit log: LoggingAdapter = NoLogging,
+      parserSettings: ParserSettings = null)
     : FromEntityUnmarshaller[Multipart.ByteRanges] =
     multipartUnmarshaller[Multipart.ByteRanges,
                           Multipart.ByteRanges.BodyPart,
@@ -81,16 +81,13 @@ trait MultipartUnmarshallers {
         mediaRange = `multipart/byteranges`,
         defaultContentType = MediaTypes.`text/plain` withCharset defaultCharset,
         createBodyPart = (entity, headers) ⇒
-            Multipart.General
-              .BodyPart(entity, headers)
-              .toByteRangesBodyPart
-              .get,
+          Multipart.General.BodyPart(entity, headers).toByteRangesBodyPart.get,
         createStreamed = (_, parts) ⇒ Multipart.ByteRanges(parts),
         createStrictBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart
-              .Strict(entity, headers)
-              .toByteRangesBodyPart
-              .get,
+          Multipart.General.BodyPart
+            .Strict(entity, headers)
+            .toByteRangesBodyPart
+            .get,
         createStrict = (_, parts) ⇒ Multipart.ByteRanges.Strict(parts))
 
   def multipartUnmarshaller[T <: Multipart,
@@ -110,21 +107,25 @@ trait MultipartUnmarshallers {
         entity.contentType.mediaType.params.get("boundary") match {
           case None ⇒
             FastFuture.failed(new RuntimeException(
-                    "Content-Type with a multipart media type must have a 'boundary' parameter"))
+                "Content-Type with a multipart media type must have a 'boundary' parameter"))
           case Some(boundary) ⇒
             import BodyPartParser._
             val effectiveParserSettings = Option(parserSettings).getOrElse(
                 ParserSettings(ActorMaterializer.downcast(mat).system))
-            val parser = new BodyPartParser(
-                defaultContentType, boundary, log, effectiveParserSettings)
+            val parser = new BodyPartParser(defaultContentType,
+                                            boundary,
+                                            log,
+                                            effectiveParserSettings)
             FastFuture.successful {
               entity match {
                 case HttpEntity.Strict(
-                    ContentType(mediaType: MediaType.Multipart, _), data) ⇒
+                    ContentType(mediaType: MediaType.Multipart, _),
+                    data) ⇒
                   val builder = new VectorBuilder[BPS]()
                   val iter =
                     new IteratorInterpreter[ByteString, BodyPartParser.Output](
-                        Iterator.single(data), List(parser)).iterator
+                        Iterator.single(data),
+                        List(parser)).iterator
                   // note that iter.next() will throw exception if stream fails
                   iter.foreach {
                     case BodyPartStart(headers, createEntity) ⇒
@@ -133,7 +134,7 @@ trait MultipartUnmarshallers {
                         case x ⇒
                           throw new IllegalStateException(
                               "Unexpected entity type from strict BodyPartParser: " +
-                              x)
+                                x)
                       }
                       builder += createStrictBodyPart(entity, headers)
                     case ParseError(errorInfo) ⇒

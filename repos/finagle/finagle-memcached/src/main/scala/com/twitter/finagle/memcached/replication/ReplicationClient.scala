@@ -64,7 +64,7 @@ object ReplicationClient {
       }
     val repStatsReceiver =
       clientBuilder map { _.statsReceiver.scope("cache_replication") } getOrElse
-      (NullStatsReceiver)
+        (NullStatsReceiver)
     new BaseReplicationClient(underlyingClients, repStatsReceiver)
   }
 
@@ -74,8 +74,11 @@ object ReplicationClient {
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
   ) = {
-    new SimpleReplicationClient(newBaseReplicationClient(
-            pools, clientBuilder, hashName, failureAccrualParams))
+    new SimpleReplicationClient(
+        newBaseReplicationClient(pools,
+                                 clientBuilder,
+                                 hashName,
+                                 failureAccrualParams))
   }
 }
 
@@ -86,8 +89,8 @@ object ReplicationClient {
   * @param clients list of memcached clients with each one representing to a single cache pool
   * @param statsReceiver
   */
-class BaseReplicationClient(
-    clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) {
+class BaseReplicationClient(clients: Seq[Client],
+                            statsReceiver: StatsReceiver = NullStatsReceiver) {
   private[this] val inconsistentContentCounter =
     statsReceiver.counter("inconsistent_content_count")
   private[this] val failedCounter =
@@ -103,12 +106,13 @@ class BaseReplicationClient(
     * TODO: introducing BackupRequestFilter to shorten the waiting period for secondary requests
     */
   private[memcached] def getResult(
-      keys: Iterable[String], useRandomOrder: Boolean): Future[GetResult] = {
+      keys: Iterable[String],
+      useRandomOrder: Boolean): Future[GetResult] = {
     val clientsInOrder =
       if (useRandomOrder) Random.shuffle(clients) else clients
 
-    def loopGet(
-        clients: Seq[Client], currentRes: GetResult): Future[GetResult] =
+    def loopGet(clients: Seq[Client],
+                currentRes: GetResult): Future[GetResult] =
       clients match {
         case _ if currentRes.misses.isEmpty && currentRes.failures.isEmpty =>
           Future.value(currentRes)
@@ -131,8 +135,8 @@ class BaseReplicationClient(
     * For each input key, this operation searches all replicas in an order until it finds the
     * first hit result, or return the last replica's result.
     */
-  def getOne(
-      key: String, useRandomOrder: Boolean = false): Future[Option[Buf]] =
+  def getOne(key: String,
+             useRandomOrder: Boolean = false): Future[Option[Buf]] =
     getOne(Seq(key), useRandomOrder) map { _.values.headOption }
 
   def getOne(keys: Iterable[String],
@@ -185,8 +189,8 @@ class BaseReplicationClient(
     : Future[ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
     getsAll(Seq(key)) map { _.values.head }
 
-  def getsAll(keys: Iterable[String]): Future[Map[
-          String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
+  def getsAll(keys: Iterable[String]): Future[
+      Map[String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
     val keySet = keys.toSet
     Future.collect(clients map { _.getsResult(keySet) }) map {
       results: Seq[GetsResult] =>
@@ -230,8 +234,7 @@ class BaseReplicationClient(
           }
         InconsistentReplication(transformed)
       case FailedReplication(fs) =>
-        FailedReplication(
-            fs map { t =>
+        FailedReplication(fs map { t =>
           Throw(t.e)
         })
     }
@@ -308,8 +311,8 @@ class BaseReplicationClient(
   def incr(key: String): Future[ReplicationStatus[Option[JLong]]] =
     incr(key, 1L)
 
-  def incr(
-      key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
+  def incr(key: String,
+           delta: Long): Future[ReplicationStatus[Option[JLong]]] =
     collectAndResolve[Option[JLong]](_.incr(key, delta))
 
   /**
@@ -318,8 +321,8 @@ class BaseReplicationClient(
   def decr(key: String): Future[ReplicationStatus[Option[JLong]]] =
     decr(key, 1L)
 
-  def decr(
-      key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
+  def decr(key: String,
+           delta: Long): Future[ReplicationStatus[Option[JLong]]] =
     collectAndResolve[Option[JLong]](_.decr(key, delta))
 
   /**
@@ -406,8 +409,8 @@ case class SimpleReplicationFailure(msg: String) extends Throwable(msg)
 
 class SimpleReplicationClient(underlying: BaseReplicationClient)
     extends Client {
-  def this(
-      clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) =
+  def this(clients: Seq[Client],
+           statsReceiver: StatsReceiver = NullStatsReceiver) =
     this(new BaseReplicationClient(clients, statsReceiver))
 
   private[this] val underlyingClient = underlying
@@ -440,7 +443,7 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
           case (key, _) =>
             GetsResult(
                 GetResult(failures = Map(key -> SimpleReplicationFailure(
-                              "One or more underlying replica failed gets"))))
+                    "One or more underlying replica failed gets"))))
         }
       GetResult.merged(getsResultSeq.toSeq)
     }
@@ -510,17 +513,22 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
           if resultsSeq.forall(_.isReturn) =>
         Future.value(default)
       case _ =>
-        Future.exception(SimpleReplicationFailure(
+        Future.exception(
+            SimpleReplicationFailure(
                 "One or more underlying replica failed op: " + name))
     }
 
-  def append(
-      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+  def append(key: String,
+             flags: Int,
+             expiry: Time,
+             value: Buf): Future[JBoolean] =
     throw new UnsupportedOperationException(
         "append is not supported for replication cache client yet.")
 
-  def prepend(
-      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+  def prepend(key: String,
+              flags: Int,
+              expiry: Time,
+              value: Buf): Future[JBoolean] =
     throw new UnsupportedOperationException(
         "prepend is not supported for replication cache client yet.")
 

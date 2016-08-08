@@ -20,9 +20,9 @@ object ApiBranchProtection {
       info: ProtectedBranchService.ProtectedBranchInfo): ApiBranchProtection =
     ApiBranchProtection(
         enabled = info.enabled,
-        required_status_checks = Some(Status(
-                  EnforcementLevel(info.enabled, info.includeAdministrators),
-                  info.contexts)))
+        required_status_checks = Some(
+            Status(EnforcementLevel(info.enabled, info.includeAdministrators),
+                   info.contexts)))
   val statusNone = Status(Off, Seq.empty)
   case class Status(enforcement_level: EnforcementLevel, contexts: Seq[String])
   sealed class EnforcementLevel(val name: String)
@@ -30,8 +30,8 @@ object ApiBranchProtection {
   case object NonAdmins extends EnforcementLevel("non_admins")
   case object Everyone extends EnforcementLevel("everyone")
   object EnforcementLevel {
-    def apply(
-        enabled: Boolean, includeAdministrators: Boolean): EnforcementLevel =
+    def apply(enabled: Boolean,
+              includeAdministrators: Boolean): EnforcementLevel =
       if (enabled) {
         if (includeAdministrators) {
           Everyone
@@ -44,9 +44,8 @@ object ApiBranchProtection {
   }
 
   implicit val enforcementLevelSerializer =
-    new CustomSerializer[EnforcementLevel](
-        format =>
-          ({
+    new CustomSerializer[EnforcementLevel](format =>
+      ({
         case JString("off") => Off
         case JString("non_admins") => NonAdmins
         case JString("everyone") => Everyone

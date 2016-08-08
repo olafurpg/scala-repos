@@ -169,11 +169,11 @@ class CompositionDocSpec extends AkkaSpec {
   "closed graph" in {
     //#embed-closed
     val closed1 = Source.single(0).to(Sink.foreach(println))
-    val closed2 = RunnableGraph.fromGraph(
-        GraphDSL.create() { implicit builder =>
-      val embeddedClosed: ClosedShape = builder.add(closed1)
-      // …
-      embeddedClosed
+    val closed2 = RunnableGraph.fromGraph(GraphDSL.create() {
+      implicit builder =>
+        val embeddedClosed: ClosedShape = builder.add(closed1)
+        // …
+        embeddedClosed
     })
     //#embed-closed
   }
@@ -217,14 +217,14 @@ class CompositionDocSpec extends AkkaSpec {
     //#mat-combine-3
 
     //#mat-combine-4
-    case class MyClass(
-        private val p: Promise[Option[Int]], conn: OutgoingConnection) {
+    case class MyClass(private val p: Promise[Option[Int]],
+                       conn: OutgoingConnection) {
       def close() = p.trySuccess(None)
     }
 
     def f(p: Promise[Option[Int]],
-          rest: (Future[OutgoingConnection],
-          Future[String])): Future[MyClass] = {
+          rest: (Future[OutgoingConnection], Future[String]))
+      : Future[MyClass] = {
 
       val connFuture = rest._1
       connFuture.map(MyClass(p, _))
@@ -240,7 +240,10 @@ class CompositionDocSpec extends AkkaSpec {
     //#attributes-inheritance
     import Attributes._
     val nestedSource =
-      Source.single(0).map(_ + 1).named("nestedSource") // Wrap, no inputBuffer set
+      Source
+        .single(0)
+        .map(_ + 1)
+        .named("nestedSource") // Wrap, no inputBuffer set
 
     val nestedFlow = Flow[Int]
       .filter(_ != 0)

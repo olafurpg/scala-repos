@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.lang.completion.postfix.templates
 
-import com.intellij.codeInsight.template.postfix.templates.{StringBasedPostfixTemplate, PostfixTemplateExpressionSelectorBase}
+import com.intellij.codeInsight.template.postfix.templates.{
+  StringBasedPostfixTemplate,
+  PostfixTemplateExpressionSelectorBase
+}
 
 /**
   * @author Roman.Shein

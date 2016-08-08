@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package lang
 package completion
 
-import com.intellij.codeInsight.completion.{CompletionParameters, CompletionUtil, PrefixMatcher}
+import com.intellij.codeInsight.completion.{
+  CompletionParameters,
+  CompletionUtil,
+  PrefixMatcher
+}
 import com.intellij.openapi.util.Key
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
@@ -60,7 +64,7 @@ object ScalaCompletionUtil {
     val prefix = prefixMatcher.getPrefix
     val capitalized =
       prefix.length() > 0 &&
-      prefix.substring(0, 1).capitalize == prefix.substring(0, 1)
+        prefix.substring(0, 1).capitalize == prefix.substring(0, 1)
     capitalized || lookingForAnnotations
   }
 
@@ -94,9 +98,9 @@ object ScalaCompletionUtil {
     val iter = paramNamesWithTypes.map {
       case (s, tp) =>
         s + ": " +
-        (if (canonical) {
-           ScType.canonicalText(tp)
-         } else ScType.presentableText(tp))
+          (if (canonical) {
+             ScType.canonicalText(tp)
+           } else ScType.presentableText(tp))
     }
     val paramsString =
       if (paramNamesWithTypes.size != 1 || !braceArgs)
@@ -161,13 +165,13 @@ object ScalaCompletionUtil {
 
   def awful(parent: PsiElement, leaf: PsiElement): Boolean = {
     (leaf.getPrevSibling == null ||
-        leaf.getPrevSibling.getPrevSibling == null ||
-        leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
+    leaf.getPrevSibling.getPrevSibling == null ||
+    leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
     (parent.getPrevSibling == null ||
-        parent.getPrevSibling.getPrevSibling == null ||
-        (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
-            !parent.getPrevSibling.getPrevSibling.getLastChild
-              .isInstanceOf[PsiErrorElement]))
+    parent.getPrevSibling.getPrevSibling == null ||
+    (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
+    !parent.getPrevSibling.getPrevSibling.getLastChild
+      .isInstanceOf[PsiErrorElement]))
   }
 
   val DUMMY_IDENTIFIER = "IntellijIdeaRulezzz"
@@ -290,8 +294,9 @@ object ScalaCompletionUtil {
     !checkErrors(dummyFile)
   }
 
-  def checkReplace(
-      elem: PsiElement, additionText: String, manager: PsiManager): Boolean = {
+  def checkReplace(elem: PsiElement,
+                   additionText: String,
+                   manager: PsiManager): Boolean = {
     val typeText = elem.getText
     var text = "class a { " + typeText + "}"
     if (text.indexOf(DUMMY_IDENTIFIER) == -1) return false
@@ -368,7 +373,8 @@ object ScalaCompletionUtil {
 
       if (ref.getElement != null && ref.getElement.getPrevSibling != null &&
           ref.getElement.getPrevSibling.getNode.getElementType == ScalaTokenTypes.tSTUB)
-        id + "`" else id
+        id + "`"
+      else id
     } else {
       if (element != null &&
           element.getNode.getElementType == ScalaTokenTypes.tSTUB) {
@@ -396,8 +402,8 @@ object ScalaCompletionUtil {
         if (owner.containingFile.contains(parameters.getOriginalFile)) {
           owner
             .getMirrorPositionForCompletion(
-                getDummyIdentifier(
-                    parameters.getOffset, parameters.getOriginalFile),
+                getDummyIdentifier(parameters.getOffset,
+                                   parameters.getOriginalFile),
                 parameters.getOffset - owner.getTextRange.getStartOffset)
             .getOrElse(parameters.getPosition)
         } else parameters.getPosition

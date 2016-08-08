@@ -33,7 +33,8 @@ import org.apache.spark.util.Utils
   * files, every `createQueryTest` calls should explicitly set `reset` to `false`.
   */
 class HiveWindowFunctionQuerySuite
-    extends HiveComparisonTest with BeforeAndAfter {
+    extends HiveComparisonTest
+    with BeforeAndAfter {
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()
@@ -818,7 +819,8 @@ class HiveWindowFunctionQuerySuite
 }
 
 class HiveWindowFunctionQueryFileSuite
-    extends HiveCompatibilitySuite with BeforeAndAfter {
+    extends HiveCompatibilitySuite
+    with BeforeAndAfter {
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()

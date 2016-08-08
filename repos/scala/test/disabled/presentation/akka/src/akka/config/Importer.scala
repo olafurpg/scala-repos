@@ -7,7 +7,13 @@
   */
 package akka.config
 
-import java.io.{BufferedReader, File, FileInputStream, InputStream, InputStreamReader}
+import java.io.{
+  BufferedReader,
+  File,
+  FileInputStream,
+  InputStream,
+  InputStreamReader
+}
 
 /**
   * An interface for finding config files and reading them into strings for

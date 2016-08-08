@@ -54,20 +54,23 @@ class AkkaHttpServer(config: ServerConfig,
   implicit val mat = materializer
 
   private def createServerBinding(
-      port: Int, connectionContext: ConnectionContext): Http.ServerBinding = {
+      port: Int,
+      connectionContext: ConnectionContext): Http.ServerBinding = {
     // Listen for incoming connections and handle them with the `handleRequest` method.
 
     // TODO: pass in Inet.SocketOption, ServerSettings and LoggerAdapter params?
-    val serverSource: Source[
-        Http.IncomingConnection, Future[Http.ServerBinding]] = Http().bind(
+    val serverSource: Source[Http.IncomingConnection,
+                             Future[Http.ServerBinding]] = Http().bind(
         interface = config.address,
         port = port,
         connectionContext = connectionContext)
 
     val connectionSink: Sink[Http.IncomingConnection, _] = Sink.foreach {
       connection: Http.IncomingConnection =>
-        connection.handleWithAsyncHandler(handleRequest(
-                connection.remoteAddress, _, connectionContext.isSecure))
+        connection.handleWithAsyncHandler(
+            handleRequest(connection.remoteAddress,
+                          _,
+                          connectionContext.isSecure))
     }
 
     val bindingFuture: Future[Http.ServerBinding] =
@@ -78,8 +81,8 @@ class AkkaHttpServer(config: ServerConfig,
     Await.result(bindingFuture, bindTimeout)
   }
 
-  private val httpServerBinding = config.port.map(
-      port => createServerBinding(port, ConnectionContext.noEncryption()))
+  private val httpServerBinding = config.port.map(port =>
+    createServerBinding(port, ConnectionContext.noEncryption()))
 
   private val httpsServerBinding = config.sslPort.map { port =>
     val connectionContext = try {
@@ -182,8 +185,8 @@ class AkkaHttpServer(config: ServerConfig,
 
         websocket(taggedRequestHeader).map {
           case Left(result) =>
-            modelConversion.convertResult(
-                taggedRequestHeader, result, request.protocol)
+            modelConversion
+              .convertResult(taggedRequestHeader, result, request.protocol)
           case Right(flow) =>
             WebSocketHandler.handleWebSocket(upgrade, flow, 16384)
         }
@@ -225,7 +228,7 @@ class AkkaHttpServer(config: ServerConfig,
         // https://github.com/akka/akka/issues/17782 for more details.
         requestBodySource
           .map(source =>
-                Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
+            Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
           .orElse(Some(Source.empty))
       } else {
         requestBodySource
@@ -238,8 +241,8 @@ class AkkaHttpServer(config: ServerConfig,
     val responseFuture: Future[HttpResponse] = resultFuture.map { result =>
       val cleanedResult: Result =
         ServerResultUtils.cleanFlashCookie(taggedRequestHeader, result)
-      modelConversion.convertResult(
-          taggedRequestHeader, cleanedResult, request.protocol)
+      modelConversion
+        .convertResult(taggedRequestHeader, cleanedResult, request.protocol)
     }
     responseFuture
   }

@@ -48,12 +48,13 @@ case class SimpleSigarProvider(location: String = "native")
   * Provide sigar library as static mock.
   */
 case class MockitoSigarProvider(pid: Long = 123,
-                                loadAverage: Array[Double] = Array(
-                                      0.7, 0.3, 0.1),
+                                loadAverage: Array[Double] =
+                                  Array(0.7, 0.3, 0.1),
                                 cpuCombined: Double = 0.5,
                                 cpuStolen: Double = 0.2,
                                 steps: Int = 5)
-    extends SigarProvider with MockitoSugar {
+    extends SigarProvider
+    with MockitoSugar {
 
   import org.hyperic.sigar._
   import org.mockito.Mockito._
@@ -90,8 +91,7 @@ case class MockitoSigarProvider(pid: Long = 123,
   *
   * TODO change factory after https://github.com/akka/akka/issues/16369
   */
-trait MetricsCollectorFactory {
-  this: AkkaSpec ⇒
+trait MetricsCollectorFactory { this: AkkaSpec ⇒
   import MetricsConfig._
   import org.hyperic.sigar.Sigar
 
@@ -209,7 +209,7 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
   private val eventBusListener: ActorRef = {
     system.systemActorOf(
         Props(new Actor with ActorLogging
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit = extension.subscribe(self)
           override def postStop(): Unit = extension.unsubscribe(self)
           def receive = {

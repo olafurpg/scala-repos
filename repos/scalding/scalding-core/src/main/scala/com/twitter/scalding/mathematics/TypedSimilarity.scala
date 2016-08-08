@@ -119,8 +119,8 @@ trait TypedSimilarity[N, E, S] extends Serializable {
 }
 
 object TypedSimilarity extends Serializable {
-  private def maybeWithReducers[T <: WithReducers[T]](
-      withReds: T, reds: Option[Int]) =
+  private def maybeWithReducers[T <: WithReducers[T]](withReds: T,
+                                                      reds: Option[Int]) =
     reds match {
       case Some(i) => withReds.withReducers(i)
       case None => withReds
@@ -129,7 +129,7 @@ object TypedSimilarity extends Serializable {
   // key: document,
   // value: (word, documentsWithWord)
   // return: Edge of similarity between words measured by documents
-  def exactSetSimilarity[N : Ordering](
+  def exactSetSimilarity[N: Ordering](
       g: Grouped[N, (N, Int)],
       smallpred: N => Boolean,
       bigpred: N => Boolean): TypedPipe[Edge[N, SetSimilarity]] =
@@ -143,7 +143,8 @@ object TypedSimilarity extends Serializable {
                         .flatMap {
                           case ((node1, deg1), (node2, deg2)) =>
                             if (smallpred(node1) && bigpred(node2))
-                              Some(((node1, node2), (1, deg1, deg2))) else None
+                              Some(((node1, node2), (1, deg1, deg2)))
+                            else None
                         }
                         .group,
                       g.reducers)
@@ -163,7 +164,7 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://arxiv.org/pdf/1206.2082v2.pdf
    */
-  def discoCosineSimilarity[N : Ordering](
+  def discoCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Int)],
       bigG: Grouped[N, (N, Int)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
@@ -205,7 +206,7 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://stanford.edu/~rezab/papers/dimsum.pdf
    */
-  def dimsumCosineSimilarity[N : Ordering](
+  def dimsumCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Double, Double)],
       bigG: Grouped[N, (N, Double, Double)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
@@ -214,7 +215,7 @@ object TypedSimilarity extends Serializable {
         smallG
           .cogroup(bigG) {
             (n: N, leftit: Iterator[(N, Double, Double)],
-            rightit: Iterable[(N, Double, Double)]) =>
+             rightit: Iterable[(N, Double, Double)]) =>
               // Use a co-group to ensure this happens in the reducer:
               leftit.flatMap {
                 case (node1, weight1, norm1) =>
@@ -245,8 +246,8 @@ object TypedSimilarity extends Serializable {
   * This algothm is just matrix multiplication done by hand to make it
   * clearer when we do the sampling implementation
   */
-class ExactInCosine[N](
-    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
+class ExactInCosine[N](reducers: Int = -1)(
+    implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
   def apply(graph: TypedPipe[Edge[N, InDegree]],
@@ -277,8 +278,10 @@ class ExactInCosine[N](
   * see: http://arxiv.org/pdf/1206.2082v2.pdf for more details
   */
 class DiscoInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
   // The probability of being more than delta error is approx:
@@ -300,14 +303,16 @@ class DiscoInCosine[N](
       (e.from, (e.to, e.data.degree))
     }.group.withReducers(reducers)
 
-    TypedSimilarity.discoCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity
+      .discoCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
   }
 }
 
 class DimsumInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, (Weight, L2Norm), Double] {
 
   // The probability of being more than delta error is approx:
@@ -329,7 +334,7 @@ class DimsumInCosine[N](
       (e.from, (e.to, e.data._1.weight, e.data._2.norm))
     }.group.withReducers(reducers)
 
-    TypedSimilarity.dimsumCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity
+      .dimsumCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
   }
 }

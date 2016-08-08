@@ -69,7 +69,9 @@ object DBHelper {
   * Test Record: Company. It has many different field types for test purposes.
   */
 class Company private ()
-    extends Record[Company] with KeyedRecord[Long] with Optimistic {
+    extends Record[Company]
+    with KeyedRecord[Long]
+    with Optimistic {
 
   override def meta = Company
 
@@ -81,13 +83,15 @@ class Company private ()
   val country = new CountryField(this)
   val postCode = new PostalCodeField(this, country)
   val created = new DateTimeField(this)
-  val employeeSatisfaction = new OptionalDecimalField(
-      this, new MathContext(10), 5)
+  val employeeSatisfaction =
+    new OptionalDecimalField(this, new MathContext(10), 5)
 
   lazy val employees = MySchema.companyToEmployees.left(this)
 }
 object Company
-    extends Company with MetaRecord[Company] with CRUDify[Long, Company] {
+    extends Company
+    with MetaRecord[Company]
+    with CRUDify[Long, Company] {
 
   def table = MySchema.companies
 
@@ -107,8 +111,10 @@ object EmployeeRole extends Enumeration {
   * TypedField are also supported.
   */
 class SpecialField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with TypedField[String]
-    with SquerylRecordField with MandatoryTypedField[String] {
+    extends Field[String, OwnerType]
+    with TypedField[String]
+    with SquerylRecordField
+    with MandatoryTypedField[String] {
 
   override def owner = rec
   override def classOfPersistentField = classOf[String]
@@ -189,12 +195,14 @@ object MySchema extends Schema {
   val companyToEmployees =
     oneToManyRelation(companies, employees).via((c, e) => c.id === e.companyId)
 
-  val roomAssignments = manyToManyRelation(employees, rooms)
-    .via[RoomAssignment]((employee, room, roomAssignment) =>
-        (roomAssignment.employeeId === employee.idField,
-         roomAssignment.roomId === room.idField))
+  val roomAssignments =
+    manyToManyRelation(employees, rooms).via[RoomAssignment](
+        (employee, room, roomAssignment) =>
+          (roomAssignment.employeeId === employee.idField,
+           roomAssignment.roomId === room.idField))
 
-  on(employees)(e =>
+  on(employees)(
+      e =>
         declare(e.companyId defineAs (indexed("idx_employee_companyId")),
                 e.email defineAs indexed("idx_employee_email")))
 

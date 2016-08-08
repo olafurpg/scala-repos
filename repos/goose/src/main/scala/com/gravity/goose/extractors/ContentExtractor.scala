@@ -93,9 +93,9 @@ trait ContentExtractor {
       title
     } catch {
       case e: NullPointerException => {
-          warn(e.toString)
-          string.empty
-        }
+        warn(e.toString)
+        string.empty
+      }
     }
   }
 
@@ -207,8 +207,9 @@ trait ContentExtractor {
     val negativeScoring: Int = 0
     val bottomNodesForNegativeScore: Double = numberOfNodes * 0.25
 
-    trace(logPrefix + "About to inspect num of nodes with text: " +
-        numberOfNodes)
+    trace(
+        logPrefix + "About to inspect num of nodes with text: " +
+          numberOfNodes)
 
     for (node <- nodesWithText) {
       var boostScore: Float = 0
@@ -222,10 +223,9 @@ trait ContentExtractor {
         if ((numberOfNodes - i) <= bottomNodesForNegativeScore) {
           val booster: Float =
             bottomNodesForNegativeScore.asInstanceOf[Float] -
-            (numberOfNodes - i).asInstanceOf[Float]
-          boostScore = -math
-            .pow(booster, 2.asInstanceOf[Float])
-            .asInstanceOf[Float]
+              (numberOfNodes - i).asInstanceOf[Float]
+          boostScore =
+            -math.pow(booster, 2.asInstanceOf[Float]).asInstanceOf[Float]
           val negscore: Float = math.abs(boostScore) + negativeScoring
           if (negscore > 40) {
             boostScore = 5
@@ -235,8 +235,8 @@ trait ContentExtractor {
 
       trace(
           logPrefix + "Location Boost Score: " + boostScore +
-          " on interation: " + i + "' id='" + node.parent.id + "' class='" +
-          node.parent.attr("class"))
+            " on interation: " + i + "' id='" + node.parent.id + "' class='" +
+            node.parent.attr("class"))
 
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
@@ -261,8 +261,8 @@ trait ContentExtractor {
 
       trace(
           logPrefix + "ParentNode: score='" + e.attr("gravityScore") +
-          "' nodeCount='" + e.attr("gravityNodes") + "' id='" + e.id +
-          "' class='" + e.attr("class") + "' ")
+            "' nodeCount='" + e.attr("gravityNodes") + "' id='" + e.id +
+            "' class='" + e.attr("class") + "' ")
 
       val score: Int = getScore(e)
       if (score > topNodeScore) {
@@ -282,11 +282,12 @@ trait ContentExtractor {
       if (topNode != null) {
         trace(
             logPrefix + "Our TOPNODE: score='" + topNode.attr("gravityScore") +
-            "' nodeCount='" + topNode.attr("gravityNodes") + "' id='" +
-            topNode.id + "' class='" + topNode.attr("class") + "' ")
+              "' nodeCount='" + topNode.attr("gravityNodes") + "' id='" +
+              topNode.id + "' class='" + topNode.attr("class") + "' ")
         val text =
           if (topNode.text.trim.length > 100)
-            topNode.text.trim.substring(0, 100) + "..." else topNode.text.trim
+            topNode.text.trim.substring(0, 100) + "..."
+          else topNode.text.trim
         trace(logPrefix + "Text - " + text)
       }
     } catch {
@@ -361,7 +362,7 @@ trait ContentExtractor {
 
     trace(
         logPrefix + "Calulated link density score as: " + score +
-        " for node: " + getShortText(e.text, 50))
+          " for node: " + getShortText(e.text, 50))
 
     if (score > 1) {
       return true
@@ -403,12 +404,13 @@ trait ContentExtractor {
     var currentScore: Int = 0
     try {
       val scoreString: String = node.attr("gravityScore")
-      currentScore = if (string.isNullOrEmpty(scoreString)) 0
-      else Integer.parseInt(scoreString)
+      currentScore =
+        if (string.isNullOrEmpty(scoreString)) 0
+        else Integer.parseInt(scoreString)
     } catch {
       case e: NumberFormatException => {
-          currentScore = 0
-        }
+        currentScore = 0
+      }
     }
     val newScore: Int = currentScore + addToScore
     node.attr("gravityScore", Integer.toString(newScore))
@@ -424,12 +426,13 @@ trait ContentExtractor {
     var currentScore: Int = 0
     try {
       val countString: String = node.attr("gravityNodes")
-      currentScore = if (string.isNullOrEmpty(countString)) 0
-      else Integer.parseInt(countString)
+      currentScore =
+        if (string.isNullOrEmpty(countString)) 0
+        else Integer.parseInt(countString)
     } catch {
       case e: NumberFormatException => {
-          currentScore = 0
-        }
+        currentScore = 0
+      }
     }
     val newScore: Int = currentScore + addToCount
     node.attr("gravityNodes", Integer.toString(newScore))
@@ -449,32 +452,33 @@ trait ContentExtractor {
       node.parent.getElementsByTag("embed").foreach(candidates.add(_))
       node.parent.getElementsByTag("object").foreach(candidates.add(_))
 
-      trace(logPrefix + "extractVideos: Starting to extract videos. Found: " +
-          candidates.size)
+      trace(
+          logPrefix + "extractVideos: Starting to extract videos. Found: " +
+            candidates.size)
 
       for (el <- candidates) {
         val attrs: Attributes = el.attributes()
         for (a <- attrs) {
           try {
             if ((a.getValue.contains(youtubeStr) ||
-                    a.getValue.contains(vimdeoStr)) && (a.getKey == "src")) {
+                a.getValue.contains(vimdeoStr)) && (a.getKey == "src")) {
               trace(logPrefix + "This page has a video!: " + a.getValue)
               goodMovies += el
             }
           } catch {
             case e: Exception => {
-                info(logPrefix + "Error extracting movies: " + e.toString)
-              }
+              info(logPrefix + "Error extracting movies: " + e.toString)
+            }
           }
         }
       }
     } catch {
       case e: NullPointerException => {
-          warn(e.toString, e)
-        }
+        warn(e.toString, e)
+      }
       case e: Exception => {
-          warn(e.toString, e)
-        }
+        warn(e.toString, e)
+      }
     }
     trace(logPrefix + "extractVideos:  done looking videos")
     goodMovies.toList
@@ -530,8 +534,9 @@ trait ContentExtractor {
     val currentNodeScore: Int = getScore(e)
     val thresholdScore: Float = (topNodeScore * .08).asInstanceOf[Float]
 
-    trace(logPrefix + "topNodeScore: " + topNodeScore + " currentNodeScore: " +
-        currentNodeScore + " threshold: " + thresholdScore)
+    trace(
+        logPrefix + "topNodeScore: " + topNodeScore + " currentNodeScore: " +
+          currentNodeScore + " threshold: " + thresholdScore)
 
     if ((currentNodeScore < thresholdScore) && e.tagName != "td") {
       trace(logPrefix + "Removing node due to low threshold score")
@@ -562,13 +567,13 @@ trait ContentExtractor {
       } else {
 
         Some((for {
-          firstParagraph <- potentialParagraphs if
-                           (firstParagraph.text.length() > 0)
+          firstParagraph <- potentialParagraphs
+          if (firstParagraph.text.length() > 0)
           wordStats: WordStats = StopWords.getStopWordCount(
               firstParagraph.text)
           paragraphScore: Int = wordStats.getStopWordCount
-          siblingBaseLineScore: Double = .30 if
-          ((baselineScoreForSiblingParagraphs * siblingBaseLineScore).toDouble < paragraphScore)
+          siblingBaseLineScore: Double = .30
+          if ((baselineScoreForSiblingParagraphs * siblingBaseLineScore).toDouble < paragraphScore)
         } yield {
 
           trace(logPrefix + "This node looks like a good sibling, adding it")
@@ -587,8 +592,10 @@ trait ContentExtractor {
       trace(logPrefix + "SIBLINGCHECK: " + debugNode(currentSibling))
       b += work(currentSibling)
 
-      currentSibling = if (currentSibling != null)
-        currentSibling.previousElementSibling else null
+      currentSibling =
+        if (currentSibling != null)
+          currentSibling.previousElementSibling
+        else null
     }
     b
   }
@@ -635,9 +642,10 @@ trait ContentExtractor {
     if (numberOfParagraphs > 0) {
       base = scoreOfParagraphs / numberOfParagraphs
       if (logger.isDebugEnabled) {
-        logger.debug("The base score for siblings to beat is: " +
-            base + " NumOfParas: " + numberOfParagraphs + " scoreOfAll: " +
-            scoreOfParagraphs)
+        logger.debug(
+            "The base score for siblings to beat is: " +
+              base + " NumOfParas: " + numberOfParagraphs + " scoreOfAll: " +
+              scoreOfParagraphs)
       }
     }
     base

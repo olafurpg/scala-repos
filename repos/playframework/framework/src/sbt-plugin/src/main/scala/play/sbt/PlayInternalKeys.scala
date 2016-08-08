@@ -35,10 +35,12 @@ object PlayInternalKeys {
       "The task that's run on a particular project to compile it. By default, builds assets and runs compile.")
 
   val playStop = TaskKey[Unit](
-      "playStop", "Stop Play, if it has been started in non blocking mode")
+      "playStop",
+      "Stop Play, if it has been started in non blocking mode")
 
   val playAllAssets = TaskKey[Seq[(String, File)]](
-      "playAllAssets", "Compiles all assets for all projects")
+      "playAllAssets",
+      "Compiles all assets for all projects")
   val playPrefixAndAssets = TaskKey[(String, File)](
       "playPrefixAndAssets",
       "Gets all the assets with their associated prefixes")

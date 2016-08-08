@@ -221,8 +221,8 @@ trait Client {
     * returning None.
     * 0.seconds (the default) means no waiting, as opposed to infinite wait.
     */
-  def get(
-      queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]]
+  def get(queueName: String,
+          waitUpTo: Duration = 0.seconds): Future[Option[Buf]]
 
   /**
     * Delete a queue. Removes the journal file on the remote server.
@@ -340,9 +340,8 @@ abstract protected[kestrel] class CommandExecutorFactory[U] extends Closable {
   * @tparam ItemId the type used by {{CommandExecutor}} to identify returned
   *                items
   */
-abstract protected[kestrel] class ClientBase[
-    CommandExecutor <: Closable, Reply, ItemId](
-    underlying: CommandExecutorFactory[CommandExecutor])
+abstract protected[kestrel] class ClientBase[CommandExecutor <: Closable,
+Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
     extends Client {
 
   /**
@@ -370,8 +369,8 @@ abstract protected[kestrel] class ClientBase[
     val close = new Broker[Unit]
     val abort = new Broker[ItemId]
 
-    def recv(
-        service: CommandExecutor, command: CommandExecutor => Future[Reply]) {
+    def recv(service: CommandExecutor,
+             command: CommandExecutor => Future[Reply]) {
       val reply = command(service)
       Offer
         .prioritize(
@@ -492,8 +491,8 @@ protected[kestrel] class ConnectedClient(
           expiry: Time = Time.epoch): Future[Response] =
     underlying.toService(Set(Buf.Utf8(queueName), expiry, value))
 
-  def get(
-      queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
+  def get(queueName: String,
+          waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
     underlying.toService(Get(Buf.Utf8(queueName), Some(waitUpTo))).map {
       case Values(Seq()) => None
       case Values(Seq(Value(key, value: Buf))) => Some(value)
@@ -530,7 +529,8 @@ protected[kestrel] class ConnectedClient(
   */
 protected[kestrel] class FinagledClosableClient(
     service: Service[ThriftClientRequest, Array[Byte]])
-    extends FinagledClient(service) with Closable {
+    extends FinagledClient(service)
+    with Closable {
   def close(time: Time): Future[Unit] = service.close(time)
 }
 
@@ -556,7 +556,8 @@ protected[kestrel] class FinagledClientFactory(
   *   ServiceFactory[ThriftClientRequest, Array[Byte] ].
   */
 protected[kestrel] class ThriftConnectedClient(
-    underlying: FinagledClientFactory, txnAbortTimeout: Duration)
+    underlying: FinagledClientFactory,
+    txnAbortTimeout: Duration)
     extends ClientBase[FinagledClosableClient, Seq[Item], Long](underlying) {
   private def safeLongToInt(l: Long): Int = {
     if (l > Int.MaxValue) Int.MaxValue
@@ -572,22 +573,16 @@ protected[kestrel] class ThriftConnectedClient(
     }
 
   def flush(queueName: String): Future[Response] =
-    withClient[Values](
-        client =>
-          client
-            .flushQueue(queueName)
-            .map { _ =>
-          Values(Nil)
-      })
+    withClient[Values](client =>
+      client.flushQueue(queueName).map { _ =>
+        Values(Nil)
+    })
 
   def delete(queueName: String): Future[Response] =
-    withClient[Response](
-        client =>
-          client
-            .deleteQueue(queueName)
-            .map { _ =>
-          Deleted()
-      })
+    withClient[Response](client =>
+      client.deleteQueue(queueName).map { _ =>
+        Deleted()
+    })
 
   def set(queueName: String,
           value: Buf,
@@ -598,22 +593,19 @@ protected[kestrel] class ThriftConnectedClient(
           client
             .put(queueName, List(Buf.ByteBuffer.Owned.extract(value)), timeout)
             .map { _ =>
-          Stored()
-      })
+              Stored()
+          })
   }
 
   def get(queueName: String,
           waitUpTo: Duration = 0.seconds): Future[Option[Buf]] = {
     val waitUpToMsec = safeLongToInt(waitUpTo.inMilliseconds)
-    withClient[Option[Buf]](
-        client =>
-          client
-            .get(queueName, 1, waitUpToMsec)
-            .map {
-          case Seq() => None
-          case Seq(item: Item) => Some(Buf.ByteBuffer.Owned(item.data))
-          case _ => throw new IllegalArgumentException
-      })
+    withClient[Option[Buf]](client =>
+      client.get(queueName, 1, waitUpToMsec).map {
+        case Seq() => None
+        case Seq(item: Item) => Some(Buf.ByteBuffer.Owned(item.data))
+        case _ => throw new IllegalArgumentException
+    })
   }
 
   private def openRead(queueName: String)(
@@ -629,8 +621,8 @@ protected[kestrel] class ThriftConnectedClient(
       openRead(queueName)(client)
     }
 
-  private def abortReadCommand(queueName: String)(
-      id: Long)(client: FinagledClosableClient): Future[Seq[Item]] =
+  private def abortReadCommand(queueName: String)(id: Long)(
+      client: FinagledClosableClient): Future[Seq[Item]] =
     client.abort(queueName, collection.Set(id)).map { _ =>
       collection.Seq[Item]()
     }

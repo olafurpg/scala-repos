@@ -44,8 +44,8 @@ class MultiSQLContextsSuite extends SparkFunSuite with BeforeAndAfterAll {
   override protected def afterAll(): Unit = {
     // Set these states back.
     originalActiveSQLContext.foreach(ctx => SQLContext.setActive(ctx))
-    originalInstantiatedSQLContext.foreach(
-        ctx => SQLContext.setInstantiatedContext(ctx))
+    originalInstantiatedSQLContext.foreach(ctx =>
+      SQLContext.setInstantiatedContext(ctx))
   }
 
   def testNewSession(rootSQLContext: SQLContext): Unit = {
@@ -57,8 +57,8 @@ class MultiSQLContextsSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   def testCreatingNewSQLContext(allowsMultipleContexts: Boolean): Unit = {
-    val conf = sparkConf.clone.set(
-        SQLConf.ALLOW_MULTIPLE_CONTEXTS.key, allowsMultipleContexts.toString)
+    val conf = sparkConf.clone.set(SQLConf.ALLOW_MULTIPLE_CONTEXTS.key,
+                                   allowsMultipleContexts.toString)
     val sparkContext = new SparkContext(conf)
 
     try {

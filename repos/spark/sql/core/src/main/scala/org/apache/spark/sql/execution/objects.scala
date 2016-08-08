@@ -20,7 +20,11 @@ package org.apache.spark.sql.execution
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{GenerateSafeProjection, GenerateUnsafeProjection, GenerateUnsafeRowJoiner}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  GenerateSafeProjection,
+  GenerateUnsafeProjection,
+  GenerateUnsafeRowJoiner
+}
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.types.ObjectType
 
@@ -28,8 +32,8 @@ import org.apache.spark.sql.types.ObjectType
   * Helper functions for physical operators that work with user defined objects.
   */
 trait ObjectOperator extends SparkPlan {
-  def generateToObject(
-      objExpr: Expression, inputSchema: Seq[Attribute]): InternalRow => Any = {
+  def generateToObject(objExpr: Expression,
+                       inputSchema: Seq[Attribute]): InternalRow => Any = {
     val objectProjection =
       GenerateSafeProjection.generate(objExpr :: Nil, inputSchema)
     (i: InternalRow) =>
@@ -62,7 +66,8 @@ case class MapPartitions(func: Iterator[Any] => Iterator[Any],
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 
   override protected def doExecute(): RDD[InternalRow] = {
@@ -81,7 +86,8 @@ case class AppendColumns(func: Any => Any,
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] =
     child.output ++ serializer.map(_.toAttribute)
@@ -118,7 +124,8 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
                      groupingAttributes: Seq[Attribute],
                      dataAttributes: Seq[Attribute],
                      child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 
@@ -150,19 +157,20 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
   * iterators containing all elements in the group from left and right side.
   * The result of this function is encoded and flattened before being output.
   */
-case class CoGroup(
-    func: (Any, Iterator[Any], Iterator[Any]) => TraversableOnce[Any],
-    keyDeserializer: Expression,
-    leftDeserializer: Expression,
-    rightDeserializer: Expression,
-    serializer: Seq[NamedExpression],
-    leftGroup: Seq[Attribute],
-    rightGroup: Seq[Attribute],
-    leftAttr: Seq[Attribute],
-    rightAttr: Seq[Attribute],
-    left: SparkPlan,
-    right: SparkPlan)
-    extends BinaryNode with ObjectOperator {
+case class CoGroup(func: (Any, Iterator[Any],
+                          Iterator[Any]) => TraversableOnce[Any],
+                   keyDeserializer: Expression,
+                   leftDeserializer: Expression,
+                   rightDeserializer: Expression,
+                   serializer: Seq[NamedExpression],
+                   leftGroup: Seq[Attribute],
+                   rightGroup: Seq[Attribute],
+                   leftAttr: Seq[Attribute],
+                   rightAttr: Seq[Attribute],
+                   left: SparkPlan,
+                   right: SparkPlan)
+    extends BinaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 

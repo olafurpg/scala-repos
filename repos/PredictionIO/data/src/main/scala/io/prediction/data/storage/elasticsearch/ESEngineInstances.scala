@@ -29,9 +29,11 @@ import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-class ESEngineInstances(
-    client: Client, config: StorageClientConfig, index: String)
-    extends EngineInstances with Logging {
+class ESEngineInstances(client: Client,
+                        config: StorageClientConfig,
+                        index: String)
+    extends EngineInstances
+    with Logging {
   implicit val formats = DefaultFormats + new EngineInstanceSerializer
   private val estype = "engine_instances"
 
@@ -45,27 +47,27 @@ class ESEngineInstances(
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("startTime" -> ("type" -> "date")) ~
-              ("endTime" -> ("type" -> "date")) ~
-              ("engineId" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("engineVersion" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("engineVariant" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("engineFactory" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("dataSourceParams" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("preparatorParams" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("algorithmsParams" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("servingParams" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+        ("properties" ->
+          ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("startTime" -> ("type" -> "date")) ~
+            ("endTime" -> ("type" -> "date")) ~
+            ("engineId" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("engineVersion" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("engineVariant" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("engineFactory" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("dataSourceParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("preparatorParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("algorithmsParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("servingParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)
@@ -117,10 +119,11 @@ class ESEngineInstances(
       val builder = client
         .prepareSearch(index)
         .setTypes(estype)
-        .setPostFilter(andFilter(termFilter("status", "COMPLETED"),
-                                 termFilter("engineId", engineId),
-                                 termFilter("engineVersion", engineVersion),
-                                 termFilter("engineVariant", engineVariant)))
+        .setPostFilter(
+            andFilter(termFilter("status", "COMPLETED"),
+                      termFilter("engineId", engineId),
+                      termFilter("engineVersion", engineVersion),
+                      termFilter("engineVariant", engineVariant)))
         .addSort("startTime", SortOrder.DESC)
       ESUtils.getAll[EngineInstance](client, builder)
     } catch {

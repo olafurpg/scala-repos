@@ -95,7 +95,7 @@ case class HyperLogLogPlusPlus(child: Expression,
 
   require(p >= 4,
           "HLL++ requires at least 4 bits for addressing. " +
-          "Use a lower error, at most 27%.")
+            "Use a lower error, at most 27%.")
 
   /**
     * Shift used to extract the index of the register from the hashed value.

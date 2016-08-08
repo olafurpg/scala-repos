@@ -124,7 +124,8 @@ trait Reducible[F[_]] extends Foldable[F] { self =>
   * values), this class is able to reduce `F[G[A]]` values.
   */
 trait CompositeReducible[F[_], G[_]]
-    extends Reducible[λ[α => F[G[α]]]] with CompositeFoldable[F, G] {
+    extends Reducible[λ[α => F[G[α]]]]
+    with CompositeFoldable[F, G] {
   implicit def F: Reducible[F]
   implicit def G: Reducible[G]
 
@@ -160,8 +161,8 @@ abstract class NonEmptyReducible[F[_], G[_]](implicit G: Foldable[G])
     G.foldLeft(ga, f(b, a))(f)
   }
 
-  def foldRight[A, B](
-      fa: F[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+  def foldRight[A, B](fa: F[A], lb: Eval[B])(
+      f: (A, Eval[B]) => Eval[B]): Eval[B] =
     Always(split(fa)).flatMap {
       case (a, ga) =>
         f(a, G.foldRight(ga, lb)(f))
@@ -172,8 +173,8 @@ abstract class NonEmptyReducible[F[_], G[_]](implicit G: Foldable[G])
     G.foldLeft(ga, f(a))((b, a) => g(b, a))
   }
 
-  def reduceRightTo[A, B](
-      fa: F[A])(f: A => B)(g: (A, Eval[B]) => Eval[B]): Eval[B] =
+  def reduceRightTo[A, B](fa: F[A])(f: A => B)(
+      g: (A, Eval[B]) => Eval[B]): Eval[B] =
     Always(split(fa)).flatMap {
       case (a, ga) =>
         G.reduceRightToOption(ga)(f)(g).flatMap {

@@ -18,10 +18,12 @@ import play.mvc.Http
 import play.mvc.Http.Context
 
 object NettyGlobalSettingsSpec
-    extends GlobalSettingsSpec with NettyIntegrationSpecification
+    extends GlobalSettingsSpec
+    with NettyIntegrationSpecification
 
 trait GlobalSettingsSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -33,7 +35,7 @@ trait GlobalSettingsSpec
       applicationGlobal.fold(Map.empty[String, String]) { s: String =>
         Map("application.global" -> s"play.it.bindings.$s")
       } +
-      ("play.http.requestHandler" -> "play.http.GlobalSettingsHttpRequestHandler")
+        ("play.http.requestHandler" -> "play.http.GlobalSettingsHttpRequestHandler")
     import play.api.inject._
     import play.api.routing.sird._
     lazy val app: Application = new GuiceApplicationBuilder()

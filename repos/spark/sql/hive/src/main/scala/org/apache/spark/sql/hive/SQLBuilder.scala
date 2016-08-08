@@ -37,7 +37,8 @@ import org.apache.spark.sql.types.{ByteType, DataType, IntegerType, NullType}
   * A place holder for generated SQL for subquery expression.
   */
 case class SubqueryHolder(query: String)
-    extends LeafExpression with Unevaluable {
+    extends LeafExpression
+    with Unevaluable {
   override def dataType: DataType = NullType
   override def nullable: Boolean = true
   override def sql: String = s"($query)"
@@ -79,8 +80,8 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     val aliasedOutput = canonicalizedPlan.output.zip(outputNames).map {
       case (attr, name) => Alias(attr.withQualifiers(Nil), name)()
     }
-    val finalPlan = Project(
-        aliasedOutput, SubqueryAlias(finalName, canonicalizedPlan))
+    val finalPlan =
+      Project(aliasedOutput, SubqueryAlias(finalName, canonicalizedPlan))
 
     try {
       val replaced = finalPlan.transformAllExpressions {
@@ -182,8 +183,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
     case Sort(orders, _, RepartitionByExpression(partitionExprs, child, _))
         if orders.map(_.child) == partitionExprs =>
-      build(
-          toSQL(child), "CLUSTER BY", partitionExprs.map(_.sql).mkString(", "))
+      build(toSQL(child),
+            "CLUSTER BY",
+            partitionExprs.map(_.sql).mkString(", "))
 
     case p: Sort =>
       build(
@@ -301,10 +303,10 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     )
   }
 
-  private def sameOutput(
-      output1: Seq[Attribute], output2: Seq[Attribute]): Boolean =
+  private def sameOutput(output1: Seq[Attribute],
+                         output2: Seq[Attribute]): Boolean =
     output1.size == output2.size &&
-    output1.zip(output2).forall(pair => pair._1.semanticEquals(pair._2))
+      output1.zip(output2).forall(pair => pair._1.semanticEquals(pair._2))
 
   private def isGroupingSet(a: Aggregate, e: Expand, p: Project): Boolean = {
     assert(a.child == e && e.child == p)
@@ -313,8 +315,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         p.child.output ++ a.groupingExpressions.map(_.asInstanceOf[Attribute]))
   }
 
-  private def groupingSetToSQL(
-      agg: Aggregate, expand: Expand, project: Project): String = {
+  private def groupingSetToSQL(agg: Aggregate,
+                               expand: Expand,
+                               project: Project): String = {
     assert(agg.groupingExpressions.length > 1)
 
     // The last column of Expand is always grouping ID
@@ -359,11 +362,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
           case ar: AttributeReference if ar == gid => GroupingID(Nil)
           case ar: AttributeReference if groupByAttrMap.contains(ar) =>
             groupByAttrMap(ar)
-          case a @ Cast(
-              BitwiseAnd(ShiftRight(ar: AttributeReference,
-                                    Literal(value: Any, IntegerType)),
-                         Literal(1, IntegerType)),
-              ByteType) if ar == gid =>
+          case a @ Cast(BitwiseAnd(ShiftRight(ar: AttributeReference,
+                                              Literal(value: Any,
+                                                      IntegerType)),
+                                   Literal(1, IntegerType)),
+                        ByteType) if ar == gid =>
             // for converting an expression to its original SQL format grouping(col)
             val idx = groupByExprs.length - 1 - value.asInstanceOf[Int]
             groupByExprs.lift(idx).map(Grouping).getOrElse(a)
@@ -444,10 +447,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         plan.transformAllExpressions {
           case a: AttributeReference =>
             AttributeReference(normalizedName(a), a.dataType)(
-                exprId = a.exprId, qualifiers = Nil)
+                exprId = a.exprId,
+                qualifiers = Nil)
           case a: Alias =>
-            Alias(a.child, normalizedName(a))(
-                exprId = a.exprId, qualifiers = Nil)
+            Alias(a.child, normalizedName(a))(exprId = a.exprId,
+                                              qualifiers = Nil)
         }
     }
 
@@ -549,8 +553,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object ExtractSQLTable {
     def unapply(plan: LogicalPlan): Option[SQLTable] = plan match {
-      case l @ LogicalRelation(
-          _, _, Some(TableIdentifier(table, Some(database)))) =>
+      case l @ LogicalRelation(_,
+                               _,
+                               Some(TableIdentifier(table, Some(database)))) =>
         Some(SQLTable(database, table, l.output.map(_.withQualifiers(Nil))))
 
       case m: MetastoreRelation =>

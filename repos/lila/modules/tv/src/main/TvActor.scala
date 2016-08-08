@@ -65,10 +65,10 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
                                    "id" -> game.id,
                                    "color" -> game.firstColor.name,
                                    "player" -> user.map { u =>
-                                 Json.obj("name" -> u.name,
-                                          "title" -> u.title,
-                                          "rating" -> player.rating)
-                               })))
+                                     Json.obj("name" -> u.name,
+                                              "title" -> u.title,
+                                              "rating" -> player.rating)
+                                   })))
         })
       }
       if (channel == Tv.Channel.Best)
@@ -91,8 +91,9 @@ private[tv] object TvActor {
   case class GetGameId(channel: Tv.Channel)
   case class GetGameIds(channel: Tv.Channel, max: Int)
   case object Select
-  case class Selected(
-      channel: Tv.Channel, game: lila.game.Game, previousId: Option[String])
+  case class Selected(channel: Tv.Channel,
+                      game: lila.game.Game,
+                      previousId: Option[String])
 
   case object GetChampions
 }

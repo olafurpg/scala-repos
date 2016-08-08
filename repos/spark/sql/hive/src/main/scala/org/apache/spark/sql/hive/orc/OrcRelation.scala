@@ -27,7 +27,13 @@ import org.apache.hadoop.hive.ql.io.orc.OrcFile.OrcTableProperties
 import org.apache.hadoop.hive.serde2.objectinspector.SettableStructObjectInspector
 import org.apache.hadoop.hive.serde2.typeinfo.{StructTypeInfo, TypeInfoUtils}
 import org.apache.hadoop.io.{NullWritable, Writable}
-import org.apache.hadoop.mapred.{InputFormat => MapRedInputFormat, JobConf, OutputFormat => MapRedOutputFormat, RecordWriter, Reporter}
+import org.apache.hadoop.mapred.{
+  InputFormat => MapRedInputFormat,
+  JobConf,
+  OutputFormat => MapRedOutputFormat,
+  RecordWriter,
+  Reporter
+}
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 
@@ -71,7 +77,7 @@ private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
           val availableCodecs =
             shortOrcCompressionCodecNames.keys.map(_.toLowerCase)
           throw new IllegalArgumentException(s"Codec [$codecName] " +
-              s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
+            s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
         }
         codecName.toLowerCase
     }
@@ -120,7 +126,8 @@ private[orc] class OrcOutputWriter(path: String,
                                    bucketId: Option[Int],
                                    dataSchema: StructType,
                                    context: TaskAttemptContext)
-    extends OutputWriter with HiveInspectors {
+    extends OutputWriter
+    with HiveInspectors {
 
   private val serializer = {
     val table = new Properties()
@@ -202,8 +209,8 @@ private[orc] class OrcOutputWriter(path: String,
   override protected[sql] def writeInternal(row: InternalRow): Unit = {
     wrapOrcStruct(cachedOrcStruct, structOI, row)
 
-    recordWriter.write(
-        NullWritable.get(), serializer.serialize(cachedOrcStruct, structOI))
+    recordWriter.write(NullWritable.get(),
+                       serializer.serialize(cachedOrcStruct, structOI))
   }
 
   override def close(): Unit = {
@@ -217,7 +224,8 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
                                      attributes: Seq[Attribute],
                                      filters: Array[Filter],
                                      @transient inputPaths: Seq[FileStatus])
-    extends Logging with HiveInspectors {
+    extends Logging
+    with HiveInspectors {
 
   private def addColumnIds(dataSchema: StructType,
                            output: Seq[Attribute],

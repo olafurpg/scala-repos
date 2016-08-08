@@ -34,7 +34,12 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyBooleanProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventHandlerDelegate, EventType}
@@ -71,8 +76,9 @@ object TreeItem {
              treeItem: TreeItem[T],
              expanded: Boolean) =
       this(
-          new jfxsc.TreeItem.TreeModificationEvent[T](
-              eventType, treeItem, expanded))
+          new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
+                                                      treeItem,
+                                                      expanded))
 
     /**
       * Constructs a TreeModificationEvent for when the TreeItem has had its
@@ -83,8 +89,10 @@ object TreeItem {
              added: mutable.Buffer[_ <: jfxsc.TreeItem[T]],
              removed: mutable.Buffer[_ <: jfxsc.TreeItem[T]]) =
       this(
-          new jfxsc.TreeItem.TreeModificationEvent[T](
-              eventType, treeItem, added, removed))
+          new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
+                                                      treeItem,
+                                                      added,
+                                                      removed))
 
     /**
       * Constructs a TreeModificationEvent for when the TreeItem has had its
@@ -94,8 +102,9 @@ object TreeItem {
              treeItem: TreeItem[T],
              newValue: T) =
       this(
-          new jfxsc.TreeItem.TreeModificationEvent[T](
-              eventType, treeItem, newValue))
+          new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
+                                                      treeItem,
+                                                      newValue))
 
     /**
       * Returns the children added to the TreeItem in this event, or an empty
@@ -185,7 +194,7 @@ object TreeItem {
   /** The general EventType used when the TreeItem receives a modification
     * that results in the number of children being visible changes.
     *
-    * @since 8.0  
+    * @since 8.0
     */
   def expandedItemCountChangeEvent =
     jfxsc.TreeItem.expandedItemCountChangeEvent
@@ -221,7 +230,8 @@ object TreeItem {
   */
 class TreeItem[T](
     override val delegate: jfxsc.TreeItem[T] = new jfxsc.TreeItem[T])
-    extends EventHandlerDelegate with SFXDelegate[jfxsc.TreeItem[T]] {
+    extends EventHandlerDelegate
+    with SFXDelegate[jfxsc.TreeItem[T]] {
 
   /**
     * Creates a TreeItem with the value property set to the provided object.

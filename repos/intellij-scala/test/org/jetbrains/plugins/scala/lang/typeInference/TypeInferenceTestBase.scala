@@ -14,8 +14,16 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation, Unit}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScType,
+  ScTypePresentation,
+  Unit
+}
 import org.jetbrains.plugins.scala.util.TestUtils
 
 /**
@@ -66,9 +74,13 @@ abstract class TypeInferenceTestBase
 
     val addOne =
       if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+                                      classOf[ScExpression]) != null) 0
+      else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+        scalaFile,
+        startOffset + addOne,
+        endOffset,
+        classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty) match {
       case Success(Unit, _) => expr.getTypeIgnoreBaseType(TypingContext.empty)
@@ -109,17 +121,17 @@ abstract class TypeInferenceTestBase
               ScType.presentableText(actualExpectedType)
             assertEquals(expectedExpectedTypeText, actualExpectedTypeText)
           case SimplifiedPattern(expectedText) =>
-            assertEquals(
-                expectedText, ScTypePresentation.withoutAliases(ttypez))
+            assertEquals(expectedText,
+                         ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
         }
       case Failure(msg, elem) =>
         assert(assertion = false,
                msg + " :: " +
-               (elem match {
-                     case Some(x) => x.getText
-                     case None => "empty element"
-                   }))
+                 (elem match {
+                   case Some(x) => x.getText
+                   case None => "empty element"
+                 }))
     }
   }
 }

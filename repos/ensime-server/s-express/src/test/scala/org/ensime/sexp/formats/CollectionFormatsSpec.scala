@@ -8,7 +8,9 @@ import org.ensime.sexp._
 
 // http://docs.scala-lang.org/overviews/collections/overview.html
 class CollectionFormatsSpec
-    extends FormatSpec with ProductFormats with CollectionFormats
+    extends FormatSpec
+    with ProductFormats
+    with CollectionFormats
     with BasicFormats {
 
   val foo = SexpString("foo")
@@ -65,8 +67,8 @@ class CollectionFormatsSpec
 
   it should "support SortedMap" in {
     assertFormat(collection.SortedMap[String, String](), SexpNil)
-    assertFormat(
-        collection.SortedMap("foo" -> "foo"), SexpList(SexpList(foo, foo)))
+    assertFormat(collection.SortedMap("foo" -> "foo"),
+                 SexpList(SexpList(foo, foo)))
   }
 
   "CollectionFormats immutable variants of the traits" should "support Traversable" in {

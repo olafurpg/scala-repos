@@ -85,12 +85,14 @@ object ActorWithBoundedStashSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorWithBoundedStashSpec
     extends AkkaSpec(ActorWithBoundedStashSpec.testConf)
-    with BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
+    with BeforeAndAfterEach
+    with DefaultTimeout
+    with ImplicitSender {
   import ActorWithBoundedStashSpec._
 
   override def atStartup: Unit = {
-    system.eventStream.publish(Mute(EventFilter.warning(
-                pattern = ".*received dead letter from.*hello.*")))
+    system.eventStream.publish(Mute(
+        EventFilter.warning(pattern = ".*received dead letter from.*hello.*")))
   }
 
   override def beforeEach(): Unit =

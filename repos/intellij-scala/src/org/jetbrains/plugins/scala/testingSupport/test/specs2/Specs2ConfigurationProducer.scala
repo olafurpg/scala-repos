@@ -7,12 +7,19 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScInfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.TestKind
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, TestConfigurationProducer, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer,
+  TestConfigurationProducer,
+  TestConfigurationUtil
+}
 
 /**
   * User: Alexander Podkhalyuzin
@@ -106,14 +113,15 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[Specs2RunConfiguration]) return false
-      return TestConfigurationUtil.isPackageConfiguration(
-          element, configuration)
+      return TestConfigurationUtil
+        .isPackageConfiguration(element, configuration)
     }
     val parent: ScTypeDefinition =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (parent == null) return false
     val suiteClasses = suitePaths
-      .map(suite =>
+      .map(
+          suite =>
             ScalaPsiManager
               .instance(parent.getProject)
               .getCachedClass(suite,
@@ -136,7 +144,7 @@ with AbstractTestConfigurationProducer {
       case configuration: Specs2RunConfiguration
           if configuration.getTestKind == TestKind.TEST_NAME =>
         testClassPath == configuration.getTestClassPath && testName != null &&
-        testName == configuration.getTestName
+          testName == configuration.getTestName
       case _ => false
     }
   }
@@ -158,7 +166,8 @@ with AbstractTestConfigurationProducer {
 
     val psiManager = ScalaPsiManager.instance(testClassDef.getProject)
     val suiteClasses = suitePaths
-      .map(suite =>
+      .map(
+          suite =>
             psiManager.getCachedClass(suite,
                                       element.getResolveScope,
                                       ScalaPsiManager.ClassCategory.TYPE))

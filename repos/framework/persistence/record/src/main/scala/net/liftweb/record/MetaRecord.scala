@@ -145,7 +145,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     val methods = rootClass.getMethods
 
     lifecycleCallbacks = (for (v <- methods if v.getName != "meta" &&
-                                   isLifecycle(v)) yield (v.getName, v)).toList
+                                 isLifecycle(v)) yield (v.getName, v)).toList
 
     introspect(this, methods) {
       case (v, mf) => tArray += FieldHolder(mf.name, v, mf)
@@ -296,8 +296,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     setFieldsFromJValue(inst, JsonParser.parse(json))
 
   def foreachCallback(inst: BaseRecord, f: LifecycleCallbacks => Any) {
-    lifecycleCallbacks.foreach(
-        m => f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
+    lifecycleCallbacks.foreach(m =>
+      f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
   }
 
   /**
@@ -360,12 +360,12 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
             child = toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
       case s: Seq[_] =>
-        s.flatMap(
-            e =>
-              e match {
+        s.flatMap(e =>
+          e match {
             case elem: Elem =>
-              elem.copy(child = toForm(
-                        inst, elem.child.flatMap(n => toForm(inst, n))))
+              elem.copy(
+                  child =
+                    toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
             case x => x
         })
@@ -379,8 +379,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     *
     * @return Box[The Field] (Empty if the field is not found)
     */
-  def fieldByName(
-      fieldName: String, inst: BaseRecord): Box[Field[_, BaseRecord]] = {
+  def fieldByName(fieldName: String,
+                  inst: BaseRecord): Box[Field[_, BaseRecord]] = {
     Box(fieldMap.get(fieldName).map(_.field(inst)))
   }
 
@@ -490,8 +490,9 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
   def fields(rec: BaseRecord): List[Field[_, BaseRecord]] =
     fieldList.map(_.field(rec))
 
-  case class FieldHolder(
-      name: String, method: Method, metaField: Field[_, BaseRecord]) {
+  case class FieldHolder(name: String,
+                         method: Method,
+                         metaField: Field[_, BaseRecord]) {
     def field(inst: BaseRecord): Field[_, BaseRecord] =
       method.invoke(inst).asInstanceOf[Field[_, BaseRecord]]
   }

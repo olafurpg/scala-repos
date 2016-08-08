@@ -55,10 +55,13 @@ import parallel.mutable.ParSet
   *  @define Coll mutable.Set
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends scala.collection.SetLike[A, This] with Scriptable[A]
-    with Builder[A, This] with Growable[A] with Shrinkable[A]
-    with Cloneable[mutable.Set[A]] with Parallelizable[A, ParSet[A]] {
-  self =>
+    extends scala.collection.SetLike[A, This]
+    with Scriptable[A]
+    with Builder[A, This]
+    with Growable[A]
+    with Shrinkable[A]
+    with Cloneable[mutable.Set[A]]
+    with Parallelizable[A, ParSet[A]] { self =>
 
   /** A common implementation of `newBuilder` for all mutable sets
     *  in terms of `empty`. Overrides the implementation in `collection.SetLike`
@@ -131,7 +134,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     */
   def retain(p: A => Boolean): Unit =
     for (elem <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(elem)) this -= elem
+      if (!p(elem)) this -= elem
 
   /** Removes all elements from the set. After this operation is completed,
     *  the set will be empty.

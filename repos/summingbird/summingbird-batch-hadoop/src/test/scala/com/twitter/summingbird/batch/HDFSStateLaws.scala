@@ -55,17 +55,19 @@ class HDFSStateLaws extends WordSpec {
       val nextPrepareState = nextState.begin
       nextPrepareState.requested match {
         case intersection @ Intersection(low, high) => {
-            val startBatchTime: Timestamp =
-              batcher.earliestTimeOf(batcher.batchOf(startDate))
-            val expectedNextRunStartMillis: Long = startBatchTime
-              .incrementMinutes(numBatches * batchLength)
-              .milliSinceEpoch
-            assert(low.least.get.milliSinceEpoch == expectedNextRunStartMillis)
-          }
+          val startBatchTime: Timestamp =
+            batcher.earliestTimeOf(batcher.batchOf(startDate))
+          val expectedNextRunStartMillis: Long = startBatchTime
+            .incrementMinutes(numBatches * batchLength)
+            .milliSinceEpoch
+          assert(low.least.get.milliSinceEpoch == expectedNextRunStartMillis)
+        }
         case _ => fail("requested interval should be an interseciton")
       }
-      shouldCheckpointInterval(
-          batcher, nextState, nextPrepareState.requested, path)
+      shouldCheckpointInterval(batcher,
+                               nextState,
+                               nextPrepareState.requested,
+                               path)
     }
   }
 
@@ -94,18 +96,20 @@ class HDFSStateLaws extends WordSpec {
       val partialCompleteInterval: Interval[Timestamp] =
         leftClosedRightOpenInterval(startBatchTime,
                                     RichDate("2012-12-26T11:30").value)
-      shouldCheckpointInterval(
-          batcher, waitingState, partialCompleteInterval, path)
+      shouldCheckpointInterval(batcher,
+                               waitingState,
+                               partialCompleteInterval,
+                               path)
     }
   }
 
   def leftClosedRightOpenInterval(low: Timestamp, high: Timestamp) =
     Interval.leftClosedRightOpen[Timestamp](low, high).right.get
 
-  def shouldNotAcceptInterval(
-      state: WaitingState[Interval[Timestamp]],
-      interval: Interval[Timestamp],
-      message: String = "PreparedState accepted a bad Interval!") = {
+  def shouldNotAcceptInterval(state: WaitingState[Interval[Timestamp]],
+                              interval: Interval[Timestamp],
+                              message: String =
+                                "PreparedState accepted a bad Interval!") = {
     state.begin.willAccept(interval) match {
       case Left(t) => t
       case Right(t) => sys.error(message)
@@ -119,7 +123,7 @@ class HDFSStateLaws extends WordSpec {
       case Left(t) =>
         sys.error(
             "PreparedState didn't accept its proposed Interval! failed state: " +
-            t)
+              t)
     }
   }
 
@@ -130,16 +134,16 @@ class HDFSStateLaws extends WordSpec {
     completeState(state.begin.willAccept(interval))
     interval match {
       case intersection @ Intersection(low, high) => {
-          BatchID
-            .range(batcher.batchOf(low.least.get),
-                   batcher.batchOf(high.greatest.get))
-            .foreach { t =>
-              val totPath =
-                (path + "/" + batcher.earliestTimeOf(t).milliSinceEpoch +
-                    ".version")
-              assert(new java.io.File(totPath).exists)
-            }
-        }
+        BatchID
+          .range(batcher.batchOf(low.least.get),
+                 batcher.batchOf(high.greatest.get))
+          .foreach { t =>
+            val totPath =
+              (path + "/" + batcher.earliestTimeOf(t).milliSinceEpoch +
+                ".version")
+            assert(new java.io.File(totPath).exists)
+          }
+      }
       case _ => sys.error("interval should be an intersection")
     }
   }

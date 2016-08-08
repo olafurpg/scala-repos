@@ -55,8 +55,9 @@ case class Const[T, N[_]](value: N[T]) extends Expr[T, N] {
 case class Var[T, N[_]](name: Id[T]) extends Expr[T, N]
 case class Unary[T1, T2, N[_]](arg: Id[T1], fn: N[T1] => N[T2])
     extends Expr[T2, N]
-case class Binary[T1, T2, T3, N[_]](
-    arg1: Id[T1], arg2: Id[T2], fn: (N[T1], N[T2]) => N[T3])
+case class Binary[T1, T2, T3, N[_]](arg1: Id[T1],
+                                    arg2: Id[T2],
+                                    fn: (N[T1], N[T2]) => N[T3])
     extends Expr[T3, N]
 
 object Expr {

@@ -9,8 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * @since 18/12/14.
   */
 class ScalaCodeContextType
-    extends TemplateContextType(
-        "SCALA_CODE", "Code", classOf[ScalaLiveTemplateContextType]) {
+    extends TemplateContextType("SCALA_CODE",
+                                "Code",
+                                classOf[ScalaLiveTemplateContextType]) {
   def isInContext(file: PsiFile, offset: Int): Boolean = {
     if (!file.isInstanceOf[ScalaFile]) return false
     !ScalaCommentContextType.isInContext(file, offset) &&

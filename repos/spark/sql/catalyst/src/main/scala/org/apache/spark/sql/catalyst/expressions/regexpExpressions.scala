@@ -69,7 +69,8 @@ trait StringRegexExpression extends ImplicitCastInputTypes {
   * Simple RegEx pattern matching function
   */
 case class Like(left: Expression, right: Expression)
-    extends BinaryExpression with StringRegexExpression {
+    extends BinaryExpression
+    with StringRegexExpression {
 
   override def escape(v: String): String = StringUtils.escapeLikeRegex(v)
 
@@ -99,7 +100,8 @@ case class Like(left: Expression, right: Expression)
         s"""
           ${eval.code}
           boolean ${ev.isNull} = ${eval.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $pattern.matcher(${eval.value}.toString()).matches();
           }
@@ -107,26 +109,25 @@ case class Like(left: Expression, right: Expression)
       } else {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       }
     } else {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (eval1, eval2) =>
-                        {
-                          s"""
+      nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+        s"""
           String rightStr = ${eval2}.toString();
           ${patternClass} $pattern = ${patternClass}.compile($escapeFunc(rightStr));
           ${ev.value} = $pattern.matcher(${eval1}.toString()).matches();
         """
-                      })
+      })
     }
   }
 }
 
 case class RLike(left: Expression, right: Expression)
-    extends BinaryExpression with StringRegexExpression {
+    extends BinaryExpression
+    with StringRegexExpression {
 
   override def escape(v: String): String = v
   override def matches(regex: Pattern, str: String): Boolean =
@@ -152,7 +153,8 @@ case class RLike(left: Expression, right: Expression)
         s"""
           ${eval.code}
           boolean ${ev.isNull} = ${eval.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $pattern.matcher(${eval.value}.toString()).find(0);
           }
@@ -160,20 +162,18 @@ case class RLike(left: Expression, right: Expression)
       } else {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       }
     } else {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (eval1, eval2) =>
-                        {
-                          s"""
+      nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+        s"""
           String rightStr = ${eval2}.toString();
           ${patternClass} $pattern = ${patternClass}.compile(rightStr);
           ${ev.value} = $pattern.matcher(${eval1}.toString()).find(0);
         """
-                      })
+      })
     }
   }
 }
@@ -182,7 +182,8 @@ case class RLike(left: Expression, right: Expression)
   * Splits str around pat (pattern is a regular expression).
   */
 case class StringSplit(str: Expression, pattern: Expression)
-    extends BinaryExpression with ImplicitCastInputTypes {
+    extends BinaryExpression
+    with ImplicitCastInputTypes {
 
   override def left: Expression = str
   override def right: Expression = pattern
@@ -213,9 +214,11 @@ case class StringSplit(str: Expression, pattern: Expression)
   *
   * NOTE: this expression is not THREAD-SAFE, as it has some internal mutable status.
   */
-case class RegExpReplace(
-    subject: Expression, regexp: Expression, rep: Expression)
-    extends TernaryExpression with ImplicitCastInputTypes {
+case class RegExpReplace(subject: Expression,
+                         regexp: Expression,
+                         rep: Expression)
+    extends TernaryExpression
+    with ImplicitCastInputTypes {
 
   // last regex in string, we will update the pattern iff regexp value changed.
   @transient private var lastRegex: UTF8String = _
@@ -268,12 +271,15 @@ case class RegExpReplace(
     val classNameStringBuffer =
       classOf[java.lang.StringBuffer].getCanonicalName
 
-    ctx.addMutableState(
-        "UTF8String", termLastRegex, s"${termLastRegex} = null;")
-    ctx.addMutableState(
-        classNamePattern, termPattern, s"${termPattern} = null;")
-    ctx.addMutableState(
-        "String", termLastReplacement, s"${termLastReplacement} = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastRegex,
+                        s"${termLastRegex} = null;")
+    ctx.addMutableState(classNamePattern,
+                        termPattern,
+                        s"${termPattern} = null;")
+    ctx.addMutableState("String",
+                        termLastReplacement,
+                        s"${termLastReplacement} = null;")
     ctx.addMutableState("UTF8String",
                         termLastReplacementInUTF8,
                         s"${termLastReplacementInUTF8} = null;")
@@ -281,11 +287,8 @@ case class RegExpReplace(
                         termResult,
                         s"${termResult} = new $classNameStringBuffer();")
 
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (subject, regexp, rep) =>
-                      {
-                        s"""
+    nullSafeCodeGen(ctx, ev, (subject, regexp, rep) => {
+      s"""
       if (!$regexp.equals(${termLastRegex})) {
         // regex value changed
         ${termLastRegex} = $regexp.clone();
@@ -306,7 +309,7 @@ case class RegExpReplace(
       ${ev.value} = UTF8String.fromString(${termResult}.toString());
       ${ev.isNull} = false;
     """
-                    })
+    })
   }
 }
 
@@ -315,9 +318,11 @@ case class RegExpReplace(
   *
   * NOTE: this expression is not THREAD-SAFE, as it has some internal mutable status.
   */
-case class RegExpExtract(
-    subject: Expression, regexp: Expression, idx: Expression)
-    extends TernaryExpression with ImplicitCastInputTypes {
+case class RegExpExtract(subject: Expression,
+                         regexp: Expression,
+                         idx: Expression)
+    extends TernaryExpression
+    with ImplicitCastInputTypes {
   def this(s: Expression, r: Expression) = this(s, r, Literal(1))
 
   // last regex in string, we will update the pattern iff regexp value changed.
@@ -351,16 +356,15 @@ case class RegExpExtract(
     val termPattern = ctx.freshName("pattern")
     val classNamePattern = classOf[Pattern].getCanonicalName
 
-    ctx.addMutableState(
-        "UTF8String", termLastRegex, s"${termLastRegex} = null;")
-    ctx.addMutableState(
-        classNamePattern, termPattern, s"${termPattern} = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastRegex,
+                        s"${termLastRegex} = null;")
+    ctx.addMutableState(classNamePattern,
+                        termPattern,
+                        s"${termPattern} = null;")
 
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (subject, regexp, idx) =>
-                      {
-                        s"""
+    nullSafeCodeGen(ctx, ev, (subject, regexp, idx) => {
+      s"""
       if (!$regexp.equals(${termLastRegex})) {
         // regex value changed
         ${termLastRegex} = $regexp.clone();
@@ -376,6 +380,6 @@ case class RegExpExtract(
         ${ev.value} = UTF8String.EMPTY_UTF8;
         ${ev.isNull} = false;
       }"""
-                    })
+    })
   }
 }

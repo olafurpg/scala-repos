@@ -43,7 +43,8 @@ object Accordion {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Accordion.html]].
   */
 class Accordion(override val delegate: jfxsc.Accordion = new jfxsc.Accordion)
-    extends Control(delegate) with SFXDelegate[jfxsc.Accordion] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Accordion] {
 
   /**
     * The expanded TitledPane in the Accordion.

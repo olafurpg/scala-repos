@@ -17,9 +17,10 @@ private case class ScalaFacetData(languageLevel: String,
   def removeFrom(module: ModuleSettings) {
     val facetElement = ScalaFacetData
       .scalaFacetElementIn(module)
-      .getOrElse(throw new IllegalStateException(
+      .getOrElse(
+          throw new IllegalStateException(
               "Cannot remove Scala facet from module: " +
-              module.getModuleName))
+                module.getModuleName))
 
     facetElement.detach()
   }
@@ -33,8 +34,8 @@ private object ScalaFacetData {
     Option(module.getFacetElement("scala"))
 
   def findIn(module: ModuleSettings): Option[ScalaFacetData] =
-    scalaFacetElementIn(module).map(
-        element => ScalaFacetData(new FacetProperties(element)))
+    scalaFacetElementIn(module).map(element =>
+      ScalaFacetData(new FacetProperties(element)))
 
   def apply(properties: FacetProperties): ScalaFacetData = {
     val compilerSettings = ScalaCompilerSettings.from(properties)

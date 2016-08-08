@@ -18,7 +18,10 @@
 package org.apache.spark.sql
 
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.catalyst.expressions.{Murmur3Hash, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Murmur3Hash,
+  UnsafeProjection
+}
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateSafeProjection
 import org.apache.spark.sql.types._
 import org.apache.spark.util.Benchmark
@@ -37,9 +40,8 @@ object HashBenchmark {
 
     val rows = (1 to numRows)
       .map(_ =>
-            // The output of encoder is UnsafeRow, use safeProjection to turn in into safe format.
-            safeProjection(encoder.toRow(generator().asInstanceOf[Row]))
-              .copy())
+        // The output of encoder is UnsafeRow, use safeProjection to turn in into safe format.
+        safeProjection(encoder.toRow(generator().asInstanceOf[Row])).copy())
       .toArray
 
     val benchmark = new Benchmark("Hash For " + name, iters * numRows)

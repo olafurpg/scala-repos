@@ -19,7 +19,12 @@ package org.apache.spark.scheduler.cluster
 
 import org.scalatest.BeforeAndAfter
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext,
+  SparkConf,
+  SparkContext,
+  SparkFunSuite
+}
 import org.apache.spark.deploy.yarn.config._
 import org.apache.spark.internal.Logging
 
@@ -27,7 +32,9 @@ import org.apache.spark.internal.Logging
   * Test the integration with [[SchedulerExtensionServices]]
   */
 class ExtensionServiceIntegrationSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfter
     with Logging {
 
   val applicationId = new StubApplicationId(0, 1111L)
@@ -38,8 +45,8 @@ class ExtensionServiceIntegrationSuite
    */
   before {
     val sparkConf = new SparkConf()
-    sparkConf.set(
-        SCHEDULER_SERVICES, Seq(classOf[SimpleExtensionService].getName()))
+    sparkConf.set(SCHEDULER_SERVICES,
+                  Seq(classOf[SimpleExtensionService].getName()))
     sparkConf.setMaster("local").setAppName("ExtensionServiceIntegrationSuite")
     sc = new SparkContext(sparkConf)
   }

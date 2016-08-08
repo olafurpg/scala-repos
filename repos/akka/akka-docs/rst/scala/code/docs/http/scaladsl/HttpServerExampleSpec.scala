@@ -20,7 +20,9 @@ import scala.language.postfixOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class HttpServerExampleSpec
-    extends WordSpec with Matchers with CompileOnlySpec {
+    extends WordSpec
+    with Matchers
+    with CompileOnlySpec {
 
   // never actually called
   val log: LoggingAdapter = null
@@ -72,8 +74,8 @@ class HttpServerExampleSpec
   }
 
   // mock values:
-  val handleConnections: Sink[
-      Http.IncomingConnection, Future[Http.ServerBinding]] =
+  val handleConnections: Sink[Http.IncomingConnection,
+                              Future[Http.ServerBinding]] =
     Sink.ignore.mapMaterializedValue(_ => Future.failed(new Exception("")))
 
   "binding-failure-handling" in compileOnlySpec {
@@ -114,7 +116,7 @@ class HttpServerExampleSpec
 
     val reactToTopLevelFailures =
       Flow[IncomingConnection].watchTermination()((_, termination) =>
-            termination.onFailure {
+        termination.onFailure {
           case cause => failureMonitor ! cause
       })
 

@@ -29,7 +29,8 @@ import scala.collection.parallel.Combiner
   */
 trait ParMap[K, +V]
     extends scala.collection /*.immutable*/ .GenMap[K, V]
-    with GenericParMapTemplate[K, V, ParMap] with parallel.ParMap[K, V]
+    with GenericParMapTemplate[K, V, ParMap]
+    with parallel.ParMap[K, V]
     with ParIterable[(K, V)]
     with ParMapLike[K, V, ParMap[K, V], scala.collection.immutable.Map[K, V]] {
   self =>

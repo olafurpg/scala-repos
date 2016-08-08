@@ -31,7 +31,11 @@ import javafx.{scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyBooleanProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object Cell {
@@ -40,7 +44,8 @@ object Cell {
 }
 
 class Cell[T](override val delegate: jfxsc.Cell[T] = new jfxsc.Cell[T])
-    extends Labeled(delegate) with SFXDelegate[jfxsc.Cell[T]] {
+    extends Labeled(delegate)
+    with SFXDelegate[jfxsc.Cell[T]] {
 
   /**
     * A property representing whether this cell is allowed to be put into an editing state.
@@ -77,7 +82,7 @@ class Cell[T](override val delegate: jfxsc.Cell[T] = new jfxsc.Cell[T])
   }
 
   /**
-    * Call this function to transition from an editing state into a non-editing state, without 
+    * Call this function to transition from an editing state into a non-editing state, without
     * saving any user input.
     */
   def cancelEdit() {
@@ -85,7 +90,7 @@ class Cell[T](override val delegate: jfxsc.Cell[T] = new jfxsc.Cell[T])
   }
 
   /**
-    * Call this function to transition from an editing state into a non-editing state, and in the 
+    * Call this function to transition from an editing state into a non-editing state, and in the
     * process saving any user input.
     */
   def commitEdit(newValue: T) {
@@ -93,7 +98,7 @@ class Cell[T](override val delegate: jfxsc.Cell[T] = new jfxsc.Cell[T])
   }
 
   /**
-    * Call this function to transition from a non-editing state into an editing state, if the cell 
+    * Call this function to transition from a non-editing state into an editing state, if the cell
     * is editable.
     */
   def startEdit() {

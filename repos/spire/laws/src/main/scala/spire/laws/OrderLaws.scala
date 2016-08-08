@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object OrderLaws {
-  def apply[A : Eq : Arbitrary] = new OrderLaws[A] {
+  def apply[A: Eq: Arbitrary] = new OrderLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -44,8 +44,7 @@ trait OrderLaws[A] extends Laws {
       name: String,
       parent: Option[OrderProperties],
       props: (String, Prop)*
-  )
-      extends DefaultRuleSet(name, parent, props: _*)
+  ) extends DefaultRuleSet(name, parent, props: _*)
 }
 
 // vim: expandtab:ts=2:sw=2

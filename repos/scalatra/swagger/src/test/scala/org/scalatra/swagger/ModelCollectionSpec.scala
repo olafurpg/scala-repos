@@ -6,15 +6,20 @@ import org.scalatra.swagger.reflect.Reflector
 import org.specs2.mutable.Specification
 
 object ModelCollectionSpec {
-  case class OnlyPrimitives(
-      id: Int, sequence: Long, deviation: Double, name: String, created: Date)
+  case class OnlyPrimitives(id: Int,
+                            sequence: Long,
+                            deviation: Double,
+                            name: String,
+                            created: Date)
 
   case class Tag(id: Sequence, name: Name)
   case class Name(value: String)
   case class Sequence(value: Long)
   case class TaggedThing(id: Long, tag: Tag, created: Date)
-  case class Asset(
-      name: String, filename: String, id: Option[Int], relatedAsset: Asset)
+  case class Asset(name: String,
+                   filename: String,
+                   id: Option[Int],
+                   relatedAsset: Asset)
 
   val taggedThingModels = Set(Swagger.modelToSwagger[Tag],
                               Swagger.modelToSwagger[Name],
@@ -79,7 +84,8 @@ class ModelCollectionSpec extends Specification {
     }
 
     "collect all the models in a nested structure" in {
-      Swagger.collectModels[TaggedThing](Set.empty) must containTheSameElementsAs(
+      Swagger
+        .collectModels[TaggedThing](Set.empty) must containTheSameElementsAs(
           taggedThingModels.flatten.toSeq)
     }
 

@@ -15,7 +15,7 @@ object IterableW {
       implicit o: Ordering[E]): Iterable[(Option[E], Option[E])] = null
 }
 
-class Series[X : Ordering, Y](val adaptee: Iterable[(X, Y)])
+class Series[X: Ordering, Y](val adaptee: Iterable[(X, Y)])
     extends Adapter[Iterable[(X, Y)]] {
   val order = implicitly[Ordering[X]]
   def zipMerge(other: Series[X, Y]): Series[X, (Option[Y], Option[Y])] =
@@ -29,6 +29,6 @@ class Series[X : Ordering, Y](val adaptee: Iterable[(X, Y)])
 }
 
 object Series {
-  implicit def wrap[X : Ordering, Y](itble: Iterable[(X, Y)]): Series[X, Y] =
+  implicit def wrap[X: Ordering, Y](itble: Iterable[(X, Y)]): Series[X, Y] =
     new Series(itble)
 }

@@ -50,11 +50,12 @@ class Node @Since("1.2.0")(
     @Since("1.0.0") var leftNode: Option[Node],
     @Since("1.0.0") var rightNode: Option[Node],
     @Since("1.0.0") var stats: Option[InformationGainStats])
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   override def toString: String = {
     s"id = $id, isLeaf = $isLeaf, predict = $predict, impurity = $impurity, " +
-    s"split = $split, stats = $stats"
+      s"split = $split, stats = $stats"
   }
 
   /**
@@ -180,9 +181,9 @@ class Node @Since("1.2.0")(
       prefix + s"Predict: ${predict.predict}\n"
     } else {
       prefix + s"If ${splitToString(split.get, left = true)}\n" +
-      leftNode.get.subtreeToString(indentFactor + 1) + prefix +
-      s"Else ${splitToString(split.get, left = false)}\n" +
-      rightNode.get.subtreeToString(indentFactor + 1)
+        leftNode.get.subtreeToString(indentFactor + 1) + prefix +
+        s"Else ${splitToString(split.get, left = false)}\n" +
+        rightNode.get.subtreeToString(indentFactor + 1)
     }
   }
 

@@ -19,9 +19,11 @@ case class HookConfig(variant: chess.variant.Variant,
 
   def fixColor =
     copy(
-        color = if (mode == Mode.Rated &&
-                    lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
-                    color != Color.Random) Color.Random else color)
+        color =
+          if (mode == Mode.Rated &&
+              lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
+              color != Color.Random) Color.Random
+          else color)
 
   // allowAnons -> membersOnly
   def >> =
@@ -42,35 +44,34 @@ case class HookConfig(variant: chess.variant.Variant,
     case _ => this
   }
 
-  def hook(
-      uid: String,
-      user: Option[User],
-      sid: Option[String],
-      blocking: Set[String]): Either[Hook, Option[Seek]] = timeMode match {
-    case TimeMode.RealTime =>
-      Left(
-          Hook.make(uid = uid,
-                    variant = variant,
-                    clock = justMakeClock,
+  def hook(uid: String,
+           user: Option[User],
+           sid: Option[String],
+           blocking: Set[String]): Either[Hook, Option[Seek]] =
+    timeMode match {
+      case TimeMode.RealTime =>
+        Left(
+            Hook.make(uid = uid,
+                      variant = variant,
+                      clock = justMakeClock,
+                      mode = mode,
+                      allowAnon = allowAnon,
+                      color = color.name,
+                      user = user,
+                      blocking = blocking,
+                      sid = sid,
+                      ratingRange = ratingRange))
+      case _ =>
+        Right(user map { u =>
+          Seek.make(variant = variant,
+                    daysPerTurn = makeDaysPerTurn,
                     mode = mode,
-                    allowAnon = allowAnon,
                     color = color.name,
-                    user = user,
+                    user = u,
                     blocking = blocking,
-                    sid = sid,
-                    ratingRange = ratingRange))
-    case _ =>
-      Right(
-          user map { u =>
-        Seek.make(variant = variant,
-                  daysPerTurn = makeDaysPerTurn,
-                  mode = mode,
-                  color = color.name,
-                  user = u,
-                  blocking = blocking,
-                  ratingRange = ratingRange)
-      })
-  }
+                    ratingRange = ratingRange)
+        })
+    }
 
   def noRatedUnlimited = mode.casual || hasClock || makeDaysPerTurn.isDefined
 
@@ -105,8 +106,8 @@ object HookConfig extends BaseHumanConfig {
         mode = realMode,
         allowAnon = !membersOnly, // membersOnly
         ratingRange = e
-            .filter(_ => useRatingRange)
-            .fold(RatingRange.default)(RatingRange.orDefault),
+          .filter(_ => useRatingRange)
+          .fold(RatingRange.default)(RatingRange.orDefault),
         color = Color(c) err "Invalid color " + c)
   }
 

@@ -16,9 +16,8 @@ final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
     new InputTask[T](s => Parser(parser(s))(in))
 
   def fullInput(in: String): InputTask[T] =
-    new InputTask[T](
-        s =>
-          Parser.parse(in, parser(s)) match {
+    new InputTask[T](s =>
+      Parser.parse(in, parser(s)) match {
         case Right(v) => Parser.success(v)
         case Left(msg) =>
           val indented = msg.lines.map("   " + _).mkString("\n")
@@ -34,16 +33,15 @@ object InputTask {
 
     import std.FullInstance._
     def toTask(in: String): Initialize[Task[T]] = flatten(
-        (Def.stateKey zipWith i)(
-            (sTask, it) =>
-              sTask map
-              (s =>
-                    Parser.parse(in, it.parser(s)) match {
-                  case Right(t) => Def.value(t)
-                  case Left(msg) =>
-                    val indented = msg.lines.map("   " + _).mkString("\n")
-                    sys.error(s"Invalid programmatic input:\n$indented")
-              }))
+        (Def.stateKey zipWith i)((sTask, it) =>
+          sTask map
+            (s =>
+               Parser.parse(in, it.parser(s)) match {
+                 case Right(t) => Def.value(t)
+                 case Left(msg) =>
+                   val indented = msg.lines.map("   " + _).mkString("\n")
+                   sys.error(s"Invalid programmatic input:\n$indented")
+               }))
     )
   }
 
@@ -131,8 +129,8 @@ object InputTask {
   private[this] def localKey[T]: AttributeKey[T] =
     AttributeKey.local[Unit].asInstanceOf[AttributeKey[T]]
 
-  private[this] def subResultForDummy[I](
-      dummyKey: AttributeKey[Task[I]], dummyTask: Task[I]) =
+  private[this] def subResultForDummy[I](dummyKey: AttributeKey[Task[I]],
+                                         dummyTask: Task[I]) =
     new (ScopedKey ~> Option) {
       def apply[T](sk: ScopedKey[T]) =
         if (sk.key eq dummyKey) {
@@ -150,8 +148,9 @@ object InputTask {
     val t: Task[I] = Task(Info[I]().set(key, None), Pure(f, false))
     (key, t)
   }
-  private[this] def subForDummy[I, T](
-      marker: AttributeKey[Option[I]], value: I, task: Task[T]): Task[T] = {
+  private[this] def subForDummy[I, T](marker: AttributeKey[Option[I]],
+                                      value: I,
+                                      task: Task[T]): Task[T] = {
     val seen = new java.util.IdentityHashMap[Task[_], Task[_]]
     lazy val f: Task ~> Task = new (Task ~> Task) {
       def apply[T](t: Task[T]): Task[T] = {

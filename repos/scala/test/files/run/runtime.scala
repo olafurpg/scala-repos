@@ -129,7 +129,7 @@ object Test3Test {
         if ((actual1 == expected) && (actual2 == !expected)) "Ok"
         else
           "KO: " + "expected: " + expected + " - " + (!expected) + ", " +
-          "found: " + actual1 + " - " + actual1);
+            "found: " + actual1 + " - " + actual1);
 
   def test(args: Array[String]): Unit = {
     val foo1: AnyRef = null;
@@ -169,11 +169,11 @@ object Test {
       test;
     } catch {
       case exception: Throwable => {
-          //val name: String = Thread.currentThread().getName();
-          Console.print("Exception in thread \"" + name + "\" " + exception);
-          Console.println;
-          errors = errors + 1;
-        }
+        //val name: String = Thread.currentThread().getName();
+        Console.print("Exception in thread \"" + name + "\" " + exception);
+        Console.println;
+        errors = errors + 1;
+      }
     }
     Console.println(">>> " + name);
     Console.println;

@@ -42,7 +42,9 @@ import org.apache.spark.sql.types.StructType
   */
 @Experimental
 final class VectorSlicer(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vectorSlicer"))
@@ -57,7 +59,7 @@ final class VectorSlicer(override val uid: String)
       this,
       "indices",
       "An array of indices to select features from a vector column." +
-      " There can be no overlap with names.",
+        " There can be no overlap with names.",
       VectorSlicer.validIndices)
 
   setDefault(indices -> Array.empty[Int])
@@ -79,7 +81,7 @@ final class VectorSlicer(override val uid: String)
       this,
       "names",
       "An array of feature names to select features from a vector column." +
-      " There can be no overlap with indices.",
+        " There can be no overlap with indices.",
       VectorSlicer.validNames)
 
   setDefault(names -> Array.empty[String])
@@ -125,8 +127,9 @@ final class VectorSlicer(override val uid: String)
         case features: SparseVector => features.slice(inds)
       }
     }
-    dataset.withColumn(
-        $(outputCol), slicer(dataset($(inputCol))), outputAttr.toMetadata())
+    dataset.withColumn($(outputCol),
+                       slicer(dataset($(inputCol))),
+                       outputAttr.toMetadata())
   }
 
   /** Get the feature indices in order: indices, names */
@@ -137,12 +140,12 @@ final class VectorSlicer(override val uid: String)
     val numDistinctFeatures = (nameFeatures ++ indFeatures).distinct.length
     lazy val errMsg =
       "VectorSlicer requires indices and names to be disjoint" +
-      s" sets of features, but they overlap." +
-      s" indices: ${indFeatures.mkString("[", ",", "]")}." + s" names: " +
-      nameFeatures
-        .zip($(names))
-        .map { case (i, n) => s"$i:$n" }
-        .mkString("[", ",", "]")
+        s" sets of features, but they overlap." +
+        s" indices: ${indFeatures.mkString("[", ",", "]")}." + s" names: " +
+        nameFeatures
+          .zip($(names))
+          .map { case (i, n) => s"$i:$n" }
+          .mkString("[", ",", "]")
     require(nameFeatures.length + indFeatures.length == numDistinctFeatures,
             errMsg)
     indFeatures ++ nameFeatures

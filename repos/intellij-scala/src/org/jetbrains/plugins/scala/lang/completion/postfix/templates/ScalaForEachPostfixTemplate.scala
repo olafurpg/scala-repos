@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala.lang.completion.postfix.templates
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{AncestorSelector, SelectorConditions}
+import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{
+  AncestorSelector,
+  SelectorConditions
+}
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 
 /**
@@ -15,7 +18,7 @@ class ScalaForEachPostfixTemplate
         new AncestorSelector(
             SelectorConditions.isDescendantCondition(
                 "scala.collection.GenTraversableOnce") ||
-            SelectorConditions.isDescendantCondition("scala.Array"),
+              SelectorConditions.isDescendantCondition("scala.Array"),
             Topmost)) {
 
   override def getTemplateString(element: PsiElement): String =

@@ -14,8 +14,9 @@ import java.io.{InputStream, File}
   * @param classLoader The classloader that all application classes and resources can be loaded from.
   * @param mode The mode of the application.
   */
-case class Environment(
-    rootPath: File, classLoader: ClassLoader, mode: Mode.Mode) {
+case class Environment(rootPath: File,
+                       classLoader: ClassLoader,
+                       mode: Mode.Mode) {
 
   /**
     * Retrieves a file relative to the application root path.

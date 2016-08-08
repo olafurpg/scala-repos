@@ -192,7 +192,8 @@ final class MutableAny extends MutableValue {
   * values of primitive columns.
   */
 final class SpecificMutableRow(val values: Array[MutableValue])
-    extends MutableRow with BaseGenericInternalRow {
+    extends MutableRow
+    with BaseGenericInternalRow {
 
   def this(dataTypes: Seq[DataType]) =
     this(dataTypes.map {

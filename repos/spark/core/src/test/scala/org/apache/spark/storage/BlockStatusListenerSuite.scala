@@ -79,7 +79,8 @@ class BlockStatusListenerSuite extends SparkFunSuite {
 
     // Remove a replication of the same block
     listener.onBlockUpdated(
-        SparkListenerBlockUpdated(BlockUpdatedInfo(
+        SparkListenerBlockUpdated(
+            BlockUpdatedInfo(
                 blockManagerId2,
                 StreamBlockId(0, 100),
                 StorageLevel.NONE, // StorageLevel.NONE means removing it

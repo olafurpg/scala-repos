@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -88,14 +88,17 @@ object RValue {
     case other => CType.toCValue(other)
   }
 
-  def unsafeInsert(
-      rootTarget: RValue, rootPath: CPath, rootValue: RValue): RValue = {
+  def unsafeInsert(rootTarget: RValue,
+                   rootPath: CPath,
+                   rootValue: RValue): RValue = {
     def rec(target: RValue, path: CPath, value: RValue): RValue = {
       if ((target == CNull || target == CUndefined) && path == CPath.Identity)
         value
       else {
-        def arrayInsert(
-            l: List[RValue], i: Int, rem: CPath, v: RValue): List[RValue] = {
+        def arrayInsert(l: List[RValue],
+                        i: Int,
+                        rem: CPath,
+                        v: RValue): List[RValue] = {
           def update(l: List[RValue], j: Int): List[RValue] = l match {
             case x :: xs =>
               (if (j == i) rec(x, rem, v) else x) :: update(xs, j + 1)
@@ -114,14 +117,15 @@ object RValue {
                 RObject(rest + (name -> rec(child, CPath(nodes), value)))
 
               case CPathIndex(_) :: _ =>
-                sys.error("Objects are not indexed: attempted to insert " +
-                    value + " at " + rootPath + " on " + rootTarget)
+                sys.error(
+                    "Objects are not indexed: attempted to insert " +
+                      value + " at " + rootPath + " on " + rootTarget)
               case _ =>
                 sys.error(
                     "RValue insert would overwrite existing data: " + target +
-                    " cannot be rewritten to " + value + " at " + path +
-                    " in unsafeInsert of " + rootValue + " at " + rootPath +
-                    " in " + rootTarget)
+                      " cannot be rewritten to " + value + " at " + path +
+                      " in unsafeInsert of " + rootValue + " at " + rootPath +
+                      " in " + rootTarget)
             }
 
           case arr @ RArray(elements) =>
@@ -129,14 +133,15 @@ object RValue {
               case CPathIndex(index) :: nodes =>
                 RArray(arrayInsert(elements, index, CPath(nodes), value))
               case CPathField(_) :: _ =>
-                sys.error("Arrays have no fields: attempted to insert " +
-                    value + " at " + rootPath + " on " + rootTarget)
+                sys.error(
+                    "Arrays have no fields: attempted to insert " +
+                      value + " at " + rootPath + " on " + rootTarget)
               case _ =>
                 sys.error(
                     "RValue insert would overwrite existing data: " + target +
-                    " cannot be rewritten to " + value + " at " + path +
-                    " in unsafeInsert of " + rootValue + " at " + rootPath +
-                    " in " + rootTarget)
+                      " cannot be rewritten to " + value + " at " + path +
+                      " in unsafeInsert of " + rootValue + " at " + rootPath +
+                      " in " + rootTarget)
             }
 
           case CNull | CUndefined =>
@@ -149,11 +154,10 @@ object RValue {
             }
 
           case x =>
-            sys.error(
-                "RValue insert would overwrite existing data: " +
-                x + " cannot be updated to " + value + " at " +
-                path + " in unsafeInsert of " + rootValue + " at " + rootPath +
-                " in " + rootTarget)
+            sys.error("RValue insert would overwrite existing data: " +
+              x + " cannot be updated to " + value + " at " +
+              path + " in unsafeInsert of " + rootValue + " at " + rootPath +
+              " in " + rootTarget)
         }
       }
     }
@@ -372,13 +376,13 @@ object CType {
     case JString(s) => CString(s)
 
     case JNum(d) => {
-        val ctype = forJValue(jval)
-        ctype match {
-          case Some(CLong) => CLong(d.toLong)
-          case Some(CDouble) => CDouble(d.toDouble)
-          case _ => CNum(d)
-        }
+      val ctype = forJValue(jval)
+      ctype match {
+        case Some(CLong) => CLong(d.toLong)
+        case Some(CDouble) => CDouble(d.toDouble)
+        case _ => CNum(d)
       }
+    }
 
     case JBool(b) => CBoolean(b)
     case JNull => CNull
@@ -393,23 +397,23 @@ object CType {
     case JBool(_) => Some(CBoolean)
 
     case JNum(d) => {
-        lazy val isLong = try {
-          d.toLongExact
-          true
-        } catch {
-          case _: ArithmeticException => false
-        }
-
-        lazy val isDouble = try {
-          BigDecimal(d.toDouble.toString, MathContext.UNLIMITED) == d
-        } catch {
-          case _: NumberFormatException | _: ArithmeticException => false
-        }
-
-        if (isLong) Some(CLong)
-        else if (isDouble) Some(CDouble)
-        else Some(CNum)
+      lazy val isLong = try {
+        d.toLongExact
+        true
+      } catch {
+        case _: ArithmeticException => false
       }
+
+      lazy val isDouble = try {
+        BigDecimal(d.toDouble.toString, MathContext.UNLIMITED) == d
+      } catch {
+        case _: NumberFormatException | _: ArithmeticException => false
+      }
+
+      if (isLong) Some(CLong)
+      else if (isDouble) Some(CDouble)
+      else Some(CNum)
+    }
 
     case JString(_) => Some(CString)
     case JNull => Some(CNull)
@@ -450,11 +454,12 @@ object CValueType {
 //
 // Homogeneous arrays
 //
-case class CArray[@spec(Boolean, Long, Double) A](
-    value: Array[A], cType: CArrayType[A])
+case class CArray[@spec(Boolean, Long, Double) A](value: Array[A],
+                                                  cType: CArrayType[A])
     extends CWrappedValue[Array[A]] {
   private final def leafEquiv[@spec(Boolean, Long, Double) A](
-      as: Array[A], bs: Array[A]): Boolean = {
+      as: Array[A],
+      bs: Array[A]): Boolean = {
     var i = 0
     var result = as.length == bs.length
     while (result && i < as.length) {
@@ -467,8 +472,8 @@ case class CArray[@spec(Boolean, Long, Double) A](
   private final def equiv(a: Any, b: Any, elemType: CValueType[_]): Boolean =
     elemType match {
       case CBoolean =>
-        leafEquiv(
-            a.asInstanceOf[Array[Boolean]], b.asInstanceOf[Array[Boolean]])
+        leafEquiv(a.asInstanceOf[Array[Boolean]],
+                  b.asInstanceOf[Array[Boolean]])
 
       case CLong =>
         leafEquiv(a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])

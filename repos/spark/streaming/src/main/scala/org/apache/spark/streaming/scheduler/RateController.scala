@@ -31,9 +31,10 @@ import org.apache.spark.util.{ThreadUtils, Utils}
   * an estimate of the speed at which this stream should ingest messages,
   * given an estimate computation from a `RateEstimator`
   */
-private[streaming] abstract class RateController(
-    val streamUID: Int, rateEstimator: RateEstimator)
-    extends StreamingListener with Serializable {
+private[streaming] abstract class RateController(val streamUID: Int,
+                                                 rateEstimator: RateEstimator)
+    extends StreamingListener
+    with Serializable {
 
   init()
 
@@ -63,8 +64,10 @@ private[streaming] abstract class RateController(
   /**
     * Compute the new rate limit and publish it asynchronously.
     */
-  private def computeAndPublish(
-      time: Long, elems: Long, workDelay: Long, waitDelay: Long): Unit =
+  private def computeAndPublish(time: Long,
+                                elems: Long,
+                                workDelay: Long,
+                                waitDelay: Long): Unit =
     Future[Unit] {
       val newRate = rateEstimator.compute(time, elems, workDelay, waitDelay)
       newRate.foreach { s =>

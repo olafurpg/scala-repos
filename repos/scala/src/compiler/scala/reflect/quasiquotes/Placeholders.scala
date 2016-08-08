@@ -182,8 +182,10 @@ trait Placeholders { self: Quasiquotes =>
     def apply(name: Name) =
       ValDef(NoMods, nme.QUASIQUOTE_REFINE_STAT, Ident(name), EmptyTree)
     def unapply(tree: Tree): Option[Hole] = tree match {
-      case ValDef(
-          _, nme.QUASIQUOTE_REFINE_STAT, Ident(Placeholder(hole)), _) =>
+      case ValDef(_,
+                  nme.QUASIQUOTE_REFINE_STAT,
+                  Ident(Placeholder(hole)),
+                  _) =>
         Some(hole)
       case _ => None
     }
@@ -217,8 +219,8 @@ trait Placeholders { self: Quasiquotes =>
 
   object ForEnumPlaceholder {
     def apply(name: Name) =
-      build.SyntacticValFrom(
-          Bind(name, Ident(nme.WILDCARD)), Ident(nme.QUASIQUOTE_FOR_ENUM))
+      build.SyntacticValFrom(Bind(name, Ident(nme.WILDCARD)),
+                             Ident(nme.QUASIQUOTE_FOR_ENUM))
     def unapply(tree: Tree): Option[Hole] = tree match {
       case build.SyntacticValFrom(Bind(Placeholder(hole), Ident(nme.WILDCARD)),
                                   Ident(nme.QUASIQUOTE_FOR_ENUM)) =>

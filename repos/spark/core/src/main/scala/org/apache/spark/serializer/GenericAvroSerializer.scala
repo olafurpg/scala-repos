@@ -134,8 +134,8 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
             case None =>
               throw new SparkException(
                   "Error reading attempting to read avro data -- encountered an unknown " +
-                  s"fingerprint: $fingerprint, not sure what schema to use.  This could happen " +
-                  "if you registered additional schemas after starting your spark context.")
+                    s"fingerprint: $fingerprint, not sure what schema to use.  This could happen " +
+                    "if you registered additional schemas after starting your spark context.")
           }
         })
       } else {
@@ -150,8 +150,9 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
       .read(null, decoder)
   }
 
-  override def write(
-      kryo: Kryo, output: KryoOutput, datum: GenericRecord): Unit =
+  override def write(kryo: Kryo,
+                     output: KryoOutput,
+                     datum: GenericRecord): Unit =
     serializeDatum(datum, output)
 
   override def read(kryo: Kryo,

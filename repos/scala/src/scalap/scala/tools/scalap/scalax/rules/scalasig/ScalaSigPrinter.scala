@@ -30,11 +30,11 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
   def printSymbolAttributes(s: Symbol, onNewLine: Boolean, indent: => Unit) =
     s match {
       case t: SymbolInfoSymbol => {
-          for (a <- t.attributes) {
-            indent; print(toString(a))
-            if (onNewLine) print("\n") else print(" ")
-          }
+        for (a <- t.attributes) {
+          indent; print(toString(a))
+          if (onNewLine) print("\n") else print(" ")
         }
+      }
       case _ =>
     }
 
@@ -73,10 +73,11 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(_, classSymbol: ClassSymbol, _) = o.infoType
     o.isFinal &&
-    (classSymbol.children.find(x => x.isCase && x.isInstanceOf[MethodSymbol]) match {
-          case Some(_) => true
-          case None => false
-        })
+    (classSymbol.children
+      .find(x => x.isCase && x.isInstanceOf[MethodSymbol]) match {
+      case Some(_) => true
+      case None => false
+    })
   }
 
   private def underCaseClass(m: MethodSymbol) = m.parent match {
@@ -226,9 +227,9 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
         if (printResult) { print(": "); printType(resType) }
       case mt @ MethodType(resType, paramSymbols) => _pmt(mt)
       case pt @ PolyType(mt, typeParams) => {
-          print(typeParamString(typeParams))
-          printMethodType(mt, printResult)({})
-        }
+        print(typeParamString(typeParams))
+        printMethodType(mt, printResult)({})
+      }
       //todo consider another method types
       case x => print(": "); printType(x)
     }
@@ -251,8 +252,8 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
     printModifiers(m)
     if (m.isAccessor) {
       val indexOfSetter = m.parent.get.children.indexWhere(x =>
-            x.isInstanceOf[MethodSymbol] &&
-            x.asInstanceOf[MethodSymbol].name == n + "_$eq")
+        x.isInstanceOf[MethodSymbol] &&
+          x.asInstanceOf[MethodSymbol].name == n + "_$eq")
       print(if (indexOfSetter > 0) "var " else "val ")
     } else {
       print("def ")
@@ -347,45 +348,46 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
         sep + processName(symbol.path) + ".type"
       case ConstantType(constant) =>
         sep +
-        (constant match {
-              case null => "scala.Null"
-              case _: Unit => "scala.Unit"
-              case _: Boolean => "scala.Boolean"
-              case _: Byte => "scala.Byte"
-              case _: Char => "scala.Char"
-              case _: Short => "scala.Short"
-              case _: Int => "scala.Int"
-              case _: Long => "scala.Long"
-              case _: Float => "scala.Float"
-              case _: Double => "scala.Double"
-              case _: String => "java.lang.String"
-              case c: Class[_] =>
-                "java.lang.Class[" +
+          (constant match {
+            case null => "scala.Null"
+            case _: Unit => "scala.Unit"
+            case _: Boolean => "scala.Boolean"
+            case _: Byte => "scala.Byte"
+            case _: Char => "scala.Char"
+            case _: Short => "scala.Short"
+            case _: Int => "scala.Int"
+            case _: Long => "scala.Long"
+            case _: Float => "scala.Float"
+            case _: Double => "scala.Double"
+            case _: String => "java.lang.String"
+            case c: Class[_] =>
+              "java.lang.Class[" +
                 c.getComponentType.getCanonicalName.replace("$", ".") + "]"
-            })
+          })
       case TypeRefType(prefix, symbol, typeArgs) =>
         sep +
-        (symbol.path match {
-              case "scala.<repeated>" =>
-                flags match {
-                  case TypeFlags(true) => toString(typeArgs.head) + "*"
-                  case _ => "scala.Seq" + typeArgString(typeArgs)
-                }
-              case "scala.<byname>" => "=> " + toString(typeArgs.head)
-              case _ => {
-                  val path =
-                    StringUtil.cutSubstring(symbol.path)(".package") //remove package object reference
-                  StringUtil.trimStart(
-                      processName(path) + typeArgString(typeArgs), "<empty>.")
-                }
-            })
+          (symbol.path match {
+            case "scala.<repeated>" =>
+              flags match {
+                case TypeFlags(true) => toString(typeArgs.head) + "*"
+                case _ => "scala.Seq" + typeArgString(typeArgs)
+              }
+            case "scala.<byname>" => "=> " + toString(typeArgs.head)
+            case _ => {
+              val path =
+                StringUtil
+                  .cutSubstring(symbol.path)(".package") //remove package object reference
+              StringUtil.trimStart(processName(path) + typeArgString(typeArgs),
+                                   "<empty>.")
+            }
+          })
       case TypeBoundsType(lower, upper) => {
-          val lb = toString(lower)
-          val ub = toString(upper)
-          val lbs = if (!lb.equals("scala.Nothing")) " >: " + lb else ""
-          val ubs = if (!ub.equals("scala.Any")) " <: " + ub else ""
-          lbs + ubs
-        }
+        val lb = toString(lower)
+        val ub = toString(upper)
+        val lbs = if (!lb.equals("scala.Nothing")) " >: " + lb else ""
+        val ubs = if (!ub.equals("scala.Any")) " <: " + ub else ""
+        lbs + ubs
+      }
       case RefinedType(classSym, typeRefs) =>
         sep + typeRefs.map(toString).mkString("", " with ", "")
       case ClassInfoType(symbol, typeRefs) =>
@@ -401,16 +403,16 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
       case PolyTypeWithCons(typeRef, symbols, cons) =>
         typeParamString(symbols) + processName(cons) + toString(typeRef, sep)
       case AnnotatedType(typeRef, attribTreeRefs) => {
-          toString(typeRef, sep)
-        }
+        toString(typeRef, sep)
+      }
       case AnnotatedWithSelfType(typeRef, symbol, attribTreeRefs) =>
         toString(typeRef, sep)
       case ExistentialType(typeRef, symbols) => {
-          val refs =
-            symbols.map(toString).filter(!_.startsWith("_")).map("type " + _)
-          toString(typeRef, sep) +
+        val refs =
+          symbols.map(toString).filter(!_.startsWith("_")).map("type " + _)
+        toString(typeRef, sep) +
           (if (refs.size > 0) refs.mkString(" forSome {", "; ", "}") else "")
-        }
+      }
       case _ => sep + t.toString
     }
   }
@@ -420,12 +422,12 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
 
   def toString(symbol: Symbol): String = symbol match {
     case symbol: TypeSymbol => {
-        val attrs = (for (a <- symbol.attributes) yield
-          toString(a)).mkString(" ")
-        val atrs = if (attrs.length > 0) attrs.trim + " " else ""
-        atrs + getVariance(symbol) + processName(symbol.name) + toString(
-            symbol.infoType)
-      }
+      val attrs =
+        (for (a <- symbol.attributes) yield toString(a)).mkString(" ")
+      val atrs = if (attrs.length > 0) attrs.trim + " " else ""
+      atrs + getVariance(symbol) + processName(symbol.name) + toString(
+          symbol.infoType)
+    }
     case s => symbol.toString
   }
 

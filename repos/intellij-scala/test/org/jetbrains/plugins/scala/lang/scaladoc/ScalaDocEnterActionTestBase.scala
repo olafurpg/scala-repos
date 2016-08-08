@@ -19,8 +19,9 @@ abstract class ScalaDocEnterActionTestBase
       .USE_SCALADOC2_FORMATTING = false
   }
 
-  protected def checkGeneratedTextFromString(
-      header: String, footer: String, assumedStub: String) {
+  protected def checkGeneratedTextFromString(header: String,
+                                             footer: String,
+                                             assumedStub: String) {
     checkGeneratedTextFromString(header, footer, assumedStub, a => a)
   }
 

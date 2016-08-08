@@ -47,7 +47,8 @@ object Label {
 }
 
 class Label(override val delegate: jfxsc.Label = new jfxsc.Label)
-    extends Labeled(delegate) with SFXDelegate[jfxsc.Label] {
+    extends Labeled(delegate)
+    with SFXDelegate[jfxsc.Label] {
 
   /** Creates Label with supplied text. */
   def this(text: String) {

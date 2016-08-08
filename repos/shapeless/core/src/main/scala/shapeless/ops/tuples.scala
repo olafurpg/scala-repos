@@ -135,8 +135,8 @@ object tuple {
 
     type Aux[T, Out0] = Last[T] { type Out = Out0 }
 
-    implicit def last[T, L <: HList](
-        implicit gen: Generic.Aux[T, L], last: hl.Last[L]): Aux[T, last.Out] =
+    implicit def last[T, L <: HList](implicit gen: Generic.Aux[T, L],
+                                     last: hl.Last[L]): Aux[T, last.Out] =
       new Last[T] {
         type Out = last.Out
         def apply(t: T): Out = gen.to(t).last
@@ -484,8 +484,11 @@ object tuple {
 
     type Aux[T, N <: Nat, Out0] = ReverseSplit[T, N] { type Out = Out0 }
 
-    implicit def tupleReverseSplit[
-        T, L <: HList, N <: Nat, LP <: HList, LS <: HList](
+    implicit def tupleReverseSplit[T,
+                                   L <: HList,
+                                   N <: Nat,
+                                   LP <: HList,
+                                   LS <: HList](
         implicit gen: Generic.Aux[T, L],
         split: hl.ReverseSplit.Aux[L, N, LP, LS],
         tpp: hl.Tupler[LP],
@@ -539,8 +542,11 @@ object tuple {
 
     type Aux[T, U, Out0] = ReverseSplitLeft[T, U] { type Out = Out0 }
 
-    implicit def tupleReverseSplitLeft[
-        T, L <: HList, U, LP <: HList, LS <: HList](
+    implicit def tupleReverseSplitLeft[T,
+                                       L <: HList,
+                                       U,
+                                       LP <: HList,
+                                       LS <: HList](
         implicit gen: Generic.Aux[T, L],
         split: hl.ReverseSplitLeft.Aux[L, U, LP, LS],
         tpp: hl.Tupler[LP],
@@ -594,8 +600,11 @@ object tuple {
 
     type Aux[T, U, Out0] = ReverseSplitRight[T, U] { type Out = Out0 }
 
-    implicit def tupleReverseSplitRight[
-        T, L <: HList, U, LP <: HList, LS <: HList](
+    implicit def tupleReverseSplitRight[T,
+                                        L <: HList,
+                                        U,
+                                        LP <: HList,
+                                        LS <: HList](
         implicit gen: Generic.Aux[T, L],
         split: hl.ReverseSplitRight.Aux[L, U, LP, LS],
         tpp: hl.Tupler[LP],
@@ -826,8 +835,11 @@ object tuple {
 
     type Aux[T, Out0] = Transposer[T] { type Out = Out0 }
 
-    implicit def transpose[
-        T, L1 <: HList, L2 <: HList, L3 <: HList, L4 <: HList](
+    implicit def transpose[T,
+                           L1 <: HList,
+                           L2 <: HList,
+                           L3 <: HList,
+                           L4 <: HList](
         implicit gen: Generic.Aux[T, L1],
         mpe: hl.Mapper.Aux[productElements.type, L1, L2],
         tps: hl.Transposer.Aux[L2, L3],
@@ -896,7 +908,8 @@ object tuple {
       new ZipOne[HT, TT] {
         type Out = tp.Out
         def apply(h: HT, t: TT): Out =
-          ((genh.to(h) zipOne (gent.to(t) map productElements)) map tupled).tupled
+          ((genh
+            .to(h) zipOne (gent.to(t) map productElements)) map tupled).tupled
       }
   }
 
@@ -1363,14 +1376,20 @@ object tuple {
     * @author Owein Reese
     */
   trait Patcher[N <: Nat, M <: Nat, T, InT]
-      extends DepFn2[T, InT] with Serializable
+      extends DepFn2[T, InT]
+      with Serializable
 
   object Patcher {
     def apply[N <: Nat, M <: Nat, T, InT](
         implicit patch: Patcher[N, M, T, InT]) = patch
 
-    implicit def tuplePatch[
-        N <: Nat, M <: Nat, T, L <: HList, InT, InL <: HList, OutL <: HList](
+    implicit def tuplePatch[N <: Nat,
+                            M <: Nat,
+                            T,
+                            L <: HList,
+                            InT,
+                            InL <: HList,
+                            OutL <: HList](
         implicit gen: Generic.Aux[T, L],
         genIn: Generic.Aux[InT, InL],
         patch: hl.Patcher.Aux[N, M, L, InL, OutL],
@@ -1399,8 +1418,11 @@ object tuple {
       type Out = Out0
     }
 
-    implicit def tupleGrouper[
-        T, N <: Nat, Step <: Nat, L <: HList, OutL <: HList](
+    implicit def tupleGrouper[T,
+                              N <: Nat,
+                              Step <: Nat,
+                              L <: HList,
+                              OutL <: HList](
         implicit gen: Generic.Aux[T, L],
         grouper: hl.Grouper.Aux[L, N, Step, OutL],
         tupler: hl.Tupler[OutL]): Aux[T, N, Step, tupler.Out] =
@@ -1422,15 +1444,16 @@ object tuple {
     * @author Andreas Koestler
     */
   trait PaddedGrouper[T, N <: Nat, Step <: Nat, Pad]
-      extends DepFn2[T, Pad] with Serializable
+      extends DepFn2[T, Pad]
+      with Serializable
 
   object PaddedGrouper {
     def apply[T, N <: Nat, Step <: Nat, Pad](
         implicit grouper: PaddedGrouper[T, N, Step, Pad])
       : Aux[T, N, Step, Pad, grouper.Out] = grouper
 
-    type Aux[T, N <: Nat, Step <: Nat, Pad, Out0] = PaddedGrouper[
-        T, N, Step, Pad] { type Out = Out0 }
+    type Aux[T, N <: Nat, Step <: Nat, Pad, Out0] =
+      PaddedGrouper[T, N, Step, Pad] { type Out = Out0 }
 
     implicit def tuplePaddedGrouper[Pad,
                                     PadL <: HList,

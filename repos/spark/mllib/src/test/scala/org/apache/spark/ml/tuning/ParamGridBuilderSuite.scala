@@ -28,8 +28,8 @@ class ParamGridBuilderSuite extends SparkFunSuite {
   import solver.{inputCol, maxIter}
 
   test("param grid builder") {
-    def validateGrid(
-        maps: Array[ParamMap], expected: mutable.Set[(Int, String)]): Unit = {
+    def validateGrid(maps: Array[ParamMap],
+                     expected: mutable.Set[(Int, String)]): Unit = {
       assert(maps.size === expected.size)
       maps.foreach { m =>
         val tuple = (m(maxIter), m(inputCol))
@@ -51,10 +51,8 @@ class ParamGridBuilderSuite extends SparkFunSuite {
       .addGrid(maxIter, Array(10, 20))
       .addGrid(inputCol, Array("input0", "input1"))
       .build()
-    val expected1 = mutable.Set((10, "input0"),
-                                (20, "input0"),
-                                (10, "input1"),
-                                (20, "input1"))
+    val expected1 = mutable
+      .Set((10, "input0"), (20, "input0"), (10, "input1"), (20, "input1"))
     validateGrid(maps1, expected1)
   }
 }

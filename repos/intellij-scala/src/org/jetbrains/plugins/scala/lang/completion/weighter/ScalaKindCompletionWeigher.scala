@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation,
+  CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
@@ -17,15 +20,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
   * on 1/18/16
   */
 class ScalaKindCompletionWeigher extends CompletionWeigher {
-  override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  override def weigh(element: LookupElement,
+                     location: CompletionLocation): Comparable[_] = {
     val position = ScalaCompletionUtil.positionFromParameters(
         location.getCompletionParameters)
 
     import KindWeights._
 
-    def handleMember(
-        inMember: PsiMember, position: PsiElement): KindWeights.Value = {
+    def handleMember(inMember: PsiMember,
+                     position: PsiElement): KindWeights.Value = {
       val cclass = inMember.getContainingClass
       val noClass = cclass == null
 

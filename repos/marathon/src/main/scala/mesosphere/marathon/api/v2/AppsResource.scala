@@ -12,14 +12,23 @@ import mesosphere.marathon.api.v2.Validation._
 import mesosphere.marathon.api.v2.json.AppUpdate
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.api.{AuthResource, MarathonMediaType, RestResource}
-import mesosphere.marathon.core.appinfo.{AppInfoService, AppSelector, TaskCounts}
+import mesosphere.marathon.core.appinfo.{
+  AppInfoService,
+  AppSelector,
+  TaskCounts
+}
 import mesosphere.marathon.core.appinfo.AppInfo
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.event.{ApiPostEvent, EventModule}
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
-import mesosphere.marathon.{ConflictingChangeException, MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  ConflictingChangeException,
+  MarathonConf,
+  MarathonSchedulerService,
+  UnknownAppException
+}
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 
@@ -37,7 +46,8 @@ class AppsResource @Inject()(clock: Clock,
                              val authenticator: Authenticator,
                              val authorizer: Authorizer,
                              groupManager: GroupManager)
-    extends RestResource with AuthResource {
+    extends RestResource
+    with AuthResource {
 
   private[this] val ListApps = """^((?:.+/)|)\*$""".r
 
@@ -54,7 +64,7 @@ class AppsResource @Inject()(clock: Clock,
       // additional embeds are deprecated!
       val resolvedEmbed =
         InfoEmbedResolver.resolveApp(embed.asScala.toSet) +
-        AppInfo.Embed.Counts + AppInfo.Embed.Deployments
+          AppInfo.Embed.Counts + AppInfo.Embed.Deployments
       val mapped = result(appInfoService.selectAppsBy(selector, resolvedEmbed))
       Response.ok(jsonObjString("apps" -> mapped)).build()
   }
@@ -76,12 +86,13 @@ class AppsResource @Inject()(clock: Clock,
           def createOrThrow(opt: Option[AppDefinition]) =
             opt
               .map(_ =>
-                    throw new ConflictingChangeException(
-                        s"An app with id [${app.id}] already exists."))
+                throw new ConflictingChangeException(
+                    s"An app with id [${app.id}] already exists."))
               .getOrElse(app)
 
-          val plan = result(groupManager.updateApp(
-                  app.id, createOrThrow, app.version, force))
+          val plan = result(
+              groupManager
+                .updateApp(app.id, createOrThrow, app.version, force))
 
           val appWithDeployments = AppInfo(
               app,
@@ -118,8 +129,9 @@ class AppsResource @Inject()(clock: Clock,
         result(groupManager.group(groupId)) match {
           case Some(group) =>
             checkAuthorization(ViewGroup, group)
-            val appsWithTasks = result(appInfoService.selectAppsInGroup(
-                    groupId, allAuthorized, resolvedEmbed))
+            val appsWithTasks = result(
+                appInfoService
+                  .selectAppsInGroup(groupId, allAuthorized, resolvedEmbed))
             ok(jsonObjString("*" -> appsWithTasks))
           case None =>
             unknownGroup(groupId)
@@ -154,8 +166,11 @@ class AppsResource @Inject()(clock: Clock,
 
       withValid(Json.parse(body).as[AppUpdate].copy(id = Some(appId))) {
         appUpdate =>
-          val plan = result(groupManager.updateApp(
-                  appId, updateOrCreate(appId, _, appUpdate, now), now, force))
+          val plan = result(
+              groupManager.updateApp(appId,
+                                     updateOrCreate(appId, _, appUpdate, now),
+                                     now,
+                                     force))
 
           val response = plan.original
             .app(appId)
@@ -188,8 +203,8 @@ class AppsResource @Inject()(clock: Clock,
               }
           }
 
-          deploymentResult(result(groupManager.update(
-                      PathId.empty, updateGroup, version, force)))
+          deploymentResult(result(
+              groupManager.update(PathId.empty, updateGroup, version, force)))
       }
   }
 
@@ -203,13 +218,15 @@ class AppsResource @Inject()(clock: Clock,
       val appId = id.toRootPath
 
       def deleteAppFromGroup(group: Group) = {
-        checkAuthorization(
-            DeleteApp, group.app(appId), UnknownAppException(appId))
+        checkAuthorization(DeleteApp,
+                           group.app(appId),
+                           UnknownAppException(appId))
         group.removeApplication(appId)
       }
 
-      deploymentResult(result(groupManager.update(
-                  appId.parent, deleteAppFromGroup, force = force)))
+      deploymentResult(
+          result(groupManager
+            .update(appId.parent, deleteAppFromGroup, force = force)))
   }
 
   @Path("{appId:.+}/tasks")
@@ -217,8 +234,11 @@ class AppsResource @Inject()(clock: Clock,
 
   @Path("{appId:.+}/versions")
   def appVersionsResource(): AppVersionsResource =
-    new AppVersionsResource(
-        service, groupManager, authenticator, authorizer, config)
+    new AppVersionsResource(service,
+                            groupManager,
+                            authenticator,
+                            authorizer,
+                            config)
 
   @POST
   @Path("{id:.+}/restart")
@@ -237,18 +257,20 @@ class AppsResource @Inject()(clock: Clock,
 
       val newVersion = clock.now()
       val restartDeployment = result(
-          groupManager.updateApp(
-              id.toRootPath, markForRestartingOrThrow, newVersion, force)
+          groupManager.updateApp(id.toRootPath,
+                                 markForRestartingOrThrow,
+                                 newVersion,
+                                 force)
       )
 
       deploymentResult(restartDeployment)
     }
 
-  private def updateOrCreate(appId: PathId,
-                             existing: Option[AppDefinition],
-                             appUpdate: AppUpdate,
-                             newVersion: Timestamp)(
-      implicit identity: Identity): AppDefinition = {
+  private def updateOrCreate(
+      appId: PathId,
+      existing: Option[AppDefinition],
+      appUpdate: AppUpdate,
+      newVersion: Timestamp)(implicit identity: Identity): AppDefinition = {
     def createApp(): AppDefinition = {
       val app = validateOrThrow(appUpdate(AppDefinition(appId)))
       checkAuthorization(CreateApp, app)
@@ -291,7 +313,7 @@ class AppsResource @Inject()(clock: Clock,
     val selectors = Seq[Option[AppSelector]](
         cmd.map(c => AppSelector(_.cmd.exists(containCaseInsensitive(c, _)))),
         id.map(s =>
-              AppSelector(app => containCaseInsensitive(s, app.id.toString))),
+          AppSelector(app => containCaseInsensitive(s, app.id.toString))),
         label.map(new LabelSelectorParsers().parsed)
     ).flatten
     AppSelector.forall(selectors)

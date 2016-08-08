@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object GroupLaws {
-  def apply[A : Eq : Arbitrary] = new GroupLaws[A] {
+  def apply[A: Eq: Arbitrary] = new GroupLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -68,9 +68,9 @@ trait GroupLaws[A] extends Laws {
         "sumOption" → forAll(
             (a: A) =>
               (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
-              (A.sumOption(Seq(a)) === Option(a)) &&
-              (A.sumOption(Seq(a, a)) === Option(a + a)) &&
-              (A.sumOption(Seq(a, a, a)) === Option(a + a + a)))
+                (A.sumOption(Seq(a)) === Option(a)) &&
+                (A.sumOption(Seq(a, a)) === Option(a + a)) &&
+                (A.sumOption(Seq(a, a, a)) === Option(a + a + a)))
     )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
@@ -98,15 +98,14 @@ trait GroupLaws[A] extends Laws {
       name: String,
       parent: Option[GroupProperties],
       props: (String, Prop)*
-  )
-      extends DefaultRuleSet(name, parent, props: _*)
+  ) extends DefaultRuleSet(name, parent, props: _*)
 
   class AdditiveProperties(
       val base: GroupProperties,
       val parent: Option[AdditiveProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet with HasOneParent {
+  ) extends RuleSet
+      with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
   }

@@ -11,7 +11,8 @@ object Test {
     import collection._
 
     val tm = new concurrent.TrieMap[String, String](
-        Hashing.fromFunction(x => x.length + x(0).toInt), Equiv.universal)
+        Hashing.fromFunction(x => x.length + x(0).toInt),
+        Equiv.universal)
     tm.put("a", "b")
     tm.put("c", "d")
 
@@ -27,7 +28,7 @@ object Test {
 
     val tm = new concurrent.TrieMap[String, String](
         Hashing.fromFunction(x => x(0).toInt),
-        Equiv.fromFunction(_ (0) == _ (0)))
+        Equiv.fromFunction(_(0) == _(0)))
     tm.put("a", "b")
     tm.put("a1", "d")
     tm.put("b", "c")

@@ -3,8 +3,16 @@ package org.jetbrains.plugins.scala.annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScValueDeclaration, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition,
+  ScValueDeclaration,
+  ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition
+}
 
 import scala.annotation.tailrec
 
@@ -30,8 +38,9 @@ trait ValueClassAnnotator {
     annotateValueClassConstructor(valueClass, holder)
     annotateValueClassTypeParameters(valueClass.typeParametersClause, holder)
     annotateInnerMembers(valueClass, holder: AnnotationHolder)
-    annotateContainingClass(
-        valueClass, holder, Option(valueClass.containingClass))
+    annotateContainingClass(valueClass,
+                            holder,
+                            Option(valueClass.containingClass))
   }
 
   @tailrec
@@ -41,8 +50,9 @@ trait ValueClassAnnotator {
       containingClass: Option[ScTemplateDefinition]): Unit = {
     containingClass match {
       case Some(obj: ScObject) =>
-        annotateContainingClass(
-            valueClass, holder, Option(obj.containingClass)) //keep going
+        annotateContainingClass(valueClass,
+                                holder,
+                                Option(obj.containingClass)) //keep going
       case Some(_) =>
         //value class is inside a trait or a class, need to highlight it
         holder.createErrorAnnotation(
@@ -54,8 +64,8 @@ trait ValueClassAnnotator {
     }
   }
 
-  private def annotateInnerMembers(
-      valueClass: ScClass, holder: AnnotationHolder): Unit = {
+  private def annotateInnerMembers(valueClass: ScClass,
+                                   holder: AnnotationHolder): Unit = {
     valueClass.allInnerTypeDefinitions.foreach { td =>
       holder.createErrorAnnotation(
           td.nameId,
@@ -92,8 +102,8 @@ trait ValueClassAnnotator {
     }
   }
 
-  private def annotateValueClassConstructor(
-      valueClass: ScClass, holder: AnnotationHolder): Unit = {
+  private def annotateValueClassConstructor(valueClass: ScClass,
+                                            holder: AnnotationHolder): Unit = {
     valueClass.constructor match {
       case Some(c) =>
         c.parameters match {
@@ -118,7 +128,8 @@ trait ValueClassAnnotator {
   }
 
   private def annotateValueClassTypeParameters(
-      tp: Option[ScTypeParamClause], holder: AnnotationHolder): Unit =
+      tp: Option[ScTypeParamClause],
+      holder: AnnotationHolder): Unit =
     tp match {
       case Some(tpClause) =>
         tpClause.typeParameters

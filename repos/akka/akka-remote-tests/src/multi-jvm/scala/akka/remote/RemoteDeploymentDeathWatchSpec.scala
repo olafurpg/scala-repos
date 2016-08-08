@@ -22,7 +22,8 @@ object RemoteDeploymentDeathWatchMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(
+      ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = off
       """)))
@@ -61,7 +62,8 @@ abstract class RemoteDeploymentNodeDeathWatchSlowSpec
 
 abstract class RemoteDeploymentDeathWatchSpec
     extends MultiNodeSpec(RemoteDeploymentDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteDeploymentDeathWatchMultiJvmSpec._
 
@@ -87,9 +89,11 @@ abstract class RemoteDeploymentDeathWatchSpec
         // if the remote deployed actor is not removed the system will not shutdown
 
         val timeout = remainingOrDefault
-        try Await.ready(system.whenTerminated, timeout) catch {
+        try Await.ready(system.whenTerminated, timeout)
+        catch {
           case _: TimeoutException ⇒
-            fail("Failed to stop [%s] within [%s] \n%s".format(
+            fail(
+                "Failed to stop [%s] within [%s] \n%s".format(
                     system.name,
                     timeout,
                     system.asInstanceOf[ActorSystemImpl].printTree))

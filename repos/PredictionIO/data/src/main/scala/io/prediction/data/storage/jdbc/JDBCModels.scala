@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Models]] */
 class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
-    extends Models with Logging {
+    extends Models
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "models")

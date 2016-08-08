@@ -22,8 +22,8 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
   val address = Address("akka.tcp", "sys", "a", 2552)
   val node = Address("akka.tcp", "sys", "a", 2552)
 
-  private def createReachabilityOfSize(
-      base: Reachability, size: Int): Reachability =
+  private def createReachabilityOfSize(base: Reachability,
+                                       size: Int): Reachability =
     (base /: (1 to size)) {
       case (r, i) ⇒
         val observer = UniqueAddress(address.copy(host = Some("node-" + i)), i)
@@ -34,14 +34,11 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
 
   private def addUnreachable(base: Reachability, count: Int): Reachability = {
     val observers = base.allObservers.take(count)
-    val subjects = Stream
-      .continually(base.allObservers)
-      .flatten
-      .iterator
-      (base /: observers) {
-        case (r, o) ⇒
-          (r /: (1 to 5)) { case (r, _) ⇒ r.unreachable(o, subjects.next()) }
-      }
+    val subjects = Stream.continually(base.allObservers).flatten.iterator
+    (base /: observers) {
+      case (r, o) ⇒
+        (r /: (1 to 5)) { case (r, _) ⇒ r.unreachable(o, subjects.next()) }
+    }
   }
 
   val reachability1 = createReachabilityOfSize(Reachability.empty, nodesSize)
@@ -59,15 +56,16 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
     }
   }
 
-  private def checkThunkFor(
-      r1: Reachability, thunk: Reachability ⇒ Unit, times: Int): Unit = {
+  private def checkThunkFor(r1: Reachability,
+                            thunk: Reachability ⇒ Unit,
+                            times: Int): Unit = {
     for (i ← 1 to times) {
       thunk(Reachability(r1.records, r1.versions))
     }
   }
 
-  private def merge(expectedRecords: Int)(
-      r1: Reachability, r2: Reachability): Unit = {
+  private def merge(expectedRecords: Int)(r1: Reachability,
+                                          r2: Reachability): Unit = {
     r1.merge(allowed, r2).records.size should ===(expectedRecords)
   }
 
@@ -116,13 +114,17 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
     }
 
     s"merge with half nodes unreachable, $iterations times" in {
-      checkThunkFor(
-          reachability1, reachability3, merge(5 * nodesSize / 2), iterations)
+      checkThunkFor(reachability1,
+                    reachability3,
+                    merge(5 * nodesSize / 2),
+                    iterations)
     }
 
     s"merge with half nodes unreachable opposite $iterations times" in {
-      checkThunkFor(
-          reachability3, reachability1, merge(5 * nodesSize / 2), iterations)
+      checkThunkFor(reachability3,
+                    reachability1,
+                    merge(5 * nodesSize / 2),
+                    iterations)
     }
 
     s"check status with half nodes unreachable, $iterations times" in {

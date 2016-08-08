@@ -28,7 +28,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.functions.col
 
 class InteractionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
   test("params") {
     ParamsSuite.checkParams(new Interaction())
@@ -39,26 +40,28 @@ class InteractionSuite
       var indices = ArrayBuilder.make[Int]
       var values = ArrayBuilder.make[Double]
       val encoder = new FeatureEncoder(cardinalities)
-      encoder.foreachNonzeroOutput(value,
-                                   (i, v) =>
-                                     {
-                                       indices += i
-                                       values += v
-                                   })
+      encoder.foreachNonzeroOutput(value, (i, v) => {
+        indices += i
+        values += v
+      })
       Vectors
         .sparse(encoder.outputSize, indices.result(), values.result())
         .compressed
     }
     assert(encode(Array(1), 2.2) === Vectors.dense(2.2))
     assert(encode(Array(3), Vectors.dense(1)) === Vectors.dense(0, 1, 0))
-    assert(encode(Array(1, 1), Vectors.dense(1.1, 2.2)) === Vectors.dense(1.1,
-                                                                          2.2))
-    assert(encode(Array(3, 1), Vectors.dense(1, 2.2)) === Vectors.dense(
-            0, 1, 0, 2.2))
-    assert(encode(Array(2, 1), Vectors.dense(1, 2.2)) === Vectors.dense(
-            0, 1, 2.2))
-    assert(encode(Array(2, 1, 1), Vectors.dense(0, 2.2, 0)) === Vectors.dense(
-            1, 0, 2.2, 0))
+    assert(
+        encode(Array(1, 1), Vectors.dense(1.1, 2.2)) === Vectors.dense(1.1,
+                                                                       2.2))
+    assert(
+        encode(Array(3, 1), Vectors.dense(1, 2.2)) === Vectors
+          .dense(0, 1, 0, 2.2))
+    assert(
+        encode(Array(2, 1), Vectors.dense(1, 2.2)) === Vectors
+          .dense(0, 1, 2.2))
+    assert(
+        encode(Array(2, 1, 1), Vectors.dense(0, 2.2, 0)) === Vectors
+          .dense(1, 0, 2.2, 0))
     intercept[SparkException] { encode(Array(1), "foo") }
     intercept[SparkException] { encode(Array(1), null) }
     intercept[AssertionError] { encode(Array(2), 2.2) }
@@ -150,8 +153,8 @@ class InteractionSuite
         Array[Attribute](NominalAttribute.defaultAttr.withNumValues(2),
                          NumericAttribute.defaultAttr))
     val df = data.select(
-        col("a").as(
-            "a", NominalAttribute.defaultAttr.withNumValues(3).toMetadata()),
+        col("a")
+          .as("a", NominalAttribute.defaultAttr.withNumValues(3).toMetadata()),
         col("b").as("b", groupAttr.toMetadata()),
         col("c").as("c", NumericAttribute.defaultAttr.toMetadata()))
     val trans = new Interaction()

@@ -9,7 +9,11 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceExpression
@@ -30,7 +34,7 @@ trait AssignmentAnnotator {
         ref.bind() match {
           case Some(r)
               if r.isDynamic &&
-              r.name == ResolvableReferenceExpression.UPDATE_DYNAMIC =>
+                r.name == ResolvableReferenceExpression.UPDATE_DYNAMIC =>
           //ignore
           case Some(r) if !r.isNamedParameter =>
             def checkVariable() {
@@ -94,11 +98,12 @@ trait AssignmentAnnotator {
                       case ExpectedTypeMismatch => // will be reported later
                       case _ =>
                         holder.createErrorAnnotation(
-                            assignment, "Wrong right assignment side")
+                            assignment,
+                            "Wrong right assignment side")
                     }
                   case _ =>
-                    holder.createErrorAnnotation(
-                        assignment, "Reassignment to val")
+                    holder
+                      .createErrorAnnotation(assignment, "Reassignment to val")
                 }
               case f: ScFunction =>
                 holder.createErrorAnnotation(assignment, "Reassignment to val")
@@ -107,16 +112,14 @@ trait AssignmentAnnotator {
                 method.containingClass match {
                   case c: PsiClass if c.isAnnotationType => //do nothing
                   case _ =>
-                    holder.createErrorAnnotation(
-                        assignment, "Reassignment to val")
+                    holder
+                      .createErrorAnnotation(assignment, "Reassignment to val")
                 }
               case v: ScValue =>
-                val annotation = holder.createErrorAnnotation(
-                    assignment, "Reassignment to val")
-                annotation.registerFix(
-                    new ValToVarQuickFix(ScalaPsiUtil
-                          .nameContext(r.element)
-                          .asInstanceOf[ScValue]))
+                val annotation = holder
+                  .createErrorAnnotation(assignment, "Reassignment to val")
+                annotation.registerFix(new ValToVarQuickFix(
+                    ScalaPsiUtil.nameContext(r.element).asInstanceOf[ScValue]))
               case _ =>
                 holder.createErrorAnnotation(assignment, "Reassignment to val")
             }

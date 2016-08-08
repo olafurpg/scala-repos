@@ -35,9 +35,9 @@ class PromiseTests extends MinimalScalaTest {
       val timedOut = Promise.successful[String]("Timedout").future
 
       Await.result(failure fallbackTo timedOut, defaultTimeout) mustBe
-      ("Timedout")
+        ("Timedout")
       Await.result(timedOut fallbackTo empty, defaultTimeout) mustBe
-      ("Timedout")
+        ("Timedout")
       Await.result(otherFailure fallbackTo failure fallbackTo timedOut,
                    defaultTimeout) mustBe ("Timedout")
       intercept[RuntimeException] {
@@ -80,7 +80,7 @@ class PromiseTests extends MinimalScalaTest {
       val result = "test value"
       val promise = Promise[String]().complete(Success(result))
       promise.isCompleted mustBe (true)
-      futureWithResult(_ (promise.future, result))
+      futureWithResult(_(promise.future, result))
     }
 
     "not be completable with a completed Promise" in {
@@ -103,7 +103,7 @@ class PromiseTests extends MinimalScalaTest {
       val promise =
         Promise[String]().complete(Failure(new RuntimeException(message)))
       promise.isCompleted mustBe (true)
-      futureWithException[RuntimeException](_ (promise.future, message))
+      futureWithException[RuntimeException](_(promise.future, message))
     }
     "not be completable with a completed Promise" in {
       {
@@ -130,7 +130,7 @@ class PromiseTests extends MinimalScalaTest {
     val future = Promise[String]()
       .complete(Failure(new InterruptedException(message)))
       .future
-    futureWithException[ExecutionException](_ (future, message))
+    futureWithException[ExecutionException](_(future, message))
   }
 
   "A NonLocalReturnControl failed Promise" should {
@@ -138,7 +138,7 @@ class PromiseTests extends MinimalScalaTest {
     val future = Promise[String]()
       .complete(Failure(new NonLocalReturnControl[String]("test", result)))
       .future
-    futureWithResult(_ (future, result))
+    futureWithResult(_(future, result))
   }
 
   def futureWithResult(f: ((Future[Any], Any) => Unit) => Unit) {
@@ -151,12 +151,12 @@ class PromiseTests extends MinimalScalaTest {
 
     "return when ready with 'Await.ready'" in {
       f((future, result) =>
-            Await.ready(future, defaultTimeout).isCompleted mustBe (true))
+        Await.ready(future, defaultTimeout).isCompleted mustBe (true))
     }
 
     "return result with 'Await.result'" in {
-      f((future,
-          result) => Await.result(future, defaultTimeout) mustBe (result))
+      f((future, result) =>
+        Await.result(future, defaultTimeout) mustBe (result))
     }
 
     "not timeout" in { f((future, _) => Await.ready(future, 0 millis)) }
@@ -164,7 +164,7 @@ class PromiseTests extends MinimalScalaTest {
     "filter result" in {
       f { (future, result) =>
         Await.result((future filter (_ => true)), defaultTimeout) mustBe
-        (result)
+          (result)
         intercept[NoSuchElementException] {
           Await.result((future filter (_ => false)), defaultTimeout)
         }
@@ -173,14 +173,14 @@ class PromiseTests extends MinimalScalaTest {
 
     "transform result with map" in {
       f((future, result) =>
-            Await.result((future map (_.toString.length)), defaultTimeout) mustBe
-            (result.toString.length))
+        Await.result((future map (_.toString.length)), defaultTimeout) mustBe
+          (result.toString.length))
     }
 
     "compose result with flatMap" in {
       f { (future, result) =>
-        val r = for (r <- future; p <- Promise.successful("foo").future) yield
-          r.toString + p
+        val r = for (r <- future; p <- Promise.successful("foo").future)
+          yield r.toString + p
         Await.result(r, defaultTimeout) mustBe (result.toString + "foo")
       }
     }
@@ -206,7 +206,8 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "not recover from exception" in {
-      f((future, result) =>
+      f(
+          (future, result) =>
             Await.result(future.recover({ case _ => "pigdog" }),
                          defaultTimeout) mustBe (result))
     }
@@ -237,7 +238,7 @@ class PromiseTests extends MinimalScalaTest {
     }
   }
 
-  def futureWithException[E <: Throwable : Manifest](
+  def futureWithException[E <: Throwable: Manifest](
       f: ((Future[Any], String) => Unit) => Unit) {
 
     "be completed" in {
@@ -245,10 +246,8 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "contain a value" in {
-      f(
-          (future, message) =>
-            {
-          future.value.get.failed.get.getMessage mustBe (message)
+      f((future, message) => {
+        future.value.get.failed.get.getMessage mustBe (message)
       })
     }
 
@@ -312,9 +311,10 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "project a failure" in {
-      f((future, message) =>
+      f(
+          (future, message) =>
             Await.result(future.failed, defaultTimeout).getMessage mustBe
-            (message))
+              (message))
     }
 
     "perform action on exception" in {

@@ -50,21 +50,22 @@ object VanishingCircles extends JFXApp {
     height = 600
     scene = new Scene {
       fill = Black
-      circles = for (i <- 0 until 50) yield
-        new Circle {
-          centerX = random * 800
-          centerY = random * 600
-          radius = 150
-          fill = color(random, random, random, .2)
-          effect = new BoxBlur(10, 10, 3)
-          // add this for binding:
-          strokeWidth <== when(hover) choose 4 otherwise 0
-          stroke = White
-          // add this for event listeners:
-          onMouseClicked = handle {
-            Timeline(at(3 s) { radius -> 0 }).play()
+      circles = for (i <- 0 until 50)
+        yield
+          new Circle {
+            centerX = random * 800
+            centerY = random * 600
+            radius = 150
+            fill = color(random, random, random, .2)
+            effect = new BoxBlur(10, 10, 3)
+            // add this for binding:
+            strokeWidth <== when(hover) choose 4 otherwise 0
+            stroke = White
+            // add this for event listeners:
+            onMouseClicked = handle {
+              Timeline(at(3 s) { radius -> 0 }).play()
+            }
           }
-        }
       content = circles
     }
   }
@@ -72,12 +73,13 @@ object VanishingCircles extends JFXApp {
   new Timeline {
     cycleCount = Indefinite
     autoReverse = true
-    keyFrames = for (circle <- circles) yield
-      at(40 s) {
-        Set(
-            circle.centerX -> random * stage.width(),
-            circle.centerY -> random * stage.height()
-        )
-      }
+    keyFrames = for (circle <- circles)
+      yield
+        at(40 s) {
+          Set(
+              circle.centerX -> random * stage.width(),
+              circle.centerY -> random * stage.height()
+          )
+        }
   }.play()
 }

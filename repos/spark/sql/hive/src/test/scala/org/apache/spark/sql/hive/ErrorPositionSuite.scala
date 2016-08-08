@@ -27,7 +27,9 @@ import org.apache.spark.sql.catalyst.util.quietly
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
 class ErrorPositionSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterEach {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterEach {
   import hiveContext.implicits._
 
   override protected def beforeEach(): Unit = {
@@ -48,14 +50,17 @@ class ErrorPositionSuite
     }
   }
 
-  positionTest(
-      "ambiguous attribute reference 1", "SELECT a from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 1",
+               "SELECT a from dupAttributes",
+               "a")
 
-  positionTest(
-      "ambiguous attribute reference 2", "SELECT a, b from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 2",
+               "SELECT a, b from dupAttributes",
+               "a")
 
-  positionTest(
-      "ambiguous attribute reference 3", "SELECT b, a from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 3",
+               "SELECT b, a from dupAttributes",
+               "a")
 
   positionTest("unresolved attribute 1", "SELECT x FROM src", "x")
 
@@ -164,7 +169,8 @@ class ErrorPositionSuite
         fail(
             s"start not returned for error on token $token\n${ast.treeString}")
       }
-      assert(expectedStart === actualStart, s"""Incorrect start position.
+      assert(expectedStart === actualStart,
+             s"""Incorrect start position.
           |== QUERY ==
           |$query
           |

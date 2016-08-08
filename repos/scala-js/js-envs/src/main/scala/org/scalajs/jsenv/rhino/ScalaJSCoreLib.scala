@@ -75,8 +75,8 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
     }
 
     // Map required files
-    val maps = for ((fileName, maxLine) <- neededMaps) yield
-      (fileName, getSourceMapper(fileName, maxLine))
+    val maps = for ((fileName, maxLine) <- neededMaps)
+      yield (fileName, getSourceMapper(fileName, maxLine))
 
     // Create new stack trace to return
     val res = context.newArray(scope, count)
@@ -86,7 +86,7 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
       val fileName = Context.toString(elem.get("fileName", elem))
       val line = Context.toNumber(elem.get("lineNumber", elem)).toInt - 1
 
-      val pos = maps.get(fileName).fold(ir.Position.NoPosition)(_ (line))
+      val pos = maps.get(fileName).fold(ir.Position.NoPosition)(_(line))
 
       val newElem =
         if (pos.isDefined) newPosElem(scope, context, elem, pos)
@@ -146,8 +146,8 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
       val base = ScalaJS.get(name, ScalaJS)
       // Depending on the Semantics, some fields could be entirely absent
       if (base != Scriptable.NOT_FOUND) {
-        val lazified = makeLazyScalaJSScope(
-            base.asInstanceOf[Scriptable], isStatics)
+        val lazified =
+          makeLazyScalaJSScope(base.asInstanceOf[Scriptable], isStatics)
         ScalaJS.put(name, ScalaJS, lazified)
       }
     }
@@ -155,7 +155,8 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
 
   private[rhino] def load(scope: Scriptable, encodedName: String): Unit = {
     val linkedClass = providers.getOrElse(
-        encodedName, throw new RhinoJSEnv.ClassNotFoundException(encodedName))
+        encodedName,
+        throw new RhinoJSEnv.ClassNotFoundException(encodedName))
 
     val desugared = new ScalaJSClassEmitter(ECMAScript51Global, linkingUnit)
       .genClassDef(linkedClass)

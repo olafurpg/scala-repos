@@ -3,7 +3,11 @@ package worksheet.actions
 
 import com.intellij.execution._
 import com.intellij.execution.configurations.JavaParameters
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler,
+  ProcessAdapter,
+  ProcessEvent
+}
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.icons.AllIcons
 import com.intellij.ide.scratch.{ScratchFileService, ScratchRootType}
@@ -11,7 +15,11 @@ import com.intellij.ide.util.EditorHelper
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.application.{ApplicationManager, ModalityState}
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext,
+  CompileStatusNotification,
+  CompilerManager
+}
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.keymap.{KeymapManager, KeymapUtil}
 import com.intellij.openapi.module.{Module, ModuleManager}
@@ -35,7 +43,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 10/17/12
   */
 class RunWorksheetAction extends AnAction with TopComponentAction {
@@ -101,8 +109,8 @@ object RunWorksheetAction {
               scala.extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
                 if (!auto)
-                  CleanWorksheetAction.cleanWorksheet(
-                      file.getNode, editor, viewer, project)
+                  CleanWorksheetAction
+                    .cleanWorksheet(file.getNode, editor, viewer, project)
               }
             }
           }, ModalityState.any())
@@ -112,17 +120,16 @@ object RunWorksheetAction {
           new WorksheetCompiler().compileAndRun(
               editor,
               file,
-              (className: String, addToCp: String) =>
-                {
-                  ApplicationManager.getApplication invokeLater new Runnable {
-                    override def run() {
-                      executeWorksheet(file.getName,
-                                       project,
-                                       file.getContainingFile,
-                                       className,
-                                       addToCp)
-                    }
+              (className: String, addToCp: String) => {
+                ApplicationManager.getApplication invokeLater new Runnable {
+                  override def run() {
+                    executeWorksheet(file.getName,
+                                     project,
+                                     file.getContainingFile,
+                                     className,
+                                     addToCp)
                   }
+                }
               },
               Option(editor),
               auto)
@@ -232,8 +239,8 @@ object RunWorksheetAction {
     handler.startNotify()
   }
 
-  def isScratchWorksheet(
-      vFileOpt: Option[VirtualFile], project: Project): Boolean =
+  def isScratchWorksheet(vFileOpt: Option[VirtualFile],
+                         project: Project): Boolean =
     vFileOpt.exists {
       case vFile =>
         ScratchFileService

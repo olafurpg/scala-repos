@@ -4,7 +4,13 @@ import scala.util.{Try, Success, Failure}
 
 import org.joda.time.DateTime
 import play.api.libs.json.JsValue
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument,
+  BSONInteger,
+  BSONRegex,
+  BSONArray,
+  BSONBoolean
+}
 import reactivemongo.core.commands._
 
 import lila.db.Types.Coll
@@ -47,7 +53,8 @@ private[opening] final class OpeningApi(openingColl: Coll,
 
     def find(openingId: Opening.ID, userId: String): Fu[Option[Attempt]] =
       attemptColl
-        .find(BSONDocument(
+        .find(
+            BSONDocument(
                 Attempt.BSONFields.id -> Attempt.makeId(openingId, userId)
             ))
         .one[Attempt]
@@ -55,13 +62,19 @@ private[opening] final class OpeningApi(openingColl: Coll,
     def add(a: Attempt) = attemptColl insert a void
 
     def hasPlayed(user: User, opening: Opening): Fu[Boolean] =
-      attemptColl.count(BSONDocument(
+      attemptColl.count(
+          BSONDocument(
               Attempt.BSONFields.id -> Attempt.makeId(opening.id, user.id)
           ).some) map (0 !=)
 
     def playedIds(user: User, max: Int): Fu[BSONArray] = {
       val col = attemptColl
-      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Group, Limit, Match, Push}
+      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+        Group,
+        Limit,
+        Match,
+        Push
+      }
 
       val playedIdsGroup =
         Group(BSONBoolean(true))("ids" -> Push(Attempt.BSONFields.openingId))
@@ -70,8 +83,8 @@ private[opening] final class OpeningApi(openingColl: Coll,
         .aggregate(Match(BSONDocument(Attempt.BSONFields.userId -> user.id)),
                    List(Limit(max), playedIdsGroup))
         .map(_.documents.headOption
-              .flatMap(_.getAs[BSONArray]("ids"))
-              .getOrElse(BSONArray()))
+          .flatMap(_.getAs[BSONArray]("ids"))
+          .getOrElse(BSONArray()))
     }
   }
 

@@ -101,7 +101,8 @@ class RegressionTest {
   }
 
   @Test
-  def should_correctly_dispatch_calls_on_private_functions_issue_165(): Unit = {
+  def should_correctly_dispatch_calls_on_private_functions_issue_165()
+    : Unit = {
     class A {
       private def x: Int = 1
       def value: Int = x
@@ -288,14 +289,14 @@ class RegressionTest {
       ): Unit = {
     def giveMeANull(): Null = null
     assertThrows(classOf[Exception], (giveMeANull(): StringBuilder).append(5))
-    assertThrows(
-        classOf[Exception], (giveMeANull(): scala.runtime.IntRef).elem)
+    assertThrows(classOf[Exception],
+                 (giveMeANull(): scala.runtime.IntRef).elem)
 
     def giveMeANothing(): Nothing = sys.error("boom")
-    assertThrows(
-        classOf[Exception], (giveMeANothing(): StringBuilder).append(5))
-    assertThrows(
-        classOf[Exception], (giveMeANothing(): scala.runtime.IntRef).elem)
+    assertThrows(classOf[Exception],
+                 (giveMeANothing(): StringBuilder).append(5))
+    assertThrows(classOf[Exception],
+                 (giveMeANothing(): scala.runtime.IntRef).elem)
   }
 
   @Test
@@ -313,7 +314,8 @@ class RegressionTest {
   }
 
   @Test
-  def should_properly_order_ctor_statements_when_inlining_issue_1369(): Unit = {
+  def should_properly_order_ctor_statements_when_inlining_issue_1369()
+    : Unit = {
     trait Bar {
       def x: Int
       var y = x + 1
@@ -451,7 +453,8 @@ class RegressionTest {
     f(5)
   }
 
-  @Test def switch_match_with_2_guards_for_the_same_value_issue_1589(): Unit = {
+  @Test
+  def switch_match_with_2_guards_for_the_same_value_issue_1589(): Unit = {
     @noinline def genB(): Int = 0xE1
     val b = genB()
     val x = b >> 4 match {

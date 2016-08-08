@@ -16,8 +16,9 @@ class XmlUnmatchedTagInspectionTest
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
 
   private def check(text: String, annotation: String) {
-    checkTextHasError(
-        text, annotation, classOf[ScalaXmlUnmatchedTagInspection])
+    checkTextHasError(text,
+                      annotation,
+                      classOf[ScalaXmlUnmatchedTagInspection])
   }
 
   def testSimpleClosingError() {

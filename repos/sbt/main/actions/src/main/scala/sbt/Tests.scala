@@ -13,7 +13,16 @@ import xsbti.api.Definition
 import xsbti.compile.CompileAnalysis
 import ConcurrentRestrictions.Tag
 
-import testing.{AnnotatedFingerprint, Fingerprint, Framework, SubclassFingerprint, Runner, TaskDef, SuiteSelector, Task => TestTask}
+import testing.{
+  AnnotatedFingerprint,
+  Fingerprint,
+  Framework,
+  SubclassFingerprint,
+  Runner,
+  TaskDef,
+  SuiteSelector,
+  Task => TestTask
+}
 import scala.annotation.tailrec
 
 import java.io.File
@@ -95,8 +104,8 @@ object Tests {
     *                  If None, the arguments will apply to all test frameworks.
     * @param args The list of arguments to pass to the selected framework(s).
     */
-  final case class Argument(
-      framework: Option[TestFramework], args: List[String])
+  final case class Argument(framework: Option[TestFramework],
+                            args: List[String])
       extends TestOption
 
   /**
@@ -109,8 +118,9 @@ object Tests {
     * @param tags The tags that should be added to each test task.  These can be used to apply restrictions on
     *             concurrent execution.
     */
-  final case class Execution(
-      options: Seq[TestOption], parallel: Boolean, tags: Seq[(Tag, Int)])
+  final case class Execution(options: Seq[TestOption],
+                             parallel: Boolean,
+                             tags: Seq[(Tag, Int)])
 
   /** Configures whether a group of tests runs in the same JVM or are forked. */
   sealed trait TestRunPolicy
@@ -127,8 +137,9 @@ object Tests {
   }
 
   /** A named group of tests configured to run in the same JVM or be forked. */
-  final case class Group(
-      name: String, tests: Seq[TestDefinition], runPolicy: TestRunPolicy)
+  final case class Group(name: String,
+                         tests: Seq[TestDefinition],
+                         runPolicy: TestRunPolicy)
 
   private[sbt] final class ProcessedOptions(
       val tests: Seq[TestDefinition],
@@ -166,11 +177,11 @@ object Tests {
     if (undefinedFrameworks.nonEmpty)
       log.warn(
           "Arguments defined for test frameworks that are not present:\n\t" +
-          undefinedFrameworks.mkString("\n\t"))
+            undefinedFrameworks.mkString("\n\t"))
 
     def includeTest(test: TestDefinition) =
       !excludeTestsSet.contains(test.name) &&
-      testFilters.forall(filter => filter(test.name))
+        testFilters.forall(filter => filter(test.name))
     val filtered0 = discovered.filter(includeTest).toList.distinct
     val tests =
       if (orderedFilters.isEmpty) filtered0
@@ -180,8 +191,10 @@ object Tests {
           .toList
           .distinct
     val uniqueTests = distinctBy(tests)(_.name)
-    new ProcessedOptions(
-        uniqueTests, setup.toList, cleanup.toList, testListeners.toList)
+    new ProcessedOptions(uniqueTests,
+                         setup.toList,
+                         cleanup.toList,
+                         testListeners.toList)
   }
 
   private[this] def distinctBy[T, K](in: Seq[T])(f: T => K): Seq[T] = {
@@ -217,15 +230,15 @@ object Tests {
                testListeners: Seq[TestReportListener],
                config: Execution): Task[Output] = {
     def fj(actions: Iterable[() => Unit]): Task[Unit] =
-      nop.dependsOn(actions.toSeq.fork(_ ()): _*)
+      nop.dependsOn(actions.toSeq.fork(_()): _*)
     def partApp(actions: Iterable[ClassLoader => Unit]) = actions.toSeq map {
       a => () =>
         a(loader)
     }
 
     val (frameworkSetup, runnables, frameworkCleanup) =
-      TestFramework.testTasks(
-          frameworks, runners, loader, tests, log, testListeners)
+      TestFramework
+        .testTasks(frameworks, runners, loader, tests, log, testListeners)
 
     val setupTasks = fj(partApp(userSetup) :+ frameworkSetup)
     val mainTasks =
@@ -315,15 +328,15 @@ object Tests {
         case hd :: rst =>
           val testFun = hd._2
           val (result, nestedTasks) = testFun.apply()
-          val nestedRunnables = createNestedRunnables(
-              loader, testFun, nestedTasks)
-          processRunnable(
-              nestedRunnables.toList ::: rst, (hd._1, result) :: acc)
+          val nestedRunnables =
+            createNestedRunnables(loader, testFun, nestedTasks)
+          processRunnable(nestedRunnables.toList ::: rst,
+                          (hd._1, result) :: acc)
         case Nil => acc
       }
 
     task { processRunnable(runnables.toList, List.empty) } dependsOn
-    (setupTasks)
+      (setupTasks)
   }
 
   def processResults(results: Iterable[(String, SuiteResult)]): Output =
@@ -336,8 +349,8 @@ object Tests {
           Output(if (v1.id < v2.id) v2 else v1, m1 ++ m2, Iterable.empty)
       })
     else {
-      def sequence(
-          tasks: List[Task[Output]], acc: List[Output]): Task[List[Output]] =
+      def sequence(tasks: List[Task[Output]],
+                   acc: List[Output]): Task[List[Output]] =
         tasks match {
           case Nil => task(acc.reverse)
           case hd :: tl =>
@@ -390,14 +403,19 @@ object Tests {
       in collect { case (name, IsModule, print) if names(name) => print }
 
     def toFingerprints(d: Discovered): Seq[Fingerprint] =
-      defined(subclasses, d.baseClasses, d.isModule) ++ defined(
-          annotations, d.annotations, d.isModule)
+      defined(subclasses, d.baseClasses, d.isModule) ++ defined(annotations,
+                                                                d.annotations,
+                                                                d.isModule)
 
     val discovered =
       Discovery(firsts(subclasses), firsts(annotations))(definitions)
     // TODO: To pass in correct explicitlySpecified and selectors
-    val tests = for ((df, di) <- discovered; fingerprint <- toFingerprints(di)) yield
-      new TestDefinition(df.name, fingerprint, false, Array(new SuiteSelector))
+    val tests = for ((df, di) <- discovered; fingerprint <- toFingerprints(di))
+      yield
+        new TestDefinition(df.name,
+                           fingerprint,
+                           false,
+                           Array(new SuiteSelector))
     val mains = discovered collect { case (df, di) if di.hasMain => df.name }
     (tests, mains.toSet)
   }
@@ -405,8 +423,9 @@ object Tests {
   @deprecated(
       "Tests.showResults() has been superseded with TestResultLogger and setting 'testResultLogger'.",
       "0.13.5")
-  def showResults(
-      log: Logger, results: Output, noTestsMessage: => String): Unit =
+  def showResults(log: Logger,
+                  results: Output,
+                  noTestsMessage: => String): Unit =
     TestResultLogger.Default
       .copy(printNoTests = TestResultLogger.const(_ info noTestsMessage))
       .run(log, results, "")

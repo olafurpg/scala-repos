@@ -212,7 +212,8 @@ object Accumulator {
     Sink.asPublisher[E](fanout = false).mapMaterializedValue { publisher =>
       future.recover {
         case error =>
-          new SinkAccumulator(Sink
+          new SinkAccumulator(
+              Sink
                 .cancelled[E]
                 .mapMaterializedValue(_ => Future.failed(error)))
       }.flatMap { accumulator =>
@@ -263,8 +264,8 @@ object Accumulator {
     new SinkAccumulator(
         Sink
           .asPublisher[E](fanout = false)
-          .mapMaterializedValue(
-              publisher => Future.successful(Source.fromPublisher(publisher))))
+          .mapMaterializedValue(publisher =>
+            Future.successful(Source.fromPublisher(publisher))))
   }
 
   /**

@@ -105,7 +105,8 @@ sealed trait JavaScriptSourceRestriction extends ContentSourceRestriction
   */
 sealed trait StylesheetSourceRestriction extends ContentSourceRestriction
 sealed trait GeneralSourceRestriction
-    extends JavaScriptSourceRestriction with StylesheetSourceRestriction
+    extends JavaScriptSourceRestriction
+    with StylesheetSourceRestriction
 
 object ContentSourceRestriction {
 
@@ -172,7 +173,8 @@ object ContentSourceRestriction {
     * policies.
     */
   case object UnsafeInline
-      extends JavaScriptSourceRestriction with StylesheetSourceRestriction {
+      extends JavaScriptSourceRestriction
+      with StylesheetSourceRestriction {
     val sourceRestrictionString = "'unsafe-inline'"
   }
 
@@ -237,18 +239,18 @@ object ContentSourceRestriction {
   */
 final case class ContentSecurityPolicy(
     defaultSources: List[ContentSourceRestriction] = List(
-          ContentSourceRestriction.Self),
+        ContentSourceRestriction.Self),
     connectSources: List[ContentSourceRestriction] = Nil,
     fontSources: List[ContentSourceRestriction] = Nil,
     frameSources: List[ContentSourceRestriction] = Nil,
     imageSources: List[ContentSourceRestriction] = List(
-          ContentSourceRestriction.All),
+        ContentSourceRestriction.All),
     mediaSources: List[ContentSourceRestriction] = Nil,
     objectSources: List[ContentSourceRestriction] = Nil,
     scriptSources: List[JavaScriptSourceRestriction] = List(
-          ContentSourceRestriction.UnsafeEval,
-          ContentSourceRestriction.Self
-      ),
+        ContentSourceRestriction.UnsafeEval,
+        ContentSourceRestriction.Self
+    ),
     styleSources: List[StylesheetSourceRestriction] = Nil,
     reportUri: Option[URI] = Some(ContentSecurityPolicy.defaultReportUri)
 ) {
@@ -273,7 +275,7 @@ final case class ContentSecurityPolicy(
     val restrictionString = allRestrictions.collect {
       case (category, restrictions) if restrictions.nonEmpty =>
         category + " " +
-        restrictions.map(_.sourceRestrictionString).mkString(" ")
+          restrictions.map(_.sourceRestrictionString).mkString(" ")
     }.mkString("; ")
 
     reportUri.map { uri =>
@@ -366,7 +368,8 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         }
         violationJson = camelCasedJson \ "csp-report"
         extractedViolation <- tryo(
-            violationJson.extract[ContentSecurityPolicyViolation])
+                                 violationJson
+                                   .extract[ContentSecurityPolicyViolation])
       } yield {
         extractedViolation
       }
@@ -375,7 +378,8 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         {
           violation match {
             case Full(violation) =>
-              LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
+              LiftRules
+                .contentSecurityPolicyViolationReport(violation) or Full(
                   OkResponse())
 
             case _ =>
@@ -385,7 +389,7 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
               )
 
               Full(BadRequestResponse(
-                      "Unrecognized format for content security policy report."))
+                  "Unrecognized format for content security policy report."))
           }
         }
   }
@@ -451,7 +455,7 @@ final case class SecurityRules(
     https: Option[HttpsRules] = None,
     content: Option[ContentSecurityPolicy] = Some(ContentSecurityPolicy()),
     frameRestrictions: Option[FrameRestrictions] = Some(
-          FrameRestrictions.SameOrigin),
+        FrameRestrictions.SameOrigin),
     enforceInOtherModes: Boolean = false,
     logInOtherModes: Boolean = true,
     enforceInDevMode: Boolean = false,

@@ -168,8 +168,8 @@ trait MemberHandlers {
   abstract class MacroHandler(member: DefDef)
       extends MemberDefHandler(member) {
     override def referencedNames =
-      super.referencedNames
-        .flatMap(name => List(name.toTermName, name.toTypeName))
+      super.referencedNames.flatMap(name =>
+        List(name.toTermName, name.toTypeName))
     override def definesValue = false
     override def definesTerm: Option[TermName] = Some(name.toTermName)
     override def definesType: Option[TypeName] = None
@@ -196,8 +196,8 @@ trait MemberHandlers {
     override def resultExtractionCode(req: Request) = {
       val lhsType = string2code(req lookupTypeOf name)
       val res = string2code(req fullPath name)
-      """ + "%s: %s = " + %s + "\n" """.format(
-          string2code(lhs.toString), lhsType, res) + "\n"
+      """ + "%s: %s = " + %s + "\n" """
+        .format(string2code(lhs.toString), lhsType, res) + "\n"
     }
   }
 
@@ -247,8 +247,9 @@ trait MemberHandlers {
     def implicitSymbols = importedSymbols filter (_.isImplicit)
     def importedSymbols = individualSymbols ++ wildcardSymbols
 
-    private val selectorNames = selectorRenames filterNot (_ == nme.USCOREkw) flatMap
-    (_.bothNames) toSet
+    private val selectorNames =
+      selectorRenames filterNot (_ == nme.USCOREkw) flatMap
+        (_.bothNames) toSet
     lazy val individualSymbols: List[Symbol] = exitingTyper(
         importableTargetMembers filter (m => selectorNames(m.name)))
     lazy val wildcardSymbols: List[Symbol] = exitingTyper(
@@ -261,7 +262,8 @@ trait MemberHandlers {
     /** The names imported by this statement */
     override lazy val importedNames: List[Name] =
       wildcardNames ++ individualNames
-    lazy val importsSymbolNamed: Set[String] = importedNames map (_.toString) toSet
+    lazy val importsSymbolNamed: Set[String] =
+      importedNames map (_.toString) toSet
 
     def importString = imp.toString
     override def resultExtractionCode(req: Request) =

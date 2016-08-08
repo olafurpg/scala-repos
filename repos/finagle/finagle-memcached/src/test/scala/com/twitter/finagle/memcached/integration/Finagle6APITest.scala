@@ -4,7 +4,11 @@ import _root_.java.io.ByteArrayOutputStream
 import _root_.java.lang.{Boolean => JBoolean}
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets,
+  ZooKeeperClient,
+  ZooKeeperUtils
+}
 import com.twitter.finagle.Memcached
 import com.twitter.finagle.cacheresolver.CachePoolConfig
 import com.twitter.finagle.memcached.PartitionedClient
@@ -43,8 +47,9 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
         ZooKeeperClient.digestCredentials("user", "pass"))
 
     // create serverset
-    val serverSet = ServerSets.create(
-        zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+    val serverSet = ServerSets.create(zookeeperClient,
+                                      ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+                                      zkPath)
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster
@@ -150,7 +155,8 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
   test("with static servers list") {
     val client = Memcached.client.newRichClient(
         "twcache!localhost:%d,localhost:%d".format(
-            testServers(0).address.getPort, testServers(1).address.getPort))
+            testServers(0).address.getPort,
+            testServers(1).address.getPort))
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)

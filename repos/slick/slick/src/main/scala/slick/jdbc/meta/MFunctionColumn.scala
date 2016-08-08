@@ -24,13 +24,14 @@ case class MFunctionColumn(function: MQName,
 }
 
 object MFunctionColumn {
-  def getFunctionColumns(
-      functionPattern: MQName, columnNamePattern: String = "%") = {
+  def getFunctionColumns(functionPattern: MQName,
+                         columnNamePattern: String = "%") = {
     ResultSetAction[MFunctionColumn] { s =>
       try s.metaData.getFunctionColumns(functionPattern.catalog_?,
                                         functionPattern.schema_?,
                                         functionPattern.name,
-                                        columnNamePattern) catch {
+                                        columnNamePattern)
+      catch {
         case _: AbstractMethodError => null
       }
     } { r =>

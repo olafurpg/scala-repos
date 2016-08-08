@@ -14,18 +14,32 @@ import com.intellij.refactoring.RefactoringActionHandler
 import org.jetbrains.annotations.Nullable
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefintionsCollector
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil, TypeAdjuster}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiElement,
+  ScalaPsiUtil,
+  TypeAdjuster
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicatesUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.showErrorHint
@@ -60,8 +74,10 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
         dataContext,
         REFACTORING_NAME,
         ScalaRefactoringUtil.checkCanBeIntroduced(_)) {
-      invokeOnEditor(
-          project, editor, file.asInstanceOf[ScalaFile], dataContext)
+      invokeOnEditor(project,
+                     editor,
+                     file.asInstanceOf[ScalaFile],
+                     dataContext)
     }
   }
 
@@ -80,8 +96,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     val elements: Seq[PsiElement] =
       ScalaRefactoringUtil.selectedElements(editor, file, trimComments = false)
 
-    val hasWarnings = ScalaRefactoringUtil.showNotPossibleWarnings(
-        elements, project, editor, REFACTORING_NAME)
+    val hasWarnings = ScalaRefactoringUtil
+      .showNotPossibleWarnings(elements, project, editor, REFACTORING_NAME)
     if (hasWarnings) return
 
     def checkLastReturn(elem: PsiElement): Boolean = {
@@ -91,7 +107,7 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           m.getBranches.forall(checkLastReturn(_))
         case f: ScIfStmt if f.elseBranch.isDefined && f.thenBranch.isDefined =>
           checkLastReturn(f.thenBranch.get) &&
-          checkLastReturn(f.elseBranch.get)
+            checkLastReturn(f.elseBranch.get)
         case block: ScBlock if block.lastExpr.isDefined =>
           checkLastReturn(block.lastExpr.get)
         case _ => false
@@ -99,8 +115,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
 
     def returnType: Option[ScType] = {
-      val fun = PsiTreeUtil.getParentOfType(
-          elements.head, classOf[ScFunctionDefinition])
+      val fun = PsiTreeUtil
+        .getParentOfType(elements.head, classOf[ScFunctionDefinition])
       if (fun == null) return None
       var result: Option[ScType] = None
       val visitor = new ScalaRecursiveElementVisitor {
@@ -179,8 +195,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       @Nullable stopAtScope: PsiElement): Array[PsiElement] = {
     def isParentOk(parent: PsiElement): Boolean = {
       if (parent == null) return false
-      assert(
-          parent.getTextRange != null, "TextRange is null: " + parent.getText)
+      assert(parent.getTextRange != null,
+             "TextRange is null: " + parent.getText)
       stopAtScope == null ||
       stopAtScope.getTextRange.contains(parent.getTextRange)
     }
@@ -228,7 +244,7 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           case td: ScTypeDefinition => td.parent
           case ScalaPsiUtil.inNameContext(varDef: ScVariableDefinition)
               if ScalaPsiUtil.isLValue(ref) &&
-              !elements.exists(_.isAncestorOf(varDef)) =>
+                !elements.exists(_.isAncestorOf(varDef)) =>
             varDef.parent
           case member: PsiMember => member.containingClass.toOption
           case _ => return None
@@ -311,8 +327,10 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           val out = output
             .map(ScalaExtractMethodUtils.convertVariableData(_, elements))
             .map(ExtractMethodOutput.from)
-          InnerClassSettings(
-              isCase || isInner, "TestMethodNameResult", out.toArray, isCase)
+          InnerClassSettings(isCase || isInner,
+                             "TestMethodNameResult",
+                             out.toArray,
+                             isCase)
         }
 
         new ScalaExtractMethodSettings(
@@ -339,7 +357,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     def local(text: String) = ScalaBundle.message("extract.local.method", text)
     element.getParent match {
       case tbody: ScTemplateBody =>
-        PsiTreeUtil.getParentOfType(tbody, classOf[ScTemplateDefinition]) match {
+        PsiTreeUtil
+          .getParentOfType(tbody, classOf[ScTemplateDefinition]) match {
           case o: ScObject => s"Extract method to object ${o.name}"
           case c: ScClass => s"Extract method to class ${c.name}"
           case t: ScTrait => s"Extract method to trait ${t.name}"
@@ -374,8 +393,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
   }
 
-  private def performRefactoring(
-      settings: ScalaExtractMethodSettings, editor: Editor) {
+  private def performRefactoring(settings: ScalaExtractMethodSettings,
+                                 editor: Editor) {
     val method = ScalaExtractMethodUtils.createMethodFromSettings(settings)
     if (method == null) return
     val ics = settings.innerClassSettings
@@ -393,7 +412,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
 
       val classText = ics.classText(canonTextForTypes = true)
       val clazz = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-          classText, anchorNext.getContext, anchorNext)
+          classText,
+          anchorNext.getContext,
+          anchorNext)
       addElementBefore(clazz, anchorNext)
       addElementBefore(newLine, anchorNext)
     }

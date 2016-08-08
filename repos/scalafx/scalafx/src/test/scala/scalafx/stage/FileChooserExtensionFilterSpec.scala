@@ -42,8 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class FileChooserExtensionFilterSpec
-    extends SimpleSFXDelegateSpec[
-        jfxs.FileChooser.ExtensionFilter, FileChooser.ExtensionFilter](
+    extends SimpleSFXDelegateSpec[jfxs.FileChooser.ExtensionFilter,
+                                  FileChooser.ExtensionFilter](
         classOf[jfxs.FileChooser.ExtensionFilter],
         classOf[FileChooser.ExtensionFilter]) {
 

@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScStableCodeReferenceElementImpl
 
 /**
-  * @author kfeodorov 
+  * @author kfeodorov
   * @since 09.03.14.
   */
 class ScInterpolatedPrefixReference(node: ASTNode)
@@ -16,7 +16,7 @@ class ScInterpolatedPrefixReference(node: ASTNode)
 
   override def handleElementRename(newElementName: String): PsiElement = {
     replace(
-        ScalaPsiElementFactory.createInterpolatedStringPrefix(
-            newElementName, getManager))
+        ScalaPsiElementFactory.createInterpolatedStringPrefix(newElementName,
+                                                              getManager))
   }
 }

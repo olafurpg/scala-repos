@@ -27,7 +27,8 @@ import org.apache.avro.generic.GenericData.Record
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
 
 class GenericAvroSerializerSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
   conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
   val schema: Schema = SchemaBuilder
@@ -40,7 +41,8 @@ class GenericAvroSerializerSuite
 
   test("schema compression and decompression") {
     val genericSer = new GenericAvroSerializer(conf.getAvroSchema)
-    assert(schema === genericSer.decompress(
+    assert(
+        schema === genericSer.decompress(
             ByteBuffer.wrap(genericSer.compress(schema))))
   }
 
@@ -83,7 +85,8 @@ class GenericAvroSerializerSuite
       genericSer.decompress(ByteBuffer.wrap(compressedSchema))
 
     assert(compressedSchema.eq(genericSer.compress(schema)))
-    assert(decompressedSchema.eq(
+    assert(
+        decompressedSchema.eq(
             genericSer.decompress(ByteBuffer.wrap(compressedSchema))))
   }
 }

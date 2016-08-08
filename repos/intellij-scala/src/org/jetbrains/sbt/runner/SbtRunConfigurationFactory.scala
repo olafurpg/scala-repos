@@ -1,6 +1,10 @@
 package org.jetbrains.sbt.runner
 
-import com.intellij.execution.configurations.{ConfigurationFactory, ConfigurationType, RunConfiguration}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory,
+  ConfigurationType,
+  RunConfiguration
+}
 import com.intellij.openapi.project.Project
 
 /**

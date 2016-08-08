@@ -4,7 +4,7 @@
 
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import scala.language.postfixOps
 import scala.concurrent.duration._
@@ -21,7 +21,8 @@ object ClusterMetricsMultiJvmSpec extends MultiNodeConfig {
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
@@ -41,7 +42,7 @@ abstract class ClusterMetricsSpec
 
   "Cluster metrics" must {
     "periodically collect metrics on each node, publish ClusterMetricsChanged to the event stream, " +
-    "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
+      "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
         60 seconds) {
       awaitClusterUp(roles: _*)
       enterBarrier("cluster-started")

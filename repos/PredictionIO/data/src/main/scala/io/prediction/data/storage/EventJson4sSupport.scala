@@ -42,66 +42,66 @@ object EventJson4sSupport {
   @DeveloperApi
   def readJson: PartialFunction[JValue, Event] = {
     case JObject(x) => {
-        val fields = new DataMap(x.toMap)
-        // use get() if required in json
-        // use getOpt() if not required in json
-        try {
-          val event = fields.get[String]("event")
-          val entityType = fields.get[String]("entityType")
-          val entityId = fields.get[String]("entityId")
-          val targetEntityType = fields.getOpt[String]("targetEntityType")
-          val targetEntityId = fields.getOpt[String]("targetEntityId")
-          val properties =
-            fields.getOrElse[Map[String, JValue]]("properties", Map())
-          // default currentTime expressed as UTC timezone
-          lazy val currentTime = DateTime.now(EventValidation.defaultTimeZone)
-          val eventTime = fields
-            .getOpt[String]("eventTime")
-            .map { s =>
-              try {
-                DataUtils.stringToDateTime(s)
-              } catch {
-                case _: Exception =>
-                  throw new MappingException(s"Fail to extract eventTime ${s}")
-              }
+      val fields = new DataMap(x.toMap)
+      // use get() if required in json
+      // use getOpt() if not required in json
+      try {
+        val event = fields.get[String]("event")
+        val entityType = fields.get[String]("entityType")
+        val entityId = fields.get[String]("entityId")
+        val targetEntityType = fields.getOpt[String]("targetEntityType")
+        val targetEntityId = fields.getOpt[String]("targetEntityId")
+        val properties =
+          fields.getOrElse[Map[String, JValue]]("properties", Map())
+        // default currentTime expressed as UTC timezone
+        lazy val currentTime = DateTime.now(EventValidation.defaultTimeZone)
+        val eventTime = fields
+          .getOpt[String]("eventTime")
+          .map { s =>
+            try {
+              DataUtils.stringToDateTime(s)
+            } catch {
+              case _: Exception =>
+                throw new MappingException(s"Fail to extract eventTime ${s}")
             }
-            .getOrElse(currentTime)
+          }
+          .getOrElse(currentTime)
 
-          // disable tags from API for now.
-          val tags = List()
-          // val tags = fields.getOpt[Seq[String]]("tags").getOrElse(List())
+        // disable tags from API for now.
+        val tags = List()
+        // val tags = fields.getOpt[Seq[String]]("tags").getOrElse(List())
 
-          val prId = fields.getOpt[String]("prId")
+        val prId = fields.getOpt[String]("prId")
 
-          // don't allow user set creationTime from API for now.
-          val creationTime = currentTime
-          // val creationTime = fields.getOpt[String]("creationTime")
-          //   .map{ s =>
-          //     try {
-          //       DataUtils.stringToDateTime(s)
-          //     } catch {
-          //       case _: Exception =>
-          //         throw new MappingException(s"Fail to extract creationTime ${s}")
-          //     }
-          //   }.getOrElse(currentTime)
+        // don't allow user set creationTime from API for now.
+        val creationTime = currentTime
+        // val creationTime = fields.getOpt[String]("creationTime")
+        //   .map{ s =>
+        //     try {
+        //       DataUtils.stringToDateTime(s)
+        //     } catch {
+        //       case _: Exception =>
+        //         throw new MappingException(s"Fail to extract creationTime ${s}")
+        //     }
+        //   }.getOrElse(currentTime)
 
-          val newEvent = Event(
-              event = event,
-              entityType = entityType,
-              entityId = entityId,
-              targetEntityType = targetEntityType,
-              targetEntityId = targetEntityId,
-              properties = DataMap(properties),
-              eventTime = eventTime,
-              prId = prId,
-              creationTime = creationTime
-          )
-          EventValidation.validate(newEvent)
-          newEvent
-        } catch {
-          case e: Exception => throw new MappingException(e.toString, e)
-        }
+        val newEvent = Event(
+            event = event,
+            entityType = entityType,
+            entityId = entityId,
+            targetEntityType = targetEntityType,
+            targetEntityId = targetEntityId,
+            properties = DataMap(properties),
+            eventTime = eventTime,
+            prId = prId,
+            creationTime = creationTime
+        )
+        EventValidation.validate(newEvent)
+        newEvent
+      } catch {
+        case e: Exception => throw new MappingException(e.toString, e)
       }
+    }
   }
 
   /** :: DeveloperApi ::
@@ -112,25 +112,27 @@ object EventJson4sSupport {
   @DeveloperApi
   def writeJson: PartialFunction[Any, JValue] = {
     case d: Event => {
-        JObject(
-            JField("eventId",
-                   d.eventId.map(eid => JString(eid)).getOrElse(JNothing)) :: JField(
-                "event", JString(d.event)) :: JField(
-                "entityType", JString(d.entityType)) :: JField(
-                "entityId", JString(d.entityId)) :: JField(
-                "targetEntityType",
-                d.targetEntityType.map(JString(_)).getOrElse(JNothing)) :: JField(
-                "targetEntityId",
-                d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
-                "properties", d.properties.toJObject) :: JField(
-                "eventTime",
-                JString(DataUtils.dateTimeToString(d.eventTime))) :: // disable tags from API for now
-            // JField("tags", JArray(d.tags.toList.map(JString(_)))) ::
-            // disable tags from API for now
-            JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
-            JField("creationTime",
-                   JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
-      }
+      JObject(JField(
+          "eventId",
+          d.eventId.map(eid => JString(eid)).getOrElse(JNothing)) :: JField(
+          "event",
+          JString(d.event)) :: JField("entityType", JString(d.entityType)) :: JField(
+          "entityId",
+          JString(d.entityId)) :: JField(
+          "targetEntityType",
+          d.targetEntityType.map(JString(_)).getOrElse(JNothing)) :: JField(
+          "targetEntityId",
+          d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
+          "properties",
+          d.properties.toJObject) :: JField(
+          "eventTime",
+          JString(DataUtils.dateTimeToString(d.eventTime))) :: // disable tags from API for now
+        // JField("tags", JArray(d.tags.toList.map(JString(_)))) ::
+        // disable tags from API for now
+        JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
+          JField("creationTime",
+                 JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
+    }
   }
 
   /** :: DeveloperApi ::
@@ -141,30 +143,30 @@ object EventJson4sSupport {
   @DeveloperApi
   def deserializeFromJValue: PartialFunction[JValue, Event] = {
     case jv: JValue => {
-        val event = (jv \ "event").extract[String]
-        val entityType = (jv \ "entityType").extract[String]
-        val entityId = (jv \ "entityId").extract[String]
-        val targetEntityType =
-          (jv \ "targetEntityType").extract[Option[String]]
-        val targetEntityId = (jv \ "targetEntityId").extract[Option[String]]
-        val properties = (jv \ "properties").extract[JObject]
-        val eventTime =
-          DataUtils.stringToDateTime((jv \ "eventTime").extract[String])
-        val tags = (jv \ "tags").extract[Seq[String]]
-        val prId = (jv \ "prId").extract[Option[String]]
-        val creationTime =
-          DataUtils.stringToDateTime((jv \ "creationTime").extract[String])
-        Event(event = event,
-              entityType = entityType,
-              entityId = entityId,
-              targetEntityType = targetEntityType,
-              targetEntityId = targetEntityId,
-              properties = DataMap(properties),
-              eventTime = eventTime,
-              tags = tags,
-              prId = prId,
-              creationTime = creationTime)
-      }
+      val event = (jv \ "event").extract[String]
+      val entityType = (jv \ "entityType").extract[String]
+      val entityId = (jv \ "entityId").extract[String]
+      val targetEntityType =
+        (jv \ "targetEntityType").extract[Option[String]]
+      val targetEntityId = (jv \ "targetEntityId").extract[Option[String]]
+      val properties = (jv \ "properties").extract[JObject]
+      val eventTime =
+        DataUtils.stringToDateTime((jv \ "eventTime").extract[String])
+      val tags = (jv \ "tags").extract[Seq[String]]
+      val prId = (jv \ "prId").extract[Option[String]]
+      val creationTime =
+        DataUtils.stringToDateTime((jv \ "creationTime").extract[String])
+      Event(event = event,
+            entityType = entityType,
+            entityId = entityId,
+            targetEntityType = targetEntityType,
+            targetEntityId = targetEntityId,
+            properties = DataMap(properties),
+            eventTime = eventTime,
+            tags = tags,
+            prId = prId,
+            creationTime = creationTime)
+    }
   }
 
   /** :: DeveloperApi ::
@@ -175,22 +177,27 @@ object EventJson4sSupport {
   @DeveloperApi
   def serializeToJValue: PartialFunction[Any, JValue] = {
     case d: Event => {
-        JObject(
-            JField("event", JString(d.event)) :: JField(
-                "entityType", JString(d.entityType)) :: JField(
-                "entityId", JString(d.entityId)) :: JField(
-                "targetEntityType",
-                d.targetEntityType.map(JString(_)).getOrElse(JNothing)) :: JField(
-                "targetEntityId",
-                d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
-                "properties", d.properties.toJObject) :: JField(
-                "eventTime",
-                JString(DataUtils.dateTimeToString(d.eventTime))) :: JField(
-                "tags", JArray(d.tags.toList.map(JString(_)))) :: JField(
-                "prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: JField(
-                "creationTime",
-                JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
-      }
+      JObject(
+          JField("event", JString(d.event)) :: JField("entityType",
+                                                      JString(d.entityType)) :: JField(
+              "entityId",
+              JString(d.entityId)) :: JField("targetEntityType",
+                                             d.targetEntityType
+                                               .map(JString(_))
+                                               .getOrElse(JNothing)) :: JField(
+              "targetEntityId",
+              d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
+              "properties",
+              d.properties.toJObject) :: JField(
+              "eventTime",
+              JString(DataUtils.dateTimeToString(d.eventTime))) :: JField(
+              "tags",
+              JArray(d.tags.toList.map(JString(_)))) :: JField(
+              "prId",
+              d.prId.map(JString(_)).getOrElse(JNothing)) :: JField(
+              "creationTime",
+              JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
+    }
   }
 
   /** :: DeveloperApi ::
@@ -199,8 +206,8 @@ object EventJson4sSupport {
     */
   @DeveloperApi
   class DBSerializer
-      extends CustomSerializer[Event](
-          format => (deserializeFromJValue, serializeToJValue))
+      extends CustomSerializer[Event](format =>
+        (deserializeFromJValue, serializeToJValue))
 
   /** :: DeveloperApi ::
     * Custom JSON4S serializer for [[Event]] intended to be used by the Event
@@ -218,18 +225,18 @@ object BatchEventsJson4sSupport {
   @DeveloperApi
   def readJson: PartialFunction[JValue, Seq[Try[Event]]] = {
     case JArray(events) => {
-        events.map { event =>
-          try {
-            Success(EventJson4sSupport.readJson(event))
-          } catch {
-            case e: Exception => Failure(e)
-          }
+      events.map { event =>
+        try {
+          Success(EventJson4sSupport.readJson(event))
+        } catch {
+          case e: Exception => Failure(e)
         }
       }
+    }
   }
 
   @DeveloperApi
   class APISerializer
-      extends CustomSerializer[Seq[Try[Event]]](
-          format => (readJson, Map.empty))
+      extends CustomSerializer[Seq[Try[Event]]](format =>
+        (readJson, Map.empty))
 }

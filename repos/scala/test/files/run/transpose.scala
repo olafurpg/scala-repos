@@ -1,6 +1,7 @@
 object Test {
   def wrap[T >: Null](body: => T) =
-    try body catch { case _: IllegalArgumentException => null }
+    try body
+    catch { case _: IllegalArgumentException => null }
 
   def main(args: Array[String]): Unit = {
     assert(wrap(Nil.transpose) == Nil)

@@ -1,5 +1,6 @@
 trait Rep[a] {
-  def rep[m[x]]: m[a] // typedTypeApply must use asSeenFrom to adapt the return type
+  def rep[m[x]]
+    : m[a] // typedTypeApply must use asSeenFrom to adapt the return type
   // since rep is called on x: Rep[t]
   // a must become t
 }

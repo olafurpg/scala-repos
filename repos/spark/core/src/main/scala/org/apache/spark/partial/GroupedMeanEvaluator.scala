@@ -28,10 +28,10 @@ import org.apache.spark.util.StatCounter
 /**
   * An ApproximateEvaluator for means by key. Returns a map of key to confidence interval.
   */
-private[spark] class GroupedMeanEvaluator[T](
-    totalOutputs: Int, confidence: Double)
-    extends ApproximateEvaluator[
-        JHashMap[T, StatCounter], Map[T, BoundedDouble]] {
+private[spark] class GroupedMeanEvaluator[T](totalOutputs: Int,
+                                             confidence: Double)
+    extends ApproximateEvaluator[JHashMap[T, StatCounter],
+                                 Map[T, BoundedDouble]] {
 
   var outputsMerged = 0
   var sums = new JHashMap[T, StatCounter] // Sum of counts for each key
@@ -74,8 +74,8 @@ private[spark] class GroupedMeanEvaluator[T](
         val confFactor = studentTCacher.get(counter.count)
         val low = mean - confFactor * stdev
         val high = mean + confFactor * stdev
-        result.put(
-            entry.getKey, new BoundedDouble(mean, confidence, low, high))
+        result
+          .put(entry.getKey, new BoundedDouble(mean, confidence, low, high))
       }
       result.asScala
     }

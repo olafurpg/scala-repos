@@ -11,7 +11,11 @@ import play.api.libs.streams.Accumulator
 import play.api.mvc._
 import play.api.routing.Router
 import play.api.{Configuration, Environment, GlobalSettings, PlayConfig}
-import play.core.j.{JavaHttpRequestHandlerDelegate, JavaHandler, JavaHandlerComponents}
+import play.core.j.{
+  JavaHttpRequestHandlerDelegate,
+  JavaHandler,
+  JavaHandlerComponents
+}
 import play.utils.Reflect
 
 /**
@@ -53,10 +57,10 @@ object HttpRequestHandler {
                                  play.core.j.JavaHttpRequestHandlerAdapter,
                                  play.http.DefaultHttpRequestHandler,
                                  JavaCompatibleHttpRequestHandler](
-        environment,
-        PlayConfig(configuration),
-        "play.http.requestHandler",
-        "RequestHandler")
+          environment,
+          PlayConfig(configuration),
+          "play.http.requestHandler",
+          "RequestHandler")
 
     val javaComponentsBindings = Seq(
         BindingKey(classOf[play.core.j.JavaHandlerComponents])
@@ -135,14 +139,14 @@ class DefaultHttpRequestHandler(router: Router,
     //   - Path starts with context followed by a '/' character.
     context.isEmpty ||
     (path.startsWith(context) &&
-        (path.length == context.length || path.charAt(context.length) == '/'))
+    (path.length == context.length || path.charAt(context.length) == '/'))
   }
 
   def handlerForRequest(request: RequestHeader) = {
 
     def notFoundHandler =
-      Action.async(BodyParsers.parse.empty)(
-          req => errorHandler.onClientError(req, NOT_FOUND))
+      Action.async(BodyParsers.parse.empty)(req =>
+        errorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
       routeRequest(request) map {
@@ -241,8 +245,10 @@ class JavaCompatibleHttpRequestHandler @Inject()(
     configuration: HttpConfiguration,
     filters: HttpFilters,
     components: JavaHandlerComponents)
-    extends DefaultHttpRequestHandler(
-        router, errorHandler, configuration, filters.filters: _*) {
+    extends DefaultHttpRequestHandler(router,
+                                      errorHandler,
+                                      configuration,
+                                      filters.filters: _*) {
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
     super.routeRequest(request) match {

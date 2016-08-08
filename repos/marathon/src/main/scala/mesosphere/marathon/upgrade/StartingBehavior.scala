@@ -5,14 +5,17 @@ import akka.event.EventStream
 import mesosphere.marathon.SchedulerActions
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{HealthStatusChanged, MarathonHealthCheckEvent, MesosStatusUpdateEvent}
+import mesosphere.marathon.event.{
+  HealthStatusChanged,
+  MarathonHealthCheckEvent,
+  MesosStatusUpdateEvent
+}
 import mesosphere.marathon.state.AppDefinition
 import org.apache.mesos.SchedulerDriver
 
 import scala.concurrent.duration._
 
-trait StartingBehavior {
-  this: Actor with ActorLogging =>
+trait StartingBehavior { this: Actor with ActorLogging =>
   import context.dispatcher
   import mesosphere.marathon.upgrade.StartingBehavior._
 
@@ -64,14 +67,22 @@ trait StartingBehavior {
   }
 
   final def checkForRunning: Receive = {
-    case MesosStatusUpdateEvent(
-        _, taskId, "TASK_RUNNING", _, app.`id`, _, _, _, VersionString, _, _)
-        if !startedRunningTasks(taskId.idString) =>
+    case MesosStatusUpdateEvent(_,
+                                taskId,
+                                "TASK_RUNNING",
+                                _,
+                                app.`id`,
+                                _,
+                                _,
+                                _,
+                                VersionString,
+                                _,
+                                _) if !startedRunningTasks(taskId.idString) =>
       // scalastyle:off line.size.limit
       startedRunningTasks += taskId.idString
       log.info(
           s"New task $taskId now running during app ${app.id.toString} scaling, " +
-          s"${nrToStart - startedRunningTasks.size} more to go")
+            s"${nrToStart - startedRunningTasks.size} more to go")
       checkFinished()
   }
 

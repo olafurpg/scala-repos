@@ -69,39 +69,37 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
       }
 
     val counterLines = (counterValues map {
-          case (k, v) => (variableName(k), v.toString)
-        }).toSeq
+      case (k, v) => (variableName(k), v.toString)
+    }).toSeq
     val statLines = (statValues map {
-          case (k, xs) =>
-            val n = xs.length
-            def idx(ptile: Double) =
-              math
-                .floor(ptile * n)
-                .toInt
-              (variableName(k),
-               "n=%d min=%.1f med=%.1f p90=%.1f p95=%.1f p99=%.1f p999=%.1f p9999=%.1f max=%.1f"
-                 .format(n,
-                         xs(0),
-                         xs(n / 2),
-                         xs(idx(.9D)),
-                         xs(idx(.95D)),
-                         xs(idx(.99D)),
-                         xs(idx(.999D)),
-                         xs(idx(.9999D)),
-                         xs(n - 1)))
-        }).toSeq
+      case (k, xs) =>
+        val n = xs.length
+        def idx(ptile: Double) =
+          math.floor(ptile * n).toInt
+        (variableName(k),
+         "n=%d min=%.1f med=%.1f p90=%.1f p95=%.1f p99=%.1f p999=%.1f p9999=%.1f max=%.1f"
+           .format(n,
+                   xs(0),
+                   xs(n / 2),
+                   xs(idx(.9D)),
+                   xs(idx(.95D)),
+                   xs(idx(.99D)),
+                   xs(idx(.999D)),
+                   xs(idx(.9999D)),
+                   xs(n - 1)))
+    }).toSeq
 
     lazy val tailValues = (statValues map {
-          case (k, xs) =>
-            val n = xs.length
-            def slice(ptile: Double) = {
-              val end = math.floor(ptile * n).toInt
-              val start = math.ceil(end - ((1.0 - ptile) * n)).toInt
-              for (i <- start to end) yield xs(i)
-            }
-            (variableName(k),
-             "p999=%s, p9999=%s".format(slice(.999D), slice(.9999D)))
-        }).toSeq
+      case (k, xs) =>
+        val n = xs.length
+        def slice(ptile: Double) = {
+          val end = math.floor(ptile * n).toInt
+          val start = math.ceil(end - ((1.0 - ptile) * n)).toInt
+          for (i <- start to end) yield xs(i)
+        }
+        (variableName(k),
+         "p999=%s, p9999=%s".format(slice(.999D), slice(.9999D)))
+    }).toSeq
 
     val sortedCounters = counterLines.sortBy { case (k, _) => k }
     val sortedGauges = gaugeValues.sortBy { case (k, _) => k }
@@ -117,8 +115,10 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
     lazy val fmtTails = sortedTails.map(fmt)
 
     "# counters\n" + fmtCounters.mkString("\n") + "\n# gauges\n" +
-    fmtGauges.sorted.mkString("\n") + "\n# stats\n" + fmtStats.mkString("\n") +
-    (if (includeTails) "\n# stats-tails\n" + (fmtTails mkString "\n") else "")
+      fmtGauges.sorted.mkString("\n") + "\n# stats\n" + fmtStats
+      .mkString("\n") +
+      (if (includeTails) "\n# stats-tails\n" + (fmtTails mkString "\n")
+       else "")
   }
 
   def print() = println(summary(false))

@@ -8,7 +8,10 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -22,7 +25,8 @@ object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       ## Keep it tight, otherwise reestablishing a connection takes too much time
@@ -48,7 +52,8 @@ class RemoteNodeShutdownAndComesBackMultiJvmNode2
 
 abstract class RemoteNodeShutdownAndComesBackSpec
     extends MultiNodeSpec(RemoteNodeShutdownAndComesBackSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeShutdownAndComesBackSpec._
 
@@ -144,7 +149,8 @@ abstract class RemoteNodeShutdownAndComesBackSpec
         Await.ready(system.whenTerminated, 30.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}

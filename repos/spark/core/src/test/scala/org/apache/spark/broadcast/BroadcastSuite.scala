@@ -37,10 +37,8 @@ class DummyBroadcastClass(rdd: RDD[Int]) extends Serializable {
     rdd.map { x =>
       val bm = SparkEnv.get.blockManager
       // Check if broadcast block was fetched
-      val isFound = bm
-        .getLocalValues(BroadcastBlockId(bid))
-        .isDefined
-        (x, isFound)
+      val isFound = bm.getLocalValues(BroadcastBlockId(bid)).isDefined
+      (x, isFound)
     }.collect().toSet
   }
 }
@@ -68,8 +66,9 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
     val conf = new SparkConf
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     conf.set("spark.broadcast.compress", "true")
-    sc = new SparkContext(
-        "local-cluster[%d, 1, 1024]".format(numSlaves), "test", conf)
+    sc = new SparkContext("local-cluster[%d, 1, 1024]".format(numSlaves),
+                          "test",
+                          conf)
     val list = List[Int](1, 2, 3, 4)
     val broadcast = sc.broadcast(list)
     val results =
@@ -100,8 +99,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
 
   test("Test Lazy Broadcast variables with TorrentBroadcast") {
     val numSlaves = 2
-    sc = new SparkContext(
-        "local-cluster[%d, 1, 1024]".format(numSlaves), "test")
+    sc =
+      new SparkContext("local-cluster[%d, 1, 1024]".format(numSlaves), "test")
     val rdd = sc.parallelize(1 to numSlaves)
     val results = new DummyBroadcastClass(rdd).doSomething()
 
@@ -109,8 +108,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test("Unpersisting TorrentBroadcast on executors only in local mode") {
-    testUnpersistTorrentBroadcast(
-        distributed = false, removeFromDriver = false)
+    testUnpersistTorrentBroadcast(distributed = false,
+                                  removeFromDriver = false)
   }
 
   test("Unpersisting TorrentBroadcast on executors and driver in local mode") {
@@ -142,8 +141,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test("Forbid broadcasting RDD directly") {
-    sc = new SparkContext(
-        new SparkConf().setAppName("test").setMaster("local"))
+    sc =
+      new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
     val rdd = sc.parallelize(1 to 4)
     intercept[IllegalArgumentException] { sc.broadcast(rdd) }
     sc.stop()
@@ -156,8 +155,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
     * In between each step, this test verifies that the broadcast blocks are present only on the
     * expected nodes.
     */
-  private def testUnpersistTorrentBroadcast(
-      distributed: Boolean, removeFromDriver: Boolean) {
+  private def testUnpersistTorrentBroadcast(distributed: Boolean,
+                                            removeFromDriver: Boolean) {
     val numSlaves = if (distributed) 2 else 0
 
     // Verify that blocks are persisted only on the driver
@@ -222,7 +221,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
 
     sc = if (distributed) {
       val _sc = new SparkContext(
-          "local-cluster[%d, 1, 1024]".format(numSlaves), "test")
+          "local-cluster[%d, 1, 1024]".format(numSlaves),
+          "test")
       // Wait until all salves are up
       try {
         _sc.jobProgressListener.waitUntilExecutorsUp(numSlaves, 60000)

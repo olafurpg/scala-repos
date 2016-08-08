@@ -8,7 +8,7 @@ object GenerateId {
   def apply(): String = generateCsrfToken()
 
   private[this] def hexEncode(bytes: Array[Byte]): String = {
-    ( (new StringBuilder(bytes.length * 2) /: bytes) { (sb, b) =>
+    ((new StringBuilder(bytes.length * 2) /: bytes) { (sb, b) =>
       if ((b.toInt & 0xff) < 0x10) sb.append("0")
       sb.append(Integer.toString(b.toInt & 0xff, 16))
     }).toString
@@ -38,8 +38,7 @@ object CsrfTokenSupport {
   * `handleForgery()` hook is invoked.  Otherwise, a token for the next
   * request is prepared with `prepareCsrfToken`.
   */
-trait CsrfTokenSupport {
-  this: ScalatraBase =>
+trait CsrfTokenSupport { this: ScalatraBase =>
 
   before(isForged) { handleForgery() }
   before() { prepareCsrfToken() }
@@ -54,10 +53,10 @@ trait CsrfTokenSupport {
     */
   protected def isForged: Boolean =
     !request.requestMethod.isSafe &&
-    session.get(csrfKey) != params.get(csrfKey) &&
-    !CsrfTokenSupport.HeaderNames
-      .map(request.headers.get)
-      .contains(session.get(csrfKey))
+      session.get(csrfKey) != params.get(csrfKey) &&
+      !CsrfTokenSupport.HeaderNames
+        .map(request.headers.get)
+        .contains(session.get(csrfKey))
 
   /**
     * Take an action when a forgery is detected. The default action
@@ -92,8 +91,7 @@ trait CsrfTokenSupport {
     request.getSession.getAttribute(csrfKey).asInstanceOf[String]
 }
 
-trait XsrfTokenSupport {
-  this: ScalatraBase =>
+trait XsrfTokenSupport { this: ScalatraBase =>
 
   import org.scalatra.XsrfTokenSupport._
 
@@ -127,8 +125,8 @@ trait XsrfTokenSupport {
     */
   protected def isForged: Boolean =
     !request.requestMethod.isSafe &&
-    session.get(xsrfKey) != params.get(xsrfKey) &&
-    !HeaderNames.map(request.headers.get).contains(session.get(xsrfKey))
+      session.get(xsrfKey) != params.get(xsrfKey) &&
+      !HeaderNames.map(request.headers.get).contains(session.get(xsrfKey))
 
   /**
     * Take an action when a forgery is detected. The default action

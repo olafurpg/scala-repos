@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
@@ -46,12 +46,12 @@ class CaseFilter extends ElementFilter {
           if (node.isInstanceOf[PsiWhiteSpace]) node = node.getPrevSibling
           node match {
             case x: PsiErrorElement => {
-                val s = ErrMsg("wrong.top.statment.declaration")
-                x.getErrorDescription match {
-                  case `s` => return true
-                  case _ => return false
-                }
+              val s = ErrMsg("wrong.top.statment.declaration")
+              x.getErrorDescription match {
+                case `s` => return true
+                case _ => return false
               }
+            }
             case _ => return true
           }
         case _ =>
@@ -84,13 +84,13 @@ class CaseFilter extends ElementFilter {
       if (leaf.getPrevSibling != null &&
           leaf.getPrevSibling.getPrevSibling != null &&
           ((leaf.getPrevSibling.getPrevSibling.getNode.getElementType == ScalaElementTypes.MATCH_STMT &&
-                  leaf.getPrevSibling.getPrevSibling.getLastChild
-                    .isInstanceOf[PsiErrorElement]) ||
-              (leaf.getPrevSibling.getPrevSibling.getNode.getElementType == ScalaElementTypes.TRY_STMT &&
-                  leaf.getPrevSibling.getPrevSibling.getLastChild
-                    .isInstanceOf[ScCatchBlock] &&
-                  leaf.getPrevSibling.getPrevSibling.getLastChild.getLastChild
-                    .isInstanceOf[PsiErrorElement]))) return true
+          leaf.getPrevSibling.getPrevSibling.getLastChild
+            .isInstanceOf[PsiErrorElement]) ||
+          (leaf.getPrevSibling.getPrevSibling.getNode.getElementType == ScalaElementTypes.TRY_STMT &&
+          leaf.getPrevSibling.getPrevSibling.getLastChild
+            .isInstanceOf[ScCatchBlock] &&
+          leaf.getPrevSibling.getPrevSibling.getLastChild.getLastChild
+            .isInstanceOf[PsiErrorElement]))) return true
       if (parent.isInstanceOf[ScTemplateBody]) {
         if (leaf.getPrevSibling != null &&
             leaf.getPrevSibling.getPrevSibling != null &&

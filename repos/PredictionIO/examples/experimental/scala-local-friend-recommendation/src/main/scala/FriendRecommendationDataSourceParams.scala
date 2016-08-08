@@ -7,5 +7,4 @@ class FriendRecommendationDataSourceParams(
     val userKeywordFilePath: String,
     val userActionFilePath: String,
     val trainingRecordFilePath: String
-)
-    extends Params
+) extends Params

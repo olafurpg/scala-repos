@@ -7,7 +7,7 @@ package types
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.02.2008
   */
@@ -25,7 +25,7 @@ object AnnotType {
     if (SimpleType.parse(builder, isPattern, multipleSQBrackets)) {
       val annotationsMarker = builder.mark
       while (!builder.newlineBeforeCurrentToken &&
-      Annotation.parse(builder, countLinesAfterAnnotation = false)) {
+             Annotation.parse(builder, countLinesAfterAnnotation = false)) {
         isAnnotation = true
       }
 

@@ -17,7 +17,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.ScalaChangeInfo
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureProcessor, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureProcessor,
+  ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**
@@ -87,7 +90,7 @@ abstract class ChangeSignatureTestBase
       VfsUtil.saveText(vFile, text)
       val psiFile = LightPlatformTestCase.getPsiManager.findFile(vFile)
       assertNotNull("Can't create PsiFile for '" + fileName +
-                    "'. Unknown file type most probably.",
+                      "'. Unknown file type most probably.",
                     vFile)
       assertTrue(psiFile.isPhysical)
       vFile.setCharset(CharsetToolkit.UTF8_CHARSET)
@@ -101,8 +104,8 @@ abstract class ChangeSignatureTestBase
     FileUtilRt.loadFile(file, CharsetToolkit.UTF8, true)
   }
 
-  protected def getPsiTypeFromText(
-      typeText: String, context: PsiElement): PsiType = {
+  protected def getPsiTypeFromText(typeText: String,
+                                   context: PsiElement): PsiType = {
     val factory: JavaCodeFragmentFactory =
       JavaCodeFragmentFactory.getInstance(getProjectAdapter)
     factory.createTypeCodeFragment(typeText, context, false).getType

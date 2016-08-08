@@ -39,17 +39,26 @@ private[akka] class RoutedActorRef(_system: ActorSystemImpl,
   if (_routerProps.routerConfig != NoRouter &&
       _routerDispatcher.isInstanceOf[BalancingDispatcher]) {
     throw new ConfigurationException("Configuration for " + this +
-        " is invalid - you can not use a 'BalancingDispatcher' as a Router's dispatcher, you can however use it for the routees.")
+      " is invalid - you can not use a 'BalancingDispatcher' as a Router's dispatcher, you can however use it for the routees.")
   } else _routerProps.routerConfig.verifyConfig(_path)
 
   override def newCell(old: UnstartedCell): Cell = {
     val cell = props.routerConfig match {
       case pool: Pool if pool.resizer.isDefined ⇒
-        new ResizablePoolCell(
-            system, this, props, dispatcher, _routeeProps, supervisor, pool)
+        new ResizablePoolCell(system,
+                              this,
+                              props,
+                              dispatcher,
+                              _routeeProps,
+                              supervisor,
+                              pool)
       case _ ⇒
-        new RoutedActorCell(
-            system, this, props, dispatcher, _routeeProps, supervisor)
+        new RoutedActorCell(system,
+                            this,
+                            props,
+                            dispatcher,
+                            _routeeProps,
+                            supervisor)
     }
     cell.init(sendSupervise = false, mailboxType)
   }

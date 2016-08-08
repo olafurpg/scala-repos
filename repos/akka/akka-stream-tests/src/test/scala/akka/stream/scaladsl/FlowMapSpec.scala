@@ -11,8 +11,8 @@ import akka.testkit.AkkaSpec
 
 class FlowMapSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -24,7 +24,7 @@ class FlowMapSpec extends AkkaSpec with ScriptedTest {
           val x = random.nextInt(); Seq(x) -> Seq(x.toString)
         }: _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.map(_.toString)))
+        (_ ⇒ runScript(script, settings)(_.map(_.toString)))
     }
 
     "not blow up with high request counts" in {

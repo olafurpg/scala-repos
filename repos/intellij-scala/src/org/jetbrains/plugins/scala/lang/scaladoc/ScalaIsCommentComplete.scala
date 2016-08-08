@@ -1,7 +1,16 @@
 package org.jetbrains.plugins.scala.lang.scaladoc
 
-import com.intellij.codeInsight.editorActions.{CommentCompleteHandler, JavaLikeQuoteHandler, QuoteHandler, TypedHandler}
-import com.intellij.lang.{CodeDocumentationAwareCommenter, Language, LanguageParserDefinitions}
+import com.intellij.codeInsight.editorActions.{
+  CommentCompleteHandler,
+  JavaLikeQuoteHandler,
+  QuoteHandler,
+  TypedHandler
+}
+import com.intellij.lang.{
+  CodeDocumentationAwareCommenter,
+  Language,
+  LanguageParserDefinitions
+}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.tree.IElementType
@@ -74,12 +83,12 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
           return false
         } else {
           return lexer.getTokenEnd -
-          lexer.getTokenStart == 2 //difference from EnterHandler
+            lexer.getTokenStart == 2 //difference from EnterHandler
         }
       }
       if (!continue &&
           (tokenType == commenter.getDocumentationCommentTokenType ||
-              tokenType == commenter.getBlockCommentTokenType)) {
+          tokenType == commenter.getBlockCommentTokenType)) {
         return false
       } else if (!continue) {
         lexer.advance()

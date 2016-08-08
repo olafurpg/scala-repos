@@ -36,8 +36,9 @@ class NoSuchTableException(db: String, table: String)
   override def getMessage: String = s"Table $table not found in database $db"
 }
 
-class NoSuchPartitionException(
-    db: String, table: String, spec: TablePartitionSpec)
+class NoSuchPartitionException(db: String,
+                               table: String,
+                               spec: TablePartitionSpec)
     extends NoSuchItemException {
 
   override def getMessage: String = {

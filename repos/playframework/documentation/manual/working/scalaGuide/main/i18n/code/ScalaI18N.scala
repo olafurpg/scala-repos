@@ -8,7 +8,12 @@ package scalaguide.i18n.scalai18n {
 
   import play.api._
   import play.api.mvc._
-  import play.api.i18n.{DefaultLangs, DefaultMessagesApi, Messages, MessagesApi}
+  import play.api.i18n.{
+    DefaultLangs,
+    DefaultMessagesApi,
+    Messages,
+    MessagesApi
+  }
 
   @RunWith(classOf[JUnitRunner])
   class ScalaI18nSpec extends PlaySpecification with Controller {
@@ -17,7 +22,8 @@ package scalaguide.i18n.scalai18n {
     import javax.inject.Inject
     import play.api.i18n.I18nSupport
     class MyController @Inject()(val messagesApi: MessagesApi)
-        extends Controller with I18nSupport {
+        extends Controller
+        with I18nSupport {
       // ...
 //#i18n-support
 
@@ -39,8 +45,9 @@ package scalaguide.i18n.scalai18n {
     val conf =
       Configuration.reference ++ Configuration.from(
           Map("play.i18n.path" -> "scalaguide/i18n"))
-    val messagesApi = new DefaultMessagesApi(
-        Environment.simple(), conf, new DefaultLangs(conf))
+    val messagesApi = new DefaultMessagesApi(Environment.simple(),
+                                             conf,
+                                             new DefaultLangs(conf))
 
     new MyController(messagesApi)
   }

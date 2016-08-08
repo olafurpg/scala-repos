@@ -22,8 +22,9 @@ object UserInfoSpec extends Specification {
     "successfully be created using the value of the openid.identity field" in {
       // For testing the claimed_id is removed to check that id contains the identity value.
       val userInfo =
-        UserInfo(createDefaultResponse(claimedId, identity, defaultSigned) -
-            "openid.claimed_id")
+        UserInfo(
+            createDefaultResponse(claimedId, identity, defaultSigned) -
+              "openid.claimed_id")
       userInfo.id must be equalTo identity
       userInfo.attributes must beEmpty
     }
@@ -46,7 +47,7 @@ object UserInfoSpec extends Specification {
             "openid.ext1.type.email" -> "http://schema.openid.net/contact/email",
             "openid.ext1.value.email" -> "user@example.com", // the email attribute *is* in the list of signed fields
             "openid.signed" ->
-            (defaultSigned +
+              (defaultSigned +
                 "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email"))
       val userInfo = UserInfo(requestParams)
       userInfo.attributes.get("email") must beSome("user@example.com")
@@ -60,7 +61,7 @@ object UserInfoSpec extends Specification {
             "openid.ext1.value.fav_movie.1" -> "Movie1",
             "openid.ext1.value.fav_movie.2" -> "Movie2",
             "openid.signed" ->
-            (defaultSigned +
+              (defaultSigned +
                 "ns.ext1,ext1.mode,ext1.type.fav_movie,ext1.value.fav_movie.1,ext1.value.fav_movie.2,ext1.count.fav_movie"))
       val userInfo = UserInfo(requestParams)
       userInfo.attributes.size must be equalTo 2
@@ -75,7 +76,7 @@ object UserInfoSpec extends Specification {
           "openid.ext1.type.firstName" -> "http://axschema.org/namePerson/first",
           "openid.ext1.value.firstName" -> Nil,
           "openid.signed" ->
-          (defaultSigned +
+            (defaultSigned +
               "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email,ext1.type.firstName,ext1.value.firstName"))
     val userInfo = UserInfo(requestParams)
     userInfo.attributes.get("firstName") must beNone

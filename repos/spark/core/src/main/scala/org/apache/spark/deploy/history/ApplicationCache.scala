@@ -18,14 +18,28 @@
 package org.apache.spark.deploy.history
 
 import java.util.NoSuchElementException
-import javax.servlet.{DispatcherType, Filter, FilterChain, FilterConfig, ServletException, ServletRequest, ServletResponse}
+import javax.servlet.{
+  DispatcherType,
+  Filter,
+  FilterChain,
+  FilterConfig,
+  ServletException,
+  ServletRequest,
+  ServletResponse
+}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 import com.codahale.metrics.{Counter, MetricRegistry, Timer}
-import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache, RemovalListener, RemovalNotification}
+import com.google.common.cache.{
+  CacheBuilder,
+  CacheLoader,
+  LoadingCache,
+  RemovalListener,
+  RemovalNotification
+}
 import org.eclipse.jetty.servlet.FilterHolder
 
 import org.apache.spark.internal.Logging
@@ -176,7 +190,8 @@ private[history] class ApplicationCache(
     *         indicate that the entry has changed
     */
   private def lookupAndUpdate(
-      appId: String, attemptId: Option[String]): (CacheEntry, Boolean) = {
+      appId: String,
+      attemptId: Option[String]): (CacheEntry, Boolean) = {
     metrics.lookupCount.inc()
     val cacheKey = CacheKey(appId, attemptId)
     var entry = appCache.getIfPresent(cacheKey)
@@ -218,8 +233,10 @@ private[history] class ApplicationCache(
     */
   def lookupCacheEntry(appId: String, attemptId: Option[String]): CacheEntry = {
     val entry = lookupAndUpdate(appId, attemptId)._1
-    new CacheEntry(
-        entry.ui, entry.completed, entry.updateProbe, entry.probeTime)
+    new CacheEntry(entry.ui,
+                   entry.completed,
+                   entry.updateProbe,
+                   entry.probeTime)
   }
 
   /**
@@ -278,8 +295,8 @@ private[history] class ApplicationCache(
     * @throws NoSuchElementException if there is no matching element
     */
   @throws[NoSuchElementException]
-  def loadApplicationEntry(
-      appId: String, attemptId: Option[String]): CacheEntry = {
+  def loadApplicationEntry(appId: String,
+                           attemptId: Option[String]): CacheEntry = {
 
     logDebug(s"Loading application Entry $appId/$attemptId")
     metrics.loadCount.inc()
@@ -293,8 +310,8 @@ private[history] class ApplicationCache(
             operations.attachSparkUI(appId, attemptId, ui, completed)
           } else {
             // incomplete UIs have the cache-check filter put in front of them.
-            ApplicationCacheCheckFilterRelay.registerFilter(
-                ui, appId, attemptId)
+            ApplicationCacheCheckFilterRelay
+              .registerFilter(ui, appId, attemptId)
             operations.attachSparkUI(appId, attemptId, ui, completed)
           }
           // build the cache entry
@@ -308,9 +325,9 @@ private[history] class ApplicationCache(
           logInfo(s"Failed to load application attempt $appId/$attemptId")
           throw new NoSuchElementException(
               s"no application with application Id '$appId'" + attemptId.map {
-            id =>
-              s" attemptId '$id'"
-          }.getOrElse(" and no attempt Id"))
+                id =>
+                  s" attemptId '$id'"
+              }.getOrElse(" and no attempt Id"))
       }
     }
   }
@@ -338,8 +355,8 @@ private[history] class ApplicationCache(
     * @param attemptId optional attempt ID
     * @return a unified string
     */
-  def mergeAppAndAttemptToKey(
-      appId: String, attemptId: Option[String]): String = {
+  def mergeAppAndAttemptToKey(appId: String,
+                              attemptId: Option[String]): String = {
     appId + attemptId.map { id =>
       s"/$id"
     }.getOrElse("")
@@ -352,7 +369,7 @@ private[history] class ApplicationCache(
   override def toString: String = {
     val sb = new StringBuilder(
         s"ApplicationCache(" +
-        s" retainedApplications= $retainedApplications)")
+          s" retainedApplications= $retainedApplications)")
     sb.append(s"; time= ${clock.getTimeMillis()}")
     sb.append(s"; entry count= ${appCache.size()}\n")
     sb.append("----\n")
@@ -393,8 +410,8 @@ private[history] final class CacheEntry(val ui: SparkUI,
   * @param appId application ID
   * @param attemptId attempt ID
   */
-private[history] final case class CacheKey(
-    appId: String, attemptId: Option[String]) {
+private[history] final case class CacheKey(appId: String,
+                                           attemptId: Option[String]) {
 
   override def toString: String = {
     appId + attemptId.map { id =>
@@ -429,8 +446,8 @@ private[history] class CacheMetrics(prefix: String) extends Source {
 
   /** all metrics, including timers */
   private val allMetrics =
-    counters ++ Seq(
-        ("load.timer", loadTimer), ("update.probe.timer", updateProbeTimer))
+    counters ++ Seq(("load.timer", loadTimer),
+                    ("update.probe.timer", updateProbeTimer))
 
   /**
     * Name of metric source
@@ -491,8 +508,9 @@ private[history] trait ApplicationCacheOperations {
     *
     * @param ui Spark UI
     */
-  def detachSparkUI(
-      appId: String, attemptId: Option[String], ui: SparkUI): Unit
+  def detachSparkUI(appId: String,
+                    attemptId: Option[String],
+                    ui: SparkUI): Unit
 }
 
 /**
@@ -518,7 +536,8 @@ private[history] trait ApplicationCacheOperations {
   * the configuration data passed to the servlet is just a string:string map.
   */
 private[history] class ApplicationCacheCheckFilter()
-    extends Filter with Logging {
+    extends Filter
+    with Logging {
 
   import ApplicationCacheCheckFilterRelay._
   var appId: String = _
@@ -623,8 +642,8 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
     * @param cache new cache
     */
   def setApplicationCache(cache: ApplicationCache): Unit = {
-    applicationCache.foreach(
-        c => logWarning(s"Overwriting application cache $c"))
+    applicationCache.foreach(c =>
+      logWarning(s"Overwriting application cache $c"))
     applicationCache = Some(cache)
   }
 
@@ -654,8 +673,8 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
         } catch {
           case ex: Exception =>
             // something went wrong. Keep going with the existing UI
-            logWarning(
-                s"When checking for $appId/$attemptId from $requestURI", ex)
+            logWarning(s"When checking for $appId/$attemptId from $requestURI",
+                       ex)
             false
         }
 
@@ -671,8 +690,9 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
     * @param appId application ID
     * @param attemptId attempt ID
     */
-  def registerFilter(
-      ui: SparkUI, appId: String, attemptId: Option[String]): Unit = {
+  def registerFilter(ui: SparkUI,
+                     appId: String,
+                     attemptId: Option[String]): Unit = {
     require(ui != null)
     val enumDispatcher =
       java.util.EnumSet.of(DispatcherType.ASYNC, DispatcherType.REQUEST)

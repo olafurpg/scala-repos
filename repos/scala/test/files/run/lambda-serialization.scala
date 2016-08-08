@@ -1,4 +1,9 @@
-import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ObjectInputStream,
+  ObjectOutputStream,
+  ByteArrayOutputStream
+}
 
 object Test {
   def main(args: Array[String]): Unit = {
@@ -21,7 +26,8 @@ object Test {
 
     val specializedLambda = (p: Int) => List(p, c).length
     assert(serializeDeserialize(specializedLambda).apply(42) == 2)
-    assert(serializeDeserialize(serializeDeserialize(specializedLambda))
+    assert(
+        serializeDeserialize(serializeDeserialize(specializedLambda))
           .apply(42) == 2)
   }
 

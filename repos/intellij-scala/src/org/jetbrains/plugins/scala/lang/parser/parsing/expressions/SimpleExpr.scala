@@ -79,9 +79,9 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
             } else {
               var isTuple = false
               while (builder.getTokenType == ScalaTokenTypes.tCOMMA &&
-              !lookAhead(builder,
-                         ScalaTokenTypes.tCOMMA,
-                         ScalaTokenTypes.tRPARENTHESIS)) {
+                     !lookAhead(builder,
+                                ScalaTokenTypes.tCOMMA,
+                                ScalaTokenTypes.tRPARENTHESIS)) {
                 isTuple = true
                 builder.advanceLexer()
                 if (!Expr.parse(builder)) {
@@ -99,7 +99,8 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
               }
               builder.restoreNewlinesState
               newMarker = simpleMarker.precede
-              simpleMarker.done(if (isTuple) ScalaElementTypes.TUPLE
+              simpleMarker.done(
+                  if (isTuple) ScalaElementTypes.TUPLE
                   else ScalaElementTypes.PARENT_EXPR)
             }
         }
@@ -143,7 +144,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
           }
         case ScalaTokenTypes.tLPARENTHESIS | ScalaTokenTypes.tLBRACE
             if builder.getTokenType != ScalaTokenTypes.tLPARENTHESIS ||
-            !builder.newlineBeforeCurrentToken =>
+              !builder.newlineBeforeCurrentToken =>
           if (state && ArgumentExprs.parse(builder)) {
             val tMarker = marker.precede
             marker.done(ScalaElementTypes.METHOD_CALL)

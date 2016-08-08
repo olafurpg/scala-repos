@@ -33,13 +33,14 @@ object Test {
     val b = new Bar { def bar = println("bar") }
     b.bar
 
-    val structural = b.asInstanceOf[ { def bar: Unit }]
+    val structural = b.asInstanceOf[{ def bar: Unit }]
     structural.bar
   }
 
   def main(args: Array[String]) {
     // figuring this will otherwise break on windows
-    try t1() catch { case _: java.io.IOException => () }
+    try t1()
+    catch { case _: java.io.IOException => () }
 
     t2()
   }

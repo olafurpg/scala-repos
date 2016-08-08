@@ -34,11 +34,11 @@ object Test extends ScaladocModelTest {
       val E = base._trait("E")
 
       base.contentDiagram.get.toString + "\n" +
-      A.inheritanceDiagram.get.toString + "\n" +
-      B.inheritanceDiagram.get.toString + "\n" +
-      C.inheritanceDiagram.get.toString + "\n" +
-      D.inheritanceDiagram.get.toString + "\n" +
-      E.inheritanceDiagram.get.toString
+        A.inheritanceDiagram.get.toString + "\n" +
+        B.inheritanceDiagram.get.toString + "\n" +
+        C.inheritanceDiagram.get.toString + "\n" +
+        D.inheritanceDiagram.get.toString + "\n" +
+        E.inheritanceDiagram.get.toString
     }
 
     // 1. check that several runs produce the same output
@@ -46,20 +46,20 @@ object Test extends ScaladocModelTest {
     val run1 = diagramString(
         model
           .getOrElse({
-        sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+            sys.error("Scaladoc Model Test ERROR: No universe generated!")
+          })
           .rootPackage)
     val run2 = diagramString(
         model
           .getOrElse({
-        sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+            sys.error("Scaladoc Model Test ERROR: No universe generated!")
+          })
           .rootPackage)
     val run3 = diagramString(
         model
           .getOrElse({
-        sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+            sys.error("Scaladoc Model Test ERROR: No universe generated!")
+          })
           .rootPackage)
 
     // any variance in the order of the diagram elements should crash the following tests:
@@ -69,11 +69,13 @@ object Test extends ScaladocModelTest {
 
     // 2. check the order in the diagram: this node, subclasses, and then implicit conversions
     def assertRightOrder(template: DocTemplateEntity, diagram: Diagram) =
-      for ((node, subclasses) <- diagram.edges) assert(
-          subclasses == subclasses.filter(_.isThisNode) ::: subclasses.filter(
-              node => node.isNormalNode || node.isOutsideNode) ::: subclasses
-            .filter(_.isImplicitNode),
-          "Diagram order for " + template + ": " + subclasses)
+      for ((node, subclasses) <- diagram.edges)
+        assert(
+            subclasses == subclasses
+              .filter(_.isThisNode) ::: subclasses.filter(node =>
+              node.isNormalNode || node.isOutsideNode) ::: subclasses.filter(
+                _.isImplicitNode),
+            "Diagram order for " + template + ": " + subclasses)
 
     val base = rootPackage
       ._package("scala")

@@ -54,8 +54,9 @@ object ForwarderService {
     }
   }
 
-  class ForwarderAppModule(
-      myHostPort: String, httpConf: HttpConf, leaderProxyConf: LeaderProxyConf)
+  class ForwarderAppModule(myHostPort: String,
+                           httpConf: HttpConf,
+                           leaderProxyConf: LeaderProxyConf)
       extends BaseRestModule {
     @Named(ModuleNames.HOST_PORT)
     @Provides
@@ -74,7 +75,9 @@ object ForwarderService {
   }
 
   class ForwarderConf(args: Seq[String])
-      extends ScallopConf(args) with HttpConf with LeaderProxyConf
+      extends ScallopConf(args)
+      with HttpConf
+      with LeaderProxyConf
 
   def startHelloAppProcess(args: String*): Unit = {
     val conf = createConf(args: _*)
@@ -112,8 +115,8 @@ object ForwarderService {
   def createHelloApp(args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(s"Start hello app at ${conf.httpPort()}")
-    startImpl(
-        conf, new LeaderInfoModule(elected = true, leaderHostPort = None))
+    startImpl(conf,
+              new LeaderInfoModule(elected = true, leaderHostPort = None))
   }
 
   def createForwarder(forwardToPort: Int, args: String*): Service = {
@@ -121,9 +124,9 @@ object ForwarderService {
     log.info(
         s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
     startImpl(conf,
-              new LeaderInfoModule(
-                  elected = false,
-                  leaderHostPort = Some(s"localhost:$forwardToPort")))
+              new LeaderInfoModule(elected = false,
+                                   leaderHostPort =
+                                     Some(s"localhost:$forwardToPort")))
   }
 
   private[this] def createConf(args: String*): ForwarderConf = {
@@ -139,7 +142,8 @@ object ForwarderService {
     val injector = Guice.createInjector(
         new MetricsModule,
         new HttpModule(conf),
-        new ForwarderAppModule(myHostPort = if (conf.disableHttp())
+        new ForwarderAppModule(myHostPort =
+                                 if (conf.disableHttp())
                                    s"localhost:${conf.httpsPort()}"
                                  else s"localhost:${conf.httpPort()}",
                                conf,

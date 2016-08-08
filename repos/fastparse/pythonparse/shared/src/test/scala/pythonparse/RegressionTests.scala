@@ -31,7 +31,8 @@ object RegressionTests extends TestSuite {
 
     'multi_line_function - TestUtils.check(
         Statements.file_input,
-        Seq(FunctionDef('session_config,
+        Seq(
+            FunctionDef('session_config,
                         arguments(Nil, None, None, Nil),
                         Seq(Expr('a), Expr('b)),
                         Nil)),
@@ -74,8 +75,8 @@ object RegressionTests extends TestSuite {
                         Seq(
                             TryExcept(
                                 Seq(Pass),
-                                Seq(excepthandler.ExceptHandler(
-                                        Some('s), None, Seq(Pass))),
+                                Seq(excepthandler
+                                  .ExceptHandler(Some('s), None, Seq(Pass))),
                                 Nil
                             )
                         ),
@@ -165,7 +166,8 @@ object RegressionTests extends TestSuite {
         Seq(
             If(
                 'b,
-                Seq(If(
+                Seq(
+                    If(
                         'c,
                         Seq(Pass),
                         Nil
@@ -214,7 +216,8 @@ object RegressionTests extends TestSuite {
     )
     'comment_after_decorator - TestUtils.check(
         Statements.file_input,
-        Seq(ClassDef('GenericForeignKeyTests,
+        Seq(
+            ClassDef('GenericForeignKeyTests,
                      Nil,
                      Seq(Pass),
                      Seq('override_settings))),

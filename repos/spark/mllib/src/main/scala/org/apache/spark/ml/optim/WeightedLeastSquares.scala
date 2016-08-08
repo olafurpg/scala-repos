@@ -65,7 +65,8 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
                                        val regParam: Double,
                                        val standardizeFeatures: Boolean,
                                        val standardizeLabel: Boolean)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   import WeightedLeastSquares._
 
   require(regParam >= 0.0, s"regParam cannot be negative: $regParam")
@@ -96,19 +97,21 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
       if (fitIntercept) {
         logWarning(
             s"The standard deviation of the label is zero, so the coefficients will be " +
-            s"zeros and the intercept will be the mean of the label; as a result, " +
-            s"training is not needed.")
+              s"zeros and the intercept will be the mean of the label; as a result, " +
+              s"training is not needed.")
         val coefficients = new DenseVector(Array.ofDim(k - 1))
         val intercept = bBar
         val diagInvAtWA = new DenseVector(Array(0D))
-        return new WeightedLeastSquaresModel(
-            coefficients, intercept, diagInvAtWA)
+        return new WeightedLeastSquaresModel(coefficients,
+                                             intercept,
+                                             diagInvAtWA)
       } else {
         require(!(regParam > 0.0 && standardizeLabel),
                 "The standard deviation of the label is zero. " +
-                "Model cannot be regularized with standardization=true")
-        logWarning(s"The standard deviation of the label is zero. " +
-            "Consider setting fitIntercept=true.")
+                  "Model cannot be regularized with standardization=true")
+        logWarning(
+            s"The standard deviation of the label is zero. " +
+              "Consider setting fitIntercept=true.")
       }
     }
 
@@ -146,8 +149,7 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
     val aaInv = CholeskyDecomposition.inverse(aa, k)
 
     // aaInv is a packed upper triangular matrix, here we get all elements on diagonal
-    val diagInvAtWA = new DenseVector(
-        (1 to k).map { i =>
+    val diagInvAtWA = new DenseVector((1 to k).map { i =>
       aaInv(i + (i - 1) * i / 2 - 1) / wSum
     }.toArray)
 
@@ -191,7 +193,7 @@ private[ml] object WeightedLeastSquares {
       require(
           k <= MAX_NUM_FEATURES,
           "In order to take the normal equation approach efficiently, " +
-          s"we set the max number of features to $MAX_NUM_FEATURES but got $k.")
+            s"we set the max number of features to $MAX_NUM_FEATURES but got $k.")
       this.k = k
       triK = k * (k + 1) / 2
       count = 0L

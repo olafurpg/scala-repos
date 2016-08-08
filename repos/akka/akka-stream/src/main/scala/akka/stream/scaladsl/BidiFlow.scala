@@ -213,8 +213,7 @@ object BidiFlow {
       flow1: Graph[FlowShape[I1, O1], M1],
       flow2: Graph[FlowShape[I2, O2], M2])(
       combine: (M1, M2) ⇒ M): BidiFlow[I1, O1, I2, O2, M] =
-    fromGraph(
-        GraphDSL.create(flow1, flow2)(combine) { implicit b ⇒ (f1, f2) ⇒
+    fromGraph(GraphDSL.create(flow1, flow2)(combine) { implicit b ⇒ (f1, f2) ⇒
       BidiShape(f1.in, f1.out, f2.in, f2.out)
     })
 
@@ -246,7 +245,8 @@ object BidiFlow {
     * stage each, expressed by the two functions.
     */
   def fromFunctions[I1, O1, I2, O2](
-      outbound: I1 ⇒ O1, inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
+      outbound: I1 ⇒ O1,
+      inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
     fromFlows(Flow[I1].map(outbound), Flow[I2].map(inbound))
 
   /**

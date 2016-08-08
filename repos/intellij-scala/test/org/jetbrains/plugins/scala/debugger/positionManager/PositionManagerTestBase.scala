@@ -4,7 +4,11 @@ import com.intellij.debugger.SourcePosition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.{PsiFile, PsiManager}
 import com.sun.jdi.Location
-import org.jetbrains.plugins.scala.debugger.{Loc, ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  Loc,
+  ScalaDebuggerTestCase,
+  ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions
 import org.junit.Assert
 
@@ -49,8 +53,8 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
       waitForBreakpoint()
       val posManager = new ScalaPositionManager(getDebugProcess)
 
-      def checkSourcePosition(
-          initialPosition: SourcePosition, location: Location) = {
+      def checkSourcePosition(initialPosition: SourcePosition,
+                              location: Location) = {
         extensions.inReadAction {
           val newPosition = posManager.getSourcePosition(location)
           Assert.assertEquals(initialPosition.getFile, newPosition.getFile)
@@ -61,8 +65,8 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
       for ((position, locationSet) <- sourcePositions.zip(expectedLocations)) {
         val foundLocations: Set[Loc] = managed {
           val classes = posManager.getAllClasses(position)
-          val locations = classes.asScala.flatMap(
-              refType => posManager.locationsOfLine(refType, position).asScala)
+          val locations = classes.asScala.flatMap(refType =>
+            posManager.locationsOfLine(refType, position).asScala)
           locations.foreach(checkSourcePosition(position, _))
           locations.map(toSimpleLocation).toSet
         }
@@ -86,7 +90,7 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
     while (offset >= 0) {
       offsets += offset
       cleanedText = cleanedText.substring(0, offset) + cleanedText.substring(
-          offset + offsetMarker.length)
+            offset + offsetMarker.length)
       offset = cleanedText.indexOf(offsetMarker)
     }
 

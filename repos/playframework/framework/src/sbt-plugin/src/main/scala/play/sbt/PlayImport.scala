@@ -21,7 +21,8 @@ object PlayImport {
   def movedExternal(msg: String): ModuleID = {
     System.err.println(msg)
     class ComponentExternalisedException
-        extends RuntimeException(msg) with FeedbackProvidedException
+        extends RuntimeException(msg)
+        with FeedbackProvidedException
     throw new ComponentExternalisedException
   }
 
@@ -100,7 +101,8 @@ object PlayImport {
     val playDefaultPort =
       SettingKey[Int]("playDefaultPort", "The default port that Play runs on")
     val playDefaultAddress = SettingKey[String](
-        "playDefaultAddress", "The default address that Play runs on")
+        "playDefaultAddress",
+        "The default address that Play runs on")
 
     /** Our means of hooking the run task with additional behavior. */
     val playRunHooks = TaskKey[Seq[PlayRunHook]](
@@ -116,7 +118,8 @@ object PlayImport {
         "playExternalizeResources",
         "Whether resources should be externalized into the conf directory when Play is packaged as a distribution.")
     val playExternalizedResources = TaskKey[Seq[(File, String)]](
-        "playExternalizedResources", "The resources to externalize")
+        "playExternalizedResources",
+        "The resources to externalize")
     val playJarSansExternalized = TaskKey[File](
         "playJarSansExternalized",
         "Creates a jar file that has all the externalized resources excluded")
@@ -125,11 +128,14 @@ object PlayImport {
         "playOmnidoc",
         "Determines whether to use the aggregated Play documentation")
     val playDocsName = SettingKey[String](
-        "playDocsName", "Artifact name of the Play documentation")
+        "playDocsName",
+        "Artifact name of the Play documentation")
     val playDocsModule = SettingKey[Option[ModuleID]](
-        "playDocsModule", "Optional Play documentation dependency")
+        "playDocsModule",
+        "Optional Play documentation dependency")
     val playDocsJar = TaskKey[Option[File]](
-        "playDocsJar", "Optional jar file containing the Play documentation")
+        "playDocsJar",
+        "Optional jar file containing the Play documentation")
 
     val playPlugin = SettingKey[Boolean]("playPlugin")
 

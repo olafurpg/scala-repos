@@ -22,14 +22,18 @@ import scala.language.existentials
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.encoders.{encoderFor, ExpressionEncoder, OuterScopes}
+import org.apache.spark.sql.catalyst.encoders.{
+  encoderFor,
+  ExpressionEncoder,
+  OuterScopes
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.ImperativeAggregate
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.types._
 
 object TypedAggregateExpression {
-  def apply[A, B : Encoder, C : Encoder](
+  def apply[A, B: Encoder, C: Encoder](
       aggregator: Aggregator[A, B, C]): TypedAggregateExpression = {
     new TypedAggregateExpression(
         aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
@@ -55,7 +59,8 @@ case class TypedAggregateExpression(
     children: Seq[Attribute],
     mutableAggBufferOffset: Int,
     inputAggBufferOffset: Int)
-    extends ImperativeAggregate with Logging {
+    extends ImperativeAggregate
+    with Logging {
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =

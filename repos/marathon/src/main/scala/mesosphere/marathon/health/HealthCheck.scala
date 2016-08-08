@@ -52,11 +52,13 @@ case class HealthCheck(
     HealthCheck(
         path = if (proto.hasPath) Some(proto.getPath) else None,
         protocol = proto.getProtocol,
-        portIndex = if (proto.hasPortIndex) Some(proto.getPortIndex)
+        portIndex =
+          if (proto.hasPortIndex) Some(proto.getPortIndex)
           else if (!proto.hasPort && proto.getProtocol != Protocol.COMMAND)
             Some(0) // backward compatibility, this used to be the default value in marathon.proto
           else None,
-        command = if (proto.hasCommand)
+        command =
+          if (proto.hasCommand)
             Some(Command("").mergeFromProto(proto.getCommand))
           else None,
         gracePeriod = proto.getGracePeriodSeconds.seconds,
@@ -142,11 +144,10 @@ object HealthCheck {
               case _ => true
             }) Success
         else
-          Failure(
-              Set(RuleViolation(
-                      hc,
-                      s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
-                      None)))
+          Failure(Set(RuleViolation(
+              hc,
+              s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
+              None)))
       }
     }
   }

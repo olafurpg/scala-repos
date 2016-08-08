@@ -14,7 +14,10 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.{PsiElement, PsiFile, PsiFileFactory, _}
 import com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{MethodInvocation, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  MethodInvocation,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScMacroDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
@@ -33,10 +36,10 @@ object ScalaMacroDebuggingUtil {
   val needFixCarriageReturn = SystemInfo.isWindows
   val isEnabled = System.getProperty(MACRO_DEBUG_ENABLE_PROPERTY) != null
 
-  private[this] val SOURCE_FILE_NAME = new FileAttribute(
-      "PreimageFileName", 1, false)
-  private[this] val SYNTHETIC_SOURCE_ATTRIBUTE = new FileAttribute(
-      "SyntheticMacroCode", 1, false)
+  private[this] val SOURCE_FILE_NAME =
+    new FileAttribute("PreimageFileName", 1, false)
+  private[this] val SYNTHETIC_SOURCE_ATTRIBUTE =
+    new FileAttribute("SyntheticMacroCode", 1, false)
   private[this] val SOURCE_CACHE = mutable.HashMap[String, PsiFile]()
   private[this] val SYNTHETIC_OFFSETS_MAP =
     mutable.HashMap[String, List[(Int, Int, Int)]]()
@@ -51,8 +54,8 @@ object ScalaMacroDebuggingUtil {
     import scala.collection.JavaConversions._
 
     if (!isEnabled) return
-    val file = VfsUtil.findFileByIoFile(
-        new File(fileName stripPrefix MACRO_SIGN_PREFIX), true)
+    val file = VfsUtil
+      .findFileByIoFile(new File(fileName stripPrefix MACRO_SIGN_PREFIX), true)
 
     val dataStream = SYNTHETIC_SOURCE_ATTRIBUTE writeAttribute file
     code foreach (dataStream writeUTF _.stripPrefix(MACRO_SIGN_PREFIX))
@@ -82,7 +85,7 @@ object ScalaMacroDebuggingUtil {
       }
 
       //linesRed ++= line
-      //unpack debug info 
+      //unpack debug info
       val offsets = ListBuffer.empty[(Int, Int, Int)]
       @inline def parse(s: String) = Integer parseInt s
       line split '|' foreach {
@@ -118,7 +121,7 @@ object ScalaMacroDebuggingUtil {
 
   def readPreimageName(file: PsiFile): Option[String] =
     Option(SOURCE_FILE_NAME readAttributeBytes file.getVirtualFile) map
-    (new String(_))
+      (new String(_))
 
   def getPreimageFile(file: PsiFile) = PREIMAGE_CACHE get file
 
@@ -130,7 +133,7 @@ object ScalaMacroDebuggingUtil {
 
   def tryToLoad(file: PsiFile) =
     !file.getVirtualFile.isInstanceOf[LightVirtualFile] &&
-    (isLoaded(file) || loadCode(file, false) != null)
+      (isLoaded(file) || loadCode(file, false) != null)
 
   def getOffsets(file: PsiFile) =
     SYNTHETIC_OFFSETS_MAP get file.getVirtualFile.getCanonicalPath
@@ -187,11 +190,11 @@ object ScalaMacroDebuggingUtil {
 
     copyTextBetweenEditors(sourceEditor, macroEditor, project)
 
-    for (elt <- macrosToExpand.toList.sortWith(
-        (a, b) => a.getTextOffset > b.getTextOffset)) {
+    for (elt <- macrosToExpand.toList.sortWith((a, b) =>
+                 a.getTextOffset > b.getTextOffset)) {
       var macroCall = macrosheetFile.findElementAt(elt.getTextOffset)
       while (macroCall != null &&
-      !ScalaMacroDebuggingUtil.isMacroCall(macroCall)) {
+             !ScalaMacroDebuggingUtil.isMacroCall(macroCall)) {
         macroCall = macroCall.getParent
       }
       if (macroCall != null) {
@@ -207,12 +210,12 @@ object ScalaMacroDebuggingUtil {
               """.stripMargin
             val expansion = ScalaPsiElementFactory
               .createBlockExpressionWithoutBracesFromText(
-                s"{$macroExpansion}", PsiManager.getInstance(project))
+                  s"{$macroExpansion}",
+                  PsiManager.getInstance(project))
             var statement = macroCall.getParent.addAfter(expansion, macroCall)
             macroCall.delete()
-            statement = CodeStyleManager
-              .getInstance(project)
-              .reformat(statement)
+            statement =
+              CodeStyleManager.getInstance(project).reformat(statement)
           }
         })
       }

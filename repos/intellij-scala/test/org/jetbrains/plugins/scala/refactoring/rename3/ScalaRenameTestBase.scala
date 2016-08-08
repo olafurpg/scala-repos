@@ -13,8 +13,16 @@ import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.intellij.psi.{PsiDocumentManager, PsiFile}
-import com.intellij.refactoring.rename.{RenameProcessor, RenamePsiElementProcessor}
-import com.intellij.testFramework.{LightPlatformCodeInsightTestCase, LightPlatformTestCase, PlatformTestUtil, PsiTestUtil}
+import com.intellij.refactoring.rename.{
+  RenameProcessor,
+  RenamePsiElementProcessor
+}
+import com.intellij.testFramework.{
+  LightPlatformCodeInsightTestCase,
+  LightPlatformTestCase,
+  PlatformTestUtil,
+  PsiTestUtil
+}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -43,7 +51,10 @@ abstract class ScalaRenameTestBase
 
   protected def doTest(newName: String = "NameAfterRename") {
     myDirectory = PsiTestUtil.createTestProjectStructure(
-        projectAdapter, moduleAdapter, rootBefore, new util.HashSet[File]())
+        projectAdapter,
+        moduleAdapter,
+        rootBefore,
+        new util.HashSet[File]())
     VirtualFilePointerManager.getInstance
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
@@ -125,11 +136,12 @@ abstract class ScalaRenameTestBase
   private def projectAdapter = getProjectAdapter
   private def moduleAdapter = getModuleAdapter
 
-  private def doRename(
-      editor: Editor, file: PsiFile, newName: String): String = {
+  private def doRename(editor: Editor,
+                       file: PsiFile,
+                       newName: String): String = {
     val element = TargetElementUtil.findTargetElement(
-        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
-            editor, file),
+        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(editor,
+                                                                  file),
         TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
     assert(element != null, "Reference is not specified.")
     val searchInComments =
@@ -141,8 +153,11 @@ abstract class ScalaRenameTestBase
         .substituteElementToRename(element, getEditorAdapter)
       if (subst != null) {
         oldName = ScalaNamesUtil.scalaName(subst)
-        new RenameProcessor(
-            projectAdapter, subst, newName, searchInComments, false).run()
+        new RenameProcessor(projectAdapter,
+                            subst,
+                            newName,
+                            searchInComments,
+                            false).run()
       }
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()

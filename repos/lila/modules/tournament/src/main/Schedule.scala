@@ -73,8 +73,8 @@ object Schedule {
     case object SuperBlitz extends Speed(30)
     case object Blitz extends Speed(40)
     case object Classical extends Speed(50)
-    val all: List[Speed] = List(
-        HyperBullet, Bullet, SuperBlitz, Blitz, Classical)
+    val all: List[Speed] =
+      List(HyperBullet, Bullet, SuperBlitz, Blitz, Classical)
     val mostPopular: List[Speed] = List(Bullet, Blitz, Classical)
     def apply(name: String) = all find (_.name == name)
     def byId(id: Int) = all find (_.id == id)

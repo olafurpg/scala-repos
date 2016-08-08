@@ -14,7 +14,11 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.Conformance
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypingContext
+}
 
 /**
   * User: Alexander Podkhalyuzin
@@ -31,8 +35,9 @@ abstract class TypeConformanceTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val expr: PsiElement = scalaFile.findLastChildByType[PsiElement](

@@ -53,27 +53,28 @@ private final class ApnsActor(certificate: InputStream, password: String)
 
     m.registerRejectedNotificationListener(
         new RejectedNotificationListener[SimpleApnsPushNotification] {
-      override def handleRejectedNotification(
-          m: PushManager[_ <: SimpleApnsPushNotification],
-          notification: SimpleApnsPushNotification,
-          reason: RejectedNotificationReason) {
-        logger.error(
-            s"$notification was rejected with rejection reason $reason")
-      }
-    })
+          override def handleRejectedNotification(
+              m: PushManager[_ <: SimpleApnsPushNotification],
+              notification: SimpleApnsPushNotification,
+              reason: RejectedNotificationReason) {
+            logger.error(
+                s"$notification was rejected with rejection reason $reason")
+          }
+        })
     m.registerFailedConnectionListener(
         new FailedConnectionListener[SimpleApnsPushNotification] {
-      override def handleFailedConnection(
-          m: PushManager[_ <: SimpleApnsPushNotification], cause: Throwable) {
-        logger.error(s"Can't connect because $cause")
-        cause match {
-          case ssl: javax.net.ssl.SSLHandshakeException =>
-            logger.error(
-                s"This is probably a permanent failure, and we should shut down the manager")
-          case _ =>
-        }
-      }
-    })
+          override def handleFailedConnection(
+              m: PushManager[_ <: SimpleApnsPushNotification],
+              cause: Throwable) {
+            logger.error(s"Can't connect because $cause")
+            cause match {
+              case ssl: javax.net.ssl.SSLHandshakeException =>
+                logger.error(
+                    s"This is probably a permanent failure, and we should shut down the manager")
+              case _ =>
+            }
+          }
+        })
     m.start()
     manager = m
     m

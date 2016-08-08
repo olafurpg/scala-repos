@@ -9,7 +9,7 @@ package inner {
     def doWork(a: A): A = a
   }
 
-  // the trait is sealed and doWork is not 
+  // the trait is sealed and doWork is not
   // and cannot be overridden: no warning
   private[outer] sealed trait C {
     def doWork(a: A): A = a

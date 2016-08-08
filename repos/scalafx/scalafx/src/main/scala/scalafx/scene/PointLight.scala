@@ -43,7 +43,8 @@ object PointLight {
   */
 class PointLight(
     override val delegate: jfxs.PointLight = new jfxs.PointLight())
-    extends LightBase(delegate) with SFXDelegate[jfxs.PointLight] {
+    extends LightBase(delegate)
+    with SFXDelegate[jfxs.PointLight] {
 
   /** Creates a new instance of `PointLight` class using the specified color. */
   def this(color: Color) {

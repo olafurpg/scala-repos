@@ -78,8 +78,8 @@ private[util] trait StackTracing extends Any {
       if (suppressable) {
         import scala.language.reflectiveCalls
         type Suppressing = { def getSuppressed(): Array[Throwable] }
-        for (s <- e.asInstanceOf[Suppressing].getSuppressed) print(
-            s, Suppressed, frames, indents + 1)
+        for (s <- e.asInstanceOf[Suppressing].getSuppressed)
+          print(s, Suppressed, frames, indents + 1)
       }
     }
     print(e, Self, share = Array.empty, indents = 0)

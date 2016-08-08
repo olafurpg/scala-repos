@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class CountVectorizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -67,7 +68,8 @@ class CountVectorizerSuite
           Seq((0,
                split("a b c d e"),
                Vectors.sparse(
-                   5, Seq((0, 1.0), (1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0)))),
+                   5,
+                   Seq((0, 1.0), (1, 1.0), (2, 1.0), (3, 1.0), (4, 1.0)))),
               (1, split("a a a a a a"), Vectors.sparse(5, Seq((0, 6.0)))),
               (2, split("c"), Vectors.sparse(5, Seq((2, 1.0)))),
               (3, split("b b b b b"), Vectors.sparse(5, Seq((1, 5.0))))))
@@ -86,13 +88,11 @@ class CountVectorizerSuite
 
   test("CountVectorizer vocabSize and minDF") {
     val df = sqlContext
-      .createDataFrame(
-          Seq((0,
-               split("a b c d"),
-               Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (1, split("a b c"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (2, split("a b"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (3, split("a"), Vectors.sparse(3, Seq((0, 1.0))))))
+      .createDataFrame(Seq(
+          (0, split("a b c d"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (1, split("a b c"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (2, split("a b"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (3, split("a"), Vectors.sparse(3, Seq((0, 1.0))))))
       .toDF("id", "words", "expected")
     val cvModel = new CountVectorizer()
       .setInputCol("words")
@@ -189,7 +189,8 @@ class CountVectorizerSuite
 
   test("CountVectorizerModel with binary") {
     val df = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0,
                split("a a a b b c"),
                Vectors.sparse(4, Seq((0, 1.0), (1, 1.0), (2, 1.0)))),

@@ -292,8 +292,8 @@ case object EmptyBody extends WSBody
 /**
   * A streamed response containing a response header and a streamable body.
   */
-case class StreamedResponse(
-    headers: WSResponseHeaders, body: Source[ByteString, _])
+case class StreamedResponse(headers: WSResponseHeaders,
+                            body: Source[ByteString, _])
 
 /**
   * A WS Request builder.
@@ -313,12 +313,12 @@ trait WSRequest {
     new java.net.URI(
         if (queryString.isEmpty) url
         else {
-      val qs = (for {
-        (n, vs) <- queryString
-        v <- vs
-      } yield s"${enc(n)}=${enc(v)}").mkString("&")
-      s"$url?$qs"
-    })
+          val qs = (for {
+            (n, vs) <- queryString
+            v <- vs
+          } yield s"${enc(n)}=${enc(v)}").mkString("&")
+          s"$url?$qs"
+        })
   }
 
   /**
@@ -380,8 +380,9 @@ trait WSRequest {
   /**
     * sets the authentication realm
     */
-  def withAuth(
-      username: String, password: String, scheme: WSAuthScheme): WSRequest
+  def withAuth(username: String,
+               password: String,
+               scheme: WSAuthScheme): WSRequest
 
   /**
     * adds any number of HTTP headers
@@ -509,8 +510,8 @@ trait WSRequest {
     * @param consumer that's handling the response
     */
   @deprecated("2.5.0", """Use WS.withMethod("PATCH").stream()""")
-  def patchAndRetrieveStream[A, T](
-      body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
+  def patchAndRetrieveStream[A, T](body: T)(
+      consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
       ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
     withMethod("PATCH").withBody(body).streamWithEnumerator().flatMap {
@@ -545,8 +546,8 @@ trait WSRequest {
     * @param consumer that's handling the response
     */
   @deprecated("2.5.0", """Use WS.withMethod("POST").stream()""")
-  def postAndRetrieveStream[A, T](
-      body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
+  def postAndRetrieveStream[A, T](body: T)(
+      consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
       ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
     withMethod("POST").withBody(body).streamWithEnumerator().flatMap {
@@ -581,8 +582,8 @@ trait WSRequest {
     * @param consumer that's handling the response
     */
   @deprecated("2.5.0", """Use WS.withMethod("PUT").stream()""")
-  def putAndRetrieveStream[A, T](
-      body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
+  def putAndRetrieveStream[A, T](body: T)(
+      consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
       ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
     withMethod("PUT").withBody(body).streamWithEnumerator().flatMap {
@@ -748,8 +749,8 @@ trait WSResponseHeaders {
   def headers: Map[String, Seq[String]]
 }
 
-case class DefaultWSResponseHeaders(
-    status: Int, headers: Map[String, Seq[String]])
+case class DefaultWSResponseHeaders(status: Int,
+                                    headers: Map[String, Seq[String]])
     extends WSResponseHeaders
 
 /**

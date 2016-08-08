@@ -100,8 +100,8 @@ trait BaseParsers extends RegexParsers {
   def oneOf(lookup: Set[Char]): Parser[String] = Parser { in =>
     if (lookup.contains(in.first)) Success(in.first.toString, in.rest)
     else
-      Failure(
-          "Expected one of " + lookup + " but found '" + in.first + "'", in)
+      Failure("Expected one of " + lookup + " but found '" + in.first + "'",
+              in)
   }
 
   /**
@@ -127,7 +127,7 @@ trait BaseParsers extends RegexParsers {
       Failure("No chars before current char, cannot look behind.", in)
     } else if (!cs.contains(source.charAt(offset - 1))) {
       Failure("Previous char was '" + source.charAt(offset - 1) +
-              "' expected one of " + cs,
+                "' expected one of " + cs,
               in)
     } else {
       Success((), in)
@@ -148,7 +148,7 @@ trait BaseParsers extends RegexParsers {
     if (begin <= c && c <= end) Success(c, in.rest)
     else
       Failure(verboseString(c) + " not in range " + verboseString(begin) +
-              " - " + verboseString(end),
+                " - " + verboseString(end),
               in)
   }
 
@@ -165,14 +165,14 @@ trait BaseParsers extends RegexParsers {
       if (begin <= c && c <= end) Success(c, in.rest)
       else
         Failure(verboseString(c) + " not in range " + verboseString(begin) +
-                " - " + verboseString(end),
+                  " - " + verboseString(end),
                 in)
     }
   }
 
   /**
     * Succeeds if the given parsers succeeds and the given function is defined at the parse result.
-    * Returns the result of the method applied to the given parsers result. 
+    * Returns the result of the method applied to the given parsers result.
     */
   def acceptMatch[S, T](f: PartialFunction[S, T])(p: Parser[S]): Parser[T] =
     Parser { in =>
@@ -278,7 +278,7 @@ trait BaseParsers extends RegexParsers {
     */
   def xmlAttrVal: Parser[String] =
     ('"' ~> ((not('"') ~> aChar) *) <~ '"' ^^ { '"' + _.mkString + '"' }) |
-    ('\'' ~> ((not('\'') ~> aChar) *) <~ '\'' ^^ { '\'' + _.mkString + '\'' })
+      ('\'' ~> ((not('\'') ~> aChar) *) <~ '\'' ^^ { '\'' + _.mkString + '\'' })
 
   /** Parses an XML Attribute with simplified value handling like xmlAttrVal.
     */

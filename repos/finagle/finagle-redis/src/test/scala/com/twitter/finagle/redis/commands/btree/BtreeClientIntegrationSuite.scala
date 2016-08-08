@@ -14,7 +14,8 @@ import scala.collection.mutable
 @Ignore
 @RunWith(classOf[JUnitRunner])
 final class BtreeClientIntegrationSuite
-    extends FunSuite with BeforeAndAfterAll {
+    extends FunSuite
+    with BeforeAndAfterAll {
   var client: Client = _
   var dict: mutable.HashMap[String, mutable.HashMap[String, String]] = _
 
@@ -153,7 +154,7 @@ final class BtreeClientIntegrationSuite
       val target = client.bCard(StringToChannelBuffer(outerKey))
       assert(inner.size == Await.result(target),
              "BCARD failed for " + outerKey + " expected " + inner.size +
-             " got " + Await.result(target))
+               " got " + Await.result(target))
     }
 
     println("Test BCARD succeeded")
@@ -164,12 +165,12 @@ final class BtreeClientIntegrationSuite
       dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       for ((innerKey, value) <- inner) {
-        val target = client.bGet(
-            StringToChannelBuffer(outerKey), StringToChannelBuffer(innerKey))
+        val target = client.bGet(StringToChannelBuffer(outerKey),
+                                 StringToChannelBuffer(innerKey))
         val targetVal = CBToString(Await.result(target).get)
         assert(value == targetVal,
                "BGET failed for " + outerKey + " expected " + value + " got " +
-               targetVal)
+                 targetVal)
       }
     }
 
@@ -336,7 +337,7 @@ final class BtreeClientIntegrationSuite
   ) {
     assert(got.size == exp.size,
            "BRANGE failed for " + outerKey + " expected size " + exp.size +
-           " got size " + got.size)
+             " got size " + got.size)
 
     for (i <- 0 until exp.size) {
       val expKey = exp(i)._1
@@ -345,10 +346,10 @@ final class BtreeClientIntegrationSuite
       val gotVal = CBToString(got(i)._2)
       assert(exp(i)._1 == CBToString(got(i)._1),
              "Key mismatch for outerKey " + outerKey + " expected " + expKey +
-             "got " + gotKey)
+               "got " + gotKey)
       assert(exp(i)._2 == CBToString(got(i)._2),
              "Value mismatch for outerKey " + outerKey + " expected " +
-             expVal + "got " + gotVal)
+               expVal + "got " + gotVal)
     }
   }
 }

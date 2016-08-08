@@ -41,7 +41,7 @@ class TestSet(s0: Set[Int], s1: Set[Int]) {
     if (res0 != res1)
       assert(false,
              "DIFFERENCE , operation = " + explain(n, s0) + ", value =" +
-             (n >> 3) + ", result0 = " + res0 + ", result1 = " + res1)
+               (n >> 3) + ", result0 = " + res0 + ", result1 = " + res1)
   }
   Console.println("succeeded for " + Iterations + " iterations.")
 }

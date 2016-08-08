@@ -2,7 +2,10 @@ package mesosphere.marathon.integration.setup
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import mesosphere.marathon.integration.facades.{ITDeploymentResult, MarathonFacade}
+import mesosphere.marathon.integration.facades.{
+  ITDeploymentResult,
+  MarathonFacade
+}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration.{FiniteDuration, _}
@@ -29,8 +32,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
 
   override def handleEvent(event: CallbackEvent): Unit = events.add(event)
 
-  def waitForEvent(
-      kind: String, maxWait: FiniteDuration = 30.seconds): CallbackEvent =
+  def waitForEvent(kind: String,
+                   maxWait: FiniteDuration = 30.seconds): CallbackEvent =
     waitForEventWith(kind, _ => true, maxWait)
 
   def waitForDeploymentId(
@@ -46,8 +49,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
     waitForDeploymentId(change.value.deploymentId, maxWait)
   }
 
-  def waitForEventMatching(
-      description: String, maxWait: FiniteDuration = 30.seconds)(
+  def waitForEventMatching(description: String,
+                           maxWait: FiniteDuration = 30.seconds)(
       fn: CallbackEvent => Boolean): CallbackEvent = {
     @tailrec
     def nextEvent: Option[CallbackEvent] =
@@ -85,8 +88,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
       val receivedEvents = Vector.newBuilder[CallbackEvent]
 
       while (eventsToWaitFor.nonEmpty) {
-        val event = waitForEventMatching(
-            s"event $eventsToWaitFor to arrive", deadline.timeLeft) { event =>
+        val event = waitForEventMatching(s"event $eventsToWaitFor to arrive",
+                                         deadline.timeLeft) { event =>
           eventsToWaitFor.contains(event.eventType)
         }
         receivedEvents += event

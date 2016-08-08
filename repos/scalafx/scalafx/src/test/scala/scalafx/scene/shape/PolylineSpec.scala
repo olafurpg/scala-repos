@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PolylineSpec
     extends SimpleSFXDelegateSpec[jfxss.Polyline, Polyline](
-        classOf[jfxss.Polyline], classOf[Polyline])
+        classOf[jfxss.Polyline],
+        classOf[Polyline])

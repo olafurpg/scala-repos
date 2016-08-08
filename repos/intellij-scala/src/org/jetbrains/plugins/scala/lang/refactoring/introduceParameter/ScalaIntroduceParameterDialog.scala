@@ -163,8 +163,8 @@ class ScalaIntroduceParameterDialog(project: Project,
     typeCombobox = new ComboBox()
     val typeLabel = new JLabel("Type:")
     typeLabel.setLabelFor(typeCombobox)
-    typeMap = ScalaRefactoringUtil.getCompatibleTypeNames(
-        introduceData.possibleTypes)
+    typeMap =
+      ScalaRefactoringUtil.getCompatibleTypeNames(introduceData.possibleTypes)
     for (typeName <- typeMap.keySet.asScala) {
       JListCompatibility.addItem(typeCombobox, typeName)
     }
@@ -192,21 +192,23 @@ class ScalaIntroduceParameterDialog(project: Project,
   private def createDefaultArgumentPanel(): JComponent = {
     val panel = new JPanel(new BorderLayout())
     defaultForIntroducedTextField = new EditorTextField(
-        introduceData.defaultArg, project, ScalaFileType.SCALA_FILE_TYPE)
+        introduceData.defaultArg,
+        project,
+        ScalaFileType.SCALA_FILE_TYPE)
     val label = new JLabel("Default value:")
     label.setLabelFor(defaultForIntroducedTextField)
     panel.add(label, BorderLayout.NORTH)
     defaultForIntroducedTextField.setOneLineMode(false)
     defaultForIntroducedTextField.setEnabled(true)
-    defaultForIntroducedTextField.addDocumentListener(
-        new DocumentAdapter {
+    defaultForIntroducedTextField.addDocumentListener(new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
         introducedParamTableItem.foreach(
-            _.parameter.defaultValue = defaultForIntroducedTextField.getText.trim)
+            _.parameter.defaultValue =
+              defaultForIntroducedTextField.getText.trim)
       }
     })
-    IJSwingUtilities.adjustComponentsOnMac(
-        label, defaultForIntroducedTextField)
+    IJSwingUtilities
+      .adjustComponentsOnMac(label, defaultForIntroducedTextField)
     panel.add(defaultForIntroducedTextField, BorderLayout.CENTER)
     val optionsPanel = new JPanel(new BorderLayout())
     replaceOccurrencesChb = new JCheckBox("Replace all occurrences")

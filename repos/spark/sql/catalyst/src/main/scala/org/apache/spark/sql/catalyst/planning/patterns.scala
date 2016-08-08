@@ -56,18 +56,19 @@ object PhysicalOperation extends PredicateHelper {
     * }}}
     */
   private def collectProjectsAndFilters(
-      plan: LogicalPlan): (Option[Seq[NamedExpression]], Seq[Expression],
-  LogicalPlan, Map[Attribute, Expression]) =
+      plan: LogicalPlan): (Option[Seq[NamedExpression]],
+                           Seq[Expression],
+                           LogicalPlan,
+                           Map[Attribute, Expression]) =
     plan match {
       case Project(fields, child) if fields.forall(_.deterministic) =>
         val (_, filters, other, aliases) = collectProjectsAndFilters(child)
-        val substitutedFields = fields
-          .map(substitute(aliases))
-          .asInstanceOf[Seq[NamedExpression]]
-          (Some(substitutedFields),
-           filters,
-           other,
-           collectAliases(substitutedFields))
+        val substitutedFields =
+          fields.map(substitute(aliases)).asInstanceOf[Seq[NamedExpression]]
+        (Some(substitutedFields),
+         filters,
+         other,
+         collectAliases(substitutedFields))
 
       case Filter(condition, child) if condition.deterministic =>
         val (fields, filters, other, aliases) = collectProjectsAndFilters(
@@ -94,15 +95,17 @@ object PhysicalOperation extends PredicateHelper {
       case a @ Alias(ref: AttributeReference, name) =>
         aliases
           .get(ref)
-          .map(Alias(_, name)(
-                  a.exprId, a.qualifiers, isGenerated = a.isGenerated))
+          .map(Alias(_, name)(a.exprId,
+                              a.qualifiers,
+                              isGenerated = a.isGenerated))
           .getOrElse(a)
 
       case a: AttributeReference =>
         aliases
           .get(a)
-          .map(Alias(_, a.name)(
-                  a.exprId, a.qualifiers, isGenerated = a.isGenerated))
+          .map(Alias(_, a.name)(a.exprId,
+                                a.qualifiers,
+                                isGenerated = a.isGenerated))
           .getOrElse(a)
     }
   }
@@ -117,8 +120,12 @@ object PhysicalOperation extends PredicateHelper {
 object ExtractEquiJoinKeys extends Logging with PredicateHelper {
 
   /** (joinType, leftKeys, rightKeys, condition, leftChild, rightChild) */
-  type ReturnType = (JoinType, Seq[Expression], Seq[Expression],
-  Option[Expression], LogicalPlan, LogicalPlan)
+  type ReturnType = (JoinType,
+                     Seq[Expression],
+                     Seq[Expression],
+                     Option[Expression],
+                     LogicalPlan,
+                     LogicalPlan)
 
   def unapply(plan: LogicalPlan): Option[ReturnType] = plan match {
     case join @ Join(left, right, joinType, condition) =>
@@ -135,18 +142,20 @@ object ExtractEquiJoinKeys extends Logging with PredicateHelper {
         // be joined together
         case EqualNullSafe(l, r)
             if canEvaluate(l, left) && canEvaluate(r, right) =>
-          Some((Coalesce(Seq(l, Literal.default(l.dataType))),
-                Coalesce(Seq(r, Literal.default(r.dataType)))))
+          Some(
+              (Coalesce(Seq(l, Literal.default(l.dataType))),
+               Coalesce(Seq(r, Literal.default(r.dataType)))))
         case EqualNullSafe(l, r)
             if canEvaluate(l, right) && canEvaluate(r, left) =>
-          Some((Coalesce(Seq(r, Literal.default(r.dataType))),
-                Coalesce(Seq(l, Literal.default(l.dataType)))))
+          Some(
+              (Coalesce(Seq(r, Literal.default(r.dataType))),
+               Coalesce(Seq(l, Literal.default(l.dataType)))))
         case other => None
       }
       val otherPredicates = predicates.filterNot {
         case EqualTo(l, r) =>
           canEvaluate(l, left) && canEvaluate(r, right) ||
-          canEvaluate(l, right) && canEvaluate(r, left)
+            canEvaluate(l, right) && canEvaluate(r, left)
         case other => false
       }
 
@@ -191,8 +200,8 @@ object ExtractFiltersAndInnerJoins extends PredicateHelper {
         val (plans, conditions) = flattenJoin(left)
         (plans ++ Seq(right), conditions ++ cond.toSeq)
 
-      case Filter(
-          filterCondition, j @ Join(left, right, Inner, joinCondition)) =>
+      case Filter(filterCondition,
+                  j @ Join(left, right, Inner, joinCondition)) =>
         val (plans, conditions) = flattenJoin(j)
         (plans, conditions ++ splitConjunctivePredicates(filterCondition))
 

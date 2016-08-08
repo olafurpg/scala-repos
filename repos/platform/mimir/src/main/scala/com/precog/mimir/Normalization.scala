@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -38,15 +38,17 @@ class BigDecimalPrecision(num: BigDecimal) {
 }
 
 trait NormalizationHelperModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ReductionLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ReductionLibModule[M] {
 
   trait NormalizationHelperLib extends ColumnarTableLib with ReductionLib {
 
     trait NormalizationHelper {
       import TransSpecModule._
 
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JType.JUniverseT)
+      val tpe = BinaryOperationType(JType.JUniverseT,
+                                    JObjectUnfixedT,
+                                    JType.JUniverseT)
 
       case class Stats(mean: BigDecimal, stdDev: BigDecimal)
       case class RowValueWithStats(rowValue: BigDecimal, stats: Stats)
@@ -93,7 +95,7 @@ trait NormalizationHelperModule[M[+ _]]
             refs collect {
               case ColumnRef(selector, ctype)
                   if selector.hasSuffix(CPathField(reduction.name)) &&
-                  ctype.isNumeric =>
+                    ctype.isNumeric =>
                 selector.take(selector.length - 1) getOrElse CPath.Identity
             }
           }
@@ -188,22 +190,22 @@ trait NormalizationHelperModule[M[+ _]]
               unifiedCols collect {
                 case (ColumnRef(selector, ctype), col: NumColumn)
                     if findSuffices(selector).size == 1 => {
-                    val suffix = findSuffices(selector).head
+                  val suffix = findSuffices(selector).head
 
-                    val mean = singleSummary(suffix).mean
-                    val stdDev = singleSummary(suffix).stdDev
+                  val mean = singleSummary(suffix).mean
+                  val stdDev = singleSummary(suffix).stdDev
 
-                    val newColumn = new Map1Column(col) with NumColumn {
-                      def value(row: Int) =
-                        RowValueWithStats(
-                            col(row).addContext,
-                            Stats(mean.addContext, stdDev.addContext))
+                  val newColumn = new Map1Column(col) with NumColumn {
+                    def value(row: Int) =
+                      RowValueWithStats(
+                          col(row).addContext,
+                          Stats(mean.addContext, stdDev.addContext))
 
-                      def apply(row: Int) = f(value(row))
-                    }
-
-                    (ColumnRef(selector, ctype), newColumn)
+                    def apply(row: Int) = f(value(row))
                   }
+
+                  (ColumnRef(selector, ctype), newColumn)
+                }
               }
 
             val bitsets = resultsAll.values map { _.definedAt(0, range.end) }

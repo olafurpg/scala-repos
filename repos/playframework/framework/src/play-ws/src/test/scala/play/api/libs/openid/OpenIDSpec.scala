@@ -62,8 +62,8 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axRequired = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axRequired =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)
@@ -85,8 +85,8 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axOptional = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axOptional =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)
@@ -108,10 +108,10 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axRequired = Seq(
-                    "first" -> "http://axschema.org/namePerson/first"),
-              axOptional = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axRequired =
+                Seq("first" -> "http://axschema.org/namePerson/first"),
+              axOptional =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)
@@ -135,8 +135,9 @@ object OpenIDSpec extends Specification with Mockito {
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
 
       val responseQueryString = openIdResponse
-      val userInfo = Await.result(
-          openId.verifiedId(setupMockRequest(responseQueryString)), dur)
+      val userInfo =
+        Await.result(openId.verifiedId(setupMockRequest(responseQueryString)),
+                     dur)
 
       "the claimedId must be present" in {
         userInfo.id must be equalTo claimedId
@@ -173,7 +174,7 @@ object OpenIDSpec extends Specification with Mockito {
       val spoofedEndpoint = "http://evilhackerendpoint.com"
       val responseQueryString =
         openIdResponse - "openid.op_endpoint" +
-        ("openid.op_endpoint" -> Seq(spoofedEndpoint))
+          ("openid.op_endpoint" -> Seq(spoofedEndpoint))
 
       Await.result(openId.verifiedId(setupMockRequest(responseQueryString)),
                    dur)
@@ -230,7 +231,8 @@ object OpenIDSpec extends Specification with Mockito {
       val errorResponse =
         (openIdResponse - "openid.mode") + ("openid.mode" -> Seq("error"))
 
-      Await.result(openId.verifiedId(setupMockRequest(errorResponse)), dur) must throwA[
+      Await
+        .result(openId.verifiedId(setupMockRequest(errorResponse)), dur) must throwA[
           BAD_RESPONSE.type]
     }
 
@@ -241,8 +243,9 @@ object OpenIDSpec extends Specification with Mockito {
 
       val responseQueryString = (openIdResponse - "openid.op_endpoint")
 
-      val userInfo = Await.result(
-          openId.verifiedId(setupMockRequest(responseQueryString)), dur)
+      val userInfo =
+        Await.result(openId.verifiedId(setupMockRequest(responseQueryString)),
+                     dur)
 
       "the claimedId must be present" in {
         userInfo.id must be equalTo claimedId

@@ -36,7 +36,7 @@ class TestBarrier(count: Int) {
       case e: TimeoutException ⇒
         throw new TestBarrierTimeoutException(
             "Timeout of %s and time factor of %s" format
-            (timeout.toString, TestKitExtension(system).TestTimeFactor))
+              (timeout.toString, TestKitExtension(system).TestTimeFactor))
     }
   }
 

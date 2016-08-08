@@ -23,7 +23,10 @@ import org.scalatest.exceptions.TestFailedException
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeReference}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  AttributeReference
+}
 import org.apache.spark.sql.execution.{SparkPlan, SparkPlanTest, UnaryNode}
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.types.StringType
@@ -118,7 +121,8 @@ private case class ExceptionInjectingOperator(child: SparkPlan)
   override protected def doExecute(): RDD[InternalRow] = {
     child.execute().map { x =>
       assert(TaskContext.get() != null) // Make sure that TaskContext is defined.
-      Thread.sleep(1000) // This sleep gives the external process time to start.
+      Thread
+        .sleep(1000) // This sleep gives the external process time to start.
       throw new IllegalArgumentException("intentional exception")
     }
   }

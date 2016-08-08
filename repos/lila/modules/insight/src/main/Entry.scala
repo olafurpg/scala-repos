@@ -75,8 +75,8 @@ object Termination {
   case object Stalemate extends Termination(5, "Stalemate")
   case object Checkmate extends Termination(6, "Checkmate")
 
-  val all = List(
-      ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
+  val all =
+    List(ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
   val byId = all map { p =>
     (p.id, p)
   } toMap
@@ -173,8 +173,9 @@ object RelativeStrength {
   }
 }
 
-sealed abstract class MovetimeRange(
-    val id: Int, val name: String, val tenths: NonEmptyList[Int])
+sealed abstract class MovetimeRange(val id: Int,
+                                    val name: String,
+                                    val tenths: NonEmptyList[Int])
 object MovetimeRange {
   case object MTR1
       extends MovetimeRange(1, "0 to 1 second", NonEmptyList(1, 5, 10))
@@ -185,8 +186,9 @@ object MovetimeRange {
   case object MTR10
       extends MovetimeRange(10, "5 to 10 seconds", NonEmptyList(60, 80, 100))
   case object MTR30
-      extends MovetimeRange(
-          30, "10 to 30 seconds", NonEmptyList(150, 200, 300))
+      extends MovetimeRange(30,
+                            "10 to 30 seconds",
+                            NonEmptyList(150, 200, 300))
   case object MTRInf
       extends MovetimeRange(60, "More than 30 seconds", NonEmptyList(400, 600))
   val all = List(MTR1, MTR3, MTR5, MTR10, MTR30, MTRInf)
@@ -196,8 +198,9 @@ object MovetimeRange {
   } toMap
 }
 
-sealed abstract class MaterialRange(
-    val id: Int, val name: String, val imbalance: Int) {
+sealed abstract class MaterialRange(val id: Int,
+                                    val name: String,
+                                    val imbalance: Int) {
   def negative = imbalance <= 0
 }
 object MaterialRange {

@@ -43,8 +43,8 @@ import org.saddle._
   * The multiplication above relies on two BinOp implementations: the first is BinOp[Multiply, Vec, Vec, Vec],
   * whose implementation in turn relies on BinOp[Multiply, Int, Int, Int].
   */
-@implicitNotFound(
-    msg = "No BinOp ${O} instance available to operate on values of type ${X} and ${Y}")
+@implicitNotFound(msg =
+  "No BinOp ${O} instance available to operate on values of type ${X} and ${Y}")
 trait BinOp[O <: OpType,
             @spec(Boolean, Int, Long, Double) -X,
             @spec(Boolean, Int, Long, Double) -Y,
@@ -61,8 +61,8 @@ trait BinOp[O <: OpType,
   * Note scala.Function2 is not specialized on Boolean inputs, only output
   */
 object BinOp {
-  private final class BinOpImpl[
-      O <: OpType, @spec(Int, Long, Double) Q : ST, @spec(Int, Long, Double) R : ST, @spec(Boolean, Int, Long, Double) S : ST](
+  private final class BinOpImpl[O <: OpType, @spec(Int, Long, Double) Q: ST,
+  @spec(Int, Long, Double) R: ST, @spec(Boolean, Int, Long, Double) S: ST](
       f: (Q, R) => S)
       extends BinOp[O, Q, R, S] {
     val sq = implicitly[ST[Q]]
@@ -72,14 +72,14 @@ object BinOp {
       if (sq.isMissing(a) || sr.isMissing(b)) ss.missing else f(a, b)
   }
 
-  private final class BinOpImplDL[O <: OpType, @spec(Int, Long) R : ST](
+  private final class BinOpImplDL[O <: OpType, @spec(Int, Long) R: ST](
       f: (Double, R) => Double)
       extends BinOp[O, Double, R, Double] {
     val sc = implicitly[ST[R]]
     def apply(a: Double, b: R) = if (sc.isMissing(b)) Double.NaN else f(a, b)
   }
 
-  private final class BinOpImplLD[O <: OpType, @spec(Int, Long) Q : ST](
+  private final class BinOpImplLD[O <: OpType, @spec(Int, Long) Q: ST](
       f: (Q, Double) => Double)
       extends BinOp[O, Q, Double, Double] {
     val sc = implicitly[ST[Q]]

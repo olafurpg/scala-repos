@@ -10,7 +10,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociateExplicitly,
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,7 +28,9 @@ object RemoteNodeRestartGateSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false).withFallback(ConfigFactory.parseString(
+          """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.retry-gate-closed-for  = 1d # Keep it long
@@ -44,7 +50,8 @@ class RemoteNodeRestartGateSpecMultiJvmNode1 extends RemoteNodeRestartGateSpec
 class RemoteNodeRestartGateSpecMultiJvmNode2 extends RemoteNodeRestartGateSpec
 
 abstract class RemoteNodeRestartGateSpec
-    extends MultiNodeSpec(RemoteNodeRestartGateSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteNodeRestartGateSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteNodeRestartGateSpec._
@@ -106,7 +113,8 @@ abstract class RemoteNodeRestartGateSpec
         Await.ready(system.whenTerminated, 10.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}

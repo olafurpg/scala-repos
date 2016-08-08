@@ -26,7 +26,11 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionSet, PredicateHelper}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression,
+  ExpressionSet,
+  PredicateHelper
+}
 import org.apache.spark.sql.catalyst.util
 import org.apache.spark.sql.execution.{DataSourceScan, PhysicalRDD}
 import org.apache.spark.sql.functions._
@@ -38,7 +42,9 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 import org.apache.spark.util.collection.BitSet
 
 class FileSourceStrategySuite
-    extends QueryTest with SharedSQLContext with PredicateHelper {
+    extends QueryTest
+    with SharedSQLContext
+    with PredicateHelper {
   import testImplicits._
 
   test("unpartitioned table, single partition") {
@@ -179,16 +185,17 @@ class FileSourceStrategySuite
 
   // Helpers for checking the arguments passed to the FileFormat.
 
-  protected val checkPartitionSchema = checkArgument(
-      "partition schema", _.partitionSchema, _: StructType)
-  protected val checkDataSchema = checkArgument(
-      "data schema", _.dataSchema, _: StructType)
-  protected val checkDataFilters = checkArgument(
-      "data filters", _.filters.toSet, _: Set[Filter])
+  protected val checkPartitionSchema =
+    checkArgument("partition schema", _.partitionSchema, _: StructType)
+  protected val checkDataSchema =
+    checkArgument("data schema", _.dataSchema, _: StructType)
+  protected val checkDataFilters =
+    checkArgument("data filters", _.filters.toSet, _: Set[Filter])
 
   /** Helper for building checks on the arguments passed to the reader. */
-  protected def checkArgument[T](
-      name: String, arg: LastArguments.type => T, expected: T): Unit = {
+  protected def checkArgument[T](name: String,
+                                 arg: LastArguments.type => T,
+                                 expected: T): Unit = {
     if (arg(LastArguments) != expected) {
       fail(s"""
            |Wrong $name
@@ -205,8 +212,7 @@ class FileSourceStrategySuite
 
   /** Returns a set with all the filters present in the physical plan. */
   def getPhysicalFilters(df: DataFrame): ExpressionSet = {
-    ExpressionSet(
-        df.queryExecution.executedPlan.collect {
+    ExpressionSet(df.queryExecution.executedPlan.collect {
       case execution.Filter(f, _) => splitConjunctivePredicates(f)
     }.flatten)
   }
@@ -248,10 +254,9 @@ class FileSourceStrategySuite
       val bucketed =
         df.queryExecution.analyzed transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
-            l.copy(relation = r.copy(bucketSpec = Some(
-                            BucketSpec(numBuckets = buckets,
-                                       "c1" :: Nil,
-                                       Nil))))
+            l.copy(
+                relation = r.copy(bucketSpec =
+                  Some(BucketSpec(numBuckets = buckets, "c1" :: Nil, Nil))))
         }
       Dataset.newDataFrame(sqlContext, bucketed)
     } else {

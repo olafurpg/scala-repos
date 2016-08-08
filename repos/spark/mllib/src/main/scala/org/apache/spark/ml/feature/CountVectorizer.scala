@@ -35,7 +35,9 @@ import org.apache.spark.util.collection.OpenHashMap
   * Params for [[CountVectorizer]] and [[CountVectorizerModel]].
   */
 private[feature] trait CountVectorizerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * Max size of the vocabulary.
@@ -45,8 +47,10 @@ private[feature] trait CountVectorizerParams
     * Default: 2^18^
     * @group param
     */
-  val vocabSize: IntParam = new IntParam(
-      this, "vocabSize", "max size of the vocabulary", ParamValidators.gt(0))
+  val vocabSize: IntParam = new IntParam(this,
+                                         "vocabSize",
+                                         "max size of the vocabulary",
+                                         ParamValidators.gt(0))
 
   /** @group getParam */
   def getVocabSize: Int = $(vocabSize)
@@ -64,9 +68,9 @@ private[feature] trait CountVectorizerParams
       this,
       "minDF",
       "Specifies the minimum number of" +
-      " different documents a term must appear in to be included in the vocabulary." +
-      " If this is an integer >= 1, this specifies the number of documents the term must" +
-      " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
+        " different documents a term must appear in to be included in the vocabulary." +
+        " If this is an integer >= 1, this specifies the number of documents the term must" +
+        " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
       ParamValidators.gtEq(0.0))
 
   /** @group getParam */
@@ -74,8 +78,8 @@ private[feature] trait CountVectorizerParams
 
   /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
-    val typeCandidates = List(
-        new ArrayType(StringType, true), new ArrayType(StringType, false))
+    val typeCandidates =
+      List(new ArrayType(StringType, true), new ArrayType(StringType, false))
     SchemaUtils.checkColumnTypes(schema, $(inputCol), typeCandidates)
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
   }
@@ -98,11 +102,11 @@ private[feature] trait CountVectorizerParams
       this,
       "minTF",
       "Filter to ignore rare words in" +
-      " a document. For each document, terms with frequency/count less than the given threshold are" +
-      " ignored. If this is an integer >= 1, then this specifies a count (of times the term must" +
-      " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
-      " of the document's token count). Note that the parameter is only used in transform of" +
-      " CountVectorizerModel and does not affect fitting.",
+        " a document. For each document, terms with frequency/count less than the given threshold are" +
+        " ignored. If this is an integer >= 1, then this specifies a count (of times the term must" +
+        " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
+        " of the document's token count). Note that the parameter is only used in transform of" +
+        " CountVectorizerModel and does not affect fitting.",
       ParamValidators.gtEq(0.0))
 
   setDefault(minTF -> 1)
@@ -117,7 +121,8 @@ private[feature] trait CountVectorizerParams
   */
 @Experimental
 class CountVectorizer(override val uid: String)
-    extends Estimator[CountVectorizerModel] with CountVectorizerParams
+    extends Estimator[CountVectorizerModel]
+    with CountVectorizerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("cntVec"))
@@ -204,9 +209,10 @@ object CountVectorizer extends DefaultParamsReadable[CountVectorizer] {
   * @param vocabulary An Array over terms. Only the terms in the vocabulary will be counted.
   */
 @Experimental
-class CountVectorizerModel(
-    override val uid: String, val vocabulary: Array[String])
-    extends Model[CountVectorizerModel] with CountVectorizerParams
+class CountVectorizerModel(override val uid: String,
+                           val vocabulary: Array[String])
+    extends Model[CountVectorizerModel]
+    with CountVectorizerParams
     with MLWritable {
 
   import CountVectorizerModel._
@@ -236,8 +242,8 @@ class CountVectorizerModel(
       this,
       "binary",
       "If True, all non zero counts are set to 1. " +
-      "This is useful for discrete probabilistic models that model binary events rather " +
-      "than integer counts")
+        "This is useful for discrete probabilistic models that model binary events rather " +
+        "than integer counts")
 
   /** @group getParam */
   def getBinary: Boolean = $(binary)

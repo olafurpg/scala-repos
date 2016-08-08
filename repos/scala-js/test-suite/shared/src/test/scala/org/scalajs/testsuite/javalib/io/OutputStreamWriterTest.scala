@@ -16,7 +16,8 @@ import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
 class OutputStreamWriterTest {
-  private def newOSWriter(): (OutputStreamWriter, MockByteArrayOutputStream) = {
+  private def newOSWriter()
+    : (OutputStreamWriter, MockByteArrayOutputStream) = {
     val bos = new MockByteArrayOutputStream
     val osw = new OutputStreamWriter(bos)
     (osw, bos)
@@ -101,8 +102,8 @@ class OutputStreamWriterTest {
 
   @Test def write_surrogate_pairs(): Unit = {
     testW(_.write("\ud83d\udca9"), Array(0xf0, 0x9f, 0x92, 0xa9))
-    testW(
-        _.write("ab\ud83d\udca9cd", 1, 3), Array('b', 0xf0, 0x9f, 0x92, 0xa9))
+    testW(_.write("ab\ud83d\udca9cd", 1, 3),
+          Array('b', 0xf0, 0x9f, 0x92, 0xa9))
   }
 
   @Test def write_surrogate_pairs_spread_across_multiple_writes(): Unit = {
@@ -132,7 +133,8 @@ class OutputStreamWriterTest {
     testW(_.write("\udca9"), Array('?'))
   }
 
-  @Test def write_malformed_surrogates_spread_across_multiple_writes(): Unit = {
+  @Test
+  def write_malformed_surrogates_spread_across_multiple_writes(): Unit = {
     testW({ osw =>
       osw.write('\ud83d'); osw.write('a')
     }, Array('?', 'a'))

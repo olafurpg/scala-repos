@@ -21,10 +21,17 @@ import org.scalatest.BeforeAndAfter
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.types.{BooleanType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{
+  BooleanType,
+  StringType,
+  StructField,
+  StructType
+}
 
 class ListTablesSuite
-    extends QueryTest with BeforeAndAfter with SharedSQLContext {
+    extends QueryTest
+    with BeforeAndAfter
+    with SharedSQLContext {
   import testImplicits._
 
   private lazy val df = (1 to 10).map(i => (i, s"str$i")).toDF("key", "value")
@@ -49,7 +56,8 @@ class ListTablesSuite
 
     sqlContext.sessionState.catalog
       .unregisterTable(TableIdentifier("ListTablesSuiteTable"))
-    assert(sqlContext
+    assert(
+        sqlContext
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
@@ -67,7 +75,8 @@ class ListTablesSuite
 
     sqlContext.sessionState.catalog
       .unregisterTable(TableIdentifier("ListTablesSuiteTable"))
-    assert(sqlContext
+    assert(
+        sqlContext
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
@@ -76,7 +85,9 @@ class ListTablesSuite
   test("query the returned DataFrame of tables") {
     val expectedSchema = StructType(
         StructField("tableName", StringType, false) :: StructField(
-            "isTemporary", BooleanType, false) :: Nil)
+            "isTemporary",
+            BooleanType,
+            false) :: Nil)
 
     Seq(sqlContext.tables(), sql("SHOW TABLes")).foreach {
       case tableDF =>

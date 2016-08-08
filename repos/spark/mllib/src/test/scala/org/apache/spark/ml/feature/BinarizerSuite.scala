@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{DataFrame, Row}
 
 class BinarizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var data: Array[Double] = _
@@ -88,7 +89,8 @@ class BinarizerSuite
     val defaultBinarized: Array[Double] =
       data.map(x => if (x > 0.0) 1.0 else 0.0)
     val dataFrame: DataFrame = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (Vectors.dense(data), Vectors.dense(defaultBinarized))
           ))
       .toDF("feature", "expected")
@@ -112,7 +114,8 @@ class BinarizerSuite
     val defaultBinarized: Array[Double] =
       data.map(x => if (x > threshold) 1.0 else 0.0)
     val dataFrame: DataFrame = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (Vectors.dense(data), Vectors.dense(defaultBinarized))
           ))
       .toDF("feature", "expected")

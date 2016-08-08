@@ -17,6 +17,7 @@ object ProjectRootBuildFileProvider extends BuildFileProvider {
     val project = module.getProject
     val buildFile = project.getBasePath.toFile / Sbt.BuildFile
     if (buildFile.exists)
-      Some(BuildFileEntry(buildFile, isModuleLocal = false)) else None
+      Some(BuildFileEntry(buildFile, isModuleLocal = false))
+    else None
   }
 }

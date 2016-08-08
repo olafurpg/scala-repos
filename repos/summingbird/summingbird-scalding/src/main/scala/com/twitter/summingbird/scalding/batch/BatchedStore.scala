@@ -18,16 +18,38 @@ package com.twitter.summingbird.scalding.batch
 
 import com.twitter.algebird.bijection.BijectedSemigroup
 import com.twitter.algebird.{Monoid, Semigroup}
-import com.twitter.algebird.{Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper}
+import com.twitter.algebird.{
+  Universe,
+  Empty,
+  Interval,
+  Intersection,
+  InclusiveLower,
+  ExclusiveUpper,
+  InclusiveUpper
+}
 import com.twitter.algebird.monad.{StateWithError, Reader}
 import com.twitter.bijection.{Bijection, ImplicitBijection}
-import com.twitter.scalding.{Dsl, Mode, TypedPipe, IterableSource, MapsideReduce, TupleSetter, TupleConverter}
+import com.twitter.scalding.{
+  Dsl,
+  Mode,
+  TypedPipe,
+  IterableSource,
+  MapsideReduce,
+  TupleSetter,
+  TupleConverter
+}
 import com.twitter.scalding.typed.Grouped
 import com.twitter.summingbird.scalding._
 import com.twitter.summingbird.scalding
 import com.twitter.summingbird._
 import com.twitter.summingbird.option._
-import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp, IteratorSums, PrunedSpace}
+import com.twitter.summingbird.batch.{
+  BatchID,
+  Batcher,
+  Timestamp,
+  IteratorSums,
+  PrunedSpace
+}
 import cascading.flow.FlowDef
 
 import org.slf4j.LoggerFactory
@@ -90,7 +112,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
   /** Record a computed batch of code */
   def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit
 
   @transient private val logger =
     LoggerFactory.getLogger(classOf[BatchedStore[_, _]])
@@ -114,7 +137,7 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
     }
   }
 
-  protected def sumByBatches[K1, V : Semigroup](
+  protected def sumByBatches[K1, V: Semigroup](
       ins: TypedPipe[(Timestamp, (K1, V))],
       capturedBatcher: Batcher,
       commutativity: Commutativity)
@@ -201,9 +224,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
     /**
       * Produce a merged stream such that each BatchID, Key pair appears only one time.
       */
-    def mergeAll(all: TypedPipe[(K, (BatchID, (Timestamp, V)))])
-      : TypedPipe[(K, (BatchID, (Option[Option[(Timestamp, V)]], Option[
-              (Timestamp, V)])))] = {
+    def mergeAll(all: TypedPipe[(K, (BatchID, (Timestamp, V)))]): TypedPipe[
+        (K,
+         (BatchID, (Option[Option[(Timestamp, V)]], Option[(Timestamp, V)])))] = {
 
       // Make sure to use sumOption on V
       implicit val timeValueSemigroup: Semigroup[(Timestamp, V)] =
@@ -239,9 +262,10 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       optopt.flatMap(identity)
 
     // This builds the format we write to disk, which is the total sum
-    def toLastFormat(
-        res: TypedPipe[(K, (BatchID, (Option[Option[(Timestamp, V)]], Option[
-                (Timestamp, V)])))]): TypedPipe[(BatchID, (K, V))] =
+    def toLastFormat(res: TypedPipe[
+        (K,
+         (BatchID, (Option[Option[(Timestamp, V)]], Option[(Timestamp, V)])))])
+      : TypedPipe[(BatchID, (K, V))] =
       res.flatMap {
         case (k, (batchid, (prev, v))) =>
           val totalSum =
@@ -250,8 +274,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       }
 
     // This builds the format we send to consumer nodes
-    def toOutputFormat(res: TypedPipe[(K, (BatchID, (Option[Option[
-                    (Timestamp, V)]], Option[(Timestamp, V)])))])
+    def toOutputFormat(res: TypedPipe[
+        (K,
+         (BatchID, (Option[Option[(Timestamp, V)]], Option[(Timestamp, V)])))])
       : TypedPipe[(Timestamp, (K, (Option[V], V)))] =
       res.flatMap {
         case (k, (batchid, (optopt, opt))) =>
@@ -285,8 +310,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
       (batchOps.coverIt(timeSpan).toList match {
         case Nil =>
-          Left(List("Timespan is covered by Nil: %s batcher: %s".format(
-                      timeSpan, batcher)))
+          Left(
+              List("Timespan is covered by Nil: %s batcher: %s"
+                .format(timeSpan, batcher)))
         case list => Right((in, list))
       })
     })
@@ -294,8 +320,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   /**
     * This is the monadic version of readLast, returns the BatchID actually on disk
     */
-  final def planReadLast: PlannerOutput[(BatchID, FlowProducer[
-          TypedPipe[(K, V)]])] =
+  final def planReadLast: PlannerOutput[(BatchID,
+                                         FlowProducer[TypedPipe[(K, V)]])] =
     for {
       batches <- timeSpanToBatches
       tsMode <- getState[FactoryInput]
@@ -305,15 +331,15 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   /**
     * Adjist the Lower bound of the interval
     */
-  private def setLower(
-      lb: InclusiveLower[Timestamp],
-      interv: Interval[Timestamp]): Interval[Timestamp] = interv match {
-    case u @ ExclusiveUpper(_) => lb && u
-    case u @ InclusiveUpper(_) => lb && u
-    case Intersection(_, u) => lb && u
-    case Empty() => Empty()
-    case _ => lb // Otherwise the upperbound is infinity.
-  }
+  private def setLower(lb: InclusiveLower[Timestamp],
+                       interv: Interval[Timestamp]): Interval[Timestamp] =
+    interv match {
+      case u @ ExclusiveUpper(_) => lb && u
+      case u @ InclusiveUpper(_) => lb && u
+      case Intersection(_, u) => lb && u
+      case Empty() => Empty()
+      case _ => lb // Otherwise the upperbound is infinity.
+    }
 
   /**
     * Reads the input data after the last batch written.
@@ -348,23 +374,24 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       // Get the total time we want to cover. If the lower bound of the requested timeSpan
       // is not the firstDeltaTimestamp, adjust it to that.
       deltaTimes: Interval[Timestamp] = setLower(
-          InclusiveLower(firstDeltaTimestamp), timeSpan)
+          InclusiveLower(firstDeltaTimestamp),
+          timeSpan)
 
       // Try to read the range covering the time we want; get the time we can completely
       // cover and the data from input in that range.
       readTimeFlow <- fromEither(
-          batchOps.readAvailableTimes(deltaTimes, mode, input))
+                         batchOps.readAvailableTimes(deltaTimes, mode, input))
 
       (readDeltaTimestamps, readFlow) = readTimeFlow
 
       // Make sure that the time we can read includes the time just after the last
       // snapshot. We can't roll the store forward without this.
       _ <- fromEither[FactoryInput](
-          if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
-          else
-            Left(List("Cannot load initial timestamp " +
-                    firstDeltaTimestamp.toString + " of deltas " + " at " +
-                    this.toString + " only " + readDeltaTimestamps.toString)))
+              if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
+              else
+                Left(List("Cannot load initial timestamp " +
+                  firstDeltaTimestamp.toString + " of deltas " + " at " +
+                  this.toString + " only " + readDeltaTimestamps.toString)))
 
       // Record the timespan we actually read.
       _ <- putState((readDeltaTimestamps, mode))
@@ -397,8 +424,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   private def atLeastOneBatch(readTimespan: Interval[Timestamp]) =
     fromEither[FactoryInput] {
       if (batcher.batchesCoveredBy(readTimespan) == Empty()) {
-        Left(List("readTimespan is not convering at least one batch: " +
-                readTimespan.toString))
+        Left(
+            List("readTimespan is not convering at least one batch: " +
+              readTimespan.toString))
       } else {
         Right(())
       }

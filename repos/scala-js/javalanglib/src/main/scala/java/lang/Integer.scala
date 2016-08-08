@@ -71,8 +71,9 @@ object Integer {
     parseIntImpl(s, radix, signed = false)
 
   @inline
-  private def parseIntImpl(
-      s: String, radix: scala.Int, signed: scala.Boolean): scala.Int = {
+  private def parseIntImpl(s: String,
+                           radix: scala.Int,
+                           signed: scala.Boolean): scala.Int = {
     def fail = throw new NumberFormatException(s"""For input string: "$s"""")
 
     if (s == null || s.size == 0 || radix < Character.MIN_RADIX ||
@@ -222,8 +223,8 @@ object Integer {
   @inline def max(a: Int, b: Int): Int = Math.max(a, b)
   @inline def min(a: Int, b: Int): Int = Math.min(a, b)
 
-  @inline private[this] def toStringBase(
-      i: scala.Int, base: scala.Int): String = {
+  @inline private[this] def toStringBase(i: scala.Int,
+                                         base: scala.Int): String = {
     import js.JSNumberOps._
     i.toUint.toString(base)
   }

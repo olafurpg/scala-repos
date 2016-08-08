@@ -1,7 +1,10 @@
 package com.twitter.finagle.http.filter
 
 import com.twitter.finagle.{Service, SimpleFilter}
-import com.twitter.finagle.filter.{LogFormatter => CoreLogFormatter, LoggingFilter => CoreLoggingFilter}
+import com.twitter.finagle.filter.{
+  LogFormatter => CoreLogFormatter,
+  LoggingFilter => CoreLoggingFilter
+}
 import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.logging.Logger
 import com.twitter.util.{Duration, Future, Return, Throw, Time, Stopwatch}
@@ -74,8 +77,8 @@ class CommonLogFormatter extends LogFormatter {
    *   %D: response time in milliseconds
    *   "%{User-Agent}i": user agent
    */
-  val DateFormat = FastDateFormat.getInstance(
-      "dd/MMM/yyyy:HH:mm:ss Z", TimeZone.getTimeZone("GMT"))
+  val DateFormat = FastDateFormat
+    .getInstance("dd/MMM/yyyy:HH:mm:ss Z", TimeZone.getTimeZone("GMT"))
   def format(request: Request, response: Response, responseTime: Duration) = {
     val remoteAddr = request.remoteAddress.getHostAddress
 
@@ -108,8 +111,9 @@ class CommonLogFormatter extends LogFormatter {
     builder.toString
   }
 
-  def formatException(
-      request: Request, throwable: Throwable, responseTime: Duration): String =
+  def formatException(request: Request,
+                      throwable: Throwable,
+                      responseTime: Duration): String =
     throw new UnsupportedOperationException(
         "Log throwables as empty 500s instead")
 
@@ -127,12 +131,12 @@ class CommonLogFormatter extends LogFormatter {
 class LoggingFilter[REQUEST <: Request](
     val log: Logger,
     val formatter: CoreLogFormatter[REQUEST, Response]
-)
-    extends CoreLoggingFilter[REQUEST, Response] {
+) extends CoreLoggingFilter[REQUEST, Response] {
 
   // Treat exceptions as empty 500 errors
-  override protected def logException(
-      duration: Duration, request: REQUEST, throwable: Throwable) {
+  override protected def logException(duration: Duration,
+                                      request: REQUEST,
+                                      throwable: Throwable) {
     val response = Response(request.version, Status.InternalServerError)
     val line = formatter.format(request, response, duration)
     log.info(line)

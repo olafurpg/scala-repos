@@ -16,7 +16,8 @@ class LeastShardAllocationStrategySpec extends AkkaSpec {
   val regionC = system.actorOf(Props.empty, "regionC")
 
   val allocationStrategy = new LeastShardAllocationStrategy(
-      rebalanceThreshold = 3, maxSimultaneousRebalance = 2)
+      rebalanceThreshold = 3,
+      maxSimultaneousRebalance = 2)
 
   "LeastShardAllocationStrategy" must {
     "allocate to region with least number of shards" in {
@@ -58,9 +59,9 @@ class LeastShardAllocationStrategySpec extends AkkaSpec {
 
       Await.result(allocationStrategy.rebalance(allocations, Set("shard2")),
                    3.seconds) should ===(Set("shard3"))
-      Await.result(
-          allocationStrategy.rebalance(allocations, Set("shard2", "shard3")),
-          3.seconds) should ===(Set.empty[String])
+      Await.result(allocationStrategy.rebalance(allocations,
+                                                Set("shard2", "shard3")),
+                   3.seconds) should ===(Set.empty[String])
     }
   }
 }

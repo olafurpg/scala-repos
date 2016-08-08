@@ -2,7 +2,10 @@ package sbt.mavenint
 
 import org.eclipse.aether.RepositorySystemSession
 import org.eclipse.aether.repository.RemoteRepository
-import org.eclipse.aether.spi.connector.transport.{Transporter, TransporterFactory}
+import org.eclipse.aether.spi.connector.transport.{
+  Transporter,
+  TransporterFactory
+}
 
 /** Override aether's default transport with Ivy-ones. */
 class MyTransportFactory extends TransporterFactory {

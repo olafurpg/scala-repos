@@ -103,8 +103,8 @@ class ErrorFormatter(showExpected: Boolean = true,
     // to advancing the principal error location (PEL). Therefore it might be that their succeeding inner match
     // reaches further than the PEL. In these cases we want to show the complete inner match as "mismatched",
     // not just the piece up to the PEL. This is what this method corrects for.
-    error.effectiveTraces
-      .foldLeft(error.principalPosition.index - error.position.index + 1) {
+    error.effectiveTraces.foldLeft(
+        error.principalPosition.index - error.position.index + 1) {
       (len, trace) ⇒
         import RuleTrace._
         trace.terminal match {
@@ -137,8 +137,8 @@ class ErrorFormatter(showExpected: Boolean = true,
   /**
     * Formats what is expected at the error location into the given StringBuilder.
     */
-  def formatExpectedAsString(
-      sb: JStringBuilder, error: ParseError): JStringBuilder = {
+  def formatExpectedAsString(sb: JStringBuilder,
+                             error: ParseError): JStringBuilder = {
     @tailrec def rec(remaining: List[String]): JStringBuilder =
       remaining match {
         case Nil ⇒ sb.append("???")
@@ -180,8 +180,8 @@ class ErrorFormatter(showExpected: Boolean = true,
                       error: ParseError,
                       input: ParserInput): JStringBuilder = {
     import error.position._
-    val (expandedCol, expandedLine) = expandErrorLineTabs(
-        input getLine line, column)
+    val (expandedCol, expandedLine) =
+      expandErrorLineTabs(input getLine line, column)
     sb.append(expandedLine).append('\n')
     for (i ← 1 until expandedCol) sb.append(' ')
     sb.append('^')
@@ -198,8 +198,8 @@ class ErrorFormatter(showExpected: Boolean = true,
         val ec = if (inCol == errorColumn - 1) sb.length else errorCol
         line.charAt(inCol) match {
           case '\t' ⇒
-            sb.append(new String(Array.fill[Char](
-                        expandTabs - (sb.length % expandTabs))(' ')))
+            sb.append(new String(
+                Array.fill[Char](expandTabs - (sb.length % expandTabs))(' ')))
           case c ⇒ sb.append(c)
         }
         rec(inCol + 1, ec)
@@ -216,7 +216,7 @@ class ErrorFormatter(showExpected: Boolean = true,
     traces
       .map(formatTrace(_, position.index))
       .mkString(traces.size + " rule" + (if (traces.size != 1) "s" else "") +
-                " mismatched at error location:\n  ",
+                  " mismatched at error location:\n  ",
                 "\n  ",
                 "\n")
   }
@@ -290,7 +290,8 @@ class ErrorFormatter(showExpected: Boolean = true,
       case ZeroOrMore ⇒ "*"
     }
     if (nonTerminal.offset != 0 && showFrameStartOffset)
-      keyString + ':' + nonTerminal.offset else keyString
+      keyString + ':' + nonTerminal.offset
+    else keyString
   }
 
   def formatTerminal(terminal: RuleTrace.Terminal): String = {

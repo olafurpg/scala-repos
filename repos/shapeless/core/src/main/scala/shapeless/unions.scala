@@ -51,10 +51,11 @@ object union {
     * }}}
     */
   object Union extends Dynamic {
-    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U = macro UnionMacros
-      .mkUnionNamedImpl[U]
+    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U =
+      macro UnionMacros.mkUnionNamedImpl[U]
 
-    def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.unionTypeImpl
+    def selectDynamic(tpeSelector: String): Any =
+      macro LabelledMacros.unionTypeImpl
   }
 }
 
@@ -68,7 +69,7 @@ class UnionMacros(val c: whitebox.Context) {
   val SymTpe = typeOf[scala.Symbol]
   val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
-  def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(
+  def mkUnionNamedImpl[U <: Coproduct: WeakTypeTag](method: Tree)(
       elems: Tree*): Tree = {
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))

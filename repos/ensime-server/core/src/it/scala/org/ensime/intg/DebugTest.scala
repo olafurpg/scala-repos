@@ -14,8 +14,10 @@ import org.scalatest.Matchers
 
 // must be refreshing as the tests don't clean up after themselves properly
 class DebugTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture
     with DebugTestUtils {
 
   val original = EnsimeConfigFixture.DebugTestProject.copy(
@@ -358,8 +360,8 @@ trait DebugTestUtils {
     asyncHelper.expectMsg(DebugVMStartEvent)
     asyncHelper.expectMsgType[DebugThreadStartEvent]
 
-    val expect = DebugBreakEvent(
-        DebugThreadId(1), "main", resolvedFile, breakLine)
+    val expect =
+      DebugBreakEvent(DebugThreadId(1), "main", resolvedFile, breakLine)
     asyncHelper.expectMsg(expect)
     project ! DebugClearBreakReq(resolvedFile, breakLine)
     expectMsg(TrueResponse)
@@ -402,11 +404,16 @@ trait DebugTestUtils {
 
     project ! DebugBacktraceReq(DebugThreadId(1), 0, 1)
     expectMsgType[DebugBacktrace] should matchPattern {
-      case DebugBacktrace(
-          List(DebugStackFrame(
-          0, _, 1, `className`, `method`, LineSourcePosition(_, `line`), _)),
-          DebugThreadId(1),
-          "main") =>
+      case DebugBacktrace(List(
+                          DebugStackFrame(0,
+                                          _,
+                                          1,
+                                          `className`,
+                                          `method`,
+                                          LineSourcePosition(_, `line`),
+                                          _)),
+                          DebugThreadId(1),
+                          "main") =>
     }
   }
 }

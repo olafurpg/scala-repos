@@ -27,7 +27,11 @@ import com.esotericsoftware.kryo.io.{Input, Output}
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.serializer._
 import org.apache.spark.streaming.rdd.MapWithStateRDDRecord
-import org.apache.spark.streaming.util.{EmptyStateMap, OpenHashMapBasedStateMap, StateMap}
+import org.apache.spark.streaming.util.{
+  EmptyStateMap,
+  OpenHashMapBasedStateMap,
+  StateMap
+}
 
 class StateMapSuite extends SparkFunSuite {
 
@@ -112,8 +116,11 @@ class StateMapSuite extends SparkFunSuite {
     map.put(4, 4000, 400)
     assert(map.get(4) === Some(4000)) // item removed + updated in this map
 
-    assert(map.getAll().toSet === Set(
-            (1, 1000, 100), (2, 2000, 200), (3, 3000, 300), (4, 4000, 400)))
+    assert(
+        map.getAll().toSet === Set((1, 1000, 100),
+                                   (2, 2000, 200),
+                                   (3, 3000, 300),
+                                   (4, 4000, 400)))
     assert(parentMap.getAll().toSet === Set((2, 200, 2)))
 
     map.remove(2) // remove item present in parent map, so that its not visible in child map
@@ -136,7 +143,8 @@ class StateMapSuite extends SparkFunSuite {
     map1.put(1, 100, 1)
     map1.put(2, 200, 2)
     testSerialization(
-        map1, "error deserializing and serialized map with data + no delta")
+        map1,
+        "error deserializing and serialized map with data + no delta")
 
     val map2 = map1.copy().asInstanceOf[OpenHashMapBasedStateMap[Int, Int]]
     // Do not test compaction
@@ -148,7 +156,8 @@ class StateMapSuite extends SparkFunSuite {
     map2.put(3, 300, 3)
     map2.put(4, 400, 4)
     testSerialization(
-        map2, "error deserializing and serialized map with 1 delta + new data")
+        map2,
+        "error deserializing and serialized map with 1 delta + new data")
 
     val map3 = map2.copy().asInstanceOf[OpenHashMapBasedStateMap[Int, Int]]
     assert(map3.shouldCompact === false)
@@ -158,7 +167,8 @@ class StateMapSuite extends SparkFunSuite {
     map3.put(3, 600, 3)
     map3.remove(2)
     testSerialization(
-        map3, "error deserializing and serialized map with 2 delta + new data")
+        map3,
+        "error deserializing and serialized map with 2 delta + new data")
   }
 
   test(
@@ -178,7 +188,8 @@ class StateMapSuite extends SparkFunSuite {
     assert(map.shouldCompact === true)
 
     val deser_map = testSerialization(
-        map, "Deserialized + compacted map not same as original map")
+        map,
+        "Deserialized + compacted map not same as original map")
     assert(deser_map.deltaChainLength < deltaChainThreshold)
     assert(deser_map.shouldCompact === false)
   }
@@ -235,7 +246,9 @@ class StateMapSuite extends SparkFunSuite {
       3 // to test seq of ops like update -> remove -> update in same set
     val numTotalOps = numOpsPerSet * numSets
     val numKeys =
-      math.pow(numTypeMapOps, numTotalOps).toInt // to get all combinations of ops
+      math
+        .pow(numTypeMapOps, numTotalOps)
+        .toInt // to get all combinations of ops
 
     val refMap = new mutable.HashMap[Int, (Int, Long)]()
     var prevSetRefMap: immutable.Map[Int, (Int, Long)] = null
@@ -254,7 +267,9 @@ class StateMapSuite extends SparkFunSuite {
           // This is similar to finding the nth bit value of a binary number
           // E.g.  nth bit from the right of any binary number B is [ B / (2 ^ (n - 1)) ] % 2
           val opCode =
-            (keyId / math.pow(numTypeMapOps, numTotalOps - opId - 1).toInt) % numTypeMapOps
+            (keyId / math
+              .pow(numTypeMapOps, numTotalOps - opId - 1)
+              .toInt) % numTypeMapOps
           opCode match {
             case 0 =>
               val value = Random.nextInt()
@@ -267,8 +282,10 @@ class StateMapSuite extends SparkFunSuite {
         }
 
         // Test whether the current state map after all key updates is correct
-        assertMap(
-            stateMap, refMap, time, "State map does not match reference map")
+        assertMap(stateMap,
+                  refMap,
+                  time,
+                  "State map does not match reference map")
 
         // Test whether the previous map before copy has not changed
         if (prevSetStateMap != null && prevSetRefMap != null) {
@@ -297,14 +314,14 @@ class StateMapSuite extends SparkFunSuite {
               "Final state map does not match reference map")
   }
 
-  private def testSerialization[T : ClassTag](
+  private def testSerialization[T: ClassTag](
       map: OpenHashMapBasedStateMap[T, T],
       msg: String): OpenHashMapBasedStateMap[T, T] = {
     testSerialization(new JavaSerializer(conf), map, msg)
     testSerialization(new KryoSerializer(conf), map, msg)
   }
 
-  private def testSerialization[T : ClassTag](
+  private def testSerialization[T: ClassTag](
       serializer: Serializer,
       map: OpenHashMapBasedStateMap[T, T],
       msg: String): OpenHashMapBasedStateMap[T, T] = {
@@ -329,7 +346,8 @@ class StateMapSuite extends SparkFunSuite {
 
       // Assert that every time threshold returns the correct data
       for (t <- 0L to (time + 1)) {
-        assert(mapToTest.getByTime(t).toSet === refMapToTestWith
+        assert(
+            mapToTest.getByTime(t).toSet === refMapToTestWith
               .getByTime(t)
               .toSet)
       }
@@ -377,9 +395,11 @@ class StateMapSuite extends SparkFunSuite {
   test("EmptyStateMap - serializing and deserializing") {
     val map = StateMap.empty[KryoState, KryoState]
     // Since EmptyStateMap doesn't contains any date, KryoState won't break JavaSerializer.
-    assert(serializeAndDeserialize(new JavaSerializer(conf), map)
+    assert(
+        serializeAndDeserialize(new JavaSerializer(conf), map)
           .isInstanceOf[EmptyStateMap[KryoState, KryoState]])
-    assert(serializeAndDeserialize(new KryoSerializer(conf), map)
+    assert(
+        serializeAndDeserialize(new KryoSerializer(conf), map)
           .isInstanceOf[EmptyStateMap[KryoState, KryoState]])
   }
 
@@ -389,7 +409,8 @@ class StateMapSuite extends SparkFunSuite {
     map.put(new KryoState("a"), new KryoState("b"), 1)
 
     val record = MapWithStateRDDRecord[KryoState, KryoState, KryoState](
-        map, Seq(new KryoState("c")))
+        map,
+        Seq(new KryoState("c")))
     val deserRecord = serializeAndDeserialize(new KryoSerializer(conf), record)
     assert(!(record eq deserRecord))
     assert(
@@ -397,8 +418,8 @@ class StateMapSuite extends SparkFunSuite {
     assert(record.mappedData === deserRecord.mappedData)
   }
 
-  private def serializeAndDeserialize[T : ClassTag](
-      serializer: Serializer, t: T): T = {
+  private def serializeAndDeserialize[T: ClassTag](serializer: Serializer,
+                                                   t: T): T = {
     val serializerInstance = serializer.newInstance()
     serializerInstance.deserialize[T](
         serializerInstance.serialize(t),

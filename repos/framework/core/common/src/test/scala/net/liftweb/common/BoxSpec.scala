@@ -428,9 +428,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       val expectedChain =
         Failure("I HATE BACON",
                 Empty,
-                Full(Failure("MORE BACON FAIL",
-                             Empty,
-                             Full(Failure("BACON WHY U BACON")))))
+                Full(
+                    Failure("MORE BACON FAIL",
+                            Empty,
+                            Full(Failure("BACON WHY U BACON")))))
 
       singleBox must beLike {
         case ParamFailure(_, _, chain, _) =>
@@ -462,7 +463,7 @@ trait BoxGenerator {
       msg <- listOfN(msgLen, alphaChar)
       exception <- const(Full(new Exception("")))
       chainLen <- choose(1, 5)
-      chain <- frequency(
-          (1, listOfN(chainLen, genFailureBox)), (3, const(Nil)))
+      chain <- frequency((1, listOfN(chainLen, genFailureBox)),
+                         (3, const(Nil)))
     } yield Failure(msg.mkString, exception, Box(chain.headOption))
 }

@@ -3,10 +3,19 @@ package mesosphere.mesos
 import com.google.protobuf.{ByteString, TextFormat}
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon._
-import mesosphere.marathon.api.serialization.{PortDefinitionSerializer, ContainerSerializer}
+import mesosphere.marathon.api.serialization.{
+  PortDefinitionSerializer,
+  ContainerSerializer
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.health.HealthCheck
-import mesosphere.marathon.state.{PersistentVolume, AppDefinition, DiscoveryInfo, IpAddress, PathId}
+import mesosphere.marathon.state.{
+  PersistentVolume,
+  AppDefinition,
+  DiscoveryInfo,
+  IpAddress,
+  PathId
+}
 import mesosphere.mesos.ResourceMatcher.{ResourceSelector, ResourceMatch}
 import mesosphere.mesos.protos.{RangesResource, Resource, ScalarResource}
 import org.apache.mesos.Protos.Environment._
@@ -56,8 +65,8 @@ class TaskBuilder(app: AppDefinition,
 
       log.info(
           s"Offer [${offer.getId.getValue}]. Insufficient resources for [${app.id}] (need cpus=${app.cpus}, " +
-          s"mem=${app.mem}, disk=${app.disk}, $portsString, available in offer: " +
-          s"[${TextFormat.shortDebugString(offer)}]"
+            s"mem=${app.mem}, disk=${app.disk}, $portsString, available in offer: " +
+            s"[${TextFormat.shortDebugString(offer)}]"
       )
     }
 
@@ -132,8 +141,12 @@ class TaskBuilder(app: AppDefinition,
     val envPrefix: Option[String] = config.envVarsPrefix.get
     executor match {
       case CommandExecutor() =>
-        builder.setCommand(TaskBuilder.commandInfo(
-                app, Some(taskId), host, resourceMatch.hostPorts, envPrefix))
+        builder.setCommand(
+            TaskBuilder.commandInfo(app,
+                                    Some(taskId),
+                                    host,
+                                    resourceMatch.hostPorts,
+                                    envPrefix))
         containerProto.foreach(builder.setContainer)
 
       case PathExecutor(path) =>
@@ -142,8 +155,11 @@ class TaskBuilder(app: AppDefinition,
         val cmd = app.cmd orElse app.args.map(_ mkString " ") getOrElse ""
         val shell = s"chmod ug+rx $executorPath && exec $executorPath $cmd"
         val command = TaskBuilder
-          .commandInfo(
-              app, Some(taskId), host, resourceMatch.hostPorts, envPrefix)
+          .commandInfo(app,
+                       Some(taskId),
+                       host,
+                       resourceMatch.hostPorts,
+                       envPrefix)
           .toBuilder
           .setValue(shell)
 
@@ -174,8 +190,8 @@ class TaskBuilder(app: AppDefinition,
       val numUnusedChecks = mesosHealthChecks.size - 1
       log.warn(
           "Mesos supports one command health check per task.\n" +
-          s"Task [$taskId] will run without " +
-          s"$numUnusedChecks of its defined health checks."
+            s"Task [$taskId] will run without " +
+            s"$numUnusedChecks of its defined health checks."
       )
     }
 
@@ -298,13 +314,15 @@ object TaskBuilder {
                   host: Option[String],
                   ports: Seq[Int],
                   envPrefix: Option[String]): CommandInfo = {
-    val containerPorts = for (pms <- app.portMappings) yield
-      pms.map(_.containerPort)
+    val containerPorts = for (pms <- app.portMappings)
+      yield pms.map(_.containerPort)
     val declaredPorts = containerPorts.getOrElse(app.portNumbers)
     val envMap: Map[String, String] =
       taskContextEnv(app, taskId) ++ addPrefix(
           envPrefix,
-          portsEnv(declaredPorts, ports) ++ host.map("HOST" -> _).toMap) ++ app.env
+          portsEnv(declaredPorts, ports) ++ host
+            .map("HOST" -> _)
+            .toMap) ++ app.env
 
     val builder = CommandInfo.newBuilder().setEnvironment(environment(envMap))
 
@@ -343,8 +361,8 @@ object TaskBuilder {
     builder.build()
   }
 
-  def portsEnv(
-      definedPorts: Seq[Int], assignedPorts: Seq[Int]): Map[String, String] = {
+  def portsEnv(definedPorts: Seq[Int],
+               assignedPorts: Seq[Int]): Map[String, String] = {
     if (assignedPorts.isEmpty) {
       Map.empty
     } else {
@@ -377,8 +395,8 @@ object TaskBuilder {
     }
   }
 
-  def taskContextEnv(
-      app: AppDefinition, taskId: Option[Task.Id]): Map[String, String] = {
+  def taskContextEnv(app: AppDefinition,
+                     taskId: Option[Task.Id]): Map[String, String] = {
     if (taskId.isEmpty) {
       // This branch is taken during serialization. Do not add environment variables in this case.
       Map.empty
@@ -405,7 +423,7 @@ object TaskBuilder {
     val validLabels = labels.collect {
       case (key, value)
           if key.length < maxVariableLength &&
-          value.length < maxEnvironmentVarLength =>
+            value.length < maxEnvironmentVarLength =>
         escape(key) -> value
     }
 

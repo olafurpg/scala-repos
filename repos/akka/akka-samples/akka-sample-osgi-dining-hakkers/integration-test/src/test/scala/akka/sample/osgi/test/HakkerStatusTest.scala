@@ -31,7 +31,9 @@ import org.apache.karaf.tooling.exam.options.LogLevelOption
   */
 @RunWith(classOf[JUnit4TestRunner])
 class HakkerStatusTest
-    extends JUnitSuite with Matchers with AssertionsForJUnit {
+    extends JUnitSuite
+    with Matchers
+    with AssertionsForJUnit {
 
   @Inject
   @Filter(timeout = 30000)
@@ -60,8 +62,8 @@ class HakkerStatusTest
   def verifyObtainingAHakkerViaTheTheDiningHakkersService() {
 
     val name = "TestHakker"
-    val hakker = Option(service.getHakker(name, 2))
-      .getOrElse(throw new IllegalStateException(
+    val hakker = Option(service.getHakker(name, 2)).getOrElse(
+        throw new IllegalStateException(
             "No Hakker was created via DiningHakkerService"))
 
     // takes some time for the first message to get through

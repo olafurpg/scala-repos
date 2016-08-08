@@ -9,11 +9,27 @@ import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTypeAliasStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{Equivalence, ScParameterizedType, ScType, ScTypeParameterType}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Equivalence,
+  ScParameterizedType,
+  ScType,
+  ScTypeParameterType
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedInsidePsiElement,
+  ModCount
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -75,19 +91,19 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
           (typeParameters corresponds sc.typeParameters) {
             case (tp1, tp2) =>
               tp1.variance == tp2.variance &&
-              tp1.upperBound == tp2.upperBound &&
-              tp1.lowerBound == tp2.lowerBound && tp1.contextBound.isEmpty &&
-              tp2.contextBound.isEmpty && tp1.viewBound.isEmpty &&
-              tp2.viewBound.isEmpty
+                tp1.upperBound == tp2.upperBound &&
+                tp1.lowerBound == tp2.lowerBound && tp1.contextBound.isEmpty &&
+                tp2.contextBound.isEmpty && tp1.viewBound.isEmpty &&
+                tp2.viewBound.isEmpty
           }
         case _ => // Java class
           (typeParameters corresponds cls.getTypeParameters) {
             case (tp1, tp2) =>
               tp1.variance == ScTypeParam.Invariant &&
-              tp1.upperTypeElement.isEmpty &&
-              tp2.getExtendsListTypes.isEmpty &&
-              tp1.lowerTypeElement.isEmpty && tp1.contextBound.isEmpty &&
-              tp1.viewBound.isEmpty
+                tp1.upperTypeElement.isEmpty &&
+                tp2.getExtendsListTypes.isEmpty &&
+                tp1.lowerTypeElement.isEmpty && tp1.contextBound.isEmpty &&
+                tp1.viewBound.isEmpty
           }
       }
       typeParamsAreAppliedInOrderToCorrectClass && varianceAndBoundsMatch

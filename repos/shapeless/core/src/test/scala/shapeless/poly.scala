@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,8 @@ class PolyTests {
     implicit def caseList[T] = at[List[T]](_.length)
     implicit def caseOption[T](implicit st: Case.Aux[T, Int]) =
       at[Option[T]](t => 1 + (t map size).getOrElse(0))
-    implicit def caseTuple[T, U](
-        implicit st: Case.Aux[T, Int], su: Case.Aux[U, Int]) = at[(T, U)] {
+    implicit def caseTuple[T, U](implicit st: Case.Aux[T, Int],
+                                 su: Case.Aux[U, Int]) = at[(T, U)] {
       case (t, u) => size(t) + size(u)
     }
   }

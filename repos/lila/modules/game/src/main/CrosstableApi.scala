@@ -20,7 +20,9 @@ final class CrosstableApi(coll: Coll) {
   }
 
   def apply(u1: String, u2: String): Fu[Option[Crosstable]] =
-    coll.find(select(u1, u2)).one[Crosstable] orElse create(u1, u2) recoverWith lila.db
+    coll
+      .find(select(u1, u2))
+      .one[Crosstable] orElse create(u1, u2) recoverWith lila.db
       .recoverDuplicateKey(_ => coll.find(select(u1, u2)).one[Crosstable])
 
   def nbGames(u1: String, u2: String): Fu[Int] =
@@ -75,23 +77,32 @@ final class CrosstableApi(coll: Coll) {
             Game.BSONFields.status -> BSONDocument(
                 "$gte" -> chess.Status.Mate.id))
 
-        import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Match, SumValue, GroupField}
+        import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+          Match,
+          SumValue,
+          GroupField
+        }
         import reactivemongo.api.ReadPreference
 
         for {
           localResults <- gameColl
-            .find(selector, BSONDocument(Game.BSONFields.winnerId -> true))
-            .sort(BSONDocument(Game.BSONFields.createdAt -> -1))
-            .cursor[BSONDocument](
-                readPreference = ReadPreference.secondaryPreferred)
-            .collect[List](maxGames)
-            .map {
-              _.flatMap { doc =>
-                doc.getAs[String](Game.BSONFields.id).map { id =>
-                  Result(id, doc.getAs[String](Game.BSONFields.winnerId))
-                }
-              }.reverse
-            }
+                           .find(
+                               selector,
+                               BSONDocument(Game.BSONFields.winnerId -> true))
+                           .sort(BSONDocument(Game.BSONFields.createdAt -> -1))
+                           .cursor[BSONDocument](readPreference =
+                             ReadPreference.secondaryPreferred)
+                           .collect[List](maxGames)
+                           .map {
+                             _.flatMap { doc =>
+                               doc.getAs[String](Game.BSONFields.id).map {
+                                 id =>
+                                   Result(id,
+                                          doc.getAs[String](
+                                              Game.BSONFields.winnerId))
+                               }
+                             }.reverse
+                           }
           nbGames <- gameColl.count(selector.some)
           ctDraft = Crosstable(Crosstable.User(su1, 0),
                                Crosstable.User(su2, 0),
@@ -99,18 +110,17 @@ final class CrosstableApi(coll: Coll) {
                                nbGames)
 
           crosstable <- gameColl
-            .aggregate(
-                Match(selector),
-                List(
-                    GroupField(Game.BSONFields.winnerId)("nb" -> SumValue(1))))
-            .map(
-                _.documents.foldLeft(ctDraft) {
-                  case (ct, obj) =>
-                    obj.getAs[Int]("nb").fold(ct) { nb =>
-                      ct.addWins(obj.getAs[String]("_id"), nb)
-                    }
-                }
-            )
+                         .aggregate(Match(selector),
+                                    List(GroupField(Game.BSONFields.winnerId)(
+                                        "nb" -> SumValue(1))))
+                         .map(
+                             _.documents.foldLeft(ctDraft) {
+                               case (ct, obj) =>
+                                 obj.getAs[Int]("nb").fold(ct) { nb =>
+                                   ct.addWins(obj.getAs[String]("_id"), nb)
+                                 }
+                             }
+                         )
 
           _ <- coll insert crosstable
         } yield crosstable.some

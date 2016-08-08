@@ -94,7 +94,8 @@ private[math] trait UShortOrder extends Order[UShort] {
 
 @SerialVersionUID(0L)
 private[math] class UShortBitString
-    extends BitString[UShort] with Serializable {
+    extends BitString[UShort]
+    with Serializable {
   def one: UShort = UShort(-1: Short)
   def zero: UShort = UShort(0: Short)
   def and(a: UShort, b: UShort): UShort = a & b
@@ -133,11 +134,15 @@ private[math] trait UShortIsSigned extends Signed[UShort] {
 }
 
 private[math] trait UShortIsReal
-    extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
+    extends IsIntegral[UShort]
+    with UShortOrder
+    with UShortIsSigned {
   def toDouble(n: UShort): Double = n.toDouble
   def toBigInt(n: UShort): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)
 private[math] class UShortAlgebra
-    extends UShortIsRig with UShortIsReal with Serializable
+    extends UShortIsRig
+    with UShortIsReal
+    with Serializable

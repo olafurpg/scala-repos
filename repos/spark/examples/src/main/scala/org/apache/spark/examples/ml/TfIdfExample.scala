@@ -33,7 +33,8 @@ object TfIdfExample {
 
     // $example on$
     val sentenceData = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0, "Hi I heard about Spark"),
               (0, "I wish Java could use case classes"),
               (1, "Logistic regression models are neat")

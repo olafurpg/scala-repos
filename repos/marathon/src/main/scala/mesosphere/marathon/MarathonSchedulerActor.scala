@@ -11,11 +11,20 @@ import mesosphere.marathon.api.v2.json.AppUpdate
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{AppTerminatedEvent, DeploymentFailed, DeploymentSuccess, LocalLeadershipEvent}
+import mesosphere.marathon.event.{
+  AppTerminatedEvent,
+  DeploymentFailed,
+  DeploymentSuccess,
+  LocalLeadershipEvent
+}
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentManager._
-import mesosphere.marathon.upgrade.{DeploymentManager, DeploymentPlan, TaskKillActor}
+import mesosphere.marathon.upgrade.{
+  DeploymentManager,
+  DeploymentPlan,
+  TaskKillActor
+}
 import mesosphere.mesos.protos
 import org.apache.mesos.Protos.{Status, TaskID}
 import org.apache.mesos.SchedulerDriver
@@ -44,7 +53,9 @@ class MarathonSchedulerActor private (
     leaderInfo: LeaderInfo,
     eventBus: EventStream,
     cancellationTimeout: FiniteDuration = 1.minute)
-    extends Actor with ActorLogging with Stash {
+    extends Actor
+    with ActorLogging
+    with Stash {
   import context.dispatcher
   import mesosphere.marathon.MarathonSchedulerActor._
 
@@ -56,8 +67,8 @@ class MarathonSchedulerActor private (
 
   override def preStart(): Unit = {
     schedulerActions = createSchedulerActions(self)
-    deploymentManager = context.actorOf(
-        deploymentManagerProps(schedulerActions), "DeploymentManager")
+    deploymentManager = context
+      .actorOf(deploymentManagerProps(schedulerActions), "DeploymentManager")
     historyActor = context.actorOf(historyActorProps, "HistoryActor")
 
     leaderInfo.subscribe(self)
@@ -161,8 +172,8 @@ class MarathonSchedulerActor private (
         val origSender = sender()
         withLockFor(appId) {
           val promise = Promise[Unit]()
-          context.actorOf(TaskKillActor.props(
-                  driver, appId, taskTracker, eventBus, taskIds, promise))
+          context.actorOf(TaskKillActor
+            .props(driver, appId, taskTracker, eventBus, taskIds, promise))
           val res = for {
             _ <- promise.future
             Some(app) <- appRepository.currentVersion(appId)
@@ -285,10 +296,8 @@ class MarathonSchedulerActor private (
         if (origSender != Actor.noSender) origSender ! cmd.answer
       case Failure(e: LockingFailedException) if cmd.force =>
         deploymentManager ! CancelConflictingDeployments(plan)
-        val cancellationHandler = context.system.scheduler.scheduleOnce(
-            cancellationTimeout,
-            self,
-            CancellationTimeoutExceeded)
+        val cancellationHandler = context.system.scheduler
+          .scheduleOnce(cancellationTimeout, self, CancellationTimeoutExceeded)
 
         context.become(
             awaitCancellation(plan, origSender, cancellationHandler))
@@ -309,7 +318,8 @@ class MarathonSchedulerActor private (
                   p.id
               }
               origSender ! CommandFailed(
-                  cmd, AppLockedException(relatedDeploymentIds))
+                  cmd,
+                  AppLockedException(relatedDeploymentIds))
           }
     }
   }
@@ -490,7 +500,7 @@ class SchedulerActions(appRepository: AppRepository,
         for (unknownAppId <- tasksByApp.allAppIdsWithTasks -- appIds) {
           log.warn(
               s"App $unknownAppId exists in TaskTracker, but not App store. " +
-              "The app was likely terminated. Will now expunge."
+                "The app was likely terminated. Will now expunge."
           )
           for (orphanTask <- tasksByApp.marathonAppTasks(unknownAppId)) {
             log.info(s"Killing task ${orphanTask.getId}")
@@ -512,8 +522,8 @@ class SchedulerActions(appRepository: AppRepository,
   def reconcileHealthChecks(): Unit = {
     for {
       apps <- groupRepository
-        .rootGroup()
-        .map(_.map(_.transitiveApps).getOrElse(Set.empty))
+               .rootGroup()
+               .map(_.map(_.transitiveApps).getOrElse(Set.empty))
       app <- apps
     } healthCheckManager.reconcileWith(app.id)
   }

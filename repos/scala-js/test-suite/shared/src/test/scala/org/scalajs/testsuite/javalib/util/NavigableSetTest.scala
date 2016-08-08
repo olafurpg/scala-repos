@@ -136,5 +136,5 @@ object NavigableSetFactory {
 }
 
 trait NavigableSetFactory extends SetFactory {
-  def empty[E : ClassTag]: ju.NavigableSet[E]
+  def empty[E: ClassTag]: ju.NavigableSet[E]
 }

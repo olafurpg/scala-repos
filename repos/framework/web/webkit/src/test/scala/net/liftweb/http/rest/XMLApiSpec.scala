@@ -47,10 +47,10 @@ object XmlApiSpec extends Specification {
       // Tests pairToResponse
       case i: Int if i == 42 => (true, "But what is the question?")
       // These test the listElemToResponse conversion
-      case f: Float if f == 42f => ( <float>perfect</float>: Elem)
-      case f: Float if f == 0f => ( <float>zero</float>: Node)
-      case f: Float if f > 0f => ( <float>positive</float>: NodeSeq)
-      case f: Float if f < 0f => ( <float>negative</float>: Seq[Node])
+      case f: Float if f == 42f => (<float>perfect</float>: Elem)
+      case f: Float if f == 0f => (<float>zero</float>: Node)
+      case f: Float if f > 0f => (<float>positive</float>: NodeSeq)
+      case f: Float if f < 0f => (<float>negative</float>: Seq[Node])
     }
 
     // This method tests the XML implicit conversions on XMLApiHelper
@@ -58,17 +58,17 @@ object XmlApiSpec extends Specification {
       case r @ Req(List("api", "sum"), _, GetRequest) =>
         () =>
           doSum(r)
-        case r @ Req(List("api", "product"), _, GetRequest) =>
+      case r @ Req(List("api", "product"), _, GetRequest) =>
         () =>
           doProduct(r)
-        case r @ Req(List("api", "max"), _, GetRequest) =>
+      case r @ Req(List("api", "max"), _, GetRequest) =>
         () =>
           doMax(r)
-        case r @ Req(List("api", "min"), _, GetRequest) =>
+      case r @ Req(List("api", "min"), _, GetRequest) =>
         () =>
           doMin(r)
-        // Tests putResponseInBox
-        case Req("api" :: _, _, _) =>
+      // Tests putResponseInBox
+      case Req("api" :: _, _, _) =>
         () =>
           BadRequestResponse()
     }
@@ -76,10 +76,9 @@ object XmlApiSpec extends Specification {
     // ===== Handler methods =====
     def reduceOp(operation: (Int, Int) => Int)(r: Req): Box[Elem] =
       tryo {
-        (r.param("args")
-          .map { args =>
-            <result>{args.split(",").map(_.toInt).reduceLeft(operation)}</result>
-          }) ?~ "Missing args"
+        (r.param("args").map { args =>
+          <result>{args.split(",").map(_.toInt).reduceLeft(operation)}</result>
+        }) ?~ "Missing args"
       } match {
         case Full(x) => x
         case f: Failure => f
@@ -100,15 +99,15 @@ object XmlApiSpec extends Specification {
     def apply[T <: LiftResponse](response: org.specs2.matcher.Expectable[T]) =
       response.value match {
         case x: XmlResponse => {
-            /* For some reason, the UnprefixedAttributes that Lift uses to merge in
-             * new attributes makes comparison fail. Instead, we simply stringify and
-             * reparse the response contents and that seems to fix the issue. */
-            val converted = secureXML.loadString(x.xml.toString)
-            result(converted == expected,
-                   "%s matches %s".format(converted, expected),
-                   "%s does not match %s".format(converted, expected),
-                   response)
-          }
+          /* For some reason, the UnprefixedAttributes that Lift uses to merge in
+           * new attributes makes comparison fail. Instead, we simply stringify and
+           * reparse the response contents and that seems to fix the issue. */
+          val converted = secureXML.loadString(x.xml.toString)
+          result(converted == expected,
+                 "%s matches %s".format(converted, expected),
+                 "%s does not match %s".format(converted, expected),
+                 response)
+        }
         case other => result(false, "matches", "not an XmlResponse", response)
       }
   }
@@ -138,9 +137,9 @@ object XmlApiSpec extends Specification {
       failure must haveClass[XmlResponse]
       failure match {
         case x: XmlResponse => {
-            x.xml.attribute("success").map(_.text) must_== Some("false")
-            x.xml.attribute("msg").isDefined must_== true
-          }
+          x.xml.attribute("success").map(_.text) must_== Some("false")
+          x.xml.attribute("msg").isDefined must_== true
+        }
       }
     }
 

@@ -6,7 +6,10 @@ import java.util
 import java.util.Collections
 
 import com.intellij.conversion._
-import com.intellij.conversion.impl.{ComponentManagerSettingsImpl, ConversionContextImpl}
+import com.intellij.conversion.impl.{
+  ComponentManagerSettingsImpl,
+  ConversionContextImpl
+}
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.util.SystemProperties
 import org.jdom.Document
@@ -96,8 +99,8 @@ class ImportPanelConverterProvider
                     settingsValue = new Element("ScalaCodeStyleSettings")
                     value.addContent(settingsValue)
                   }
-                  getElements.foreach(
-                      elem => settingsValue.addContent(elem.clone()))
+                  getElements.foreach(elem =>
+                    settingsValue.addContent(elem.clone()))
                 }
                 JDOMUtil.writeDocument(new Document(root.clone()),
                                        file,

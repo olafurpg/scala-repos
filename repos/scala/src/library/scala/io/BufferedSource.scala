@@ -37,8 +37,9 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
   }
 
   override lazy val iter =
-    (Iterator continually (codec wrap charReader.read()) takeWhile (_ != -1) map
-        (_.toChar))
+    (Iterator continually (codec wrap charReader
+      .read()) takeWhile (_ != -1) map
+      (_.toChar))
 
   private def decachedReader: BufferedReader = {
     // Don't want to lose a buffered char sitting in iter either. Yes,
@@ -60,7 +61,8 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
   }
 
   class BufferedLineIterator
-      extends AbstractIterator[String] with Iterator[String] {
+      extends AbstractIterator[String]
+      with Iterator[String] {
     private val lineReader = decachedReader
     var nextLine: String = null
 
@@ -72,7 +74,9 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
     override def next(): String = {
       val result = {
         if (nextLine == null) lineReader.readLine
-        else try nextLine finally nextLine = null
+        else
+          try nextLine
+          finally nextLine = null
       }
       if (result == null) Iterator.empty.next()
       else result

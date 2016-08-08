@@ -2,12 +2,19 @@ package mesosphere.marathon.api.v2.json
 
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.JsonTestHelper
-import mesosphere.marathon.core.appinfo.{TaskLifeTime, TaskCounts, TaskStats, TaskStatsByVersion}
+import mesosphere.marathon.core.appinfo.{
+  TaskLifeTime,
+  TaskCounts,
+  TaskStats,
+  TaskStatsByVersion
+}
 import org.scalatest.{Matchers, GivenWhenThen}
 import play.api.libs.json.Json
 
 class TaskStatsByVersionFormatTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   import Formats._
 
   private[this] val emptyStats = TaskStatsByVersion(
@@ -19,17 +26,17 @@ class TaskStatsByVersionFormatTest
 
   private[this] val fullTaskStats = TaskStats(
       counts = TaskCounts(
-            tasksStaged = 1,
-            tasksRunning = 2,
-            tasksHealthy = 3,
-            tasksUnhealthy = 4
-        ),
+          tasksStaged = 1,
+          tasksRunning = 2,
+          tasksHealthy = 3,
+          tasksUnhealthy = 4
+      ),
       maybeLifeTime = Some(
-            TaskLifeTime(
-                averageSeconds = 20.0,
-                medianSeconds = 10.0
-            )
-        )
+          TaskLifeTime(
+              averageSeconds = 20.0,
+              medianSeconds = 10.0
+          )
+      )
   )
 
   test("empty stats get rendered correctly") {
@@ -85,14 +92,14 @@ class TaskStatsByVersionFormatTest
   test("full task stats by version get rendered correctly") {
     // we just vary the task running count to see that the different instances get rendered to the correct output
     val fullStats = TaskStatsByVersion(
-        maybeStartedAfterLastScaling = Some(fullTaskStats.copy(
-                  fullTaskStats.counts.copy(tasksRunning = 100))),
-        maybeWithLatestConfig = Some(fullTaskStats.copy(
-                  fullTaskStats.counts.copy(tasksRunning = 200))),
-        maybeWithOutdatedConfig = Some(fullTaskStats.copy(
-                  fullTaskStats.counts.copy(tasksRunning = 300))),
-        maybeTotalSummary = Some(fullTaskStats.copy(
-                  fullTaskStats.counts.copy(tasksRunning = 500)))
+        maybeStartedAfterLastScaling = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 100))),
+        maybeWithLatestConfig = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 200))),
+        maybeWithOutdatedConfig = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 300))),
+        maybeTotalSummary = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 500)))
     )
 
     When("serializing to JSON")
@@ -101,12 +108,12 @@ class TaskStatsByVersionFormatTest
     withClue(Json.prettyPrint(json)) {
       (json \ "startedAfterLastScaling" \ "stats" \ "counts" \ "running")
         .as[Int] should be(100)
-      (json \ "withLatestConfig" \ "stats" \ "counts" \ "running").as[Int] should be(
-          200)
-      (json \ "withOutdatedConfig" \ "stats" \ "counts" \ "running").as[Int] should be(
-          300)
-      (json \ "totalSummary" \ "stats" \ "counts" \ "running").as[Int] should be(
-          500)
+      (json \ "withLatestConfig" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(200)
+      (json \ "withOutdatedConfig" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(300)
+      (json \ "totalSummary" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(500)
     }
   }
 }

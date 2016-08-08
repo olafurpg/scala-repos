@@ -23,12 +23,10 @@ trait ProjectStructureMatcher {
 
   def assertProjectsEqual(expected: project, actual: Project): Unit = {
     assertEquals("Project name", expected.name, actual.getName)
-    expected.foreach(sdk)(
-        it =>
-          assertEquals(
-              "Project SDK",
-              it,
-              roots.ProjectRootManager.getInstance(actual).getProjectSdk))
+    expected.foreach(sdk)(it =>
+      assertEquals("Project SDK",
+                   it,
+                   roots.ProjectRootManager.getInstance(actual).getProjectSdk))
     expected.foreach(languageLevel)(
         it =>
           assertEquals("Project language level",
@@ -72,12 +70,14 @@ trait ProjectStructureMatcher {
     expected.foreach(contentRoots)(assertModuleContentRootsEqual(actual))
     expected.foreach(ProjectStructureDsl.sources)(
         assertModuleContentFoldersEqual(actual, JavaSourceRootType.SOURCE))
-    expected.foreach(testSources)(assertModuleContentFoldersEqual(
-            actual, JavaSourceRootType.TEST_SOURCE))
+    expected.foreach(testSources)(
+        assertModuleContentFoldersEqual(actual,
+                                        JavaSourceRootType.TEST_SOURCE))
     expected.foreach(resources)(
         assertModuleContentFoldersEqual(actual, JavaResourceRootType.RESOURCE))
-    expected.foreach(testResources)(assertModuleContentFoldersEqual(
-            actual, JavaResourceRootType.TEST_RESOURCE))
+    expected.foreach(testResources)(
+        assertModuleContentFoldersEqual(actual,
+                                        JavaResourceRootType.TEST_RESOURCE))
     expected.foreach(excluded)(assertModuleExcludedFoldersEqual(actual))
     expected.foreach(moduleDependencies)(assertModuleDependenciesEqual(actual))
     expected.foreach(libraryDependencies)(
@@ -96,8 +96,8 @@ trait ProjectStructureMatcher {
   }
 
   private def assertModuleContentFoldersEqual(
-      module: Module, folderType: JpsModuleSourceRootType[_])(
-      expected: Seq[String]): Unit = {
+      module: Module,
+      folderType: JpsModuleSourceRootType[_])(expected: Seq[String]): Unit = {
     val contentRoot = getSingleContentRoot(module)
     assertContentRootFoldersEqual(
         contentRoot,
@@ -108,8 +108,9 @@ trait ProjectStructureMatcher {
   private def assertModuleExcludedFoldersEqual(module: Module)(
       expected: Seq[String]): Unit = {
     val contentRoot = getSingleContentRoot(module)
-    assertContentRootFoldersEqual(
-        contentRoot, contentRoot.getExcludeFolders, expected)
+    assertContentRootFoldersEqual(contentRoot,
+                                  contentRoot.getExcludeFolders,
+                                  expected)
   }
 
   private def assertContentRootFoldersEqual(contentRoot: roots.ContentEntry,
@@ -157,11 +158,12 @@ trait ProjectStructureMatcher {
   }
 
   private def assertDependencyScopeAndExportedFlagEqual(
-      expected: dependency[_], actual: roots.ExportableOrderEntry): Unit = {
+      expected: dependency[_],
+      actual: roots.ExportableOrderEntry): Unit = {
     expected.foreach(isExported)(it =>
-          assertEquals("Dependency isExported flag", it, actual.isExported))
-    expected.foreach(scope)(
-        it => assertEquals("Dependency scope", it, actual.getScope))
+      assertEquals("Dependency isExported flag", it, actual.isExported))
+    expected.foreach(scope)(it =>
+      assertEquals("Dependency scope", it, actual.getScope))
   }
 
   private def assertProjectLibrariesEqual(project: Project)(
@@ -173,19 +175,20 @@ trait ProjectStructureMatcher {
         (assertLibraryContentsEqual _).tupled)
   }
 
-  private def assertLibraryContentsEqual(
-      expected: library, actual: Library): Unit = {
+  private def assertLibraryContentsEqual(expected: library,
+                                         actual: Library): Unit = {
     expected.foreach(classes)(
         assertLibraryFilesEqual(actual, roots.OrderRootType.CLASSES))
     expected.foreach(ProjectStructureDsl.sources)(
         assertLibraryFilesEqual(actual, roots.OrderRootType.SOURCES))
-    expected.foreach(javadocs)(assertLibraryFilesEqual(
-            actual, roots.JavadocOrderRootType.getInstance))
+    expected.foreach(javadocs)(
+        assertLibraryFilesEqual(actual,
+                                roots.JavadocOrderRootType.getInstance))
   }
 
   private def assertLibraryFilesEqual(
-      lib: Library, fileType: roots.OrderRootType)(
-      expectedFiles: Seq[String]): Unit =
+      lib: Library,
+      fileType: roots.OrderRootType)(expectedFiles: Seq[String]): Unit =
     // TODO: support non-local library contents (if necessary)
     // This implemetation works well only for local files; *.zip and other archives are not supported
     // @dancingrobot84
@@ -207,8 +210,9 @@ trait ProjectStructureMatcher {
   }
 
   private def assertNamesEqual[T](
-      what: String, expected: Seq[Named], actual: Seq[T])(
-      implicit nameOf: HasName[T]): Unit =
+      what: String,
+      expected: Seq[Named],
+      actual: Seq[T])(implicit nameOf: HasName[T]): Unit =
     assertMatch(what, expected.map(_.name), actual.map(s => nameOf(s)))
 
   private def assertEquals[T](what: String, expected: T, actual: T): Unit = {
@@ -242,17 +246,19 @@ object ProjectStructureMatcher {
 }
 
 trait InexactMatch { self: ProjectStructureMatcher =>
-  override def assertMatch[T](
-      what: String, expected: Seq[T], actual: Seq[T]): Unit =
+  override def assertMatch[T](what: String,
+                              expected: Seq[T],
+                              actual: Seq[T]): Unit =
     expected.foreach(it =>
-          assertTrue(
-              s"$what mismatch\nExpected [ ${expected.toList} ]\nActual   [ ${actual.toList} ]",
-              actual.contains(it)))
+      assertTrue(
+          s"$what mismatch\nExpected [ ${expected.toList} ]\nActual   [ ${actual.toList} ]",
+          actual.contains(it)))
 }
 
 trait ExactMatch { self: ProjectStructureMatcher =>
-  override def assertMatch[T](
-      what: String, expected: Seq[T], actual: Seq[T]): Unit = {
+  override def assertMatch[T](what: String,
+                              expected: Seq[T],
+                              actual: Seq[T]): Unit = {
     val errorMessage =
       s"$what mismatch\nExpected [ ${expected.toList} ]\nActual   [ ${actual.toList} ]"
     assertTrue(errorMessage, expected.forall(actual.contains))

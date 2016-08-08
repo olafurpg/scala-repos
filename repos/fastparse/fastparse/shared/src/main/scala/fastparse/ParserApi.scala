@@ -24,9 +24,8 @@ trait ParserApi[+T] {
     * Repeats this parser 0 or more times
     */
   def rep[R](implicit ev: Repeater[T, R]): Parser[R]
-  def rep[R](min: Int = 0,
-             sep: Parser[_] = Pass,
-             max: Int = Int.MaxValue)(implicit ev: Repeater[T, R]): Parser[R]
+  def rep[R](min: Int = 0, sep: Parser[_] = Pass, max: Int = Int.MaxValue)(
+      implicit ev: Repeater[T, R]): Parser[R]
 
   /**
     * Parses using this or the parser `p`

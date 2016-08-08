@@ -24,7 +24,10 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, RandomForest => OldRandomForest}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper,
+  RandomForest => OldRandomForest
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
@@ -35,7 +38,8 @@ import org.apache.spark.sql.{DataFrame, Row}
   * Test suite for [[RandomForestClassifier]].
   */
 class RandomForestClassifierSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   import RandomForestClassifierSuite.compareAPIs
 
@@ -45,8 +49,8 @@ class RandomForestClassifierSuite
   override def beforeAll() {
     super.beforeAll()
     orderedLabeledPoints50_1000 = sc.parallelize(
-        EnsembleTestHelper.generateOrderedLabeledPoints(
-            numFeatures = 50, 1000))
+        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 50,
+                                                        1000))
     orderedLabeledPoints5_20 = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 5, 20))
   }
@@ -65,29 +69,36 @@ class RandomForestClassifierSuite
       .setNumTrees(1)
       .setFeatureSubsetStrategy("auto")
       .setSeed(123)
-    compareAPIs(
-        orderedLabeledPoints50_1000, newRF, categoricalFeatures, numClasses)
+    compareAPIs(orderedLabeledPoints50_1000,
+                newRF,
+                categoricalFeatures,
+                numClasses)
   }
 
   test("params") {
     ParamsSuite.checkParams(new RandomForestClassifier)
     val model = new RandomForestClassificationModel(
         "rfc",
-        Array(new DecisionTreeClassificationModel(
-                "dtc", new LeafNode(0.0, 0.0, null), 1, 2)),
+        Array(
+            new DecisionTreeClassificationModel("dtc",
+                                                new LeafNode(0.0, 0.0, null),
+                                                1,
+                                                2)),
         2,
         2)
     ParamsSuite.checkParams(model)
   }
 
-  test("Binary classification with continuous features:" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+  test(
+      "Binary classification with continuous features:" +
+        " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val rf = new RandomForestClassifier()
     binaryClassificationTestWithContinuousFeatures(rf)
   }
 
-  test("Binary classification with continuous features and node Id cache:" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+  test(
+      "Binary classification with continuous features and node Id cache:" +
+        " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val rf = new RandomForestClassifier().setCacheNodeIds(true)
     binaryClassificationTestWithContinuousFeatures(rf)
   }
@@ -150,8 +161,9 @@ class RandomForestClassifierSuite
 
     val predictions = model
       .transform(df)
-      .select(
-          rf.getPredictionCol, rf.getRawPredictionCol, rf.getProbabilityCol)
+      .select(rf.getPredictionCol,
+              rf.getRawPredictionCol,
+              rf.getProbabilityCol)
       .collect()
 
     predictions.foreach {

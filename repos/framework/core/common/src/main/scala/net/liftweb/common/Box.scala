@@ -502,7 +502,7 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
   def forall(func: A => Boolean): Boolean = true
 
   /**
-    * 
+    *
     * If this `Box` contains a value and it does '''not''' satisfy the specified
     * `f`, return the `Box` unchanged. Otherwise, return an `Empty`.
     */
@@ -653,7 +653,7 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * This method calls the specified function with the specified `in` value and
     * the value contained in this `Box`. If this box is empty, returns the `in`
     * value directly.
-    * 
+    *
     * @return The result of the function or the `in` value.
     */
   def run[T](in: => T)(f: (T, A) => T) = in
@@ -863,7 +863,7 @@ sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
   def openOrThrowException(justification: String) =
     throw new NullPointerException(
         "An Empty Box was opened.  The justification for allowing the openOrThrowException was " +
-        justification)
+          justification)
 
   override def openOr[B >: Nothing](default: => B): B = default
 
@@ -893,16 +893,17 @@ object Failure {
   * exception and/or a chain of previous `Failure`s that may have caused this
   * one.
   */
-sealed case class Failure(
-    msg: String, exception: Box[Throwable], chain: Box[Failure])
+sealed case class Failure(msg: String,
+                          exception: Box[Throwable],
+                          chain: Box[Failure])
     extends EmptyBox {
   type A = Nothing
 
   override def openOrThrowException(justification: String) =
     throw new NullPointerException(
         "An Failure Box was opened.  Failure Message: " + msg +
-        ".  The justification for allowing the openOrThrowException was " +
-        justification) {
+          ".  The justification for allowing the openOrThrowException was " +
+          justification) {
       override def getCause() = exception openOr null
     }
 
@@ -992,8 +993,10 @@ sealed case class Failure(
   * well as allow pattern-matching on the `ParamFailure`.
   */
 object ParamFailure {
-  def apply[T](
-      msg: String, exception: Box[Throwable], chain: Box[Failure], param: T) =
+  def apply[T](msg: String,
+               exception: Box[Throwable],
+               chain: Box[Failure],
+               param: T) =
     new ParamFailure(msg, exception, chain, param)
 
   def apply[T](msg: String, param: T) =
@@ -1041,10 +1044,11 @@ final class ParamFailure[T](override val msg: String,
                             override val exception: Box[Throwable],
                             override val chain: Box[Failure],
                             val param: T)
-    extends Failure(msg, exception, chain) with Serializable {
+    extends Failure(msg, exception, chain)
+    with Serializable {
   override def toString(): String =
     "ParamFailure(" + msg + ", " + exception + ", " + chain + ", " + param +
-    ")"
+      ")"
 
   override def equals(that: Any): Boolean = that match {
     case ParamFailure(m, e, c, p) =>
@@ -1054,10 +1058,10 @@ final class ParamFailure[T](override val msg: String,
 
   override def hashCode(): Int =
     super.hashCode() +
-    (param match {
-          case null => 0
-          case x => x.hashCode()
-        })
+      (param match {
+        case null => 0
+        case x => x.hashCode()
+      })
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure(msg, exception, Full(this), errorCode)

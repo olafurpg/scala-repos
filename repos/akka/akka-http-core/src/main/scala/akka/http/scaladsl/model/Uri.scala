@@ -285,8 +285,9 @@ object Uri {
            fragment: Option[String] = None,
            mode: Uri.ParsingMode = Uri.ParsingMode.Relaxed): Uri =
     apply(scheme,
-          Authority(
-              Host(host, UTF8, mode), normalizePort(port, scheme), userinfo),
+          Authority(Host(host, UTF8, mode),
+                    normalizePort(port, scheme),
+                    userinfo),
           Path(path),
           queryString,
           fragment)
@@ -375,8 +376,13 @@ object Uri {
         }
       }
     }
-    create(
-        _scheme, "", _host, _port, collapseDotSegments(path), query, fragment)
+    create(_scheme,
+           "",
+           _host,
+           _port,
+           collapseDotSegments(path),
+           query,
+           fragment)
   }
 
   def httpScheme(securedConnection: Boolean = false) =
@@ -451,8 +457,8 @@ object Uri {
     def isEmpty = false
     def toOption = Some(this)
   }
-  final case class IPv4Host private[http](
-      bytes: immutable.Seq[Byte], address: String)
+  final case class IPv4Host private[http] (bytes: immutable.Seq[Byte],
+                                           address: String)
       extends NonEmptyHost {
     require(bytes.length == 4, "bytes array must have length 4")
     require(!address.isEmpty, "address must not be empty")
@@ -475,8 +481,8 @@ object Uri {
     private[http] def apply(bytes: Array[Byte], address: String): IPv4Host =
       IPv4Host(immutable.Seq(bytes: _*), address)
   }
-  final case class IPv6Host private (
-      bytes: immutable.Seq[Byte], address: String)
+  final case class IPv6Host private (bytes: immutable.Seq[Byte],
+                                     address: String)
       extends NonEmptyHost {
     require(bytes.length == 16, "bytes array must have length 16")
     require(!address.isEmpty, "address must not be empty")
@@ -671,8 +677,8 @@ object Uri {
                  q: Query): Map[String, List[String]] =
         if (q.isEmpty) map
         else
-          append(
-              map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)), q.tail)
+          append(map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)),
+                 q.tail)
       append(Map.empty, this)
     }
     override def newBuilder: mutable.Builder[(String, String), Query] =
@@ -831,8 +837,8 @@ object Uri {
 
   @tailrec
   private[http] def decode(string: String, charset: Charset, ix: Int)(
-      sb: JStringBuilder = new JStringBuilder(string.length)
-          .append(string, 0, ix)): String =
+      sb: JStringBuilder =
+        new JStringBuilder(string.length).append(string, 0, ix)): String =
     if (ix < string.length)
       string.charAt(ix) match {
         case '%' ⇒
@@ -849,7 +855,7 @@ object Uri {
 
           var lastPercentSignIndexPlus3 = ix + 3
           while (lastPercentSignIndexPlus3 < string.length && string.charAt(
-              lastPercentSignIndexPlus3) == '%') lastPercentSignIndexPlus3 += 3
+                     lastPercentSignIndexPlus3) == '%') lastPercentSignIndexPlus3 += 3
           val bytesCount = (lastPercentSignIndexPlus3 - ix) / 3
           val bytes = new Array[Byte](bytesCount)
 
@@ -882,8 +888,10 @@ object Uri {
       if (ix >= 0) {
         val c = scheme.charAt(ix)
         if (allowed(c))
-          verify(ix - 1, `scheme-char`, allLower && !UPPER_ALPHA(c)) else ix
-      } else if (allLower) -1 else -2
+          verify(ix - 1, `scheme-char`, allLower && !UPPER_ALPHA(c))
+        else ix
+      } else if (allLower) -1
+      else -2
     verify() match {
       case -2 ⇒ scheme.toLowerCase
       case -1 ⇒ scheme
@@ -926,7 +934,8 @@ object Uri {
         case Slash(Segment("..", tail)) ⇒
           process(
               input = if (tail.isEmpty) Path./ else tail,
-              output = if (output.startsWithSegment)
+              output =
+                if (output.startsWithSegment)
                   if (output.tail.startsWithSlash) output.tail.tail else tail
                 else output)
         case Segment("." | "..", tail) ⇒ process(tail, output)
@@ -1012,8 +1021,9 @@ object UriRendering {
     * produce percent-encoded representations of potentially existing non-ASCII characters in the
     * different components.
     */
-  def renderUriWithoutFragment[R <: Rendering](
-      r: R, value: Uri, charset: Charset): r.type = {
+  def renderUriWithoutFragment[R <: Rendering](r: R,
+                                               value: Uri,
+                                               charset: Charset): r.type = {
     import value._
     if (isAbsolute) r ~~ scheme ~~ ':'
     renderAuthority(r, authority, path, scheme, charset)
@@ -1022,8 +1032,10 @@ object UriRendering {
     r
   }
 
-  def renderAuthority[R <: Rendering](
-      r: R, authority: Authority, scheme: String, charset: Charset): r.type =
+  def renderAuthority[R <: Rendering](r: R,
+                                      authority: Authority,
+                                      scheme: String,
+                                      charset: Charset): r.type =
     renderAuthority(r, authority, Path.Empty, scheme, charset)
 
   def renderAuthority[R <: Rendering](r: R,
@@ -1094,8 +1106,8 @@ object UriRendering {
           case c if keep(c) ⇒ { r ~~ c; 1 }
           case ' ' if replaceSpaces ⇒ { r ~~ '+'; 1 }
           case c if c <= 127 && asciiCompatible ⇒ {
-              appendEncoded(c.toByte); 1
-            }
+            appendEncoded(c.toByte); 1
+          }
           case c ⇒
             def append(s: String) = s.getBytes(charset).foreach(appendEncoded)
             if (Character.isHighSurrogate(c)) {

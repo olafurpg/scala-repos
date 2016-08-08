@@ -19,7 +19,13 @@ package com.twitter.logging
 import com.twitter.conversions.time._
 import com.twitter.util.TempFolder
 import java.net.InetSocketAddress
-import java.util.concurrent.{Callable, CountDownLatch, Executors, Future, TimeUnit}
+import java.util.concurrent.{
+  Callable,
+  CountDownLatch,
+  Executors,
+  Future,
+  TimeUnit
+}
 import java.util.{logging => javalog}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -209,8 +215,7 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
       val executorService = Executors.newFixedThreadPool(numThreads)
       val futureResults = new mutable.ListBuffer[Future[Logger]]
       for (i <- 0.until(numThreads)) {
-        val future = executorService.submit(
-            new Callable[Logger]() {
+        val future = executorService.submit(new Callable[Logger]() {
           def call(): Logger = {
             latch.await(10, TimeUnit.SECONDS)
             return Logger.get("concurrencyTest")
@@ -261,10 +266,10 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
                     append = false,
                     level = Some(Level.INFO),
                     formatter = new Formatter(
-                          useFullPackageNames = true,
-                          truncateAt = 1024,
-                          prefix = "%s <HH:mm> %s"
-                      )
+                        useFullPackageNames = true,
+                        truncateAt = 1024,
+                        prefix = "%s <HH:mm> %s"
+                    )
                 ) :: Nil
           ).apply()
 
@@ -292,9 +297,9 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
                 node = "com.twitter",
                 handlers = SyslogHandler(
                       formatter = new SyslogFormatter(
-                            serverName = Some("elmo"),
-                            priority = 128
-                        ),
+                          serverName = Some("elmo"),
+                          priority = 128
+                      ),
                       server = "example.com",
                       port = 212
                   ) :: Nil
@@ -303,7 +308,9 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
             assert(log.getHandlers.length == 1)
             val h = log.getHandlers()(0).asInstanceOf[SyslogHandler]
             assert(
-                h.dest.asInstanceOf[InetSocketAddress].getHostName == "example.com")
+                h.dest
+                  .asInstanceOf[InetSocketAddress]
+                  .getHostName == "example.com")
             assert(h.dest.asInstanceOf[InetSocketAddress].getPort == 212)
             val formatter = h.formatter.asInstanceOf[SyslogFormatter]
             assert(formatter.serverName == Some("elmo"))
@@ -321,12 +328,12 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
                       duration = 60.seconds,
                       maxToDisplay = 10,
                       handler = FileHandler(
-                            filename = folderName + "/production.log",
-                            rollPolicy = Policy.SigHup,
-                            formatter = new Formatter(
-                                  truncateStackTracesAt = 100
-                              )
-                        )
+                          filename = folderName + "/production.log",
+                          rollPolicy = Policy.SigHup,
+                          formatter = new Formatter(
+                              truncateStackTracesAt = 100
+                          )
+                      )
                   ) :: Nil
             ) :: LoggerFactory(
                 node = "w3c",

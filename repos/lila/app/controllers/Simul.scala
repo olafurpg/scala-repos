@@ -123,8 +123,8 @@ object Simul extends LilaController {
       Env.chat.api.userChat find sim.id map (_.forUser(ctx.me).some)
     }
 
-  private def AsHost(simulId: Sim.ID)(
-      f: Sim => Result)(implicit ctx: Context): Fu[Result] =
+  private def AsHost(simulId: Sim.ID)(f: Sim => Result)(
+      implicit ctx: Context): Fu[Result] =
     env.repo.find(simulId) flatMap {
       case None => notFound
       case Some(simul) if ctx.userId.exists(simul.hostId ==) =>

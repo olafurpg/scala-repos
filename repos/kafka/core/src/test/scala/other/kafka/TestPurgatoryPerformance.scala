@@ -124,8 +124,8 @@ object TestPurgatoryPerformance {
     val latch = new CountDownLatch(numRequests)
     val start = System.currentTimeMillis
     val rand = new Random()
-    val keys = (0 until numKeys).map(
-        i => "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
+    val keys = (0 until numKeys).map(i =>
+      "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
     @volatile var requestArrivalTime = start
     @volatile var end = 0L
     val generator = new Runnable {
@@ -140,8 +140,10 @@ object TestPurgatoryPerformance {
 
           if (requestArrivalTime > now) Thread.sleep(requestArrivalTime - now)
 
-          val request = new FakeOperation(
-              timeout, requestDataSize, latencyToComplete, latch)
+          val request = new FakeOperation(timeout,
+                                          requestDataSize,
+                                          latencyToComplete,
+                                          latch)
           if (latencyToComplete < timeout) queue.add(request)
           purgatory.tryCompleteElseWatch(request, keys)
         }
@@ -171,8 +173,8 @@ object TestPurgatoryPerformance {
       numRequests.toDouble * 1000d / (requestArrivalTime - start).toDouble
     val actualRate = numRequests.toDouble * 1000d / (end - start).toDouble
 
-    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(
-        x => (x - initialCpuTimeNano.get) / 1000000L)
+    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(x =>
+      (x - initialCpuTimeNano.get) / 1000000L)
     val gcCounts = gcMXBeans.map(_.getCollectionCount)
     val gcTimes = gcMXBeans.map(_.getCollectionTime)
 
@@ -241,7 +243,7 @@ object TestPurgatoryPerformance {
       val normalMean = math.log(pct50)
       val normalStDev =
         (math.log(pct75) -
-            normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
+          normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
       val dist = new LogNormalDistribution(normalMean, normalStDev)
       (0 until sampleSize).map { _ =>
         dist.next().toLong
@@ -287,8 +289,10 @@ object TestPurgatoryPerformance {
     }
   }
 
-  private class FakeOperation(
-      delayMs: Long, size: Int, val latencyMs: Long, latch: CountDownLatch)
+  private class FakeOperation(delayMs: Long,
+                              size: Int,
+                              val latencyMs: Long,
+                              latch: CountDownLatch)
       extends DelayedOperation(delayMs) {
     private[this] val data = new Array[Byte](size)
     val completesAt = System.currentTimeMillis + latencyMs
@@ -308,7 +312,8 @@ object TestPurgatoryPerformance {
   private class CompletionQueue {
     private[this] val delayQueue = new DelayQueue[Scheduled]()
     private[this] val thread = new ShutdownableThread(
-        name = "completion thread", isInterruptible = false) {
+        name = "completion thread",
+        isInterruptible = false) {
       override def doWork(): Unit = {
         val scheduled = delayQueue.poll(100, TimeUnit.MILLISECONDS)
         if (scheduled != null) {

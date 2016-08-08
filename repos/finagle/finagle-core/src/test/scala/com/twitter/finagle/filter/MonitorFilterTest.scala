@@ -16,7 +16,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MonitorFilterTest
-    extends FunSuite with MockitoSugar with IntegrationBase {
+    extends FunSuite
+    with MockitoSugar
+    with IntegrationBase {
 
   class MockMonitor extends Monitor {
     def handle(cause: Throwable) = false
@@ -56,7 +58,8 @@ class MonitorFilterTest
   }
 
   class MockSourcedException(underlying: Throwable, name: String)
-      extends RuntimeException(underlying) with SourcedException {
+      extends RuntimeException(underlying)
+      with SourcedException {
     def this(name: String) = this(null, name)
     serviceName = name
   }
@@ -64,8 +67,8 @@ class MonitorFilterTest
   class Helper {
     val monitor = Mockito.spy(new MockMonitor)
     val inner = new MockSourcedException("FakeService1")
-    val outer = new MockSourcedException(
-        inner, SourcedException.UnspecifiedServiceName)
+    val outer =
+      new MockSourcedException(inner, SourcedException.UnspecifiedServiceName)
 
     val mockLogger = Mockito.spy(Logger.getLogger("MockServer"))
     // add handler to redirect and mute output, so that it doesn't show up in the console during a test run.
@@ -130,7 +133,8 @@ class MonitorFilterTest
     when(preparedFactory.status) thenReturn (Status.Open)
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(
+    when(
+        m.codec.prepareConnFactory(
             any[ServiceFactory[String, String]],
             any[Stack.Params])) thenReturn preparedFactory
 

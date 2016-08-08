@@ -26,8 +26,8 @@ object CommonParams {
                                                 inactive = "pio_inactive",
                                                 rating = "pio_rating")
 
-  val PreparatorParams = new PreparatorParams(
-      actions = Map("rate" -> None), conflict = "latest")
+  val PreparatorParams =
+    new PreparatorParams(actions = Map("rate" -> None), conflict = "latest")
 
   val MahoutAlgoParams0 = new ItemBasedAlgoParams(
       booleanData = true,
@@ -46,10 +46,10 @@ object CommonParams {
       actions = Set("rate"),
       attributeNames = CommonParams.DataSourceAttributeNames,
       slidingEval = Some(
-            new EventsSlidingEvalParams(
-                firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
-                evalDuration = Duration.standardDays(7),
-                evalCount = 12)))
+          new EventsSlidingEvalParams(firstTrainingUntilTime =
+                                        new DateTime(1998, 2, 1, 0, 0),
+                                      evalDuration = Duration.standardDays(7),
+                                      evalCount = 12)))
 }
 
 object Evaluation1 {
@@ -62,23 +62,23 @@ object Evaluation1 {
         actions = Set("rate"),
         attributeNames = CommonParams.DataSourceAttributeNames,
         slidingEval = Some(
-              new EventsSlidingEvalParams(
-                  firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
-                  evalDuration = Duration.standardDays(7),
-                  evalCount = 3))
+            new EventsSlidingEvalParams(
+                firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
+                evalDuration = Duration.standardDays(7),
+                evalCount = 3))
     )
 
     val engineParams = new EngineParams(
         dataSourceParams = dsp,
         preparatorParams = CommonParams.PreparatorParams,
-        algorithmParamsList = Seq(
-              ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+        algorithmParamsList =
+          Seq(("mahoutItemBased", CommonParams.MahoutAlgoParams0))
     )
 
     // Evaluator Setting
     val evaluatorParams = new DetailedEvaluatorParams(
-        ratingParams = new BinaryRatingParams(
-              actionsMap = Map("rate" -> None), goodThreshold = 3),
+        ratingParams = new BinaryRatingParams(actionsMap = Map("rate" -> None),
+                                              goodThreshold = 3),
         measureType = MeasureType.PrecisionAtK,
         measureK = 10
     )
@@ -102,14 +102,14 @@ object Evaluation2 {
     val engineParams = new EngineParams(
         dataSourceParams = CommonParams.CompleteDataSourceParams,
         preparatorParams = CommonParams.PreparatorParams,
-        algorithmParamsList = Seq(
-              ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+        algorithmParamsList =
+          Seq(("mahoutItemBased", CommonParams.MahoutAlgoParams0))
     )
 
     // Evaluator Setting
     val evaluatorParams = new DetailedEvaluatorParams(
-        ratingParams = new BinaryRatingParams(
-              actionsMap = Map("rate" -> None), goodThreshold = 3),
+        ratingParams = new BinaryRatingParams(actionsMap = Map("rate" -> None),
+                                              goodThreshold = 3),
         measureType = MeasureType.PrecisionAtK,
         measureK = 10
     )

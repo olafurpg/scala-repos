@@ -35,17 +35,18 @@ trait PsiElementExtTrait {
   def getPrevSiblingNotWhitespace: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
     while (prev != null &&
-    (prev.isInstanceOf[PsiWhiteSpace] ||
-        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev = prev.getPrevSibling
+           (prev.isInstanceOf[PsiWhiteSpace] ||
+           prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev =
+      prev.getPrevSibling
     prev
   }
 
   def getPrevSiblingNotWhitespaceComment: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
     while (prev != null &&
-    (prev.isInstanceOf[PsiWhiteSpace] ||
-        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
-        prev.isInstanceOf[PsiComment])) prev = prev.getPrevSibling
+           (prev.isInstanceOf[PsiWhiteSpace] ||
+           prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+           prev.isInstanceOf[PsiComment])) prev = prev.getPrevSibling
     prev
   }
 
@@ -62,17 +63,18 @@ trait PsiElementExtTrait {
   def getNextSiblingNotWhitespace: PsiElement = {
     var next: PsiElement = repr.getNextSibling
     while (next != null &&
-    (next.isInstanceOf[PsiWhiteSpace] ||
-        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next = next.getNextSibling
+           (next.isInstanceOf[PsiWhiteSpace] ||
+           next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next =
+      next.getNextSibling
     next
   }
 
   def getNextSiblingNotWhitespaceComment: PsiElement = {
     var next: PsiElement = repr.getNextSibling
     while (next != null &&
-    (next.isInstanceOf[PsiWhiteSpace] ||
-        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
-        next.isInstanceOf[PsiComment])) next = next.getNextSibling
+           (next.isInstanceOf[PsiWhiteSpace] ||
+           next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+           next.isInstanceOf[PsiComment])) next = next.getNextSibling
     next
   }
 

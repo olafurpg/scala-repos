@@ -6,7 +6,11 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import _root_.akka.actor.ActorSystem
 import org.atmosphere.wasync._
-import org.atmosphere.wasync.impl.{DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder}
+import org.atmosphere.wasync.impl.{
+  DefaultOptions,
+  DefaultOptionsBuilder,
+  DefaultRequestBuilder
+}
 import org.json4s.JsonDSL._
 import org.json4s.{DefaultFormats, Formats, _}
 import org.scalatra.json.JacksonJsonSupport
@@ -17,7 +21,9 @@ import scala.concurrent.duration._
 
 class AtmosphereSpecServlet(
     implicit override protected val scalatraActorSystem: ActorSystem)
-    extends ScalatraServlet with JacksonJsonSupport with SessionSupport
+    extends ScalatraServlet
+    with JacksonJsonSupport
+    with SessionSupport
     with AtmosphereSupport {
 
   implicit protected def jsonFormats: Formats = DefaultFormats
@@ -55,8 +61,8 @@ class AtmosphereSpecServlet(
     case t: Throwable => t.printStackTrace()
   }
 
-  override def handle(
-      request: HttpServletRequest, response: HttpServletResponse) {
+  override def handle(request: HttpServletRequest,
+                      response: HttpServletResponse) {
     withRequestResponse(request, response) {
       println(request.headers)
       println("routeBasePath: " + routeBasePath(request))

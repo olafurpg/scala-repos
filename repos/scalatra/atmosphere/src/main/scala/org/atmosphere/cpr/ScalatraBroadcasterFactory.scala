@@ -14,9 +14,10 @@ import scala.util.{Try, Success, Failure}
 
 object ScalatraBroadcasterFactory {}
 
-class ScalatraBroadcasterFactory(
-    var cfg: AtmosphereConfig, bCfg: BroadcasterConf)(
-    implicit wireFormat: WireFormat, system: ActorSystem)
+class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
+                                 bCfg: BroadcasterConf)(
+    implicit wireFormat: WireFormat,
+    system: ActorSystem)
     extends BroadcasterFactory {
   BroadcasterFactory.setBroadcasterFactory(this, cfg)
 
@@ -46,8 +47,10 @@ class ScalatraBroadcasterFactory(
       b.setSuspendPolicy(-1, Broadcaster.POLICY.FIFO)
 
       if (b.getBroadcasterConfig == null) {
-        b.setBroadcasterConfig(new BroadcasterConfig(
-                cfg.framework().broadcasterFilters, cfg, id.toString).init())
+        b.setBroadcasterConfig(
+            new BroadcasterConfig(cfg.framework().broadcasterFilters,
+                                  cfg,
+                                  id.toString).init())
       }
 
       b.setBroadcasterLifeCyclePolicy(BroadcasterLifeCyclePolicy.NEVER)
@@ -69,7 +72,7 @@ class ScalatraBroadcasterFactory(
     if (s != null && s.equalsIgnoreCase("TRUE")) {
       logger.warn(
           "Factory shared, will not be destroyed. That can possibly cause memory leaks if" +
-          "Broadcaster where created. Make sure you destroy them manually.")
+            "Broadcaster where created. Make sure you destroy them manually.")
     }
 
     var bc: BroadcasterConfig = null
@@ -94,13 +97,14 @@ class ScalatraBroadcasterFactory(
   def lookup[T <: Broadcaster](c: Class[T], id: scala.Any): T =
     lookup(c, id, false)
 
-  def lookup[T <: Broadcaster](
-      c: Class[T], id: scala.Any, createIfNull: Boolean): T = {
+  def lookup[T <: Broadcaster](c: Class[T],
+                               id: scala.Any,
+                               createIfNull: Boolean): T = {
     val bOpt = store get id
     if (bOpt.isDefined && !c.isAssignableFrom(bOpt.get.getClass)) {
       val msg =
         "Invalid lookup class " + c.getName + ". Cached class is: " +
-        bOpt.get.getClass.getName
+          bOpt.get.getClass.getName
       logger.warn(msg)
       throw new IllegalStateException(msg)
     }
@@ -137,8 +141,8 @@ class ScalatraBroadcasterFactory(
   def remove(b: Broadcaster, id: Any): Boolean = {
     val removed: Boolean = store.remove(id, b)
     if (removed) {
-      logger.debug(
-          "Removing Broadcaster {} factory size now {} ", id, store.size)
+      logger
+        .debug("Removing Broadcaster {} factory size now {} ", id, store.size)
     }
     removed
   }
@@ -160,8 +164,8 @@ class ScalatraBroadcasterFactory(
       }
     } catch {
       case ex: Exception => {
-          logger.warn(ex.getMessage, ex)
-        }
+        logger.warn(ex.getMessage, ex)
+      }
     }
   }
 }

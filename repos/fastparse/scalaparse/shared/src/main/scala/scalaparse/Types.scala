@@ -15,7 +15,7 @@ trait Types extends Core {
   val Dcl: P0 = {
     P(
         Pass ~
-        ((`val` | `var`) ~/ ValVarDef | `def` ~/ FunDef | `type` ~/ TypeDef))
+          ((`val` | `var`) ~/ ValVarDef | `def` ~/ FunDef | `type` ~/ TypeDef))
   }
 
   val Mod: P0 = P(LocalMod | AccessMod | `override`)

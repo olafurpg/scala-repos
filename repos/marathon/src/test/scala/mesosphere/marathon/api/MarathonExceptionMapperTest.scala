@@ -11,7 +11,9 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsObject, JsResultException, Json}
 
 class MarathonExceptionMapperTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("Render js result exception correctly") {
     Given("A JsResultException, from an invalid json to object Reads")

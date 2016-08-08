@@ -22,13 +22,19 @@ import org.scalatest.exceptions.TestFailedException
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class PolynomialExpansionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -44,8 +50,8 @@ class PolynomialExpansionSuite
   )
 
   private val twoDegreeExpansion: Array[Vector] = Array(
-      Vectors.sparse(
-          9, Array(0, 1, 2, 3, 4), Array(-2.0, 4.0, 2.3, -4.6, 5.29)),
+      Vectors
+        .sparse(9, Array(0, 1, 2, 3, 4), Array(-2.0, 4.0, 2.3, -4.6, 5.29)),
       Vectors.dense(-2.0, 4.0, 2.3, -4.6, 5.29),
       Vectors.dense(new Array[Double](9)),
       Vectors.dense(0.6, 0.36, -1.1, -0.66, 1.21, -3.0, -1.8, 3.3, 9.0),
@@ -99,7 +105,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+              "Unmatched data types after polynomial expansion",
+              0)
       }
   }
 
@@ -124,7 +131,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+              "Unmatched data types after polynomial expansion",
+              0)
       }
   }
 
@@ -146,7 +154,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+              "Unmatched data types after polynomial expansion",
+              0)
       }
   }
 

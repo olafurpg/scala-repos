@@ -85,12 +85,11 @@ final class JsonView {
         "name" -> p.name,
         "dimension" -> p.question.dimension.key,
         "metric" -> p.question.metric.key,
-        "filters" -> JsObject(
-            p.question.filters.map {
+        "filters" -> JsObject(p.question.filters.map {
           case Filter(dimension, selected) =>
             dimension.key -> JsArray(selected
-                  .map(Dimension.valueKey(dimension))
-                  .map(JsString.apply))
+              .map(Dimension.valueKey(dimension))
+              .map(JsString.apply))
         })
     )
   }
@@ -128,13 +127,13 @@ final class JsonView {
       "metric" -> metric,
       "dimension" -> dimension,
       "filters" ->
-      (filters
-            .split('/')
-            .map(_ split ':')
-            .collect {
-              case Array(key, values) =>
-                key -> JsArray(values.split(',').map(JsString.apply))
-            }
-            .toMap: Map[String, JsArray])
+        (filters
+          .split('/')
+          .map(_ split ':')
+          .collect {
+            case Array(key, values) =>
+              key -> JsArray(values.split(',').map(JsString.apply))
+          }
+          .toMap: Map[String, JsArray])
   )
 }

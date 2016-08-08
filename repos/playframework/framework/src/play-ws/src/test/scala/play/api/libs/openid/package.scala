@@ -40,7 +40,8 @@ package object openid {
   def createDefaultResponse(
       claimedId: String,
       identity: String,
-      defaultSigned: String = "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle")
+      defaultSigned: String =
+        "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle")
     : Map[String, Seq[String]] = Map(
       "openid.ns" -> "http://specs.openid.net/auth/2.0",
       "openid.mode" -> "id_res",

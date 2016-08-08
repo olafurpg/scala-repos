@@ -71,9 +71,10 @@ trait StringTypedField extends TypedField[String] with StringValidators {
   }
 }
 
-class StringField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val maxLength: Int)
-    extends Field[String, OwnerType] with MandatoryTypedField[String]
+class StringField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                  val maxLength: Int)
+    extends Field[String, OwnerType]
+    with MandatoryTypedField[String]
     with StringTypedField {
 
   def this(rec: OwnerType, maxLength: Int, value: String) = {
@@ -94,16 +95,18 @@ class StringField[OwnerType <: Record[OwnerType]](
 }
 
 abstract class UniqueIdField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, override val maxLength: Int)
+    rec: OwnerType,
+    override val maxLength: Int)
     extends StringField[OwnerType](rec, maxLength) {
   override lazy val defaultValue = randomString(maxLen)
 
   def reset(): OwnerType = this(randomString(maxLen))
 }
 
-class OptionalStringField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val maxLength: Int)
-    extends Field[String, OwnerType] with OptionalTypedField[String]
+class OptionalStringField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                          val maxLength: Int)
+    extends Field[String, OwnerType]
+    with OptionalTypedField[String]
     with StringTypedField {
 
   def this(rec: OwnerType, maxLength: Int, value: Box[String]) = {

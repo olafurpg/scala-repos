@@ -26,8 +26,8 @@ class ScalaSemicolonSelectioner extends ExtendWordSelectionHandlerBase {
     val result = new util.ArrayList[TextRange]
     if (treeNext != null &&
         treeNext.getElementType == ScalaTokenTypes.tSEMICOLON) {
-      val r = new TextRange(
-          e.getTextRange.getStartOffset, treeNext.getTextRange.getEndOffset)
+      val r = new TextRange(e.getTextRange.getStartOffset,
+                            treeNext.getTextRange.getEndOffset)
       result.add(r)
     }
     result

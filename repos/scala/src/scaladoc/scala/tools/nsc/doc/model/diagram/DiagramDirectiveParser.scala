@@ -13,7 +13,10 @@ import scala.util.matching.Regex
   *  @author Vlad Ureche
   */
 trait DiagramDirectiveParser {
-  this: ModelFactory with DiagramFactory with CommentFactory with TreeFactory =>
+  this: ModelFactory
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory =>
 
   import this.global.definitions.AnyRefClass
 
@@ -135,12 +138,11 @@ trait DiagramDirectiveParser {
 
     def hideNode(clazz: Node): Boolean = {
       val qualifiedName = getName(clazz)
-      for (hideFilter <- hideNodesFilter) if (hideFilter
-                                                .matcher(qualifiedName)
-                                                .matches) {
-        // println(hideFilter + ".matcher(" + qualifiedName + ").matches = " + hideFilter.matcher(qualifiedName).matches)
-        return true
-      }
+      for (hideFilter <- hideNodesFilter)
+        if (hideFilter.matcher(qualifiedName).matches) {
+          // println(hideFilter + ".matcher(" + qualifiedName + ").matches = " + hideFilter.matcher(qualifiedName).matches)
+          return true
+        }
       false
     }
 
@@ -199,7 +201,7 @@ trait DiagramDirectiveParser {
             else template.sym
           assert(
               (sym != global.NoSymbol) ||
-              (sym == global.rootMirror.RootPackage))
+                (sym == global.rootMirror.RootPackage))
           global.reporter.warning(sym.pos, message)
         }
 
@@ -248,11 +250,11 @@ trait DiagramDirectiveParser {
           case _ =>
             warning(
                 "Could not understand diagram annotation in " + template.kind +
-                " " + template.qualifiedName + ": unmatched entry \"" + entry +
-                "\".\n" + "  This could be because:\n" +
-                "   - you forgot to separate entries by commas\n" +
-                "   - you used a tag that is not allowed in the current context (like @contentDiagram hideSuperclasses)\n" +
-                "   - you did not use one of the allowed tags (see docs.scala-lang.org for scaladoc annotations)")
+                  " " + template.qualifiedName + ": unmatched entry \"" + entry +
+                  "\".\n" + "  This could be because:\n" +
+                  "   - you forgot to separate entries by commas\n" +
+                  "   - you used a tag that is not allowed in the current context (like @contentDiagram hideSuperclasses)\n" +
+                  "   - you did not use one of the allowed tags (see docs.scala-lang.org for scaladoc annotations)")
         }
         val result =
           if (hideDiagram0) NoDiagramAtAll
@@ -275,8 +277,9 @@ trait DiagramDirectiveParser {
 
         if (settings.docDiagramsDebug && result != NoDiagramAtAll &&
             result != FullDiagram)
-          settings.printMsg(template.kind + " " + template.qualifiedName +
-              " filter: " + result)
+          settings.printMsg(
+              template.kind + " " + template.qualifiedName +
+                " filter: " + result)
         tFilter += System.currentTimeMillis
 
         result

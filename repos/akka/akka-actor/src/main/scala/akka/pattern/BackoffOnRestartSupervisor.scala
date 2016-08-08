@@ -21,7 +21,9 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
                                          val reset: BackoffReset,
                                          randomFactor: Double,
                                          strategy: OneForOneStrategy)
-    extends Actor with HandleBackoff with ActorLogging {
+    extends Actor
+    with HandleBackoff
+    with ActorLogging {
 
   import context._
   import BackoffSupervisor._
@@ -51,8 +53,8 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
     case Terminated(`childRef`) ⇒
       become(receive)
       child = None
-      val restartDelay = BackoffSupervisor.calculateDelay(
-          restartCount, minBackoff, maxBackoff, randomFactor)
+      val restartDelay = BackoffSupervisor
+        .calculateDelay(restartCount, minBackoff, maxBackoff, randomFactor)
       context.system.scheduler
         .scheduleOnce(restartDelay, self, BackoffSupervisor.StartChild)
       restartCount += 1

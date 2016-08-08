@@ -2,7 +2,10 @@ package com.twitter.finagle.netty3.socks
 
 import com.twitter.finagle.ConnectionFailedException
 import com.twitter.finagle.netty3.SocketAddressResolveHandler
-import com.twitter.finagle.socks.{Unauthenticated, UsernamePassAuthenticationSetting}
+import com.twitter.finagle.socks.{
+  Unauthenticated,
+  UsernamePassAuthenticationSetting
+}
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}
 import java.util.Arrays
 import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
@@ -32,20 +35,23 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val portByte2 = (port & 0xFF).toByte
 
     val remoteAddress = new InetSocketAddress(
-        InetAddress.getByAddress(null, Array[Byte](0x7F, 0x0, 0x0, 0x1)), port)
+        InetAddress.getByAddress(null, Array[Byte](0x7F, 0x0, 0x0, 0x1)),
+        port)
     when(channel.getRemoteAddress) thenReturn remoteAddress
     val proxyAddress = mock[SocketAddress]
 
     val connectFuture = Channels.future(channel, true)
     val connectRequested = new DownstreamChannelStateEvent(
-        channel, connectFuture, ChannelState.CONNECTED, remoteAddress)
+        channel,
+        connectFuture,
+        ChannelState.CONNECTED,
+        remoteAddress)
 
     def sendBytesToServer(x: Byte, xs: Byte*) {
       val ec = ArgumentCaptor.forClass(classOf[DownstreamMessageEvent])
       verify(ctx, atLeastOnce()).sendDownstream(ec.capture)
       val e = ec.getValue
-      assert(
-          e.getMessage match {
+      assert(e.getMessage match {
         case buf: ChannelBuffer =>
           val a = Array(x, xs: _*)
           val bufBytes = Array.ofDim[Byte](buf.readableBytes())
@@ -57,8 +63,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     def receiveBytesFromServer(ch: SocksConnectHandler, bytes: Array[Byte]) {
       ch.handleUpstream(
           ctx,
-          new UpstreamMessageEvent(
-              channel, ChannelBuffers.wrappedBuffer(bytes), null))
+          new UpstreamMessageEvent(channel,
+                                   ChannelBuffers.wrappedBuffer(bytes),
+                                   null))
     }
 
     def connectAndRemoveHandler(ch: SocksConnectHandler) {
@@ -127,8 +134,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val ch = new SocksConnectHandler(proxyAddress, remoteAddress)
     ch.handleDownstream(ctx, connectRequested)
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -143,8 +151,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val ch = new SocksConnectHandler(proxyAddress, remoteAddress)
     ch.handleDownstream(ctx, connectRequested)
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -160,8 +169,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val ch = new SocksConnectHandler(proxyAddress, remoteAddress)
     ch.handleDownstream(ctx, connectRequested)
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -174,8 +184,16 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
       // when init response is received send connect request
       receiveBytesFromServer(ch, Array[Byte](0x05, 0x00))
 
-      sendBytesToServer(
-          0x05, 0x01, 0x00, 0x01, 0x7F, 0x00, 0x00, 0x01, portByte1, portByte2)
+      sendBytesToServer(0x05,
+                        0x01,
+                        0x00,
+                        0x01,
+                        0x7F,
+                        0x00,
+                        0x00,
+                        0x01,
+                        portByte1,
+                        portByte2)
     }
 
     {
@@ -229,8 +247,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     ch.handleDownstream(ctx, connectRequested)
 
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -250,8 +269,16 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
       // when authenticated response is received send connect request
       receiveBytesFromServer(ch, Array[Byte](0x01, 0x00))
 
-      sendBytesToServer(
-          0x05, 0x01, 0x00, 0x01, 0x7F, 0x00, 0x00, 0x01, portByte1, portByte2)
+      sendBytesToServer(0x05,
+                        0x01,
+                        0x00,
+                        0x01,
+                        0x7F,
+                        0x00,
+                        0x00,
+                        0x01,
+                        portByte1,
+                        portByte2)
     }
 
     {
@@ -286,8 +313,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     ch.handleDownstream(ctx, connectRequested)
 
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -335,7 +363,8 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
         Seq(Unauthenticated),
         pipeline
     )
-    assert(pipeline
+    assert(
+        pipeline
           .get("socketAddressResolver")
           .isInstanceOf[SocketAddressResolveHandler])
   }

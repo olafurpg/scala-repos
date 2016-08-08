@@ -16,7 +16,10 @@ class TickSourceSpec extends AkkaSpec {
   "A Flow based on tick publisher" must {
     "produce ticks" in assertAllStagesStopped {
       val c = TestSubscriber.manualProbe[String]()
-      Source.tick(1.second, 500.millis, "tick").to(Sink.fromSubscriber(c)).run()
+      Source
+        .tick(1.second, 500.millis, "tick")
+        .to(Sink.fromSubscriber(c))
+        .run()
       val sub = c.expectSubscription()
       sub.request(3)
       c.expectNoMsg(600.millis)
@@ -68,8 +71,7 @@ class TickSourceSpec extends AkkaSpec {
       val c = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           import GraphDSL.Implicits._
           val zip = b.add(Zip[Int, String]())
           Source(1 to 100) ~> zip.in0

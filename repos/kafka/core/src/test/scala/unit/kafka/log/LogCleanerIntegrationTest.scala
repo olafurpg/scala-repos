@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -76,8 +76,9 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
         startSize > compactedSize)
 
     val read = readFromLog(log)
-    assertEquals(
-        "Contents of the map shouldn't change.", appends.toMap, read.toMap)
+    assertEquals("Contents of the map shouldn't change.",
+                 appends.toMap,
+                 read.toMap)
     assertTrue(startSize > log.size)
 
     // write some more stuff and validate again
@@ -97,8 +98,9 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
                lastCleaned2 >= firstDirty2);
 
     val read2 = readFromLog(log)
-    assertEquals(
-        "Contents of the map shouldn't change.", appends2.toMap, read2.toMap)
+    assertEquals("Contents of the map shouldn't change.",
+                 appends2.toMap,
+                 read2.toMap)
 
     // simulate deleting a partition, by removing it from logs
     // force a checkpoint
@@ -117,12 +119,12 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
 
   def readFromLog(log: Log): Iterable[(Int, Int)] = {
     for (segment <- log.logSegments; entry <- segment.log;
-    messageAndOffset <- {
-      // create single message iterator or deep iterator depending on compression codec
-      if (entry.message.compressionCodec == NoCompressionCodec)
-        Stream.cons(entry, Stream.empty).iterator
-      else ByteBufferMessageSet.deepIterator(entry)
-    }) yield {
+         messageAndOffset <- {
+           // create single message iterator or deep iterator depending on compression codec
+           if (entry.message.compressionCodec == NoCompressionCodec)
+             Stream.cons(entry, Stream.empty).iterator
+           else ByteBufferMessageSet.deepIterator(entry)
+         }) yield {
       val key = TestUtils.readString(messageAndOffset.message.key).toInt
       val value = TestUtils.readString(messageAndOffset.message.payload).toInt
       key -> value
@@ -165,10 +167,10 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
       dir.mkdirs()
       val logProps = new Properties()
       logProps.put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
-      logProps.put(
-          LogConfig.SegmentIndexBytesProp, 100 * 1024: java.lang.Integer)
-      logProps.put(
-          LogConfig.FileDeleteDelayMsProp, deleteDelay: java.lang.Integer)
+      logProps
+        .put(LogConfig.SegmentIndexBytesProp, 100 * 1024: java.lang.Integer)
+      logProps
+        .put(LogConfig.FileDeleteDelayMsProp, deleteDelay: java.lang.Integer)
       logProps.put(LogConfig.CleanupPolicyProp, LogConfig.Compact)
       logProps.put(LogConfig.MinCleanableDirtyRatioProp,
                    minCleanableDirtyRatio: java.lang.Float)

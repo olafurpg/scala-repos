@@ -23,17 +23,20 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
-        val trustManager = new CompositeX509TrustManager(
-            trustManagers = Seq(mockTrustManager1, mockTrustManager2),
-            algorithmChecker)
+        val trustManager =
+          new CompositeX509TrustManager(trustManagers = Seq(mockTrustManager1,
+                                                            mockTrustManager2),
+                                        algorithmChecker)
 
         val certificate = CertificateGenerator.generateRSAWithSHA256()
         val chain = Array[X509Certificate](certificate)
         val authType = ""
 
-        mockTrustManager1.checkClientTrusted(chain, authType) throws new CertificateException(
+        mockTrustManager1
+          .checkClientTrusted(chain, authType) throws new CertificateException(
             "fake1")
-        mockTrustManager2.checkClientTrusted(chain, authType) throws new CertificateException(
+        mockTrustManager2
+          .checkClientTrusted(chain, authType) throws new CertificateException(
             "fake2")
 
         trustManager
@@ -59,25 +62,27 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager.checkClientTrusted(chain, authType) must not(
             throwA[Throwable].like {
-          case e: CompositeCertificateException =>
-            val sourceExceptions = e.getSourceExceptions
-            sourceExceptions(0).getMessage must be_==("fake")
-        })
+              case e: CompositeCertificateException =>
+                val sourceExceptions = e.getSourceExceptions
+                sourceExceptions(0).getMessage must be_==("fake")
+            })
       }
 
       "returns true eventually" in {
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
-        val trustManager = new CompositeX509TrustManager(
-            trustManagers = Seq(mockTrustManager1, mockTrustManager2),
-            algorithmChecker)
+        val trustManager =
+          new CompositeX509TrustManager(trustManagers = Seq(mockTrustManager1,
+                                                            mockTrustManager2),
+                                        algorithmChecker)
 
         val certificate = CertificateGenerator.generateRSAWithSHA256()
         val chain = Array[X509Certificate](certificate)
         val authType = ""
 
-        mockTrustManager1.checkClientTrusted(chain, authType) throws new CertificateException(
+        mockTrustManager1
+          .checkClientTrusted(chain, authType) throws new CertificateException(
             "fake1")
         mockTrustManager2.checkClientTrusted(chain, authType)
 
@@ -111,10 +116,10 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager.getAcceptedIssuers.must(
             throwA[CompositeCertificateException].like {
-          case e: CompositeCertificateException =>
-            val sourceExceptions = e.getSourceExceptions
-            sourceExceptions(0).getMessage must be_==("fake")
-        })
+              case e: CompositeCertificateException =>
+                val sourceExceptions = e.getSourceExceptions
+                sourceExceptions(0).getMessage must be_==("fake")
+            })
       }
     }
 
@@ -138,17 +143,20 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
-        val trustManager = new CompositeX509TrustManager(
-            trustManagers = Seq(mockTrustManager1, mockTrustManager2),
-            algorithmChecker)
+        val trustManager =
+          new CompositeX509TrustManager(trustManagers = Seq(mockTrustManager1,
+                                                            mockTrustManager2),
+                                        algorithmChecker)
 
         val certificate = CertificateGenerator.generateRSAWithSHA256()
         val chain = Array[X509Certificate](certificate)
         val authType = ""
 
-        mockTrustManager1.checkServerTrusted(chain, authType) throws new CertificateException(
+        mockTrustManager1
+          .checkServerTrusted(chain, authType) throws new CertificateException(
             "fake1")
-        mockTrustManager2.checkServerTrusted(chain, authType) throws new CertificateException(
+        mockTrustManager2
+          .checkServerTrusted(chain, authType) throws new CertificateException(
             "fake2")
 
         trustManager

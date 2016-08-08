@@ -62,8 +62,7 @@ abstract class TreeCheckers extends Analyzer {
     (if (str.length <= len) str
      else (str takeWhile (_ != '\n') take len - 3) + "...")
   private def signature(sym: Symbol) =
-    clean_s(
-        sym match {
+    clean_s(sym match {
       case null => "null"
       case _: ClassSymbol => sym.name + ": " + sym.tpe_*
       case _ => sym.defString
@@ -130,8 +129,8 @@ abstract class TreeCheckers extends Analyzer {
         if (s1 contains s2) ()
         else
           movedMsgs +=
-          ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s".format(
-                  ownerstr(sym), s1 mkString ", ", s2))
+            ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s"
+              .format(ownerstr(sym), s1 mkString ", ", s2))
       }
     }
 
@@ -151,9 +150,8 @@ abstract class TreeCheckers extends Analyzer {
 
       // duplicate defs
       for ((sym, defs) <- defSyms; if defs.size > 1) {
-        errorFn(
-            "%s DefTrees with symbol '%s': %s".format(
-                defs.size, ownerstr(sym), defs map beststr mkString ", "))
+        errorFn("%s DefTrees with symbol '%s': %s"
+          .format(defs.size, ownerstr(sym), defs map beststr mkString ", "))
       }
       defSyms.clear()
     }
@@ -175,13 +173,15 @@ abstract class TreeCheckers extends Analyzer {
   lazy val tpeOfTree = mutable.HashMap[Tree, Type]()
   private lazy val reportedAlready = mutable.HashSet[(Tree, Symbol)]()
 
-  def posstr(p: Position): String = (if (p eq null) ""
-                                     else {
-                                       try p.source.path + ":" + p.line catch {
-                                         case _: UnsupportedOperationException =>
-                                           p.toString
-                                       }
-                                     })
+  def posstr(p: Position): String =
+    (if (p eq null) ""
+     else {
+       try p.source.path + ":" + p.line
+       catch {
+         case _: UnsupportedOperationException =>
+           p.toString
+       }
+     })
 
   def errorFn(pos: Position, msg: Any): Unit =
     reporter.warning(pos, "[check: %s] %s".format(phase.prev, msg))
@@ -196,7 +196,8 @@ abstract class TreeCheckers extends Analyzer {
     if (!cond) errorFn(msg)
 
   private def wrap[T](msg: => Any)(body: => T): T = {
-    try body catch {
+    try body
+    catch {
       case x: Throwable =>
         Console.println("Caught " + x)
         Console.println(msg)
@@ -240,8 +241,10 @@ abstract class TreeCheckers extends Analyzer {
   class TreeChecker(context0: Context) extends Typer(context0) {
     // If we don't intercept this all the synthetics get added at every phase,
     // with predictably unfortunate results.
-    override protected def finishMethodSynthesis(
-        templ: Template, clazz: Symbol, context: Context): Template = templ
+    override protected def finishMethodSynthesis(templ: Template,
+                                                 clazz: Symbol,
+                                                 context: Context): Template =
+      templ
 
     // XXX check for tree.original on TypeTrees.
     private def treesDiffer(t1: Tree, t2: Tree): Unit = {
@@ -293,7 +296,8 @@ abstract class TreeCheckers extends Analyzer {
       private var enclosingMemberDefs: List[MemberDef] = Nil
       private def pushMemberDef[T](md: MemberDef)(body: => T): T = {
         enclosingMemberDefs ::= md
-        try body finally enclosingMemberDefs = enclosingMemberDefs.tail
+        try body
+        finally enclosingMemberDefs = enclosingMemberDefs.tail
       }
       override def traverse(tree: Tree): Unit = tree match {
         case md: MemberDef => pushMemberDef(md)(traverseInternal(tree))
@@ -328,7 +332,7 @@ abstract class TreeCheckers extends Analyzer {
                     assertFn(
                         agetter == sym || asetter == sym,
                         sym + " is getter or setter, but accessed sym " +
-                        accessed + " shows " + agetter + " and " + asetter)
+                          accessed + " shows " + agetter + " and " + asetter)
                   }
               }
             }
@@ -336,13 +340,13 @@ abstract class TreeCheckers extends Analyzer {
             if (sym.hasGetter && !sym.isOuterField && !sym.isOuterAccessor) {
               assertFn(sym.getterIn(sym.owner) != NoSymbol,
                        ownerstr(sym) + " has getter but cannot be found. " +
-                       sym.ownerChain)
+                         sym.ownerChain)
             }
           case Apply(fn, args) =>
             if (args exists (_ == EmptyTree))
               errorFn(tree.pos,
                       "Apply arguments to " + fn +
-                      " contains an empty tree: " + args)
+                        " contains an empty tree: " + args)
 
           case Select(qual, name) =>
             checkSym(tree)
@@ -350,9 +354,10 @@ abstract class TreeCheckers extends Analyzer {
             checkSym(tree)
             if (sym.isStatic && sym.hasModuleFlag) ()
             else if (currentOwner.ownerChain takeWhile (_ != sym) exists
-                     (_ == NoSymbol))
-              return fail("tree symbol " + sym +
-                  " does not point to enclosing class; tree = ")
+                       (_ == NoSymbol))
+              return fail(
+                  "tree symbol " + sym +
+                    " does not point to enclosing class; tree = ")
 
           /* XXX: temporary while Import nodes are arriving untyped. */
           case Import(_, _) =>
@@ -369,8 +374,9 @@ abstract class TreeCheckers extends Analyzer {
               if ((sym.ownerChain contains currentOwner) ||
                   currentOwner.isEmptyPackageClass) ()
               else
-                fail(sym + " owner chain does not contain currentOwner " +
-                    currentOwner + sym.ownerChain)
+                fail(
+                    sym + " owner chain does not contain currentOwner " +
+                      currentOwner + sym.ownerChain)
             case _ =>
               def cond(s: Symbol) = !s.isTerm || s.isMethod || s == sym.owner
 
@@ -389,7 +395,8 @@ abstract class TreeCheckers extends Analyzer {
       }
 
       private def checkSymbolRefsRespectScope(
-          enclosingMemberDefs: List[MemberDef], tree: Tree) {
+          enclosingMemberDefs: List[MemberDef],
+          tree: Tree) {
         def symbolOf(t: Tree): Symbol =
           if (t.symbol eq null) NoSymbol else t.symbol
         def typeOf(t: Tree): Type = if (t.tpe eq null) NoType else t.tpe
@@ -406,18 +413,18 @@ abstract class TreeCheckers extends Analyzer {
         val treeTpe = typeOf(tree)
 
         def isOk(sym: Symbol) =
-          treeSym hasTransOwner sym.enclosingSuchThat(
-              x => !x.isTypeParameterOrSkolem) // account for higher order type params
+          treeSym hasTransOwner sym.enclosingSuchThat(x =>
+            !x.isTypeParameterOrSkolem) // account for higher order type params
         def isEligible(sym: Symbol) =
           (sym ne NoSymbol) && (sym.isTypeParameter || sym.isLocalToBlock)
         val referencedSymbols =
           (treeSym :: referencesInType(treeInfo)).distinct filter
-          (sym => isEligible(sym) && !isOk(sym))
+            (sym => isEligible(sym) && !isOk(sym))
         def mk[T](what: String,
                   x: T,
                   str: T => String = (x: T) => "" + x): ((Any, String)) =
-          x -> s"%10s  %-20s %s".format(
-              what, classString(x), truncate(str(x), 80).trim)
+          x -> s"%10s  %-20s %s"
+            .format(what, classString(x), truncate(str(x), 80).trim)
 
         def encls =
           enclosingMemberDefs.filterNot(_.symbol == treeSym).zipWithIndex map {
@@ -454,11 +461,11 @@ abstract class TreeCheckers extends Analyzer {
         }
 
         referencedSymbols foreach
-        (sym =>
-              if (!reportedAlready((tree, sym))) {
-                errorFn("\n" + mkErrorMsg(sym))
-                reportedAlready += ((tree, sym))
-            })
+          (sym =>
+             if (!reportedAlready((tree, sym))) {
+               errorFn("\n" + mkErrorMsg(sym))
+               reportedAlready += ((tree, sym))
+             })
       }
 
       private def checkReturnReferencesDirectlyEnclosingDef(tree: Tree): Unit =
@@ -482,9 +489,10 @@ abstract class TreeCheckers extends Analyzer {
         case _ =>
           tpeOfTree get tree foreach { oldtpe =>
             if (tree.tpe eq null)
-              errorFn(s"tree.tpe=null for " + tree.shortClass +
-                  " (symbol: " + classString(tree.symbol) + " " +
-                  signature(tree.symbol) + "), last seen tpe was " + oldtpe)
+              errorFn(
+                  s"tree.tpe=null for " + tree.shortClass +
+                    " (symbol: " + classString(tree.symbol) + " " +
+                    signature(tree.symbol) + "), last seen tpe was " + oldtpe)
             else if (oldtpe =:= tree.tpe) ()
             else typesDiffer(tree, oldtpe, tree.tpe)
 

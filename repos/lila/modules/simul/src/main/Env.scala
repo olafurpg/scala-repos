@@ -107,8 +107,7 @@ final class Env(config: Config,
 
   private[simul] val simulColl = db(CollectionSimul)
 
-  private val sequencerMap = system.actorOf(
-      Props(ActorMap { id =>
+  private val sequencerMap = system.actorOf(Props(ActorMap { id =>
     new Sequencer(SequencerTimeout.some, logger = logger)
   }))
 

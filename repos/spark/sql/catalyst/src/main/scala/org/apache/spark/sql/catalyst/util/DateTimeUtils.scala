@@ -336,7 +336,7 @@ object DateTimeUtils {
 
     if (!justTime &&
         (segments(0) < 0 || segments(0) > 9999 || segments(1) < 1 ||
-            segments(1) > 12 || segments(2) < 1 || segments(2) > 31)) {
+        segments(1) > 12 || segments(2) < 1 || segments(2) > 31)) {
       return None
     }
 
@@ -357,7 +357,7 @@ object DateTimeUtils {
         Calendar.getInstance()
       } else {
         Calendar.getInstance(TimeZone.getTimeZone(
-                f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
+            f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
       }
     c.set(Calendar.MILLISECOND, 0)
 
@@ -443,7 +443,7 @@ object DateTimeUtils {
 
   private def localTimestamp(microsec: SQLTimestamp): SQLTimestamp = {
     absoluteMicroSecond(microsec) +
-    defaultTimeZone.getOffset(microsec / 1000) * 1000L
+      defaultTimeZone.getOffset(microsec / 1000) * 1000L
   }
 
   /**
@@ -706,7 +706,7 @@ object DateTimeUtils {
   private def getDateFromYear(absoluteYear: Int): SQLDate = {
     val absoluteDays =
       (absoluteYear * 365 + absoluteYear / 400 - absoluteYear / 100 +
-          absoluteYear / 4)
+        absoluteYear / 4)
     absoluteDays - toYearZero
   }
 
@@ -740,12 +740,13 @@ object DateTimeUtils {
     * Add timestamp and full interval.
     * Returns a timestamp value, expressed in microseconds since 1.1.1970 00:00:00.
     */
-  def timestampAddInterval(
-      start: SQLTimestamp, months: Int, microseconds: Long): SQLTimestamp = {
+  def timestampAddInterval(start: SQLTimestamp,
+                           months: Int,
+                           microseconds: Long): SQLTimestamp = {
     val days = millisToDays(start / 1000L)
     val newDays = dateAddMonths(days, months)
     daysToMillis(newDays) * 1000L + start - daysToMillis(days) * 1000L +
-    microseconds
+      microseconds
   }
 
   /**

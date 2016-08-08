@@ -27,7 +27,8 @@ private[akka] object ActorProcessor {
   * INTERNAL API
   */
 private[akka] class ActorProcessor[I, O](impl: ActorRef)
-    extends ActorPublisher[O](impl) with Processor[I, O] {
+    extends ActorPublisher[O](impl)
+    with Processor[I, O] {
   override def onSubscribe(s: Subscription): Unit = {
     ReactiveStreamsCompliance.requireNonNullSubscription(s)
     impl ! OnSubscribe(s)
@@ -86,8 +87,8 @@ private[akka] abstract class BatchingInputBuffer(val size: Int, val pump: Pump)
     if (isOpen) {
       if (inputBufferElements == size)
         throw new IllegalStateException("Input buffer overrun")
-      inputBuffer((nextInputElementCursor + inputBufferElements) & IndexMask) = elem
-        .asInstanceOf[AnyRef]
+      inputBuffer((nextInputElementCursor + inputBufferElements) & IndexMask) =
+        elem.asInstanceOf[AnyRef]
       inputBufferElements += 1
     }
     pump.pump()
@@ -256,13 +257,15 @@ private[akka] class SimpleOutputs(val actor: ActorRef, val pump: Pump)
   */
 private[akka] abstract class ActorProcessorImpl(
     val settings: ActorMaterializerSettings)
-    extends Actor with ActorLogging with Pump {
+    extends Actor
+    with ActorLogging
+    with Pump {
 
-  protected val primaryInputs: Inputs = new BatchingInputBuffer(
-      settings.initialInputBufferSize, this) {
-    override def inputOnError(e: Throwable): Unit =
-      ActorProcessorImpl.this.onError(e)
-  }
+  protected val primaryInputs: Inputs =
+    new BatchingInputBuffer(settings.initialInputBufferSize, this) {
+      override def inputOnError(e: Throwable): Unit =
+        ActorProcessorImpl.this.onError(e)
+    }
 
   protected val primaryOutputs: Outputs = new SimpleOutputs(self, this)
 

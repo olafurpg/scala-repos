@@ -40,7 +40,8 @@ class BytecodeTest extends ClearAfterClass {
 
     val List(c) = compileClasses(compiler)(code)
 
-    assertTrue(getSingleMethod(c, "f").instructions
+    assertTrue(
+        getSingleMethod(c, "f").instructions
           .count(_.isInstanceOf[TableSwitch]) == 1)
     assertTrue(
         getSingleMethod(c, "g").instructions
@@ -72,13 +73,13 @@ class BytecodeTest extends ClearAfterClass {
              new BatchSourceFile("AnnotB.java", annotB),
              new BatchSourceFile("Test.scala", scalaSrc)))
     val outDir = compiler.settings.outputDirs.getSingleOutput.get
-    val outfiles = (for (f <- outDir.iterator if !f.isDirectory) yield
-      (f.name, f.toByteArray)).toList
+    val outfiles = (for (f <- outDir.iterator if !f.isDirectory)
+      yield (f.name, f.toByteArray)).toList
 
     def check(classfile: String, annotName: String) = {
       val f = (outfiles collect {
-            case (`classfile`, bytes) => AsmUtils.readClass(bytes)
-          }).head
+        case (`classfile`, bytes) => AsmUtils.readClass(bytes)
+      }).head
       val descs = f.visibleAnnotations.asScala.map(_.desc).toList
       assertTrue(descs.toString, descs exists (_ contains annotName))
     }
@@ -260,8 +261,9 @@ class BytecodeTest extends ClearAfterClass {
                         Op(IRETURN)))
 
     // t7: universal equality
-    assertInvoke(
-        getSingleMethod(c, "t7"), "scala/runtime/BoxesRunTime", "equals")
+    assertInvoke(getSingleMethod(c, "t7"),
+                 "scala/runtime/BoxesRunTime",
+                 "equals")
 
     // t8: no null checks invoking equals on modules and constants
     assertSameCode(getSingleMethod(c, "t8"),

@@ -212,13 +212,11 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) this else empty
         })
       case Cons(fa, more) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) Cons(fa, () => more().takeWhile(p))
           else more().takeWhile(p)
         })
@@ -238,13 +236,11 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) empty else this
         })
       case Cons(fa, more) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) more().dropWhile(p)
           else Cons(fa, () => more().dropWhile(p))
         })
@@ -314,13 +310,11 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) this else empty
         })
       case Cons(fa, more) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) Cons(fa, () => more().filter(p))
           else more().filter(p)
         })
@@ -593,8 +587,7 @@ sealed abstract class AsyncStream[+A] {
     */
   def grouped(groupSize: Int): AsyncStream[Seq[A]] =
     if (groupSize > 1) {
-      Embed(
-          buffer(groupSize).map {
+      Embed(buffer(groupSize).map {
         case (items, _) if items.isEmpty => empty
         case (items, remaining) =>
           Cons(Future.value(items), () => remaining().grouped(groupSize))
@@ -638,7 +631,7 @@ sealed abstract class AsyncStream[+A] {
     * values.
     */
   def force: Future[Unit] = foreach { _ =>
-  }
+    }
 }
 
 object AsyncStream {

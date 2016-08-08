@@ -28,14 +28,15 @@ object PresentationUtil {
         val buffer = new StringBuilder("")
         buffer.append("(")
         if (clause.isImplicit) buffer.append("implicit ")
-        buffer.append(clause.parameters
+        buffer.append(
+            clause.parameters
               .map(presentationString(_, substitutor))
               .mkString(", "))
         buffer.append(")")
         buffer.toString()
       case param: ScParameter =>
-        ScalaDocumentationProvider.parseParameter(
-            param, presentationString(_, substitutor))
+        ScalaDocumentationProvider
+          .parseParameter(param, presentationString(_, substitutor))
       case param: Parameter =>
         val builder = new StringBuilder
         builder.append(param.name)
@@ -47,8 +48,8 @@ object PresentationUtil {
       case tp: PsiEllipsisType =>
         presentationString(tp.getComponentType, substitutor) + "*"
       case tp: PsiType =>
-        presentationString(
-            ScType.create(tp, DecompilerUtil.obtainProject), substitutor)
+        presentationString(ScType.create(tp, DecompilerUtil.obtainProject),
+                           substitutor)
       case tp: ScTypeParamClause =>
         tp.typeParameters
           .map(t => presentationString(t, substitutor))
@@ -74,7 +75,8 @@ object PresentationUtil {
         }
         param.contextBound foreach { (tp: ScType) =>
           paramText = paramText + " : " + presentationString(
-              ScTypeUtil.stripTypeArgs(substitutor.subst(tp)), substitutor)
+                ScTypeUtil.stripTypeArgs(substitutor.subst(tp)),
+                substitutor)
         }
         paramText
       case param: PsiTypeParameter =>
@@ -101,7 +103,8 @@ object PresentationUtil {
           buffer.append(name)
         }
         buffer.append(": ")
-        buffer.append(presentationString(param.getType, substitutor)) //todo: create param type, java.lang.Object => Any
+        buffer
+          .append(presentationString(param.getType, substitutor)) //todo: create param type, java.lang.Object => Any
         buffer.toString()
       case fun: ScFunction =>
         val buffer: StringBuilder = new StringBuilder("")

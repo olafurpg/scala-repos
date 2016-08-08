@@ -54,8 +54,8 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                                  Set.empty,
                                  monitoredByNrOfMembers = 3),
         oldReceiversNowUnreachable = Set.empty[UniqueAddress],
-        failureDetector = new DefaultFailureDetectorRegistry[Address](
-              () ⇒ new FailureDetectorStub))
+        failureDetector = new DefaultFailureDetectorRegistry[Address](() ⇒
+          new FailureDetectorStub))
 
   private def fd(state: ClusterHeartbeatSenderState,
                  node: UniqueAddress): FailureDetectorStub =
@@ -100,8 +100,11 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
     }
 
     "not use removed members" in {
-      emptyState.addMember(bb).addMember(cc).removeMember(bb).activeReceivers should ===(
-          Set(cc))
+      emptyState
+        .addMember(bb)
+        .addMember(cc)
+        .removeMember(bb)
+        .activeReceivers should ===(Set(cc))
     }
 
     "use specified number of members" in {
@@ -222,7 +225,8 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
 
             case Unreachable ⇒
               if (node != selfUniqueAddress && state.activeReceivers(node)) {
-                state.failureDetector.heartbeat(node.address) // make sure the fd is created
+                state.failureDetector
+                  .heartbeat(node.address) // make sure the fd is created
                 fd(state, node).markNodeAsUnavailable()
                 state.failureDetector.isMonitoring(node.address) should ===(
                     true)
@@ -258,8 +262,8 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
         } catch {
           case e: Throwable ⇒
             println(s"Failure context: i=$i, node=$node, op=$operation, " +
-                s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
-                s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
+              s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
+              s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
             throw e
         }
       }

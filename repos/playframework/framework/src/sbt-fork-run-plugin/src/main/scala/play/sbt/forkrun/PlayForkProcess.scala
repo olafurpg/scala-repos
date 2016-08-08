@@ -5,7 +5,11 @@ package play.sbt.forkrun
 
 import sbt._
 import java.io.File
-import java.lang.{Process => JProcess, ProcessBuilder => JProcessBuilder, Runtime => JRuntime}
+import java.lang.{
+  Process => JProcess,
+  ProcessBuilder => JProcessBuilder,
+  Runtime => JRuntime
+}
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.duration.FiniteDuration
 
@@ -51,8 +55,8 @@ object PlayForkProcess {
           log: Logger,
           shutdownTimeout: FiniteDuration): Unit = {
     val java = (file(sys.props("java.home")) / "bin" / "java").absolutePath
-    val (classpathEnv, options) = makeOptions(
-        jvmOptions, classpath, mainClass, arguments)
+    val (classpathEnv, options) =
+      makeOptions(jvmOptions, classpath, mainClass, arguments)
     val command = (java +: options).toArray
     val builder = new JProcessBuilder(command: _*)
     builder.directory(workingDirectory)
@@ -82,15 +86,19 @@ object PlayForkProcess {
           log.info(s"Forked Play process exited with status: $x")
       }
       // now join our logging threads (process is supposed to be gone, so nothing to log)
-      try process.getInputStream.close() catch { case _: Exception => }
-      try process.getErrorStream.close() catch { case _: Exception => }
+      try process.getInputStream.close()
+      catch { case _: Exception => }
+      try process.getErrorStream.close()
+      catch { case _: Exception => }
       outputThread.join()
       errorThread.join()
     }
     val shutdownHook = newThread { stop() }
     JRuntime.getRuntime.addShutdownHook(shutdownHook)
-    try process.waitFor() catch { case _: InterruptedException => stop() }
-    try JRuntime.getRuntime.removeShutdownHook(shutdownHook) catch {
+    try process.waitFor()
+    catch { case _: InterruptedException => stop() }
+    try JRuntime.getRuntime.removeShutdownHook(shutdownHook)
+    catch {
       case _: IllegalStateException =>
     } // thrown when already shutting down
   }

@@ -9,7 +9,10 @@ import java.security.{PrivilegedAction, AccessController}
 import java.util.jar.JarFile
 import play.api.PlayException
 import play.core.{Build, BuildLink, BuildDocHandler}
-import play.runsupport.classloader.{ApplicationClassLoaderProvider, DelegatingClassLoader}
+import play.runsupport.classloader.{
+  ApplicationClassLoaderProvider,
+  DelegatingClassLoader
+}
 import sbt._
 
 object Reloader {
@@ -95,8 +98,8 @@ object Reloader {
     val httpPortString: Option[String] =
       otherArgs.headOption orElse prop("http.port") orElse devSettings.toMap
         .get("play.server.http.port")
-    val httpPort: Option[Int] = parsePortValue(
-        httpPortString, Option(defaultHttpPort))
+    val httpPort: Option[Int] =
+      parsePortValue(httpPortString, Option(defaultHttpPort))
 
     // https port can be defined as a -Dhttps.port argument or system property
     val httpsPortString: Option[String] =
@@ -117,7 +120,8 @@ object Reloader {
     new NamedURLClassLoader(name, urls, parent)
 
   val createDelegatedResourcesClassLoader: ClassLoaderCreator = (name, urls,
-  parent) => new DelegatedResourcesClassLoader(name, urls, parent)
+                                                                 parent) =>
+    new DelegatedResourcesClassLoader(name, urls, parent)
 
   def assetsClassLoader(allAssets: Seq[(String, File)])(
       parent: ClassLoader): ClassLoader =
@@ -169,8 +173,8 @@ object Reloader {
                    runSbtTask: String => AnyRef,
                    mainClassName: String): PlayDevServer = {
 
-    val (properties, httpPort, httpsPort, httpAddress) = filterArgs(
-        args, defaultHttpPort, defaultHttpAddress, devSettings)
+    val (properties, httpPort, httpsPort, httpAddress) =
+      filterArgs(args, defaultHttpPort, defaultHttpAddress, devSettings)
     val systemProperties = extractSystemProperties(javaOptions)
 
     require(httpPort.isDefined || httpsPort.isDefined,
@@ -261,8 +265,8 @@ object Reloader {
 
       // Get a handler for the documentation. The documentation content lives in play/docs/content
       // within the play-docs JAR.
-      val docsLoader = new URLClassLoader(
-          urls(docsClasspath), applicationLoader)
+      val docsLoader =
+        new URLClassLoader(urls(docsClasspath), applicationLoader)
       val maybeDocsJarFile =
         docsJar map { f =>
           new JarFile(f)
@@ -271,8 +275,8 @@ object Reloader {
         docsLoader.loadClass("play.docs.BuildDocHandlerFactory")
       val buildDocHandler = maybeDocsJarFile match {
         case Some(docsJarFile) =>
-          val factoryMethod = docHandlerFactoryClass.getMethod(
-              "fromJar", classOf[JarFile], classOf[String])
+          val factoryMethod = docHandlerFactoryClass
+            .getMethod("fromJar", classOf[JarFile], classOf[String])
           factoryMethod
             .invoke(null, docsJarFile, "play/docs/content")
             .asInstanceOf[BuildDocHandler]
@@ -383,11 +387,9 @@ class Reloader(reloadCompile: () => CompileResult,
   @volatile private var watchState: WatchState = WatchState.empty
 
   // Create the watcher, updates the changed boolean when a file has changed.
-  private val watcher = fileWatchService.watch(monitoredFiles,
-                                               () =>
-                                                 {
-                                                   changed = true
-                                               })
+  private val watcher = fileWatchService.watch(monitoredFiles, () => {
+    changed = true
+  })
   private val classLoaderVersion =
     new java.util.concurrent.atomic.AtomicInteger(0)
 
@@ -428,8 +430,10 @@ class Reloader(reloadCompile: () => CompileResult,
               // We only want to reload if the classpath has changed.  Assets don't live on the classpath, so
               // they won't trigger a reload.
               // Use the SBT watch service, passing true as the termination to force it to break after one check
-              val (_, newState) = SourceModificationWatch.watch(
-                  PathFinder.strict(classpath).***, 0, watchState)(true)
+              val (_, newState) =
+                SourceModificationWatch.watch(PathFinder.strict(classpath).***,
+                                              0,
+                                              watchState)(true)
               // SBT has a quiet wait period, if that's set to true, sources were modified
               val triggered = newState.awaitingQuietPeriod
               watchState = newState
@@ -463,8 +467,8 @@ class Reloader(reloadCompile: () => CompileResult,
     forceReloadNextTime = true
   }
 
-  def findSource(
-      className: String, line: java.lang.Integer): Array[java.lang.Object] = {
+  def findSource(className: String,
+                 line: java.lang.Integer): Array[java.lang.Object] = {
     val topType = className.split('$').head
     currentSourceMap.flatMap { sources =>
       sources.get(topType).map { source =>

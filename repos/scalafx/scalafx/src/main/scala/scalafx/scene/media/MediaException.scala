@@ -31,7 +31,11 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 
 object MediaException {
   implicit def sfxMediaException2jfx(
@@ -146,7 +150,8 @@ object MediaException {
 }
 
 class MediaException(override val delegate: jfxsm.MediaException)
-    extends Exception(delegate) with SFXDelegate[jfxsm.MediaException] {
+    extends Exception(delegate)
+    with SFXDelegate[jfxsm.MediaException] {
 
   /**
     * Retrieves the category into which this error falls.

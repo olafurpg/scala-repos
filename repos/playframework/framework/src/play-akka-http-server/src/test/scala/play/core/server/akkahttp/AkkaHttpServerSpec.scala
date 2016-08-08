@@ -81,8 +81,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       }
     }
 
-    def headerDump(
-        headerNames: String*)(implicit request: Request[_]): String = {
+    def headerDump(headerNames: String*)(
+        implicit request: Request[_]): String = {
       val headerGroups: Seq[String] = for (n <- headerNames) yield {
         val headerGroup = request.headers.getAll(n)
         headerGroup.mkString("<", ", ", ">")

@@ -97,21 +97,21 @@ class StorageStatus(val blockManagerId: BlockManagerId, val maxMem: Long) {
     _rddBlocks.getOrElse(rddId, Map.empty)
 
   /** Add the given block to this storage status. If it already exists, overwrite it. */
-  private[spark] def addBlock(
-      blockId: BlockId, blockStatus: BlockStatus): Unit = {
+  private[spark] def addBlock(blockId: BlockId,
+                              blockStatus: BlockStatus): Unit = {
     updateStorageInfo(blockId, blockStatus)
     blockId match {
       case RDDBlockId(rddId, _) =>
-        _rddBlocks
-          .getOrElseUpdate(rddId, new mutable.HashMap)(blockId) = blockStatus
+        _rddBlocks.getOrElseUpdate(rddId, new mutable.HashMap)(blockId) =
+          blockStatus
       case _ =>
         _nonRddBlocks(blockId) = blockStatus
     }
   }
 
   /** Update the given block in this storage status. If it doesn't already exist, add it. */
-  private[spark] def updateBlock(
-      blockId: BlockId, blockStatus: BlockStatus): Unit = {
+  private[spark] def updateBlock(blockId: BlockId,
+                                 blockStatus: BlockStatus): Unit = {
     addBlock(blockId, blockStatus)
   }
 
@@ -208,8 +208,8 @@ class StorageStatus(val blockManagerId: BlockManagerId, val maxMem: Long) {
   /**
     * Update the relevant storage info, taking into account any existing status for this block.
     */
-  private def updateStorageInfo(
-      blockId: BlockId, newBlockStatus: BlockStatus): Unit = {
+  private def updateStorageInfo(blockId: BlockId,
+                                newBlockStatus: BlockStatus): Unit = {
     val oldBlockStatus = getBlock(blockId).getOrElse(BlockStatus.empty)
     val changeInMem = newBlockStatus.memSize - oldBlockStatus.memSize
     val changeInDisk = newBlockStatus.diskSize - oldBlockStatus.diskSize
@@ -265,8 +265,8 @@ private[spark] object StorageUtils extends Logging {
     * Update the given list of RDDInfo with the given list of storage statuses.
     * This method overwrites the old values stored in the RDDInfo's.
     */
-  def updateRddInfo(
-      rddInfos: Seq[RDDInfo], statuses: Seq[StorageStatus]): Unit = {
+  def updateRddInfo(rddInfos: Seq[RDDInfo],
+                    statuses: Seq[StorageStatus]): Unit = {
     rddInfos.foreach { rddInfo =>
       val rddId = rddInfo.id
       // Assume all blocks belonging to the same RDD have the same storage level
@@ -289,14 +289,16 @@ private[spark] object StorageUtils extends Logging {
     * Return a mapping from block ID to its locations for each block that belongs to the given RDD.
     */
   def getRddBlockLocations(
-      rddId: Int, statuses: Seq[StorageStatus]): Map[BlockId, Seq[String]] = {
+      rddId: Int,
+      statuses: Seq[StorageStatus]): Map[BlockId, Seq[String]] = {
     val blockLocations =
       new mutable.HashMap[BlockId, mutable.ListBuffer[String]]
     statuses.foreach { status =>
       status.rddBlocksById(rddId).foreach {
         case (bid, _) =>
           val location = status.blockManagerId.hostPort
-          blockLocations.getOrElseUpdate(bid, mutable.ListBuffer.empty) += location
+          blockLocations
+            .getOrElseUpdate(bid, mutable.ListBuffer.empty) += location
       }
     }
     blockLocations

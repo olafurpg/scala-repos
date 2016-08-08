@@ -15,8 +15,8 @@ class AccrualFailureDetectorSpec extends AkkaSpec("akka.loglevel = INFO") {
 
     def fakeTimeGenerator(timeIntervals: Seq[Long]): Clock = new Clock {
       @volatile var times =
-        timeIntervals.tail.foldLeft(List[Long](timeIntervals.head))(
-            (acc, c) ⇒ acc ::: List[Long](acc.last + c))
+        timeIntervals.tail.foldLeft(List[Long](timeIntervals.head))((acc, c) ⇒
+          acc ::: List[Long](acc.last + c))
       override def apply(): Long = {
         val currentTime = times.head
         times = times.tail
@@ -31,12 +31,12 @@ class AccrualFailureDetectorSpec extends AkkaSpec("akka.loglevel = INFO") {
         acceptableLostDuration: FiniteDuration = Duration.Zero,
         firstHeartbeatEstimate: FiniteDuration = 1.second,
         clock: Clock = FailureDetector.defaultClock) =
-      new PhiAccrualFailureDetector(
-          threshold,
-          maxSampleSize,
-          minStdDeviation,
-          acceptableLostDuration,
-          firstHeartbeatEstimate = firstHeartbeatEstimate)(clock = clock)
+      new PhiAccrualFailureDetector(threshold,
+                                    maxSampleSize,
+                                    minStdDeviation,
+                                    acceptableLostDuration,
+                                    firstHeartbeatEstimate =
+                                      firstHeartbeatEstimate)(clock = clock)
 
     def cdf(phi: Double) = 1.0 - math.pow(10, -phi)
 
@@ -79,7 +79,7 @@ class AccrualFailureDetectorSpec extends AkkaSpec("akka.loglevel = INFO") {
 
       // larger stdDeviation results => lower phi
       fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 500.0) should be <
-      (fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 100.0))
+        (fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 100.0))
     }
 
     "return phi value of 0.0 on startup for each address, when no heartbeats" in {

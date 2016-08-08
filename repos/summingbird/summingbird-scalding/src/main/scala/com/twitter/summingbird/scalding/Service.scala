@@ -45,7 +45,8 @@ trait ExternalService[K, +V] extends Service[K, V] {
   */
 sealed trait InternalService[K, +V] extends Service[K, V]
 case class StoreService[K, V](store: BatchedStore[K, V])
-    extends InternalService[K, V] with Store[K, V] {
+    extends InternalService[K, V]
+    with Store[K, V] {
 
   def merge(delta: PipeFactory[(K, V)],
             sg: Semigroup[V],
@@ -112,8 +113,8 @@ private[scalding] object InternalService {
     recurse(depsOfSummer.head)
   }
 
-  def storeIsJoined[K, V](
-      dag: Dependants[Scalding], store: Store[K, V]): Boolean =
+  def storeIsJoined[K, V](dag: Dependants[Scalding],
+                          store: Store[K, V]): Boolean =
     dag.nodes.exists {
       case LeftJoinedProducer(l, StoreService(s)) => s == store
       case _ => false
@@ -136,7 +137,7 @@ private[scalding] object InternalService {
     * the FlowToPipe is already on the matching time, so we don't
     * need to worry about that here.
     */
-  def doIndependentJoin[K : Ordering, U, V](
+  def doIndependentJoin[K: Ordering, U, V](
       input: FlowToPipe[(K, U)],
       toJoin: FlowToPipe[(K, V)],
       sg: Semigroup[V],
@@ -145,18 +146,19 @@ private[scalding] object InternalService {
       (flowMode: (FlowDef, Mode)) =>
         val left = input(flowMode)
         val right = toJoin(flowMode)
-        LookupJoin.rightSumming(left, right, reducers)(
-            implicitly, implicitly, sg)
+        LookupJoin
+          .rightSumming(left, right, reducers)(implicitly, implicitly, sg)
     }
 
   /**
     * This looks into the dag, and finds the mapping function into the store
     * and a producer of any merged input into the store
     */
-  def getLoopInputs[K, U, V](dag: Dependants[Scalding],
-                             left: Producer[Scalding, (K, U)],
-                             store: BatchedStore[K, V]): ((((U,
-  Option[V])) => TraversableOnce[V]), Option[Producer[Scalding, (K, V)]]) = {
+  def getLoopInputs[K, U, V](
+      dag: Dependants[Scalding],
+      left: Producer[Scalding, (K, U)],
+      store: BatchedStore[K, V]): ((((U, Option[V])) => TraversableOnce[V]),
+                                   Option[Producer[Scalding, (K, V)]]) = {
 
     val Summer(summerProd, _, _) = getSummer[K, V](dag, store)
       .getOrElse(sys.error("Could not find the Summer for store."))
@@ -177,12 +179,12 @@ private[scalding] object InternalService {
           case ValueFlatMappedProducer(prod, fn) =>
             cummulativeFn match {
               case Some(cfn) => {
-                  val newFn = (e: Any) =>
-                    fn(e).flatMap { r =>
-                      cfn(r)
-                  }
-                  recurse(prod, Some(newFn))
+                val newFn = (e: Any) =>
+                  fn(e).flatMap { r =>
+                    cfn(r)
                 }
+                recurse(prod, Some(newFn))
+              }
               case None => recurse(prod, Some(fn))
             }
           case IdentityKeyedProducer(prod) =>
@@ -200,7 +202,7 @@ private[scalding] object InternalService {
     }
 
     res.getOrElse(sys.error(
-            "Could not find correct loop inputs for leftJoin-store loop. Check the job DAG for validity."))
+        "Could not find correct loop inputs for leftJoin-store loop. Check the job DAG for validity."))
   }
 
   /**
@@ -214,12 +216,12 @@ private[scalding] object InternalService {
     * This function performs the loop join by sorting the input by time and then calling scanLeft to merge the two TypedPipes.
     * The result is a join stream and the output stream of the store.
     */
-  def loopJoin[T : Ordering, K : Ordering, V, U : Semigroup](
+  def loopJoin[T: Ordering, K: Ordering, V, U: Semigroup](
       left: TypedPipe[(T, (K, V))],
       mergeLog: TypedPipe[(T, (K, U))],
       valueExpansion: ((V, Option[U])) => TraversableOnce[U],
       reducers: Option[Int]): (TypedPipe[(T, (K, (V, Option[U])))],
-  TypedPipe[(T, (K, (Option[U], U)))]) = {
+                               TypedPipe[(T, (K, (Option[U], U)))]) = {
 
     def sum(opt: Option[U], u: U): U =
       if (opt.isDefined) Semigroup.plus(opt.get, u) else u
@@ -236,56 +238,57 @@ private[scalding] object InternalService {
       case Right(_) => 1
     }
 
-    val bothPipes = (left.map { case (t, (k, v)) => (k, (t, Left(v))) } ++ mergeLog.map {
-          case (t, (k, u)) => (k, (t, Right(u)))
-        }).group
-      .withReducers(reducers.getOrElse(-1)) // jank, but scalding needs a way to maybe set reducers
-      .sorted
-      .scanLeft((Option.empty[(T, (V, Option[U]))],
-                 Option.empty[(T, (Option[U], U))])) {
-        case ((_, None), (time, Left(v))) =>
-          /*
-           * This is a lookup, but there is no value for this key
-           */
-          val joinResult = Some((time, (v, None)))
-          val sumResult = Semigroup
-            .sumOption(valueExpansion((v, None)))
-            .map(u => (time, (None, u)))
+    val bothPipes =
+      (left.map { case (t, (k, v)) => (k, (t, Left(v))) } ++ mergeLog.map {
+        case (t, (k, u)) => (k, (t, Right(u)))
+      }).group
+        .withReducers(reducers.getOrElse(-1)) // jank, but scalding needs a way to maybe set reducers
+        .sorted
+        .scanLeft((Option.empty[(T, (V, Option[U]))],
+                   Option.empty[(T, (Option[U], U))])) {
+          case ((_, None), (time, Left(v))) =>
+            /*
+             * This is a lookup, but there is no value for this key
+             */
+            val joinResult = Some((time, (v, None)))
+            val sumResult = Semigroup
+              .sumOption(valueExpansion((v, None)))
+              .map(u => (time, (None, u)))
             (joinResult, sumResult)
-        case ((_, Some((_, (optu, u)))), (time, Left(v))) =>
-          /*
-           * This is a lookup, and there is an existing value
-           */
-          val currentU =
-            Some(sum(optu, u)) // isn't u already a sum and optu prev value?
-          val joinResult = Some((time, (v, currentU)))
-          val sumResult = Semigroup
-            .sumOption(valueExpansion((v, currentU)))
-            .map(u => (time, (currentU, u)))
+          case ((_, Some((_, (optu, u)))), (time, Left(v))) =>
+            /*
+             * This is a lookup, and there is an existing value
+             */
+            val currentU =
+              Some(sum(optu, u)) // isn't u already a sum and optu prev value?
+            val joinResult = Some((time, (v, currentU)))
+            val sumResult = Semigroup
+              .sumOption(valueExpansion((v, currentU)))
+              .map(u => (time, (currentU, u)))
             (joinResult, sumResult)
-        case ((_, None), (time, Right(u))) =>
-          /*
-           * This is merging in new data into the store not coming in from the service
-           * (either from the store history or from a merge after the leftJoin, but
-           * There was previously no data.
-           */
-          val joinResult = None
-          val sumResult = Some((time, (None, u)))
-          (joinResult, sumResult)
-        case ((_, Some((_, (optu, oldu)))), (time, Right(u))) =>
-          /*
-           * This is the case where we are updating a non-empty key. This should
-           * only be triggered by a merged data-stream after the join since
-           * store initialization
-           */
-          val joinResult = None
-          val currentU = Some(sum(optu, oldu))
-          val sumResult = Some((time, (currentU, u)))
-          (joinResult, sumResult)
-      }
-      .toTypedPipe
-      // We forceToDisk because we can't do two writes from one TypedPipe
-      .forceToDisk
+          case ((_, None), (time, Right(u))) =>
+            /*
+             * This is merging in new data into the store not coming in from the service
+             * (either from the store history or from a merge after the leftJoin, but
+             * There was previously no data.
+             */
+            val joinResult = None
+            val sumResult = Some((time, (None, u)))
+            (joinResult, sumResult)
+          case ((_, Some((_, (optu, oldu)))), (time, Right(u))) =>
+            /*
+             * This is the case where we are updating a non-empty key. This should
+             * only be triggered by a merged data-stream after the join since
+             * store initialization
+             */
+            val joinResult = None
+            val currentU = Some(sum(optu, oldu))
+            val sumResult = Some((time, (currentU, u)))
+            (joinResult, sumResult)
+        }
+        .toTypedPipe
+        // We forceToDisk because we can't do two writes from one TypedPipe
+        .forceToDisk
 
     val leftOut = bothPipes.collect {
       case (k, (Some((t, vu)), _)) =>

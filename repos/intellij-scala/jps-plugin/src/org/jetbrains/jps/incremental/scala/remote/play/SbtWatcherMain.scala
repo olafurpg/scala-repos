@@ -28,11 +28,12 @@ object SbtWatcherMain {
       override def consume(message: String) {
         out.write(
             Base64Converter
-              .encode(MessageEvent(BuildMessage.Kind.INFO,
-                                   message,
-                                   None,
-                                   None,
-                                   None).toBytes)
+              .encode(
+                  MessageEvent(BuildMessage.Kind.INFO,
+                               message,
+                               None,
+                               None,
+                               None).toBytes)
               .getBytes)
       }
     }
@@ -59,8 +60,7 @@ object SbtWatcherMain {
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
-        messageConsumer.consume(
-            currentExec.map { a =>
+        messageConsumer.consume(currentExec.map { a =>
           toMessage(a._1.isRunning)
         } getOrElse FALSE)
       case _ =>

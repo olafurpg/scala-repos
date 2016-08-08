@@ -48,26 +48,27 @@ object Test extends App {
         case "%d" => createTempValDef(paramsStack.pop, typeOf[Int])
         case "%s" => createTempValDef(paramsStack.pop, typeOf[String])
         case "%%" => {
-            (None: Option[Tree], Literal(Constant("%")))
-          }
+          (None: Option[Tree], Literal(Constant("%")))
+        }
         case part => {
-            (None: Option[Tree], Literal(Constant(part)))
-          }
+          (None: Option[Tree], Literal(Constant(part)))
+        }
       }
 
-    val evals = for ((Some(eval), _) <- parsed if eval != None) yield
-      (eval: Tree)
-    val prints = for ((_, ref) <- parsed) yield
-      Apply(
-          Select(
-              Select(
-                  Ident(TermName("scala")),
-                  TermName("Predef")
-              ),
-              TermName("print")
-          ),
-          List(ref)
-      ): Tree
+    val evals = for ((Some(eval), _) <- parsed if eval != None)
+      yield (eval: Tree)
+    val prints = for ((_, ref) <- parsed)
+      yield
+        Apply(
+            Select(
+                Select(
+                    Ident(TermName("scala")),
+                    TermName("Predef")
+                ),
+                TermName("print")
+            ),
+            List(ref)
+        ): Tree
     Block((evals ++ prints).toList, Literal(Constant(())))
   }
 }

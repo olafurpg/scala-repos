@@ -46,7 +46,8 @@ object SampledRDDs {
         .text(
             s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+          """
         |For example, the following command runs this app:
         |
         | bin/spark-submit --class org.apache.spark.examples.mllib.SampledRDDs \
@@ -104,7 +105,7 @@ object SampledRDDs {
     val sizeB = keyCountsB.values.sum
     println(
         s"  Sampled $sizeB examples using approximate stratified sampling (by label)." +
-        " ==> Approx Sample")
+          " ==> Approx Sample")
 
     //  Subsample, and count examples per label in sampled data. (approximate)
     val sampledByKeyRDDExact =
@@ -113,7 +114,7 @@ object SampledRDDs {
     val sizeBExact = keyCountsBExact.values.sum
     println(
         s"  Sampled $sizeBExact examples using exact stratified sampling (by label)." +
-        " ==> Exact Sample")
+          " ==> Exact Sample")
 
     //  Compare samples
     println(s"   \tFractions of examples with key")

@@ -11,7 +11,10 @@ import com.intellij.openapi.diff.impl._
 import com.intellij.openapi.diff.impl.highlighting.FragmentSide
 import com.intellij.openapi.diff.impl.incrementalMerge.ChangeList
 import com.intellij.openapi.diff.impl.splitter._
-import com.intellij.openapi.editor.event.{VisibleAreaEvent, VisibleAreaListener}
+import com.intellij.openapi.editor.event.{
+  VisibleAreaEvent,
+  VisibleAreaListener
+}
 import com.intellij.openapi.editor.{Document, Editor}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
@@ -33,8 +36,11 @@ object WorksheetDiffSplitters {
                            intervals: Iterable[(Int, Int)],
                            changes: Iterable[(Int, Int)],
                            prop: Float) = {
-    new SimpleWorksheetSplitter(
-        originalEditor, viewerEditor, intervals, changes, prop)
+    new SimpleWorksheetSplitter(originalEditor,
+                                viewerEditor,
+                                intervals,
+                                changes,
+                                prop)
   }
 
   class WorksheetEditingSides(originalEditor: Editor, viewerEditor: Editor)
@@ -54,8 +60,9 @@ object WorksheetDiffSplitters {
     override def getLineBlocks: LineBlocks = lineBlocks
   }
 
-  private def createLineBlocks(
-      original: Document, viewer: Document, project: Project) =
+  private def createLineBlocks(original: Document,
+                               viewer: Document,
+                               project: Project) =
     ChangeList.build(original, viewer, project).getLineBlocks
 
   private def getVisibleInterval(editor: Editor) = {
@@ -63,7 +70,7 @@ object WorksheetDiffSplitters {
       .xyToLogicalPosition(
           new Point(0, editor.getScrollingModel.getVerticalScrollOffset))
       .line
-      (line, editor.getComponent.getHeight / editor.getLineHeight + 1)
+    (line, editor.getComponent.getHeight / editor.getLineHeight + 1)
   }
 
   class SimpleWorksheetSplitter(editor1: Editor,
@@ -71,7 +78,8 @@ object WorksheetDiffSplitters {
                                 private var intervals: Iterable[(Int, Int)],
                                 private var changes: Iterable[(Int, Int)],
                                 prop: Float)
-      extends Splitter(false, prop) with DiffSplitterI {
+      extends Splitter(false, prop)
+      with DiffSplitterI {
     setDividerWidth(30)
     setFirstComponent(editor1.getComponent)
     setSecondComponent(editor2.getComponent)
@@ -81,8 +89,8 @@ object WorksheetDiffSplitters {
       override def mouseReleased(mouseEvent: MouseEvent) {
         val f = getProportion
 
-        Option(
-            PsiDocumentManager.getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
+        Option(PsiDocumentManager
+          .getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
           case file: ScalaFile =>
             WorksheetEditorPrinter.saveOnlyRatio(file, f)
           case _ =>
@@ -135,8 +143,8 @@ object WorksheetDiffSplitters {
           intervals zip changes collect {
             case ((from, to), (offset, spaces))
                 if spaces != 0 && firstVisible1 <= from &&
-                lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
-                lastVisible2 >= (offset + spaces) =>
+                  lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
+                  lastVisible2 >= (offset + spaces) =>
               flag = !flag
               new DividerPolygon(
                   (from + 1) * lineHeight1,

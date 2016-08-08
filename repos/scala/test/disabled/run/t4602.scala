@@ -1,4 +1,11 @@
-import java.io.{File, FileOutputStream, BufferedOutputStream, FileWriter, ByteArrayOutputStream, PrintStream}
+import java.io.{
+  File,
+  FileOutputStream,
+  BufferedOutputStream,
+  FileWriter,
+  ByteArrayOutputStream,
+  PrintStream
+}
 import tools.nsc.{CompileClient, CompileServer}
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
@@ -7,8 +14,7 @@ object Test extends App {
   // we have to explicitly launch our server because when the client launches a server it uses
   // the "scala" shell command meaning whatever version of scala (and whatever version of libraries)
   // happens to be in the path gets used
-  val t = new Thread(
-      new Runnable {
+  val t = new Thread(new Runnable {
     def run() = {
       CompileServer.execute(() => startupLatch.countDown(), Array[String]())
     }
@@ -35,7 +41,8 @@ object Test extends App {
       dir.createDirectory()
       val file = path.jfile
       val out = new FileWriter(file)
-      try out.write(s"object ${name}\n") finally out.close
+      try out.write(s"object ${name}\n")
+      finally out.close
   }
 
   val success = (scala.Console withOut ps) {

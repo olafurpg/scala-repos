@@ -22,7 +22,11 @@ import java.util.Random
 import scala.collection.mutable
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.catalyst.expressions.{BoundReference, MutableRow, SpecificMutableRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  BoundReference,
+  MutableRow,
+  SpecificMutableRow
+}
 import org.apache.spark.sql.types.{DataType, IntegerType}
 
 class HyperLogLogPlusPlusSuite extends SparkFunSuite {
@@ -44,8 +48,9 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
   }
 
   /** Evaluate the estimate. It should be within 3*SD's of the given true rsd. */
-  def evaluateEstimate(
-      hll: HyperLogLogPlusPlus, buffer: MutableRow, cardinality: Int): Unit = {
+  def evaluateEstimate(hll: HyperLogLogPlusPlus,
+                       buffer: MutableRow,
+                       cardinality: Int): Unit = {
     val estimate = hll.eval(buffer).asInstanceOf[Long].toDouble
     val error = math.abs((estimate / cardinality.toDouble) - 1.0d)
     assert(error < hll.trueRsd * 3.0d, "Error should be within 3 std. errors.")
@@ -85,8 +90,8 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
     val repeats = 10
     testCardinalityEstimates(
         Seq(0.1, 0.05, 0.025, 0.01),
-        Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000)
-          .map(_ * repeats),
+        Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000).map(
+            _ * repeats),
         i => i / repeats,
         i => i / repeats)
   }
@@ -94,20 +99,20 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
   test("random cardinality estimation") {
     val srng = new Random(323981238L)
     val seen = mutable.HashSet.empty[Int]
-    val update = (i: Int) =>
-      {
-        val value = srng.nextInt()
-        seen += value
-        value
+    val update = (i: Int) => {
+      val value = srng.nextInt()
+      seen += value
+      value
     }
-    val eval = (n: Int) =>
-      {
-        val cardinality = seen.size
-        seen.clear()
-        cardinality
+    val eval = (n: Int) => {
+      val cardinality = seen.size
+      seen.clear()
+      cardinality
     }
-    testCardinalityEstimates(
-        Seq(0.05, 0.01), Seq(100, 10000, 500000), update, eval)
+    testCardinalityEstimates(Seq(0.05, 0.01),
+                             Seq(100, 10000, 500000),
+                             update,
+                             eval)
   }
 
   // Test merging

@@ -64,7 +64,9 @@ private trait UFoldable[F[_, _]] extends Foldable[λ[α => F[α, α]]] {
 }
 
 private trait LeftTraverse[F[_, _], X]
-    extends Traverse[F[?, X]] with LeftFunctor[F, X] with LeftFoldable[F, X] {
+    extends Traverse[F[?, X]]
+    with LeftFunctor[F, X]
+    with LeftFoldable[F, X] {
   implicit def F: Bitraverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: F[A, X])(
@@ -73,7 +75,8 @@ private trait LeftTraverse[F[_, _], X]
 }
 
 private trait RightTraverse[F[_, _], X]
-    extends Traverse[F[X, ?]] with RightFunctor[F, X]
+    extends Traverse[F[X, ?]]
+    with RightFunctor[F, X]
     with RightFoldable[F, X] {
   implicit def F: Bitraverse[F]
 
@@ -83,7 +86,9 @@ private trait RightTraverse[F[_, _], X]
 }
 
 private trait UTraverse[F[_, _]]
-    extends Traverse[λ[α => F[α, α]]] with UFunctor[F] with UFoldable[F] {
+    extends Traverse[λ[α => F[α, α]]]
+    with UFunctor[F]
+    with UFoldable[F] {
   implicit def F: Bitraverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: F[A, A])(

@@ -135,9 +135,9 @@ class ForwardedHeaderHandlerSpec extends Specification {
       handler(
           version("rfc7239") ++ trustedProxies("192.168.1.1/24", "127.0.0.1"))
         .remoteConnection(
-          localhost,
-          false,
-          headers("""
+            localhost,
+            false,
+            headers("""
           |Forwarded: for="_gazonk"
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
@@ -148,9 +148,9 @@ class ForwardedHeaderHandlerSpec extends Specification {
     "get first untrusted proxy protocol with rfc7239 with trusted localhost proxy" in {
       handler(version("rfc7239") ++ trustedProxies("127.0.0.1"))
         .remoteConnection(
-          localhost,
-          false,
-          headers("""
+            localhost,
+            false,
+            headers("""
           |Forwarded: for="_gazonk"
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
@@ -162,9 +162,9 @@ class ForwardedHeaderHandlerSpec extends Specification {
       handler(
           version("rfc7239") ++ trustedProxies("192.168.1.1/24", "127.0.0.1"))
         .remoteConnection(
-          localhost,
-          false,
-          headers("""
+            localhost,
+            false,
+            headers("""
           |Forwarded: for="_gazonk"
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=https;by=203.0.113.43
@@ -291,7 +291,7 @@ class ForwardedHeaderHandlerSpec extends Specification {
                           false,
                           headers("""
           |Forwarded: for=""" + '"' + '"' +
-                              '"' + """
+                            '"' + """
           |Forwarded: for=192.168.1.10, for=127.0.0.1
         """.stripMargin)) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
     }
@@ -411,11 +411,12 @@ class ForwardedHeaderHandlerSpec extends Specification {
 
     // example from RFC 7239 section 7.4
     "handle unquoted IPv6 addresses in x-forwarded-for headers" in {
-      handler(version("x-forwarded") ++ trustedProxies(
-              "127.0.0.1", "2001:db8:cafe::17")).remoteConnection(
-          localhost,
-          false,
-          headers("""
+      handler(version("x-forwarded") ++ trustedProxies("127.0.0.1",
+                                                       "2001:db8:cafe::17"))
+        .remoteConnection(
+            localhost,
+            false,
+            headers("""
           |X-Forwarded-For: 192.0.2.43, 2001:db8:cafe::17
         """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.43"), false)
     }

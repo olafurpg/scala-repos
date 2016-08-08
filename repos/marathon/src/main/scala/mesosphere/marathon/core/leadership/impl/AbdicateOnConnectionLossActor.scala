@@ -23,7 +23,8 @@ private[leadership] object AbdicateOnConnectionLossActor {
   */
 private[impl] class AbdicateOnConnectionLossActor(zk: ZooKeeperClient,
                                                   leader: LeadershipAbdication)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[impl] val watcher = new Watcher {
     val reference = self

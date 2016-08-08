@@ -39,7 +39,8 @@ trait HeapBackend extends RelationalBackend with Logging {
       new BasicActionContext { val useSameThread = _useSameThread }
 
     protected[this] def createStreamingDatabaseActionContext[T](
-        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext =
+        s: Subscriber[_ >: T],
+        useSameThread: Boolean): StreamingContext =
       new BasicStreamingActionContext(s, useSameThread, DatabaseDef.this)
 
     protected val tables = new HashMap[String, HeapTable]
@@ -51,17 +52,17 @@ trait HeapBackend extends RelationalBackend with Logging {
         .get(name)
         .getOrElse(throw new SlickException(s"Table $name does not exist"))
     }
-    def createTable(
-        name: String,
-        columns: IndexedSeq[HeapBackend.Column],
-        indexes: IndexedSeq[Index],
-        constraints: IndexedSeq[Constraint]): HeapTable = synchronized {
-      if (tables.contains(name))
-        throw new SlickException(s"Table $name already exists")
-      val t = new HeapTable(name, columns, indexes, constraints)
-      tables += ((name, t))
-      t
-    }
+    def createTable(name: String,
+                    columns: IndexedSeq[HeapBackend.Column],
+                    indexes: IndexedSeq[Index],
+                    constraints: IndexedSeq[Constraint]): HeapTable =
+      synchronized {
+        if (tables.contains(name))
+          throw new SlickException(s"Table $name already exists")
+        val t = new HeapTable(name, columns, indexes, constraints)
+        tables += ((name, t))
+        t
+      }
     def dropTable(name: String): Unit = synchronized {
       if (!tables.remove(name).isDefined)
         throw new SlickException(s"Table $name does not exist")
@@ -74,8 +75,7 @@ trait HeapBackend extends RelationalBackend with Logging {
   def createEmptyDatabase: Database = {
     def err =
       throw new SlickException("Unsupported operation for empty heap database")
-    new DatabaseDef(
-        new ExecutionContext {
+    new DatabaseDef(new ExecutionContext {
       def reportFailure(t: Throwable) = err
       def execute(runnable: Runnable) = err
     }) {
@@ -145,7 +145,8 @@ trait HeapBackend extends RelationalBackend with Logging {
         case (z, c) =>
           if (c.isUnique)
             z andThen createUniquenessVerifier(
-                "<unique column " + c.sym.name + ">", Vector(c.sym))
+                "<unique column " + c.sym.name + ">",
+                Vector(c.sym))
           else z
       }
     }
@@ -166,7 +167,8 @@ trait HeapBackend extends RelationalBackend with Logging {
         })
 
     protected def createUniquenessVerifier(
-        name: String, on: IndexedSeq[FieldSymbol]): Verifier = {
+        name: String,
+        on: IndexedSeq[FieldSymbol]): Verifier = {
       val columns: IndexedSeq[Int] = on.map(columnIndexes)
       val extract: (Row => Any) =
         if (columns.length == 1) (r: Row) => r(columns.head)
@@ -178,7 +180,7 @@ trait HeapBackend extends RelationalBackend with Logging {
           if (hash contains e)
             throw new SlickException(
                 "Uniqueness constraint " + name +
-                " violated. Duplicate data: " + e)
+                  " violated. Duplicate data: " + e)
         }
         def inserted(row: Row) { hash += extract(row) }
       }

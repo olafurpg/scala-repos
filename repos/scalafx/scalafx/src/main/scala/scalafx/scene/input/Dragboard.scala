@@ -56,7 +56,8 @@ object Dragboard {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Dragboard(override val delegate: jfxsi.Dragboard)
-    extends Clipboard(delegate) with SFXDelegate[jfxsi.Dragboard] {
+    extends Clipboard(delegate)
+    with SFXDelegate[jfxsi.Dragboard] {
 
   /** The image used as a drag view. */
   def dragView: Image = delegate.getDragView

@@ -28,14 +28,14 @@ object NewRemoteActorMultiJvmSpec extends MultiNodeConfig {
     }
   }
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
-              "akka.remote.log-remote-lifecycle-events = off")))
+  commonConfig(
+      debugConfig(on = false).withFallback(ConfigFactory.parseString(
+          "akka.remote.log-remote-lifecycle-events = off")))
 
   val master = role("master")
   val slave = role("slave")
 
-  deployOn(master,
-           """
+  deployOn(master, """
     /service-hello.remote = "@slave@"
     /service-hello-null.remote = "@slave@"
     /service-hello3.remote = "@slave@"
@@ -48,8 +48,10 @@ class NewRemoteActorMultiJvmNode1 extends NewRemoteActorSpec
 class NewRemoteActorMultiJvmNode2 extends NewRemoteActorSpec
 
 class NewRemoteActorSpec
-    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import NewRemoteActorMultiJvmSpec._
 
   def initialParticipants = roles.size

@@ -1,10 +1,17 @@
 package mesosphere.marathon.integration
 
 import mesosphere.marathon.api.v2.json.AppUpdate
-import mesosphere.marathon.integration.facades.MesosFacade.{ITResources, ITMesosState}
+import mesosphere.marathon.integration.facades.MesosFacade.{
+  ITResources,
+  ITMesosState
+}
 import mesosphere.marathon.integration.facades.{ITEnrichedTask, MarathonFacade}
 import MarathonFacade._
-import mesosphere.marathon.integration.setup.{RestResult, IntegrationFunSuite, SingleMarathonIntegrationTest}
+import mesosphere.marathon.integration.setup.{
+  RestResult,
+  IntegrationFunSuite,
+  SingleMarathonIntegrationTest
+}
 import mesosphere.marathon.state._
 import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{Tag, BeforeAndAfter, GivenWhenThen, Matchers}
@@ -14,8 +21,11 @@ import scala.util.Try
 import scala.concurrent.duration._
 
 class ResidentTaskIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   import Fixture._
 
@@ -100,7 +110,8 @@ class ResidentTaskIntegrationTest
     When("the app is suspended")
     f.suspendSuccessfully(app.id)
 
-    Then("there are no used resources anymore but there are the same reserved resources")
+    Then(
+        "there are no used resources anymore but there are the same reserved resources")
     val state2: RestResult[ITMesosState] = mesos.state
 
     withClue("used_resources") {
@@ -240,8 +251,9 @@ class ResidentTaskIntegrationTest
     val disk: Double = 1.0
     val persistentVolumeSize: Long = 2
 
-    val itMesosResources = ITResources(
-        "mem" -> mem, "cpus" -> cpus, "disk" -> (disk + persistentVolumeSize))
+    val itMesosResources = ITResources("mem" -> mem,
+                                       "cpus" -> cpus,
+                                       "disk" -> (disk + persistentVolumeSize))
 
     def residentApp(containerPath: String = "persistent-volume",
                     cmd: String = "sleep 1000",
@@ -263,15 +275,15 @@ class ResidentTaskIntegrationTest
           appId,
           instances = instances,
           residency = Some(
-                Residency(
-                    Residency.defaultRelaunchEscalationTimeoutSeconds,
-                    Residency.defaultTaskLostBehaviour
-                )),
+              Residency(
+                  Residency.defaultRelaunchEscalationTimeoutSeconds,
+                  Residency.defaultTaskLostBehaviour
+              )),
           container = Some(
-                Container(
-                    `type` = Mesos.ContainerInfo.Type.MESOS,
-                    volumes = Seq(persistentVolume)
-                )),
+              Container(
+                  `type` = Mesos.ContainerInfo.Type.MESOS,
+                  volumes = Seq(persistentVolume)
+              )),
           cmd = Some(cmd),
           executor = "",
           // cpus, mem and disk are really small because otherwise we'll soon run out of reservable resources
@@ -299,8 +311,8 @@ class ResidentTaskIntegrationTest
       app
     }
 
-    def scaleToSuccessfully(
-        appId: PathId, instances: Int): Iterable[ITEnrichedTask] = {
+    def scaleToSuccessfully(appId: PathId,
+                            instances: Int): Iterable[ITEnrichedTask] = {
       val result =
         marathon.updateApp(appId, AppUpdate(instances = Some(instances)))
       result.code should be(200) // OK

@@ -6,8 +6,8 @@ import profile.simple._
 
 trait LabelsService {
 
-  def getLabels(
-      owner: String, repository: String)(implicit s: Session): List[Label] =
+  def getLabels(owner: String, repository: String)(
+      implicit s: Session): List[Label] =
     Labels
       .filter(_.byRepository(owner, repository))
       .sortBy(_.labelName asc)
@@ -21,9 +21,10 @@ trait LabelsService {
       implicit s: Session): Option[Label] =
     Labels.filter(_.byLabel(owner, repository, labelName)).firstOption
 
-  def createLabel(
-      owner: String, repository: String, labelName: String, color: String)(
-      implicit s: Session): Int =
+  def createLabel(owner: String,
+                  repository: String,
+                  labelName: String,
+                  color: String)(implicit s: Session): Int =
     Labels returning Labels.map(_.labelId) += Label(
         userName = owner,
         repositoryName = repository,

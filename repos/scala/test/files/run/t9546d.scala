@@ -3,7 +3,7 @@ class X {
     object Opt {
       def mkOpt = Opt("")
     }
-    case class Opt[A] private[X](val get: A)
+    case class Opt[A] private[X] (val get: A)
     Opt.mkOpt
   }
 }

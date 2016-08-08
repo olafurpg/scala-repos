@@ -11,4 +11,5 @@ trait MonadFilterSyntax1 {
 }
 
 trait MonadFilterSyntax
-    extends MonadFilter.ToMonadFilterOps with MonadFilterSyntax1
+    extends MonadFilter.ToMonadFilterOps
+    with MonadFilterSyntax1

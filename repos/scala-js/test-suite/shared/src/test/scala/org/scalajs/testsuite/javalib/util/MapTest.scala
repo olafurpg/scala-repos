@@ -262,8 +262,7 @@ trait MapTest {
   class SimpleQueryableMap[K, V](inner: mu.HashMap[K, V])
       extends ju.AbstractMap[K, V] {
     def entrySet(): java.util.Set[java.util.Map.Entry[K, V]] = {
-      setAsJavaSet(
-          inner.map {
+      setAsJavaSet(inner.map {
         case (k, v) => new ju.AbstractMap.SimpleImmutableEntry(k, v)
       }.toSet)
     }
@@ -305,7 +304,8 @@ trait MapTest {
     assertEquals(2, new SimpleQueryableMap(hm4).values.size)
   }
 
-  @Test def values_should_check_single_and_multiple_objects_presence(): Unit = {
+  @Test
+  def values_should_check_single_and_multiple_objects_presence(): Unit = {
     val mp = factory.empty[String, String]
 
     mp.put("ONE", "one")
@@ -452,7 +452,8 @@ trait MapTest {
     assertEquals(2, new SimpleQueryableMap(hm4).keySet.size)
   }
 
-  @Test def keySet_should_check_single_and_multiple_objects_presence(): Unit = {
+  @Test
+  def keySet_should_check_single_and_multiple_objects_presence(): Unit = {
     val mp = factory.empty[String, String]
 
     mp.put("ONE", "one")
@@ -573,7 +574,7 @@ object MapFactory {
 trait MapFactory {
   def implementationName: String
 
-  def empty[K : ClassTag, V : ClassTag]: ju.Map[K, V]
+  def empty[K: ClassTag, V: ClassTag]: ju.Map[K, V]
 
   def allowsNullKeys: Boolean
 

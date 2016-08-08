@@ -14,7 +14,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class TFinagleBinaryProtocolTest
-    extends FunSuite with BeforeAndAfter with ShouldMatchers {
+    extends FunSuite
+    with BeforeAndAfter
+    with ShouldMatchers {
 
   private val NullCounter = NullStatsReceiver.counter("")
 
@@ -41,8 +43,9 @@ class TFinagleBinaryProtocolTest
     val fastEncodeFailed = stats.counter("fastEncodeFailed")
     val largerThanTlOutBuffer = stats.counter("largerThanTlOutBuffer")
     val trans = new TMemoryBuffer(128)
-    val proto = new TFinagleBinaryProtocol(
-        trans, fastEncodeFailed, largerThanTlOutBuffer)
+    val proto = new TFinagleBinaryProtocol(trans,
+                                           fastEncodeFailed,
+                                           largerThanTlOutBuffer)
 
     proto.writeString("abc")
     assertSerializedBytes("abc", trans)

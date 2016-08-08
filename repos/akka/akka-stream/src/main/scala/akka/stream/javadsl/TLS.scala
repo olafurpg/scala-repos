@@ -61,8 +61,11 @@ object TLS {
     */
   def create(sslContext: SSLContext,
              firstSession: NegotiateNewSession,
-             role: TLSRole): BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SslTlsInbound, NotUsed] =
+             role: TLSRole): BidiFlow[SslTlsOutbound,
+                                      ByteString,
+                                      ByteString,
+                                      SslTlsInbound,
+                                      NotUsed] =
     new javadsl.BidiFlow(scaladsl.TLS.apply(sslContext, firstSession, role))
 
   /**
@@ -85,8 +88,11 @@ object TLS {
              firstSession: NegotiateNewSession,
              role: TLSRole,
              hostInfo: Optional[japi.Pair[String, java.lang.Integer]],
-             closing: TLSClosing): BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SslTlsInbound, NotUsed] =
+             closing: TLSClosing): BidiFlow[SslTlsOutbound,
+                                            ByteString,
+                                            ByteString,
+                                            SslTlsInbound,
+                                            NotUsed] =
     new javadsl.BidiFlow(
         scaladsl.TLS.apply(
             sslContext,
@@ -107,10 +113,16 @@ object TLSPlacebo {
   /**
     * Returns a reusable [[BidiFlow]] instance representing a [[TLSPlacebo$]].
     */
-  def getInstance(): javadsl.BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SessionBytes, NotUsed] = forJava
+  def getInstance(): javadsl.BidiFlow[SslTlsOutbound,
+                                      ByteString,
+                                      ByteString,
+                                      SessionBytes,
+                                      NotUsed] = forJava
 
-  private val forJava: javadsl.BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SessionBytes, NotUsed] =
+  private val forJava: javadsl.BidiFlow[SslTlsOutbound,
+                                        ByteString,
+                                        ByteString,
+                                        SessionBytes,
+                                        NotUsed] =
     new javadsl.BidiFlow(scaladsl.TLSPlacebo())
 }

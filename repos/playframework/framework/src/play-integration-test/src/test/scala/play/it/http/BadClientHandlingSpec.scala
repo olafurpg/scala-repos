@@ -13,12 +13,15 @@ import scala.concurrent.Future
 import scala.util.Random
 
 object NettyBadClientHandlingSpec
-    extends BadClientHandlingSpec with NettyIntegrationSpecification
+    extends BadClientHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpBadClientHandlingSpec
-    extends BadClientHandlingSpec with AkkaHttpIntegrationSpecification
+    extends BadClientHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait BadClientHandlingSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   "Play" should {
 
@@ -61,12 +64,13 @@ trait BadClientHandlingSpec
 
     "allow accessing the raw unparsed path from an error handler" in withServer(
         new HttpErrorHandler() {
-      def onClientError(
-          request: RequestHeader, statusCode: Int, message: String) =
-        Future.successful(Results.BadRequest("Bad path: " + request.path))
-      def onServerError(request: RequestHeader, exception: Throwable) =
-        Future.successful(Results.Ok)
-    }) { port =>
+          def onClientError(request: RequestHeader,
+                            statusCode: Int,
+                            message: String) =
+            Future.successful(Results.BadRequest("Bad path: " + request.path))
+          def onServerError(request: RequestHeader, exception: Throwable) =
+            Future.successful(Results.Ok)
+        }) { port =>
       val response = BasicHttpClient.makeRequests(port)(
           BasicRequest("GET", "/[", "HTTP/1.1", Map(), "")
       )(0)

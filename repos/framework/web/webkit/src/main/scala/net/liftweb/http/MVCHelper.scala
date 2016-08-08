@@ -89,25 +89,19 @@ trait MVCHelper extends LiftRules.DispatchPF {
     val path = in.path.partPath
     S.session match {
       case Full(_) =>
-        val resp = dispatch
-          .find(_.isDefinedAt(path))
-          .get
-          .apply(path)
-          .toResponse
+        val resp =
+          dispatch.find(_.isDefinedAt(path)).get.apply(path).toResponse
+
+        () =>
+          resp
+
+      case _ =>
+        S.init(Box !! in, curSession.is) {
+          val resp =
+            dispatch.find(_.isDefinedAt(path)).get.apply(path).toResponse
 
           () =>
             resp
-
-        case _ =>
-        S.init(Box !! in, curSession.is) {
-          val resp = dispatch
-            .find(_.isDefinedAt(path))
-            .get
-            .apply(path)
-            .toResponse
-
-            () =>
-              resp
         }
     }
   }
@@ -119,7 +113,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * NodeSeq (run the template),
     * LiftResponse (send the response back),
     * or Box or Option of any of the above.
-    * 
+    *
     */
   protected sealed trait MVCResponse {
     def toResponse: Box[LiftResponse]
@@ -156,10 +150,8 @@ trait MVCHelper extends LiftRules.DispatchPF {
           session <- S.session
           req <- S.request
           template <- templateForPath(req)
-          resp <- session.processTemplate(Full(bind(template)),
-                                          req,
-                                          req.path,
-                                          200)
+          resp <- session
+                   .processTemplate(Full(bind(template)), req, req.path, 200)
         } yield resp
       }
 
@@ -193,10 +185,10 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * Turn a Box[T] into the return type expected by
     * DispatchPF.  Note that this method will return
     * messages from Failure() and return codes and messages
-    * from ParamFailure[Int[(msg, _, _, code) 
+    * from ParamFailure[Int[(msg, _, _, code)
     */
-  protected implicit def boxToResp[T](
-      in: Box[T])(implicit c: T => MVCResponse): Box[LiftResponse] =
+  protected implicit def boxToResp[T](in: Box[T])(
+      implicit c: T => MVCResponse): Box[LiftResponse] =
     in match {
       case Full(v) => c(v).toResponse
       case e: EmptyBox => emptyToResp(e)
@@ -232,11 +224,10 @@ trait MVCHelper extends LiftRules.DispatchPF {
     def validate: List[FieldError];
     def save(): Boolean
   }, where: String) =
-    () =>
-      {
-        what.validate match {
-          case Nil => what.save(); S.redirectTo(where)
-          case xs => S.error(xs)
-        }
+    () => {
+      what.validate match {
+        case Nil => what.save(); S.redirectTo(where)
+        case xs => S.error(xs)
+      }
     }
 }

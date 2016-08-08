@@ -38,7 +38,8 @@ trait LinearSeqLike[+A, +Repr <: LinearSeqLike[A, Repr]]
   def seq: LinearSeq[A]
 
   override def hashCode() =
-    scala.util.hashing.MurmurHash3.seqHash(seq) // TODO - can we get faster via "linearSeqHash" ?
+    scala.util.hashing.MurmurHash3
+      .seqHash(seq) // TODO - can we get faster via "linearSeqHash" ?
 
   override /*IterableLike*/
   def iterator: Iterator[A] = new AbstractIterator[A] {

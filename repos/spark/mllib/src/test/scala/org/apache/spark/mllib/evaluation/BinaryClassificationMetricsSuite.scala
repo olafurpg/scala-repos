@@ -22,7 +22,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
 class BinaryClassificationMetricsSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private def areWithinEpsilon(x: (Double, Double)): Boolean =
     x._1 ~= (x._2) absTol 1E-5
@@ -31,13 +32,13 @@ class BinaryClassificationMetricsSuite
       x: ((Double, Double), (Double, Double))): Boolean =
     (x._1._1 ~= x._2._1 absTol 1E-5) && (x._1._2 ~= x._2._2 absTol 1E-5)
 
-  private def assertSequencesMatch(
-      left: Seq[Double], right: Seq[Double]): Unit = {
+  private def assertSequencesMatch(left: Seq[Double],
+                                   right: Seq[Double]): Unit = {
     assert(left.zip(right).forall(areWithinEpsilon))
   }
 
-  private def assertTupleSequencesMatch(
-      left: Seq[(Double, Double)], right: Seq[(Double, Double)]): Unit = {
+  private def assertTupleSequencesMatch(left: Seq[(Double, Double)],
+                                        right: Seq[(Double, Double)]): Unit = {
     assert(left.zip(right).forall(pairsWithinEpsilon))
   }
 
@@ -96,8 +97,14 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test(
@@ -115,8 +122,14 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test(
@@ -140,8 +153,14 @@ class BinaryClassificationMetricsSuite
       case (r, p) => 5.0 * (p * r) / (4.0 * p + r)
     }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test("binary evaluation metrics with downsampling") {

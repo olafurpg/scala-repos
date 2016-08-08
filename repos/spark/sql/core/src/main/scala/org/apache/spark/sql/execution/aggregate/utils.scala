@@ -29,8 +29,8 @@ object Utils {
   def planAggregateWithoutPartial(
       groupingExpressions: Seq[NamedExpression],
       aggregateExpressions: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
 
@@ -63,31 +63,31 @@ object Utils {
     val usesTungstenAggregate = TungstenAggregate.supportsAggregate(
         aggregateExpressions.flatMap(_.aggregateFunction.aggBufferAttributes))
     if (usesTungstenAggregate) {
-      TungstenAggregate(
-          requiredChildDistributionExpressions = requiredChildDistributionExpressions,
-          groupingExpressions = groupingExpressions,
-          aggregateExpressions = aggregateExpressions,
-          aggregateAttributes = aggregateAttributes,
-          initialInputBufferOffset = initialInputBufferOffset,
-          resultExpressions = resultExpressions,
-          child = child)
+      TungstenAggregate(requiredChildDistributionExpressions =
+                          requiredChildDistributionExpressions,
+                        groupingExpressions = groupingExpressions,
+                        aggregateExpressions = aggregateExpressions,
+                        aggregateAttributes = aggregateAttributes,
+                        initialInputBufferOffset = initialInputBufferOffset,
+                        resultExpressions = resultExpressions,
+                        child = child)
     } else {
-      SortBasedAggregate(
-          requiredChildDistributionExpressions = requiredChildDistributionExpressions,
-          groupingExpressions = groupingExpressions,
-          aggregateExpressions = aggregateExpressions,
-          aggregateAttributes = aggregateAttributes,
-          initialInputBufferOffset = initialInputBufferOffset,
-          resultExpressions = resultExpressions,
-          child = child)
+      SortBasedAggregate(requiredChildDistributionExpressions =
+                           requiredChildDistributionExpressions,
+                         groupingExpressions = groupingExpressions,
+                         aggregateExpressions = aggregateExpressions,
+                         aggregateAttributes = aggregateAttributes,
+                         initialInputBufferOffset = initialInputBufferOffset,
+                         resultExpressions = resultExpressions,
+                         child = child)
     }
   }
 
   def planAggregateWithoutDistinct(
       groupingExpressions: Seq[NamedExpression],
       aggregateExpressions: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
     // Check if we can use TungstenAggregate.
@@ -137,8 +137,8 @@ object Utils {
       groupingExpressions: Seq[NamedExpression],
       functionsWithDistinct: Seq[AggregateExpression],
       functionsWithoutDistinct: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
 
@@ -183,12 +183,13 @@ object Utils {
         aggregateFunctionToAttribute(expr.aggregateFunction, expr.isDistinct)
       }
       createAggregate(
-          requiredChildDistributionExpressions = Some(
-                groupingAttributes ++ distinctAttributes),
+          requiredChildDistributionExpressions =
+            Some(groupingAttributes ++ distinctAttributes),
           groupingExpressions = groupingAttributes ++ distinctAttributes,
           aggregateExpressions = aggregateExpressions,
           aggregateAttributes = aggregateAttributes,
-          initialInputBufferOffset = (groupingAttributes ++ distinctAttributes).length,
+          initialInputBufferOffset =
+            (groupingAttributes ++ distinctAttributes).length,
           resultExpressions = groupingAttributes ++ distinctAttributes ++ aggregateExpressions
               .flatMap(_.aggregateFunction.inputAggBufferAttributes),
           child = partialAggregate)
@@ -226,7 +227,8 @@ object Utils {
             // Use original AggregationFunction to lookup attributes, which is used to build
             // aggregateFunctionToAttribute
             val attr = aggregateFunctionToAttribute(
-                functionsWithDistinct(i).aggregateFunction, true)
+                functionsWithDistinct(i).aggregateFunction,
+                true)
             (expr, attr)
         }.unzip
 
@@ -238,7 +240,8 @@ object Utils {
           groupingExpressions = groupingAttributes,
           aggregateExpressions = mergeAggregateExpressions ++ distinctAggregateExpressions,
           aggregateAttributes = mergeAggregateAttributes ++ distinctAggregateAttributes,
-          initialInputBufferOffset = (groupingAttributes ++ distinctAttributes).length,
+          initialInputBufferOffset =
+            (groupingAttributes ++ distinctAttributes).length,
           resultExpressions = partialAggregateResult,
           child = partialMergeAggregate)
     }
@@ -264,7 +267,8 @@ object Utils {
             // Use original AggregationFunction to lookup attributes, which is used to build
             // aggregateFunctionToAttribute
             val attr = aggregateFunctionToAttribute(
-                functionsWithDistinct(i).aggregateFunction, true)
+                functionsWithDistinct(i).aggregateFunction,
+                true)
             (expr, attr)
         }.unzip
 

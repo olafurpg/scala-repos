@@ -37,7 +37,8 @@ class InterpreterTest extends FunSuite {
     assert(interpreter(Get(Seq(key))) == Values(Seq(Value(key, value1))))
     val hashValue1 =
       interpreter(Gets(Seq(key))).asInstanceOf[Values].values.last.casUnique
-    assert(interpreter(Gets(Seq(key))) == Values(
+    assert(
+        interpreter(Gets(Seq(key))) == Values(
             Seq(Value(key, value1, hashValue1))))
 
     assert(
@@ -68,7 +69,8 @@ class InterpreterTest extends FunSuite {
       info("verify we can retrieve it up until the expiry")
       control.advance(9.seconds)
       assert(interpreter(Get(Seq(key))) == Values(Seq(Value(key, value))))
-      assert(interpreter(Get(Seq(noExpiry))) == Values(
+      assert(
+          interpreter(Get(Seq(noExpiry))) == Values(
               Seq(Value(noExpiry, value))))
 
       info("verify it's not accessible after the expiry")
@@ -82,7 +84,8 @@ class InterpreterTest extends FunSuite {
 
       info("but the value without an expiry should still be accessible (even minutes later)")
       control.advance(1.hour)
-      assert(interpreter(Get(Seq(noExpiry))) == Values(
+      assert(
+          interpreter(Get(Seq(noExpiry))) == Values(
               Seq(Value(noExpiry, value))))
     }
   }

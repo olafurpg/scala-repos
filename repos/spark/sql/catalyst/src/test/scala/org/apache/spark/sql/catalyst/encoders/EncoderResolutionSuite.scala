@@ -61,8 +61,8 @@ class EncoderResolutionSuite extends PlanTest {
 
   test(
       "real type doesn't match encoder schema but they are compatible: tupled encoder") {
-    val encoder = ExpressionEncoder.tuple(
-        ExpressionEncoder[StringLongClass], ExpressionEncoder[Long])
+    val encoder = ExpressionEncoder.tuple(ExpressionEncoder[StringLongClass],
+                                          ExpressionEncoder[Long])
     val attrs = Seq('a.struct('a.string, 'b.byte), 'b.int)
     encoder
       .resolve(attrs, null)
@@ -94,18 +94,18 @@ class EncoderResolutionSuite extends PlanTest {
       val attrs = Seq('a.string, 'b.long, 'c.int)
       assert(
           intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<a:string,b:bigint,c:int> to Tuple2, " +
-          "but failed as the number of fields does not line up.\n" +
-          " - Input schema: struct<a:string,b:bigint,c:int>\n" +
-          " - Target schema: struct<_1:string,_2:bigint>")
+            "but failed as the number of fields does not line up.\n" +
+            " - Input schema: struct<a:string,b:bigint,c:int>\n" +
+            " - Target schema: struct<_1:string,_2:bigint>")
     }
 
     {
       val attrs = Seq('a.string)
       assert(
           intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<a:string> to Tuple2, " +
-          "but failed as the number of fields does not line up.\n" +
-          " - Input schema: struct<a:string>\n" +
-          " - Target schema: struct<_1:string,_2:bigint>")
+            "but failed as the number of fields does not line up.\n" +
+            " - Input schema: struct<a:string>\n" +
+            " - Target schema: struct<_1:string,_2:bigint>")
     }
   }
 
@@ -115,20 +115,18 @@ class EncoderResolutionSuite extends PlanTest {
 
     {
       val attrs = Seq('a.string, 'b.struct('x.long, 'y.string, 'z.int))
-      assert(
-          intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<x:bigint,y:string,z:int> to Tuple2, " +
-          "but failed as the number of fields does not line up.\n" +
-          " - Input schema: struct<a:string,b:struct<x:bigint,y:string,z:int>>\n" +
-          " - Target schema: struct<_1:string,_2:struct<_1:bigint,_2:string>>")
+      assert(intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<x:bigint,y:string,z:int> to Tuple2, " +
+        "but failed as the number of fields does not line up.\n" +
+        " - Input schema: struct<a:string,b:struct<x:bigint,y:string,z:int>>\n" +
+        " - Target schema: struct<_1:string,_2:struct<_1:bigint,_2:string>>")
     }
 
     {
       val attrs = Seq('a.string, 'b.struct('x.long))
-      assert(
-          intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<x:bigint> to Tuple2, " +
-          "but failed as the number of fields does not line up.\n" +
-          " - Input schema: struct<a:string,b:struct<x:bigint>>\n" +
-          " - Target schema: struct<_1:string,_2:struct<_1:bigint,_2:string>>")
+      assert(intercept[AnalysisException](encoder.validate(attrs)).message == "Try to map struct<x:bigint> to Tuple2, " +
+        "but failed as the number of fields does not line up.\n" +
+        " - Input schema: struct<a:string,b:struct<x:bigint>>\n" +
+        " - Target schema: struct<_1:string,_2:struct<_1:bigint,_2:string>>")
     }
   }
 
@@ -148,8 +146,8 @@ class EncoderResolutionSuite extends PlanTest {
       val structType = new StructType()
         .add("a", StringType)
         .add("b", DecimalType.SYSTEM_DEFAULT)
-      ExpressionEncoder[ComplexClass].resolve(
-          Seq('a.long, 'b.struct(structType)), null)
+      ExpressionEncoder[ComplexClass]
+        .resolve(Seq('a.long, 'b.struct(structType)), null)
     }.message
     assert(msg2 == s"""
          |Cannot up cast `b`.`b` from decimal(38,18) to bigint as it may truncate
@@ -175,7 +173,7 @@ class EncoderResolutionSuite extends PlanTest {
   castFail[java.math.BigDecimal, Int]
   castFail[String, Long]
 
-  private def castSuccess[T : TypeTag, U : TypeTag]: Unit = {
+  private def castSuccess[T: TypeTag, U: TypeTag]: Unit = {
     val from = ExpressionEncoder[T]
     val to = ExpressionEncoder[U]
     val catalystType = from.schema.head.dataType.simpleString
@@ -185,7 +183,7 @@ class EncoderResolutionSuite extends PlanTest {
     }
   }
 
-  private def castFail[T : TypeTag, U : TypeTag]: Unit = {
+  private def castFail[T: TypeTag, U: TypeTag]: Unit = {
     val from = ExpressionEncoder[T]
     val to = ExpressionEncoder[U]
     val catalystType = from.schema.head.dataType.simpleString

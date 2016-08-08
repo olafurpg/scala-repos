@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,8 +36,8 @@ import Arbitrary.arbitrary
 
 trait ArbitraryEventMessage extends ArbitraryJValue {
   def genStreamId: Gen[Option[UUID]] =
-    Gen.oneOf(
-        Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)), None)
+    Gen
+      .oneOf(Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)), None)
 
   def genContentJValue: Gen[JValue] =
     frequency(
@@ -71,8 +71,8 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       apiKey <- alphaStr
       path <- genPath
       ownerAccountId <- alphaStr
-      content <- containerOf[List, JValue](genContentJValue)
-                  .map(l => Vector(l: _*)) if !content.isEmpty
+      content <- containerOf[List, JValue](genContentJValue).map(l =>
+                  Vector(l: _*)) if !content.isEmpty
       jobId <- oneOf(identifier.map(Option.apply), None)
       streamRef <- genStreamRef
     } yield
@@ -95,7 +95,7 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
     for {
       ingest <- genRandomIngest if ingest.writeAs.isDefined
       eventIds <- containerOfN[List, EventId](ingest.data.size, genEventId)
-        .map(l => Vector(l: _*))
+                   .map(l => Vector(l: _*))
       streamRef <- genStreamRef
     } yield {
       //TODO: Replace with IngestMessage.fromIngest when it's usable
@@ -157,8 +157,8 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
     } else {
       parent :: containerOfN[List, String](choose(2, 4).sample.get,
                                            resize(10, alphaStr))
-        .map(_.filter(_.length > 1).flatMap(
-                child => buildChildPaths(child :: parent, depth - 1)))
+        .map(_.filter(_.length > 1).flatMap(child =>
+          buildChildPaths(child :: parent, depth - 1)))
         .sample
         .get
     }
@@ -183,8 +183,8 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
   def genIngest: Gen[Ingest] =
     for {
       path <- genStablePath
-      ingestData <- containerOf[List, JValue](genIngestData)
-        .map(l => Vector(l: _*))
+      ingestData <- containerOf[List, JValue](genIngestData).map(l =>
+                     Vector(l: _*))
       streamRef <- genStreamRef
     } yield
       Ingest(ingestAPIKey,
@@ -203,7 +203,8 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
       val records =
         ingest.data map { jv =>
           IngestRecord(
-              EventId(producerId, eventIds(producerId).getAndIncrement), jv)
+              EventId(producerId, eventIds(producerId).getAndIncrement),
+              jv)
         }
       IngestMessage(ingest.apiKey,
                     ingest.path,

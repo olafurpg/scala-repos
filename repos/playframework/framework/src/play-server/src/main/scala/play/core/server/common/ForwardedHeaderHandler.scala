@@ -60,8 +60,8 @@ private[server] class ForwardedHeaderHandler(
     remoteConnection(rawConnection, headers)
   }
 
-  def remoteConnection(
-      rawConnection: ConnectionInfo, headers: Headers): ConnectionInfo = {
+  def remoteConnection(rawConnection: ConnectionInfo,
+                       headers: Headers): ConnectionInfo = {
 
     // Use a mutable iterator for performance when scanning the
     // header entries. Go through the headers in reverse order because
@@ -123,11 +123,11 @@ private[server] object ForwardedHeaderHandler {
     * An unparsed address and protocol pair from a forwarded header. Both values are
     * optional.
     */
-  final case class ForwardedEntry(
-      addressString: Option[String], protoString: Option[String])
+  final case class ForwardedEntry(addressString: Option[String],
+                                  protoString: Option[String])
 
-  case class ForwardedHeaderHandlerConfig(
-      version: ForwardedHeaderVersion, trustedProxies: List[Subnet]) {
+  case class ForwardedHeaderHandlerConfig(version: ForwardedHeaderVersion,
+                                          trustedProxies: List[Subnet]) {
 
     val nodeIdentifierParser = new NodeIdentifierParser(version)
 
@@ -155,19 +155,18 @@ private[server] object ForwardedHeaderHandler {
             fh <- fhs.split(",\\s*")
           } yield fh)
             .map(_.split(";")
-                  .flatMap(s =>
-                        {
-                  val splitted = s.split("=", 2)
-                  if (splitted.length < 2) Seq.empty
-                  else {
-                    // Remove surrounding quotes
-                    val name =
-                      splitted(0).toLowerCase(java.util.Locale.ENGLISH)
-                    val value = unquote(splitted(1))
-                    Seq(name -> value)
-                  }
+              .flatMap(s => {
+                val splitted = s.split("=", 2)
+                if (splitted.length < 2) Seq.empty
+                else {
+                  // Remove surrounding quotes
+                  val name =
+                    splitted(0).toLowerCase(java.util.Locale.ENGLISH)
+                  val value = unquote(splitted(1))
+                  Seq(name -> value)
+                }
               })
-                  .toMap)
+              .toMap)
             .map { paramMap: Map[String, String] =>
               ForwardedEntry(paramMap.get("for"), paramMap.get("proto"))
             }
@@ -206,7 +205,8 @@ private[server] object ForwardedHeaderHandler {
             case Right((Ip(address), _)) =>
               // Parsing was successful, use this connection and scan for another connection.
               val secure =
-                entry.protoString.fold(false)(_ == "https") // Assume insecure by default
+                entry.protoString
+                  .fold(false)(_ == "https") // Assume insecure by default
               val connection = ConnectionInfo(address, secure)
               Right(connection)
             case errorOrNonIp =>

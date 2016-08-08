@@ -25,11 +25,11 @@ import kafka.utils.Pool
     "0.10.0.0")
 class ProducerStats(clientId: String) extends KafkaMetricsGroup {
   val tags: Map[String, String] = Map("clientId" -> clientId)
-  val serializationErrorRate = newMeter(
-      "SerializationErrorsPerSec", "errors", TimeUnit.SECONDS, tags)
+  val serializationErrorRate =
+    newMeter("SerializationErrorsPerSec", "errors", TimeUnit.SECONDS, tags)
   val resendRate = newMeter("ResendsPerSec", "resends", TimeUnit.SECONDS, tags)
-  val failedSendRate = newMeter(
-      "FailedSendsPerSec", "failed sends", TimeUnit.SECONDS, tags)
+  val failedSendRate =
+    newMeter("FailedSendsPerSec", "failed sends", TimeUnit.SECONDS, tags)
 }
 
 /**

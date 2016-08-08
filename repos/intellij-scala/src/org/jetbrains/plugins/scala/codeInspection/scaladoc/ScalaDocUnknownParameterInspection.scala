@@ -8,11 +8,24 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam, ScTypeParamClause}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam,
+  ScTypeParamClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment,
+  ScDocTag
+}
 
 import scala.collection.mutable
 
@@ -23,8 +36,8 @@ import scala.collection.mutable
 class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitDocComment(s: ScDocComment) {
         val tagParams = mutable.HashMap[String, ScDocTag]()
@@ -32,8 +45,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
         val duplicatingParams = mutable.HashSet[ScDocTag]()
 
         import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.convertMemberName
-        def insertDuplicating(
-            element: Option[ScDocTag], duplicateElement: ScDocTag) {
+        def insertDuplicating(element: Option[ScDocTag],
+                              duplicateElement: ScDocTag) {
           element.foreach(duplicatingParams += (_, duplicateElement))
         }
 
@@ -53,7 +66,7 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
 
         def collectDocParams() {
           for (tagParam <- s.findTagsByName(
-              Set("@param", "@tparam").contains(_))) {
+                              Set("@param", "@tparam").contains(_))) {
             if (tagParam.getValueElement != null) {
               tagParam.name match {
                 case "@param" =>
@@ -101,7 +114,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
                     ProblemHighlightType.GENERIC_ERROR,
                     isOnTheFly,
                     new ScalaDocDeleteDuplicatingParamQuickFix(
-                        duplicatingParam, true)))
+                        duplicatingParam,
+                        true)))
           }
         }
 
@@ -144,7 +158,7 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
             for (tag <- s.findTagsByName(
                            Set(MyScaladocParsing.PARAM_TAG,
                                MyScaladocParsing.TYPE_PARAM_TAG).contains _)
-                           if tag.isInstanceOf[ScDocTag]) {
+                 if tag.isInstanceOf[ScDocTag]) {
               holder.registerProblem(
                   holder.getManager.createProblemDescriptor(
                       tag.getFirstChild,
@@ -153,7 +167,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
                       ProblemHighlightType.GENERIC_ERROR,
                       isOnTheFly,
                       new ScalaDocDeleteDuplicatingParamQuickFix(
-                          tag.asInstanceOf[ScDocTag], false)))
+                          tag.asInstanceOf[ScDocTag],
+                          false)))
             }
         }
       }
@@ -161,8 +176,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
   }
 }
 
-class ScalaDocDeleteDuplicatingParamQuickFix(
-    paramTag: ScDocTag, isDuplicating: Boolean)
+class ScalaDocDeleteDuplicatingParamQuickFix(paramTag: ScDocTag,
+                                             isDuplicating: Boolean)
     extends AbstractFixOnPsiElement(
         if (isDuplicating) ScalaBundle.message("delete.duplicating.param")
         else ScalaBundle.message("delete.tag"),

@@ -24,13 +24,13 @@ import kafka.common.{InvalidConfigException, Config}
 
 @deprecated(
     "This object has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
+      "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 object ProducerConfig extends Config {
   def validate(config: ProducerConfig) {
     validateClientId(config.clientId)
-    validateBatchSize(
-        config.batchNumMessages, config.queueBufferingMaxMessages)
+    validateBatchSize(config.batchNumMessages,
+                      config.queueBufferingMaxMessages)
     validateProducerType(config.producerType)
   }
 
@@ -42,7 +42,7 @@ object ProducerConfig extends Config {
     if (batchSize > queueSize)
       throw new InvalidConfigException(
           "Batch size = " + batchSize + " can't be larger than queue size = " +
-          queueSize)
+            queueSize)
   }
 
   def validateProducerType(producerType: String) {
@@ -50,18 +50,20 @@ object ProducerConfig extends Config {
       case "sync" =>
       case "async" =>
       case _ =>
-        throw new InvalidConfigException("Invalid value " + producerType +
-            " for producer.type, valid values are sync/async")
+        throw new InvalidConfigException(
+            "Invalid value " + producerType +
+              " for producer.type, valid values are sync/async")
     }
   }
 }
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
+      "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 class ProducerConfig private (val props: VerifiableProperties)
-    extends AsyncProducerConfig with SyncProducerConfigShared {
+    extends AsyncProducerConfig
+    with SyncProducerConfigShared {
   import ProducerConfig._
 
   def this(originalProps: Properties) {

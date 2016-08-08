@@ -37,11 +37,14 @@ class PythonRDDSuite extends SparkFunSuite {
     PythonRDD.writeIteratorToStream(Iterator("a", null), buffer)
     PythonRDD.writeIteratorToStream(Iterator(null, "a"), buffer)
     PythonRDD.writeIteratorToStream(
-        Iterator("a".getBytes(StandardCharsets.UTF_8), null), buffer)
+        Iterator("a".getBytes(StandardCharsets.UTF_8), null),
+        buffer)
     PythonRDD.writeIteratorToStream(
-        Iterator(null, "a".getBytes(StandardCharsets.UTF_8)), buffer)
+        Iterator(null, "a".getBytes(StandardCharsets.UTF_8)),
+        buffer)
     PythonRDD.writeIteratorToStream(
-        Iterator((null, null), ("a", null), (null, "b")), buffer)
+        Iterator((null, null), ("a", null), (null, "b")),
+        buffer)
     PythonRDD.writeIteratorToStream(
         Iterator((null, null),
                  ("a".getBytes(StandardCharsets.UTF_8), null),

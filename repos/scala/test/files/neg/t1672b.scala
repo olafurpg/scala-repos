@@ -45,10 +45,10 @@ object Test {
     if (i == 0) 0
     else
       1 +
-      (try {
-            throw new RuntimeException
-          } catch {
-            case _: Throwable => bar(i - 1)
-          })
+        (try {
+          throw new RuntimeException
+        } catch {
+          case _: Throwable => bar(i - 1)
+        })
   }
 }

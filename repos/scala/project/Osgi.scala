@@ -16,9 +16,11 @@ object Osgi {
   val bundleName =
     SettingKey[String]("osgiBundleName", "The Bundle-Name for the manifest.")
   val bundleSymbolicName = SettingKey[String](
-      "osgiBundleSymbolicName", "The Bundle-SymbolicName for the manifest.")
+      "osgiBundleSymbolicName",
+      "The Bundle-SymbolicName for the manifest.")
   val headers = SettingKey[Seq[(String, String)]](
-      "osgiHeaders", "Headers and processing instructions for BND.")
+      "osgiHeaders",
+      "Headers and processing instructions for BND.")
 
   def settings: Seq[Setting[_]] = Seq(
       bundleName := description.value,
@@ -31,7 +33,7 @@ object Osgi {
             "ver" -> v,
             "Export-Package" -> ("*;version=${ver}"),
             "Import-Package" ->
-            ("scala.*;version=\"${range;[==,=+);${ver}}\",*"),
+              ("scala.*;version=\"${range;[==,=+);${ver}}\",*"),
             "Bundle-Version" -> v,
             "Bundle-RequiredExecutionEnvironment" -> "JavaSE-1.8",
             "-eclipse" -> "false"
@@ -54,7 +56,7 @@ object Osgi {
           "Bundle-SymbolicName" -> (bundleSymbolicName.value + ".source"),
           "Bundle-Version" -> versionProperties.value.osgiVersion,
           "Eclipse-SourceBundle" ->
-          (bundleSymbolicName.value + ";version=\"" +
+            (bundleSymbolicName.value + ";version=\"" +
               versionProperties.value.osgiVersion + "\";roots:=\".\"")
       )
   )

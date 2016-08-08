@@ -97,14 +97,14 @@ final case class OneAnd[F[_], A](head: A, tail: F[A]) {
 
 private[data] sealed trait OneAndInstances extends OneAndLowPriority2 {
 
-  implicit def oneAndEq[A, F[_]](
-      implicit A: Eq[A], FA: Eq[F[A]]): Eq[OneAnd[F, A]] =
+  implicit def oneAndEq[A, F[_]](implicit A: Eq[A],
+                                 FA: Eq[F[A]]): Eq[OneAnd[F, A]] =
     new Eq[OneAnd[F, A]] {
       def eqv(x: OneAnd[F, A], y: OneAnd[F, A]): Boolean = x === y
     }
 
-  implicit def oneAndShow[A, F[_]](
-      implicit A: Show[A], FA: Show[F[A]]): Show[OneAnd[F, A]] =
+  implicit def oneAndShow[A, F[_]](implicit A: Show[A],
+                                   FA: Show[F[A]]): Show[OneAnd[F, A]] =
     Show.show[OneAnd[F, A]](_.show)
 
   implicit def oneAndSemigroupK[F[_]: MonadCombine]: SemigroupK[OneAnd[F, ?]] =
@@ -113,8 +113,8 @@ private[data] sealed trait OneAndInstances extends OneAndLowPriority2 {
         a combine b
     }
 
-  implicit def oneAndSemigroup[
-      F[_]: MonadCombine, A]: Semigroup[OneAnd[F, A]] =
+  implicit def oneAndSemigroup[F[_]: MonadCombine, A]
+    : Semigroup[OneAnd[F, A]] =
     oneAndSemigroupK[F].algebra
 
   implicit def oneAndReducible[F[_]](

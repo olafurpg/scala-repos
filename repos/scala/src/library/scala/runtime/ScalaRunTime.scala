@@ -28,7 +28,7 @@ object ScalaRunTime {
 
   private def isArrayClass(clazz: jClass[_], atLevel: Int): Boolean =
     clazz.isArray &&
-    (atLevel == 1 || isArrayClass(clazz.getComponentType, atLevel - 1))
+      (atLevel == 1 || isArrayClass(clazz.getComponentType, atLevel - 1))
 
   def isValueClass(clazz: jClass[_]) = clazz.isPrimitive()
 
@@ -69,7 +69,7 @@ object ScalaRunTime {
     *  e.g., classOf[int], not classOf[java.lang.Integer].  The compiler
     *  rewrites expressions like 5.getClass to come here.
     */
-  def anyValClass[T <: AnyVal : ClassTag](value: T): jClass[T] =
+  def anyValClass[T <: AnyVal: ClassTag](value: T): jClass[T] =
     classTag[T].runtimeClass.asInstanceOf[jClass[T]]
 
   /** Retrieve generic array element */
@@ -253,8 +253,8 @@ object ScalaRunTime {
     *  it's performing a series of Any/Any equals comparisons anyway.
     *  See ticket #2867 for specifics.
     */
-  def sameElements(
-      xs1: scala.collection.Seq[Any], xs2: scala.collection.Seq[Any]) =
+  def sameElements(xs1: scala.collection.Seq[Any],
+                   xs2: scala.collection.Seq[Any]) =
     xs1 sameElements xs2
 
   /** Given any Scala value, convert it to a String.
@@ -310,7 +310,7 @@ object ScalaRunTime {
       // or c) print AbstractFiles which are somehow also Iterable[AbstractFile]s.
       case x: Traversable[_] =>
         !x.hasDefiniteSize || !isScalaClass(x) || isScalaCompilerClass(x) ||
-        isXmlNode(x.getClass) || isXmlMetaData(x.getClass)
+          isXmlNode(x.getClass) || isXmlMetaData(x.getClass)
       // Otherwise, nothing could possibly go wrong
       case _ => false
     }
@@ -325,10 +325,10 @@ object ScalaRunTime {
     def arrayToString(x: AnyRef) = {
       if (x.getClass.getComponentType == classOf[BoxedUnit])
         0 until (array_length(x) min maxElements) map (_ => "()") mkString
-        ("Array(", ", ", ")")
+          ("Array(", ", ", ")")
       else
         WrappedArray make x take maxElements map inner mkString
-        ("Array(", ", ", ")")
+          ("Array(", ", ", ")")
     }
 
     // The recursively applied attempt to prettify Array printing.
@@ -344,10 +344,10 @@ object ScalaRunTime {
       case x: AnyRef if isArray(x) => arrayToString(x)
       case x: scala.collection.Map[_, _] =>
         x.iterator take maxElements map mapInner mkString
-        (x.stringPrefix + "(", ", ", ")")
+          (x.stringPrefix + "(", ", ", ")")
       case x: GenIterable[_] =>
         x.iterator take maxElements map inner mkString
-        (x.stringPrefix + "(", ", ", ")")
+          (x.stringPrefix + "(", ", ", ")")
       case x: Traversable[_] =>
         x take maxElements map inner mkString (x.stringPrefix + "(", ", ", ")")
       case x: Product1[_] if isTuple(x) =>
@@ -359,7 +359,8 @@ object ScalaRunTime {
 
     // The try/catch is defense against iterables which aren't actually designed
     // to be iterated, such as some scala.tools.nsc.io.AbstractFile derived classes.
-    try inner(arg) catch {
+    try inner(arg)
+    catch {
       case _: UnsupportedOperationException | _: AssertionError => "" + arg
     }
   }

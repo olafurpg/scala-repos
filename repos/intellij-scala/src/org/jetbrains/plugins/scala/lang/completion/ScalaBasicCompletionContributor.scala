@@ -3,7 +3,11 @@ package lang
 package completion
 
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{InsertHandlerDecorator, LookupElement, LookupElementDecorator}
+import com.intellij.codeInsight.lookup.{
+  InsertHandlerDecorator,
+  LookupElement,
+  LookupElementDecorator
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.Computable
@@ -16,15 +20,36 @@ import org.jetbrains.plugins.scala.debugger.evaluation.ScalaRuntimeTypeEvaluator
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.ScalaAfterNewCompletionUtil._
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
-import org.jetbrains.plugins.scala.lang.completion.lookups.{LookupElementManager, ScalaLookupItem}
+import org.jetbrains.plugins.scala.lang.completion.lookups.{
+  LookupElementManager,
+  ScalaLookupItem
+}
 import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolated, ScReferenceElement, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScNewTemplateDefinition, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScCaseClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolated,
+  ScReferenceElement,
+  ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScNewTemplateDefinition,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
@@ -34,7 +59,10 @@ import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScTypeProjectionImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScReferenceExpressionImpl
 import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScType}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 
 import scala.annotation.tailrec
@@ -70,10 +98,11 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                 //it's ok to use parameters here as we want just to calculate offset
                 val offsetInString =
                   parameters.getOffset -
-                  parameters.getPosition.getTextRange.getStartOffset + 1
+                    parameters.getPosition.getTextRange.getStartOffset + 1
                 val interpolated =
                   ScalaPsiElementFactory.createExpressionFromText(
-                      "s" + dummyPosition.getText, dummyPosition.getContext)
+                      "s" + dummyPosition.getText,
+                      dummyPosition.getContext)
                 (interpolated.findElementAt(offsetInString), true, false)
               case ScalaTokenTypes.tINTERPOLATED_STRING |
                   ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING =>
@@ -97,16 +126,17 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                 val offsetInString =
                   offset - dummyInterpolated.getTextRange.getStartOffset
                 val res = ScalaBasicCompletionContributor
-                  .getStartEndPointForInterpolatedString(
-                    interpolated, index, offsetInString)
+                  .getStartEndPointForInterpolatedString(interpolated,
+                                                         index,
+                                                         offsetInString)
                 if (res.isEmpty) return
                 val (exprStartInString, endPoint) = res.get
                 val stringText = interpolated.getText
                 val newInterpolated =
                   ScalaPsiElementFactory.createExpressionFromText(
                       stringText.substring(0, exprStartInString) + "{" +
-                      stringText.substring(exprStartInString, endPoint) +
-                      "}" + stringText.substring(endPoint),
+                        stringText.substring(exprStartInString, endPoint) +
+                        "}" + stringText.substring(endPoint),
                       position.getContext)
                 (newInterpolated.findElementAt(offsetInString + 1),
                  false,
@@ -116,8 +146,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
           result.restartCompletionWhenNothingMatches()
 
           val (expectedTypesAfterNew, isAfterNew) =
-            ScalaAfterNewCompletionUtil.expectedTypesAfterNew(
-                position, context)
+            ScalaAfterNewCompletionUtil.expectedTypesAfterNew(position,
+                                                              context)
 
           //if prefix is capitalized, class name completion is enabled
           val classNameCompletion =
@@ -129,8 +159,9 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                 .fileContext(insertedElement)
                 .isInstanceOf[ScalaFile]) return
           val lookingForAnnotations: Boolean =
-            Option(insertedElement.getContainingFile findElementAt
-                (insertedElement.getTextOffset - 1)) exists {
+            Option(
+                insertedElement.getContainingFile findElementAt
+                  (insertedElement.getTextOffset - 1)) exists {
               _.getNode.getElementType == ScalaTokenTypes.tAT
             }
 
@@ -144,7 +175,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
           position.getContext match {
             case ref: ScReferenceElement =>
               val isInImport =
-                ScalaPsiUtil.getContextOfType(ref, true, classOf[ScImportStmt]) != null
+                ScalaPsiUtil
+                  .getContextOfType(ref, true, classOf[ScImportStmt]) != null
               def applyVariant(
                   variant: Object,
                   addElement: LookupElement => Unit = addElement) {
@@ -159,22 +191,24 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                         val renamedMap =
                           new MHashMap[String, (String, PsiNamedElement)]
                         el.isRenamed.foreach(name =>
-                              renamedMap += ((clazz.name, (name, clazz))))
+                          renamedMap += ((clazz.name, (name, clazz))))
                         val isExcluded: Boolean =
                           ApplicationManager.getApplication.runReadAction(
                               new Computable[Boolean] {
-                            def compute: Boolean = {
-                              JavaCompletionUtil.isInExcludedPackage(clazz,
-                                                                     false)
-                            }
-                          })
+                                def compute: Boolean = {
+                                  JavaCompletionUtil.isInExcludedPackage(clazz,
+                                                                         false)
+                                }
+                              })
 
                         if (!isExcluded && !classNameCompletion &&
                             (!lookingForAnnotations ||
-                                clazz.isAnnotationType)) {
+                            clazz.isAnnotationType)) {
                           if (isAfterNew) {
-                            val lookupElement = getLookupElementFromClass(
-                                expectedTypesAfterNew, clazz, renamedMap)
+                            val lookupElement =
+                              getLookupElementFromClass(expectedTypesAfterNew,
+                                                        clazz,
+                                                        renamedMap)
                             addElement(lookupElement)
                           } else {
                             addElement(el)
@@ -183,7 +217,7 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                       case _ if lookingForAnnotations =>
                       case f: FakePsiMethod
                           if f.name.endsWith("_=") &&
-                          parameters.getInvocationCount < 2 =>
+                            parameters.getInvocationCount < 2 =>
                       //don't show _= methods for vars in basic completion
                       case fun: ScFun => addElement(el)
                       case param: ScClassParameter =>
@@ -206,14 +240,17 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                           case memb: PsiMember =>
                             if (parameters.getInvocationCount > 1 ||
                                 ResolveUtils.isAccessible(
-                                    memb, position, forCompletion = true))
+                                    memb,
+                                    position,
+                                    forCompletion = true))
                               addElement(el)
                           case _ => addElement(el)
                         }
                       case memb: PsiMember =>
                         if (parameters.getInvocationCount > 1 ||
-                            ResolveUtils.isAccessible(
-                                memb, position, forCompletion = true))
+                            ResolveUtils.isAccessible(memb,
+                                                      position,
+                                                      forCompletion = true))
                           addElement(el)
                       case _ =>
                         addElement(el)
@@ -232,15 +269,15 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                       isInImport = isInImport,
                       qualifierType = qualifierType,
                       containingClass = probablyContinigClass,
-                      isInStableCodeReference = ref
-                          .isInstanceOf[ScStableCodeReferenceElement])
+                      isInStableCodeReference =
+                        ref.isInstanceOf[ScStableCodeReferenceElement])
                 lookupItems.foreach(applyVariant(_))
               }
 
-              def completionProcessor(
-                  ref: ScReferenceElement,
-                  collectImplicit: Boolean = false,
-                  postProcess: ScalaResolveResult => Unit = postProcessMethod)
+              def completionProcessor(ref: ScReferenceElement,
+                                      collectImplicit: Boolean = false,
+                                      postProcess: ScalaResolveResult => Unit =
+                                        postProcessMethod)
                 : CompletionProcessor =
                 new CompletionProcessor(
                     ref.getKinds(incomplete = false, completion = true),
@@ -286,7 +323,10 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                       checkInvocationCount = false,
                       lookingForAnnotations = lookingForAnnotations)) {
                 ScalaClassNameCompletionContributor.completeClassName(
-                    dummyPosition, parameters, context, result)
+                    dummyPosition,
+                    parameters,
+                    context,
+                    result)
               }
 
               //adds runtime completions for evaluate expression in debugger
@@ -309,26 +349,28 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                         resolveResult,
                         isInImport = isInImport,
                         qualifierType = runtimeQualifierType,
-                        isInStableCodeReference = ref
-                            .isInstanceOf[ScStableCodeReferenceElement],
+                        isInStableCodeReference =
+                          ref.isInstanceOf[ScStableCodeReferenceElement],
                         isInSimpleString = inString,
                         isInInterpolatedString = inInterpolatedString
                     )
                   val decorator =
                     castDecorator(runtimeQualifierType.canonicalText)
                   lookupItems.foreach(item =>
-                        applyVariant(item,
-                                     addElementWithDecorator(_, decorator)))
+                    applyVariant(item, addElementWithDecorator(_, decorator)))
                 }
 
-                val newRef = createReferenceWithQualifierType(
-                    runtimeQualifierType, ref.getContext, ref)
+                val newRef =
+                  createReferenceWithQualifierType(runtimeQualifierType,
+                                                   ref.getContext,
+                                                   ref)
                 newRef match {
                   case refImpl: ScReferenceExpressionImpl =>
-                    refImpl.doResolve(
-                        refImpl,
-                        completionProcessor(
-                            refImpl, collectImplicit = true, postProcess))
+                    refImpl.doResolve(refImpl,
+                                      completionProcessor(refImpl,
+                                                          collectImplicit =
+                                                            true,
+                                                          postProcess))
                   case _ =>
                 }
               }
@@ -358,7 +400,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
 
   @Nullable
   private def getQualifierCastType(
-      ref: ScReferenceElement, parameters: CompletionParameters): ScType = {
+      ref: ScReferenceElement,
+      parameters: CompletionParameters): ScType = {
     ref match {
       case refExpr: ScReferenceExpression =>
         (for (qualifier <- refExpr.qualifier) yield {
@@ -394,7 +437,10 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
           .getInstance(context.getProject)
           .getPsiFile(document)
         val ref: ScReferenceElement = PsiTreeUtil.findElementOfClassAtOffset(
-            file, context.getStartOffset, classOf[ScReferenceElement], false)
+            file,
+            context.getStartOffset,
+            classOf[ScReferenceElement],
+            false)
         if (ref != null) {
           ref.qualifier match {
             case None =>
@@ -427,7 +473,7 @@ object ScalaBasicCompletionContributor {
       val stringText = interpolated.getText
       val pointPosition =
         expr.getTextRange.getEndOffset -
-        interpolated.getTextRange.getStartOffset
+          interpolated.getTextRange.getStartOffset
       if (stringText.charAt(pointPosition) == '.') {
         val restString = stringText.substring(pointPosition + 1)
         val lexer = new ScalaLexer()
@@ -438,7 +484,7 @@ object ScalaBasicCompletionContributor {
           if (endPoint >= offsetInString) {
             val exprStartInString =
               expr.getTextRange.getStartOffset -
-              interpolated.getTextRange.getStartOffset
+                interpolated.getTextRange.getStartOffset
             Some(exprStartInString, endPoint)
           } else None
         } else None

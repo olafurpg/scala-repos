@@ -7,7 +7,9 @@ trait SCL8398 {
 
   val t: T = ???
   t match {
-    case T.Prod(p) => /*start*/ p /*end*/
+    case T.Prod(p) =>
+      /*start*/
+      p /*end*/
   }
 }
 //Product2[Long, String]

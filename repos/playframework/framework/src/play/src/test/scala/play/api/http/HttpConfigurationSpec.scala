@@ -6,7 +6,12 @@ package play.api.http
 import com.typesafe.config.ConfigFactory
 import org.specs2.mutable.Specification
 import play.api.{PlayException, Configuration}
-import play.core.netty.utils.{ClientCookieEncoder, ClientCookieDecoder, ServerCookieDecoder, ServerCookieEncoder}
+import play.core.netty.utils.{
+  ClientCookieEncoder,
+  ClientCookieDecoder,
+  ServerCookieDecoder,
+  ServerCookieEncoder
+}
 
 object HttpConfigurationSpec extends Specification {
 

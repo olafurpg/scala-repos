@@ -6,7 +6,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.maddyhome.idea.copyright.CopyrightProfile
-import com.maddyhome.idea.copyright.psi.{UpdateCopyright, UpdateCopyrightsProvider, UpdateJavaFileCopyright}
+import com.maddyhome.idea.copyright.psi.{
+  UpdateCopyright,
+  UpdateCopyrightsProvider,
+  UpdateJavaFileCopyright
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**

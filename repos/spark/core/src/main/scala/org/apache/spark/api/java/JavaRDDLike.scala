@@ -31,7 +31,11 @@ import org.apache.spark.annotation.Since
 import org.apache.spark.api.java.JavaPairRDD._
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
 import org.apache.spark.api.java.JavaUtils.mapAsSerializableJavaMap
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2, _}
+import org.apache.spark.api.java.function.{
+  Function => JFunction,
+  Function2 => JFunction2,
+  _
+}
 import org.apache.spark.partial.{BoundedDouble, PartialResult}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
@@ -82,8 +86,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * This should ''not'' be called by users directly, but is available for implementors of custom
     * subclasses of RDD.
     */
-  def iterator(
-      split: Partition, taskContext: TaskContext): java.util.Iterator[T] =
+  def iterator(split: Partition,
+               taskContext: TaskContext): java.util.Iterator[T] =
     rdd.iterator(split, taskContext).asJava
 
   // Transformations (return a new RDD)
@@ -118,8 +122,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     */
   def mapToPair[K2, V2](f: PairFunction[T, K2, V2]): JavaPairRDD[K2, V2] = {
     def cm: ClassTag[(K2, V2)] = implicitly[ClassTag[(K2, V2)]]
-    new JavaPairRDD(rdd.map[(K2, V2)](f)(cm))(
-        fakeClassTag[K2], fakeClassTag[V2])
+    new JavaPairRDD(rdd.map[(K2, V2)](f)(cm))(fakeClassTag[K2],
+                                              fakeClassTag[V2])
   }
 
   /**
@@ -197,8 +201,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     def fn: (Iterator[T]) => Iterator[(K2, V2)] = { (x: Iterator[T]) =>
       f.call(x.asJava).asScala
     }
-    JavaPairRDD.fromRDD(rdd.mapPartitions(fn))(
-        fakeClassTag[K2], fakeClassTag[V2])
+    JavaPairRDD
+      .fromRDD(rdd.mapPartitions(fn))(fakeClassTag[K2], fakeClassTag[V2])
   }
 
   /**
@@ -223,7 +227,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
       f.call(x.asJava).asScala
     }
     JavaPairRDD.fromRDD(rdd.mapPartitions(fn, preservesPartitioning))(
-        fakeClassTag[K2], fakeClassTag[V2])
+        fakeClassTag[K2],
+        fakeClassTag[V2])
   }
 
   /**
@@ -245,7 +250,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     */
   def cartesian[U](other: JavaRDDLike[U, _]): JavaPairRDD[T, U] =
     JavaPairRDD.fromRDD(rdd.cartesian(other.rdd)(other.classTag))(
-        classTag, other.classTag)
+        classTag,
+        other.classTag)
 
   /**
     * Return an RDD of grouped elements. Each group consists of a key and a sequence of elements
@@ -262,8 +268,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * Return an RDD of grouped elements. Each group consists of a key and a sequence of elements
     * mapping to that key.
     */
-  def groupBy[U](
-      f: JFunction[T, U], numPartitions: Int): JavaPairRDD[U, JIterable[T]] = {
+  def groupBy[U](f: JFunction[T, U],
+                 numPartitions: Int): JavaPairRDD[U, JIterable[T]] = {
     // The type parameter is U instead of K in order to work around a compiler bug; see SPARK-4459
     implicit val ctagK: ClassTag[U] = fakeClassTag
     implicit val ctagV: ClassTag[JList[T]] = fakeClassTag
@@ -424,8 +430,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * allowed to modify and return their first argument instead of creating a new U to avoid memory
     * allocation.
     */
-  def aggregate[U](zeroValue: U)(
-      seqOp: JFunction2[U, T, U], combOp: JFunction2[U, U, U]): U =
+  def aggregate[U](zeroValue: U)(seqOp: JFunction2[U, T, U],
+                                 combOp: JFunction2[U, U, U]): U =
     rdd.aggregate(zeroValue)(seqOp, combOp)(fakeClassTag[U])
 
   /**
@@ -459,8 +465,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * Approximate version of count() that returns a potentially incomplete result
     * within a timeout, even if not all tasks have finished.
     */
-  def countApprox(
-      timeout: Long, confidence: Double): PartialResult[BoundedDouble] =
+  def countApprox(timeout: Long,
+                  confidence: Double): PartialResult[BoundedDouble] =
     rdd.countApprox(timeout, confidence)
 
   /**
@@ -678,8 +684,8 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * future for counting the number of elements in this RDD.
     */
   def countAsync(): JavaFutureAction[jl.Long] = {
-    new JavaFutureActionWrapper[Long, jl.Long](
-        rdd.countAsync(), jl.Long.valueOf)
+    new JavaFutureActionWrapper[Long, jl.Long](rdd.countAsync(),
+                                               jl.Long.valueOf)
   }
 
   /**
@@ -723,7 +729,7 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
       f: VoidFunction[java.util.Iterator[T]]): JavaFutureAction[Void] = {
     new JavaFutureActionWrapper[Unit, Void](
         rdd.foreachPartitionAsync(x => f.call(x.asJava)), { x =>
-      null.asInstanceOf[Void]
-    })
+          null.asInstanceOf[Void]
+        })
   }
 }

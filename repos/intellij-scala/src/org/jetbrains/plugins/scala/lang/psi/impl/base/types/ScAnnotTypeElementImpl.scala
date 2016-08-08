@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScAnnotTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScAnnotTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScAnnotTypeElement {
   override def toString: String = "TypeWithAnnotation: " + getText
 
   protected def innerType(ctx: TypingContext) = typeElement.getType(ctx)

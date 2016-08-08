@@ -13,13 +13,14 @@ import breeze.util.SerializableLogging
   *
   * @author dlwh
   */
-class TruncatedNewtonMinimizer[T, H](
-    maxIterations: Int = -1,
-    tolerance: Double = 1E-6,
-    l2Regularization: Double = 0,
-    m: Int = 0)(implicit space: MutableVectorField[T, Double],
-                mult: OpMulMatrix.Impl2[H, T, T])
-    extends Minimizer[T, SecondOrderFunction[T, H]] with SerializableLogging {
+class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
+                                     tolerance: Double = 1E-6,
+                                     l2Regularization: Double = 0,
+                                     m: Int = 0)(
+    implicit space: MutableVectorField[T, Double],
+    mult: OpMulMatrix.Impl2[H, T, T])
+    extends Minimizer[T, SecondOrderFunction[T, H]]
+    with SerializableLogging {
 
   def minimize(f: SecondOrderFunction[T, H], initial: T): T =
     iterations(f, initial).takeUpToWhere(_.converged).last.x
@@ -39,7 +40,7 @@ class TruncatedNewtonMinimizer[T, H](
                    history: History) {
     def converged =
       (iter >= maxIterations && maxIterations > 0 && accept == true) ||
-      norm(adjGrad) <= tolerance * initialGNorm || stop
+        norm(adjGrad) <= tolerance * initialGNorm || stop
   }
 
   private def initialState(f: SecondOrderFunction[T, H], initial: T): State = {
@@ -108,11 +109,11 @@ class TruncatedNewtonMinimizer[T, H](
         if (actualReduction < eta0 * predictedReduction)
           math.min(math.max(alpha, sigma1) * stepNorm, sigma2 * newDelta)
         else if (actualReduction < eta1 * predictedReduction)
-          math.max(
-              sigma1 * newDelta, math.min(alpha * stepNorm, sigma2 * newDelta))
+          math.max(sigma1 * newDelta,
+                   math.min(alpha * stepNorm, sigma2 * newDelta))
         else if (actualReduction < eta2 * predictedReduction)
-          math.max(
-              sigma1 * newDelta, math.min(alpha * stepNorm, sigma3 * newDelta))
+          math.max(sigma1 * newDelta,
+                   math.min(alpha * stepNorm, sigma3 * newDelta))
         else math.max(newDelta, math.min(10 * stepNorm, sigma3 * newDelta))
       }
 
@@ -129,8 +130,9 @@ class TruncatedNewtonMinimizer[T, H](
         val stop_cond =
           if (adjNewV < -1.0e+32 ||
               (math.abs(actualReduction) <= math.abs(adjNewV) * 1.0e-12 &&
-                  math.abs(predictedReduction) <= math.abs(adjNewV) * 1.0e-12))
-            true else false
+              math.abs(predictedReduction) <= math.abs(adjNewV) * 1.0e-12))
+            true
+          else false
         val newHistory = updateHistory(x_new, adjNewG, adjNewV, state)
         val this_iter = if (state.accept == true) iter + 1 else iter
         State(this_iter,
@@ -150,8 +152,9 @@ class TruncatedNewtonMinimizer[T, H](
         val stop_cond =
           if (adjFval < -1.0e+32 ||
               (math.abs(actualReduction) <= math.abs(adjFval) * 1.0e-12 &&
-                  math.abs(predictedReduction) <= math.abs(adjFval) * 1.0e-12))
-            true else false
+              math.abs(predictedReduction) <= math.abs(adjFval) * 1.0e-12))
+            true
+          else false
         logger.info(
             "Reject %d d=%.2f resNorm=%.2f pred=%.2f actual=%.2f".format(
                 iter,
@@ -159,8 +162,8 @@ class TruncatedNewtonMinimizer[T, H](
                 norm(residual),
                 predictedReduction,
                 actualReduction))
-        state.copy(
-            this_iter, delta = newDelta, stop = stop_cond, accept = false)
+        state
+          .copy(this_iter, delta = newDelta, stop = stop_cond, accept = false)
       }
     }
   }
@@ -214,8 +217,10 @@ class TruncatedNewtonMinimizer[T, H](
     sy / yy
   }
 
-  protected def updateHistory(
-      newX: T, newGrad: T, newVal: Double, oldState: State): History = {
+  protected def updateHistory(newX: T,
+                              newGrad: T,
+                              newVal: Double,
+                              oldState: State): History = {
     val gradDelta: T = (newGrad :- oldState.adjGrad)
     val step: T = (newX - oldState.x)
 

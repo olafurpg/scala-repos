@@ -9,14 +9,21 @@ import mesosphere.marathon.state.StorageVersions._
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.{MarathonConf, MarathonSpec}
 import mesosphere.util.state.memory.InMemoryEntity
-import mesosphere.util.state.{PersistentEntity, PersistentStore, PersistentStoreManagement}
+import mesosphere.util.state.{
+  PersistentEntity,
+  PersistentStore,
+  PersistentStoreManagement
+}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.concurrent.Future
 
 class MigrationTest
-    extends MarathonSpec with Mockito with Matchers with GivenWhenThen
+    extends MarathonSpec
+    with Mockito
+    with Matchers
+    with GivenWhenThen
     with ScalaFutures {
 
   test("migrations can be filtered by version") {
@@ -124,7 +131,8 @@ class MigrationTest
 
   class Fixture {
     trait StoreWithManagement
-        extends PersistentStore with PersistentStoreManagement
+        extends PersistentStore
+        with PersistentStoreManagement
     val metrics = new Metrics(new MetricRegistry)
     val store = mock[StoreWithManagement]
     val appRepo = mock[AppRepository]
@@ -135,10 +143,11 @@ class MigrationTest
             store = store,
             metrics = metrics,
             newState = () =>
-                MarathonTaskState(MarathonTask
-                      .newBuilder()
-                      .setId(UUID.randomUUID().toString)
-                      .build()),
+              MarathonTaskState(
+                  MarathonTask
+                    .newBuilder()
+                    .setId(UUID.randomUUID().toString)
+                    .build()),
             prefix = "task:"),
         metrics
     )

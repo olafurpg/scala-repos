@@ -53,8 +53,8 @@ abstract class AbstractFetcherThread(name: String,
   private val partitionMapLock = new ReentrantLock
   private val partitionMapCond = partitionMapLock.newCondition()
 
-  private val metricId = new ClientIdAndBroker(
-      clientId, sourceBroker.host, sourceBroker.port)
+  private val metricId =
+    new ClientIdAndBroker(clientId, sourceBroker.host, sourceBroker.port)
   val fetcherStats = new FetcherStats(metricId)
   val fetcherLagStats = new FetcherLagStats(metricId)
 
@@ -106,8 +106,8 @@ abstract class AbstractFetcherThread(name: String,
 
     try {
       trace(
-          "Issuing to broker %d of fetch request %s".format(
-              sourceBroker.id, fetchRequest))
+          "Issuing to broker %d of fetch request %s".format(sourceBroker.id,
+                                                            fetchRequest))
       responseData = fetch(fetchRequest)
     } catch {
       case t: Throwable =>
@@ -132,8 +132,9 @@ abstract class AbstractFetcherThread(name: String,
             partitionMap
               .get(topicAndPartition)
               .foreach(currentPartitionFetchState =>
-                    // we append to the log if the current offset is defined and it is the same as the offset requested during fetch
-                    if (fetchRequest.offset(topicAndPartition) == currentPartitionFetchState.offset) {
+                // we append to the log if the current offset is defined and it is the same as the offset requested during fetch
+                if (fetchRequest
+                      .offset(topicAndPartition) == currentPartitionFetchState.offset) {
                   Errors.forCode(partitionData.errorCode) match {
                     case Errors.NONE =>
                       try {
@@ -148,8 +149,8 @@ abstract class AbstractFetcherThread(name: String,
                                          new PartitionFetchState(newOffset))
                         fetcherLagStats
                           .getFetcherLagStats(topic, partitionId)
-                          .lag = Math.max(
-                            0L, partitionData.highWatermark - newOffset)
+                          .lag =
+                          Math.max(0L, partitionData.highWatermark - newOffset)
                         fetcherStats.byteRate.mark(validBytes)
                         // Once we hand off the partition data to the subclass, we can't mess with it any more in this thread
                         processPartitionData(topicAndPartition,
@@ -163,9 +164,9 @@ abstract class AbstractFetcherThread(name: String,
                           // should get fixed in the subsequent fetches
                           logger.error(
                               "Found invalid messages during fetch for partition [" +
-                              topic + "," + partitionId + "] offset " +
-                              currentPartitionFetchState.offset +
-                              " error " + ime.getMessage)
+                                topic + "," + partitionId + "] offset " +
+                                currentPartitionFetchState.offset +
+                                " error " + ime.getMessage)
                         case e: Throwable =>
                           throw new KafkaException(
                               "error processing data for partition [%s,%d] offset %d"
@@ -180,7 +181,8 @@ abstract class AbstractFetcherThread(name: String,
                           handleOffsetOutOfRange(topicAndPartition)
                         partitionMap.put(topicAndPartition,
                                          new PartitionFetchState(newOffset))
-                        error("Current offset %d for partition [%s,%d] out of range; reset offset to %d"
+                        error(
+                            "Current offset %d for partition [%s,%d] out of range; reset offset to %d"
                               .format(currentPartitionFetchState.offset,
                                       topic,
                                       partitionId,
@@ -194,7 +196,8 @@ abstract class AbstractFetcherThread(name: String,
                       }
                     case _ =>
                       if (isRunning.get) {
-                        error("Error for partition [%s,%d] to broker %d:%s"
+                        error(
+                            "Error for partition [%s,%d] to broker %d:%s"
                               .format(topic,
                                       partitionId,
                                       sourceBroker.id,
@@ -238,7 +241,8 @@ abstract class AbstractFetcherThread(name: String,
       for (partition <- partitions) {
         partitionMap
           .get(partition)
-          .foreach(currentPartitionFetchState =>
+          .foreach(
+              currentPartitionFetchState =>
                 if (currentPartitionFetchState.isActive)
                   partitionMap.put(partition,
                                    new PartitionFetchState(
@@ -251,13 +255,14 @@ abstract class AbstractFetcherThread(name: String,
 
   def removePartitions(topicAndPartitions: Set[TopicAndPartition]) {
     partitionMapLock.lockInterruptibly()
-    try topicAndPartitions.foreach(partitionMap.remove) finally partitionMapLock
-      .unlock()
+    try topicAndPartitions.foreach(partitionMap.remove)
+    finally partitionMapLock.unlock()
   }
 
   def partitionCount() = {
     partitionMapLock.lockInterruptibly()
-    try partitionMap.size finally partitionMapLock.unlock()
+    try partitionMap.size
+    finally partitionMapLock.unlock()
   }
 }
 
@@ -311,14 +316,15 @@ class FetcherStats(metricId: ClientIdAndBroker) extends KafkaMetricsGroup {
                  "brokerHost" -> metricId.brokerHost,
                  "brokerPort" -> metricId.brokerPort.toString)
 
-  val requestRate = newMeter(
-      "RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val requestRate =
+    newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
 
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
 }
 
-case class ClientIdTopicPartition(
-    clientId: String, topic: String, partitionId: Int) {
+case class ClientIdTopicPartition(clientId: String,
+                                  topic: String,
+                                  partitionId: Int) {
   override def toString = "%s-%s-%d".format(clientId, topic, partitionId)
 }
 

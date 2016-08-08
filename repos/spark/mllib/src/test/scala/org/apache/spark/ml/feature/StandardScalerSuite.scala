@@ -26,7 +26,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class StandardScalerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var data: Array[Vector] = _
@@ -69,8 +70,10 @@ class StandardScalerSuite
 
   test("params") {
     ParamsSuite.checkParams(new StandardScaler)
-    ParamsSuite.checkParams(new StandardScalerModel(
-            "empty", Vectors.dense(1.0), Vectors.dense(2.0)))
+    ParamsSuite.checkParams(
+        new StandardScalerModel("empty",
+                                Vectors.dense(1.0),
+                                Vectors.dense(2.0)))
   }
 
   test("Standardization with default parameter") {

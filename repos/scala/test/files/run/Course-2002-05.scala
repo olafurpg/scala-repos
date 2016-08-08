@@ -188,11 +188,11 @@ object M4 {
       else {
         def isSafe(col: Int, p: Placement, delta: Int): Boolean =
           (p.isEmpty ||
-              (col != p.head && abs(col - p.head) != delta &&
-                  isSafe(col, p.tail, delta + 1)));
+            (col != p.head && abs(col - p.head) != delta &&
+              isSafe(col, p.tail, delta + 1)));
 
         for (placement <- placeQueens(row - 1);
-        col <- columns; if isSafe(col, placement, 1)) yield {
+             col <- columns; if isSafe(col, placement, 1)) yield {
           col :: placement
         }
       }

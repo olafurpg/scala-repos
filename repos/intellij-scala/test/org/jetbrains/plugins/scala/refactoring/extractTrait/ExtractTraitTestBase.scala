@@ -16,8 +16,8 @@ abstract class ExtractTraitTestBase
                   expectedText: String,
                   onlyDeclarations: Boolean,
                   onlyFirstMember: Boolean = false) {
-    configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+    configureFromFileTextAdapter("dummy.scala",
+                                 fileText.replace("\r", "").stripMargin.trim)
     new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
                                               getEditorAdapter,
                                               getFileAdapter,
@@ -31,8 +31,8 @@ abstract class ExtractTraitTestBase
                      messageText: String,
                      onlyDeclarations: Boolean,
                      onlyFirstMember: Boolean) {
-    configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+    configureFromFileTextAdapter("dummy.scala",
+                                 fileText.replace("\r", "").stripMargin.trim)
     try {
       new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
                                                 getEditorAdapter,

@@ -27,15 +27,16 @@ import org.apache.spark.storage.RDDInfo
   * Stores information about a stage to pass from the scheduler to SparkListeners.
   */
 @DeveloperApi
-class StageInfo(val stageId: Int,
-                val attemptId: Int,
-                val name: String,
-                val numTasks: Int,
-                val rddInfos: Seq[RDDInfo],
-                val parentIds: Seq[Int],
-                val details: String,
-                private[spark] val taskLocalityPreferences: Seq[Seq[
-                        TaskLocation]] = Seq.empty) {
+class StageInfo(
+    val stageId: Int,
+    val attemptId: Int,
+    val name: String,
+    val numTasks: Int,
+    val rddInfos: Seq[RDDInfo],
+    val parentIds: Seq[Int],
+    val details: String,
+    private[spark] val taskLocalityPreferences: Seq[Seq[TaskLocation]] =
+      Seq.empty) {
 
   /** When this stage was submitted from the DAGScheduler to a TaskScheduler. */
   var submissionTime: Option[Long] = None

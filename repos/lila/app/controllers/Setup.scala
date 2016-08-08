@@ -92,9 +92,9 @@ object Setup extends LilaController with TheftPrevention {
                           destUser = destUser,
                           rematchOf = none)
                       env.processor.saveFriendConfig(config) >>
-                      (Env.challenge.api create challenge) >> negotiate(
-                          html = fuccess(Redirect(routes.Round.watcher(
-                                        challenge.id, "white"))),
+                        (Env.challenge.api create challenge) >> negotiate(
+                          html = fuccess(Redirect(
+                              routes.Round.watcher(challenge.id, "white"))),
                           api = _ => Challenge showChallenge challenge)
                   }
               }
@@ -180,10 +180,9 @@ object Setup extends LilaController with TheftPrevention {
       .filter(ctx)
       .bindFromRequest
       .fold[Fu[Result]](
-          f =>
-            {
-              logger.branch("setup").warn(f.errors.toString)
-              BadRequest(()).fuccess
+          f => {
+            logger.branch("setup").warn(f.errors.toString)
+            BadRequest(()).fuccess
           },
           config => JsonOk(env.processor filter config inject config.render)
       )
@@ -212,7 +211,7 @@ object Setup extends LilaController with TheftPrevention {
                 negotiate(
                     html = fuccess(redirectPov(pov)),
                     api = apiVersion =>
-                        Env.api.roundApi.player(pov, apiVersion) map { data =>
+                      Env.api.roundApi.player(pov, apiVersion) map { data =>
                         Created(data) as JSON
                     }
                 )

@@ -2,7 +2,14 @@ package com.twitter.finagle.service
 
 import com.twitter.finagle.stats.{Counter, StatsReceiver}
 import com.twitter.finagle.util.AsyncLatch
-import com.twitter.finagle.{param, Service, ServiceFactory, ServiceProxy, Stack, Stackable}
+import com.twitter.finagle.{
+  param,
+  Service,
+  ServiceFactory,
+  ServiceProxy,
+  Stack,
+  Stackable
+}
 import com.twitter.util.{Duration, Promise, Future, NullTimerTask, Timer, Time}
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -28,8 +35,10 @@ object ExpiringService {
     * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.ExpiringService]].
     */
   private[finagle] def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module3[
-        Param, param.Timer, param.Stats, ServiceFactory[Req, Rep]] {
+    new Stack.Module3[Param,
+                      param.Timer,
+                      param.Stats,
+                      ServiceFactory[Req, Rep]] {
       val role = ExpiringService.role
       val description = "Expire a service after a certain amount of idle time"
       def make(
@@ -50,8 +59,11 @@ object ExpiringService {
           case _ =>
             next map { service =>
               val closeOnRelease = new CloseOnReleaseService(service)
-              new ExpiringService(
-                  closeOnRelease, idle, life, timer, statsReceiver) {
+              new ExpiringService(closeOnRelease,
+                                  idle,
+                                  life,
+                                  timer,
+                                  statsReceiver) {
                 def onExpire() { closeOnRelease.close() }
               }
             }
@@ -75,8 +87,7 @@ abstract class ExpiringService[Req, Rep](
     maxLifeTime: Option[Duration],
     timer: Timer,
     stats: StatsReceiver
-)
-    extends ServiceProxy[Req, Rep](self) {
+) extends ServiceProxy[Req, Rep](self) {
   private[this] var active = true
   private[this] val latch = new AsyncLatch
 

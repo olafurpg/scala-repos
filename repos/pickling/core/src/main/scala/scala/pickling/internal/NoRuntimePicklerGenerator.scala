@@ -14,8 +14,9 @@ object NoRuntimePicklerGeneration extends RuntimePicklerGenerator {
 
   /** Create a new pickler using the given tagKey. */
   override def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: Share): Pickler[_] =
+      classLoader: ClassLoader,
+      clazz: Class[_],
+      tag: FastTypeTag[_])(implicit share: Share): Pickler[_] =
     sys.error(
         s"Runtime pickling generation is disabled, cannot make unpickler for $clazz")
 }

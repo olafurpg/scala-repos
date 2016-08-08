@@ -39,7 +39,7 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
   val TestText = {
     ("a" * 1000) + ("b" * 1000) + ("c" * 1000) + ("d" * 1000) + ("e" * 1000) +
-    ("f" * 1000)
+      ("f" * 1000)
   }
 
   val testFile = {
@@ -129,8 +129,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       }
 
       sub.request(demandAllButOneChunks)
-      for (i ← 1 to demandAllButOneChunks) c.expectNext().utf8String should ===(
-          nextChunk())
+      for (i ← 1 to demandAllButOneChunks)
+        c.expectNext().utf8String should ===(nextChunk())
       c.expectNoMsg(300.millis)
 
       sub.request(1)
@@ -187,8 +187,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
         val ref = expectMsgType[Children].children
           .find(_.path.toString contains "fileSource")
           .get
-        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher") finally p
-          .cancel()
+        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher")
+        finally p.cancel()
       } finally shutdown(sys)
     }
 
@@ -213,8 +213,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
         val ref = expectMsgType[Children].children
           .find(_.path.toString contains "File")
           .get
-        try assertDispatcher(ref, "akka.actor.default-dispatcher") finally p
-          .cancel()
+        try assertDispatcher(ref, "akka.actor.default-dispatcher")
+        finally p.cancel()
       } finally shutdown(sys)
     }
 

@@ -24,60 +24,60 @@ object SelfType {
         builder.advanceLexer // Ate this or _
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
-              builder.advanceLexer //Ate ':'
-              if (!parseType(builder)) {
-                selfTypeMarker.rollbackTo
-                return
-              } else {
-                builder.getTokenType match {
-                  case ScalaTokenTypes.tFUNTYPE => {
-                      builder.advanceLexer //Ate '=>'
-                      selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
-                      return
-                    }
-                  case _ => {
-                      selfTypeMarker.rollbackTo
-                      return
-                    }
+            builder.advanceLexer //Ate ':'
+            if (!parseType(builder)) {
+              selfTypeMarker.rollbackTo
+              return
+            } else {
+              builder.getTokenType match {
+                case ScalaTokenTypes.tFUNTYPE => {
+                  builder.advanceLexer //Ate '=>'
+                  selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
+                  return
+                }
+                case _ => {
+                  selfTypeMarker.rollbackTo
+                  return
                 }
               }
             }
+          }
           case _ => {
-              selfTypeMarker.rollbackTo
-              return
-            }
+            selfTypeMarker.rollbackTo
+            return
+          }
         }
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer //Ate identifier
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
-              builder.advanceLexer //Ate ':'
-              if (!parseType(builder)) {
-                selfTypeMarker.rollbackTo
-                return
-              } else {
-                builder.getTokenType match {
-                  case ScalaTokenTypes.tFUNTYPE => {
-                      builder.advanceLexer //Ate '=>'
-                      selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
-                      return
-                    }
-                  case _ => {
-                      selfTypeMarker.rollbackTo
-                      return
-                    }
+            builder.advanceLexer //Ate ':'
+            if (!parseType(builder)) {
+              selfTypeMarker.rollbackTo
+              return
+            } else {
+              builder.getTokenType match {
+                case ScalaTokenTypes.tFUNTYPE => {
+                  builder.advanceLexer //Ate '=>'
+                  selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
+                  return
+                }
+                case _ => {
+                  selfTypeMarker.rollbackTo
+                  return
                 }
               }
             }
+          }
           case ScalaTokenTypes.tFUNTYPE => {
-              builder.advanceLexer //Ate '=>'
-              selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
-              return
-            }
+            builder.advanceLexer //Ate '=>'
+            selfTypeMarker.done(ScalaElementTypes.SELF_TYPE)
+            return
+          }
           case _ => {
-              selfTypeMarker.rollbackTo
-              return
-            }
+            selfTypeMarker.rollbackTo
+            return
+          }
         }
       case _ =>
         selfTypeMarker.rollbackTo

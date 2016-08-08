@@ -131,8 +131,9 @@ trait ActorContext[T] {
     * by invoking [[akka.actor.Cancellable]] `cancel` on the returned
     * handle.
     */
-  def schedule[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U): untyped.Cancellable
+  def schedule[U](delay: FiniteDuration,
+                  target: ActorRef[U],
+                  msg: U): untyped.Cancellable
 
   /**
     * This Actor’s execution context. It can be used to run asynchronous tasks
@@ -229,13 +230,13 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
 
 /*
  * TODO
- * 
+ *
  * Currently running a behavior requires that the context stays the same, since
  * the behavior may well close over it and thus a change might not be effective
  * at all. Another issue is that there is genuine state within the context that
  * is coupled to the behavior’s state: if child actors were created then
  * migrating a behavior into a new context will not work.
- * 
+ *
  * This note is about remembering the reasons behind this restriction and
  * proposes an ActorContextProxy as a (broken) half-solution. Another avenue
  * by which a solution may be explored is for Pure behaviors in that they

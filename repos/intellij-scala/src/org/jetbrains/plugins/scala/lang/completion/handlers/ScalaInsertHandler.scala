@@ -12,9 +12,16 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolated, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolated,
+  ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun,
+  ScFunction,
+  ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 
@@ -86,15 +93,15 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
           }
         val res = ScalaBasicCompletionContributor
           .getStartEndPointForInterpolatedString(
-            literal.asInstanceOf[ScInterpolated],
-            index,
-            contextStartOffset - literal.getTextRange.getStartOffset)
+              literal.asInstanceOf[ScInterpolated],
+              index,
+              contextStartOffset - literal.getTextRange.getStartOffset)
         if (res.isEmpty) return
         val (startOffset, _) = res.get
         val tailOffset = context.getTailOffset
         document.insertString(tailOffset, "}")
-        document.insertString(
-            startOffset + literal.getTextRange.getStartOffset, "{")
+        document
+          .insertString(startOffset + literal.getTextRange.getStartOffset, "{")
         context.commitDocument()
         (startOffset + 1, tailOffset - startOffset)
       } else (contextStartOffset, context.getTailOffset - contextStartOffset)
@@ -117,13 +124,13 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
         file.findElementAt(startOffset) match {
           case elem
               if elem.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER &&
-              elem.getParent.isInstanceOf[ScReferenceExpression] &&
-              elem.getParent.getParent.isInstanceOf[ScReferenceExpression] &&
-              item.getAllLookupStrings.size() > 1 =>
+                elem.getParent.isInstanceOf[ScReferenceExpression] &&
+                elem.getParent.getParent.isInstanceOf[ScReferenceExpression] &&
+                item.getAllLookupStrings.size() > 1 =>
             val ref = elem.getParent.asInstanceOf[ScReferenceExpression]
             val newRefText = ref.getText
-            val newRef = ScalaPsiElementFactory.createExpressionFromText(
-                newRefText, ref.getManager)
+            val newRef = ScalaPsiElementFactory
+              .createExpressionFromText(newRefText, ref.getManager)
             ref.getParent.replace(newRef).getFirstChild
           case elem => elem
         }
@@ -132,19 +139,19 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
       var elem = element
       var parent = elem.getParent
       while (parent match {
-        case _: ScStableCodeReferenceElement =>
-          parent.getParent match {
-            case _: ScThisReference | _: ScSuperReference => true
-            case _ => false
-          }
-        case _: ScReferenceExpression => true
-        case _: ScThisReference => true
-        case _: ScSuperReference => true
-        case inf: ScInfixExpr if elem == inf.operation => true
-        case pref: ScPrefixExpr if elem == pref.operation => true
-        case postf: ScPostfixExpr if elem == postf.operation => true
-        case _ => false
-      }) {
+               case _: ScStableCodeReferenceElement =>
+                 parent.getParent match {
+                   case _: ScThisReference | _: ScSuperReference => true
+                   case _ => false
+                 }
+               case _: ScReferenceExpression => true
+               case _: ScThisReference => true
+               case _: ScSuperReference => true
+               case inf: ScInfixExpr if elem == inf.operation => true
+               case pref: ScPrefixExpr if elem == pref.operation => true
+               case postf: ScPostfixExpr if elem == postf.operation => true
+               case _ => false
+             }) {
         elem = parent
         parent = parent.getParent
       }
@@ -211,7 +218,7 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
         }
       } else if (withSpace &&
                  (nextChar != ' ' ||
-                     documentText.charAt(endOffset + 1) != openChar)) {
+                 documentText.charAt(endOffset + 1) != openChar)) {
         document.insertString(endOffset, " ")
         shiftEndOffset(1, withSomeNum = false)
         insertIfNeeded(placeInto,
@@ -262,7 +269,7 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
       case _: ScFun if item.isInImport => moveCaretIfNeeded()
       case fun: ScFunction
           if fun.name == "classOf" && fun.containingClass != null &&
-          fun.containingClass.qualifiedName == "scala.Predef" =>
+            fun.containingClass.qualifiedName == "scala.Predef" =>
         context.setAddCompletionChar(false)
         insertIfNeeded(placeInto = true,
                        openChar = '[',
@@ -329,7 +336,8 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                   endOffset += 1
                   editor.getCaretModel.moveToOffset(endOffset + someNum)
                 } else if (endOffset == document.getTextLength ||
-                           document.getCharsSequence.charAt(endOffset) != '(') {
+                           document.getCharsSequence
+                             .charAt(endOffset) != '(') {
                   disableParenthesesCompletionChar()
                   if (!item.etaExpanded) {
                     if (context.getCompletionChar == '{') {
@@ -401,8 +409,8 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
               val blockEndOffset = block.getTextRange.getEndOffset
               val blockStartOffset = block.getTextRange.getStartOffset
               document.replaceString(blockEndOffset - 1, blockEndOffset, "")
-              document.replaceString(
-                  blockStartOffset, blockStartOffset + 1, "")
+              document
+                .replaceString(blockStartOffset, blockStartOffset + 1, "")
               item.isInSimpleStringNoBraces = true
             case _ =>
           }

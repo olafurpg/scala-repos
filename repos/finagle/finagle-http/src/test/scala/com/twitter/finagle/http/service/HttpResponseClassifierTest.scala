@@ -16,7 +16,8 @@ class HttpResponseClassifierTest extends FunSuite {
     val classifier = HttpResponseClassifier.ServerErrorsAsFailures
     assert("ServerErrorsAsFailures" == classifier.toString)
 
-    assert(ResponseClass.NonRetryableFailure == classifier(
+    assert(
+        ResponseClass.NonRetryableFailure == classifier(
             ReqRep(req, rep(Status.InternalServerError))))
 
     assert(!classifier.isDefinedAt(ReqRep(req, rep(Status.Ok))))
@@ -36,13 +37,15 @@ class HttpResponseClassifierTest extends FunSuite {
     }
     val classifier = ok500.orElse(badReqs)
 
-    assert(ResponseClass.Success == classifier(
+    assert(
+        ResponseClass.Success == classifier(
             ReqRep(req, rep(Status.fromCode(500)))))
-    assert(ResponseClass.NonRetryableFailure == classifier(
+    assert(
+        ResponseClass.NonRetryableFailure == classifier(
             ReqRep(Request("fail" -> "1"), rep(Status.Ok))))
 
     assert(!classifier.isDefinedAt(ReqRep(req, rep(Status.Ok))))
-    assert(ResponseClass.Success == classifier.applyOrElse(
-            ReqRep(req, rep(Status.Ok)), ResponseClassifier.Default))
+    assert(ResponseClass.Success == classifier
+      .applyOrElse(ReqRep(req, rep(Status.Ok)), ResponseClassifier.Default))
   }
 }

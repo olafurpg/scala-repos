@@ -94,7 +94,7 @@ case class In(attribute: String, values: Array[Any]) extends Filter {
   override def equals(o: Any): Boolean = o match {
     case In(a, vs) =>
       a == attribute && vs.length == values.length &&
-      vs.zip(values).forall(x => x._1 == x._2)
+        vs.zip(values).forall(x => x._1 == x._2)
     case _ => false
   }
   override def toString: String = {

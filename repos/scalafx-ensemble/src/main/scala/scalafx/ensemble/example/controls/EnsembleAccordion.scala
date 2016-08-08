@@ -29,7 +29,13 @@ package scalafx.ensemble.example.controls
 
 import scalafx.ensemble.commons.EnsembleExample
 import scalafx.geometry.Insets
-import scalafx.scene.control.{Accordion, Button, CheckBox, TextField, TitledPane}
+import scalafx.scene.control.{
+  Accordion,
+  Button,
+  CheckBox,
+  TextField,
+  TitledPane
+}
 import scalafx.scene.layout.StackPane
 
 /** An example of an accordion control. You can use accordion controls to define

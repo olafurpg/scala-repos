@@ -74,8 +74,9 @@ object GameFilterMenu {
   def currentOf(filters: NonEmptyList[GameFilter], name: String) =
     (filters.list find (_.name == name)) | filters.head
 
-  private def cachedNbOf(
-      user: User, info: Option[UserInfo], filter: GameFilter): Option[Int] =
+  private def cachedNbOf(user: User,
+                         info: Option[UserInfo],
+                         filter: GameFilter): Option[Int] =
     filter match {
       case Bookmark => info.map(_.nbBookmark)
       case Imported => info.map(_.nbImported)
@@ -111,19 +112,20 @@ object GameFilterMenu {
       case Loss => std(Query loss user)
       case Draw => std(Query draw user)
       case Playing =>
-        pag(selector = Query nowPlaying user.id,
-            sort = Seq(),
-            nb = nb)(page) addEffect { p =>
-          p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
+        pag(selector = Query nowPlaying user.id, sort = Seq(), nb = nb)(page) addEffect {
+          p =>
+            p.currentPageResults
+              .filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
         }
       case Search => userGameSearch(user, page)
     }
   }
 
   def searchForm(
-      userGameSearch: lila.gameSearch.UserGameSearch, filter: GameFilter)(
-      implicit req: Request[_]): play.api.data.Form[_] = filter match {
-    case Search => userGameSearch.requestForm
-    case _ => userGameSearch.defaultForm
-  }
+      userGameSearch: lila.gameSearch.UserGameSearch,
+      filter: GameFilter)(implicit req: Request[_]): play.api.data.Form[_] =
+    filter match {
+      case Search => userGameSearch.requestForm
+      case _ => userGameSearch.defaultForm
+    }
 }

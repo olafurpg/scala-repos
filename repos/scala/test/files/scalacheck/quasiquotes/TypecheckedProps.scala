@@ -2,7 +2,8 @@ import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, Flag._, internal.reificationSupport._
 
 object TypecheckedProps
-    extends QuasiquoteProperties("typechecked") with TypecheckedTypes {
+    extends QuasiquoteProperties("typechecked")
+    with TypecheckedTypes {
   property("tuple term") = test {
     val q"(..$elements)" = typecheck(q"(1, 2)")
     assert(elements ≈ List(q"1", q"2"))

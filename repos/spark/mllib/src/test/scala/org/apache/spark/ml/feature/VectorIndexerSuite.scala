@@ -30,7 +30,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 class VectorIndexerSuite
-    extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with DefaultReadWriteTest
     with Logging {
 
   import VectorIndexerSuite.FeatureData
@@ -77,10 +79,9 @@ class VectorIndexerSuite
     assert(densePoints2Seq.head.size == sparsePoints2Seq.head.size)
     assert(densePoints1Seq.head.size != densePoints2Seq.head.size)
     def checkPair(dvSeq: Seq[Vector], svSeq: Seq[Vector]): Unit = {
-      assert(dvSeq
-               .zip(svSeq)
-               .forall { case (dv, sv) => dv.toArray === sv.toArray },
-             "typo in unit test")
+      assert(dvSeq.zip(svSeq).forall {
+        case (dv, sv) => dv.toArray === sv.toArray
+      }, "typo in unit test")
     }
     checkPair(densePoints1Seq, sparsePoints1Seq)
     checkPair(densePoints2Seq, sparsePoints2Seq)
@@ -137,8 +138,8 @@ class VectorIndexerSuite
   }
 
   test("Same result with dense and sparse vectors") {
-    def testDenseSparse(
-        densePoints: DataFrame, sparsePoints: DataFrame): Unit = {
+    def testDenseSparse(densePoints: DataFrame,
+                        sparsePoints: DataFrame): Unit = {
       val denseVectorIndexer = getIndexer.setMaxCategories(2)
       val sparseVectorIndexer = getIndexer.setMaxCategories(2)
       val denseModel = denseVectorIndexer.fit(densePoints)
@@ -164,7 +165,7 @@ class VectorIndexerSuite
       val collectedData = data.collect().map(_.getAs[Vector](0))
       val errMsg =
         s"checkCategoryMaps failed for input with maxCategories=$maxCategories," +
-        s" categoricalFeatures=${categoricalFeatures.mkString(", ")}"
+          s" categoricalFeatures=${categoricalFeatures.mkString(", ")}"
       try {
         val vectorIndexer = getIndexer.setMaxCategories(maxCategories)
         val model = vectorIndexer.fit(data)
@@ -178,7 +179,7 @@ class VectorIndexerSuite
         assert(featureAttrs.name === "indexed")
         assert(featureAttrs.attributes.get.length === model.numFeatures)
         categoricalFeatures.foreach { feature: Int =>
-          val origValueSet = collectedData.map(_ (feature)).toSet
+          val origValueSet = collectedData.map(_(feature)).toSet
           val targetValueIndexSet = Range(0, origValueSet.size).toSet
           val catMap = categoryMaps(feature)
           assert(catMap.keys.toSet === origValueSet) // Correct categories
@@ -188,22 +189,27 @@ class VectorIndexerSuite
           }
           // Check transformed data
           assert(
-              indexedRDD.map(_ (feature)).collect().toSet === targetValueIndexSet)
+              indexedRDD
+                .map(_(feature))
+                .collect()
+                .toSet === targetValueIndexSet)
           // Check metadata
           val featureAttr = featureAttrs(feature)
           assert(featureAttr.index.get === feature)
           featureAttr match {
             case attr: BinaryAttribute =>
-              assert(attr.values.get === origValueSet.toArray.sorted
+              assert(
+                  attr.values.get === origValueSet.toArray.sorted
                     .map(_.toString))
             case attr: NominalAttribute =>
-              assert(attr.values.get === origValueSet.toArray.sorted
+              assert(
+                  attr.values.get === origValueSet.toArray.sorted
                     .map(_.toString))
               assert(attr.isOrdinal.get === false)
             case _ =>
               throw new RuntimeException(
                   errMsg + s". Categorical feature $feature failed" +
-                  s" metadata check. Found feature attribute: $featureAttr.")
+                    s" metadata check. Found feature attribute: $featureAttr.")
           }
         }
         // Check numerical feature metadata.
@@ -217,7 +223,7 @@ class VectorIndexerSuite
               case _ =>
                 throw new RuntimeException(
                     errMsg + s". Numerical feature $feature failed" +
-                    s" metadata check. Found feature attribute: $featureAttr.")
+                      s" metadata check. Found feature attribute: $featureAttr.")
             }
           }
       } catch {
@@ -226,12 +232,15 @@ class VectorIndexerSuite
           throw e
       }
     }
-    checkCategoryMaps(
-        densePoints1, maxCategories = 2, categoricalFeatures = Set(0))
-    checkCategoryMaps(
-        densePoints1, maxCategories = 3, categoricalFeatures = Set(0, 2))
-    checkCategoryMaps(
-        densePoints2, maxCategories = 2, categoricalFeatures = Set(1, 3))
+    checkCategoryMaps(densePoints1,
+                      maxCategories = 2,
+                      categoricalFeatures = Set(0))
+    checkCategoryMaps(densePoints1,
+                      maxCategories = 3,
+                      categoricalFeatures = Set(0, 2))
+    checkCategoryMaps(densePoints2,
+                      maxCategories = 2,
+                      categoricalFeatures = Set(1, 3))
   }
 
   test("Maintain sparsity for sparse vectors") {

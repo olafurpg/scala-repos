@@ -1,6 +1,10 @@
 package scala.reflect.reify
 
-import scala.reflect.macros.{ReificationException, UnexpectedReificationException, TypecheckException}
+import scala.reflect.macros.{
+  ReificationException,
+  UnexpectedReificationException,
+  TypecheckException
+}
 import scala.reflect.macros.contexts.Context
 
 abstract class Taggers {
@@ -37,8 +41,10 @@ abstract class Taggers {
     })
   }
 
-  def materializeTypeTag(
-      universe: Tree, mirror: Tree, tpe: Type, concrete: Boolean): Tree = {
+  def materializeTypeTag(universe: Tree,
+                         mirror: Tree,
+                         tpe: Type,
+                         concrete: Boolean): Tree = {
     val tagType = if (concrete) TypeTagClass else WeakTypeTagClass
     // what we need here is to compose a type Universe # TypeTag[$tpe]
     // to look for an implicit that conforms to this type
@@ -46,15 +52,18 @@ abstract class Taggers {
     // nor TypeRef(ApiUniverseClass.thisType, tagType, List(tpe)) won't fit here
     // scala> :type -v def foo: scala.reflect.api.Universe#TypeTag[Int] = ???
     // NullaryMethodType(TypeRef(pre = TypeRef(TypeSymbol(Universe)), TypeSymbol(TypeTag), args = List($tpe))))
-    val unaffiliatedTagTpe = TypeRef(
-        ApiUniverseClass.typeConstructor, tagType, List(tpe))
-    val unaffiliatedTag = c.inferImplicitValue(
-        unaffiliatedTagTpe, silent = true, withMacrosDisabled = true)
+    val unaffiliatedTagTpe =
+      TypeRef(ApiUniverseClass.typeConstructor, tagType, List(tpe))
+    val unaffiliatedTag = c.inferImplicitValue(unaffiliatedTagTpe,
+                                               silent = true,
+                                               withMacrosDisabled = true)
     unaffiliatedTag match {
       case success if !success.isEmpty =>
-        Apply(Select(success, nme.in),
-              List(mirror orElse mkDefaultMirrorRef(c.universe)(
-                      universe, c.callsiteTyper)))
+        Apply(
+            Select(success, nme.in),
+            List(
+                mirror orElse mkDefaultMirrorRef(c.universe)(universe,
+                                                             c.callsiteTyper)))
       case _ =>
         val tagModule = if (concrete) TypeTagModule else WeakTypeTagModule
         materializeTag(universe,
@@ -77,7 +86,8 @@ abstract class Taggers {
       case _ =>
         translatingReificationErrors(materializer)
     }
-    try c.typecheck(result) catch {
+    try c.typecheck(result)
+    catch {
       case terr @ TypecheckException(pos, msg) => failTag(result, terr)
     }
   }
@@ -85,13 +95,15 @@ abstract class Taggers {
   def materializeExpr(universe: Tree, mirror: Tree, expr: Tree): Tree = {
     val result = translatingReificationErrors(
         c.reifyTree(universe, mirror, expr))
-    try c.typecheck(result) catch {
+    try c.typecheck(result)
+    catch {
       case terr @ TypecheckException(pos, msg) => failExpr(result, terr)
     }
   }
 
   private def translatingReificationErrors(materializer: => Tree): Tree = {
-    try materializer catch {
+    try materializer
+    catch {
       case ReificationException(pos, msg) =>
         c.abort(pos.asInstanceOf[c.Position], msg) // this cast is a very small price for the sanity of exception handling
       case UnexpectedReificationException(pos, err, cause) if cause != null =>

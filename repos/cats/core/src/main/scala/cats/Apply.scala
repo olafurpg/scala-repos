@@ -9,7 +9,9 @@ import simulacrum.typeclass
   */
 @typeclass(excludeParents = List("ApplyArityFunctions"))
 trait Apply[F[_]]
-    extends Functor[F] with Cartesian[F] with ApplyArityFunctions[F] { self =>
+    extends Functor[F]
+    with Cartesian[F]
+    with ApplyArityFunctions[F] { self =>
 
   /**
     * Given a value and a function in the Apply context, applies the
@@ -49,7 +51,8 @@ trait Apply[F[_]]
 }
 
 trait CompositeApply[F[_], G[_]]
-    extends Apply[Lambda[X => F[G[X]]]] with Functor.Composite[F, G] {
+    extends Apply[Lambda[X => F[G[X]]]]
+    with Functor.Composite[F, G] {
   def F: Apply[F]
   def G: Apply[G]
 

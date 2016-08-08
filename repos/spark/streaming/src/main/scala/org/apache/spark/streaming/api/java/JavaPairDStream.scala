@@ -31,10 +31,18 @@ import org.apache.hadoop.mapreduce.{OutputFormat => NewOutputFormat}
 
 import org.apache.spark.Partitioner
 import org.apache.spark.annotation.Experimental
-import org.apache.spark.api.java.{JavaPairRDD, JavaSparkContext, JavaUtils, Optional}
+import org.apache.spark.api.java.{
+  JavaPairRDD,
+  JavaSparkContext,
+  JavaUtils,
+  Optional
+}
 import org.apache.spark.api.java.JavaPairRDD._
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2}
+import org.apache.spark.api.java.function.{
+  Function => JFunction,
+  Function2 => JFunction2
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming._
@@ -45,9 +53,11 @@ import org.apache.spark.streaming.dstream.DStream
   * like `reduceByKey` and `join`.
   */
 class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
-    implicit val kManifest: ClassTag[K], implicit val vManifest: ClassTag[V])
-    extends AbstractJavaDStreamLike[
-        (K, V), JavaPairDStream[K, V], JavaPairRDD[K, V]] {
+    implicit val kManifest: ClassTag[K],
+    implicit val vManifest: ClassTag[V])
+    extends AbstractJavaDStreamLike[(K, V),
+                                    JavaPairDStream[K, V],
+                                    JavaPairRDD[K, V]] {
 
   override def wrapRDD(rdd: RDD[(K, V)]): JavaPairRDD[K, V] =
     JavaPairRDD.fromRDD(rdd)
@@ -153,8 +163,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
     * merged using the supplied reduce function. Hash partitioning is used to generate the RDDs
     * with `numPartitions` partitions.
     */
-  def reduceByKey(
-      func: JFunction2[V, V, V], numPartitions: Int): JavaPairDStream[K, V] =
+  def reduceByKey(func: JFunction2[V, V, V],
+                  numPartitions: Int): JavaPairDStream[K, V] =
     dstream.reduceByKey(func, numPartitions)
 
   /**
@@ -177,8 +187,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
                       mergeCombiners: JFunction2[C, C, C],
                       partitioner: Partitioner): JavaPairDStream[K, C] = {
     implicit val cm: ClassTag[C] = fakeClassTag
-    dstream.combineByKey(
-        createCombiner, mergeValue, mergeCombiners, partitioner)
+    dstream
+      .combineByKey(createCombiner, mergeValue, mergeCombiners, partitioner)
   }
 
   /**
@@ -322,8 +332,10 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       slideDuration: Duration,
       numPartitions: Int
   ): JavaPairDStream[K, V] = {
-    dstream.reduceByKeyAndWindow(
-        reduceFunc, windowDuration, slideDuration, numPartitions)
+    dstream.reduceByKeyAndWindow(reduceFunc,
+                                 windowDuration,
+                                 slideDuration,
+                                 numPartitions)
   }
 
   /**
@@ -344,8 +356,10 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       slideDuration: Duration,
       partitioner: Partitioner
   ): JavaPairDStream[K, V] = {
-    dstream.reduceByKeyAndWindow(
-        reduceFunc, windowDuration, slideDuration, partitioner)
+    dstream.reduceByKeyAndWindow(reduceFunc,
+                                 windowDuration,
+                                 slideDuration,
+                                 partitioner)
   }
 
   /**
@@ -370,8 +384,10 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       windowDuration: Duration,
       slideDuration: Duration
   ): JavaPairDStream[K, V] = {
-    dstream.reduceByKeyAndWindow(
-        reduceFunc, invReduceFunc, windowDuration, slideDuration)
+    dstream.reduceByKeyAndWindow(reduceFunc,
+                                 invReduceFunc,
+                                 windowDuration,
+                                 slideDuration)
   }
 
   /**
@@ -483,22 +499,21 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       spec: StateSpec[K, V, StateType, MappedType])
     : JavaMapWithStateDStream[K, V, StateType, MappedType] = {
     new JavaMapWithStateDStream(
-        dstream.mapWithState(spec)(
-            JavaSparkContext.fakeClassTag, JavaSparkContext.fakeClassTag))
+        dstream.mapWithState(spec)(JavaSparkContext.fakeClassTag,
+                                   JavaSparkContext.fakeClassTag))
   }
 
   private def convertUpdateStateFunction[S](
       in: JFunction2[JList[V], Optional[S], Optional[S]])
     : (Seq[V], Option[S]) => Option[S] = {
-    val scalaFunc: (Seq[V], Option[S]) => Option[S] = (values, state) =>
-      {
-        val list: JList[V] = values.asJava
-        val scalaState: Optional[S] = JavaUtils.optionToOptional(state)
-        val result: Optional[S] = in.apply(list, scalaState)
-        result.isPresent match {
-          case true => Some(result.get())
-          case _ => None
-        }
+    val scalaFunc: (Seq[V], Option[S]) => Option[S] = (values, state) => {
+      val list: JList[V] = values.asJava
+      val scalaState: Optional[S] = JavaUtils.optionToOptional(state)
+      val result: Optional[S] = in.apply(list, scalaState)
+      result.isPresent match {
+        case true => Some(result.get())
+        case _ => None
+      }
     }
     scalaFunc
   }
@@ -531,8 +546,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       updateFunc: JFunction2[JList[V], Optional[S], Optional[S]],
       numPartitions: Int): JavaPairDStream[K, S] = {
     implicit val cm: ClassTag[S] = fakeClassTag
-    dstream.updateStateByKey(
-        convertUpdateStateFunction(updateFunc), numPartitions)
+    dstream
+      .updateStateByKey(convertUpdateStateFunction(updateFunc), numPartitions)
   }
 
   /**
@@ -550,8 +565,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       partitioner: Partitioner
   ): JavaPairDStream[K, S] = {
     implicit val cm: ClassTag[S] = fakeClassTag
-    dstream.updateStateByKey(
-        convertUpdateStateFunction(updateFunc), partitioner)
+    dstream
+      .updateStateByKey(convertUpdateStateFunction(updateFunc), partitioner)
   }
 
   /**
@@ -571,8 +586,9 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       initialRDD: JavaPairRDD[K, S]
   ): JavaPairDStream[K, S] = {
     implicit val cm: ClassTag[S] = fakeClassTag
-    dstream.updateStateByKey(
-        convertUpdateStateFunction(updateFunc), partitioner, initialRDD)
+    dstream.updateStateByKey(convertUpdateStateFunction(updateFunc),
+                             partitioner,
+                             initialRDD)
   }
 
   /**
@@ -813,8 +829,11 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
                                                  keyClass: Class[_],
                                                  valueClass: Class[_],
                                                  outputFormatClass: Class[F]) {
-    dstream.saveAsHadoopFiles(
-        prefix, suffix, keyClass, valueClass, outputFormatClass)
+    dstream.saveAsHadoopFiles(prefix,
+                              suffix,
+                              keyClass,
+                              valueClass,
+                              outputFormatClass)
   }
 
   /**
@@ -827,8 +846,12 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
                                                  valueClass: Class[_],
                                                  outputFormatClass: Class[F],
                                                  conf: JobConf) {
-    dstream.saveAsHadoopFiles(
-        prefix, suffix, keyClass, valueClass, outputFormatClass, conf)
+    dstream.saveAsHadoopFiles(prefix,
+                              suffix,
+                              keyClass,
+                              valueClass,
+                              outputFormatClass,
+                              conf)
   }
 
   /**
@@ -849,8 +872,11 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       keyClass: Class[_],
       valueClass: Class[_],
       outputFormatClass: Class[F]) {
-    dstream.saveAsNewAPIHadoopFiles(
-        prefix, suffix, keyClass, valueClass, outputFormatClass)
+    dstream.saveAsNewAPIHadoopFiles(prefix,
+                                    suffix,
+                                    keyClass,
+                                    valueClass,
+                                    outputFormatClass)
   }
 
   /**
@@ -864,8 +890,12 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       valueClass: Class[_],
       outputFormatClass: Class[F],
       conf: Configuration = dstream.context.sparkContext.hadoopConfiguration) {
-    dstream.saveAsNewAPIHadoopFiles(
-        prefix, suffix, keyClass, valueClass, outputFormatClass, conf)
+    dstream.saveAsNewAPIHadoopFiles(prefix,
+                                    suffix,
+                                    keyClass,
+                                    valueClass,
+                                    outputFormatClass,
+                                    conf)
   }
 
   /** Convert to a JavaDStream */
@@ -877,7 +907,7 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
 }
 
 object JavaPairDStream {
-  implicit def fromPairDStream[K : ClassTag, V : ClassTag](
+  implicit def fromPairDStream[K: ClassTag, V: ClassTag](
       dstream: DStream[(K, V)]): JavaPairDStream[K, V] = {
     new JavaPairDStream[K, V](dstream)
   }
@@ -889,7 +919,7 @@ object JavaPairDStream {
     new JavaPairDStream[K, V](dstream.dstream)
   }
 
-  def scalaToJavaLong[K : ClassTag](
+  def scalaToJavaLong[K: ClassTag](
       dstream: JavaPairDStream[K, Long]): JavaPairDStream[K, jl.Long] = {
     DStream.toPairDStreamFunctions(dstream.dstream).mapValues(jl.Long.valueOf)
   }

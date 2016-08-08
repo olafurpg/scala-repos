@@ -44,10 +44,12 @@ import scala.collection.parallel.mutable.ParMap
   *    `size` for efficiency.
   */
 trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
-    extends scala.collection.MapLike[A, B, This] with Builder[(A, B), This]
-    with Growable[(A, B)] with Shrinkable[A]
-    with Cloneable[This] with Parallelizable[(A, B), ParMap[A, B]] {
-  self =>
+    extends scala.collection.MapLike[A, B, This]
+    with Builder[(A, B), This]
+    with Growable[(A, B)]
+    with Shrinkable[A]
+    with Cloneable[This]
+    with Parallelizable[(A, B), ParMap[A, B]] { self =>
 
   /** A common implementation of `newBuilder` for all mutable maps
     *    in terms of `empty`.
@@ -140,8 +142,9 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
   @migration(
       "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
       "2.8.0")
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): Map[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): Map[A, B1] =
     clone().asInstanceOf[Map[A, B1]] += elem1 += elem2 ++= elems
 
   /** Creates a new map containing the key/value mappings provided by the specified traversable object
@@ -199,7 +202,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     *  Concurrent map implementations may evaluate the expression `op`
     *  multiple times, or may evaluate `op` without inserting the result.
-    *  
+    *
     *  @param  key the key to test
     *  @param  op  the computation yielding the value to associate with `key`, if
     *              `key` is previously unbound.
@@ -233,7 +236,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     */
   def retain(p: (A, B) => Boolean): this.type = {
     for ((k, v) <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(k, v)) this -= k
+      if (!p(k, v)) this -= k
 
     this
   }

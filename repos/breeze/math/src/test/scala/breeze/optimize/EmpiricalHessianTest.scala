@@ -9,7 +9,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class EmpiricalHessianTest
-    extends OptimizeTestBase with Matchers with DoubleImplicits {
+    extends OptimizeTestBase
+    with Matchers
+    with DoubleImplicits {
 
   test("hessian matrix of rosenbrook function") {
     val x = DenseVector(1d, 1d)

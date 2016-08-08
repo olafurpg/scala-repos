@@ -18,7 +18,13 @@ package com.twitter.summingbird.scalding
 
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.monad.{StateWithError, Reader}
-import com.twitter.scalding.{Dsl, TypedPipe, MapsideReduce, TupleSetter, TupleConverter}
+import com.twitter.scalding.{
+  Dsl,
+  TypedPipe,
+  MapsideReduce,
+  TupleSetter,
+  TupleConverter
+}
 import com.twitter.summingbird._
 import com.twitter.summingbird.option._
 import cascading.flow.FlowDef

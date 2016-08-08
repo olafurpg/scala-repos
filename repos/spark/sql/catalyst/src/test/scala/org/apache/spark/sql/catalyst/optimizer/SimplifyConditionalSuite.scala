@@ -19,7 +19,10 @@ package org.apache.spark.sql.catalyst.optimizer
 
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.Literal.{FalseLiteral, TrueLiteral}
+import org.apache.spark.sql.catalyst.expressions.Literal.{
+  FalseLiteral,
+  TrueLiteral
+}
 import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
@@ -69,8 +72,8 @@ class SimplifyConditionalSuite extends PlanTest with PredicateHelper {
   }
 
   test("remove entire CaseWhen if the first branch is always true") {
-    assertEquivalent(
-        CaseWhen(trueBranch :: normalBranch :: Nil, None), Literal(5))
+    assertEquivalent(CaseWhen(trueBranch :: normalBranch :: Nil, None),
+                     Literal(5))
 
     // Test branch elimination and simplification in combination
     assertEquivalent(

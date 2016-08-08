@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -40,7 +40,11 @@ import akka.util.Duration
 import blueeyes.util.Clock
 import blueeyes.json._
 import blueeyes.bkka._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeExtractor => _,
+  DateTimeDecomposer => _,
+  _
+}
 
 import org.specs2.mutable.Specification
 
@@ -70,14 +74,15 @@ object ManagedQueryTestSupport {
 import ManagedQueryTestSupport._
 
 class ManagedQueryModuleSpec
-    extends TestManagedQueryModule with Specification {
+    extends TestManagedQueryModule
+    with Specification {
   val actorSystem = ActorSystem("managedQueryModuleSpec")
   val jobActorSystem = ActorSystem("managedQueryModuleSpecJobs")
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(30, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(30, "seconds"))
 
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
@@ -93,10 +98,10 @@ class ManagedQueryModuleSpec
                                AccountPlan.Free)
 
   def dropStreamToFuture =
-    implicitly[Hoist[StreamT]].hoist[TestFuture, Future](
-        new (TestFuture ~> Future) {
-      def apply[A](fa: TestFuture[A]): Future[A] = fa.value
-    })
+    implicitly[Hoist[StreamT]]
+      .hoist[TestFuture, Future](new (TestFuture ~> Future) {
+        def apply[A](fa: TestFuture[A]): Future[A] = fa.value
+      })
 
   def waitForJobCompletion(jobId: JobId): Future[Job] = {
     import JobState._
@@ -105,11 +110,11 @@ class ManagedQueryModuleSpec
       _ <- waitFor(1)
       Some(job) <- jobManager.findJob(jobId)
       finalJob <- job.state match {
-        case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
-          waitForJobCompletion(jobId)
-        case _ =>
-          Future(job)
-      }
+                   case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
+                     waitForJobCompletion(jobId)
+                   case _ =>
+                     Future(job)
+                 }
     } yield finalJob
   }
 
@@ -120,19 +125,21 @@ class ManagedQueryModuleSpec
       ticksToTimeout map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
       }
-    val ctx = EvaluationContext(
-        apiKey, account, Path.Root, Path.Root, clock.now())
+    val ctx =
+      EvaluationContext(apiKey, account, Path.Root, Path.Root, clock.now())
 
     val result = for {
       // TODO: No idea how to work with EitherT[TestFuture, so sys.error it is]
       executor <- executorFor(apiKey) valueOr { err =>
-        sys.error(err.toString)
-      }
+                   sys.error(err.toString)
+                 }
       result0 <- executor
-        .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
-        .valueOr(err => sys.error(err.toString)) mapValue {
-        case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
-      }
+                  .execute(numTicks.toString,
+                           ctx,
+                           QueryOptions(timeout = timeout))
+                  .valueOr(err => sys.error(err.toString)) mapValue {
+                  case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
+                }
     } yield {
       val (Some((jobId, ticks)), result) = result0
 
@@ -271,8 +278,8 @@ class ManagedQueryModuleSpec
 
 trait TestManagedQueryModule
     extends Execution[TestFuture, StreamT[TestFuture, CharBuffer]]
-    with ManagedQueryModule with SchedulableFuturesModule {
-  self =>
+    with ManagedQueryModule
+    with SchedulableFuturesModule { self =>
 
   def actorSystem: ActorSystem
   implicit def executionContext: ExecutionContext
@@ -296,8 +303,9 @@ trait TestManagedQueryModule
         new QueryExecutor[TestFuture, StreamT[TestFuture, CharBuffer]] {
           import UserQuery.Serialization._
 
-          def execute(
-              query: String, ctx: EvaluationContext, opts: QueryOptions) = {
+          def execute(query: String,
+                      ctx: EvaluationContext,
+                      opts: QueryOptions) = {
             val userQuery =
               UserQuery(query, ctx.basePath, opts.sortOn, opts.sortOrder)
             val numTicks = query.toInt

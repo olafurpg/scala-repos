@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PerspectiveCameraSpec
     extends SimpleSFXDelegateSpec[jfxs.PerspectiveCamera, PerspectiveCamera](
-        classOf[jfxs.PerspectiveCamera], classOf[PerspectiveCamera])
+        classOf[jfxs.PerspectiveCamera],
+        classOf[PerspectiveCamera])

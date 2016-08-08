@@ -59,7 +59,8 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
           .setClazz(props.clazz.getName)
           .setDeploy(deployProto(props.deploy))
         props.args map serialize foreach builder.addArgs
-        props.args map (a ⇒ if (a == null) "null" else a.getClass.getName) foreach builder.addClasses
+        props.args map (a ⇒
+                          if (a == null) "null" else a.getClass.getName) foreach builder.addClasses
         builder.build
       }
 
@@ -109,11 +110,11 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
       Props(deploy(proto.getProps.getDeploy), clazz, args)
     }
 
-    DaemonMsgCreate(
-        props = props,
-        deploy = deploy(proto.getDeploy),
-        path = proto.getPath,
-        supervisor = deserializeActorRef(system, proto.getSupervisor))
+    DaemonMsgCreate(props = props,
+                    deploy = deploy(proto.getDeploy),
+                    path = proto.getPath,
+                    supervisor =
+                      deserializeActorRef(system, proto.getSupervisor))
   }
 
   protected def serialize(any: Any): ByteString =
@@ -123,8 +124,8 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
     if (p._1.isEmpty && p._2 == "null") null
     else deserialize(p._1, system.dynamicAccess.getClassFor[AnyRef](p._2).get)
 
-  protected def deserialize[T : ClassTag](
-      data: ByteString, clazz: Class[T]): T = {
+  protected def deserialize[T: ClassTag](data: ByteString,
+                                         clazz: Class[T]): T = {
     val bytes = data.toByteArray
     serialization.deserialize(bytes, clazz) match {
       case Success(x: T) ⇒ x

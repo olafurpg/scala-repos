@@ -17,8 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import scala.scalajs.runtime.genTraversableOnce2jsArray
 
-sealed abstract class JSConvertersLowPrioImplicits {
-  this: JSConverters.type =>
+sealed abstract class JSConvertersLowPrioImplicits { this: JSConverters.type =>
 
   @inline
   implicit def JSRichFutureNonThenable[A](f: Future[A]): JSRichFuture[A] =
@@ -81,7 +80,7 @@ object JSConverters extends JSConvertersLowPrioImplicits {
     def toJSPromise(implicit executor: ExecutionContext): Promise[A] = {
       new Promise[A]({
         (resolve: js.Function1[A | Thenable[A], _],
-        reject: js.Function1[scala.Any, _]) =>
+         reject: js.Function1[scala.Any, _]) =>
           self onComplete {
             case scala.util.Success(value) =>
               resolve(value)

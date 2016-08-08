@@ -4,7 +4,15 @@ import org.apache.zookeeper.ZooKeeper
 
 import com.twitter.concurrent.{Broker, Offer, Serialized}
 import com.twitter.logging.Logger
-import com.twitter.util.{Await, Duration, Future, Promise, Return, TimeoutException, Timer}
+import com.twitter.util.{
+  Await,
+  Duration,
+  Future,
+  Promise,
+  Return,
+  TimeoutException,
+  Timer
+}
 
 /**
   * An Asynchronous ZooKeeper Client.
@@ -14,7 +22,8 @@ case class NativeConnector(connectString: String,
                            sessionTimeout: Duration,
                            timer: Timer,
                            authenticate: Option[AuthInfo] = None)
-    extends Connector with Serialized {
+    extends Connector
+    with Serialized {
   override val name = "native-zk-connector"
 
   protected[this] def mkConnection = {
@@ -69,9 +78,9 @@ case class NativeConnector(connectString: String,
       connection match {
         case None => Future.Unit
         case Some(c) => {
-            connection = None
-            c.release()
-          }
+          connection = None
+          c.release()
+        }
       }
     }.flatten
 }
@@ -149,7 +158,7 @@ object NativeConnector {
               connectPromise.updateIfEmpty(Return(zk))
               authenticate foreach { auth =>
                 log.info("Authenticating to zk as %s".format(
-                        new String(auth.data, "UTF-8")))
+                    new String(auth.data, "UTF-8")))
                 zk.addAuthInfo(auth.mode, auth.data)
               }
             }
@@ -173,8 +182,9 @@ object NativeConnector {
     }
 
     protected[this] def mkZooKeeper = {
-      new ZooKeeper(
-          connectString, sessionTimeout.inMillis.toInt, sessionBroker)
+      new ZooKeeper(connectString,
+                    sessionTimeout.inMillis.toInt,
+                    sessionBroker)
     }
 
     def release(): Future[Unit] = Future {

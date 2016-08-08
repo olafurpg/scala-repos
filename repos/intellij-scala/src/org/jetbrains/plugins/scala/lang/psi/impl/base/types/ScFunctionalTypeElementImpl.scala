@@ -10,14 +10,19 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 /**
   * @author ilyas, Alexander Podkhalyuzin
   */
 class ScFunctionalTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScFunctionalTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScFunctionalTypeElement {
   override def toString: String = "FunctionalType: " + getText
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
@@ -31,9 +36,9 @@ class ScFunctionalTypeElementImpl(node: ASTNode)
     val n = paramTypes.length
     val newTypeText =
       s"_root_.scala.Function$n[${paramTypes.map(_.getText).mkString(",")}${if (n == 0) "" else ", "}" +
-      s"${returnTypeElement.map(_.getText).getOrElse("Any")}]"
-    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
-        newTypeText, getContext, this)
+        s"${returnTypeElement.map(_.getText).getOrElse("Any")}]"
+    val newTypeElement = ScalaPsiElementFactory
+      .createTypeElementFromText(newTypeText, getContext, this)
     newTypeElement match {
       case p: ScParameterizedTypeElement => Some(p)
       case _ => None

@@ -63,25 +63,26 @@ object MultiNode extends AutoPlugin {
         SbtScalariform.configScalariformSettings) ++ Seq(
         jvmOptions in MultiJvm := defaultMultiJvmOptions,
         compileInputs in (MultiJvm, compile) <<=
-        (compileInputs in (MultiJvm, compile)) dependsOn
-        (ScalariformKeys.format in MultiJvm),
+          (compileInputs in (MultiJvm, compile)) dependsOn
+            (ScalariformKeys.format in MultiJvm),
         scalacOptions in MultiJvm <<= scalacOptions in Test,
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy
-        (compile in Test)
-    ) ++ CliOptions.hostsFileName.map(multiNodeHostsFileName in MultiJvm := _) ++ CliOptions.javaName
-      .map(multiNodeJavaName in MultiJvm := _) ++ CliOptions.targetDirName.map(
+          (compile in Test)
+    ) ++ CliOptions.hostsFileName
+      .map(multiNodeHostsFileName in MultiJvm := _) ++ CliOptions.javaName.map(
+        multiNodeJavaName in MultiJvm := _) ++ CliOptions.targetDirName.map(
         multiNodeTargetDirName in MultiJvm := _) ++ // make sure that MultiJvm tests are executed by the default test target,
-    // and combine the results from ordinary test and multi-jvm tests
-    (executeTests in Test <<= (executeTests in Test, multiExecuteTests) map {
-          case (testResults, multiNodeResults) =>
-            val overall =
-              if (testResults.overall.id < multiNodeResults.overall.id)
-                multiNodeResults.overall
-              else testResults.overall
-            Tests.Output(overall,
-                         testResults.events ++ multiNodeResults.events,
-                         testResults.summaries ++ multiNodeResults.summaries)
-        })
+      // and combine the results from ordinary test and multi-jvm tests
+      (executeTests in Test <<= (executeTests in Test, multiExecuteTests) map {
+        case (testResults, multiNodeResults) =>
+          val overall =
+            if (testResults.overall.id < multiNodeResults.overall.id)
+              multiNodeResults.overall
+            else testResults.overall
+          Tests.Output(overall,
+                       testResults.events ++ multiNodeResults.events,
+                       testResults.summaries ++ multiNodeResults.summaries)
+      })
 }
 
 /**
@@ -100,18 +101,18 @@ object MultiNodeScalaTest extends AutoPlugin {
       },
       scalatestOptions in MultiJvm := {
         Seq("-C", "org.scalatest.extra.QuietReporter") ++
-        (if (excludeTestTags.value.isEmpty) Seq.empty
-         else
-           Seq("-l",
-               if (MultiNode.CliOptions.multiNode.get)
-                 excludeTestTags.value.mkString("\"", " ", "\"")
-               else excludeTestTags.value.mkString(" "))) ++
-        (if (onlyTestTags.value.isEmpty) Seq.empty
-         else
-           Seq("-n",
-               if (MultiNode.CliOptions.multiNode.get)
-                 onlyTestTags.value.mkString("\"", " ", "\"")
-               else onlyTestTags.value.mkString(" ")))
+          (if (excludeTestTags.value.isEmpty) Seq.empty
+           else
+             Seq("-l",
+                 if (MultiNode.CliOptions.multiNode.get)
+                   excludeTestTags.value.mkString("\"", " ", "\"")
+                 else excludeTestTags.value.mkString(" "))) ++
+          (if (onlyTestTags.value.isEmpty) Seq.empty
+           else
+             Seq("-n",
+                 if (MultiNode.CliOptions.multiNode.get)
+                   onlyTestTags.value.mkString("\"", " ", "\"")
+                 else onlyTestTags.value.mkString(" ")))
       }
   )
 }

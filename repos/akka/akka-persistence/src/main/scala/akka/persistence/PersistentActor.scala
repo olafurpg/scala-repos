@@ -52,10 +52,10 @@ final case class DeleteMessagesFailure(cause: Throwable, toSequenceNr: Long)
   * @param replayMax maximum number of messages to replay. Default is no limit.
   */
 @SerialVersionUID(1L)
-final case class Recovery(
-    fromSnapshot: SnapshotSelectionCriteria = SnapshotSelectionCriteria.Latest,
-    toSequenceNr: Long = Long.MaxValue,
-    replayMax: Long = Long.MaxValue)
+final case class Recovery(fromSnapshot: SnapshotSelectionCriteria =
+                            SnapshotSelectionCriteria.Latest,
+                          toSequenceNr: Long = Long.MaxValue,
+                          replayMax: Long = Long.MaxValue)
 
 object Recovery {
 
@@ -168,7 +168,9 @@ trait PersistentActor extends Eventsourced with PersistenceIdentity {
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class UntypedPersistentActor
-    extends UntypedActor with Eventsourced with PersistenceIdentity {
+    extends UntypedActor
+    with Eventsourced
+    with PersistenceIdentity {
 
   final def onReceive(message: Any) = onReceiveCommand(message)
 
@@ -247,7 +249,7 @@ abstract class UntypedPersistentActor
     * @param handler handler for each persisted `event`
     */
   def persistAsync[A](event: A)(handler: Procedure[A]): Unit =
-    super [Eventsourced].persistAsync(event)(event ⇒ handler(event))
+    super[Eventsourced].persistAsync(event)(event ⇒ handler(event))
 
   /**
     * JAVA API: asynchronously persists `events` in specified order. This is equivalent to calling
@@ -258,8 +260,8 @@ abstract class UntypedPersistentActor
     * @param handler handler for each persisted `events`
     */
   def persistAllAsync[A](events: JIterable[A], handler: Procedure[A]): Unit =
-    super [Eventsourced].persistAllAsync(Util.immutableSeq(events))(
-        event ⇒ handler(event))
+    super[Eventsourced].persistAllAsync(Util.immutableSeq(events))(event ⇒
+      handler(event))
 
   /**
     * Defer the handler execution until all pending handlers have been executed.
@@ -279,7 +281,7 @@ abstract class UntypedPersistentActor
     * @param handler handler for the given `event`
     */
   def deferAsync[A](event: A)(handler: Procedure[A]): Unit =
-    super [Eventsourced].deferAsync(event)(event ⇒ handler(event))
+    super[Eventsourced].deferAsync(event)(event ⇒ handler(event))
 
   /**
     * Java API: recovery handler that receives persisted events during recovery. If a state snapshot
@@ -311,7 +313,9 @@ abstract class UntypedPersistentActor
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class AbstractPersistentActor
-    extends AbstractActor with PersistentActor with Eventsourced {
+    extends AbstractActor
+    with PersistentActor
+    with Eventsourced {
 
   /**
     * Java API: asynchronously persists `event`. On successful persistence, `handler` is called with the
@@ -412,5 +416,5 @@ abstract class AbstractPersistentActor
   def deferAsync[A](event: A)(handler: Procedure[A]): Unit =
     super.deferAsync(event)(event ⇒ handler(event))
 
-  override def receive = super [PersistentActor].receive
+  override def receive = super[PersistentActor].receive
 }

@@ -28,7 +28,7 @@ import org.apache.spark.util.BoundedPriorityQueue
   * Machine learning specific Pair RDD functions.
   */
 @DeveloperApi
-class MLPairRDDFunctions[K : ClassTag, V : ClassTag](self: RDD[(K, V)])
+class MLPairRDDFunctions[K: ClassTag, V: ClassTag](self: RDD[(K, V)])
     extends Serializable {
 
   /**
@@ -43,13 +43,11 @@ class MLPairRDDFunctions[K : ClassTag, V : ClassTag](self: RDD[(K, V)])
   def topByKey(num: Int)(implicit ord: Ordering[V]): RDD[(K, Array[V])] = {
     self
       .aggregateByKey(new BoundedPriorityQueue[V](num)(ord))(
-          seqOp = (queue, item) =>
-              {
-              queue += item
+          seqOp = (queue, item) => {
+            queue += item
           },
-          combOp = (queue1, queue2) =>
-              {
-              queue1 ++= queue2
+          combOp = (queue1, queue2) => {
+            queue1 ++= queue2
           }
       )
       .mapValues(_.toArray.sorted(ord.reverse)) // This is an min-heap, so we reverse the order.
@@ -60,7 +58,7 @@ class MLPairRDDFunctions[K : ClassTag, V : ClassTag](self: RDD[(K, V)])
 object MLPairRDDFunctions {
 
   /** Implicit conversion from a pair RDD to MLPairRDDFunctions. */
-  implicit def fromPairRDD[K : ClassTag, V : ClassTag](
+  implicit def fromPairRDD[K: ClassTag, V: ClassTag](
       rdd: RDD[(K, V)]): MLPairRDDFunctions[K, V] =
     new MLPairRDDFunctions[K, V](rdd)
 }

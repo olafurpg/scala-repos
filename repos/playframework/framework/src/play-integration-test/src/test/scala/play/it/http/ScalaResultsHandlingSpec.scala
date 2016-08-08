@@ -17,12 +17,15 @@ import scala.util.Try
 import play.api.http.{HttpEntity, HttpChunk, Status}
 
 object NettyScalaResultsHandlingSpec
-    extends ScalaResultsHandlingSpec with NettyIntegrationSpecification
+    extends ScalaResultsHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpScalaResultsHandlingSpec
-    extends ScalaResultsHandlingSpec with AkkaHttpIntegrationSpecification
+    extends ScalaResultsHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait ScalaResultsHandlingSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -59,7 +62,8 @@ trait ScalaResultsHandlingSpec
     }
 
     "not add a content length header when none is supplied" in makeRequest(
-        Results.Ok.sendEntity(HttpEntity.Streamed(
+        Results.Ok.sendEntity(
+            HttpEntity.Streamed(
                 Source(List("abc", "def", "ghi")).map(ByteString.apply),
                 None,
                 None))
@@ -81,10 +85,11 @@ trait ScalaResultsHandlingSpec
         Results.Ok
           .chunked(Source(List("a", "b")) via EventSource.flow)
           .as("text/event-stream")
-      ) { response =>
+    ) { response =>
       response.header(CONTENT_TYPE) must beSome.like {
         case value =>
-          value.toLowerCase(java.util.Locale.ENGLISH) must_== "text/event-stream"
+          value
+            .toLowerCase(java.util.Locale.ENGLISH) must_== "text/event-stream"
       }
       response.header(TRANSFER_ENCODING) must beSome("chunked")
       response.header(CONTENT_LENGTH) must beNone
@@ -126,8 +131,9 @@ trait ScalaResultsHandlingSpec
                        "")
       )(0)
       response.status must_== 200
-      response.headers.get(CONNECTION).map(_.toLowerCase(ENGLISH)) must beOneOf(
-          None, Some("close"))
+      response.headers
+        .get(CONNECTION)
+        .map(_.toLowerCase(ENGLISH)) must beOneOf(None, Some("close"))
     }
 
     "close the connection when the connection close header is present" in withServer(
@@ -135,8 +141,11 @@ trait ScalaResultsHandlingSpec
     ) { port =>
       BasicHttpClient
         .makeRequests(port, checkClosed = true)(
-            BasicRequest(
-                "GET", "/", "HTTP/1.1", Map("Connection" -> "close"), "")
+            BasicRequest("GET",
+                         "/",
+                         "HTTP/1.1",
+                         Map("Connection" -> "close"),
+                         "")
         )(0)
         .status must_== 200
     }
@@ -155,8 +164,11 @@ trait ScalaResultsHandlingSpec
         Results.Ok
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest(
-              "GET", "/", "HTTP/1.0", Map("Connection" -> "keep-alive"), ""),
+          BasicRequest("GET",
+                       "/",
+                       "HTTP/1.0",
+                       Map("Connection" -> "keep-alive"),
+                       ""),
           BasicRequest("GET", "/", "HTTP/1.0", Map(), "")
       )
       responses(0).status must_== 200
@@ -183,8 +195,11 @@ trait ScalaResultsHandlingSpec
       // will timeout if not closed
       BasicHttpClient
         .makeRequests(port, checkClosed = true)(
-            BasicRequest(
-                "GET", "/", "HTTP/1.1", Map("Connection" -> "close"), "")
+            BasicRequest("GET",
+                         "/",
+                         "HTTP/1.1",
+                         Map("Connection" -> "close"),
+                         "")
         )
         .head
         .status must_== 200
@@ -203,10 +218,12 @@ trait ScalaResultsHandlingSpec
 
     "allow sending trailers" in withServer(
         Result(
-            ResponseHeader(
-                200, Map(TRANSFER_ENCODING -> CHUNKED, TRAILER -> "Chunks")),
+            ResponseHeader(200,
+                           Map(TRANSFER_ENCODING -> CHUNKED,
+                               TRAILER -> "Chunks")),
             HttpEntity.Chunked(
-                Source(List(
+                Source(
+                    List(
                         chunk("aa"),
                         chunk("bb"),
                         chunk("cc"),
@@ -263,7 +280,8 @@ trait ScalaResultsHandlingSpec
     "return a 400 error on Header value contains a prohibited character" in withServer(
         Results.Ok
     ) { port =>
-      forall(List(
+      forall(
+          List(
               "aaa" -> "bbb\fccc",
               "ddd" -> "eee\u000bfff"
           )) { header =>
@@ -293,7 +311,7 @@ trait ScalaResultsHandlingSpec
                 Cookies.decodeSetCookieHeader(headerValue).to[Set]
             }.to[Set]
             decodedCookieHeaders must_==
-            (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
+              (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
         }
       }
     }
@@ -343,7 +361,8 @@ trait ScalaResultsHandlingSpec
         )
         .head
       response.body must beLeft("")
-      response.headers.get(CONTENT_LENGTH) must beOneOf(None, Some("0")) // Both header values are valid
+      response.headers
+        .get(CONTENT_LENGTH) must beOneOf(None, Some("0")) // Both header values are valid
     }
 
     "not have a message body, nor a Content-Length, when a 304 response is returned" in withServer(
@@ -367,7 +386,8 @@ trait ScalaResultsHandlingSpec
         )
         .head
       response.body must beLeft("")
-      response.headers.get(CONTENT_LENGTH) must beOneOf(None, Some("0")) // Both header values are valid
+      response.headers
+        .get(CONTENT_LENGTH) must beOneOf(None, Some("0")) // Both header values are valid
     }
 
     "return a 500 response if a forbidden character is used in a response's header field" in withServer(

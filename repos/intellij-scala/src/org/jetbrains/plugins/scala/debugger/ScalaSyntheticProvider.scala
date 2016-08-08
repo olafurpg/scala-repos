@@ -26,11 +26,11 @@ object ScalaSyntheticProvider {
     typeComponent match {
       case m: Method
           if m.isConstructor &&
-          ScalaPositionManager.isAnonfunType(m.declaringType()) =>
+            ScalaPositionManager.isAnonfunType(m.declaringType()) =>
         true
       case m: Method
           if m.name() == "apply" &&
-          hasSpecializationMethod(m.declaringType()) && !isMacroDefined(m) =>
+            hasSpecializationMethod(m.declaringType()) && !isMacroDefined(m) =>
         true
       case m: Method if isDefaultArg(m) => true
       case m: Method if isTraitForwarder(m) => true
@@ -79,7 +79,8 @@ object ScalaSyntheticProvider {
   }
 
   private def onlyInvokesStatic(m: Method): Boolean = {
-    val bytecodes = try m.bytecodes() catch {
+    val bytecodes = try m.bytecodes()
+    catch {
       case t: Throwable => return false
     }
 
@@ -92,7 +93,7 @@ object ScalaSyntheticProvider {
         val nextIdx = i + 3
         val nextInstr = bytecodes(nextIdx)
         return nextIdx == (bytecodes.length - 1) &&
-        BytecodeUtil.returnCodes.contains(nextInstr)
+          BytecodeUtil.returnCodes.contains(nextInstr)
       } else return false
     }
     false
@@ -108,8 +109,8 @@ object ScalaSyntheticProvider {
         for {
           interface <- interfaces
           traitImpl <- allTraitImpls
-                          if traitImpl.name().stripSuffix("$class") == interface
-                        .name() && !traitImpl.methodsByName(m.name).isEmpty
+          if traitImpl.name().stripSuffix("$class") == interface
+            .name() && !traitImpl.methodsByName(m.name).isEmpty
         } {
           return true
         }

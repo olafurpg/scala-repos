@@ -20,7 +20,11 @@ package org.apache.spark.sql.execution.columnar
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodeFormatter, CodeGenerator, UnsafeRowWriter}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodeFormatter,
+  CodeGenerator,
+  UnsafeRowWriter
+}
 import org.apache.spark.sql.types._
 
 /**
@@ -64,11 +68,12 @@ class MutableUnsafeRow(val writer: UnsafeRowWriter)
   * Generates bytecode for an [[ColumnarIterator]] for columnar cache.
   */
 object GenerateColumnAccessor
-    extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging {
+    extends CodeGenerator[Seq[DataType], ColumnarIterator]
+    with Logging {
 
   protected def canonicalize(in: Seq[DataType]): Seq[DataType] = in
-  protected def bind(
-      in: Seq[DataType], inputSchema: Seq[Attribute]): Seq[DataType] = in
+  protected def bind(in: Seq[DataType],
+                     inputSchema: Seq[Attribute]): Seq[DataType] = in
 
   protected def create(columnTypes: Seq[DataType]): ColumnarIterator = {
     val ctx = newCodeGenContext()
@@ -94,8 +99,9 @@ object GenerateColumnAccessor
           case array: ArrayType => classOf[ArrayColumnAccessor].getName
           case t: MapType => classOf[MapColumnAccessor].getName
         }
-        ctx.addMutableState(
-            accessorCls, accessorName, s"$accessorName = null;")
+        ctx.addMutableState(accessorCls,
+                            accessorName,
+                            s"$accessorName = null;")
 
         val createCode = dt match {
           case t if ctx.isPrimitiveType(dt) =>

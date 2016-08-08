@@ -18,7 +18,11 @@
 package org.apache.spark.sql.streaming
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, Offset}
+import org.apache.spark.sql.execution.streaming.{
+  CompositeOffset,
+  LongOffset,
+  Offset
+}
 
 trait OffsetSuite extends SparkFunSuite {
 

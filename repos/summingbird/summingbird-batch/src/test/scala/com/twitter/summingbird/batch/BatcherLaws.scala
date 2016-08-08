@@ -63,9 +63,9 @@ object BatcherLaws extends Properties("Batcher") {
       list == List(b)
     }
 
-  def batchIntervalTransformToTs(batcher: Batcher,
-                                 intervalGenerator: (BatchID,
-                                 BatchID) => Interval[BatchID]) =
+  def batchIntervalTransformToTs(
+      batcher: Batcher,
+      intervalGenerator: (BatchID, BatchID) => Interval[BatchID]) =
     forAll { (tsA: Timestamp, tsB: Timestamp, deltaMs: Long) =>
       val (tsLower, tsUpper) = if (tsA < tsB) (tsA, tsB) else (tsB, tsA)
 
@@ -85,9 +85,9 @@ object BatcherLaws extends Properties("Batcher") {
 
   def batcherLaws(batcher: Batcher) =
     earliestIs_<=(batcher) && batchesAreWeakOrderings(batcher) &&
-    batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
-    batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
-    batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
+      batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
+      batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
+      batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
 
   property("UnitBatcher should always return the same batch") = {
     val batcher = Batcher.unit
@@ -124,16 +124,17 @@ object BatcherLaws extends Properties("Batcher") {
     val flooredBatch = BatchID(if (millis < 0) (hourIndex - 1) else hourIndex)
 
     (hourlyBatcher.batchOf(Timestamp(millis)) == flooredBatch) &&
-    (hourlyBatcher.earliestTimeOf(flooredBatch).milliSinceEpoch == hourlyBatchFloor(
-            flooredBatch.id))
+    (hourlyBatcher
+      .earliestTimeOf(flooredBatch)
+      .milliSinceEpoch == hourlyBatchFloor(flooredBatch.id))
   }
 
   property(
-      "DurationBatcher should fully enclose each batch with a single batch") = forAll {
-    i: Int =>
+      "DurationBatcher should fully enclose each batch with a single batch") =
+    forAll { i: Int =>
       hourlyBatcher.enclosedBy(BatchID(i), hourlyBatcher).toList == List(
           BatchID(i))
-  }
+    }
 
   property("batchesCoveredBy is a subset of covers") = forAll {
     (int: Interval[Timestamp]) =>

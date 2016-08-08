@@ -54,7 +54,7 @@ final class GameSearchApi(client: ESClient)
           Fields.averageRating -> game.averageUsersRating,
           Fields.ai -> game.aiLevel,
           Fields.date ->
-          (lila.search.Date.formatter print game.updatedAtOrCreatedAt),
+            (lila.search.Date.formatter print game.updatedAtOrCreatedAt),
           Fields.duration -> game.durationSeconds,
           Fields.clockInit -> game.clock.map(_.limit),
           Fields.clockInc -> game.clock.map(_.increment),
@@ -115,8 +115,8 @@ final class GameSearchApi(client: ESClient)
 
     lila.game.tube.gameTube.coll
       .find(BSONDocument(
-              "ca" -> BSONDocument("$gt" -> since)
-          ))
+          "ca" -> BSONDocument("$gt" -> since)
+      ))
       .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)
       .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(

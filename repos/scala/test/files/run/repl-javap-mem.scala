@@ -15,10 +15,10 @@ object Test extends JavapTest {
     val p = """.*m\(.*\);""".r
     def filtered =
       res filter
-      (_ match {
-            case p() => true
-            case _ => false
-          })
+        (_ match {
+          case p() => true
+          case _ => false
+        })
     1 == filtered.size
   }
 }

@@ -43,7 +43,8 @@ object LightBase {
 
 /** The LightBase class provides definitions of common properties for objects that represent a form of Light source. */
 abstract class LightBase(override val delegate: jfxs.LightBase)
-    extends Node(delegate) with SFXDelegate[jfxs.LightBase] {
+    extends Node(delegate)
+    with SFXDelegate[jfxs.LightBase] {
 
   /** Specifies the color of light source. */
   def color: ObjectProperty[jfxsp.Color] = delegate.colorProperty

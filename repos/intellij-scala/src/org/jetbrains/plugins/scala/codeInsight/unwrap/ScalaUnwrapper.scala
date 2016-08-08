@@ -14,8 +14,7 @@ abstract class ScalaUnwrapper
   override def createContext() = new ScalaUnwrapContext
 }
 
-trait ShortTextDescription {
-  this: ScalaUnwrapper =>
+trait ShortTextDescription { this: ScalaUnwrapper =>
 
   protected def shortText(element: PsiElement) = {
     val text = element.getText

@@ -44,7 +44,8 @@ import mocks.MockHttpServletRequest
   * is to just point this at your Boostrap.boot method.
   */
 abstract class WebSpec(boot: () => Any = () => {})
-    extends Specification with XmlMatchers {
+    extends Specification
+    with XmlMatchers {
 
   /**
     * This is our private spec instance of Liftrules. Everything we run will
@@ -265,9 +266,8 @@ abstract class WebSpec(boot: () => Any = () => {})
                     case Full(sReq) =>
                       expectations(S.runTemplate(sReq.path.partPath))
                     case other =>
-                      failure(
-                          "Error: withTemplateFor call did not result in " +
-                          "request initialization (S.request = " + other + ")")
+                      failure("Error: withTemplateFor call did not result in " +
+                        "request initialization (S.request = " + other + ")")
                   }
                 }
               }

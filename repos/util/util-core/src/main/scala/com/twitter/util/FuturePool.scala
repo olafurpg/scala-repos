@@ -2,7 +2,13 @@ package com.twitter.util
 
 import com.twitter.concurrent.NamedPoolThreadFactory
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.{CancellationException, ExecutionException, ExecutorService, Executors, RejectedExecutionException}
+import java.util.concurrent.{
+  CancellationException,
+  ExecutionException,
+  ExecutorService,
+  Executors,
+  RejectedExecutionException
+}
 import scala.runtime.NonLocalReturnControl
 
 /**
@@ -80,8 +86,8 @@ class InterruptibleExecutorServiceFuturePool(executor: ExecutorService)
   * cancellation unless `interruptible` is true. If you want to propagate cancellation,
   * use an [[InterruptibleExecutorServiceFuturePool]].
   */
-class ExecutorServiceFuturePool protected[this](
-    val executor: ExecutorService, val interruptible: Boolean)
+class ExecutorServiceFuturePool protected[this] (val executor: ExecutorService,
+                                                 val interruptible: Boolean)
     extends FuturePool {
   def this(executor: ExecutorService) = this(executor, false)
 
@@ -99,7 +105,8 @@ class ExecutorServiceFuturePool protected[this](
         val current = Local.save()
         Local.restore(saved)
 
-        try p.updateIfEmpty(Try(f)) catch {
+        try p.updateIfEmpty(Try(f))
+        catch {
           case nlrc: NonLocalReturnControl[_] =>
             val fnlrc = new FutureNonLocalReturnControl(nlrc)
             p.updateIfEmpty(Throw(fnlrc))
@@ -114,7 +121,8 @@ class ExecutorServiceFuturePool protected[this](
     // This is safe: the only thing that can call task.run() is
     // executor, the only thing that can raise an interrupt is the
     // receiver of this value, which will then be fully initialized.
-    val javaFuture = try executor.submit(task) catch {
+    val javaFuture = try executor.submit(task)
+    catch {
       case e: RejectedExecutionException =>
         runOk.set(false)
         p.setException(e)

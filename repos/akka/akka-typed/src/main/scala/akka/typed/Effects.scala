@@ -29,8 +29,9 @@ object Effect {
   @SerialVersionUID(1L)
   final case class Messaged[U](other: ActorRef[U], msg: U) extends Effect
   @SerialVersionUID(1L)
-  final case class Scheduled[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U)
+  final case class Scheduled[U](delay: FiniteDuration,
+                                target: ActorRef[U],
+                                msg: U)
       extends Effect
   @SerialVersionUID(1L)
   case object EmptyEffect extends Effect
@@ -40,8 +41,9 @@ object Effect {
   * An [[ActorContext]] for testing purposes that records the effects performed
   * on it and otherwise stubs them out like a [[StubbedActorContext]].
   */
-class EffectfulActorContext[T](
-    _name: String, _props: Props[T], _system: ActorSystem[Nothing])
+class EffectfulActorContext[T](_name: String,
+                               _props: Props[T],
+                               _system: ActorSystem[Nothing])
     extends StubbedActorContext[T](_name, _props)(_system) {
   import akka.{actor ⇒ a}
   import Effect._
@@ -71,8 +73,8 @@ class EffectfulActorContext[T](
   def run(msg: T): Unit =
     current = Behavior.canonicalize(this, current.message(this, msg), current)
   def signal(signal: Signal): Unit =
-    current = Behavior.canonicalize(
-        this, current.management(this, signal), current)
+    current =
+      Behavior.canonicalize(this, current.management(this, signal), current)
 
   override def spawnAnonymous[U](props: Props[U]): ActorRef[U] = {
     val ref = super.spawnAnonymous(props)
@@ -116,8 +118,9 @@ class EffectfulActorContext[T](
     effectQueue.offer(ReceiveTimeoutSet(d))
     super.setReceiveTimeout(d)
   }
-  override def schedule[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U): a.Cancellable = {
+  override def schedule[U](delay: FiniteDuration,
+                           target: ActorRef[U],
+                           msg: U): a.Cancellable = {
     effectQueue.offer(Scheduled(delay, target, msg))
     super.schedule(delay, target, msg)
   }

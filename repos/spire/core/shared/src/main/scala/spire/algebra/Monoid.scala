@@ -8,7 +8,8 @@ package algebra
   * with `op` as string concatenation, then `id = ""`.
   */
 trait Monoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Semigroup[A] {
+    extends Any
+    with Semigroup[A] {
 
   /**
     * Return the identity element for this monoid.
@@ -61,7 +62,9 @@ object Monoid {
   * A monoid is commutative if for all x and y, x |+| y === y |+| x.
   */
 trait CMonoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Monoid[A] with CSemigroup[A]
+    extends Any
+    with Monoid[A]
+    with CSemigroup[A]
 
 object CMonoid {
   @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev

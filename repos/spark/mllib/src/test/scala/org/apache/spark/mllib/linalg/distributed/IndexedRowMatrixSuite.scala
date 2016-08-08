@@ -63,10 +63,8 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("toBreeze") {
     val mat = new IndexedRowMatrix(indexedRows)
-    val expected = BDM((0.0, 1.0, 2.0),
-                       (3.0, 4.0, 5.0),
-                       (0.0, 0.0, 0.0),
-                       (9.0, 0.0, 1.0))
+    val expected =
+      BDM((0.0, 1.0, 2.0), (3.0, 4.0, 5.0), (0.0, 0.0, 0.0), (9.0, 0.0, 1.0))
     assert(mat.toBreeze() === expected)
   }
 

@@ -18,8 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
     extends BaseGenerateAction(handler) {
 
-  override protected def isValidForFile(
-      project: Project, editor: Editor, file: PsiFile): Boolean = {
+  override protected def isValidForFile(project: Project,
+                                        editor: Editor,
+                                        file: PsiFile): Boolean = {
     lazy val classOk = {
       PsiDocumentManager
         .getInstance(project)
@@ -37,8 +38,8 @@ abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
 
   override protected def isValidForClass(targetClass: PsiClass): Boolean = true
 
-  override protected def getTargetClass(
-      editor: Editor, file: PsiFile): PsiClass = {
+  override protected def getTargetClass(editor: Editor,
+                                        file: PsiFile): PsiClass = {
     val offset: Int = editor.getCaretModel.getOffset
     val element: PsiElement = file.findElementAt(offset)
     PsiTreeUtil.getParentOfType(element, classOf[ScTemplateDefinition])

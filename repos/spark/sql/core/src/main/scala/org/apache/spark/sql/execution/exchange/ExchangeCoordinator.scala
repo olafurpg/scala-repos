@@ -22,7 +22,11 @@ import javax.annotation.concurrent.GuardedBy
 
 import scala.collection.mutable.ArrayBuffer
 
-import org.apache.spark.{MapOutputStatistics, ShuffleDependency, SimpleFutureAction}
+import org.apache.spark.{
+  MapOutputStatistics,
+  ShuffleDependency,
+  SimpleFutureAction
+}
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
@@ -141,7 +145,7 @@ private[sql] class ExchangeCoordinator(
 
     logInfo(
         s"advisoryTargetPostShuffleInputSize: $advisoryTargetPostShuffleInputSize, " +
-        s"targetPostShuffleInputSize $targetPostShuffleInputSize.")
+          s"targetPostShuffleInputSize $targetPostShuffleInputSize.")
 
     // Make sure we do get the same number of pre-shuffle partitions for those stages.
     val distinctNumPreShufflePartitions = mapOutputStatistics
@@ -156,7 +160,7 @@ private[sql] class ExchangeCoordinator(
     assert(
         distinctNumPreShufflePartitions.length == 1,
         "There should be only one distinct value of the number pre-shuffle partitions " +
-        "among registered Exchange operator.")
+          "among registered Exchange operator.")
     val numPreShufflePartitions = distinctNumPreShufflePartitions.head
 
     val partitionStartIndices = ArrayBuffer[Int]()
@@ -251,8 +255,8 @@ private[sql] class ExchangeCoordinator(
       var k = 0
       while (k < numExchanges) {
         val exchange = exchanges(k)
-        val rdd = exchange.preparePostShuffleRDD(
-            shuffleDependencies(k), partitionStartIndices)
+        val rdd = exchange.preparePostShuffleRDD(shuffleDependencies(k),
+                                                 partitionStartIndices)
         newPostShuffleRDDs.put(exchange, rdd)
 
         k += 1

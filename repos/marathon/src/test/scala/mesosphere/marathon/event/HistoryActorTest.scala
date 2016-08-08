@@ -5,7 +5,11 @@ import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.PathId._
-import mesosphere.marathon.state.{TaskFailure, TaskFailureRepository, Timestamp}
+import mesosphere.marathon.state.{
+  TaskFailure,
+  TaskFailureRepository,
+  Timestamp
+}
 import mesosphere.marathon.test.MarathonActorSupport
 import org.apache.mesos.Protos.{NetworkInfo, TaskState}
 import org.mockito.Matchers.any
@@ -14,8 +18,12 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
 class HistoryActorTest
-    extends MarathonActorSupport with MarathonSpec with MockitoSugar
-    with BeforeAndAfterAll with Matchers with ImplicitSender {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with MockitoSugar
+    with BeforeAndAfterAll
+    with Matchers
+    with ImplicitSender {
   import org.apache.mesos.Protos.TaskState._
 
   var historyActor: ActorRef = _
@@ -34,7 +42,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_ERROR") {
@@ -42,7 +51,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_LOST") {
@@ -50,7 +60,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Ignore TASK_RUNNING") {

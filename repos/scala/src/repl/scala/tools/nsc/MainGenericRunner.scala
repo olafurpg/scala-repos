@@ -46,9 +46,15 @@ class MainGenericRunner {
   }
 
   def process(args: Array[String]): Boolean = {
-    val command = new GenericRunnerCommand(
-        args.toList, (x: String) => errorFn(x))
-    import command.{settings, howToRun, thingToRun, shortUsageMsg, shouldStopWithInfo}
+    val command =
+      new GenericRunnerCommand(args.toList, (x: String) => errorFn(x))
+    import command.{
+      settings,
+      howToRun,
+      thingToRun,
+      shortUsageMsg,
+      shouldStopWithInfo
+    }
     def sampleCompiler =
       new Global(settings) // def so it's not created unless needed
 
@@ -71,11 +77,11 @@ class MainGenericRunner {
 
       def runTarget(): Either[Throwable, Boolean] = howToRun match {
         case AsObject =>
-          ObjectRunner.runAndCatch(
-              settings.classpathURLs, thingToRun, command.arguments)
+          ObjectRunner
+            .runAndCatch(settings.classpathURLs, thingToRun, command.arguments)
         case AsScript =>
-          ScriptRunner.runScriptAndCatch(
-              settings, thingToRun, command.arguments)
+          ScriptRunner
+            .runScriptAndCatch(settings, thingToRun, command.arguments)
         case AsJar =>
           JarRunner.runJar(settings, thingToRun, command.arguments)
         case Error =>
@@ -93,8 +99,8 @@ class MainGenericRunner {
         *  This all needs a rewrite though.
         */
       if (isE) {
-        ScriptRunner.runCommand(
-            settings, combinedCode, thingToRun +: command.arguments)
+        ScriptRunner
+          .runCommand(settings, combinedCode, thingToRun +: command.arguments)
       } else
         runTarget() match {
           case Left(ex) =>

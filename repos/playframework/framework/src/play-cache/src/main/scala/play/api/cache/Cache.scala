@@ -9,7 +9,11 @@ import play.api.inject.{BindingKey, Injector, ApplicationLifecycle, Module}
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.concurrent.duration._
-import play.cache.{CacheApi => JavaCacheApi, DefaultCacheApi => DefaultJavaCacheApi, NamedCacheImpl}
+import play.cache.{
+  CacheApi => JavaCacheApi,
+  DefaultCacheApi => DefaultJavaCacheApi,
+  NamedCacheImpl
+}
 
 import net.sf.ehcache._
 import com.google.common.primitives.Primitives
@@ -40,8 +44,8 @@ trait CacheApi {
     * @param expiration expiration period in seconds.
     * @param orElse The default function to invoke if the value was not found in cache.
     */
-  def getOrElse[A : ClassTag](
-      key: String, expiration: Duration = Duration.Inf)(orElse: => A): A
+  def getOrElse[A: ClassTag](key: String, expiration: Duration = Duration.Inf)(
+      orElse: => A): A
 
   /**
     * Retrieve a value from the cache for the given type
@@ -49,7 +53,7 @@ trait CacheApi {
     * @param key Item key.
     * @return result as Option[T]
     */
-  def get[T : ClassTag](key: String): Option[T]
+  def get[T: ClassTag](key: String): Option[T]
 }
 
 /**
@@ -122,8 +126,8 @@ object Cache {
     * @param orElse The default function to invoke if the value was not found in cache.
     */
   @deprecated("Inject CacheApi into your component", "2.5.0")
-  def getOrElse[A](key: String, expiration: Int)(orElse: => A)(
-      implicit app: Application, ct: ClassTag[A]): A = {
+  def getOrElse[A](key: String, expiration: Int)(
+      orElse: => A)(implicit app: Application, ct: ClassTag[A]): A = {
     getOrElse(key, intToDuration(expiration))(orElse)
   }
 
@@ -134,8 +138,8 @@ object Cache {
     * @return result as Option[T]
     */
   @deprecated("Inject CacheApi into your component", "2.5.0")
-  def getAs[T](key: String)(
-      implicit app: Application, ct: ClassTag[T]): Option[T] = {
+  def getAs[T](key: String)(implicit app: Application,
+                            ct: ClassTag[T]): Option[T] = {
     cacheApi.get[T](key)
   }
 
@@ -154,7 +158,9 @@ trait EhCacheComponents {
   def applicationLifecycle: ApplicationLifecycle
 
   lazy val ehCacheManager: CacheManager = new CacheManagerProvider(
-      environment, configuration, applicationLifecycle).get
+      environment,
+      configuration,
+      applicationLifecycle).get
 
   /**
     * Use this to create with the given name.
@@ -199,7 +205,7 @@ class EhCacheModule extends Module {
           bind[Cached]
             .qualifiedWith(namedCache)
             .to(new NamedCachedProvider(cacheApiKey))
-        )
+      )
     }
 
     Seq(
@@ -213,8 +219,9 @@ class EhCacheModule extends Module {
 }
 
 @Singleton
-class CacheManagerProvider @Inject()(
-    env: Environment, config: Configuration, lifecycle: ApplicationLifecycle)
+class CacheManagerProvider @Inject()(env: Environment,
+                                     config: Configuration,
+                                     lifecycle: ApplicationLifecycle)
     extends Provider[CacheManager] {
   lazy val get: CacheManager = {
     val resourceName = config.underlying.getString("play.cache.configResource")
@@ -306,8 +313,7 @@ class EhCacheApi @Inject()(cache: Ehcache) extends CacheApi {
       .asInstanceOf[Option[T]]
   }
 
-  def getOrElse[A : ClassTag](key: String, expiration: Duration)(
-      orElse: => A) = {
+  def getOrElse[A: ClassTag](key: String, expiration: Duration)(orElse: => A) = {
     get[A](key).getOrElse {
       val value = orElse
       set(key, value, expiration)

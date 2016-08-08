@@ -14,7 +14,11 @@ import scala.reflect.macros.{blackbox, whitebox}
 import scala.collection.mutable.ArrayBuffer
 
 import slick.SlickException
-import slick.basic.{DatabaseConfig, StaticDatabaseConfigMacros, StaticDatabaseConfig}
+import slick.basic.{
+  DatabaseConfig,
+  StaticDatabaseConfigMacros,
+  StaticDatabaseConfig
+}
 import slick.dbio.{NoStream, Effect}
 import slick.sql.{SqlAction, SqlStreamingAction}
 import slick.util.ClassLoaderUtil
@@ -29,7 +33,8 @@ class ActionBasedSQLInterpolation(val s: StringContext) extends AnyVal {
   def sqlu(param: Any*): SqlAction[Int, NoStream, Effect] = macro sqluImpl
 
   /** Build an Invoker for a statement with computed types via string interpolation */
-  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] = macro tsqlImpl
+  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] =
+    macro tsqlImpl
 }
 
 object ActionBasedSQLInterpolation {
@@ -64,8 +69,9 @@ object ActionBasedSQLInterpolation {
 
     val uri = StaticDatabaseConfigMacros.getURI(ctxt)
     //TODO The database configuration and connection should be cached for subsequent macro invocations
-    val dc = try DatabaseConfig.forURI[JdbcProfile](
-        new URI(uri), ClassLoaderUtil.defaultClassLoader) catch {
+    val dc = try DatabaseConfig
+      .forURI[JdbcProfile](new URI(uri), ClassLoaderUtil.defaultClassLoader)
+    catch {
       case ex @ (_: ConfigException | _: SlickException) =>
         ctxt.abort(
             ctxt.enclosingPosition,
@@ -102,8 +108,8 @@ object ActionBasedSQLInterpolation {
   }
 }
 
-case class SQLActionBuilder(
-    queryParts: Seq[Any], unitPConv: SetParameter[Unit]) {
+case class SQLActionBuilder(queryParts: Seq[Any],
+                            unitPConv: SetParameter[Unit]) {
   def as[R](implicit rconv: GetResult[R])
     : SqlStreamingAction[Vector[R], R, Effect] = {
     val query =

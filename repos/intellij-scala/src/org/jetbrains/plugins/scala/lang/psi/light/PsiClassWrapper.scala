@@ -20,7 +20,12 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper.DefinitionRole._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
@@ -43,7 +48,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     obj match {
       case wrapper: PsiClassWrapper =>
         definition.equals(wrapper.definition) &&
-        qualName == wrapper.qualName && name == wrapper.name
+          qualName == wrapper.qualName && name == wrapper.name
       case _ => false
     }
   }
@@ -85,8 +90,9 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
         val res = new ArrayBuffer[PsiMethod]()
         TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(obj) {
           node =>
-            this.processPsiMethodsForNode(
-                node, isStatic = true, isInterface = false)(res += _)
+            this.processPsiMethodsForNode(node,
+                                          isStatic = true,
+                                          isInterface = false)(res += _)
         }
         res.toArray
 
@@ -173,13 +179,13 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     PsiClassImplUtil.findFieldByName(this, name, checkBases)
   }
 
-  def findMethodBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
+  def findMethodBySignature(patternMethod: PsiMethod,
+                            checkBases: Boolean): PsiMethod = {
     PsiClassImplUtil.findMethodBySignature(this, patternMethod, checkBases)
   }
 
-  def findMethodsBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
+  def findMethodsBySignature(patternMethod: PsiMethod,
+                             checkBases: Boolean): Array[PsiMethod] = {
     PsiClassImplUtil.findMethodsBySignature(this, patternMethod, checkBases)
   }
 
@@ -190,12 +196,12 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   def findMethodsAndTheirSubstitutorsByName(
       name: String,
       checkBases: Boolean): util.List[Pair[PsiMethod, PsiSubstitutor]] = {
-    PsiClassImplUtil.findMethodsAndTheirSubstitutorsByName(
-        this, name, checkBases)
+    PsiClassImplUtil
+      .findMethodsAndTheirSubstitutorsByName(this, name, checkBases)
   }
 
-  def getAllMethodsAndTheirSubstitutors: util.List[Pair[
-          PsiMethod, PsiSubstitutor]] = {
+  def getAllMethodsAndTheirSubstitutors: util.List[
+      Pair[PsiMethod, PsiSubstitutor]] = {
     PsiClassImplUtil.getAllWithSubstitutorsByMap(this, MemberType.METHOD)
   }
 
@@ -223,7 +229,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     definition match {
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
-        (baseClass.getQualifiedName == "scala.ScalaObject" &&
+          (baseClass.getQualifiedName == "scala.ScalaObject" &&
             !baseClass.isDeprecated)
       case _ => false
     }
@@ -233,7 +239,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     definition match {
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
-        (baseClass.getQualifiedName == "scala.ScalaObject" &&
+          (baseClass.getQualifiedName == "scala.ScalaObject" &&
             !baseClass.isDeprecated)
       case _ => false
     }
@@ -257,8 +263,9 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   override def getName: String = name
 
   override def copy: PsiElement = {
-    new PsiClassWrapper(
-        definition.copy.asInstanceOf[ScTemplateDefinition], qualName, name)
+    new PsiClassWrapper(definition.copy.asInstanceOf[ScTemplateDefinition],
+                        qualName,
+                        name)
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,

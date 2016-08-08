@@ -7,5 +7,6 @@ package foo {
     }
   }
   class Parametrized2[T]
-      extends Parametrized1[T] with Abstract2[Parametrized2[T]]
+      extends Parametrized1[T]
+      with Abstract2[Parametrized2[T]]
 }

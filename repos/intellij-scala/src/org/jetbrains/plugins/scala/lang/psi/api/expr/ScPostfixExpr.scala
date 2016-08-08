@@ -4,7 +4,7 @@ package psi
 package api
 package expr
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
@@ -16,7 +16,7 @@ trait ScPostfixExpr extends ScExpression with ScSugarCallExpr {
       case _ =>
         throw new UnsupportedOperationException(
             "Postfix Expr Operation is not reference expression: " +
-            this.getText)
+              this.getText)
     }
 
   def getBaseExpr: ScExpression = operand

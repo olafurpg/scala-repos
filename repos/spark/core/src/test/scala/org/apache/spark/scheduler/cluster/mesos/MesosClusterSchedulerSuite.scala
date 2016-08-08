@@ -33,10 +33,12 @@ import org.apache.spark.deploy.Command
 import org.apache.spark.deploy.mesos.MesosDriverDescription
 
 class MesosClusterSchedulerSuite
-    extends SparkFunSuite with LocalSparkContext with MockitoSugar {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with MockitoSugar {
 
-  private val command = new Command(
-      "mainClass", Seq("arg"), Map(), Seq(), Seq(), Seq())
+  private val command =
+    new Command("mainClass", Seq("arg"), Map(), Seq(), Seq(), Seq())
   private var scheduler: MesosClusterScheduler = _
 
   override def beforeEach(): Unit = {
@@ -44,7 +46,8 @@ class MesosClusterSchedulerSuite
     conf.setMaster("mesos://localhost:5050")
     conf.setAppName("spark mesos")
     scheduler = new MesosClusterScheduler(
-        new BlackHoleMesosClusterPersistenceEngineFactory, conf) {
+        new BlackHoleMesosClusterPersistenceEngineFactory,
+        conf) {
       override def start(): Unit = { ready = true }
     }
     scheduler.start()
@@ -113,30 +116,31 @@ class MesosClusterSchedulerSuite
     assert(response.success)
     val offer = Offer
       .newBuilder()
-      .addResources(Resource
+      .addResources(
+          Resource
             .newBuilder()
             .setRole("*")
             .setScalar(Scalar.newBuilder().setValue(1).build())
             .setName("cpus")
             .setType(Type.SCALAR))
       .addResources(Resource
-            .newBuilder()
-            .setRole("*")
-            .setScalar(Scalar.newBuilder().setValue(1000).build())
-            .setName("mem")
-            .setType(Type.SCALAR))
+        .newBuilder()
+        .setRole("*")
+        .setScalar(Scalar.newBuilder().setValue(1000).build())
+        .setName("mem")
+        .setType(Type.SCALAR))
       .addResources(Resource
-            .newBuilder()
-            .setRole("role2")
-            .setScalar(Scalar.newBuilder().setValue(1).build())
-            .setName("cpus")
-            .setType(Type.SCALAR))
+        .newBuilder()
+        .setRole("role2")
+        .setScalar(Scalar.newBuilder().setValue(1).build())
+        .setName("cpus")
+        .setType(Type.SCALAR))
       .addResources(Resource
-            .newBuilder()
-            .setRole("role2")
-            .setScalar(Scalar.newBuilder().setValue(500).build())
-            .setName("mem")
-            .setType(Type.SCALAR))
+        .newBuilder()
+        .setRole("role2")
+        .setScalar(Scalar.newBuilder().setValue(500).build())
+        .setName("mem")
+        .setType(Type.SCALAR))
       .setId(OfferID.newBuilder().setValue("o1").build())
       .setFrameworkId(FrameworkID.newBuilder().setValue("f1").build())
       .setSlaveId(SlaveID.newBuilder().setValue("s1").build())

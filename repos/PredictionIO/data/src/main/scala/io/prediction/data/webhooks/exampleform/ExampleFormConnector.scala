@@ -64,7 +64,8 @@ private[prediction] object ExampleFormConnector extends FormConnector {
       case e: ConnectorException => throw e
       case e: Exception =>
         throw new ConnectorException(
-            s"Cannot convert ${data} to event JSON. ${e.getMessage()}", e)
+            s"Cannot convert ${data} to event JSON. ${e.getMessage()}",
+            e)
     }
     json
   }
@@ -77,8 +78,8 @@ private[prediction] object ExampleFormConnector extends FormConnector {
       if (data.exists(_._1.startsWith("context["))) {
         Some(
             ("ip" -> data.get("context[ip]")) ~
-            ("prop1" -> data.get("context[prop1]").map(_.toDouble)) ~
-            ("prop2" -> data.get("context[prop2]"))
+              ("prop1" -> data.get("context[prop1]").map(_.toDouble)) ~
+              ("prop2" -> data.get("context[prop2]"))
         )
       } else {
         None
@@ -86,11 +87,11 @@ private[prediction] object ExampleFormConnector extends FormConnector {
 
     val json =
       ("event" -> data("event")) ~ ("entityType" -> "user") ~
-      ("entityId" -> data("userId")) ~ ("eventTime" -> data("timestamp")) ~
-      ("properties" ->
+        ("entityId" -> data("userId")) ~ ("eventTime" -> data("timestamp")) ~
+        ("properties" ->
           (("context" -> context) ~
-              ("anotherProperty1" -> data("anotherProperty1").toInt) ~
-              ("anotherProperty2" -> data.get("anotherProperty2"))))
+            ("anotherProperty1" -> data("anotherProperty1").toInt) ~
+            ("anotherProperty2" -> data.get("anotherProperty2"))))
     json
   }
 
@@ -99,19 +100,20 @@ private[prediction] object ExampleFormConnector extends FormConnector {
 
     val json =
       ("event" -> data("event")) ~ ("entityType" -> "user") ~
-      ("entityId" -> data("userId")) ~ ("targetEntityType" -> "item") ~
-      ("targetEntityId" -> data("itemId")) ~ ("eventTime" -> data("timestamp")) ~
-      ("properties" ->
+        ("entityId" -> data("userId")) ~ ("targetEntityType" -> "item") ~
+        ("targetEntityId" -> data("itemId")) ~ ("eventTime" -> data(
+          "timestamp")) ~
+        ("properties" ->
           (("context" ->
-                  (("ip" -> data("context[ip]")) ~
-                      ("prop1" -> data("context[prop1]").toDouble) ~
-                      ("prop2" -> data("context[prop2]")))) ~
-              ("anotherPropertyA" -> data
-                    .get("anotherPropertyA")
-                    .map(_.toDouble)) ~
-              ("anotherPropertyB" -> data
-                    .get("anotherPropertyB")
-                    .map(_.toBoolean))))
+            (("ip" -> data("context[ip]")) ~
+              ("prop1" -> data("context[prop1]").toDouble) ~
+              ("prop2" -> data("context[prop2]")))) ~
+            ("anotherPropertyA" -> data
+              .get("anotherPropertyA")
+              .map(_.toDouble)) ~
+            ("anotherPropertyB" -> data
+              .get("anotherPropertyB")
+              .map(_.toBoolean))))
     json
   }
 }

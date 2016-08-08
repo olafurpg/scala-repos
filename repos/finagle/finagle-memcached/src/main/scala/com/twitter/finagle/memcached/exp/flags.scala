@@ -13,9 +13,8 @@ object localMemcachedPort
     extends GlobalFlag[Option[Int]](
         None,
         "port to use for local memcached; " +
-        "this is a temporary workaround and will be deprecated once memcache has wily support."
-    )(
-        new Flaggable[Option[Int]] {
+          "this is a temporary workaround and will be deprecated once memcache has wily support."
+    )(new Flaggable[Option[Int]] {
       def parse(s: String) = s match {
         case "" => None
         case value => Some(value.toInt)

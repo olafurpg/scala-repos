@@ -25,8 +25,11 @@ object ScalaInplaceTypeAliasIntroducer {
     editor
       .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
       .addScopeElement(scopeItem)
-    new ScalaInplaceTypeAliasIntroducer(
-        scNamedElement, substituted, editor, initialName, oldName)
+    new ScalaInplaceTypeAliasIntroducer(scNamedElement,
+                                        substituted,
+                                        editor,
+                                        initialName,
+                                        oldName)
   }
 
   def revertState(myEditor: Editor,
@@ -40,8 +43,9 @@ object ScalaInplaceTypeAliasIntroducer {
         val document = myEditor.getDocument
         if (revertInfo != null) {
           extensions.inWriteAction {
-            document.replaceString(
-                0, document.getTextLength, revertInfo.fileText)
+            document.replaceString(0,
+                                   document.getTextLength,
+                                   revertInfo.fileText)
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
           }
           val offset = revertInfo.caretOffset
@@ -64,16 +68,19 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
                                       editor: Editor,
                                       initialName: String,
                                       oldName: String)
-    extends ScalaMemberInplaceRenamer(
-        scNamedElement, substituted, editor, initialName, oldName) {
+    extends ScalaMemberInplaceRenamer(scNamedElement,
+                                      substituted,
+                                      editor,
+                                      initialName,
+                                      oldName) {
 
   override def setAdvertisementText(text: String) = {
     myAdvertisementText = "Press ctrl + alt + v" +
-    " to show dialog with more options"
+        " to show dialog with more options"
   }
 
-  override def startsOnTheSameElement(
-      handler: RefactoringActionHandler, element: PsiElement): Boolean = {
+  override def startsOnTheSameElement(handler: RefactoringActionHandler,
+                                      element: PsiElement): Boolean = {
     def checkEquals(typeAliasDefinition: ScTypeAliasDefinition) = {
       editor
         .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
@@ -83,7 +90,7 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
     element match {
       case typeAliasDefinition: ScTypeAliasDefinition =>
         checkEquals(typeAliasDefinition) &&
-        handler.isInstanceOf[ScalaIntroduceVariableHandler]
+          handler.isInstanceOf[ScalaIntroduceVariableHandler]
       case _ => false
     }
   }
@@ -107,8 +114,8 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
           val myFile: PsiFile = PsiDocumentManager
             .getInstance(myEditor.getProject)
             .getPsiFile(myEditor.getDocument)
-          myEditor.getDocument.replaceString(
-              0, myFile.getTextLength, revertInfo.fileText)
+          myEditor.getDocument
+            .replaceString(0, myFile.getTextLength, revertInfo.fileText)
         }
         myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
         myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)

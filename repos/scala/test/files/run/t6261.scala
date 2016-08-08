@@ -78,7 +78,7 @@ object Test extends App {
     // StructureTests.printStructure(y)
     require(
         y.size == 3 && y.contains(a._1) && y.contains(b._1) &&
-        y.contains(c._1))
+          y.contains(c._1))
 
     // go from a HashSet1 directly to a HashTrieSet with maximum depth
     val z = HashMap(a) + c
@@ -114,7 +114,7 @@ package scala.collection.immutable {
         case m: HashMap.HashTrieMap[_, _] =>
           require(
               m.elems.size > 1 ||
-              (m.elems.size == 1 &&
+                (m.elems.size == 1 &&
                   m.elems(0).isInstanceOf[HashMap.HashTrieMap[_, _]]))
           m.elems.foreach(validate _)
         case m: HashMap.HashMapCollision1[_, _] =>

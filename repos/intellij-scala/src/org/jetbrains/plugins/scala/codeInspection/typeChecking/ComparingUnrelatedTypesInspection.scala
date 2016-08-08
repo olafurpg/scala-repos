@@ -6,7 +6,10 @@ import com.intellij.psi.{PsiMethod, PsiElement}
 import com.siyeh.ig.psiutils.MethodUtils
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.ComparingUnrelatedTypesInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.extensions.{PsiClassExt, ResolvesTo}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
@@ -87,7 +90,9 @@ class ComparingUnrelatedTypesInspection
         //getType() for the reference on the left side returns singleton type, little hack here
         val leftOnTheRight =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              left.getText, right.getParent, right)
+              left.getText,
+              right.getParent,
+              right)
         Seq(leftOnTheRight, right) map (_.getType()) match {
           case Seq(Success(leftType, _), Success(rightType, _))
               if cannotBeCompared(leftType, rightType) =>
@@ -98,21 +103,23 @@ class ComparingUnrelatedTypesInspection
           case _ =>
         }
       }
-    case MethodRepr(
-        _, Some(baseExpr), Some(ResolvesTo(fun: ScFunction)), Seq(arg, _ *))
-        if mayNeedHighlighting(fun) =>
+    case MethodRepr(_,
+                    Some(baseExpr),
+                    Some(ResolvesTo(fun: ScFunction)),
+                    Seq(arg, _ *)) if mayNeedHighlighting(fun) =>
       for {
         ScParameterizedType(_, Seq(elemType)) <- baseExpr
-          .getType()
-          .map(tryExtractSingletonType)
+                                                  .getType()
+                                                  .map(tryExtractSingletonType)
         argType <- arg.getType() if cannotBeCompared(elemType, argType)
       } {
         val (elemTypeText, argTypeText) =
           ScTypePresentation.different(elemType, argType)
-        val message = InspectionBundle.message(
-            "comparing.unrelated.types.hint", elemTypeText, argTypeText)
-        holder.registerProblem(
-            arg, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        val message = InspectionBundle
+          .message("comparing.unrelated.types.hint", elemTypeText, argTypeText)
+        holder.registerProblem(arg,
+                               message,
+                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
     case IsInstanceOfCall(call) =>
       val qualType = call.referencedExpr match {

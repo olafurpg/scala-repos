@@ -20,8 +20,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy1.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject1
@@ -44,8 +44,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy2.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject2
@@ -68,8 +68,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy3.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject3
@@ -92,8 +92,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy4.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject4
@@ -116,8 +116,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy5.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject5
@@ -142,8 +142,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy6.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 import rawObject.RawObject6.importedDef
@@ -166,8 +166,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy7.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
     assert(activeLookup == null)
 
     val resultText = """
@@ -186,8 +186,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy7.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
 
     val resultText = """
 class TUI {
@@ -216,8 +216,8 @@ class Test {
 }
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy7.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 2)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 2)
     Assert.assertTrue(
         !activeLookup.exists(_.getLookupString == "doSmthPrivate"))
   }
@@ -236,8 +236,8 @@ class Test {
       }
       """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy7.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 3)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 3)
     Assert.assertTrue(
         activeLookup.exists(_.getLookupString == "doSmthPrivate"))
   }
@@ -263,8 +263,8 @@ class Test {
       }
       """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummyGlobalMemberInherited.scala", fileText)
-    val (activeLookup, _) = complete(
-        completionType = CompletionType.BASIC, time = 3)
+    val (activeLookup, _) =
+      complete(completionType = CompletionType.BASIC, time = 3)
     val lookups = activeLookup.collect {
       case sli: ScalaLookupItem =>
         sli.containingClass.name + "." + sli.getLookupString

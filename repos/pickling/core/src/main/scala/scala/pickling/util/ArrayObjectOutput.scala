@@ -69,8 +69,7 @@ case class GenObjectOutput(
     val arrByteArrBuf: ArrayBuffer[Array[Byte]] = new ArrayBuffer[Array[Byte]],
     val anyRefArrBuf: ArrayBuffer[Any] = new ArrayBuffer[Any],
     val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String]
-)
-    extends ObjectOutput {
+) extends ObjectOutput {
   def toInput: ObjectInput =
     new GenObjectInput(booleanArrBuf.iterator,
                        byteArrBuf.iterator,

@@ -43,10 +43,13 @@ import scala.collection.mutable.ListBuffer
   *  @author Mirco Dotta
   */
 abstract class InteractiveTest
-    extends AskParse with AskShutdown with AskReload with AskLoadedTyped
-    with PresentationCompilerInstance with CoreTestDefs
-    with InteractiveTestSettings {
-  self =>
+    extends AskParse
+    with AskShutdown
+    with AskReload
+    with AskLoadedTyped
+    with PresentationCompilerInstance
+    with CoreTestDefs
+    with InteractiveTestSettings { self =>
 
   protected val runRandomTests = false
 
@@ -73,7 +76,8 @@ abstract class InteractiveTest
 
   /** Test's entry point */
   def main(args: Array[String]) {
-    try execute() finally askShutdown()
+    try execute()
+    finally askShutdown()
   }
 
   protected def execute(): Unit = {

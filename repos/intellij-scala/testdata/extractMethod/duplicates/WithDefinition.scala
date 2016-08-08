@@ -7,7 +7,7 @@ object WithDefinition {
       y + 1
     }
     println(bar + i)
-/*end*/
+    /*end*/
   }
 
   def foofoo() {

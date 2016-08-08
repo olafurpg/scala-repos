@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory
 import scala.util.control.NonFatal
 import scala.util.parsing.combinator.RegexParsers
 
-case class LabelSelector(
-    key: String, fn: String => Boolean, value: List[String])
+case class LabelSelector(key: String,
+                         fn: String => Boolean,
+                         value: List[String])
     extends AppSelector {
   def matches(app: AppDefinition): Boolean =
     app.labels.contains(key) && fn(app.labels(key))

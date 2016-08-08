@@ -40,11 +40,12 @@ import scala.collection.parallel.Task
   *  @define coll immutable parallel hash map
   */
 @SerialVersionUID(1L)
-class ParHashMap[K, +V] private[immutable](
+class ParHashMap[K, +V] private[immutable] (
     private[this] val trie: HashMap[K, V])
-    extends ParMap[K, V] with GenericParMapTemplate[K, V, ParHashMap]
-    with ParMapLike[K, V, ParHashMap[K, V], HashMap[K, V]] with Serializable {
-  self =>
+    extends ParMap[K, V]
+    with GenericParMapTemplate[K, V, ParHashMap]
+    with ParMapLike[K, V, ParHashMap[K, V], HashMap[K, V]]
+    with Serializable { self =>
 
   def this() = this(HashMap.empty[K, V])
 
@@ -67,14 +68,14 @@ class ParHashMap[K, +V] private[immutable](
 
   override def size = trie.size
 
-  protected override def reuse[S, That](
-      oldc: Option[Combiner[S, That]], newc: Combiner[S, That]) = oldc match {
+  protected override def reuse[S, That](oldc: Option[Combiner[S, That]],
+                                        newc: Combiner[S, That]) = oldc match {
     case Some(old) => old
     case None => newc
   }
 
-  class ParHashMapIterator(
-      var triter: Iterator[(K, V @uncheckedVariance)], val sz: Int)
+  class ParHashMapIterator(var triter: Iterator[(K, V @uncheckedVariance)],
+                           val sz: Int)
       extends IterableSplitter[(K, V)] {
     var i = 0
     def dup = triter match {
@@ -134,7 +135,7 @@ class ParHashMap[K, +V] private[immutable](
         println("hash of key: " + hm.getHash)
         println(
             "computed hash of " + hm.getKey + ": " +
-            hm.computeHashFor(hm.getKey))
+              hm.computeHashFor(hm.getKey))
         println("trie.get(key): " + hm.get(hm.getKey))
       case _ =>
         println("other kind of node")
@@ -152,8 +153,8 @@ object ParHashMap extends ParMapFactory[ParHashMap] {
   def newCombiner[K, V]: Combiner[(K, V), ParHashMap[K, V]] =
     HashMapCombiner[K, V]
 
-  implicit def canBuildFrom[K, V]: CanCombineFrom[
-      Coll, (K, V), ParHashMap[K, V]] = {
+  implicit def canBuildFrom[K, V]
+    : CanCombineFrom[Coll, (K, V), ParHashMap[K, V]] = {
     new CanCombineFromMap[K, V]
   }
 
@@ -163,8 +164,10 @@ object ParHashMap extends ParMapFactory[ParHashMap] {
 }
 
 private[parallel] abstract class HashMapCombiner[K, V]
-    extends scala.collection.parallel.BucketCombiner[
-        (K, V), ParHashMap[K, V], (K, V), HashMapCombiner[K, V]](
+    extends scala.collection.parallel.BucketCombiner[(K, V),
+                                                     ParHashMap[K, V],
+                                                     (K, V),
+                                                     HashMapCombiner[K, V]](
         HashMapCombiner.rootsize) {
 //self: EnvironmentPassingCombiner[(K, V), ParHashMap[K, V]] =>
   import HashMapCombiner._
@@ -226,7 +229,9 @@ private[parallel] abstract class HashMapCombiner[K, V]
       new ParHashMap[K, Repr](root(0).asInstanceOf[HashMap[K, Repr]])
     else {
       val trie = new HashMap.HashTrieMap(
-          bitmap, root.asInstanceOf[Array[HashMap[K, Repr]]], sz)
+          bitmap,
+          root.asInstanceOf[Array[HashMap[K, Repr]]],
+          sz)
       new ParHashMap[K, Repr](trie)
     }
   }
@@ -316,8 +321,12 @@ private[parallel] abstract class HashMapCombiner[K, V]
             case Some(cmb) => cmb
             case None =>
               val cmb: Combiner[V, Repr] = cbf()
-              trie = trie.updated0[Combiner[V, Repr]](
-                  kv._1, hc, rootbits, cmb, null, null)
+              trie = trie.updated0[Combiner[V, Repr]](kv._1,
+                                                      hc,
+                                                      rootbits,
+                                                      cmb,
+                                                      null,
+                                                      null)
               cmb
           }
           cmb += kv._2
@@ -343,8 +352,8 @@ private[parallel] abstract class HashMapCombiner[K, V]
       case htm: HashMap.HashTrieMap[k, v] =>
         var i = 0
         while (i < htm.elems.length) {
-          htm.elems(i) = evaluateCombiners(htm.elems(i))
-            .asInstanceOf[HashMap[k, v]]
+          htm.elems(i) =
+            evaluateCombiners(htm.elems(i)).asInstanceOf[HashMap[k, v]]
           i += 1
         }
         htm.asInstanceOf[HashMap[K, Repr]]

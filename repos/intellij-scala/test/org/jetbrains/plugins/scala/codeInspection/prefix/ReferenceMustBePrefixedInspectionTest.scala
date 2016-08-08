@@ -3,7 +3,10 @@ package codeInspection.prefix
 
 import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
-import org.jetbrains.plugins.scala.codeInspection.prefixMutableCollections.{AddPrefixFix, ReferenceMustBePrefixedInspection}
+import org.jetbrains.plugins.scala.codeInspection.prefixMutableCollections.{
+  AddPrefixFix,
+  ReferenceMustBePrefixedInspection
+}
 
 /**
   * Nikolay.Tropin

@@ -24,8 +24,14 @@ import org.apache.spark.sql.catalyst.analysis.MultiInstanceRelation
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenContext
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Statistics}
-import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, Partitioning, UnknownPartitioning}
-import org.apache.spark.sql.execution.datasources.parquet.{DefaultSource => ParquetSource}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  HashPartitioning,
+  Partitioning,
+  UnknownPartitioning
+}
+import org.apache.spark.sql.execution.datasources.parquet.{
+  DefaultSource => ParquetSource
+}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.{BaseRelation, HadoopFsRelation}
@@ -33,7 +39,8 @@ import org.apache.spark.sql.types.DataType
 
 object RDDConversions {
   def productToRowRdd[A <: Product](
-      data: RDD[A], outputTypes: Seq[DataType]): RDD[InternalRow] = {
+      data: RDD[A],
+      outputTypes: Seq[DataType]): RDD[InternalRow] = {
     data.mapPartitions { iterator =>
       val numColumns = outputTypes.length
       val mutableRow = new GenericMutableRow(numColumns)
@@ -54,8 +61,8 @@ object RDDConversions {
   /**
     * Convert the objects inside Row into the types Catalyst expected.
     */
-  def rowToRowRdd(
-      data: RDD[Row], outputTypes: Seq[DataType]): RDD[InternalRow] = {
+  def rowToRowRdd(data: RDD[Row],
+                  outputTypes: Seq[DataType]): RDD[InternalRow] = {
     data.mapPartitions { iterator =>
       val numColumns = outputTypes.length
       val mutableRow = new GenericMutableRow(numColumns)
@@ -76,8 +83,10 @@ object RDDConversions {
 
 /** Logical plan node for scanning data from an RDD. */
 private[sql] case class LogicalRDD(
-    output: Seq[Attribute], rdd: RDD[InternalRow])(sqlContext: SQLContext)
-    extends LogicalPlan with MultiInstanceRelation {
+    output: Seq[Attribute],
+    rdd: RDD[InternalRow])(sqlContext: SQLContext)
+    extends LogicalPlan
+    with MultiInstanceRelation {
 
   override def children: Seq[LogicalPlan] = Nil
 
@@ -133,7 +142,8 @@ private[sql] case class DataSourceScan(
     rdd: RDD[InternalRow],
     @transient relation: BaseRelation,
     override val metadata: Map[String, String] = Map.empty)
-    extends LeafNode with CodegenSupport {
+    extends LeafNode
+    with CodegenSupport {
 
   override val nodeName: String = relation.toString
 
@@ -171,7 +181,7 @@ private[sql] case class DataSourceScan(
       output.find(_.name == colName).getOrElse {
         throw new AnalysisException(
             s"bucket column $colName not found in existing columns " +
-            s"(${output.map(_.name).mkString(", ")})")
+              s"(${output.map(_.name).mkString(", ")})")
       }
 
     bucketSpec.map { spec =>
@@ -202,8 +212,8 @@ private[sql] case class DataSourceScan(
   }
 
   override def simpleString: String = {
-    val metadataEntries = for ((key, value) <- metadata.toSeq.sorted) yield
-      s"$key: $value"
+    val metadataEntries = for ((key, value) <- metadata.toSeq.sorted)
+      yield s"$key: $value"
     s"Scan $nodeName${output.mkString("[", ",", "]")}${metadataEntries
       .mkString(" ", ", ", "")}"
   }
@@ -221,13 +231,14 @@ private[sql] case class DataSourceScan(
     val idx = ctx.freshName("batchIdx")
     val batch = ctx.freshName("batch")
     // PhysicalRDD always just has one input
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
     ctx.addMutableState(columnarBatchClz, batch, s"$batch = null;")
     ctx.addMutableState("int", idx, s"$idx = 0;")
 
-    val exprs = output.zipWithIndex.map(
-        x => new BoundReference(x._2, x._1.dataType, true))
+    val exprs = output.zipWithIndex.map(x =>
+      new BoundReference(x._2, x._1.dataType, true))
     val row = ctx.freshName("row")
     val numOutputRows = metricTerm(ctx, "numOutputRows")
 
@@ -241,7 +252,8 @@ private[sql] case class DataSourceScan(
     ctx.currentVars = null
     val columns1 = exprs.map(_.gen(ctx))
     val scanBatches = ctx.freshName("processBatches")
-    ctx.addNewFunction(scanBatches, s"""
+    ctx.addNewFunction(scanBatches,
+                       s"""
       | private void $scanBatches() throws java.io.IOException {
       |  while (true) {
       |     int numRows = $batch.numRows();
@@ -267,7 +279,8 @@ private[sql] case class DataSourceScan(
     val columns2 = exprs.map(_.gen(ctx))
     val inputRow = if (outputUnsafeRows) row else null
     val scanRows = ctx.freshName("processRows")
-    ctx.addNewFunction(scanRows, s"""
+    ctx.addNewFunction(scanRows,
+                       s"""
        | private void $scanRows(InternalRow $row) throws java.io.IOException {
        |   boolean firstRow = true;
        |   while (!shouldStop() && (firstRow || $input.hasNext())) {

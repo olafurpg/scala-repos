@@ -47,7 +47,8 @@ object ReadOnlyLongWrapper {
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyLongWrapper.html javafx.beans.property.ReadOnlyLongWrapper]] */
 class ReadOnlyLongWrapper(
-    override val delegate: jfxbp.ReadOnlyLongWrapper = new jfxbp.ReadOnlyLongWrapper(
+    override val delegate: jfxbp.ReadOnlyLongWrapper =
+      new jfxbp.ReadOnlyLongWrapper(
           ))
     extends LongProperty(delegate)
     with SFXDelegate[jfxbp.ReadOnlyLongWrapper] {

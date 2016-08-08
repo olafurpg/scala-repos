@@ -30,7 +30,8 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * (private[spark]) Params for classification.
   */
 private[spark] trait ClassifierParams
-    extends PredictorParams with HasRawPredictionCol {
+    extends PredictorParams
+    with HasRawPredictionCol {
 
   override protected def validateAndTransformSchema(
       schema: StructType,
@@ -56,7 +57,8 @@ private[spark] trait ClassifierParams
 abstract class Classifier[FeaturesType,
                           E <: Classifier[FeaturesType, E, M],
                           M <: ClassificationModel[FeaturesType, M]]
-    extends Predictor[FeaturesType, E, M] with ClassifierParams {
+    extends Predictor[FeaturesType, E, M]
+    with ClassifierParams {
 
   /** @group setParam */
   def setRawPredictionCol(value: String): E =
@@ -77,7 +79,8 @@ abstract class Classifier[FeaturesType,
 @DeveloperApi
 abstract class ClassificationModel[
     FeaturesType, M <: ClassificationModel[FeaturesType, M]]
-    extends PredictionModel[FeaturesType, M] with ClassifierParams {
+    extends PredictionModel[FeaturesType, M]
+    with ClassifierParams {
 
   /** @group setParam */
   def setRawPredictionCol(value: String): M =
@@ -106,8 +109,8 @@ abstract class ClassificationModel[
       val predictRawUDF = udf { (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
       }
-      outputData = outputData.withColumn(
-          getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
+      outputData = outputData
+        .withColumn(getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
     }
     if (getPredictionCol != "") {
@@ -125,8 +128,9 @@ abstract class ClassificationModel[
     }
 
     if (numColsOutput == 0) {
-      logWarning(s"$uid: ClassificationModel.transform() was called as NOOP" +
-          " since no output columns were set.")
+      logWarning(
+          s"$uid: ClassificationModel.transform() was called as NOOP" +
+            " since no output columns were set.")
     }
     outputData
   }

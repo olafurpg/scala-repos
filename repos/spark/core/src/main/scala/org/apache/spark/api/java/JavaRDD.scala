@@ -121,8 +121,9 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
     *  with replacement: expected number of times each element is chosen; fraction must be >= 0
     * @param seed seed for the random number generator
     */
-  def sample(
-      withReplacement: Boolean, fraction: Double, seed: Long): JavaRDD[T] =
+  def sample(withReplacement: Boolean,
+             fraction: Double,
+             seed: Long): JavaRDD[T] =
     wrapRDD(rdd.sample(withReplacement, fraction, seed))
 
   /**
@@ -205,7 +206,7 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
 
 object JavaRDD {
 
-  implicit def fromRDD[T : ClassTag](rdd: RDD[T]): JavaRDD[T] =
+  implicit def fromRDD[T: ClassTag](rdd: RDD[T]): JavaRDD[T] =
     new JavaRDD[T](rdd)
 
   implicit def toRDD[T](rdd: JavaRDD[T]): RDD[T] = rdd.rdd

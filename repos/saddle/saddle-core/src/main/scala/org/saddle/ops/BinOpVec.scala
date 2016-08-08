@@ -28,9 +28,9 @@ trait BinOpVec {
   // ***************
 
   // Binary element-wise operation on one Vec and one scalar
-  final class VecSclrElemOp[
-      OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A, @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C : ST](
-      val op: BinOp[OP, A, B, C])
+  final class VecSclrElemOp[OP <: ScalarOp,
+  @spec(Boolean, Int, Long, Double) A, @spec(Boolean, Int, Long, Double) B,
+  @spec(Boolean, Int, Long, Double) C: ST](val op: BinOp[OP, A, B, C])
       extends BinOp[OP, Vec[A], B, Vec[C]] {
     def apply(v1: Vec[A], v2: B) = {
       val sz = v1.length
@@ -114,9 +114,9 @@ trait BinOpVec {
   // ***************
 
   // Binary element-wise operation on two Vecs
-  final class VecVecElemOp[
-      OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A, @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C : ST](
-      op: BinOp[OP, A, B, C])
+  final class VecVecElemOp[OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A,
+  @spec(Boolean, Int, Long, Double) B,
+  @spec(Boolean, Int, Long, Double) C: ST](op: BinOp[OP, A, B, C])
       extends BinOp[OP, Vec[A], Vec[B], Vec[C]] {
 
     def apply(v1: Vec[A], v2: Vec[B]) = {
@@ -205,8 +205,9 @@ trait BinOpVec {
 
   final class VecVecDot[@spec(Int, Long, Double) A,
                         @spec(Int, Long, Double) B,
-                        @spec(Int, Long, Double) C : ST : NUM](
-      opadd: BinOp[Add, C, C, C], opmul: BinOp[Multiply, A, B, C])
+                        @spec(Int, Long, Double) C: ST: NUM](
+      opadd: BinOp[Add, C, C, C],
+      opmul: BinOp[Multiply, A, B, C])
       extends BinOp[InnerProd, Vec[A], Vec[B], C] {
 
     def apply(v1: Vec[A], v2: Vec[B]) = {
@@ -254,8 +255,8 @@ trait BinOpVec {
 
   // Binary outer product of two vectors
 
-  final class VecVecOuter[
-      @spec(Int, Long, Double) A, @spec(Int, Long, Double) B, @spec(Int, Long, Double) C : ST](
+  final class VecVecOuter[@spec(Int, Long, Double) A,
+  @spec(Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
       opmul: BinOp[Multiply, A, B, C])
       extends BinOp[OuterProd, Vec[A], Vec[B], Mat[C]] {
 

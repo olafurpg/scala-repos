@@ -76,14 +76,14 @@ trait DerbyProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
-        RelationalCapabilities.pagingNested -
-        JdbcCapabilities.returnInsertOther - SqlCapabilities.sequenceCurr
-        // Cycling is broken in Derby. It cycles to the start value instead of min or max
-        - SqlCapabilities.sequenceCycle - RelationalCapabilities.zip -
-        RelationalCapabilities.joinFull - JdbcCapabilities.insertOrUpdate -
-        RelationalCapabilities.replace - RelationalCapabilities.reverse -
-        JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
-        RelationalCapabilities.repeat)
+      RelationalCapabilities.pagingNested -
+      JdbcCapabilities.returnInsertOther - SqlCapabilities.sequenceCurr
+    // Cycling is broken in Derby. It cycles to the start value instead of min or max
+      - SqlCapabilities.sequenceCycle - RelationalCapabilities.zip -
+      RelationalCapabilities.joinFull - JdbcCapabilities.insertOrUpdate -
+      RelationalCapabilities.replace - RelationalCapabilities.reverse -
+      JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
+      RelationalCapabilities.repeat)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -95,8 +95,8 @@ trait DerbyProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -106,25 +106,27 @@ trait DerbyProfile extends JdbcProfile {
 
   override protected def computeQueryCompiler =
     super.computeQueryCompiler + Phase.rewriteBooleans +
-    Phase.specializeParameters
+      Phase.specializeParameters
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createSequenceDDLBuilder(
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
 
-  override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.BOOLEAN => "SMALLINT"
-    /* Derby does not have a TINYINT type, so we use SMALLINT instead. */
-    case java.sql.Types.TINYINT => "SMALLINT"
-    case _ => super.defaultSqlTypeName(tmd, sym)
-  }
+  override def defaultSqlTypeName(tmd: JdbcType[_],
+                                  sym: Option[FieldSymbol]): String =
+    tmd.sqlType match {
+      case java.sql.Types.BOOLEAN => "SMALLINT"
+      /* Derby does not have a TINYINT type, so we use SMALLINT instead. */
+      case java.sql.Types.TINYINT => "SMALLINT"
+      case _ => super.defaultSqlTypeName(tmd, sym)
+    }
 
   override val scalarFrom = Some("sysibm.sysdummy1")
 

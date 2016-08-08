@@ -41,15 +41,15 @@ object ExpandLibJarsGlobs {
   }
 
   //tree from Duncan McGregor @ http://stackoverflow.com/questions/2637643/how-do-i-list-all-files-in-a-subdirectory-in-scala
-  private[this] def tree(
-      root: File, skipHidden: Boolean = false): Stream[File] =
+  private[this] def tree(root: File,
+                         skipHidden: Boolean = false): Stream[File] =
     if (!root.exists || (skipHidden && root.isHidden)) Stream.empty
     else
       root #::
-      (root.listFiles match {
-            case null => Stream.empty
-            case files => files.toStream.flatMap(tree(_, skipHidden))
-          })
+        (root.listFiles match {
+          case null => Stream.empty
+          case files => files.toStream.flatMap(tree(_, skipHidden))
+        })
 
   def fromGlob(glob: String, filesOnly: Boolean = true): Stream[Path] = {
     import java.nio._
@@ -61,7 +61,8 @@ object ExpandLibJarsGlobs {
 
     val parentPath =
       if (absoluteGlob.getFileName.toString.contains("*"))
-        absoluteGlob.getParent else absoluteGlob
+        absoluteGlob.getParent
+      else absoluteGlob
 
     val pathStream = tree(parentPath.toFile).map(_.toPath)
 

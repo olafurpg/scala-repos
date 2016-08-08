@@ -91,14 +91,16 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
     Array[Row](Row.apply("dave", 42, 1), Row.apply("mary", 222, 2))
   private lazy val schema3 =
     StructType(StructField("name", StringType) :: StructField(
-            "id", IntegerType) :: StructField("seq", IntegerType) :: Nil)
+        "id",
+        IntegerType) :: StructField("seq", IntegerType) :: Nil)
 
   test("Basic CREATE") {
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x2), schema2)
 
     df.write.jdbc(url, "TEST.BASICCREATETEST", new Properties)
-    assert(2 === sqlContext.read
+    assert(
+        2 === sqlContext.read
           .jdbc(url, "TEST.BASICCREATETEST", new Properties)
           .count)
     assert(
@@ -141,7 +143,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
     df2.write
       .mode(SaveMode.Append)
       .jdbc(url, "TEST.APPENDTEST", new Properties)
-    assert(3 === sqlContext.read
+    assert(
+        3 === sqlContext.read
           .jdbc(url, "TEST.APPENDTEST", new Properties)
           .count)
     assert(
@@ -161,7 +164,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
     df2.write
       .mode(SaveMode.Overwrite)
       .jdbc(url1, "TEST.TRUNCATETEST", properties)
-    assert(1 === sqlContext.read
+    assert(
+        1 === sqlContext.read
           .jdbc(url1, "TEST.TRUNCATETEST", properties)
           .count)
     assert(

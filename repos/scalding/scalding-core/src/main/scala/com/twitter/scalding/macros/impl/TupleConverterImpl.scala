@@ -36,8 +36,8 @@ object TupleConverterImpl {
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] =
     caseClassTupleConverterCommonImpl(c, true)
 
-  def caseClassTupleConverterCommonImpl[T](
-      c: Context, allowUnknownTypes: Boolean)(
+  def caseClassTupleConverterCommonImpl[T](c: Context,
+                                           allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] = {
     import c.universe._
 
@@ -47,8 +47,8 @@ object TupleConverterImpl {
       outerTpe.declarations.collect {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
-        accessorMethod.returnType.asSeenFrom(
-            outerTpe, outerTpe.typeSymbol.asClass)
+        accessorMethod.returnType.asSeenFrom(outerTpe,
+                                             outerTpe.typeSymbol.asClass)
       }.toVector
 
     sealed trait ConverterBuilder {
@@ -94,9 +94,8 @@ object TupleConverterImpl {
           PrimitiveBuilder(idx => q"""t.getString($idx)""")
         case tpe if tpe =:= typeOf[String] =>
           // In this case, null is identical to empty, and we always return non-null
-          PrimitiveBuilder(
-              idx =>
-                q"""{val s = t.getString($idx); if (s == null) "" else s}""")
+          PrimitiveBuilder(idx =>
+            q"""{val s = t.getString($idx); if (s == null) "" else s}""")
         case tpe if tpe =:= typeOf[Boolean] =>
           PrimitiveBuilder(idx => q"""t.getBoolean($idx)""")
         case tpe if tpe =:= typeOf[Short] =>

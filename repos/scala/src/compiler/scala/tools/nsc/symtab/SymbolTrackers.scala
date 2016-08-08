@@ -19,7 +19,7 @@ trait SymbolTrackers {
   private implicit lazy val SymbolOrdering: Ordering[Symbol] =
     Ordering by (x => (x.kindString, x.name.toString))
 
-  private implicit def toList[T : Ordering](xs: Set[T]): List[T] =
+  private implicit def toList[T: Ordering](xs: Set[T]): List[T] =
     xs.toList.sorted
 
   /** Reversing the direction of Symbol's owner arrow. */
@@ -144,10 +144,10 @@ trait SymbolTrackers {
           children map (c => c.indentString(indent)) mkString "\n"
         else {
           indicatorString + indent + symString(root) +
-          (if (children.isEmpty) ""
-           else
-             children map (c => c.indentString(indent + "    ")) mkString
-             ("\n", "\n", ""))
+            (if (children.isEmpty) ""
+             else
+               children map (c => c.indentString(indent + "    ")) mkString
+                 ("\n", "\n", ""))
         }
       }
     }
@@ -200,10 +200,10 @@ trait SymbolTrackers {
         } mkString "\n"
 
       "" + hierarchy +
-      (if (removed.isEmpty) ""
-       else
-         "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
-         removedString)
+        (if (removed.isEmpty) ""
+         else
+           "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
+             removedString)
     }
   }
 }

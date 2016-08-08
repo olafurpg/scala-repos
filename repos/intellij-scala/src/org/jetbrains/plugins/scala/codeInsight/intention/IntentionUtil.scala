@@ -5,7 +5,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiComment, PsiDocumentManager, PsiElement, PsiWhiteSpace}
+import com.intellij.psi.{
+  PsiComment,
+  PsiDocumentManager,
+  PsiElement,
+  PsiWhiteSpace
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 
 object IntentionUtil {
@@ -38,7 +43,7 @@ object IntentionUtil {
     val allComments =
       PsiTreeUtil.getChildrenOfTypeAsList(element, classOf[PsiComment])
     allComments.size() > commentsAroundElement.before.size +
-    commentsAroundElement.after.size
+      commentsAroundElement.after.size
   }
 
   def addComments(commentsAroundElement: CommentsAroundElement,
@@ -60,8 +65,8 @@ object IntentionUtil {
     before.foreach(c => parent.getNode.addChild(c.getNode, anchor.getNode))
   }
 
-  case class CommentsAroundElement(
-      before: Seq[PsiElement], after: Seq[PsiElement])
+  case class CommentsAroundElement(before: Seq[PsiElement],
+                                   after: Seq[PsiElement])
 
   def startTemplate(elem: PsiElement,
                     context: PsiElement,

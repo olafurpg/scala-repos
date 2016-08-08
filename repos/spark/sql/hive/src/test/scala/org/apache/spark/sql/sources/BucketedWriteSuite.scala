@@ -31,7 +31,9 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
 
 class BucketedWriteSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   test("bucketed by non-existing column") {
@@ -80,9 +82,8 @@ class BucketedWriteSuite
   def tableDir: File = {
     val identifier =
       hiveContext.sessionState.sqlParser.parseTableIdentifier("bucketed_table")
-    new File(
-        URI.create(hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(identifier)))
+    new File(URI.create(
+        hiveContext.sessionState.catalog.hiveDefaultTableFilePath(identifier)))
   }
 
   /**
@@ -172,8 +173,11 @@ class BucketedWriteSuite
           .saveAsTable("bucketed_table")
 
         for (i <- 0 until 5) {
-          testBucketing(
-              new File(tableDir, s"i=$i"), source, 8, Seq("j"), Seq("k"))
+          testBucketing(new File(tableDir, s"i=$i"),
+                        source,
+                        8,
+                        Seq("j"),
+                        Seq("k"))
         }
       }
     }
@@ -191,7 +195,8 @@ class BucketedWriteSuite
 
   test(
       "write bucketed data with the identical bucketBy and partitionBy columns") {
-    intercept[AnalysisException](df.write
+    intercept[AnalysisException](
+        df.write
           .partitionBy("i")
           .bucketBy(8, "i")
           .saveAsTable("bucketed_table"))
@@ -236,8 +241,10 @@ class BucketedWriteSuite
             .saveAsTable("bucketed_table")
 
           for (i <- 0 until 5) {
-            testBucketing(
-                new File(tableDir, s"i=$i"), source, 8, Seq("j", "k"))
+            testBucketing(new File(tableDir, s"i=$i"),
+                          source,
+                          8,
+                          Seq("j", "k"))
           }
         }
       }

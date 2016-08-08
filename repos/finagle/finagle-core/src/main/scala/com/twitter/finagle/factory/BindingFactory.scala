@@ -24,10 +24,10 @@ private class DynNameFactory[Req, Rep](
 
   private sealed trait State
   private case class Pending(
-      q: immutable.Queue[
-          (ClientConnection, Promise[Service[Req, Rep]], Stopwatch.Elapsed)]
-  )
-      extends State
+      q: immutable.Queue[(ClientConnection,
+                          Promise[Service[Req, Rep]],
+                          Stopwatch.Elapsed)]
+  ) extends State
   private case class Named(name: NameTree[Name.Bound]) extends State
   private case class Failed(exc: Throwable) extends State
   private case class Closed() extends State
@@ -177,8 +177,7 @@ private[finagle] object NameTreeFactory {
     case class Weighted(
         drv: Drv,
         factories: Seq[ServiceFactory[Req, Rep]]
-    )
-        extends ServiceFactory[Req, Rep] {
+    ) extends ServiceFactory[Req, Rep] {
       def apply(conn: ClientConnection) = factories(drv(rng)).apply(conn)
 
       override def status =
@@ -296,15 +295,19 @@ private[finagle] class BindingFactory[Req, Rep](
               // we don't have the dtabs handy at the point we throw
               // the exception; fill them in on the way out
               case e: NoBrokersAvailableException =>
-                Future.exception(new NoBrokersAvailableException(
-                        e.name, baseDtab, localDtab))
+                Future.exception(
+                    new NoBrokersAvailableException(e.name,
+                                                    baseDtab,
+                                                    localDtab))
             }
           }
         }
     }
 
     new ServiceFactoryCache[(Dtab, Dtab), Req, Rep](
-        newFactory, statsReceiver.scope("dtabcache"), maxNamerCacheSize)
+        newFactory,
+        statsReceiver.scope("dtabcache"),
+        maxNamerCacheSize)
   }
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
@@ -381,11 +384,11 @@ object BindingFactory {
       def newStack(errorLabel: String, bound: Name.Bound) = {
         val client = next.make(
             params +
-            // replace the possibly unbound Dest with the definitely bound
-            // Dest because (1) it's needed by AddrMetadataExtraction and
-            // (2) it seems disingenuous not to.
-            Dest(bound) + LoadBalancerFactory.Dest(bound.addr) +
-            LoadBalancerFactory.ErrorLabel(errorLabel))
+              // replace the possibly unbound Dest with the definitely bound
+              // Dest because (1) it's needed by AddrMetadataExtraction and
+              // (2) it seems disingenuous not to.
+              Dest(bound) + LoadBalancerFactory.Dest(bound.addr) +
+              LoadBalancerFactory.ErrorLabel(errorLabel))
 
         boundPathFilter(bound.path) andThen client
       }
@@ -395,8 +398,10 @@ object BindingFactory {
 
         case Name.Path(path) =>
           val BaseDtab(baseDtab) = params[BaseDtab]
-          new BindingFactory(
-              path, newStack(path.show, _), baseDtab, stats.scope("namer"))
+          new BindingFactory(path,
+                             newStack(path.show, _),
+                             baseDtab,
+                             stats.scope("namer"))
       }
 
       Stack.Leaf(role, factory)

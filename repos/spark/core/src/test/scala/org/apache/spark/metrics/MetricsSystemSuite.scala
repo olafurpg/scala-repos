@@ -27,7 +27,9 @@ import org.apache.spark.deploy.master.MasterSource
 import org.apache.spark.metrics.source.Source
 
 class MetricsSystemSuite
-    extends SparkFunSuite with BeforeAndAfter with PrivateMethodTester {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with PrivateMethodTester {
   var filePath: String = _
   var conf: SparkConf = null
   var securityMgr: SecurityManager = null

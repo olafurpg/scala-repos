@@ -54,18 +54,20 @@ object PersistentActorSpec {
           persistAll(Seq(Evt(s"${data}-1"), Evt(s"${data}-2")))(updateState)
         case d: DeleteMessagesSuccess ⇒
           val replyTo = askedForDelete.getOrElse(throw new RuntimeException(
-                  "Received DeleteMessagesSuccess without anyone asking for delete!"))
+              "Received DeleteMessagesSuccess without anyone asking for delete!"))
           replyTo ! d
       }
 
-    override protected def onPersistRejected(
-        cause: Throwable, event: Any, seqNr: Long): Unit =
+    override protected def onPersistRejected(cause: Throwable,
+                                             event: Any,
+                                             seqNr: Long): Unit =
       event match {
         case Evt(data) ⇒ sender() ! s"Rejected: $data"
         case _ ⇒ super.onPersistRejected(cause, event, seqNr)
       }
-    override protected def onPersistFailure(
-        cause: Throwable, event: Any, seqNr: Long): Unit =
+    override protected def onPersistFailure(cause: Throwable,
+                                            event: Any,
+                                            seqNr: Long): Unit =
       event match {
         case Evt(data) ⇒ sender() ! s"Failure: $data"
         case _ ⇒ super.onPersistFailure(cause, event, seqNr)
@@ -232,8 +234,9 @@ object PersistentActorSpec {
       counter
     }
 
-    override protected def onPersistFailure(
-        cause: Throwable, event: Any, seqNr: Long): Unit =
+    override protected def onPersistFailure(cause: Throwable,
+                                            event: Any,
+                                            seqNr: Long): Unit =
       event match {
         case Evt(data) ⇒ sender() ! s"Failure: $data"
         case _ ⇒ super.onPersistFailure(cause, event, seqNr)
@@ -250,7 +253,8 @@ object PersistentActorSpec {
 
           1 to 3 foreach { i ⇒
             persistAsync(Evt(s"$data-${incCounter()}")) { evt ⇒
-              sender() ! ("a" + evt.data.toString.drop(1)) // c-1 => a-1, as in "ack"
+              sender() ! ("a" + evt.data.toString
+                .drop(1)) // c-1 => a-1, as in "ack"
             }
           }
       }
@@ -381,8 +385,8 @@ object PersistentActorSpec {
     }
   }
 
-  class HandleRecoveryFinishedEventPersistentActor(
-      name: String, probe: ActorRef)
+  class HandleRecoveryFinishedEventPersistentActor(name: String,
+                                                   probe: ActorRef)
       extends SnapshottingPersistentActor(name, probe) {
     val sendingRecover: Receive = {
       case msg: SnapshotOffer ⇒
@@ -598,7 +602,8 @@ object PersistentActorSpec {
   }
 
   class StackableTestPersistentActor(val probe: ActorRef)
-      extends StackableTestPersistentActor.BaseActor with PersistentActor
+      extends StackableTestPersistentActor.BaseActor
+      with PersistentActor
       with StackableTestPersistentActor.MixinActor {
     override def persistenceId: String = "StackableTestPersistentActor"
 
@@ -635,8 +640,7 @@ object PersistentActorSpec {
   }
 
   object StackableTestPersistentActor {
-    trait BaseActor extends Actor {
-      this: StackableTestPersistentActor ⇒
+    trait BaseActor extends Actor { this: StackableTestPersistentActor ⇒
       override protected[akka] def aroundPreStart() = {
         probe ! "base aroundPreStart"
         super.aroundPreStart()
@@ -647,8 +651,8 @@ object PersistentActorSpec {
         super.aroundPostStop()
       }
 
-      override protected[akka] def aroundPreRestart(
-          reason: Throwable, message: Option[Any]) = {
+      override protected[akka] def aroundPreRestart(reason: Throwable,
+                                                    message: Option[Any]) = {
         probe ! "base aroundPreRestart"
         super.aroundPreRestart(reason, message)
       }
@@ -658,8 +662,8 @@ object PersistentActorSpec {
         super.aroundPostRestart(reason)
       }
 
-      override protected[akka] def aroundReceive(
-          receive: Receive, message: Any) = {
+      override protected[akka] def aroundReceive(receive: Receive,
+                                                 message: Any) = {
         if (message == "restart" && recoveryFinished) {
           probe ! s"base aroundReceive $message"
         }
@@ -667,8 +671,7 @@ object PersistentActorSpec {
       }
     }
 
-    trait MixinActor extends Actor {
-      this: StackableTestPersistentActor ⇒
+    trait MixinActor extends Actor { this: StackableTestPersistentActor ⇒
       override protected[akka] def aroundPreStart() = {
         probe ! "mixin aroundPreStart"
         super.aroundPreStart()
@@ -679,8 +682,8 @@ object PersistentActorSpec {
         super.aroundPostStop()
       }
 
-      override protected[akka] def aroundPreRestart(
-          reason: Throwable, message: Option[Any]) = {
+      override protected[akka] def aroundPreRestart(reason: Throwable,
+                                                    message: Option[Any]) = {
         probe ! "mixin aroundPreRestart"
         super.aroundPreRestart(reason, message)
       }
@@ -690,8 +693,8 @@ object PersistentActorSpec {
         super.aroundPostRestart(reason)
       }
 
-      override protected[akka] def aroundReceive(
-          receive: Receive, message: Any) = {
+      override protected[akka] def aroundReceive(receive: Receive,
+                                                 message: Any) = {
         if (message == "restart" && recoveryFinished) {
           probe ! s"mixin aroundReceive $message"
         }
@@ -702,7 +705,8 @@ object PersistentActorSpec {
 }
 
 abstract class PersistentActorSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentActorSpec._
 
   override protected def beforeEach() {
@@ -878,7 +882,9 @@ abstract class PersistentActorSpec(config: Config)
       }
 
       val all: Seq[String] =
-        this.receiveN(40).asInstanceOf[Seq[String]] // each command = 1 reply + 3 event-replies
+        this
+          .receiveN(40)
+          .asInstanceOf[Seq[String]] // each command = 1 reply + 3 event-replies
 
       val replies = all.filter(r ⇒ r.count(_ == '-') == 1)
       replies should equal(commands.map(_.data))
@@ -1075,8 +1081,14 @@ abstract class PersistentActorSpec(config: Config)
       expectMsg("I am the stashed")
       expectMsg("I am the recovered")
       persistentActor2 ! GetState
-      expectMsg(List(
-              "a-1", "a-2", "b-41", "b-42", "c-41", "c-42", RecoveryCompleted))
+      expectMsg(
+          List("a-1",
+               "a-2",
+               "b-41",
+               "b-42",
+               "c-41",
+               "c-42",
+               RecoveryCompleted))
     }
     "preserv order of incoming messages" in {
       val persistentActor = namedPersistentActor[StressOrdering]
@@ -1154,8 +1166,11 @@ abstract class PersistentActorSpec(config: Config)
     "allow deeply nested persist calls" in {
       val nestedPersists = 6
 
-      val persistentActor = system.actorOf(Props(
-              classOf[DeeplyNestedPersists], name, nestedPersists, testActor))
+      val persistentActor = system.actorOf(
+          Props(classOf[DeeplyNestedPersists],
+                name,
+                nestedPersists,
+                testActor))
       persistentActor ! "a"
       persistentActor ! "b"
 
@@ -1182,8 +1197,8 @@ abstract class PersistentActorSpec(config: Config)
       persistentActor ! "b"
       persistentActor ! "c"
       val expectedReplies = 2 + (nestedPersistAsyncs * 2)
-      receiveN(expectedReplies).map(_.toString) should beIndependentlyOrdered(
-          "b-", "c-")
+      receiveN(expectedReplies)
+        .map(_.toString) should beIndependentlyOrdered("b-", "c-")
     }
     "allow mixed nesting of persistAsync in persist calls" in {
       val persistentActor = system.actorOf(
@@ -1204,8 +1219,10 @@ abstract class PersistentActorSpec(config: Config)
           List("a-outer-async-1", "a-outer-async-2", "a-inner-1", "a-inner-2"))
     }
     "make sure persist retains promised semantics when nested in persistAsync callback" in {
-      val persistentActor = system.actorOf(Props(
-              classOf[NestedPersistInAsyncEnforcesStashing], name, testActor))
+      val persistentActor = system.actorOf(
+          Props(classOf[NestedPersistInAsyncEnforcesStashing],
+                name,
+                testActor))
       persistentActor ! "a"
 
       expectMsg("a")

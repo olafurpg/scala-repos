@@ -56,15 +56,20 @@ private[spark] object TestUtils {
                            classpathUrls: Seq[URL] = Seq()): URL = {
     val tempDir = Utils.createTempDir()
     val files1 = for (name <- classNames) yield {
-      createCompiledClass(
-          name, tempDir, toStringValue, classpathUrls = classpathUrls)
+      createCompiledClass(name,
+                          tempDir,
+                          toStringValue,
+                          classpathUrls = classpathUrls)
     }
     val files2 = for ((childName, baseName) <- classNamesWithBase) yield {
-      createCompiledClass(
-          childName, tempDir, toStringValue, baseName, classpathUrls)
+      createCompiledClass(childName,
+                          tempDir,
+                          toStringValue,
+                          baseName,
+                          classpathUrls)
     }
-    val jarFile = new File(
-        tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
+    val jarFile =
+      new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
     createJar(files1 ++ files2, jarFile)
   }
 
@@ -96,8 +101,8 @@ private[spark] object TestUtils {
                 jarFile: File,
                 directoryPrefix: Option[String] = None): URL = {
     val jarFileStream = new FileOutputStream(jarFile)
-    val jarStream = new JarOutputStream(
-        jarFileStream, new java.util.jar.Manifest())
+    val jarStream =
+      new JarOutputStream(jarFileStream, new java.util.jar.Manifest())
 
     for (file <- files) {
       val jarEntry = new JarEntry(
@@ -142,8 +147,12 @@ private[spark] object TestUtils {
         Seq()
       }
     compiler
-      .getTask(
-          null, null, null, options.asJava, null, Arrays.asList(sourceFile))
+      .getTask(null,
+               null,
+               null,
+               options.asJava,
+               null,
+               Arrays.asList(sourceFile))
       .call()
 
     val fileName = className + ".class"
@@ -156,8 +165,8 @@ private[spark] object TestUtils {
     // use google's Files.move instead
     Files.move(result, out)
 
-    assert(
-        out.exists(), "Destination file not moved: " + out.getAbsolutePath())
+    assert(out.exists(),
+           "Destination file not moved: " + out.getAbsolutePath())
     out
   }
 
@@ -173,9 +182,9 @@ private[spark] object TestUtils {
     val sourceFile = new JavaSourceFromString(
         className,
         "public class " +
-        className + extendsText + " implements java.io.Serializable {" +
-        "  @Override public String toString() { return \"" + toStringValue +
-        "\"; }}")
+          className + extendsText + " implements java.io.Serializable {" +
+          "  @Override public String toString() { return \"" + toStringValue +
+          "\"; }}")
     createCompiledClass(className, destDir, sourceFile, classpathUrls)
   }
 
@@ -217,7 +226,8 @@ private class SpillListener extends SparkListener {
 
   override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = {
     stageIdToTaskMetrics.getOrElseUpdate(
-        taskEnd.stageId, new ArrayBuffer[TaskMetrics]) += taskEnd.taskMetrics
+        taskEnd.stageId,
+        new ArrayBuffer[TaskMetrics]) += taskEnd.taskMetrics
   }
 
   override def onStageCompleted(

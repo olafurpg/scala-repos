@@ -19,8 +19,12 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 class OffersWantedForReconciliationActorTest
-    extends FunSuite with MarathonActorSupport with Mockito with GivenWhenThen
-    with Matchers with ScalaFutures {
+    extends FunSuite
+    with MarathonActorSupport
+    with Mockito
+    with GivenWhenThen
+    with Matchers
+    with ScalaFutures {
   test("want offers on startup but times out") {
     val f = new Fixture()
 
@@ -64,8 +68,8 @@ class OffersWantedForReconciliationActorTest
     val valAfterDeploymentStepSuccess = f.futureOffersWanted()
     val app =
       AppDefinition(PathId("/resident"), residency = Some(Residency.default))
-    val plan = DeploymentPlan(
-        original = Group.empty.copy(apps = Set(app)), target = Group.empty)
+    val plan = DeploymentPlan(original = Group.empty.copy(apps = Set(app)),
+                              target = Group.empty)
     f.eventStream.publish(
         DeploymentStepSuccess(plan = plan, currentStep = plan.steps.head))
 

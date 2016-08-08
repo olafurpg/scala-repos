@@ -86,15 +86,15 @@ class WeightedPageRank(args: Args) extends Job(args) {
   def getNodes(fileName: String) = {
     mode match {
       case Hdfs(_, conf) => {
-          SequenceFile(fileName).read.mapTo(
-              (0, 1, 2, 3) -> ('src_id, 'dst_ids, 'weights, 'mass_prior)) {
+        SequenceFile(fileName).read
+          .mapTo((0, 1, 2, 3) -> ('src_id, 'dst_ids, 'weights, 'mass_prior)) {
             input: (Int, Array[Int], Array[Float], Double) =>
               input
           }
-        }
+      }
       case _ => {
-          Tsv(fileName).read.mapTo(
-              (0, 1, 2, 3) -> ('src_id, 'dst_ids, 'weights, 'mass_prior)) {
+        Tsv(fileName).read
+          .mapTo((0, 1, 2, 3) -> ('src_id, 'dst_ids, 'weights, 'mass_prior)) {
             input: (Int, String, String, Double) =>
               {
                 (input._1,
@@ -113,7 +113,7 @@ class WeightedPageRank(args: Args) extends Job(args) {
                  input._4)
               }
           }
-        }
+      }
     }
   }
 
@@ -205,7 +205,7 @@ class WeightedPageRank(args: Args) extends Job(args) {
     val randomPagerank = nodeJoined
       .crossWithTiny(deadPagerank)
       .mapTo(('src_id, 'mass_prior, 'deadMass, 'mass_input) ->
-          ('src_id, 'mass_n, 'mass_input)) {
+        ('src_id, 'mass_n, 'mass_input)) {
         ranks: (Int, Double, Double, Double) =>
           (ranks._1, ranks._2 * ALPHA + ranks._3 * (1 - ALPHA), ranks._4)
       }

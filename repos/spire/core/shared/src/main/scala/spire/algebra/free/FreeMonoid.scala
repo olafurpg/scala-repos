@@ -11,8 +11,7 @@ final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>
   def runSemigroup[B](f: A => B)(implicit B: Semigroup[B]): Option[B] =
     terms match {
       case head :: tail =>
-        Some(
-            tail.foldLeft(f(head)) { (acc, a) =>
+        Some(tail.foldLeft(f(head)) { (acc, a) =>
           B.op(acc, f(a))
         })
       case Nil =>

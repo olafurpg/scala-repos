@@ -20,7 +20,11 @@ package org.apache.spark.sql
 import scala.collection.mutable
 
 import org.apache.spark.annotation.Experimental
-import org.apache.spark.sql.execution.streaming.{ContinuousQueryListenerBus, Sink, StreamExecution}
+import org.apache.spark.sql.execution.streaming.{
+  ContinuousQueryListenerBus,
+  Sink,
+  StreamExecution
+}
 import org.apache.spark.sql.util.ContinuousQueryListener
 
 /**
@@ -169,8 +173,9 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /** Start a query */
-  private[sql] def startQuery(
-      name: String, df: DataFrame, sink: Sink): ContinuousQuery = {
+  private[sql] def startQuery(name: String,
+                              df: DataFrame,
+                              sink: Sink): ContinuousQuery = {
     activeQueriesLock.synchronized {
       if (activeQueries.contains(name)) {
         throw new IllegalArgumentException(

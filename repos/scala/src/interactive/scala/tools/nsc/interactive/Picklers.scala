@@ -48,7 +48,7 @@ trait Picklers { self: Global =>
     val bs = sourceFilesSeen(f)
     var start = 0
     while (start < bs.length && start < cs.length &&
-    bs(start) == cs(start)) start += 1
+           bs(start) == cs(start)) start += 1
     var end = bs.length
     var end2 = cs.length
     while (end > start && end2 > start && bs(end - 1) == cs(end2 - 1)) {
@@ -197,8 +197,8 @@ trait Picklers { self: Global =>
     }.asClass(classOf[AskLinkPosItem])
 
   implicit def askDocCommentItem: CondPickler[AskDocCommentItem] =
-    (pkl[Symbol] ~ pkl[SourceFile] ~ pkl[Symbol] ~ pkl[List[
-                (Symbol, SourceFile)]]).wrapped {
+    (pkl[Symbol] ~ pkl[SourceFile] ~ pkl[Symbol] ~ pkl[
+        List[(Symbol, SourceFile)]]).wrapped {
       case sym ~ source ~ site ~ fragments =>
         new AskDocCommentItem(sym, source, site, fragments, new Response)
     } { item =>

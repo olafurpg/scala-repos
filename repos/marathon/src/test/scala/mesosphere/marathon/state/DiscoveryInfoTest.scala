@@ -19,15 +19,15 @@ class DiscoveryInfoTest extends MarathonSpec with Matchers {
     )
     lazy val discoveryInfoWithTwoPorts = DiscoveryInfo(
         ports = Seq(
-              Port(name = "dns", number = 53, protocol = "udp"),
-              Port(name = "http", number = 80, protocol = "tcp")
-          )
+            Port(name = "dns", number = 53, protocol = "udp"),
+            Port(name = "http", number = 80, protocol = "tcp")
+        )
     )
     lazy val discoveryInfoWithTwoPorts2 = DiscoveryInfo(
         ports = Seq(
-              Port(name = "dnsudp", number = 53, protocol = "udp"),
-              Port(name = "dnstcp", number = 53, protocol = "tcp")
-          )
+            Port(name = "dnsudp", number = 53, protocol = "udp"),
+            Port(name = "dnstcp", number = 53, protocol = "tcp")
+        )
     )
   }
 
@@ -165,8 +165,8 @@ class DiscoveryInfoTest extends MarathonSpec with Matchers {
 
     val readResult = Json.fromJson[DiscoveryInfo](Json.parse(json))
     readResult should be(JsError(
-            JsPath() \ "ports",
-            "There may be only one port with a particular port number/protocol combination."))
+        JsPath() \ "ports",
+        "There may be only one port with a particular port number/protocol combination."))
   }
 
   test("Read discovery info with two ports with duplicate name") {

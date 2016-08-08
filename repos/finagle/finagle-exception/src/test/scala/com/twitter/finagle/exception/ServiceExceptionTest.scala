@@ -20,7 +20,7 @@ private[exception] class TestServiceException(
     traceId: Option[Long] = None,
     clientAddress: Option[String] = None,
     sourceAddress: Option[String] = Some(
-          InetAddress.getLoopbackAddress.getHostName),
+        InetAddress.getLoopbackAddress.getHostName),
     cardinality: Option[Int] = None) {
 
   private val ste = new javaSTE("badclass", "badmethod", "badfile", 42)
@@ -45,8 +45,10 @@ private[exception] class TestServiceException(
   }
 
   def verifyJSON(json: String) = {
-    def verify[T](
-        actual: T, expected: T, message: String, previous: Boolean = false) = {
+    def verify[T](actual: T,
+                  expected: T,
+                  message: String,
+                  previous: Boolean = false) = {
       assert(!previous, message + ": variable already set")
       assert(actual == expected, message + ": " + actual)
       true
@@ -92,55 +94,65 @@ private[exception] class TestServiceException(
       mapEntry.getKey match {
         case "name" =>
           assert(jsonValue.isTextual)
-          hasName = verify(
-              jsonValue.textValue, serviceName, "bad service name", hasName)
+          hasName = verify(jsonValue.textValue,
+                           serviceName,
+                           "bad service name",
+                           hasName)
         case "traceId" =>
           assert(jsonValue.isNumber)
-          hasTraceId = verifyOption(
-              jsonValue.longValue, traceId, "bad traceId", hasTraceId, false)
+          hasTraceId = verifyOption(jsonValue.longValue,
+                                    traceId,
+                                    "bad traceId",
+                                    hasTraceId,
+                                    false)
         case "timestamp" =>
           assert(jsonValue.isNumber)
-          hasTimestamp = verifyOption(
-              jsonValue.longValue, time, "incorrect time", hasTimestamp, false)
+          hasTimestamp = verifyOption(jsonValue.longValue,
+                                      time,
+                                      "incorrect time",
+                                      hasTimestamp,
+                                      false)
         case "exceptionContents" => {
-            assert(!hasExceptionContents, "got exception contents >1 times")
-            hasExceptionContents = true
+          assert(!hasExceptionContents, "got exception contents >1 times")
+          hasExceptionContents = true
 
-            assert(jsonValue.isObject)
-            jsonValue.fields.asScala foreach { contentsMapEntry =>
-              val contentsJsonValue = contentsMapEntry.getValue
+          assert(jsonValue.isObject)
+          jsonValue.fields.asScala foreach { contentsMapEntry =>
+            val contentsJsonValue = contentsMapEntry.getValue
 
-              contentsMapEntry.getKey match {
-                case "exceptionClass" =>
-                  assert(contentsJsonValue.isTextual)
-                  hasExceptionClass = verify(contentsJsonValue.textValue,
-                                             "java.lang.Throwable",
-                                             "bad exception class",
-                                             hasExceptionClass)
-                case "message" =>
-                  assert(contentsJsonValue.isTextual)
-                  hasMessage = verify(contentsJsonValue.textValue,
-                                      exceptionMessage,
-                                      "bad excepution message",
-                                      hasMessage)
-                case "stackTrace" =>
-                  assert(contentsJsonValue.isTextual)
-                  hasStackTrace = verify(contentsJsonValue.textValue,
-                                         ste.toString + "\n" + ste.toString,
-                                         "bad stacktrace",
-                                         hasStackTrace)
-                case a => fail(a, "exception contents")
-              }
+            contentsMapEntry.getKey match {
+              case "exceptionClass" =>
+                assert(contentsJsonValue.isTextual)
+                hasExceptionClass = verify(contentsJsonValue.textValue,
+                                           "java.lang.Throwable",
+                                           "bad exception class",
+                                           hasExceptionClass)
+              case "message" =>
+                assert(contentsJsonValue.isTextual)
+                hasMessage = verify(contentsJsonValue.textValue,
+                                    exceptionMessage,
+                                    "bad excepution message",
+                                    hasMessage)
+              case "stackTrace" =>
+                assert(contentsJsonValue.isTextual)
+                hasStackTrace = verify(contentsJsonValue.textValue,
+                                       ste.toString + "\n" + ste.toString,
+                                       "bad stacktrace",
+                                       hasStackTrace)
+              case a => fail(a, "exception contents")
             }
           }
+        }
         case "peer" =>
           assert(jsonValue.isTextual)
-          hasClient = verifyOption(
-              jsonValue.textValue, clientAddress, "peer", hasClient)
+          hasClient =
+            verifyOption(jsonValue.textValue, clientAddress, "peer", hasClient)
         case "sourceAddress" =>
           assert(jsonValue.isTextual)
-          hasSource = verifyOption(
-              jsonValue.textValue, sourceAddress, "source", hasSource)
+          hasSource = verifyOption(jsonValue.textValue,
+                                   sourceAddress,
+                                   "source",
+                                   hasSource)
         case "cardinality" =>
           assert(jsonValue.isNumber)
           hasCardinality = verifyOption(jsonValue.intValue, cardinality map {
@@ -172,8 +184,10 @@ private[exception] class TestServiceException(
 
 class ServiceExceptionTest extends FunSuite {
   test("with no endpoint reporting serialize to JSON in the proper format") {
-    val tse = new TestServiceException(
-        "service16", "my cool message", Some(Time.now), Some(124564L))
+    val tse = new TestServiceException("service16",
+                                       "my cool message",
+                                       Some(Time.now),
+                                       Some(124564L))
     assert(tse.verifyJSON(tse.serviceException.toJson))
   }
 

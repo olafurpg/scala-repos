@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -68,7 +68,8 @@ import scalaz.syntax.std.either._
 import scala.collection.JavaConverters._
 
 class MongoQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with MongoColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig
+    with MongoColumnarTableModuleConfig {
   val logPrefix = "mongo"
 
   def mongoServer: String = config[String]("mongo.server", "localhost:27017")
@@ -84,18 +85,20 @@ object MongoQueryExecutor {
             jobActorSystem: ActorSystem)(
       implicit ec: ExecutionContext,
       M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] = {
-    new MongoQueryExecutor(
-        new MongoQueryExecutorConfig(config), jobManager, jobActorSystem)
+    new MongoQueryExecutor(new MongoQueryExecutorConfig(config),
+                           jobManager,
+                           jobActorSystem)
   }
 }
 
 class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                          val jobManager: JobManager[Future],
                          val jobActorSystem: ActorSystem)(
-    implicit val executionContext: ExecutionContext, val M: Monad[Future])
-    extends StandaloneQueryExecutor with MongoColumnarTableModule
-    with Logging {
-  platform =>
+    implicit val executionContext: ExecutionContext,
+    val M: Monad[Future])
+    extends StandaloneQueryExecutor
+    with MongoColumnarTableModule
+    with Logging { platform =>
   type YggConfig = MongoQueryExecutorConfig
 
   val includeIdField = yggConfig.includeIdField
@@ -123,10 +126,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         path.elements.toList match {
           case dbName :: collectionName :: Nil =>
             val db = Table.mongo.getDB(dbName)
-            success(JNum(db
-                      .getCollection(collectionName)
-                      .getStats
-                      .getLong("count")))
+            success(JNum(
+                db.getCollection(collectionName).getStats.getLong("count")))
 
           case _ =>
             success(JNum(0))
@@ -135,8 +136,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         case t => logger.error("Failure during size", t)
       }
 
-    def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] =
+    def browse(userUID: String,
+               path: Path): Future[Validation[String, JArray]] =
       Future {
         path.elements.toList match {
           case Nil =>
@@ -163,8 +164,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                 if (db == null) JArray(Nil)
                 else
                   db.getCollectionNames.asScala.map { d =>
-                d + "/"
-              }.toList.sorted.serialize.asInstanceOf[JArray])
+                    d + "/"
+                  }.toList.sorted.serialize.asInstanceOf[JArray])
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))
@@ -177,12 +178,15 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         case t => logger.error("Failure during browse", t)
       }
 
-    def structure(userUID: String, path: Path, cpath: CPath)
-      : Future[Validation[String, JObject]] = Promise.successful(
-        Success(JObject(Map(
-                    "children" -> JArray.empty,
-                    "types" -> JObject.empty))) // TODO: How to implement this?
-    )
+    def structure(userUID: String,
+                  path: Path,
+                  cpath: CPath): Future[Validation[String, JObject]] =
+      Promise.successful(
+          Success(
+              JObject(Map(
+                  "children" -> JArray.empty,
+                  "types" -> JObject.empty))) // TODO: How to implement this?
+      )
 
     def currentVersion(apiKey: APIKey, path: Path) = Promise.successful(None)
     def currentAuthorities(apiKey: APIKey, path: Path) =

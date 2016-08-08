@@ -42,7 +42,8 @@ object ColumnConstraints {
 }
 
 class ColumnConstraints(
-    override val delegate: jfxsl.ColumnConstraints = new jfxsl.ColumnConstraints)
+    override val delegate: jfxsl.ColumnConstraints =
+      new jfxsl.ColumnConstraints)
     extends ConstraintsBase(delegate)
     with SFXDelegate[jfxsl.ColumnConstraints] {
 
@@ -67,8 +68,12 @@ class ColumnConstraints(
            halignment: jfxg.HPos,
            fillWidth: Boolean) =
     this(
-        new jfxsl.ColumnConstraints(
-            minWidth, prefWidth, maxWidth, hgrow, halignment, fillWidth))
+        new jfxsl.ColumnConstraints(minWidth,
+                                    prefWidth,
+                                    maxWidth,
+                                    hgrow,
+                                    halignment,
+                                    fillWidth))
 
   /**
     * The horizontal fill policy for the column.

@@ -85,7 +85,8 @@ class TestActor(queue: BlockingDeque[TestActor.Message]) extends Actor {
         case other ⇒ other
       }
       val observe =
-        ignore map (ignoreFunc ⇒ !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
+        ignore map (ignoreFunc ⇒
+                      !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
       if (observe) queue.offerLast(RealMessage(x, sender()))
   }
 
@@ -331,7 +332,8 @@ trait TestKitBase {
     val prev_end = end
     end = start + max_diff
 
-    val ret = try f finally end = prev_end
+    val ret = try f
+    finally end = prev_end
 
     val diff = now - start
     assert(
@@ -376,13 +378,14 @@ trait TestKitBase {
   def expectMsg[T](max: FiniteDuration, hint: String, obj: T): T =
     expectMsg_internal(max.dilated, obj, Some(hint))
 
-  private def expectMsg_internal[T](
-      max: Duration, obj: T, hint: Option[String] = None): T = {
+  private def expectMsg_internal[T](max: Duration,
+                                    obj: T,
+                                    hint: Option[String] = None): T = {
     val o = receiveOne(max)
     val hintOrEmptyString = hint.map(": " + _).getOrElse("")
     assert(o ne null,
            s"timeout ($max) during expectMsg while waiting for $obj" +
-           hintOrEmptyString)
+             hintOrEmptyString)
     assert(obj == o, s"expected $obj, found $o" + hintOrEmptyString)
     o.asInstanceOf[T]
   }
@@ -412,8 +415,8 @@ trait TestKitBase {
     *
     * @return the received Terminated message
     */
-  def expectTerminated(
-      target: ActorRef, max: Duration = Duration.Undefined): Terminated =
+  def expectTerminated(target: ActorRef,
+                       max: Duration = Duration.Undefined): Terminated =
     expectMsgPF(max, "Terminated " + target) {
       case t @ Terminated(`target`) ⇒ t
     }
@@ -433,8 +436,8 @@ trait TestKitBase {
     @tailrec
     def recv: Any = {
       val o = receiveOne(end - now)
-      assert(
-          o ne null, s"timeout (${_max}) during fishForMessage, hint: $hint")
+      assert(o ne null,
+             s"timeout (${_max}) during fishForMessage, hint: $hint")
       assert(f.isDefinedAt(o),
              s"fishForMessage($hint) found unexpected message $o")
       if (f(o)) o else recv
@@ -446,8 +449,8 @@ trait TestKitBase {
     * Same as `expectMsgType[T](remainingOrDefault)`, but correctly treating the timeFactor.
     */
   def expectMsgType[T](implicit t: ClassTag[T]): T =
-    expectMsgClass_internal(
-        remainingOrDefault, t.runtimeClass.asInstanceOf[Class[T]])
+    expectMsgClass_internal(remainingOrDefault,
+                            t.runtimeClass.asInstanceOf[Class[T]])
 
   /**
     * Receive one message from the test actor and assert that it conforms to the
@@ -523,13 +526,12 @@ trait TestKitBase {
   def expectMsgAnyClassOf[C](max: FiniteDuration, obj: Class[_ <: C]*): C =
     expectMsgAnyClassOf_internal(max.dilated, obj: _*)
 
-  private def expectMsgAnyClassOf_internal[C](
-      max: FiniteDuration, obj: Class[_ <: C]*): C = {
+  private def expectMsgAnyClassOf_internal[C](max: FiniteDuration,
+                                              obj: Class[_ <: C]*): C = {
     val o = receiveOne(max)
-    assert(
-        o ne null,
-        s"timeout ($max) during expectMsgAnyClassOf waiting for ${obj.mkString(
-            "(", ", ", ")")}")
+    assert(o ne null,
+           s"timeout ($max) during expectMsgAnyClassOf waiting for ${obj
+             .mkString("(", ", ", ")")}")
     assert(obj exists (c ⇒ BoxedType(c) isInstance o), s"found unexpected $o")
     o.asInstanceOf[C]
   }
@@ -562,18 +564,21 @@ trait TestKitBase {
                                         unexpectedMessage: String): Unit = {
     assert(missing.isEmpty && unexpected.isEmpty,
            (if (missing.isEmpty)
-              "" else missing.mkString(missingMessage + " [", ", ", "] ")) +
-           (if (unexpected.isEmpty) ""
-            else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
+              ""
+            else missing.mkString(missingMessage + " [", ", ", "] ")) +
+             (if (unexpected.isEmpty) ""
+              else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
   }
 
-  private def expectMsgAllOf_internal[T](
-      max: FiniteDuration, obj: T*): immutable.Seq[T] = {
+  private def expectMsgAllOf_internal[T](max: FiniteDuration,
+                                         obj: T*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
     val missing = obj filterNot (x ⇒ recv exists (x == _))
     val unexpected = recv filterNot (x ⇒ obj exists (x == _))
-    checkMissingAndUnexpected(
-        missing, unexpected, "not found", "found unexpected")
+    checkMissingAndUnexpected(missing,
+                              unexpected,
+                              "not found",
+                              "found unexpected")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -591,18 +596,21 @@ trait TestKitBase {
     * Wait time is bounded by the given duration, with an AssertionFailure
     * being thrown in case of timeout.
     */
-  def expectMsgAllClassOf[T](
-      max: FiniteDuration, obj: Class[_ <: T]*): immutable.Seq[T] =
+  def expectMsgAllClassOf[T](max: FiniteDuration,
+                             obj: Class[_ <: T]*): immutable.Seq[T] =
     internalExpectMsgAllClassOf(max.dilated, obj: _*)
 
   private def internalExpectMsgAllClassOf[T](
-      max: FiniteDuration, obj: Class[_ <: T]*): immutable.Seq[T] = {
+      max: FiniteDuration,
+      obj: Class[_ <: T]*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
     val missing = obj filterNot (x ⇒ recv exists (_.getClass eq BoxedType(x)))
     val unexpected =
       recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) eq x.getClass))
-    checkMissingAndUnexpected(
-        missing, unexpected, "not found", "found non-matching object(s)")
+    checkMissingAndUnexpected(missing,
+                              unexpected,
+                              "not found",
+                              "found non-matching object(s)")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -623,18 +631,21 @@ trait TestKitBase {
     * Beware that one object may satisfy all given class constraints, which
     * may be counter-intuitive.
     */
-  def expectMsgAllConformingOf[T](
-      max: FiniteDuration, obj: Class[_ <: T]*): immutable.Seq[T] =
+  def expectMsgAllConformingOf[T](max: FiniteDuration,
+                                  obj: Class[_ <: T]*): immutable.Seq[T] =
     internalExpectMsgAllConformingOf(max.dilated, obj: _*)
 
   private def internalExpectMsgAllConformingOf[T](
-      max: FiniteDuration, obj: Class[_ <: T]*): immutable.Seq[T] = {
+      max: FiniteDuration,
+      obj: Class[_ <: T]*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
     val missing = obj filterNot (x ⇒ recv exists (BoxedType(x) isInstance _))
     val unexpected =
       recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) isInstance x))
-    checkMissingAndUnexpected(
-        missing, unexpected, "not found", "found non-matching object(s)")
+    checkMissingAndUnexpected(missing,
+                              unexpected,
+                              "not found",
+                              "found non-matching object(s)")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -862,7 +873,8 @@ object TestKit {
                           duration: Duration = 10.seconds,
                           verifySystemShutdown: Boolean = false): Unit = {
     actorSystem.terminate()
-    try Await.ready(actorSystem.whenTerminated, duration) catch {
+    try Await.ready(actorSystem.whenTerminated, duration)
+    catch {
       case _: TimeoutException ⇒
         val msg = "Failed to stop [%s] within [%s] \n%s".format(
             actorSystem.name,
@@ -919,13 +931,11 @@ object TestProbe {
     new TestProbe(system, name)
 }
 
-trait ImplicitSender {
-  this: TestKitBase ⇒
+trait ImplicitSender { this: TestKitBase ⇒
   implicit def self = testActor
 }
 
-trait DefaultTimeout {
-  this: TestKitBase ⇒
+trait DefaultTimeout { this: TestKitBase ⇒
   implicit val timeout: Timeout = testKitSettings.DefaultTimeout
 }
 

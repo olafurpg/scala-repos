@@ -13,7 +13,8 @@ class UdpConnectedIntegrationSpec
     extends AkkaSpec("""
     akka.loglevel = INFO
     akka.actor.serialize-creators = on
-    """) with ImplicitSender {
+    """)
+    with ImplicitSender {
 
   val addresses = temporaryServerAddresses(3, udp = true)
 

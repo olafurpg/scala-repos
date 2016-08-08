@@ -62,18 +62,19 @@ object Round extends LilaController with TheftPrevention {
   private def renderPlayer(pov: Pov)(implicit ctx: Context): Fu[Result] =
     negotiate(
         html = pov.game.started.fold(
-              PreventTheft(pov) {
+            PreventTheft(pov) {
               myTour(pov.game.tournamentId, true) zip
-              (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+                (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
                 .crosstableApi(pov.game) zip
-              (pov.game.isSwitchable ?? otherPovs(pov.game)) flatMap {
+                (pov.game.isSwitchable ?? otherPovs(pov.game)) flatMap {
                 case (((tour, simul), crosstable), playing) =>
                   simul foreach Env.simul.api.onPlayerConnection(pov.game,
                                                                  ctx.me)
                   Env.api.roundApi
                     .player(pov, lila.api.Mobile.Api.currentVersion) map {
                     data =>
-                      Ok(html.round.player(
+                      Ok(
+                          html.round.player(
                               pov,
                               data,
                               tour = tour,
@@ -81,20 +82,19 @@ object Round extends LilaController with TheftPrevention {
                               cross = crosstable,
                               playing = playing,
                               prefs = ctx.isAuth option
-                                (Env.pref.forms miniPrefOf ctx.pref)))
+                                  (Env.pref.forms miniPrefOf ctx.pref)))
                   }
               }
             }.mon(_.http.response.player.website),
-              notFound
-          ),
-        api = apiVersion =>
-            {
-            if (isTheft(pov)) fuccess(theftResponse)
-            else
-              Env.api.roundApi
-                .player(pov, apiVersion)
-                .map { Ok(_) }
-                .mon(_.http.response.player.mobile)
+            notFound
+        ),
+        api = apiVersion => {
+          if (isTheft(pov)) fuccess(theftResponse)
+          else
+            Env.api.roundApi
+              .player(pov, apiVersion)
+              .map { Ok(_) }
+              .mon(_.http.response.player.mobile)
         }
     ) map NoCache
 
@@ -115,8 +115,8 @@ object Round extends LilaController with TheftPrevention {
       }
   }
 
-  private def getNext(currentGame: GameModel)(
-      povs: List[Pov])(implicit ctx: Context) =
+  private def getNext(currentGame: GameModel)(povs: List[Pov])(
+      implicit ctx: Context) =
     povs find { pov =>
       pov.isMyTurn && (pov.game.hasClock || !currentGame.hasClock)
     }
@@ -179,19 +179,20 @@ object Round extends LilaController with TheftPrevention {
                 Analyse.replay(pov, userTv = userTv)
               else if (HTTPRequest.isHuman(ctx.req))
                 myTour(pov.game.tournamentId, false) zip
-                (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+                  (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
                   .crosstableApi(pov.game) zip Env.api.roundApi.watcher(
                     pov,
                     lila.api.Mobile.Api.currentVersion,
                     tv = none,
                     withOpening = false) map {
                   case (((tour, simul), crosstable), data) =>
-                    Ok(html.round.watcher(pov,
-                                          data,
-                                          tour,
-                                          simul,
-                                          crosstable,
-                                          userTv = userTv))
+                    Ok(
+                        html.round.watcher(pov,
+                                           data,
+                                           tour,
+                                           simul,
+                                           crosstable,
+                                           userTv = userTv))
                 } else
                 // web crawlers don't need the full thing
                 GameRepo.initialFen(pov.game.id) zip Env.game.crosstableApi(
@@ -202,8 +203,8 @@ object Round extends LilaController with TheftPrevention {
                 }
             }.mon(_.http.response.watcher.website),
             api = apiVersion =>
-                Env.api.roundApi.watcher(
-                    pov, apiVersion, tv = none, withOpening = false) map {
+              Env.api.roundApi
+                .watcher(pov, apiVersion, tv = none, withOpening = false) map {
                 Ok(_)
             }
         ) map NoCache
@@ -248,8 +249,8 @@ object Round extends LilaController with TheftPrevention {
 
   private def sides(pov: Pov, isPlayer: Boolean)(implicit ctx: Context) =
     myTour(pov.game.tournamentId, isPlayer) zip
-    (pov.game.simulId ?? Env.simul.repo.find) zip GameRepo.initialFen(pov.game) zip Env.game
-      .crosstableApi(pov.game) map {
+      (pov.game.simulId ?? Env.simul.repo.find) zip GameRepo.initialFen(
+        pov.game) zip Env.game.crosstableApi(pov.game) map {
       case (((tour, simul), initialFen), crosstable) =>
         Ok(html.game.sides(pov, initialFen, tour, crosstable, simul))
     }
@@ -259,7 +260,7 @@ object Round extends LilaController with TheftPrevention {
       Redirect(
           "%s?fen=%s#%s".format(routes.Lobby.home(),
                                 get("fen") |
-                                (chess.format.Forsyth >> game.toChess),
+                                  (chess.format.Forsyth >> game.toChess),
                                 mode))
     }
   }

@@ -15,7 +15,8 @@ object Test extends ScaladocModelTest {
 
     def isShadowed(mbr: MemberEntity): Boolean =
       mbr.byConversion
-        .map(_.source.implicitsShadowing
+        .map(
+            _.source.implicitsShadowing
               .get(mbr)
               .map(_.isShadowed)
               .getOrElse(false))

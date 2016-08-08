@@ -61,7 +61,7 @@ private[sql] object JDBCRelation {
     // Here we get a little roundoff, but that's (hopefully) OK.
     val stride: Long =
       (partitioning.upperBound / numPartitions -
-          partitioning.lowerBound / numPartitions)
+        partitioning.lowerBound / numPartitions)
     var i: Int = 0
     var currentValue: Long = partitioning.lowerBound
     var ans = new ArrayBuffer[Partition]()
@@ -85,13 +85,15 @@ private[sql] object JDBCRelation {
   }
 }
 
-private[sql] case class JDBCRelation(url: String,
-                                     table: String,
-                                     parts: Array[Partition],
-                                     properties: Properties = new Properties(
-                                           ))(
-    @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedFilteredScan with InsertableRelation {
+private[sql] case class JDBCRelation(
+    url: String,
+    table: String,
+    parts: Array[Partition],
+    properties: Properties = new Properties(
+        ))(@transient val sqlContext: SQLContext)
+    extends BaseRelation
+    with PrunedFilteredScan
+    with InsertableRelation {
 
   override val needConversion: Boolean = false
 
@@ -103,8 +105,8 @@ private[sql] case class JDBCRelation(url: String,
     filters.filter(JDBCRDD.compileFilter(_).isEmpty)
   }
 
-  override def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
+  override def buildScan(requiredColumns: Array[String],
+                         filters: Array[Filter]): RDD[Row] = {
     // Rely on a type erasure hack to pass RDD[InternalRow] back as RDD[Row]
     JDBCRDD
       .scanTable(sqlContext.sparkContext,

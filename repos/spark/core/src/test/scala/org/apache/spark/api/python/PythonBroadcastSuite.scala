@@ -30,7 +30,9 @@ import org.apache.spark.util.Utils
 // This test suite uses SharedSparkContext because we need a SparkEnv in order to deserialize
 // a PythonBroadcast:
 class PythonBroadcastSuite
-    extends SparkFunSuite with Matchers with SharedSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with SharedSparkContext {
   test("PythonBroadcast can be serialized with Kryo (SPARK-4882)") {
     val tempDir = Utils.createTempDir()
     val broadcastedString = "Hello, world!"
@@ -51,8 +53,9 @@ class PythonBroadcastSuite
       val broadcast = new PythonBroadcast(broadcastDataFile.getAbsolutePath)
       assertBroadcastIsValid(broadcast)
       val conf = new SparkConf().set("spark.kryo.registrationRequired", "true")
-      val deserializedBroadcast = Utils.clone[PythonBroadcast](
-          broadcast, new KryoSerializer(conf).newInstance())
+      val deserializedBroadcast =
+        Utils.clone[PythonBroadcast](broadcast,
+                                     new KryoSerializer(conf).newInstance())
       assertBroadcastIsValid(deserializedBroadcast)
     } finally {
       Utils.deleteRecursively(tempDir)

@@ -34,9 +34,11 @@ package object swagger {
     @deprecated(
         "because of swagger spec 1.2 this got renamed to ApiModelProperty",
         "2.2.2")
-    type ApiProperty = org.scalatra.swagger.runtime.annotations.ApiModelProperty @field
+    type ApiProperty =
+      org.scalatra.swagger.runtime.annotations.ApiModelProperty @field
 
-    type ApiModelProperty = org.scalatra.swagger.runtime.annotations.ApiModelProperty @field
+    type ApiModelProperty =
+      org.scalatra.swagger.runtime.annotations.ApiModelProperty @field
 
     type ApiModel = org.scalatra.swagger.runtime.annotations.ApiModel
     type XmlRootElement = javax.xml.bind.annotation.XmlRootElement

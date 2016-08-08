@@ -53,7 +53,7 @@ object Game extends LilaController {
               Ok.chunked(Env.api.pgnDump exportUserGames userId)
                 .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                              CONTENT_DISPOSITION ->
-                             ("attachment; filename=" +
+                               ("attachment; filename=" +
                                  s"lichess_${me.username}_$date.pgn"))
           })
     else notFound

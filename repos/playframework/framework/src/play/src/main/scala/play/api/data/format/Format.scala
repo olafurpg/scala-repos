@@ -13,7 +13,8 @@ import annotation.implicitNotFound
   * Handles field binding and unbinding.
   */
 @implicitNotFound(
-    msg = "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
+    msg =
+      "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
 )
 trait Formatter[T] {
 
@@ -85,9 +86,11 @@ object Formats {
     * @param key Key name of the field to parse
     * @param data Field data
     */
-  private def parsing[T](
-      parse: String => T, errMsg: String, errArgs: Seq[Any])(
-      key: String, data: Map[String, String]): Either[Seq[FormError], T] = {
+  private def parsing[T](parse: String => T,
+                         errMsg: String,
+                         errArgs: Seq[Any])(
+      key: String,
+      data: Map[String, String]): Either[Seq[FormError], T] = {
     stringFormat.bind(key, data).right.flatMap { s =>
       scala.util.control.Exception
         .allCatch[T]
@@ -97,8 +100,8 @@ object Formats {
     }
   }
 
-  private def numberFormatter[T](
-      convert: String => T, real: Boolean = false): Formatter[T] = {
+  private def numberFormatter[T](convert: String => T,
+                                 real: Boolean = false): Formatter[T] = {
     val (formatString, errorString) =
       if (real) ("format.real", "error.real")
       else ("format.numeric", "error.number")
@@ -184,8 +187,8 @@ object Formats {
         Map(
             key -> precision
               .map({ p =>
-            value.setScale(p._2)
-          })
+                value.setScale(p._2)
+              })
               .getOrElse(value)
               .toString)
     }
@@ -237,7 +240,8 @@ object Formats {
         parsing(dateParse, "error.date", Nil)(key, data)
 
       def unbind(key: String, value: Date) =
-        Map(key -> formatter.print(
+        Map(
+            key -> formatter.print(
                 new org.joda.time.DateTime(value).withZone(jodaTimeZone)))
     }
 
@@ -284,9 +288,9 @@ object Formats {
     * @param pattern a date pattern as specified in `org.joda.time.format.DateTimeFormat`.
     * @param timeZone the `org.joda.time.DateTimeZone` to use for parsing and formatting
     */
-  def jodaDateTimeFormat(
-      pattern: String,
-      timeZone: org.joda.time.DateTimeZone = org.joda.time.DateTimeZone.getDefault)
+  def jodaDateTimeFormat(pattern: String,
+                         timeZone: org.joda.time.DateTimeZone =
+                           org.joda.time.DateTimeZone.getDefault)
     : Formatter[org.joda.time.DateTime] =
     new Formatter[org.joda.time.DateTime] {
 

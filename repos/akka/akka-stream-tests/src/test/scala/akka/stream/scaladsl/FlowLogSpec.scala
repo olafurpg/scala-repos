@@ -128,8 +128,8 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
       "log upstream failure" in {
         val cause = new TestException
         Source.failed(cause).log("flow-4").runWith(Sink.ignore)
-        logProbe.expectMsg(Logging.Error(
-                cause, LogSrc, LogClazz, "[flow-4] Upstream failed."))
+        logProbe.expectMsg(Logging
+          .Error(cause, LogSrc, LogClazz, "[flow-4] Upstream failed."))
       }
 
       "allow passing in custom LoggingAdapter" in {
@@ -170,9 +170,9 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
           .withAttributes(logAttrs)
           .runWith(Sink.ignore)
         logProbe.expectMsg(Logging.Debug(
-                LogSrc,
-                LogClazz,
-                "[flow-6e] Upstream failed, cause: FlowLogSpec$TestException: Boom!"))
+            LogSrc,
+            LogClazz,
+            "[flow-6e] Upstream failed, cause: FlowLogSpec$TestException: Boom!"))
       }
 
       "follow supervision strategy when exception thrown" in {

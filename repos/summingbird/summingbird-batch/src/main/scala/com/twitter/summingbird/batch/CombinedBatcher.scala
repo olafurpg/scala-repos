@@ -26,8 +26,9 @@ import com.twitter.algebird.ExclusiveUpper
   * the BatchID so that the BatchIDs are contiguous. The BatchID of
   * beforeBound is before.batchOf(beforeBound - 1ms) + 1
   */
-class CombinedBatcher(
-    before: Batcher, beforeBound: ExclusiveUpper[Timestamp], after: Batcher)
+class CombinedBatcher(before: Batcher,
+                      beforeBound: ExclusiveUpper[Timestamp],
+                      after: Batcher)
     extends Batcher {
   import OrderedFromOrderingExt._
   val batchAtBound: BatchID = before.batchOf(beforeBound.upper.prev) + 1L

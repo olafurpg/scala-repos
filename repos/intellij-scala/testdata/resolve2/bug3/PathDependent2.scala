@@ -18,7 +18,8 @@ trait K { self: Z =>
 
   x match {
     case U(u) =>
-      /* line: 26 */ foo(u)
+      /* line: 26 */
+      foo(u)
   }
 
   def foo(t: T) = 1

@@ -88,8 +88,10 @@ sealed abstract class Marshaller[-A, +B] {
 
 //# marshaller-creation
 object Marshaller
-    extends GenericMarshallers with PredefinedToEntityMarshallers
-    with PredefinedToResponseMarshallers with PredefinedToRequestMarshallers {
+    extends GenericMarshallers
+    with PredefinedToEntityMarshallers
+    with PredefinedToResponseMarshallers
+    with PredefinedToRequestMarshallers {
 
   /**
     * Creates a [[Marshaller]] from the given function.
@@ -98,7 +100,8 @@ object Marshaller
     : Marshaller[A, B] =
     new Marshaller[A, B] {
       def apply(value: A)(implicit ec: ExecutionContext) =
-        try f(ec)(value) catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
+        try f(ec)(value)
+        catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
     }
 
   /**
@@ -115,7 +118,7 @@ object Marshaller
     */
   def oneOf[A, B](marshallers: Marshaller[A, B]*): Marshaller[A, B] =
     Marshaller { implicit ec ⇒ a ⇒
-      FastFuture.sequence(marshallers.map(_ (a))).fast.map(_.flatten.toList)
+      FastFuture.sequence(marshallers.map(_(a))).fast.map(_.flatten.toList)
     }
 
   /**
@@ -155,8 +158,8 @@ object Marshaller
     * Helper for creating a [[Marshaller]] combined of the provided `marshal` function
     * and an implicit Marshaller which is able to produce the required final type.
     */
-  def combined[A, B, C](
-      marshal: A ⇒ B)(implicit m2: Marshaller[B, C]): Marshaller[A, C] =
+  def combined[A, B, C](marshal: A ⇒ B)(
+      implicit m2: Marshaller[B, C]): Marshaller[A, C] =
     Marshaller[A, C] { ec ⇒ a ⇒
       m2.compose(marshal).apply(a)(ec)
     }

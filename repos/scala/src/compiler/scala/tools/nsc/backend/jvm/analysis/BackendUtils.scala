@@ -35,7 +35,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
   class AsmAnalyzer[V <: Value](methodNode: MethodNode,
                                 classInternalName: InternalName,
                                 val analyzer: Analyzer[V] = new Analyzer(
-                                      new BasicInterpreter)) {
+                                    new BasicInterpreter)) {
     computeMaxLocalsMaxStack(methodNode)
     analyzer.analyze(classInternalName, methodNode)
     def frameAt(instruction: AbstractInsnNode): Frame[V] =
@@ -68,15 +68,15 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       size(method) < sourceValueSizeLimit
   }
 
-  class ProdConsAnalyzer(
-      val methodNode: MethodNode, classInternalName: InternalName)
+  class ProdConsAnalyzer(val methodNode: MethodNode,
+                         classInternalName: InternalName)
       extends AsmAnalyzer(methodNode,
                           classInternalName,
                           new Analyzer(new InitialProducerSourceInterpreter))
       with ProdConsAnalyzerImpl
 
-  class NonLubbingTypeFlowAnalyzer(
-      val methodNode: MethodNode, classInternalName: InternalName)
+  class NonLubbingTypeFlowAnalyzer(val methodNode: MethodNode,
+                                   classInternalName: InternalName)
       extends AsmAnalyzer(methodNode,
                           classInternalName,
                           new Analyzer(new NonLubbingTypeFlowInterpreter))
@@ -112,8 +112,9 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
                               null)
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0)
-      mv.visitInvokeDynamicInsn(
-          "lambdaDeserialize", serlamObjDesc, lambdaDeserializeBootstrapHandle)
+      mv.visitInvokeDynamicInsn("lambdaDeserialize",
+                                serlamObjDesc,
+                                lambdaDeserializeBootstrapHandle)
       mv.visitInsn(ARETURN)
       mv.visitEnd()
     }
@@ -125,8 +126,8 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     * a boolean indicating if the instruction list contains an instantiation of a serializable SAM
     * type.
     */
-  def cloneInstructions(
-      methodNode: MethodNode, labelMap: Map[LabelNode, LabelNode])
+  def cloneInstructions(methodNode: MethodNode,
+                        labelMap: Map[LabelNode, LabelNode])
     : (InsnList, Map[AbstractInsnNode, AbstractInsnNode], Boolean) = {
     val javaLabelMap = labelMap.asJava
     val result = new InsnList
@@ -185,10 +186,10 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       val args = Type.getArgumentTypes(insn.desc)
       args.length == 1 &&
       (srBoxesRuntimeBoxToMethods.get(primitiveAsmTypeToBType(args(0))) match {
-            case Some(MethodNameAndType(name, tp)) =>
-              name == insn.name && tp.descriptor == insn.desc
-            case _ => false
-          })
+        case Some(MethodNameAndType(name, tp)) =>
+          name == insn.name && tp.descriptor == insn.desc
+        case _ => false
+      })
     }
   }
 
@@ -205,11 +206,11 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
   def isScalaUnbox(insn: MethodInsnNode): Boolean = {
     insn.owner == srBoxesRunTimeRef.internalName &&
     (srBoxesRuntimeUnboxToMethods.get(
-            primitiveAsmTypeToBType(Type.getReturnType(insn.desc))) match {
-          case Some(MethodNameAndType(name, tp)) =>
-            name == insn.name && tp.descriptor == insn.desc
-          case _ => false
-        })
+        primitiveAsmTypeToBType(Type.getReturnType(insn.desc))) match {
+      case Some(MethodNameAndType(name, tp)) =>
+        name == insn.name && tp.descriptor == insn.desc
+      case _ => false
+    })
   }
 
   def getScalaUnbox(primitiveType: Type): MethodInsnNode = {
@@ -238,17 +239,17 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
   def isPredefAutoBox(insn: MethodInsnNode): Boolean = {
     insn.owner == PredefRef.internalName &&
     (predefAutoBoxMethods.get(insn.name) match {
-          case Some(tp) => insn.desc == tp.descriptor
-          case _ => false
-        })
+      case Some(tp) => insn.desc == tp.descriptor
+      case _ => false
+    })
   }
 
   def isPredefAutoUnbox(insn: MethodInsnNode): Boolean = {
     insn.owner == PredefRef.internalName &&
     (predefAutoUnboxMethods.get(insn.name) match {
-          case Some(tp) => insn.desc == tp.descriptor
-          case _ => false
-        })
+      case Some(tp) => insn.desc == tp.descriptor
+      case _ => false
+    })
   }
 
   def isRefCreate(insn: MethodInsnNode): Boolean =
@@ -275,7 +276,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     insn match {
       case fi: FieldInsnNode =>
         fi.getOpcode == GETSTATIC && fi.owner == moduleName &&
-        fi.name == "MODULE$" && fi.desc == ("L" + moduleName + ";")
+          fi.name == "MODULE$" && fi.desc == ("L" + moduleName + ";")
       case _ => false
     }
 

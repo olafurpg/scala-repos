@@ -122,9 +122,8 @@ object JFXApp {
 
     private def parseArguments() {
       if (!filled) {
-        arguments.foreach(
-            arg =>
-              keyValue.findFirstMatchIn(arg) match {
+        arguments.foreach(arg =>
+          keyValue.findFirstMatchIn(arg) match {
             case None => unnamedArguments += arg
             case Some(matcher) =>
               namedArguments(matcher.group(1)) = matcher.group(2)

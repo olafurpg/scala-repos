@@ -92,8 +92,9 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
     * @param stateData initial state data
     * @param timeout state timeout for the initial state, overriding the default timeout for that state
     */
-  final def startWith(
-      stateName: S, stateData: D, timeout: FiniteDuration): Unit =
+  final def startWith(stateName: S,
+                      stateData: D,
+                      timeout: FiniteDuration): Unit =
     startWith(stateName, stateData, Option(timeout))
 
   /**
@@ -273,7 +274,8 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
     * @return the builder with the case statement added
     */
   final def matchEventEquals[E](
-      event: E, apply: Apply2[E, D, State]): FSMStateFunctionBuilder[S, D] =
+      event: E,
+      apply: Apply2[E, D, State]): FSMStateFunctionBuilder[S, D] =
     new FSMStateFunctionBuilder[S, D]().eventEquals(event, apply);
 
   /**
@@ -328,8 +330,8 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
     * @param apply  an action to apply to the event and state data if there is a match
     * @return the builder with the case statement added
     */
-  final def matchStop(
-      reason: Reason, apply: UnitApply2[S, D]): FSMStopBuilder[S, D] =
+  final def matchStop(reason: Reason,
+                      apply: UnitApply2[S, D]): FSMStopBuilder[S, D] =
     new FSMStopBuilder[S, D]().stop(reason, apply)
 
   /**
@@ -369,8 +371,8 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
     * @param apply  an action to apply to the argument if the type matches
     * @return a builder with the case statement added
     */
-  final def matchData[DT <: D](
-      dataType: Class[DT], apply: UnitApply[DT]): UnitPFBuilder[D] =
+  final def matchData[DT <: D](dataType: Class[DT],
+                               apply: UnitApply[DT]): UnitPFBuilder[D] =
     UnitMatch.`match`(dataType, apply)
 
   /**
@@ -426,7 +428,8 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractLoggingFSM[S, D]
-    extends AbstractFSM[S, D] with LoggingFSM[S, D]
+    extends AbstractFSM[S, D]
+    with LoggingFSM[S, D]
 
 /**
   * Java API: compatible with lambda expressions

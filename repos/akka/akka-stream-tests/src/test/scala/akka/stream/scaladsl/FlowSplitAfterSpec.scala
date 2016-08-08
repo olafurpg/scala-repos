@@ -31,7 +31,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
   val settings = ActorMaterializerSettings(system)
     .withInputBuffer(initialSize = 2, maxSize = 2)
     .withSubscriptionTimeoutSettings(StreamSubscriptionTimeoutSettings(
-            StreamSubscriptionTimeoutTerminationMode.cancel, 1.second))
+        StreamSubscriptionTimeoutTerminationMode.cancel,
+        1.second))
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -48,10 +49,10 @@ class FlowSplitAfterSpec extends AkkaSpec {
     def cancel(): Unit = subscription.cancel()
   }
 
-  class SubstreamsSupport(
-      splitAfter: Int = 3,
-      elementCount: Int = 6,
-      substreamCancelStrategy: SubstreamCancelStrategy = SubstreamCancelStrategy.drain) {
+  class SubstreamsSupport(splitAfter: Int = 3,
+                          elementCount: Int = 6,
+                          substreamCancelStrategy: SubstreamCancelStrategy =
+                            SubstreamCancelStrategy.drain) {
 
     val source = Source(1 to elementCount)
     val groupStream = source

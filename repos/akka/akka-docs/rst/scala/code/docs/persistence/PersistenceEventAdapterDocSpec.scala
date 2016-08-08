@@ -15,7 +15,8 @@ import scala.collection.immutable
 class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config) {
 
   def this() {
-    this("""
+    this(
+        """
       akka.persistence.snapshot-store.plugin = "akka.persistence.snapshot-store.local"
 
       //#event-adapters-config

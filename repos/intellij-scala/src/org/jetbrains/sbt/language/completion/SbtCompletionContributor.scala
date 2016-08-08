@@ -7,18 +7,37 @@ import com.intellij.psi._
 import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionContributor
-import org.jetbrains.plugins.scala.lang.completion.lookups.{LookupElementManager, ScalaChainLookupElement, ScalaLookupItem}
+import org.jetbrains.plugins.scala.lang.completion.lookups.{
+  LookupElementManager,
+  ScalaChainLookupElement,
+  ScalaLookupItem
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.NonValueType
 import org.jetbrains.plugins.scala.lang.psi.types.result.Success
-import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScParameterizedType, ScProjectionType, ScType}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScDesignatorType,
+  ScParameterizedType,
+  ScProjectionType,
+  ScType
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 
 /**
   * @author Nikolay Obedin
@@ -80,8 +99,9 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
           def getScopeType: Option[ScType] = {
             if (operator.getText != "in") return None
             val manager = ScalaPsiManager.instance(place.getProject)
-            val scopeClass = manager.getCachedClass(
-                "sbt.Scope", place.getResolveScope, ClassCategory.TYPE)
+            val scopeClass = manager.getCachedClass("sbt.Scope",
+                                                    place.getResolveScope,
+                                                    ClassCategory.TYPE)
             if (scopeClass != null) Some(ScDesignatorType(scopeClass))
             else None
           }
@@ -142,8 +162,8 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               case typed: ScTypedDefinition
                   if typed.getType().getOrAny.conforms(expectedType) =>
                 variant.isLocalVariable = (typed.isVar || typed.isVal) &&
-                (typed.containingFile exists
-                    (_.getName == parameters.getOriginalFile.getName))
+                    (typed.containingFile exists
+                      (_.getName == parameters.getOriginalFile.getName))
                 apply(variant)
               case _ => // do nothing
             }
@@ -153,27 +173,28 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
           ScType.extractClass(expectedType) match {
             case Some(clazz: ScTypeDefinition) =>
               expectedType match {
-                case ScProjectionType(
-                    proj, _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+                case ScProjectionType(proj,
+                                      _: ScTypeAlias | _: ScClass | _: ScTrait,
+                                      _) =>
                   ScType.extractClass(proj) foreach collectAndApplyVariants
                 case _ => // do nothing
               }
-              ScalaPsiUtil.getCompanionModule(clazz) foreach collectAndApplyVariants
+              ScalaPsiUtil
+                .getCompanionModule(clazz) foreach collectAndApplyVariants
             case Some(p: PsiClass) if isAccessible(p) =>
-              p.getFields.foreach(field =>
-                    {
-                  if (field.hasModifierProperty("static") &&
-                      isAccessible(field)) {
-                    val lookup = LookupElementManager
-                      .getLookupElement(new ScalaResolveResult(field),
-                                        isClassName = true,
-                                        isOverloadedForClassName = false,
-                                        shouldImport = true,
-                                        isInStableCodeReference = false)
-                      .head
-                    lookup.addLookupStrings(p.getName + "." + field.getName)
-                    applyVariant(lookup)
-                  }
+              p.getFields.foreach(field => {
+                if (field.hasModifierProperty("static") &&
+                    isAccessible(field)) {
+                  val lookup = LookupElementManager
+                    .getLookupElement(new ScalaResolveResult(field),
+                                      isClassName = true,
+                                      isOverloadedForClassName = false,
+                                      shouldImport = true,
+                                      isInStableCodeReference = false)
+                    .head
+                  lookup.addLookupStrings(p.getName + "." + field.getName)
+                  applyVariant(lookup)
+                }
               })
             case _ => // do nothing
           }

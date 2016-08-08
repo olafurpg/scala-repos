@@ -25,8 +25,17 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.BlockDataManager
 import org.apache.spark.network.buffer.{ManagedBuffer, NioManagedBuffer}
 import org.apache.spark.network.client.{RpcResponseCallback, TransportClient}
-import org.apache.spark.network.server.{OneForOneStreamManager, RpcHandler, StreamManager}
-import org.apache.spark.network.shuffle.protocol.{BlockTransferMessage, OpenBlocks, StreamHandle, UploadBlock}
+import org.apache.spark.network.server.{
+  OneForOneStreamManager,
+  RpcHandler,
+  StreamManager
+}
+import org.apache.spark.network.shuffle.protocol.{
+  BlockTransferMessage,
+  OpenBlocks,
+  StreamHandle,
+  UploadBlock
+}
 import org.apache.spark.serializer.Serializer
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
@@ -37,9 +46,11 @@ import org.apache.spark.storage.{BlockId, StorageLevel}
   * Opened blocks are registered with the "one-for-one" strategy, meaning each Transport-layer Chunk
   * is equivalent to one Spark-level shuffle block.
   */
-class NettyBlockRpcServer(
-    appId: String, serializer: Serializer, blockManager: BlockDataManager)
-    extends RpcHandler with Logging {
+class NettyBlockRpcServer(appId: String,
+                          serializer: Serializer,
+                          blockManager: BlockDataManager)
+    extends RpcHandler
+    with Logging {
 
   private val streamManager = new OneForOneStreamManager()
 

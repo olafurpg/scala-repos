@@ -24,7 +24,8 @@ private[akka] object RemoteDeploymentWatcher {
   * goes down (jvm crash, network failure), i.e. triggered by [[akka.actor.AddressTerminated]].
   */
 private[akka] class RemoteDeploymentWatcher
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import RemoteDeploymentWatcher._
   var supervisors = Map.empty[ActorRef, InternalActorRef]
 

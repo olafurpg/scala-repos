@@ -5,7 +5,10 @@ import java.awt.datatransfer.Transferable
 import java.util.Collections._
 import java.{lang, util}
 
-import com.intellij.codeInsight.editorActions.{CopyPastePostProcessor, TextBlockTransferableData}
+import com.intellij.codeInsight.editorActions.{
+  CopyPastePostProcessor,
+  TextBlockTransferableData
+}
 import com.intellij.openapi.editor.{Editor, RangeMarker}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
@@ -27,8 +30,8 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                              startOffsets: Array[Int],
                                              endOffsets: Array[Int]) = {
 
-    val result = collectTransferableData0(
-        file, editor, startOffsets, endOffsets)
+    val result =
+      collectTransferableData0(file, editor, startOffsets, endOffsets)
 
     if (result == null) emptyList() else singletonList(result)
   }
@@ -57,8 +60,12 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                              values: util.List[T]) {
 
     values.asScala.foreach { value =>
-      processTransferableData0(
-          project, editor, bounds, caretOffset, ref, value)
+      processTransferableData0(project,
+                               editor,
+                               bounds,
+                               caretOffset,
+                               ref,
+                               value)
     }
   }
 

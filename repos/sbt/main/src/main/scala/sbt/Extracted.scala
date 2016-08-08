@@ -7,10 +7,10 @@ import sbt.internal.util.complete.Parser
 import sbt.internal.util.{AttributeKey, Show}
 import std.Transform.DummyTaskMap
 
-final case class Extracted(structure: BuildStructure,
-                           session: SessionSettings,
-                           currentRef: ProjectRef)(
-    implicit val showKey: Show[ScopedKey[_]]) {
+final case class Extracted(
+    structure: BuildStructure,
+    session: SessionSettings,
+    currentRef: ProjectRef)(implicit val showKey: Show[ScopedKey[_]]) {
   def rootProject = structure.rootProject
   lazy val currentUnit = structure units currentRef.build
   lazy val currentProject = currentUnit defined currentRef.project
@@ -47,8 +47,8 @@ final case class Extracted(structure: BuildStructure,
     import EvaluateTask._
     val rkey = resolve(key.scopedKey)
     val config = extractedTaskConfig(this, structure, state)
-    val value: Option[(State, Result[T])] = apply(
-        structure, key.scopedKey, state, currentRef, config)
+    val value: Option[(State, Result[T])] =
+      apply(structure, key.scopedKey, state, currentRef, config)
     val (newS, result) = getOrError(rkey.scope, rkey.key, value)
     (newS, processResult(result, newS.log))
   }
@@ -62,8 +62,9 @@ final case class Extracted(structure: BuildStructure,
     *
     * This method requests execution of only the given task and does not aggregate execution.
     */
-  def runInputTask[T](
-      key: InputKey[T], input: String, state: State): (State, T) = {
+  def runInputTask[T](key: InputKey[T],
+                      input: String,
+                      state: State): (State, T) = {
     import EvaluateTask._
 
     val scopedKey = Scoped.scopedSetting(
@@ -80,8 +81,8 @@ final case class Extracted(structure: BuildStructure,
     val config = extractedTaskConfig(this, structure, state)
     withStreams(structure, state) { str =>
       val nv = nodeView(state, str, rkey :: Nil)
-      val (newS, result) = EvaluateTask.runTask(
-          task, state, str, structure.index.triggers, config)(nv)
+      val (newS, result) = EvaluateTask
+        .runTask(task, state, str, structure.index.triggers, config)(nv)
       (newS, processResult(result, newS.log))
     }
   }
@@ -108,8 +109,9 @@ final case class Extracted(structure: BuildStructure,
         Scope.resolveScope(GlobalScope, currentRef.build, rootProject))(
         key.scopedKey)
   private def getOrError[T](
-      scope: Scope, key: AttributeKey[_], value: Option[T])(
-      implicit display: Show[ScopedKey[_]]): T =
+      scope: Scope,
+      key: AttributeKey[_],
+      value: Option[T])(implicit display: Show[ScopedKey[_]]): T =
     value getOrElse sys.error(
         display(ScopedKey(scope, key)) + " is undefined.")
   private def getOrError[T](scope: Scope, key: AttributeKey[T])(
@@ -118,8 +120,10 @@ final case class Extracted(structure: BuildStructure,
         display(ScopedKey(scope, key)) + " is undefined.")
 
   def append(settings: Seq[Setting[_]], state: State): State = {
-    val appendSettings = Load.transformSettings(
-        Load.projectScope(currentRef), currentRef.build, rootProject, settings)
+    val appendSettings = Load.transformSettings(Load.projectScope(currentRef),
+                                                currentRef.build,
+                                                rootProject,
+                                                settings)
     val newStructure =
       Load.reapply(session.original ++ appendSettings, structure)
     Project.setProject(session, newStructure, state)

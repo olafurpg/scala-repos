@@ -1,6 +1,12 @@
 package com.twitter.finagle.thrift
 
-import com.twitter.finagle.{Status, ServiceProxy, Service, WriteException, ServiceException}
+import com.twitter.finagle.{
+  Status,
+  ServiceProxy,
+  Service,
+  WriteException,
+  ServiceException
+}
 import java.util.logging.{Logger, Level}
 import org.apache.thrift.TApplicationException
 import org.apache.thrift.protocol.{TProtocolFactory, TMessageType}
@@ -30,8 +36,7 @@ case class InvalidThriftConnectionException() extends ServiceException {
 class ValidateThriftService(
     self: Service[ThriftClientRequest, Array[Byte]],
     protocolFactory: TProtocolFactory
-)
-    extends ServiceProxy[ThriftClientRequest, Array[Byte]](self) {
+) extends ServiceProxy[ThriftClientRequest, Array[Byte]](self) {
   @volatile private[this] var isValid = true
 
   override def apply(req: ThriftClientRequest) =

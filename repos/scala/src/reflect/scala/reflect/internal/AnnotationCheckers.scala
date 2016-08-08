@@ -51,8 +51,8 @@ trait AnnotationCheckers { self: SymbolTable =>
       * Decide whether this analyzer plugin can adapt a tree that has an annotated type to the
       * given type tp, taking into account the given mode (see method adapt in trait Typers).
       */
-    @deprecated(
-        "Create an AnalyzerPlugin and use canAdaptAnnotations", "2.10.1")
+    @deprecated("Create an AnalyzerPlugin and use canAdaptAnnotations",
+                "2.10.1")
     def canAdaptAnnotations(tree: Tree, mode: Mode, pt: Type): Boolean = false
 
     /**
@@ -74,7 +74,7 @@ trait AnnotationCheckers { self: SymbolTable =>
       */
     @deprecated(
         "Create an AnalyzerPlugin and use pluginsTypedReturn. Note: the 'tree' argument here is\n" +
-        "the 'expr' of a Return tree; 'pluginsTypedReturn' takes the Return tree itself as argument",
+          "the 'expr' of a Return tree; 'pluginsTypedReturn' takes the Return tree itself as argument",
         "2.10.1")
     def adaptTypeOfReturn(tree: Tree, pt: Type, default: => Type): Type =
       default
@@ -101,10 +101,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     if (annotationCheckers.isEmpty ||
         (tp1.annotations.isEmpty && tp2.annotations.isEmpty)) true
     else
-      annotationCheckers.forall(
-          checker =>
-            {
-          !checker.isActive() || checker.annotationsConform(tp1, tp2)
+      annotationCheckers.forall(checker => {
+        !checker.isActive() || checker.annotationsConform(tp1, tp2)
       })
 
   /** @see AnnotationChecker.annotationsLub */
@@ -112,14 +110,14 @@ trait AnnotationCheckers { self: SymbolTable =>
     if (annotationCheckers.isEmpty) tpe
     else
       annotationCheckers.foldLeft(tpe)((tpe, checker) =>
-            if (!checker.isActive()) tpe else checker.annotationsLub(tpe, ts))
+        if (!checker.isActive()) tpe else checker.annotationsLub(tpe, ts))
 
   /** @see AnnotationChecker.annotationsGlb */
   def annotationsGlb(tpe: Type, ts: List[Type]): Type =
     if (annotationCheckers.isEmpty) tpe
     else
       annotationCheckers.foldLeft(tpe)((tpe, checker) =>
-            if (!checker.isActive()) tpe else checker.annotationsGlb(tpe, ts))
+        if (!checker.isActive()) tpe else checker.annotationsGlb(tpe, ts))
 
   /** @see AnnotationChecker.adaptBoundsToAnnotations */
   def adaptBoundsToAnnotations(bounds: List[TypeBounds],
@@ -127,7 +125,8 @@ trait AnnotationCheckers { self: SymbolTable =>
                                targs: List[Type]): List[TypeBounds] =
     if (annotationCheckers.isEmpty) bounds
     else
-      annotationCheckers.foldLeft(bounds)((bounds, checker) =>
+      annotationCheckers.foldLeft(bounds)(
+          (bounds, checker) =>
             if (!checker.isActive()) bounds
             else checker.adaptBoundsToAnnotations(bounds, tparams, targs))
 
@@ -136,30 +135,31 @@ trait AnnotationCheckers { self: SymbolTable =>
   def addAnnotations(tree: Tree, tpe: Type): Type =
     if (annotationCheckers.isEmpty) tpe
     else
-      annotationCheckers.foldLeft(tpe)((tpe, checker) =>
+      annotationCheckers.foldLeft(tpe)(
+          (tpe, checker) =>
             if (!checker.isActive()) tpe
             else checker.addAnnotations(tree, tpe))
 
   def canAdaptAnnotations(tree: Tree, mode: Mode, pt: Type): Boolean =
     if (annotationCheckers.isEmpty) false
     else
-      annotationCheckers.exists(
-          checker =>
-            {
-          checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
+      annotationCheckers.exists(checker => {
+        checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
       })
 
   def adaptAnnotations(tree: Tree, mode: Mode, pt: Type): Tree =
     if (annotationCheckers.isEmpty) tree
     else
-      annotationCheckers.foldLeft(tree)((tree, checker) =>
+      annotationCheckers.foldLeft(tree)(
+          (tree, checker) =>
             if (!checker.isActive()) tree
             else checker.adaptAnnotations(tree, mode, pt))
 
   def adaptTypeOfReturn(tree: Tree, pt: Type, default: => Type): Type =
     if (annotationCheckers.isEmpty) default
     else
-      annotationCheckers.foldLeft(default)((tpe, checker) =>
+      annotationCheckers.foldLeft(default)(
+          (tpe, checker) =>
             if (!checker.isActive()) tpe
             else checker.adaptTypeOfReturn(tree, pt, tpe))
 }

@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ActionEventSpec
     extends SimpleSFXDelegateSpec[jfxe.ActionEvent, ActionEvent](
-        classOf[jfxe.ActionEvent], classOf[ActionEvent])
+        classOf[jfxe.ActionEvent],
+        classOf[ActionEvent])

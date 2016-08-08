@@ -125,8 +125,8 @@ case class GroupSummary(state: String,
   *  3. leader id
   */
 @nonthreadsafe
-private[coordinator] class GroupMetadata(
-    val groupId: String, val protocolType: String) {
+private[coordinator] class GroupMetadata(val groupId: String,
+                                         val protocolType: String) {
 
   private val members = new mutable.HashMap[String, MemberMetadata]
   private var state: GroupState = Stable
@@ -237,8 +237,10 @@ private[coordinator] class GroupMetadata(
       val members = this.members.values.map { member =>
         member.summaryNoMetadata()
       }.toList
-      GroupSummary(
-          state.toString, protocolType, GroupCoordinator.NoProtocol, members)
+      GroupSummary(state.toString,
+                   protocolType,
+                   GroupCoordinator.NoProtocol,
+                   members)
     }
   }
 
@@ -251,14 +253,14 @@ private[coordinator] class GroupMetadata(
       throw new IllegalStateException(
           "Group %s should be in the %s states before moving to %s state. Instead it is in %s state"
             .format(
-              groupId,
-              GroupMetadata.validPreviousStates(targetState).mkString(","),
-              targetState,
-              state))
+                groupId,
+                GroupMetadata.validPreviousStates(targetState).mkString(","),
+                targetState,
+                state))
   }
 
   override def toString = {
-    "[%s,%s,%s,%s]".format(
-        groupId, protocolType, currentState.toString, members)
+    "[%s,%s,%s,%s]"
+      .format(groupId, protocolType, currentState.toString, members)
   }
 }

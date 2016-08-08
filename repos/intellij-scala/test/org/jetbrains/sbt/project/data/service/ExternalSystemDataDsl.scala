@@ -111,15 +111,16 @@ object ExternalSystemDataDsl {
         case (module, moduleNode) =>
           module.getLibraryDependencies.foreach { dependency =>
             libraryToNode.get(dependency).foreach { libraryNode =>
-              moduleNode.add(new LibraryDependencyNode(
-                      moduleNode, libraryNode, LibraryLevel.PROJECT))
+              moduleNode.add(new LibraryDependencyNode(moduleNode,
+                                                       libraryNode,
+                                                       LibraryLevel.PROJECT))
             }
           }
       }
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ProjectAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -156,7 +157,7 @@ object ExternalSystemDataDsl {
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ModuleAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -178,7 +179,7 @@ object ExternalSystemDataDsl {
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with LibraryAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](

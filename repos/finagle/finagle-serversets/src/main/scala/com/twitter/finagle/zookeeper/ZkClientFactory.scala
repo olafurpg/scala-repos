@@ -23,9 +23,9 @@ private[finagle] class ZooKeeperHealthHandler extends Watcher {
     for {
       permit <- mu.acquire()
       () <- evt.getState match {
-        case KeeperState.SyncConnected => pulse ! Healthy
-        case _ => pulse ! Unhealthy
-      }
+             case KeeperState.SyncConnected => pulse ! Healthy
+             case _ => pulse ! Unhealthy
+           }
     } permit.release()
 }
 
@@ -37,8 +37,8 @@ private[finagle] object DefaultZkClientFactory
           .toDuration)
 
 private[finagle] class ZkClientFactory(val sessionTimeout: Duration) {
-  private[this] val zkClients: mutable.Map[
-      Set[InetSocketAddress], ZooKeeperClient] = mutable.Map()
+  private[this] val zkClients: mutable.Map[Set[InetSocketAddress],
+                                           ZooKeeperClient] = mutable.Map()
 
   def hostSet(hosts: String) = InetSocketAddressUtil.parseHosts(hosts).toSet
 

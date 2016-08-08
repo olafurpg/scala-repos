@@ -16,7 +16,12 @@ import com.intellij.openapi.util.{Ref, TextRange}
 import com.intellij.psi.codeStyle.{CodeStyleManager, CodeStyleSettingsManager}
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiJavaFile}
 import com.intellij.util.ExceptionUtil
-import org.jetbrains.plugins.scala.conversion.ast.{JavaCodeReferenceStatement, LiteralExpression, MainConstruction, TypedElement}
+import org.jetbrains.plugins.scala.conversion.ast.{
+  JavaCodeReferenceStatement,
+  LiteralExpression,
+  MainConstruction,
+  TypedElement
+}
 import org.jetbrains.plugins.scala.conversion.visitors.SimplePrintVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
@@ -76,9 +81,9 @@ class JavaCopyPastePostProcessor
           var elem: PsiElement = findElem(startOffset)
           if (elem != null) {
             while (elem.getParent != null &&
-            !elem.getParent.isInstanceOf[PsiFile] &&
-            elem.getParent.getTextRange.getEndOffset <= endOffset &&
-            elem.getParent.getTextRange.getStartOffset >= startOffset) {
+                   !elem.getParent.isInstanceOf[PsiFile] &&
+                   elem.getParent.getTextRange.getEndOffset <= endOffset &&
+                   elem.getParent.getTextRange.getStartOffset >= startOffset) {
               elem = elem.getParent
             }
             if (startOffset < elem.getTextRange.getStartOffset) {
@@ -88,7 +93,7 @@ class JavaCopyPastePostProcessor
             }
             buffer += ElementPart(elem)
             while (elem.getNextSibling != null &&
-            elem.getNextSibling.getTextRange.getEndOffset <= endOffset) {
+                   elem.getNextSibling.getTextRange.getEndOffset <= endOffset) {
               elem = elem.getNextSibling
               buffer += ElementPart(elem)
             }
@@ -104,8 +109,8 @@ class JavaCopyPastePostProcessor
 
       def getRefs: Seq[ReferenceData] = {
         val refs = {
-          val data = referenceProcessor.collectTransferableData(
-              file, editor, startOffsets, endOffsets)
+          val data = referenceProcessor
+            .collectTransferableData(file, editor, startOffsets, endOffsets)
           if (data.isEmpty) null
           else data.get(0).asInstanceOf[ReferenceTransferableData]
         }
@@ -129,7 +134,9 @@ class JavaCopyPastePostProcessor
             resultNode.addChild(LiteralExpression(s))
           case ElementPart(element) =>
             val result = JavaToScala.convertPsiToIntermdeiate(element, null)(
-                associationsHelper, data, withComments = true)
+                associationsHelper,
+                data,
+                withComments = true)
             resultNode.addChild(result)
         }
       }
@@ -157,10 +164,10 @@ class JavaCopyPastePostProcessor
       new ConvertedCode(text, updatedAssociations.toArray)
     } catch {
       case e: Exception =>
-        val selections = (startOffsets, endOffsets).zipped
-          .map((a, b) => file.getText.substring(a, b))
-        val attachments = selections.zipWithIndex.map(
-            p => new Attachment("Selection-%d.java".format(p._2 + 1), p._1))
+        val selections = (startOffsets, endOffsets).zipped.map((a, b) =>
+          file.getText.substring(a, b))
+        val attachments = selections.zipWithIndex.map(p =>
+          new Attachment("Selection-%d.java".format(p._2 + 1), p._1))
         Log.error(
             LogMessageEx.createEvent(e.getMessage,
                                      ExceptionUtil.getThrowableText(e),
@@ -215,15 +222,17 @@ class JavaCopyPastePostProcessor
 
         withSpecialStyleIn(project) {
           val manager = CodeStyleManager.getInstance(project)
-          manager.reformatText(
-              file, bounds.getStartOffset, bounds.getStartOffset + text.length)
+          manager.reformatText(file,
+                               bounds.getStartOffset,
+                               bounds.getStartOffset + text.length)
         }
 
         markedAssociations.map {
           case (association, marker) =>
-            val movedAssociation = association.copy(range = new TextRange(
-                      marker.getStartOffset - bounds.getStartOffset,
-                      marker.getEndOffset - bounds.getStartOffset))
+            val movedAssociation = association.copy(
+                range =
+                  new TextRange(marker.getStartOffset - bounds.getStartOffset,
+                                marker.getEndOffset - bounds.getStartOffset))
             marker.dispose()
             movedAssociation
         }
@@ -257,13 +266,15 @@ class JavaCopyPastePostProcessor
       block
     } finally {
       settings.KEEP_BLANK_LINES_IN_CODE = keep_blank_lines_in_code
-      settings.KEEP_BLANK_LINES_IN_DECLARATIONS = keep_blank_lines_in_declarations
+      settings.KEEP_BLANK_LINES_IN_DECLARATIONS =
+        keep_blank_lines_in_declarations
       settings.KEEP_BLANK_LINES_BEFORE_RBRACE = keep_blank_lines_before_rbrace
     }
   }
 
-  def replaceByConvertedCode(
-      editor: Editor, bounds: RangeMarker, text: String) = {
+  def replaceByConvertedCode(editor: Editor,
+                             bounds: RangeMarker,
+                             text: String) = {
     val document = editor.getDocument
     def hasQuoteAt(offset: Int) = {
       val chars = document.getCharsSequence
@@ -305,7 +316,7 @@ class JavaCopyPastePostProcessor
   }
 
   object ConvertedCode {
-    lazy val Flavor: DataFlavor = new DataFlavor(
-        classOf[ConvertedCode], "JavaToScalaConvertedCode")
+    lazy val Flavor: DataFlavor =
+      new DataFlavor(classOf[ConvertedCode], "JavaToScalaConvertedCode")
   }
 }

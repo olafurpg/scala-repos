@@ -4,13 +4,27 @@ package codeInspection.typeAnnotation
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInsight.intention.types.{AddOnlyStrategy, ToggleTypeAnnotation}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.formatting.settings.{ScalaCodeStyleSettings, TypeAnnotationPolicy, TypeAnnotationRequirement}
+import org.jetbrains.plugins.scala.codeInsight.intention.types.{
+  AddOnlyStrategy,
+  ToggleTypeAnnotation
+}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.formatting.settings.{
+  ScalaCodeStyleSettings,
+  TypeAnnotationPolicy,
+  TypeAnnotationRequirement
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**
@@ -50,7 +64,7 @@ class TypeAnnotationInspection extends AbstractInspection {
 
     case method: ScFunctionDefinition
         if method.hasAssign && !method.hasExplicitType &&
-        !method.isSecondaryConstructor =>
+          !method.isSecondaryConstructor =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
       inspect(method.nameId,
@@ -70,8 +84,8 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def requirementForProperty(
-      property: ScMember, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForProperty(property: ScMember,
+                                     settings: ScalaCodeStyleSettings): Int = {
     if (property.isLocal) {
       settings.LOCAL_PROPERTY_TYPE_ANNOTATION
     } else {
@@ -82,8 +96,8 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def requirementForMethod(
-      method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForMethod(method: ScFunctionDefinition,
+                                   settings: ScalaCodeStyleSettings): Int = {
     if (method.isLocal) {
       settings.LOCAL_METHOD_TYPE_ANNOTATION
     } else {
@@ -97,7 +111,8 @@ class TypeAnnotationInspection extends AbstractInspection {
     if (member.isLocal) "Local"
     else {
       if (member.isPrivate) "Private"
-      else if (member.isProtected) "Protected" else "Public"
+      else if (member.isProtected) "Protected"
+      else "Public"
     }
 
   private def inspect(element: PsiElement,
@@ -111,7 +126,7 @@ class TypeAnnotationInspection extends AbstractInspection {
     if (requirement == TypeAnnotationRequirement.Required.ordinal &&
         (!isSimple || simplePolicy == TypeAnnotationPolicy.Regular.ordinal) &&
         (overridingPolicy == TypeAnnotationPolicy.Regular.ordinal ||
-            !isOverriding)) {
+        !isOverriding)) {
       holder.registerProblem(
           element,
           s"$name requires an explicit type annotation (according to Code Style settings)",

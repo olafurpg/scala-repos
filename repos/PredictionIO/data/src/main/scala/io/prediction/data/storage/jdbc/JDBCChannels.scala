@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Channels]] */
 class JDBCChannels(client: String, config: StorageClientConfig, prefix: String)
-    extends Channels with Logging {
+    extends Channels
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "channels")

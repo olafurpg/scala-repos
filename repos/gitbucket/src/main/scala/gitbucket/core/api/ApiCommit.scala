@@ -19,8 +19,8 @@ case class ApiCommit(id: String,
                      removed: List[String],
                      modified: List[String],
                      author: ApiPersonIdent,
-                     committer: ApiPersonIdent)(
-    repositoryName: RepositoryName, urlIsHtmlUrl: Boolean)
+                     committer: ApiPersonIdent)(repositoryName: RepositoryName,
+                                                urlIsHtmlUrl: Boolean)
     extends FieldSerializable {
   val url =
     if (urlIsHtmlUrl) {
@@ -55,7 +55,7 @@ object ApiCommit {
         modified = diffs._1.collect {
           case x
               if x.changeType != DiffEntry.ChangeType.ADD &&
-              x.changeType != DiffEntry.ChangeType.DELETE =>
+                x.changeType != DiffEntry.ChangeType.DELETE =>
             x.newPath
         },
         author = ApiPersonIdent.author(commit),

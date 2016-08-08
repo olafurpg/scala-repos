@@ -16,8 +16,9 @@ object Test {
     assert(xs.mapConserve(x => x) eq xs)
   }
 
-  def checkBehaviourUnchanged(
-      input: List[_], oldOutput: List[_], newOutput: List[_]) {
+  def checkBehaviourUnchanged(input: List[_],
+                              oldOutput: List[_],
+                              newOutput: List[_]) {
     if (oldOutput eq input) assert(newOutput eq oldOutput)
     else {
       assert(newOutput.head == oldOutput.head)
@@ -33,11 +34,11 @@ object Test {
 
   def main(args: Array[String]) {
     for (length <- 0 to maxListLength;
-    bitmap <- 0 until (1 << length);
-    data = List.range(0, length) map { x: Int =>
-      if ((bitmap & (1 << x)) != 0) BigInt(x + 16)
-      else BigInt(x)
-    }) {
+         bitmap <- 0 until (1 << length);
+         data = List.range(0, length) map { x: Int =>
+           if ((bitmap & (1 << x)) != 0) BigInt(x + 16)
+           else BigInt(x)
+         }) {
       // Behaves like map with respect to  ==
       callCount = 0
       val numUnconserved = data.reverse.dropWhile(_ < 16).length
@@ -48,8 +49,9 @@ object Test {
       assert(callCount == 2 * length) // map, mapConserve call transform for each element in the list
 
       // Behaves like existing mapConserve with respect to  eq
-      checkBehaviourUnchanged(
-          data, data mapConserve lastHexDigit, data mapConserve lastHexDigit)
+      checkBehaviourUnchanged(data,
+                              data mapConserve lastHexDigit,
+                              data mapConserve lastHexDigit)
     }
 
     checkStackOverflow();

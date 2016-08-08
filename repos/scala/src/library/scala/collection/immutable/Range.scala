@@ -32,7 +32,7 @@ import scala.collection.parallel.immutable.ParRange
   *  `init`) are also permitted on overfull ranges.
   *
   *  @param start      the start of this range.
-  *  @param end        the end of the range.  For exclusive ranges, e.g. 
+  *  @param end        the end of the range.  For exclusive ranges, e.g.
   *                    `Range(0,3)` or `(0 until 3)`, this is one
   *                    step past the last one in the range.  For inclusive
   *                    ranges, e.g. `Range.inclusive(0,3)` or `(0 to 3)`,
@@ -60,7 +60,8 @@ import scala.collection.parallel.immutable.ParRange
     "The implementation details of Range makes inheriting from it unwise.",
     "2.11.0")
 class Range(val start: Int, val end: Int, val step: Int)
-    extends scala.collection.AbstractSeq[Int] with IndexedSeq[Int]
+    extends scala.collection.AbstractSeq[Int]
+    with IndexedSeq[Int]
     with scala.collection.CustomParallelizable[Int, ParRange]
     with Serializable {
   override def par = new ParRange(this)
@@ -77,9 +78,9 @@ class Range(val start: Int, val end: Int, val step: Int)
   // correct.
   override final val isEmpty =
     ((start > end && step > 0) || (start < end && step < 0) ||
-        (start == end && !isInclusive))
-  @deprecated(
-      "This method will be made private, use `length` instead.", "2.11")
+      (start == end && !isInclusive))
+  @deprecated("This method will be made private, use `length` instead.",
+              "2.11")
   final val numRangeElements: Int = {
     if (step == 0) throw new IllegalArgumentException("step cannot be 0.")
     else if (isEmpty) 0
@@ -140,8 +141,8 @@ class Range(val start: Int, val end: Int, val step: Int)
   override def length = if (numRangeElements < 0) fail() else numRangeElements
 
   private def description =
-    "%d %s %d by %s".format(
-        start, if (isInclusive) "to" else "until", end, step)
+    "%d %s %d by %s"
+      .format(start, if (isInclusive) "to" else "until", end, step)
   private def fail() =
     throw new IllegalArgumentException(
         description + ": seqs cannot contain more than Int.MaxValue elements.")
@@ -192,16 +193,16 @@ class Range(val start: Int, val end: Int, val step: Int)
     *  @param n  the number of elements to drop.
     *  @return   a new range consisting of all the elements of this range except `n` first elements.
     */
-  final override def drop(n: Int): Range = (if (n <= 0 || isEmpty) this
-                                            else if (n >= numRangeElements &&
-                                                     numRangeElements >= 0)
-                                              newEmptyRange(end)
-                                            else {
-                                              // May have more than Int.MaxValue elements (numRangeElements < 0)
-                                              // but the logic is the same either way: go forwards n steps, keep the rest
-                                              copy(
-                                                  locationAfterN(n), end, step)
-                                            })
+  final override def drop(n: Int): Range =
+    (if (n <= 0 || isEmpty) this
+     else if (n >= numRangeElements &&
+              numRangeElements >= 0)
+       newEmptyRange(end)
+     else {
+       // May have more than Int.MaxValue elements (numRangeElements < 0)
+       // but the logic is the same either way: go forwards n steps, keep the rest
+       copy(locationAfterN(n), end, step)
+     })
 
   /** Creates a new range containing the elements starting at `from` up to but not including `until`.
     *
@@ -396,10 +397,10 @@ class Range(val start: Int, val end: Int, val step: Int)
             // ...so other must contain something and have same start
             val l0 = last
             (l0 == x.last &&
-                (// And same end
-                    start == l0 ||
-                    step == x.step // And either the same step, or not take any steps
-                    ))
+            (// And same end
+            start == l0 ||
+            step == x.step // And either the same step, or not take any steps
+            ))
           }
       }
     case _ =>
@@ -412,7 +413,8 @@ class Range(val start: Int, val end: Int, val step: Int)
   override def toString() = {
     val endStr =
       if (numRangeElements > Range.MAX_PRINT ||
-          (!isEmpty && numRangeElements < 0)) ", ... )" else ")"
+          (!isEmpty && numRangeElements < 0)) ", ... )"
+      else ")"
     take(Range.MAX_PRINT).mkString("Range(", ", ", endStr)
   }
 }
@@ -525,7 +527,7 @@ object Range {
 
     def inclusive(start: Double, end: Double, step: Double) =
       BigDecimal.inclusive(toBD(start), toBD(end), toBD(step)) mapRange
-      (_.doubleValue)
+        (_.doubleValue)
   }
 
   // As there is no appealing default step size for not-really-integral ranges,

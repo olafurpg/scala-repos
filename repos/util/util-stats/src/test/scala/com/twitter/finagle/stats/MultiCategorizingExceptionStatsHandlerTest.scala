@@ -29,20 +29,22 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
                               "interrupted",
                               classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("clienterrors",
-                              "interrupted",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("clienterrors",
+                "interrupted",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(
         receiver.counters(Seq("clienterrors",
                               "restartable",
                               classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("clienterrors",
-                              "restartable",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("clienterrors",
+                "restartable",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(receiver.counters(Seq("sourcedfailures", "service")) == 1)
     assert(
@@ -50,10 +52,11 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
                               "service",
                               classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("sourcedfailures",
+                "service",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(
         keys == Seq(
@@ -85,7 +88,8 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
     val keys = receiver.counters.keys.map(_.mkString("/")).toSeq.sorted
 
     assert(receiver.counters(Seq("clienterrors")) == 1)
-    assert(receiver.counters(
+    assert(
+        receiver.counters(
             Seq("clienterrors", classOf[RuntimeException].getName)) == 1)
     assert(
         receiver.counters(Seq("clienterrors",
@@ -98,10 +102,11 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
                               "service",
                               classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("sourcedfailures",
+                "service",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(
         keys == Seq(
@@ -153,23 +158,26 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
     assert(receiver.counters(Seq("clienterrors", "restartable")) == 1)
 
     assert(
-        receiver.counters(Seq("clienterrors",
-                              "interrupted",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("clienterrors",
+                "interrupted",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(
-        receiver.counters(Seq("clienterrors",
-                              "restartable",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("clienterrors",
+                "restartable",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(receiver.counters(Seq("sourcedfailures", "service")) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+        receiver.counters(
+            Seq("sourcedfailures",
+                "service",
+                classOf[RuntimeException].getName,
+                classOf[Exception].getName)) == 1)
 
     assert(
         keys == Seq(

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -25,7 +25,9 @@ import org.specs2.mutable.Specification
 import com.codecommit.gll.LineStream
 
 object TreeShakerSpecs
-    extends Specification with StubPhases with TreeShaker
+    extends Specification
+    with StubPhases
+    with TreeShaker
     with RandomLibrarySpec {
   import ast._
 
@@ -1136,9 +1138,10 @@ object TreeShakerSpecs
             Vector(),
             NumLit(LineStream(), "42"),
             ObjectDef(LineStream(),
-                      Vector("foo" -> Dispatch(LineStream(),
-                                               Identifier(Vector(), "a"),
-                                               Vector()))))
+                      Vector(
+                          "foo" -> Dispatch(LineStream(),
+                                            Identifier(Vector(), "a"),
+                                            Vector()))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
@@ -1165,11 +1168,12 @@ object TreeShakerSpecs
             Identifier(Vector(), "a"),
             Vector("a", "b"),
             ObjectDef(LineStream(),
-                      Vector("foo" -> Add(LineStream(),
-                                          Dispatch(LineStream(),
-                                                   Identifier(Vector(), "a"),
-                                                   Vector()),
-                                          NumLit(LineStream(), "42")))),
+                      Vector(
+                          "foo" -> Add(LineStream(),
+                                       Dispatch(LineStream(),
+                                                Identifier(Vector(), "a"),
+                                                Vector()),
+                                       NumLit(LineStream(), "42")))),
             Dispatch(LineStream(),
                      Identifier(Vector(), "a"),
                      Vector(NullLit(LineStream()), NullLit(LineStream()))))
@@ -1185,9 +1189,10 @@ object TreeShakerSpecs
         Solve(LineStream(),
               Vector(TicVar(LineStream(), "'a"), TicVar(LineStream(), "'b")),
               ObjectDef(LineStream(),
-                        Vector("foo" -> Add(LineStream(),
-                                            TicVar(LineStream(), "'a"),
-                                            NumLit(LineStream(), "42")))))
+                        Vector(
+                            "foo" -> Add(LineStream(),
+                                         TicVar(LineStream(), "'a"),
+                                         NumLit(LineStream(), "42")))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
@@ -1217,9 +1222,10 @@ object TreeShakerSpecs
                      Vector(),
                      NumLit(LineStream(), "42"),
                      ArrayDef(LineStream(),
-                              Vector(Dispatch(LineStream(),
-                                              Identifier(Vector(), "a"),
-                                              Vector()))))
+                              Vector(
+                                  Dispatch(LineStream(),
+                                           Identifier(Vector(), "a"),
+                                           Vector()))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
@@ -1245,11 +1251,12 @@ object TreeShakerSpecs
             Identifier(Vector(), "a"),
             Vector("a", "b"),
             ArrayDef(LineStream(),
-                     Vector(Add(LineStream(),
-                                Dispatch(LineStream(),
-                                         Identifier(Vector(), "a"),
-                                         Vector()),
-                                NumLit(LineStream(), "42")))),
+                     Vector(
+                         Add(LineStream(),
+                             Dispatch(LineStream(),
+                                      Identifier(Vector(), "a"),
+                                      Vector()),
+                             NumLit(LineStream(), "42")))),
             Dispatch(LineStream(),
                      Identifier(Vector(), "a"),
                      Vector(NullLit(LineStream()), NullLit(LineStream()))))
@@ -1265,9 +1272,10 @@ object TreeShakerSpecs
         Solve(LineStream(),
               Vector(TicVar(LineStream(), "'a"), TicVar(LineStream(), "'b")),
               ArrayDef(LineStream(),
-                       Vector(Add(LineStream(),
-                                  TicVar(LineStream(), "'a"),
-                                  NumLit(LineStream(), "42")))))
+                       Vector(
+                           Add(LineStream(),
+                               TicVar(LineStream(), "'a"),
+                               NumLit(LineStream(), "42")))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
@@ -1583,9 +1591,10 @@ object TreeShakerSpecs
                      NumLit(LineStream(), "42"),
                      Dispatch(LineStream(),
                               Identifier(Vector(), "count"),
-                              Vector(Dispatch(LineStream(),
-                                              Identifier(Vector(), "a"),
-                                              Vector()))))
+                              Vector(
+                                  Dispatch(LineStream(),
+                                           Identifier(Vector(), "a"),
+                                           Vector()))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
@@ -1613,11 +1622,12 @@ object TreeShakerSpecs
             Vector("a", "b"),
             Dispatch(LineStream(),
                      Identifier(Vector(), "count"),
-                     Vector(Add(LineStream(),
-                                Dispatch(LineStream(),
-                                         Identifier(Vector(), "a"),
-                                         Vector()),
-                                NumLit(LineStream(), "42")))),
+                     Vector(
+                         Add(LineStream(),
+                             Dispatch(LineStream(),
+                                      Identifier(Vector(), "a"),
+                                      Vector()),
+                             NumLit(LineStream(), "42")))),
             Dispatch(LineStream(),
                      Identifier(Vector(), "a"),
                      Vector(NullLit(LineStream()), NullLit(LineStream()))))
@@ -1634,9 +1644,10 @@ object TreeShakerSpecs
               Vector(TicVar(LineStream(), "'a"), TicVar(LineStream(), "'b")),
               Dispatch(LineStream(),
                        Identifier(Vector(), "count"),
-                       Vector(Add(LineStream(),
-                                  TicVar(LineStream(), "'a"),
-                                  NumLit(LineStream(), "42")))))
+                       Vector(
+                           Add(LineStream(),
+                               TicVar(LineStream(), "'a"),
+                               NumLit(LineStream(), "42")))))
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)

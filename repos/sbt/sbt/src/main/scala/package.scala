@@ -2,12 +2,16 @@
  * Copyright 2010, 2011 Mark Harrah
  */
 package object sbt
-    extends sbt.std.TaskExtra with sbt.internal.util.Types
+    extends sbt.std.TaskExtra
+    with sbt.internal.util.Types
     with sbt.ProcessExtra
     with sbt.internal.librarymanagement.impl.DependencyBuilders
-    with sbt.io.PathExtra with sbt.ProjectExtra
+    with sbt.io.PathExtra
+    with sbt.ProjectExtra
     with sbt.internal.librarymanagement.DependencyFilterExtra
-    with sbt.BuildExtra with sbt.TaskMacroExtra with sbt.ScopeFilter.Make {
+    with sbt.BuildExtra
+    with sbt.TaskMacroExtra
+    with sbt.ScopeFilter.Make {
   type Setting[T] = Def.Setting[T]
   type ScopedKey[T] = Def.ScopedKey[T]
   type SettingsDefinition = Def.SettingsDefinition
@@ -44,10 +48,10 @@ package object sbt
   def config(s: String): Configuration = C.config(s)
 
   import language.experimental.macros
-  def settingKey[T](description: String): SettingKey[T] = macro std.KeyMacro
-    .settingKeyImpl[T]
-  def taskKey[T](description: String): TaskKey[T] = macro std.KeyMacro
-    .taskKeyImpl[T]
-  def inputKey[T](description: String): InputKey[T] = macro std.KeyMacro
-    .inputKeyImpl[T]
+  def settingKey[T](description: String): SettingKey[T] =
+    macro std.KeyMacro.settingKeyImpl[T]
+  def taskKey[T](description: String): TaskKey[T] =
+    macro std.KeyMacro.taskKeyImpl[T]
+  def inputKey[T](description: String): InputKey[T] =
+    macro std.KeyMacro.inputKeyImpl[T]
 }

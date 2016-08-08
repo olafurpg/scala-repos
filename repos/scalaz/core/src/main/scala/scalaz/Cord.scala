@@ -23,7 +23,7 @@ final case class Cord(self: FingerTree[Int, String]) {
     */
   def apply(i: Int): Char = {
     val (a, b) = self.split(_ > i)
-    b.viewl.headOption.map(_ (i - a.measure)).getOrElse(rangeError(i))
+    b.viewl.headOption.map(_(i - a.measure)).getOrElse(rangeError(i))
   }
 
   /**

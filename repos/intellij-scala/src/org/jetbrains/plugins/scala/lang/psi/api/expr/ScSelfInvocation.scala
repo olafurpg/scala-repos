@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

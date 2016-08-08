@@ -37,18 +37,18 @@ object A {
   import language.implicitConversions // according to SIP18
 
   implicit def enrichA0[V](a: A[V]) = new EnrichedA(a)
-  implicit def enrichA1[ZBUR : Numeric](a: A[ZBUR]) = new NumericA[ZBUR](a)
+  implicit def enrichA1[ZBUR: Numeric](a: A[ZBUR]) = new NumericA[ZBUR](a)
   implicit def enrichA2(a: A[Int]) = new IntA(a)
   implicit def enrichA3(a: A[T] forSome { type T <: Double }) =
     new GtColonDoubleA(a)
-  implicit def enrichA4[S](a: A[Foo[Bar[S]]])(
-      implicit foo: Foo[S], bar: Bar[S]): EnrichedA[S] =
+  implicit def enrichA4[S](a: A[Foo[Bar[S]]])(implicit foo: Foo[S],
+                                              bar: Bar[S]): EnrichedA[S] =
     sys.error("not implemented")
   implicit def enrichA5[Z](a: A[Z]): EnrichedA[Bar[Foo[Z]]] =
     sys.error("not implemented")
-  implicit def enrichA6[Z : MyNumeric](a: A[Z]) = new MyNumericA[Z](a)
+  implicit def enrichA6[Z: MyNumeric](a: A[Z]) = new MyNumericA[Z](a)
   // TODO: Add H <: Double and see why it crashes for C and D -- context bounds, need to check!
-  implicit def enrichA7[H <: Double : Manifest](a: A[H]) =
+  implicit def enrichA7[H <: Double: Manifest](a: A[H]) =
     new ManifestA[H](a) with MyTraversableOps[H] {
       def convToTraversableOps(x: H): H = sys.error("no")
     }
@@ -112,7 +112,7 @@ class EnrichedA[V](a: A[V]) {
 /** NumericA class <br/>
   *  - tests the implicit conversion between parametric and fixed types
   *  - A, B and C should be implicitly converted to this */
-class NumericA[U : Numeric](a: A[U]) {
+class NumericA[U: Numeric](a: A[U]) {
 
   /** The convToNumericA: U documentation... */
   def convToNumericA(x: U): U = implicitly[Numeric[U]].zero
@@ -139,7 +139,7 @@ class GtColonDoubleA(a: A[T] forSome { type T <: Double }) {
 /** MyNumericA class <br/>
   *  - tests the implicit conversion between parametric and fixed types
   *  - A should be implicitly converted to this */
-class MyNumericA[U : MyNumeric](a: A[U]) {
+class MyNumericA[U: MyNumeric](a: A[U]) {
 
   /** The convToMyNumericA: U documentation... */
   def convToMyNumericA(x: U): U = sys.error("dunno")
@@ -148,7 +148,7 @@ class MyNumericA[U : MyNumeric](a: A[U]) {
 /** ManifestA class <br/>
   *  - tests the manifest recognition
   *  - A, B, C, D should be implicitly converted to this */
-class ManifestA[W : Manifest](a: A[W]) {
+class ManifestA[W: Manifest](a: A[W]) {
 
   /** The convToManifestA: W documentation... */
   def convToManifestA(x: W): W = sys.error("dunno")

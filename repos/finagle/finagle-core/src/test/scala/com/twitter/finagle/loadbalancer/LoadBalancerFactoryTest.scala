@@ -4,7 +4,10 @@ import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, StringClient}
 import com.twitter.finagle.param.Stats
 import com.twitter.finagle.server.StringServer
-import com.twitter.finagle.stats.{InMemoryHostStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  InMemoryHostStatsReceiver,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Await, Future, Var}
 import java.net.{InetAddress, InetSocketAddress, SocketAddress}
@@ -15,7 +18,10 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class LoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer with Eventually
+    extends FunSuite
+    with StringClient
+    with StringServer
+    with Eventually
     with IntegrationPatience {
   val echoService = Service.mk[String, String](Future.value(_))
 
@@ -101,7 +107,9 @@ class LoadBalancerFactoryTest
 
 @RunWith(classOf[JUnitRunner])
 class ConcurrentLoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer {
+    extends FunSuite
+    with StringClient
+    with StringServer {
   val echoService = Service.mk[String, String](Future.value(_))
 
   test("makes service factory stack") {

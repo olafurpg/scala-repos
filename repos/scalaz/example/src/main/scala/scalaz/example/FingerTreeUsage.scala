@@ -36,19 +36,21 @@ object FingerTreeUsage extends App {
   assert((streamToTree(intStream.take(3)) :-| 5).toList == List(1, 2, 5))
 
   //appending two trees
-  assert((streamToTree(intStream.take(5)) <++> streamToTree(
-              Stream.from(6).take(5))).toStream == intStream.take(10))
+  assert(
+      (streamToTree(intStream.take(5)) <++> streamToTree(
+          Stream.from(6).take(5))).toStream == intStream.take(10))
 
   import std.option._
 
   //traversing the tree
-  val traversedTree = streamToTree(intStream.take(10))
-    .traverseTree[Option, Int, Int](i => Some(i * 2))
+  val traversedTree =
+    streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i =>
+      Some(i * 2))
   assert(
       traversedTree.map(_.toStream).getOrElse(Stream.empty) == intStream
         .map(_ * 2)
         .take(10))
 
-  println(streamToTree(intStream.take(10))
-        .traverseTree[Option, Int, Int](i => Some(i + 1)))
+  println(streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i =>
+    Some(i + 1)))
 }

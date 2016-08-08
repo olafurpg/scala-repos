@@ -29,8 +29,14 @@ object Client {
 }
 
 class Client(service: Service[Command, Reply])
-    extends BaseClient(service) with Keys with Strings with Hashes
-    with SortedSets with Lists with Sets with BtreeSortedSetCommands
+    extends BaseClient(service)
+    with Keys
+    with Strings
+    with Hashes
+    with SortedSets
+    with Lists
+    with Sets
+    with BtreeSortedSetCommands
     with HyperLogLogs
 
 /**
@@ -101,14 +107,14 @@ class BaseClient(service: Service[Command, Reply]) {
   /**
     * Helper function for passing a command to the service
     */
-  private[redis] def doRequest[T](
-      cmd: Command)(handler: PartialFunction[Reply, Future[T]]) =
+  private[redis] def doRequest[T](cmd: Command)(
+      handler: PartialFunction[Reply, Future[T]]) =
     service(cmd) flatMap
-    (handler orElse {
-          case ErrorReply(message) =>
-            Future.exception(new ServerError(message))
-          case _ => Future.exception(new IllegalStateException)
-        })
+      (handler orElse {
+        case ErrorReply(message) =>
+          Future.exception(new ServerError(message))
+        case _ => Future.exception(new IllegalStateException)
+      })
 
   /**
     * Helper function to convert a Redis multi-bulk reply into a map of pairs
@@ -182,8 +188,8 @@ object TransactionalClient {
   */
 private[redis] class ConnectedTransactionalClient(
     serviceFactory: ServiceFactory[Command, Reply]
-)
-    extends Client(serviceFactory.toService) with TransactionalClient {
+) extends Client(serviceFactory.toService)
+    with TransactionalClient {
 
   def transaction(cmds: Seq[Command]): Future[Seq[Reply]] = {
     serviceFactory() flatMap { svc =>
@@ -216,7 +222,8 @@ private[redis] class ConnectedTransactionalClient(
       case MBulkReply(messages) => Future.value(messages)
       case EmptyMBulkReply() => Future.Nil
       case NilMBulkReply() =>
-        Future.exception(new ServerError(
+        Future.exception(
+            new ServerError(
                 "One or more keys were modified before transaction"))
       case ErrorReply(message) => Future.exception(new ServerError(message))
       case _ => Future.exception(new IllegalStateException)

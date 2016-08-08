@@ -10,7 +10,7 @@ class a {
     * @tparam Q
     *
     */
-  type aaa [T, U, P, Q >: U, Z <: U]
+  type aaa[T, U, P, Q >: U, Z <: U]
 
   /**
     * @tparam <testref>A

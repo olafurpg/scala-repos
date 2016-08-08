@@ -26,7 +26,8 @@ object NodeChurnMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+            """
       akka.cluster.auto-down-unreachable-after = 1s
       akka.remote.log-frame-size-exceeding = 2000b
       """))
@@ -48,7 +49,8 @@ class NodeChurnMultiJvmNode2 extends NodeChurnSpec
 class NodeChurnMultiJvmNode3 extends NodeChurnSpec
 
 abstract class NodeChurnSpec
-    extends MultiNodeSpec(NodeChurnMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(NodeChurnMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import NodeChurnMultiJvmSpec._

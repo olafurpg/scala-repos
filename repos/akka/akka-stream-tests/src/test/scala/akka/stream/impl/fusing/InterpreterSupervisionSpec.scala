@@ -37,8 +37,8 @@ object InterpreterSupervisionSpec {
     }
   }
 
-  case class OneToManyTestStage(
-      decider: Supervision.Decider, absorbTermination: Boolean = false)
+  case class OneToManyTestStage(decider: Supervision.Decider,
+                                absorbTermination: Boolean = false)
       extends PushPullStage[Int, Int] {
     var buf: List[Int] = Nil
     def onPush(elem: Int, ctx: Context[Int]): SyncDirective = {
@@ -69,7 +69,8 @@ object InterpreterSupervisionSpec {
 }
 
 class InterpreterSupervisionSpec
-    extends AkkaSpec with GraphInterpreterSpecKit {
+    extends AkkaSpec
+    with GraphInterpreterSpecKit {
   import InterpreterSupervisionSpec._
   import Supervision.stoppingDecider
   import Supervision.resumingDecider
@@ -282,7 +283,8 @@ class InterpreterSupervisionSpec
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
-        upstream.onNext(-5) // this will trigger failure of next requestOne (pull)
+        upstream
+          .onNext(-5) // this will trigger failure of next requestOne (pull)
         lastEvents() should be(Set(OnNext(99)))
 
         downstream.requestOne() // boom
@@ -290,8 +292,8 @@ class InterpreterSupervisionSpec
       }
     }
 
-    "resume when Filter throws" in new OneBoundedSetup[Int](Seq(Filter(
-                (x: Int) ⇒ if (x == 0) throw TE else true, resumingDecider))) {
+    "resume when Filter throws" in new OneBoundedSetup[Int](Seq(
+        Filter((x: Int) ⇒ if (x == 0) throw TE else true, resumingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
       upstream.onNext(2)
@@ -376,8 +378,8 @@ class InterpreterSupervisionSpec
 
     "fail when Expand `seed` throws" in new OneBoundedSetup[Int](
         new Expand((in: Int) ⇒
-              if (in == 2) throw TE
-              else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
+          if (in == 2) throw TE
+          else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
 
       lastEvents() should be(Set(RequestOne))
 
@@ -399,8 +401,8 @@ class InterpreterSupervisionSpec
 
     "fail when Expand `extrapolate` throws" in new OneBoundedSetup[Int](
         new Expand((in: Int) ⇒
-              if (in == 2) Iterator.continually(throw TE)
-              else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
+          if (in == 2) Iterator.continually(throw TE)
+          else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
 
       lastEvents() should be(Set(RequestOne))
 

@@ -51,8 +51,9 @@ abstract class GeneralizedLinearModel @Since("1.0.0")(
     * @param weightMatrix Column vector containing the weights of the model
     * @param intercept Intercept of the model.
     */
-  protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double): Double
+  protected def predictPoint(dataMatrix: Vector,
+                             weightMatrix: Vector,
+                             intercept: Double): Double
 
   /**
     * Predict values for the given data set using the model trained.
@@ -103,7 +104,8 @@ abstract class GeneralizedLinearModel @Since("1.0.0")(
 @Since("0.8.0")
 @DeveloperApi
 abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   protected val validators: Seq[RDD[LabeledPoint] => Boolean] = List()
 
@@ -250,7 +252,7 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data is not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Check the data properties before running the optimizer
@@ -330,8 +332,9 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
 
     var weights =
       if (addIntercept && numOfLinearPredictor == 1) {
-        Vectors.dense(weightsWithIntercept.toArray.slice(
-                0, weightsWithIntercept.size - 1))
+        Vectors.dense(
+            weightsWithIntercept.toArray
+              .slice(0, weightsWithIntercept.size - 1))
       } else {
         weightsWithIntercept
       }
@@ -380,7 +383,7 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Unpersist cached data

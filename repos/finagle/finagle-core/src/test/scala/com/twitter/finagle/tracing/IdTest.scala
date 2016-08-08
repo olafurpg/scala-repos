@@ -9,24 +9,37 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class IdTest extends FunSuite {
   test("compare unequal ids") {
-    assert(TraceId(None, None, SpanId(0L), None) != TraceId(
-            None, None, SpanId(1L), None))
+    assert(
+        TraceId(None, None, SpanId(0L), None) != TraceId(None,
+                                                         None,
+                                                         SpanId(1L),
+                                                         None))
   }
 
   test("compare equal ids") {
-    assert(TraceId(None, None, SpanId(0L), None) == TraceId(
-            None, None, SpanId(0L), None))
+    assert(
+        TraceId(None, None, SpanId(0L), None) == TraceId(None,
+                                                         None,
+                                                         SpanId(0L),
+                                                         None))
   }
 
   test("compare synthesized parentId") {
-    assert(TraceId(None, Some(SpanId(1L)), SpanId(1L), None) == TraceId(
-            None, None, SpanId(1L), None))
+    assert(
+        TraceId(None, Some(SpanId(1L)), SpanId(1L), None) == TraceId(
+            None,
+            None,
+            SpanId(1L),
+            None))
   }
 
   test("compare synthesized traceId") {
     assert(
         TraceId(Some(SpanId(1L)), Some(SpanId(1L)), SpanId(1L), None) == TraceId(
-            None, Some(SpanId(1L)), SpanId(1L), None))
+            None,
+            Some(SpanId(1L)),
+            SpanId(1L),
+            None))
   }
 
   test("serialize and deserialize") {

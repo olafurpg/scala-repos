@@ -40,8 +40,11 @@ class InnerProductJob(args: Args) extends Job(args) {
       input
   }
   in0
-    .blockJoinWithSmaller(
-        'y1 -> 'y2, in1, leftReplication = l, rightReplication = r, joiner = j)
+    .blockJoinWithSmaller('y1 -> 'y2,
+                          in1,
+                          leftReplication = l,
+                          rightReplication = r,
+                          joiner = j)
     .map(('s1, 's2) -> 'score) { v: (Int, Int) =>
       v._1 * v._2
     }
@@ -58,8 +61,9 @@ class BlockJoinPipeTest extends WordSpec with Matchers {
     val correctOutput = Set((0, 1, 2.0), (0, 0, 1.0), (1, 1, 4.0), (2, 1, 8.0))
 
     def runJobWithArguments(
-        left: Int = 1, right: Int = 1, joiner: String = "i")(
-        callback: Buffer[(Int, Int, Double)] => Unit) {
+        left: Int = 1,
+        right: Int = 1,
+        joiner: String = "i")(callback: Buffer[(Int, Int, Double)] => Unit) {
       JobTest(new InnerProductJob(_))
         .source(Tsv("input0"), in1)
         .source(Tsv("input1"), in2)
@@ -94,19 +98,21 @@ class BlockJoinPipeTest extends WordSpec with Matchers {
     "throw an exception when used with OuterJoin" in {
       an[InvalidJoinModeException] should be thrownBy runJobWithArguments(
           joiner = "o") { _ =>
-      }
+        }
     }
 
     "throw an exception when used with an invalid LeftJoin" in {
       an[InvalidJoinModeException] should be thrownBy runJobWithArguments(
-          joiner = "l", left = 2) { _ =>
-      }
+          joiner = "l",
+          left = 2) { _ =>
+        }
     }
 
     "throw an exception when used with an invalid RightJoin" in {
       an[InvalidJoinModeException] should be thrownBy runJobWithArguments(
-          joiner = "r", right = 2) { _ =>
-      }
+          joiner = "r",
+          right = 2) { _ =>
+        }
     }
   }
 }

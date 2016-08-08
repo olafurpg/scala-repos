@@ -17,7 +17,12 @@ import scala.concurrent.{Await, Future, ExecutionContext}
 import slick.SlickException
 import slick.basic.{BasicProfile, Capability}
 import slick.dbio.{NoStream, DBIOAction, DBIO}
-import slick.jdbc.{JdbcProfile, ResultSetAction, JdbcDataSource, SimpleJdbcAction}
+import slick.jdbc.{
+  JdbcProfile,
+  ResultSetAction,
+  JdbcDataSource,
+  SimpleJdbcAction
+}
 import slick.jdbc.GetResult._
 import slick.relational.RelationalProfile
 import slick.sql.SqlProfile
@@ -192,28 +197,24 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
       for {
         tables <- localTables
         sequences <- localSequences
-        _ <- DBIO.seq(
-            (tables.map(t =>
-                      sqlu"""drop table if exists #${profile.quoteIdentifier(t)} cascade""") ++ sequences
-                  .map(t =>
-                      sqlu"""drop sequence if exists #${profile
+        _ <- DBIO.seq((tables.map(t =>
+              sqlu"""drop table if exists #${profile
+                .quoteIdentifier(t)} cascade""") ++ sequences.map(t =>
+              sqlu"""drop sequence if exists #${profile
                 .quoteIdentifier(t)} cascade""")): _*)
       } yield ()
     }
   def assertTablesExist(tables: String*) =
-    DBIO.seq(
-        tables.map(t =>
-              sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
-                .as[Int]): _*)
+    DBIO.seq(tables.map(t =>
+      sql"""select 1 from #${profile
+        .quoteIdentifier(t)} where 1 < 0""".as[Int]): _*)
   def assertNotTablesExist(tables: String*) =
-    DBIO.seq(
-        tables.map(t =>
-              sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
-                .as[Int]
-                .failed): _*)
+    DBIO.seq(tables.map(t =>
+      sql"""select 1 from #${profile
+        .quoteIdentifier(t)} where 1 < 0""".as[Int].failed): _*)
   def createSingleSessionDatabase(implicit session: profile.Backend#Session,
                                   executor: AsyncExecutor = AsyncExecutor
-                                      .default()): profile.Backend#Database = {
+                                    .default()): profile.Backend#Database = {
     val wrappedConn = new DelegateConnection(session.conn) {
       override def close(): Unit = ()
     }
@@ -236,7 +237,8 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
     db.run(f(ec)).value.get.get
   }
   protected[this] def await[T](f: Future[T]): T =
-    try Await.result(f, TestkitConfig.asyncTimeout) catch {
+    try Await.result(f, TestkitConfig.asyncTimeout)
+    catch {
       case ex: ExecutionException => throw ex.getCause
     }
 }
@@ -264,13 +266,13 @@ abstract class ExternalJdbcTestDB(confName: String)
 
   override def isEnabled = super.isEnabled && config.getBoolean("enabled")
 
-  override lazy val testClasses: Seq[Class[
-          _ <: GenericTest[_ >: Null <: TestDB]]] = TestkitConfig
+  override lazy val testClasses: Seq[
+      Class[_ <: GenericTest[_ >: Null <: TestDB]]] = TestkitConfig
     .getStrings(config, "testClasses")
     .map(_.map(n =>
-              Class
-                .forName(n)
-                .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]]))
+      Class
+        .forName(n)
+        .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]]))
     .getOrElse(super.testClasses)
 
   def databaseFor(path: String) =
@@ -281,12 +283,9 @@ abstract class ExternalJdbcTestDB(confName: String)
   override def cleanUpBefore() {
     if (!drop.isEmpty || !create.isEmpty) {
       println("[Creating test database " + this + "]")
-      await(
-          databaseFor("adminConn").run(
-              DBIO
-                .seq((drop ++ create).map(s => sqlu"#$s"): _*)
-                .withPinnedSession
-            ))
+      await(databaseFor("adminConn").run(
+          DBIO.seq((drop ++ create).map(s => sqlu"#$s"): _*).withPinnedSession
+      ))
     }
     if (!postCreate.isEmpty) {
       await(

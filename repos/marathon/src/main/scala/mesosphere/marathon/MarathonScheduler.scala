@@ -49,15 +49,15 @@ class MarathonScheduler @Inject()(
         SchedulerRegisteredEvent(frameworkId.getValue, master.getHostname))
   }
 
-  override def reregistered(
-      driver: SchedulerDriver, master: MasterInfo): Unit = {
+  override def reregistered(driver: SchedulerDriver,
+                            master: MasterInfo): Unit = {
     log.info("Re-registered to %s".format(master))
     mesosLeaderInfo.onNewMasterInfo(master)
     eventBus.publish(SchedulerReregisteredEvent(master.getHostname))
   }
 
-  override def resourceOffers(
-      driver: SchedulerDriver, offers: java.util.List[Offer]): Unit = {
+  override def resourceOffers(driver: SchedulerDriver,
+                              offers: java.util.List[Offer]): Unit = {
     import scala.collection.JavaConverters._
     offers.asScala.foreach { offer =>
       val processFuture = offerProcessor.processOffer(offer)
@@ -74,10 +74,10 @@ class MarathonScheduler @Inject()(
     log.info("Offer %s rescinded".format(offer))
   }
 
-  override def statusUpdate(
-      driver: SchedulerDriver, status: TaskStatus): Unit = {
-    log.info("Received status update for task %s: %s (%s)".format(
-            status.getTaskId.getValue, status.getState, status.getMessage))
+  override def statusUpdate(driver: SchedulerDriver,
+                            status: TaskStatus): Unit = {
+    log.info("Received status update for task %s: %s (%s)"
+      .format(status.getTaskId.getValue, status.getState, status.getMessage))
 
     taskStatusProcessor.publish(status).onFailure {
       case NonFatal(e) =>
@@ -89,8 +89,9 @@ class MarathonScheduler @Inject()(
                                 executor: ExecutorID,
                                 slave: SlaveID,
                                 message: Array[Byte]): Unit = {
-    log.info("Received framework message %s %s %s ".format(
-            executor, slave, message))
+    log.info(
+        "Received framework message %s %s %s "
+          .format(executor, slave, message))
     eventBus.publish(
         MesosFrameworkMessageEvent(executor.getValue, slave.getValue, message))
   }
@@ -117,11 +118,10 @@ class MarathonScheduler @Inject()(
   }
 
   override def error(driver: SchedulerDriver, message: String) {
-    log.warn(
-        s"Error: $message\n" +
-        s"In case Mesos does not allow registration with the current frameworkId, " +
-        s"delete the ZooKeeper Node: ${config.zkPath}/state/framework:id\n" +
-        s"CAUTION: if you remove this node, all tasks started with the current frameworkId will be orphaned!")
+    log.warn(s"Error: $message\n" +
+      s"In case Mesos does not allow registration with the current frameworkId, " +
+      s"delete the ZooKeeper Node: ${config.zkPath}/state/framework:id\n" +
+      s"CAUTION: if you remove this node, all tasks started with the current frameworkId will be orphaned!")
 
     // Currently, it's pretty hard to disambiguate this error from other causes of framework errors.
     // Watch MESOS-2522 which will add a reason field for framework errors to help with this.

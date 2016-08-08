@@ -20,7 +20,11 @@ package org.apache.spark.ml.evaluation
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.ml.param.shared.{HasLabelCol, HasPredictionCol}
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable,
+  DefaultParamsWritable,
+  Identifiable
+}
 import org.apache.spark.mllib.evaluation.RegressionMetrics
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions._
@@ -34,7 +38,9 @@ import org.apache.spark.sql.types.{DoubleType, FloatType}
 @Experimental
 final class RegressionEvaluator @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Evaluator with HasPredictionCol with HasLabelCol
+    extends Evaluator
+    with HasPredictionCol
+    with HasLabelCol
     with DefaultParamsWritable {
 
   @Since("1.4.0")
@@ -84,7 +90,7 @@ final class RegressionEvaluator @Since("1.4.0")(
     require(
         predictionType == FloatType || predictionType == DoubleType,
         s"Prediction column $predictionColName must be of type float or double, " +
-        s" but not $predictionType")
+          s" but not $predictionType")
     val labelColName = $(labelCol)
     val labelType = schema($(labelCol)).dataType
     require(

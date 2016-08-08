@@ -17,7 +17,10 @@
 
 package org.apache.spark.partial
 
-import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
+import org.apache.commons.math3.distribution.{
+  NormalDistribution,
+  TDistribution
+}
 
 /**
   * A utility class for caching Student's T distribution values for a given confidence level
@@ -40,8 +43,8 @@ private[spark] class StudentTCacher(confidence: Double) {
       val size = sampleSize.toInt
       if (cache(size) < 0) {
         val tDist = new TDistribution(size - 1)
-        cache(size) = tDist.inverseCumulativeProbability(
-            1 - (1 - confidence) / 2)
+        cache(size) =
+          tDist.inverseCumulativeProbability(1 - (1 - confidence) / 2)
       }
       cache(size)
     }

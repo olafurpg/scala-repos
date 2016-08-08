@@ -5,7 +5,14 @@ import chess.Pos.posAt
 import chess.{Status, Role, Color, MoveOrDrop}
 import scalaz.Validation.FlatMap._
 
-import actorApi.round.{HumanPlay, DrawNo, TakebackNo, PlayResult, Cheat, ForecastPlay}
+import actorApi.round.{
+  HumanPlay,
+  DrawNo,
+  TakebackNo,
+  PlayResult,
+  Cheat,
+  ForecastPlay
+}
 import akka.actor.ActorRef
 import lila.game.{Game, GameRepo, Pov, Progress, UciMemo}
 import lila.hub.actorApi.map.Tell
@@ -31,27 +38,29 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
               .flatMap {
                 case (progress, moveOrDrop) =>
                   (GameRepo save progress).mon(_.round.move.segment.save) >>-
-                  (pov.game.hasAi ! uciMemo.add(pov.game, moveOrDrop)) >>- notifyMove(
-                      moveOrDrop, progress.game) >> progress.game.finished
+                    (pov.game.hasAi ! uciMemo
+                      .add(pov.game, moveOrDrop)) >>- notifyMove(
+                      moveOrDrop,
+                      progress.game) >> progress.game.finished
                     .fold(moveFinish(progress.game, color) map {
-                    progress.events ::: _
-                  }, {
-                    cheatDetector(progress.game) addEffect {
-                      case Some(color) => round ! Cheat(color)
-                      case None =>
-                        if (progress.game.playableByAi)
-                          requestFishnet(progress.game)
-                        if (pov.opponent.isOfferingDraw)
-                          round ! DrawNo(pov.player.id)
-                        if (pov.player.isProposingTakeback)
-                          round ! TakebackNo(pov.player.id)
-                        moveOrDrop.left.toOption
-                          .ifTrue(pov.game.forecastable)
-                          .foreach { move =>
-                            round ! ForecastPlay(move)
-                          }
-                    } inject progress.events
-                  }) >>- promiseOption.foreach(_.success(()))
+                      progress.events ::: _
+                    }, {
+                      cheatDetector(progress.game) addEffect {
+                        case Some(color) => round ! Cheat(color)
+                        case None =>
+                          if (progress.game.playableByAi)
+                            requestFishnet(progress.game)
+                          if (pov.opponent.isOfferingDraw)
+                            round ! DrawNo(pov.player.id)
+                          if (pov.player.isProposingTakeback)
+                            round ! TakebackNo(pov.player.id)
+                          moveOrDrop.left.toOption
+                            .ifTrue(pov.game.forecastable)
+                            .foreach { move =>
+                              round ! ForecastPlay(move)
+                            }
+                      } inject progress.events
+                    }) >>- promiseOption.foreach(_.success(()))
               } addFailureEffect { e =>
               promiseOption.foreach(_ failure e)
             }
@@ -74,9 +83,10 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
           .fold(errs => fufail(ClientError(errs.shows)), fuccess)
           .flatMap {
             case (progress, moveOrDrop) =>
-              (GameRepo save progress) >>- uciMemo.add(
-                  progress.game, moveOrDrop) >>- notifyMove(
-                  moveOrDrop, progress.game) >> progress.game.finished.fold(
+              (GameRepo save progress) >>- uciMemo
+                .add(progress.game, moveOrDrop) >>- notifyMove(
+                  moveOrDrop,
+                  progress.game) >> progress.game.finished.fold(
                   moveFinish(progress.game, game.turnColor) map {
                     progress.events ::: _
                   },
@@ -87,8 +97,10 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
             FishnetError("Invalid AI move current FEN"))
     } else fufail(FishnetError("Not AI turn"))
 
-  private def applyUci(
-      game: Game, uci: Uci, blur: Boolean, lag: FiniteDuration) =
+  private def applyUci(game: Game,
+                       uci: Uci,
+                       blur: Boolean,
+                       lag: FiniteDuration) =
     (uci match {
       case Uci.Move(orig, dest, prom) =>
         game.toChess.apply(orig, dest, prom, lag) map {

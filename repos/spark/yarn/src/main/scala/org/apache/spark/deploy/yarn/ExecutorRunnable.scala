@@ -55,7 +55,8 @@ private[yarn] class ExecutorRunnable(container: Container,
                                      executorCores: Int,
                                      appId: String,
                                      securityMgr: SecurityManager)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
 
   var rpc: YarnRPC = YarnRPC.create(conf)
   var nmClient: NMClient = _
@@ -133,7 +134,7 @@ private[yarn] class ExecutorRunnable(container: Container,
       case ex: Exception =>
         throw new SparkException(
             s"Exception while starting container ${container.getId}" +
-            s" on host $hostname",
+              s" on host $hostname",
             ex)
     }
   }
@@ -215,7 +216,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // For log4j configuration to reference
     javaOpts +=
-    ("-Dspark.yarn.app.container.log.dir=" +
+      ("-Dspark.yarn.app.container.log.dir=" +
         ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
@@ -235,7 +236,7 @@ private[yarn] class ExecutorRunnable(container: Container,
     val commands =
       prefixEnv ++ Seq(
           YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
-          "/bin/java",
+            "/bin/java",
           "-server",
           // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
           // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in

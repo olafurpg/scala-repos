@@ -125,8 +125,8 @@ object ParquetReadSupportProvider {
       def matchPrimitiveField(converterType: Type): (Tree, Tree, Tree, Tree) = {
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
         val innerConverter: Tree = q"new $converterType()"
-        val converter: Tree = fieldConverter(
-            converterName, innerConverter, isPrimitive = true)
+        val converter: Tree =
+          fieldConverter(converterName, innerConverter, isPrimitive = true)
         createFieldMatchResult(converterName, converter)
       }
 
@@ -141,8 +141,11 @@ object ParquetReadSupportProvider {
                         keyConverter: Tree,
                         valueConverter: Tree): (Tree, Tree, Tree, Tree) = {
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
-        val mapConverter = createMapFieldConverter(
-            converterName, K, V, keyConverter, valueConverter)
+        val mapConverter = createMapFieldConverter(converterName,
+                                                   K,
+                                                   V,
+                                                   keyConverter,
+                                                   valueConverter)
         createFieldMatchResult(converterName, mapConverter)
       }
 
@@ -208,8 +211,10 @@ object ParquetReadSupportProvider {
     def unzip(treeTuples: List[(Tree, Tree, Tree, Tree)])
       : (List[Tree], List[Tree], List[Tree], List[Tree]) = {
       val emptyTreeList = List[Tree]()
-      treeTuples.foldRight(
-          emptyTreeList, emptyTreeList, emptyTreeList, emptyTreeList) {
+      treeTuples.foldRight(emptyTreeList,
+                           emptyTreeList,
+                           emptyTreeList,
+                           emptyTreeList) {
         case ((t1, t2, t3, t4), (l1, l2, l3, l4)) =>
           (t1 :: l1, t2 :: l2, t3 :: l3, t4 :: l4)
       }

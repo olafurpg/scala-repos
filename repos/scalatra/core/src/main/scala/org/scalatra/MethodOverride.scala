@@ -1,6 +1,10 @@
 package org.scalatra
 
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServletRequest,
+  HttpServletRequestWrapper,
+  HttpServletResponse
+}
 
 import org.scalatra.servlet.ServletApiImplicits
 
@@ -24,8 +28,8 @@ object MethodOverride {
   */
 trait MethodOverride extends Handler with ServletApiImplicits {
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse): Unit = {
     val req2 = req.requestMethod match {
       case Post =>
         new HttpServletRequestWrapper(req) {

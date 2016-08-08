@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.codeInspection
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.CachedValueProvider.Result
-import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiTreeUtil}
+import com.intellij.psi.util.{
+  CachedValueProvider,
+  CachedValuesManager,
+  PsiTreeUtil
+}
 import com.intellij.psi.{PsiElement, PsiMethod, PsiType}
 import org.jetbrains.plugins.scala.codeInspection.InspectionsUtil.isExpressionOfType
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil
@@ -10,16 +14,33 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings.nameFitToPatterns
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScFunctionDefinition,
+  ScValue,
+  ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  InferUtil,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_9
@@ -219,8 +240,8 @@ package object collections {
             case _ => None
           }
         case ScInfixExpr(underscore(), oper, underscore()) => Some(oper)
-        case ScMethodCall(
-            refExpr: ScReferenceExpression, Seq(underscore(), underscore())) =>
+        case ScMethodCall(refExpr: ScReferenceExpression,
+                          Seq(underscore(), underscore())) =>
           Some(refExpr)
         case _ => None
       }
@@ -237,11 +258,11 @@ package object collections {
               (stripped(left), stripped(right)) match {
                 case (leftRef: ScReferenceExpression, rightExpr)
                     if leftRef.resolve() == x &&
-                    isIndependentOf(rightExpr, x) =>
+                      isIndependentOf(rightExpr, x) =>
                   Some(rightExpr)
                 case (leftExpr: ScExpression, rightRef: ScReferenceExpression)
                     if rightRef.resolve() == x &&
-                    isIndependentOf(leftExpr, x) =>
+                      isIndependentOf(leftExpr, x) =>
                   Some(leftExpr)
                 case _ => None
               }
@@ -276,8 +297,9 @@ package object collections {
                   val funExprText = secondArgName + " => " + right.getText
                   Some(
                       ScalaPsiElementFactory
-                        .createExpressionWithContextFromText(
-                          funExprText, expr.getContext, expr))
+                        .createExpressionWithContextFromText(funExprText,
+                                                             expr.getContext,
+                                                             expr))
                 case _ => None
               }
             case _ => None
@@ -325,8 +347,9 @@ package object collections {
     }
   }
 
-  def invocationText(
-      qual: ScExpression, methName: String, args: ScExpression*): String = {
+  def invocationText(qual: ScExpression,
+                     methName: String,
+                     args: ScExpression*): String = {
     val qualText = qual.getText
     val argsText = argListText(args)
     qual match {
@@ -374,11 +397,13 @@ package object collections {
     elem.scalaLanguageLevel.map(_ > Scala_2_9).getOrElse(true)
   }
 
-  def implicitParameterExistsFor(
-      methodName: String, baseExpr: ScExpression): Boolean = {
+  def implicitParameterExistsFor(methodName: String,
+                                 baseExpr: ScExpression): Boolean = {
     val expression =
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          s"${baseExpr.getText}.$methodName", baseExpr.getContext, baseExpr)
+          s"${baseExpr.getText}.$methodName",
+          baseExpr.getContext,
+          baseExpr)
     implicitParameterExistsFor(expression)
   }
 
@@ -513,7 +538,7 @@ package object collections {
       def isSideEffectCollectionMethod(ref: ScReferenceExpression): Boolean = {
         val refName = ref.refName
         (refName.endsWith("=") || refName.endsWith("=:") ||
-            sideEffectsCollectionMethods.contains(refName)) && checkResolve(
+        sideEffectsCollectionMethods.contains(refName)) && checkResolve(
             ref,
             Array("scala.collection.mutable._", "scala.collection.Iterator"))
       }
@@ -555,24 +580,27 @@ package object collections {
       val sameLevelIterator = expr.depthFirst(predicate).filter(predicate)
 
       sameLevelIterator.collect {
-        case assign @ ScAssignStmt(
-            definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)), _) =>
+        case assign @ ScAssignStmt(definedOutside(
+                                   ScalaPsiUtil.inNameContext(_: ScVariable)),
+                                   _) =>
           assign
         case assign @ ScAssignStmt(mc @ ScMethodCall(definedOutside(_), _), _)
             if mc.isUpdateCall =>
           assign
-        case infix @ ScInfixExpr(
-            definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)), _, _)
-            if infix.isAssignmentOperator =>
+        case infix @ ScInfixExpr(definedOutside(
+                                 ScalaPsiUtil.inNameContext(v: ScVariable)),
+                                 _,
+                                 _) if infix.isAssignmentOperator =>
           infix
         case MethodRepr(
             itself,
-            Some(definedOutside(
+            Some(
+            definedOutside(
             ScalaPsiUtil.inNameContext(v @ (_: ScVariable | _: ScValue)))),
             Some(ref),
             _)
             if isSideEffectCollectionMethod(ref) || isSetter(ref) ||
-            hasUnitReturnType(ref) =>
+              hasUnitReturnType(ref) =>
           itself
         case MethodRepr(itself, None, Some(ref @ definedOutside(_)), _)
             if hasUnitReturnType(ref) =>

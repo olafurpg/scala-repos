@@ -18,8 +18,9 @@ object SbtWatcherMain {
     "Waiting for source changes... (press enter to interrupt)"
   private val MESSAGE_LIMIT = 12
   private val WAIT_TIME = 150
-  private var currentExec: Option[(SbtWatcherExec, CachingMessageConsumer, Seq[
-          String])] = None
+  private var currentExec: Option[(SbtWatcherExec,
+                                   CachingMessageConsumer,
+                                   Seq[String])] = None
 
   def nailMain(context: NGContext) {
     handle(context.getArgs.toSeq, context.out)
@@ -31,11 +32,16 @@ object SbtWatcherMain {
 
   private def handle(arguments: Seq[String], out: PrintStream) {
     def write2source(message: String) {
-      out.write(
-          Base64Converter
-            .encode(MessageEvent(
-                    BuildMessage.Kind.INFO, message, None, None, None).toBytes)
-            .getBytes)
+      out
+        .write(
+            Base64Converter
+              .encode(
+                  MessageEvent(BuildMessage.Kind.INFO,
+                               message,
+                               None,
+                               None,
+                               None).toBytes)
+              .getBytes)
     }
 
     def createConsumer(delegate: MessageConsumer) =
@@ -94,7 +100,7 @@ object SbtWatcherMain {
         currentExec match {
           case Some((watcher, cons, args))
               if watcher.isRunning && args.head == argsTail.head &&
-              cm == LOOP =>
+                cm == LOOP =>
             val oldDelegate = cons.delegate
             val newDelegate = delegate
             cons.delegate = newDelegate
@@ -113,8 +119,7 @@ object SbtWatcherMain {
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
-        write2source(
-            currentExec.map { a =>
+        write2source(currentExec.map { a =>
           toMessage(a._1.isRunning)
         } getOrElse FALSE)
       case _ =>

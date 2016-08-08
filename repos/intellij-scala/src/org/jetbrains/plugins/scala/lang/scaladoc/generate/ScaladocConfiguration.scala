@@ -4,7 +4,10 @@ import javax.swing.Icon
 
 import com.intellij.analysis.AnalysisScope
 import com.intellij.execution.Executor
-import com.intellij.execution.configurations.{ModuleRunProfile, RunProfileState}
+import com.intellij.execution.configurations.{
+  ModuleRunProfile,
+  RunProfileState
+}
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -22,10 +25,10 @@ class ScaladocConfiguration(
     Module.EMPTY_ARRAY
   }
 
-  def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
-    val state: ScaladocCommandLineState = new ScaladocCommandLineState(
-        env, project)
+  def getState(executor: Executor,
+               env: ExecutionEnvironment): RunProfileState = {
+    val state: ScaladocCommandLineState =
+      new ScaladocCommandLineState(env, project)
     state.setAdditionalScaladocFlags(form.getAdditionalFlags)
     state.setScope(scope)
     state.setVerbose(form.isVerbose)

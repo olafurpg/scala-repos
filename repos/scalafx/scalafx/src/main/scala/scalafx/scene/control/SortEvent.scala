@@ -71,7 +71,8 @@ object SortEvent {
   * @define JFX JavaFX
   */
 class SortEvent[C](override val delegate: jfxsc.SortEvent[C])
-    extends Event(delegate) with SFXDelegate[jfxsc.SortEvent[C]] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsc.SortEvent[C]] {
 
   /**
     * Constructor with source and target

@@ -19,11 +19,20 @@ package org.apache.spark.sql.execution.datasources
 
 import org.apache.spark.sql.{AnalysisException, SaveMode, SQLContext}
 import org.apache.spark.sql.catalyst.analysis._
-import org.apache.spark.sql.catalyst.expressions.{Alias, Attribute, Cast, RowOrdering}
+import org.apache.spark.sql.catalyst.expressions.{
+  Alias,
+  Attribute,
+  Cast,
+  RowOrdering
+}
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.Rule
-import org.apache.spark.sql.sources.{BaseRelation, HadoopFsRelation, InsertableRelation}
+import org.apache.spark.sql.sources.{
+  BaseRelation,
+  HadoopFsRelation,
+  InsertableRelation
+}
 
 /**
   * Try to replaces [[UnresolvedRelation]]s with [[ResolvedDataSource]].
@@ -69,7 +78,7 @@ private[sql] object PreInsertCastAndRename extends Rule[LogicalPlan] {
       if (l.output.size != child.output.size) {
         sys.error(
             s"$l requires that the query in the SELECT clause of the INSERT INTO/OVERWRITE " +
-            s"statement generates the same number of columns as its schema.")
+              s"statement generates the same number of columns as its schema.")
       }
       castAndRenameChildOutput(i, l.output, child)
   }
@@ -109,12 +118,12 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
 
   def apply(plan: LogicalPlan): Unit = {
     plan.foreach {
-      case i @ logical.InsertIntoTable(l @ LogicalRelation(
-                                       t: InsertableRelation, _, _),
-                                       partition,
-                                       query,
-                                       overwrite,
-                                       ifNotExists) =>
+      case i @ logical.InsertIntoTable(
+          l @ LogicalRelation(t: InsertableRelation, _, _),
+          partition,
+          query,
+          overwrite,
+          ifNotExists) =>
         // Right now, we do not support insert into a data source table with partition specs.
         if (partition.nonEmpty) {
           failAnalysis(
@@ -142,17 +151,18 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
         val existingPartitionColumns = r.partitionSchema.fieldNames.toSet
         val specifiedPartitionColumns = part.keySet
         if (existingPartitionColumns != specifiedPartitionColumns) {
-          failAnalysis(
-              s"Specified partition columns " +
-              s"(${specifiedPartitionColumns.mkString(", ")}) " +
-              s"do not match the partition columns of the table. Please use " +
-              s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
+          failAnalysis(s"Specified partition columns " +
+            s"(${specifiedPartitionColumns.mkString(", ")}) " +
+            s"do not match the partition columns of the table. Please use " +
+            s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
         } else {
           // OK
         }
 
         PartitioningUtils.validatePartitionColumnDataTypes(
-            r.schema, part.keySet.toSeq, catalog.conf.caseSensitiveAnalysis)
+            r.schema,
+            part.keySet.toSeq,
+            catalog.conf.caseSensitiveAnalysis)
 
         // Get all input data source relations of the query.
         val srcRelations = query.collect {

@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.PsiFileStubW
   * @author ilyas
   */
 class ScFileStubImpl(file: ScalaFile)
-    extends PsiFileStubWrapperImpl[ScalaFile](file) with ScFileStub {
+    extends PsiFileStubWrapperImpl[ScalaFile](file)
+    with ScFileStub {
 
   override def getType =
     ScalaElementTypes.FILE.asInstanceOf[IStubFileElementType[Nothing]]

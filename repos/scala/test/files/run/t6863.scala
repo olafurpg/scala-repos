@@ -110,7 +110,9 @@ object Test {
   }
   def labelDef() = {
     var x = 100 match {
-      case 100 => try "42" finally ()
+      case 100 =>
+        try "42"
+        finally ()
     }
     assert({ () =>
       x
@@ -119,7 +121,9 @@ object Test {
   def nested() = {
     var x = {
       val y = 42
-      if (true) try "42" catch { case _: Throwable => "43" } else "44"
+      if (true)
+        try "42"
+        catch { case _: Throwable => "43" } else "44"
     }
     assert({ () =>
       x

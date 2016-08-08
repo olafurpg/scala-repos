@@ -68,7 +68,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       case Failure(e: java.sql.SQLException) => // TODO: this needs a test!
         logger.debug(
             s"Skipping indices of table ${t.name.name} due to exception during getIndexInfo: " +
-            e.getMessage.trim)
+              e.getMessage.trim)
         Seq()
       case Failure(e) => throw e
     }
@@ -79,20 +79,20 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
 
   /** Column model builder factory. Override for customization.
     * @group Basic customization overrides */
-  def createColumnBuilder(
-      tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+  def createColumnBuilder(tableBuilder: TableBuilder,
+                          meta: MColumn): ColumnBuilder =
     new ColumnBuilder(tableBuilder, meta)
 
-  def createPrimaryKeyBuilder(
-      tableBuilder: TableBuilder, meta: Seq[MPrimaryKey]): PrimaryKeyBuilder =
+  def createPrimaryKeyBuilder(tableBuilder: TableBuilder,
+                              meta: Seq[MPrimaryKey]): PrimaryKeyBuilder =
     new PrimaryKeyBuilder(tableBuilder, meta)
 
-  def createForeignKeyBuilder(
-      tableBuilder: TableBuilder, meta: Seq[MForeignKey]): ForeignKeyBuilder =
+  def createForeignKeyBuilder(tableBuilder: TableBuilder,
+                              meta: Seq[MForeignKey]): ForeignKeyBuilder =
     new ForeignKeyBuilder(tableBuilder, meta)
 
-  def createIndexBuilder(
-      tableBuilder: TableBuilder, meta: Seq[MIndexInfo]): IndexBuilder =
+  def createIndexBuilder(tableBuilder: TableBuilder,
+                         meta: Seq[MIndexInfo]): IndexBuilder =
     new IndexBuilder(tableBuilder, meta)
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////// Main builder
@@ -211,8 +211,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       columns.map(c => c.name -> c).toMap
 
     /** Primary key models in key sequence order */
-    final lazy val primaryKey: Option[m.PrimaryKey] = createPrimaryKeyBuilder(
-        this, mPrimaryKeys).model
+    final lazy val primaryKey: Option[m.PrimaryKey] =
+      createPrimaryKeyBuilder(this, mPrimaryKeys).model
 
     /** Foreign key models by key sequence order */
     final def buildForeignKeys(builders: Builders) =
@@ -249,7 +249,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       * Only valid for single column primary keys. */
     def createPrimaryKeyColumnOption: Boolean =
       tableBuilder.mPrimaryKeys.size == 1 &&
-      tableBuilder.mPrimaryKeys.head.column == meta.name
+        tableBuilder.mPrimaryKeys.head.column == meta.name
 
     /** A (potentially non-portable) database column type for string types, this should not
       * include a length ascription for other types it should */
@@ -305,7 +305,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
 
     private def formatDefault(v: Any) =
       s" default value $v for column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
-      meta.toString
+        meta.toString
 
     /** The default value for the column as a ColumnOption Default or None if no default. The value wrapped by
       * ColumnOption Default needs to be an Option in case of a nullable column but can't be an Option in case of a
@@ -320,30 +320,33 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         .map(v => (v, tpe))
         .collect {
           case (v, _)
-              if Seq(
-                  "NOW", "CURRENT_TIMESTAMP", "CURRENT_DATE", "CURRENT_TIME")
-                .contains(v.stripSuffix("()").toUpperCase) =>
+              if Seq("NOW",
+                     "CURRENT_TIMESTAMP",
+                     "CURRENT_DATE",
+                     "CURRENT_TIME").contains(
+                  v.stripSuffix("()").toUpperCase) =>
             logger.debug(s"Ignoring" + formatDefault(v))
             None
         }
         .getOrElse {
-          default.map(
-              d =>
-                RelationalProfile.ColumnOption.Default(
-                    if (nullable) d
-                    else
-                      d.getOrElse(throw new SlickException(
-                              s"Invalid default value $d for non-nullable column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
-                              meta.toString))
-              ))
+          default.map(d =>
+            RelationalProfile.ColumnOption.Default(
+                if (nullable) d
+                else
+                  d.getOrElse(throw new SlickException(
+                      s"Invalid default value $d for non-nullable column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
+                        meta.toString))
+          ))
         }
 
     private def convenientDefault: Option[
         RelationalProfile.ColumnOption.Default[_]] =
-      try defaultColumnOption catch {
+      try defaultColumnOption
+      catch {
         case e: java.lang.NumberFormatException if ignoreInvalidDefaults =>
-          logger.debug(s"NumberFormatException: Could not parse" +
-              formatDefault(rawDefault))
+          logger.debug(
+              s"NumberFormatException: Could not parse" +
+                formatDefault(rawDefault))
           None
         case e: scala.MatchError =>
           val msg = "Could not parse" + formatDefault(rawDefault)
@@ -360,11 +363,11 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
           tpe = tpe,
           nullable = nullable,
           options = Set() ++ dbType.map(SqlProfile.ColumnOption.SqlType) ++
-            (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
-            (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
-             else None) ++ length.map(RelationalProfile.ColumnOption.Length
-                  .apply(_, varying = varying)) ++
-            (if (!autoInc) convenientDefault else None))
+              (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
+              (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
+               else None) ++ length.map(RelationalProfile.ColumnOption.Length
+              .apply(_, varying = varying)) ++
+              (if (!autoInc) convenientDefault else None))
   }
 
   class PrimaryKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MPrimaryKey]) {
@@ -426,12 +429,13 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       * - indices matching primary key
       * - non-unique indices matching foreign keys referencing columns
       * - indices matching foreign keys referenced columns */
-    def enabled = (idx.indexType != DatabaseMetaData.tableIndexStatistic &&
+    def enabled =
+      (idx.indexType != DatabaseMetaData.tableIndexStatistic &&
         (tableBuilder.mPrimaryKeys.isEmpty ||
-            tableBuilder.mPrimaryKeys.map(_.column).toSet != columns.toSet) &&
+          tableBuilder.mPrimaryKeys.map(_.column).toSet != columns.toSet) &&
         // preserve additional uniqueness constraints on (usually not unique) fk columns
         (unique || tableBuilder.mForeignKeys.forall(
-                _.map(_.fkColumn).toSet != columns.toSet)) &&
+            _.map(_.fkColumn).toSet != columns.toSet)) &&
         // postgres may refer to column oid, skipping index for now. Maybe we should generate a column and include it
         // instead. And maybe this should be moved into PostgresModelBuilder.
         // TODO: This needs a test case!

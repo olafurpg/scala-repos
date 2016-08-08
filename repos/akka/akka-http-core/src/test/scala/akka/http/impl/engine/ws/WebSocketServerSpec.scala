@@ -13,7 +13,9 @@ import org.scalatest.{Matchers, FreeSpec}
 import akka.http.impl.engine.server.HttpServerTestSetupBase
 
 class WebSocketServerSpec
-    extends FreeSpec with Matchers with WithMaterializerSpec { spec ⇒
+    extends FreeSpec
+    with Matchers
+    with WithMaterializerSpec { spec ⇒
 
   "The server-side WebSocket integration should" - {
     "establish a websocket connection when the user requests it" - {
@@ -33,14 +35,15 @@ class WebSocketServerSpec
           val upgrade = request.header[UpgradeToWebSocket]
           upgrade.isDefined shouldBe true
 
-          val source = Source(List(1, 2, 3, 4, 5))
-            .map(num ⇒ TextMessage.Strict(s"Message $num"))
+          val source = Source(List(1, 2, 3, 4, 5)).map(num ⇒
+            TextMessage.Strict(s"Message $num"))
           val handler =
             Flow.fromSinkAndSourceMat(Sink.ignore, source)(Keep.none)
           val response = upgrade.get.handleMessages(handler)
           responses.sendNext(response)
 
-          expectResponseWithWipedDate("""HTTP/1.1 101 Switching Protocols
+          expectResponseWithWipedDate(
+              """HTTP/1.1 101 Switching Protocols
               |Upgrade: websocket
               |Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
               |Server: akka-http/test
@@ -92,7 +95,8 @@ class WebSocketServerSpec
             upgrade.get.handleMessages(Flow[Message]) // simple echoing
           responses.sendNext(response)
 
-          expectResponseWithWipedDate("""HTTP/1.1 101 Switching Protocols
+          expectResponseWithWipedDate(
+              """HTTP/1.1 101 Switching Protocols
               |Upgrade: websocket
               |Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
               |Server: akka-http/test

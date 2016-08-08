@@ -18,7 +18,14 @@ abstract class TreeInfo {
   val global: SymbolTable
 
   import global._
-  import definitions.{isVarArgsList, isCastSymbol, ThrowableClass, uncheckedStableClass, isBlackboxMacroBundleType, isWhiteboxContextType}
+  import definitions.{
+    isVarArgsList,
+    isCastSymbol,
+    ThrowableClass,
+    uncheckedStableClass,
+    isBlackboxMacroBundleType,
+    isWhiteboxContextType
+  }
 
   /* Does not seem to be used. Not sure what it does anyway.
   def isOwnerDefinition(tree: Tree): Boolean = tree match {
@@ -60,8 +67,8 @@ abstract class TreeInfo {
   /** Is tree a pure (i.e. non-side-effecting) definition?
     */
   def isPureDef(tree: Tree): Boolean = tree match {
-    case EmptyTree | ClassDef(_, _, _, _) |
-        TypeDef(_, _, _, _) | Import(_, _) | DefDef(_, _, _, _, _, _) =>
+    case EmptyTree | ClassDef(_, _, _, _) | TypeDef(_, _, _, _) |
+        Import(_, _) | DefDef(_, _, _, _, _, _) =>
       true
     case ValDef(mods, _, _, rhs) =>
       !mods.isMutable && isExprSafeToInline(rhs)
@@ -104,7 +111,7 @@ abstract class TreeInfo {
       case i @ Ident(_) => isStableIdent(i, allowVolatile)
       case Select(qual, _) =>
         isStableMemberOf(tree.symbol, qual, allowVolatile) &&
-        isPath(qual, allowVolatile)
+          isPath(qual, allowVolatile)
       case Apply(Select(free @ Ident(_), nme.apply), _)
           if free.symbol.name endsWith nme.REIFY_FREE_VALUE_SUFFIX =>
         // see a detailed explanation of this trick in `GenSymbols.reifyFreeTerm`
@@ -121,27 +128,28 @@ abstract class TreeInfo {
     * Stable members are packages or members introduced
     * by object definitions or by value definitions of non-volatile types (§3.6).
     */
-  def isStableMemberOf(
-      sym: Symbol, tree: Tree, allowVolatile: Boolean): Boolean =
+  def isStableMemberOf(sym: Symbol,
+                       tree: Tree,
+                       allowVolatile: Boolean): Boolean =
     (symOk(sym) &&
-        (!sym.isTerm ||
-            (sym.isStable && (allowVolatile || !sym.hasVolatileType))) &&
-        typeOk(tree.tpe) && (allowVolatile || !hasVolatileType(tree)) &&
-        !definitions.isByNameParamType(tree.tpe))
+      (!sym.isTerm ||
+        (sym.isStable && (allowVolatile || !sym.hasVolatileType))) &&
+      typeOk(tree.tpe) && (allowVolatile || !hasVolatileType(tree)) &&
+      !definitions.isByNameParamType(tree.tpe))
 
   private def isStableIdent(tree: Ident, allowVolatile: Boolean): Boolean =
     (symOk(tree.symbol) && tree.symbol.isStable &&
-        !definitions.isByNameParamType(tree.tpe) &&
-        !definitions.isByName(tree.symbol) &&
-        (allowVolatile ||
-            !tree.symbol.hasVolatileType) // TODO SPEC: not required by spec
-        )
+      !definitions.isByNameParamType(tree.tpe) &&
+      !definitions.isByName(tree.symbol) &&
+      (allowVolatile ||
+        !tree.symbol.hasVolatileType) // TODO SPEC: not required by spec
+    )
 
   /** Is `tree`'s type volatile? (Ignored if its symbol has the @uncheckedStable annotation.)
     */
   def hasVolatileType(tree: Tree): Boolean =
     symOk(tree.symbol) && tree.tpe.isVolatile &&
-    !tree.symbol.hasAnnotation(uncheckedStableClass)
+      !tree.symbol.hasAnnotation(uncheckedStableClass)
 
   /** Is `tree` either a non-volatile type,
     *  or a path that does not include any of:
@@ -197,7 +205,7 @@ abstract class TreeInfo {
       // we check that the callee is a method.
       // The callee might also be a Block, which has a null symbol, so we guard against that (SI-7185)
       fn.symbol != null && fn.symbol.isMethod && !fn.symbol.isLazy &&
-      isExprSafeToInline(fn)
+        isExprSafeToInline(fn)
     case Typed(expr, _) =>
       isExprSafeToInline(expr)
     case Block(stats, expr) =>
@@ -219,22 +227,22 @@ abstract class TreeInfo {
       def isWarnableRefTree = tree match {
         case t: RefTree =>
           isExprSafeToInline(t.qualifier) && t.symbol != null &&
-          t.symbol.isAccessor
+            t.symbol.isAccessor
         case _ => false
       }
       def isWarnableSymbol = {
         val sym = tree.symbol
         (sym == null) || !(sym.isModule ||
-            sym.isLazy || definitions.isByNameParamType(sym.tpe_*)) || {
+          sym.isLazy || definitions.isByNameParamType(sym.tpe_*)) || {
           debuglog(
               "'Pure' but side-effecting expression in statement position: " +
-              tree)
+                tree)
           false
         }
       }
 
       (!tree.isErrorTyped && (isExprSafeToInline(tree) || isWarnableRefTree) &&
-          isWarnableSymbol)
+      isWarnableSymbol)
   }
 
   def mapMethodParamsAndArgs[R](params: List[Symbol], args: List[Tree])(
@@ -432,7 +440,7 @@ abstract class TreeInfo {
     tree.hasExistingSymbol || tree.exists {
       case dd: DefDef =>
         dd.mods.hasAccessorFlag ||
-        dd.mods.isSynthetic // for untypechecked trees
+          dd.mods.isSynthetic // for untypechecked trees
       case md: MemberDef => md.hasExistingSymbol
       case _ => false
     }
@@ -624,12 +632,13 @@ abstract class TreeInfo {
   }
 
   /** Does this CaseDef catch Throwable? */
-  def catchesThrowable(cdef: CaseDef) = (cdef.guard.isEmpty &&
+  def catchesThrowable(cdef: CaseDef) =
+    (cdef.guard.isEmpty &&
       (unbind(cdef.pat) match {
-            case Ident(nme.WILDCARD) => true
-            case i @ Ident(name) => hasNoSymbol(i)
-            case _ => false
-          }))
+        case Ident(nme.WILDCARD) => true
+        case i @ Ident(name) => hasNoSymbol(i)
+        case _ => false
+      }))
 
   /** Is this CaseDef synthetically generated, e.g. by `MatchTranslation.translateTry`? */
   def isSyntheticCase(cdef: CaseDef) = cdef.pat.exists {
@@ -650,7 +659,7 @@ abstract class TreeInfo {
   private def isSimpleThrowable(tp: Type): Boolean = tp match {
     case TypeRef(pre, sym, args) =>
       (pre == NoPrefix || pre.widen.typeSymbol.isStatic) &&
-      (sym isNonBottomSubClass ThrowableClass) && /* bq */ !sym.isTrait
+        (sym isNonBottomSubClass ThrowableClass) && /* bq */ !sym.isTrait
     case _ =>
       false
   }
@@ -851,8 +860,8 @@ abstract class TreeInfo {
     def unapply(tree: Tree): Option[Tree] = tree match {
       // SI-7868 Admit Select() to account for numeric widening, e.g. <unapplySelector>.toInt
       case Apply(fun,
-                 (Ident(nme.SELECTOR_DUMMY) | Select(
-                 Ident(nme.SELECTOR_DUMMY), _)) :: Nil) =>
+                 (Ident(nme.SELECTOR_DUMMY) |
+                 Select(Ident(nme.SELECTOR_DUMMY), _)) :: Nil) =>
         Some(fun)
       case Apply(fun, _) => unapply(fun)
       case _ => None
@@ -916,13 +925,12 @@ abstract class TreeInfo {
 
   def isApplyDynamicName(name: Name) =
     (name == nme.updateDynamic) || (name == nme.selectDynamic) ||
-    (name == nme.applyDynamic) || (name == nme.applyDynamicNamed)
+      (name == nme.applyDynamic) || (name == nme.applyDynamicNamed)
 
   class DynamicApplicationExtractor(nameTest: Name => Boolean) {
     def unapply(tree: Tree) = tree match {
-      case Apply(
-          TypeApply(Select(qual, oper), _), List(Literal(Constant(name))))
-          if nameTest(oper) =>
+      case Apply(TypeApply(Select(qual, oper), _),
+                 List(Literal(Constant(name)))) if nameTest(oper) =>
         Some((qual, name))
       case Apply(Select(qual, oper), List(Literal(Constant(name))))
           if nameTest(oper) =>
@@ -949,39 +957,39 @@ abstract class TreeInfo {
 
     def unapply(tree: Tree) = refPart(tree) match {
       case ref: RefTree => {
-          val qual = ref.qualifier
-          val isBundle = definitions.isMacroBundleType(qual.tpe)
-          val isBlackbox =
-            if (isBundle) isBlackboxMacroBundleType(qual.tpe)
-            else
-              ref.symbol.paramss match {
-                case (c :: Nil) :: _ if isWhiteboxContextType(c.info) => false
-                case _ => true
-              }
-          val owner =
-            if (isBundle) qual.tpe.typeSymbol
-            else {
-              val qualSym = if (qual.hasSymbolField) qual.symbol else NoSymbol
-              if (qualSym.isModule) qualSym.moduleClass else qualSym
+        val qual = ref.qualifier
+        val isBundle = definitions.isMacroBundleType(qual.tpe)
+        val isBlackbox =
+          if (isBundle) isBlackboxMacroBundleType(qual.tpe)
+          else
+            ref.symbol.paramss match {
+              case (c :: Nil) :: _ if isWhiteboxContextType(c.info) => false
+              case _ => true
             }
-          Some(
-              (isBundle,
-               isBlackbox,
-               owner,
-               ref.symbol,
-               dissectApplied(tree).targs))
-        }
+        val owner =
+          if (isBundle) qual.tpe.typeSymbol
+          else {
+            val qualSym = if (qual.hasSymbolField) qual.symbol else NoSymbol
+            if (qualSym.isModule) qualSym.moduleClass else qualSym
+          }
+        Some(
+            (isBundle,
+             isBlackbox,
+             owner,
+             ref.symbol,
+             dissectApplied(tree).targs))
+      }
       case _ => None
     }
   }
 
   def isNullaryInvocation(tree: Tree): Boolean =
     tree.symbol != null && tree.symbol.isMethod &&
-    (tree match {
-          case TypeApply(fun, _) => isNullaryInvocation(fun)
-          case tree: RefTree => true
-          case _ => false
-        })
+      (tree match {
+        case TypeApply(fun, _) => isNullaryInvocation(fun)
+        case tree: RefTree => true
+        case _ => false
+      })
 
   def isMacroApplication(tree: Tree): Boolean = !tree.isDef && {
     val sym = tree.symbol

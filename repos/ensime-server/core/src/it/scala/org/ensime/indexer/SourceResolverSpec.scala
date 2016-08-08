@@ -7,8 +7,10 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class SourceResolverSpec
-    extends EnsimeSpec with SharedEnsimeVFSFixture
-    with SharedSourceResolverFixture with SourceResolverTestUtils {
+    extends EnsimeSpec
+    with SharedEnsimeVFSFixture
+    with SharedSourceResolverFixture
+    with SourceResolverTestUtils {
 
   def original = EnsimeConfigFixture.SimpleTestProject
 
@@ -51,7 +53,7 @@ trait SourceResolverTestUtils {
           RawSource(Some(file), None)
       )
       .map(fo =>
-            fo.pathWithinArchive match {
+        fo.pathWithinArchive match {
           case None => fo.asLocalFile.getAbsolutePath
           case _ => fo.getName.getPath
       })

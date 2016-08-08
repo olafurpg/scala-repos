@@ -8,7 +8,10 @@ import scala.language.reflectiveCalls
 import java.nio.charset.Charset
 import akka.actor.ActorSystem
 import akka.persistence.journal.{EventAdapter, EventSeq}
-import akka.serialization.{SerializationExtension, SerializerWithStringManifest}
+import akka.serialization.{
+  SerializationExtension,
+  SerializerWithStringManifest
+}
 import akka.testkit.TestKit
 import com.typesafe.config._
 import org.scalatest.WordSpec
@@ -143,8 +146,7 @@ class RenamePlainJson {
     override def fromJournal(event: Any, manifest: String): EventSeq =
       event match {
         case json: JsObject =>
-          EventSeq(
-              marshaller.fromJson(manifest match {
+          EventSeq(marshaller.fromJson(manifest match {
             case V1 => rename(json, "code", "seatNr")
             case V2 => json // pass-through
             case unknown =>
@@ -208,7 +210,7 @@ object SimplestCustomSerializer {
         case _ =>
           throw new IllegalArgumentException(
               s"Unable to deserialize from bytes, manifest was: $manifest! Bytes length: " +
-              bytes.length)
+                bytes.length)
       }
   }
 

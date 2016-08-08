@@ -92,7 +92,7 @@ trait UnrolledParArrayCombiner[T] extends Combiner[T, ParArray[T]] {
     private def findStart(pos: Int) = {
       var left = pos
       var node = buff.headPtr
-      while ( (left - node.size) >= 0) {
+      while ((left - node.size) >= 0) {
         left -= node.size
         node = node.next
       }

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -55,7 +55,8 @@ import scala.collection.JavaConverters._
 import scalaz.{EitherT, Monad}
 
 object DesktopIngestShardServer
-    extends StandaloneShardServer with StandaloneIngestServer
+    extends StandaloneShardServer
+    with StandaloneIngestServer
     with NIHDBQueryExecutorComponent {
   val caveatMessage = None
 
@@ -123,8 +124,7 @@ object DesktopIngestShardServer
         })
 
         Some({ (msg: String) =>
-          EventQueue.invokeLater(
-              new Runnable {
+          EventQueue.invokeLater(new Runnable {
             def run() {
               notifyArea.append(msg + "\n")
             }
@@ -135,7 +135,7 @@ object DesktopIngestShardServer
         None
       }
 
-    guiNotifier.foreach(_ ("Starting internal services"))
+    guiNotifier.foreach(_("Starting internal services"))
     val zookeeper = startZookeeperStandalone(config.detach("zookeeper"))
 
     logger.debug("Waiting for ZK startup")
@@ -164,12 +164,12 @@ object DesktopIngestShardServer
       }
     })
 
-    guiNotifier.foreach(_ ("Internal services started, bringing up Precog"))
+    guiNotifier.foreach(_("Internal services started, bringing up Precog"))
 
     this.run(config) map {
       _.onSuccess {
         case (runningState, stoppable) =>
-          guiNotifier.foreach(_ ("Precog startup complete"))
+          guiNotifier.foreach(_("Precog startup complete"))
       }.map { _ =>
         PrecogUnit
       }
@@ -181,8 +181,8 @@ object DesktopIngestShardServer
       apiKeyFinder: APIKeyFinder[Future],
       jobManager: JobManager[Future]): (ManagedPlatform, Stoppable) = {
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
-    val accountFinder = new StaticAccountFinder(
-        "desktop", rootAPIKey, Some("/"))
+    val accountFinder =
+      new StaticAccountFinder("desktop", rootAPIKey, Some("/"))
     val platform = platformFactory(config.detach("queryExecutor"),
                                    apiKeyFinder,
                                    accountFinder,
@@ -234,8 +234,8 @@ object DesktopIngestShardServer
     defaultProps.setProperty("log.cleanup.interval.mins", "1")
     defaultProps.setProperty("zk.connectiontimeout.ms", "1000000")
 
-    defaultProps.setProperty(
-        "zk.connect", "localhost:" + config[String]("zookeeper.port"))
+    defaultProps.setProperty("zk.connect",
+                             "localhost:" + config[String]("zookeeper.port"))
 
     val centralProps = defaultProps.clone.asInstanceOf[Properties]
     centralProps.putAll(config.detach("kafka").data.asJava)
@@ -322,13 +322,15 @@ object LaunchLabcoat {
     launchBrowser(jettyPort, shardPort, zkPort, kafkaPort)
   }
 
-  def launchBrowser(
-      jettyPort: Int, shardPort: Int, zkPort: Int, kafkaPort: Int): Unit = {
+  def launchBrowser(jettyPort: Int,
+                    shardPort: Int,
+                    zkPort: Int,
+                    kafkaPort: Int): Unit = {
     def waitForPorts =
       DesktopIngestShardServer.waitForPortOpen(jettyPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(shardPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(zkPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(kafkaPort, 15)
+        DesktopIngestShardServer.waitForPortOpen(shardPort, 15) &&
+        DesktopIngestShardServer.waitForPortOpen(zkPort, 15) &&
+        DesktopIngestShardServer.waitForPortOpen(kafkaPort, 15)
 
     @tailrec
     def doLaunch() {

@@ -38,7 +38,9 @@ import org.apache.spark.storage.StorageLevel._
 
 /** Testsuite that tests block replication in BlockManager */
 class BlockManagerReplicationSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfter {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfter {
 
   private val conf = new SparkConf(false).set("spark.app.id", "test")
   private var rpcEnv: RpcEnv = null
@@ -62,10 +64,10 @@ class BlockManagerReplicationSuite
   private def makeBlockManager(
       maxMem: Long,
       name: String = SparkContext.DRIVER_IDENTIFIER): BlockManager = {
-    val transfer = new NettyBlockTransferService(
-        conf, securityMgr, numCores = 1)
-    val memManager = new StaticMemoryManager(
-        conf, Long.MaxValue, maxMem, numCores = 1)
+    val transfer =
+      new NettyBlockTransferService(conf, securityMgr, numCores = 1)
+    val memManager =
+      new StaticMemoryManager(conf, Long.MaxValue, maxMem, numCores = 1)
     val store = new BlockManager(name,
                                  rpcEnv,
                                  master,
@@ -97,9 +99,12 @@ class BlockManagerReplicationSuite
     conf.set("spark.storage.cachedPeersTtl", "10")
 
     master = new BlockManagerMaster(
-        rpcEnv.setupEndpoint("blockmanager",
-                             new BlockManagerMasterEndpoint(
-                                 rpcEnv, true, conf, new LiveListenerBus)),
+        rpcEnv.setupEndpoint(
+            "blockmanager",
+            new BlockManagerMasterEndpoint(rpcEnv,
+                                           true,
+                                           conf,
+                                           new LiveListenerBus)),
         conf,
         true)
     allStores.clear()
@@ -121,17 +126,23 @@ class BlockManagerReplicationSuite
     }
     val storeIds = stores.map { _.blockManagerId }.toSet
     assert(
-        master.getPeers(stores(0).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(0).blockManagerId
-    })
+        master
+          .getPeers(stores(0).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(0).blockManagerId
+        })
     assert(
-        master.getPeers(stores(1).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(1).blockManagerId
-    })
+        master
+          .getPeers(stores(1).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(1).blockManagerId
+        })
     assert(
-        master.getPeers(stores(2).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(2).blockManagerId
-    })
+        master
+          .getPeers(stores(2).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(2).blockManagerId
+        })
 
     // Add driver store and test whether it is filtered out
     val driverStore = makeBlockManager(1000, SparkContext.DRIVER_IDENTIFIER)
@@ -142,17 +153,23 @@ class BlockManagerReplicationSuite
     // Add a new store and test whether get peers returns it
     val newStore = makeBlockManager(1000, s"store$numStores")
     assert(
-        master.getPeers(stores(0).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(0).blockManagerId
-    } + newStore.blockManagerId)
+        master
+          .getPeers(stores(0).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(0).blockManagerId
+        } + newStore.blockManagerId)
     assert(
-        master.getPeers(stores(1).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(1).blockManagerId
-    } + newStore.blockManagerId)
+        master
+          .getPeers(stores(1).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(1).blockManagerId
+        } + newStore.blockManagerId)
     assert(
-        master.getPeers(stores(2).blockManagerId).toSet === storeIds.filterNot {
-      _ == stores(2).blockManagerId
-    } + newStore.blockManagerId)
+        master
+          .getPeers(stores(2).blockManagerId)
+          .toSet === storeIds.filterNot {
+          _ == stores(2).blockManagerId
+        } + newStore.blockManagerId)
     assert(master.getPeers(newStore.blockManagerId).toSet === storeIds)
 
     // Remove a store and test whether get peers returns it
@@ -230,8 +247,8 @@ class BlockManagerReplicationSuite
     val storageLevel3x = StorageLevel(true, true, false, true, 3)
     val storageLevel4x = StorageLevel(true, true, false, true, 4)
 
-    def putBlockAndGetLocations(
-        blockId: String, level: StorageLevel): Set[BlockManagerId] = {
+    def putBlockAndGetLocations(blockId: String,
+                                level: StorageLevel): Set[BlockManagerId] = {
       stores.head.putSingle(blockId, new Array[Byte](blockSize), level)
       val locations =
         master.getLocations(blockId).sortBy { _.executorId }.toSet
@@ -257,7 +274,7 @@ class BlockManagerReplicationSuite
     assert(
         a2Locs2x.subsetOf(a2Locs3x),
         "Inserting a with 2x replication gave locations that are not a subset of locations" +
-        s" with 3x replication [3x: ${a2Locs3x.mkString(",")}; 2x: ${a2Locs2x.mkString(",")}"
+          s" with 3x replication [3x: ${a2Locs3x.mkString(",")}; 2x: ${a2Locs2x.mkString(",")}"
     )
 
     // Test if 4x replication of a2 returns a strict superset of the locations of 3x replication
@@ -265,7 +282,7 @@ class BlockManagerReplicationSuite
     assert(
         a2Locs3x.subsetOf(a2Locs4x),
         "Inserting a with 4x replication gave locations that are not a superset of locations " +
-        s"with 3x replication [3x: ${a2Locs3x.mkString(",")}; 4x: ${a2Locs4x.mkString(",")}"
+          s"with 3x replication [3x: ${a2Locs3x.mkString(",")}; 4x: ${a2Locs4x.mkString(",")}"
     )
 
     // Test if 3x replication of two different blocks gives two different sets of locations
@@ -297,8 +314,9 @@ class BlockManagerReplicationSuite
 
     // Insert a block with 2x replication and return the number of copies of the block
     def replicateAndGetNumCopies(blockId: String): Int = {
-      store.putSingle(
-          blockId, new Array[Byte](1000), StorageLevel.MEMORY_AND_DISK_2)
+      store.putSingle(blockId,
+                      new Array[Byte](1000),
+                      StorageLevel.MEMORY_AND_DISK_2)
       val numLocations = master.getLocations(blockId).size
       allStores.foreach { _.removeBlock(blockId) }
       numLocations
@@ -326,7 +344,8 @@ class BlockManagerReplicationSuite
     memManager.setMemoryStore(failableStore.memoryStore)
     failableStore.initialize("app-id")
     allStores += failableStore // so that this gets stopped after test
-    assert(master.getPeers(store.blockManagerId).toSet === Set(
+    assert(
+        master.getPeers(store.blockManagerId).toSet === Set(
             failableStore.blockManagerId))
 
     // Test that 2x replication fails by creating only one copy of the block
@@ -347,12 +366,12 @@ class BlockManagerReplicationSuite
     }
 
     // Insert a block with given replication factor and return the number of copies of the block\
-    def replicateAndGetNumCopies(
-        blockId: String, replicationFactor: Int): Int = {
+    def replicateAndGetNumCopies(blockId: String,
+                                 replicationFactor: Int): Int = {
       val storageLevel =
         StorageLevel(true, true, false, true, replicationFactor)
-      initialStores.head.putSingle(
-          blockId, new Array[Byte](blockSize), storageLevel)
+      initialStores.head
+        .putSingle(blockId, new Array[Byte](blockSize), storageLevel)
       val numLocations = master.getLocations(blockId).size
       allStores.foreach { _.removeBlock(blockId) }
       numLocations
@@ -398,12 +417,12 @@ class BlockManagerReplicationSuite
     * is correct. Then it also drops the block from memory of each store (using LRU) and
     * again checks whether the master's knowledge gets updated.
     */
-  private def testReplication(
-      maxReplication: Int, storageLevels: Seq[StorageLevel]) {
+  private def testReplication(maxReplication: Int,
+                              storageLevels: Seq[StorageLevel]) {
     import org.apache.spark.storage.StorageLevel._
 
-    assert(
-        maxReplication > 1, s"Cannot test replication factor $maxReplication")
+    assert(maxReplication > 1,
+           s"Cannot test replication factor $maxReplication")
 
     // storage levels to test with the given replication factor
 
@@ -417,8 +436,9 @@ class BlockManagerReplicationSuite
 
     storageLevels.foreach { storageLevel =>
       // Put the block into one of the stores
-      val blockId = new TestBlockId("block-with-" +
-          storageLevel.description.replace(" ", "-").toLowerCase)
+      val blockId = new TestBlockId(
+          "block-with-" +
+            storageLevel.description.replace(" ", "-").toLowerCase)
       stores(0).putSingle(blockId, new Array[Byte](blockSize), storageLevel)
 
       // Assert that master know two locations for the block
@@ -449,15 +469,15 @@ class BlockManagerReplicationSuite
         // Assert that block status in the master for this store has expected storage level
         assert(
             blockStatus.storageLevel.useDisk === storageLevel.useDisk &&
-            blockStatus.storageLevel.useMemory === storageLevel.useMemory &&
-            blockStatus.storageLevel.useOffHeap === storageLevel.useOffHeap &&
-            blockStatus.storageLevel.deserialized === storageLevel.deserialized,
+              blockStatus.storageLevel.useMemory === storageLevel.useMemory &&
+              blockStatus.storageLevel.useOffHeap === storageLevel.useOffHeap &&
+              blockStatus.storageLevel.deserialized === storageLevel.deserialized,
             s"master does not know correct storage level for ${blockId.name} in $testStoreName")
 
         // Assert that the block status in the master for this store has correct memory usage info
         assert(
             !blockStatus.storageLevel.useMemory ||
-            blockStatus.memSize >= blockSize,
+              blockStatus.memSize >= blockSize,
             s"master does not know size of ${blockId.name} stored in memory of $testStoreName")
 
         // If the block is supposed to be in memory, then drop the copy of the block in
@@ -480,20 +500,21 @@ class BlockManagerReplicationSuite
           // from every store) or has zero memory usage for this store
           assert(
               newBlockStatusOption.isEmpty ||
-              newBlockStatusOption.get.memSize === 0,
+                newBlockStatusOption.get.memSize === 0,
               s"after dropping, master does not know size of ${blockId.name} " +
-              s"stored in memory of $testStoreName"
+                s"stored in memory of $testStoreName"
           )
         }
 
         // If the block is supposed to be in disk (after dropping or otherwise, then
         // test whether master has correct disk usage for this store
         if (storageLevel.useDisk) {
-          assert(master
-                   .getBlockStatus(blockId)(testStore.blockManagerId)
-                   .diskSize >= blockSize,
-                 s"after dropping, master does not know size of ${blockId.name} " +
-                 s"stored in disk of $testStoreName")
+          assert(
+              master
+                .getBlockStatus(blockId)(testStore.blockManagerId)
+                .diskSize >= blockSize,
+              s"after dropping, master does not know size of ${blockId.name} " +
+                s"stored in disk of $testStoreName")
         }
       }
       master.removeBlock(blockId)

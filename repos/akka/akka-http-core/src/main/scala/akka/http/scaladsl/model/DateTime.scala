@@ -20,7 +20,8 @@ final case class DateTime private (
     weekday: Int, // the day of the week. Sunday is 0.
     clicks: Long, // milliseconds since January 1, 1970, 00:00:00 GMT
     isLeapYear: Boolean)
-    extends akka.http.javadsl.model.DateTime with Ordered[DateTime]
+    extends akka.http.javadsl.model.DateTime
+    with Ordered[DateTime]
     with Renderable {
 
   /**
@@ -123,8 +124,8 @@ final case class DateTime private (
 }
 
 object DateTime {
-  private[this] val WEEKDAYS = Array(
-      "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+  private[this] val WEEKDAYS =
+    Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
   private[this] val MONTHS = Array("Jan",
                                    "Feb",
                                    "Mar",
@@ -184,7 +185,7 @@ object DateTime {
     val dn = d - (1969 * 365 + 492 - 19 + 4)
     val c =
       (dn - 1) * 86400L + hour * 3600L + minute * 60L +
-      second // seconds since Jan 1, 1970, 00:00:00
+        second // seconds since Jan 1, 1970, 00:00:00
 
     new DateTime(year,
                  month,
@@ -204,9 +205,9 @@ object DateTime {
     */
   def apply(clicks: Long): DateTime = {
     require(DateTime.MinValue.clicks <= clicks &&
-            clicks <= DateTime.MaxValue.clicks,
+              clicks <= DateTime.MaxValue.clicks,
             "DateTime value must be >= " + DateTime.MinValue + " and <= " +
-            DateTime.MaxValue)
+              DateTime.MaxValue)
 
     // based on a fast RFC1123 implementation (C) 2000 by Tim Kientzle <kientzle@acm.org>
     val c = clicks - clicks % 1000
@@ -296,10 +297,10 @@ object DateTime {
       len match {
         case 19 ⇒
           c(4) == '-' && c(7) == '-' && c(10) == 'T' && c(13) == ':' &&
-          c(16) == ':'
+            c(16) == ':'
         case 24 ⇒
           check(19) && c(19) == '.' && isDigit(c(20)) && isDigit(c(21)) &&
-          isDigit(c(22)) && c(23) == 'Z'
+            isDigit(c(22)) && c(23) == 'Z'
         case _ ⇒ false
       }
     def mul10(i: Int) = (i << 3) + (i << 1)

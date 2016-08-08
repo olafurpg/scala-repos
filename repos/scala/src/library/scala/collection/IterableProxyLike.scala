@@ -24,7 +24,8 @@ import generic._
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
 trait IterableProxyLike[+A, +Repr <: IterableLike[A, Repr] with Iterable[A]]
-    extends IterableLike[A, Repr] with TraversableProxyLike[A, Repr] {
+    extends IterableLike[A, Repr]
+    with TraversableProxyLike[A, Repr] {
   override def iterator: Iterator[A] = self.iterator
   override def grouped(size: Int): Iterator[Repr] = self.grouped(size)
   override def sliding(size: Int): Iterator[Repr] = self.sliding(size)
@@ -36,8 +37,9 @@ trait IterableProxyLike[+A, +Repr <: IterableLike[A, Repr] with Iterable[A]]
       implicit bf: CanBuildFrom[Repr, (A1, B), That]): That =
     self.zip[A1, B, That](that)(bf)
   override def zipAll[B, A1 >: A, That](
-      that: GenIterable[B], thisElem: A1, thatElem: B)(
-      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That =
+      that: GenIterable[B],
+      thisElem: A1,
+      thatElem: B)(implicit bf: CanBuildFrom[Repr, (A1, B), That]): That =
     self.zipAll(that, thisElem, thatElem)(bf)
   override def zipWithIndex[A1 >: A, That](
       implicit bf: CanBuildFrom[Repr, (A1, Int), That]): That =

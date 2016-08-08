@@ -2,7 +2,11 @@ package com.twitter.finagle.netty3.channel
 
 import com.twitter.finagle.stats.InMemoryStatsReceiver
 import java.util.concurrent.atomic.AtomicInteger
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, MessageEvent}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext,
+  ChannelStateEvent,
+  MessageEvent
+}
 import org.junit.runner.RunWith
 import org.mockito.Mockito._
 import org.scalatest.FunSuite

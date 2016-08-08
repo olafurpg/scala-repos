@@ -20,8 +20,9 @@ import spire.std.bigInteger._
   * to a Long when possible.
   */
 sealed abstract class SafeLong
-    extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
-  lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Ordered[SafeLong] { lhs =>
 
   def isZero: Boolean
 
@@ -155,8 +156,10 @@ sealed abstract class SafeLong
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
     @tailrec
-    def loop(
-        total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
+    def loop(total: SafeLong,
+             base: SafeLong,
+             k: Int,
+             mod: SafeLong): SafeLong = {
       if (k == 0) total
       else if ((k & 1) == 1)
         loop((total * base) % mod, (base * base) % mod, k >> 1, mod)
@@ -263,11 +266,11 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def -(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
+        BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
 
   def *(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
+        BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
 
   def /(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.safe64)
@@ -514,7 +517,9 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 trait SafeLongInstances {
   @SerialVersionUID(1L)
   implicit object SafeLongAlgebra
-      extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+      extends SafeLongIsEuclideanRing
+      with SafeLongIsNRoot
+      with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -536,7 +541,8 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
 }
 
 private[math] trait SafeLongIsEuclideanRing
-    extends EuclideanRing[SafeLong] with SafeLongIsRing {
+    extends EuclideanRing[SafeLong]
+    with SafeLongIsRing {
   def quot(a: SafeLong, b: SafeLong): SafeLong = a / b
   def mod(a: SafeLong, b: SafeLong): SafeLong = a % b
   override def quotmod(a: SafeLong, b: SafeLong): (SafeLong, SafeLong) = a /% b
@@ -571,7 +577,9 @@ private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
 }
 
 private[math] trait SafeLongIsReal
-    extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+    extends IsIntegral[SafeLong]
+    with SafeLongOrder
+    with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

@@ -15,8 +15,8 @@ object RetryingService {
     * `numTries - 1` times, but only when the failure encountered
     * is a [[com.twitter.finagle.WriteException WriteException]].
     */
-  def tries[Req, Rep](
-      numTries: Int, stats: StatsReceiver): Filter[Req, Rep, Req, Rep] = {
+  def tries[Req, Rep](numTries: Int,
+                      stats: StatsReceiver): Filter[Req, Rep, Req, Rep] = {
     val policy = RetryPolicy.tries(numTries)
     new RetryExceptionsFilter[Req, Rep](policy, HighResTimer.Default, stats)
   }
@@ -128,8 +128,9 @@ object RetryFilter {
   )(
       implicit timer: Timer
   ): RetryFilter[Req, Rep] =
-    new RetryFilter[Req, Rep](
-        RetryPolicy.backoff(backoffs)(shouldRetry), timer, statsReceiver)
+    new RetryFilter[Req, Rep](RetryPolicy.backoff(backoffs)(shouldRetry),
+                              timer,
+                              statsReceiver)
 }
 
 /**

@@ -216,11 +216,11 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
     */
   @inline def view = basis.getView
 
-  @inline def startActivity[T : ClassTag](implicit context: Context): Unit =
+  @inline def startActivity[T: ClassTag](implicit context: Context): Unit =
     basis.startActivity(SIntent[T])
 
   @inline
-  def startActivityForResult[T : ClassTag](p: Int)(
+  def startActivityForResult[T: ClassTag](p: Int)(
       implicit context: Context): Unit =
     basis.startActivityForResult(SIntent[T], p)
 }
@@ -229,7 +229,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html android.support.v4.app.Fragment]]`.
   */
 class SFragment()
-    extends android.support.v4.app.Fragment() with TraitFragment[SFragment] {
+    extends android.support.v4.app.Fragment()
+    with TraitFragment[SFragment] {
 
   def basis = this
 }
@@ -314,8 +315,8 @@ trait TraitFragmentManager[This <: android.support.v4.app.FragmentManager] {
   @inline def onBackStackChanged[U](f: => U): This = {
     basis.addOnBackStackChangedListener(
         new android.support.v4.app.FragmentManager.OnBackStackChangedListener {
-      def onBackStackChanged(): Unit = { f }
-    })
+          def onBackStackChanged(): Unit = { f }
+        })
     basis
   }
 }

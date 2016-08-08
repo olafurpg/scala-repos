@@ -221,12 +221,14 @@ class ExecuteRequestTest extends FunSuite {
       assert(br.readDouble() == doubleVal)
     }
 
-    val timestampValueLocal = new TimestampValue(
-        TimeZone.getDefault(), TimeZone.getDefault())
+    val timestampValueLocal =
+      new TimestampValue(TimeZone.getDefault(), TimeZone.getDefault())
 
     test("java.sql.Timestamp") {
-      val raw = RawValue(
-          Type.Timestamp, Charset.Binary, true, br.readLengthCodedBytes())
+      val raw = RawValue(Type.Timestamp,
+                         Charset.Binary,
+                         true,
+                         br.readLengthCodedBytes())
       val timestampValueLocal(ts) = raw
       assert(ts == timestamp)
     }
@@ -239,8 +241,10 @@ class ExecuteRequestTest extends FunSuite {
     }
 
     test("java.util.Date") {
-      val raw = RawValue(
-          Type.DateTime, Charset.Binary, true, br.readLengthCodedBytes())
+      val raw = RawValue(Type.DateTime,
+                         Charset.Binary,
+                         true,
+                         br.readLengthCodedBytes())
       val timestampValueLocal(dt) = raw
       assert(dt.getTime == timestamp.getTime)
     }

@@ -4,11 +4,17 @@ package lang.resolve.processor
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAliasDeclaration, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAliasDeclaration,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveTargets, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveTargets,
+  ScalaResolveResult
+}
 
 import scala.collection.Set
 
@@ -72,7 +78,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                           boundClass = getBoundClass(state),
                           fromType = fromType,
                           isAccessible = isAccessible(constr, ref) &&
-                            accessible)))
+                              accessible)))
           }
         case ta: ScTypeAliasDeclaration =>
           addResult(
@@ -118,7 +124,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                               boundClass = getBoundClass(state),
                               fromType = fromType,
                               isAccessible = isAccessible(constr, ref) &&
-                                accessible)))
+                                  accessible)))
               }
             case _ =>
               addResult(r)

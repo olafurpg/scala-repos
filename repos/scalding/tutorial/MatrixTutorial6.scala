@@ -6,10 +6,10 @@ import com.twitter.scalding.mathematics.Matrix
 /*
  * MatrixTutorial6.scala
  *
- * Loads a document to word matrix where a[i,j] = freq of the word j in the document i 
+ * Loads a document to word matrix where a[i,j] = freq of the word j in the document i
  * computes the Tf-Idf score of each word w.r.t. to each document and keeps the top nrWords in each document
  * (see http://en.wikipedia.org/wiki/Tf*idf for more info)
- * 
+ *
  * ../scripts/scald.rb --local MatrixTutorial6.scala --input data/docBOW.tsv --nrWords 300 --output data/featSelectedMatrix.tsv
  *
  */

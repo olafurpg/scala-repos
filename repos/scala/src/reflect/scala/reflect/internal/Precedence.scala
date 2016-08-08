@@ -6,7 +6,8 @@ import scala.annotation.switch
 import Chars._
 
 final class Precedence private (val level: Int)
-    extends AnyVal with Ordered[Precedence] {
+    extends AnyVal
+    with Ordered[Precedence] {
   def compare(that: Precedence): Int = level compare that.level
   override def toString = s"Precedence($level)"
 }

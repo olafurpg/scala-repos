@@ -18,7 +18,11 @@
 package org.apache.spark.sql.catalyst.plans.logical
 
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.catalyst.{analysis, CatalystTypeConverters, InternalRow}
+import org.apache.spark.sql.catalyst.{
+  analysis,
+  CatalystTypeConverters,
+  InternalRow
+}
 import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.types.{StructField, StructType}
 
@@ -43,7 +47,8 @@ object LocalRelation {
 }
 
 case class LocalRelation(output: Seq[Attribute], data: Seq[InternalRow] = Nil)
-    extends LeafNode with analysis.MultiInstanceRelation {
+    extends LeafNode
+    with analysis.MultiInstanceRelation {
 
   // A local relation must have resolved output.
   require(output.forall(_.resolved),
@@ -63,7 +68,7 @@ case class LocalRelation(output: Seq[Attribute], data: Seq[InternalRow] = Nil)
   override def sameResult(plan: LogicalPlan): Boolean = plan match {
     case LocalRelation(otherOutput, otherData) =>
       otherOutput.map(_.dataType) == output.map(_.dataType) &&
-      otherData == data
+        otherData == data
     case _ => false
   }
 

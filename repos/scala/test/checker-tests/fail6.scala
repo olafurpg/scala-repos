@@ -9,7 +9,7 @@ class Erasure {
   }
 }
 
-// % work/check all -Xprint:erasure work/fail6.scala  
+// % work/check all -Xprint:erasure work/fail6.scala
 // TypeStack init: REFERENCE(type AnyRef)
 // [Not checkable: parser]
 // [Not checkable: namer]
@@ -47,9 +47,9 @@ class Erasure {
 //       }
 //   }
 // }
-// 
+//
 // [Now checking: erasure]
-// work/fail6.scala:4: error: 
+// work/fail6.scala:4: error:
 // **** ERROR DURING INTERNAL CHECKING ****
 // type mismatch;
 //  found   : scala.runtime.BoxedUnit
@@ -57,5 +57,5 @@ class Erasure {
 //     else while (b) ()
 //          ^
 // one error found
-// 
-// 
+//
+//

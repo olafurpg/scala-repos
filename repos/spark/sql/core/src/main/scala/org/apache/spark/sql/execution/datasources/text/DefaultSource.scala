@@ -30,7 +30,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{AnalysisException, Row, SQLContext}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.UnsafeRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{BufferHolder, UnsafeRowWriter}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  BufferHolder,
+  UnsafeRowWriter
+}
 import org.apache.spark.sql.execution.datasources.CompressionCodecs
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.{StringType, StructType}
@@ -131,16 +134,17 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   }
 }
 
-class TextOutputWriter(
-    path: String, dataSchema: StructType, context: TaskAttemptContext)
+class TextOutputWriter(path: String,
+                       dataSchema: StructType,
+                       context: TaskAttemptContext)
     extends OutputWriter {
 
   private[this] val buffer = new Text()
 
   private val recordWriter: RecordWriter[NullWritable, Text] = {
     new TextOutputFormat[NullWritable, Text]() {
-      override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+      override def getDefaultWorkFile(context: TaskAttemptContext,
+                                      extension: String): Path = {
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")

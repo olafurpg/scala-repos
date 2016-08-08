@@ -82,7 +82,8 @@ object EstimatorTransformerParamExample {
 
     // Prepare test data.
     val test = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (1.0, Vectors.dense(-1.0, 1.5, 1.3)),
               (0.0, Vectors.dense(3.0, 2.0, -0.1)),
               (1.0, Vectors.dense(0.0, 2.2, -1.5))

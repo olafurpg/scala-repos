@@ -122,7 +122,8 @@ private[niocharset] abstract class UTF_16_Common protected (
                              2.0f,
                              // Character 0xfffd
                              if (endianness == LittleEndian)
-                               Array(-3, -1) else Array(-1, -3)) {
+                               Array(-3, -1)
+                             else Array(-1, -3)) {
 
     private var needToWriteBOM: Boolean = endianness == AutoEndian
 

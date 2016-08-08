@@ -69,14 +69,14 @@ object Reader {
     }
   }
 
-  implicit def option[T : Reader]: Reader[Option[T]] = new Reader[Option[T]] {
+  implicit def option[T: Reader]: Reader[Option[T]] = new Reader[Option[T]] {
     val r = implicitly[Reader[T]]
     def read(is: InputStream) =
       if (is.readByte == (0: Byte)) None
       else Some(r.read(is))
   }
 
-  implicit def either[L : Reader, R : Reader]: Reader[Either[L, R]] =
+  implicit def either[L: Reader, R: Reader]: Reader[Either[L, R]] =
     new Reader[Either[L, R]] {
       val lRead = implicitly[Reader[L]]
       val rRead = implicitly[Reader[R]]
@@ -85,7 +85,7 @@ object Reader {
         else Right(rRead.read(is))
     }
 
-  implicit def tuple2[T1 : Reader, T2 : Reader]: Reader[(T1, T2)] =
+  implicit def tuple2[T1: Reader, T2: Reader]: Reader[(T1, T2)] =
     new Reader[(T1, T2)] {
       val r1 = implicitly[Reader[T1]]
       val r2 = implicitly[Reader[T2]]
@@ -93,13 +93,13 @@ object Reader {
     }
 
   implicit def array[@specialized(
-                         Boolean,
-                         Byte,
-                         Short,
-                         Int,
-                         Long,
-                         Float,
-                         Double) T : Reader : ClassTag]: Reader[Array[T]] =
+      Boolean,
+      Byte,
+      Short,
+      Int,
+      Long,
+      Float,
+      Double) T: Reader: ClassTag]: Reader[Array[T]] =
     new Reader[Array[T]] {
       val readerT = implicitly[Reader[T]]
       def read(is: InputStream) = {
@@ -118,7 +118,7 @@ object Reader {
     }
 
   // Scala seems to have issues with this being implicit
-  def collection[T : Reader, C](
+  def collection[T: Reader, C](
       implicit cbf: CanBuildFrom[Nothing, T, C]): Reader[C] = new Reader[C] {
     val readerT = implicitly[Reader[T]]
     def read(is: InputStream): C = {

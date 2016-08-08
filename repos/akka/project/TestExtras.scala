@@ -9,7 +9,12 @@ import Keys._
 import com.timgroup.statsd.{StatsDClientErrorHandler, NonBlockingStatsDClient}
 import sbt.testing.{TestSelector, Status, Event}
 import scala.util.Try
-import java.io.{InputStreamReader, BufferedReader, DataOutputStream, OutputStreamWriter}
+import java.io.{
+  InputStreamReader,
+  BufferedReader,
+  DataOutputStream,
+  OutputStreamWriter
+}
 import java.net.{InetAddress, URLEncoder, HttpURLConnection, Socket}
 import com.typesafe.sbt.SbtGit
 import com.typesafe.sbt.SbtGit.GitKeys._
@@ -61,8 +66,8 @@ object TestExtras {
           onlyTestTags := Params.testTagsOnly,
           // add filters for tests excluded by name
           testOptions in Test <++= excludeTestNames map {
-            _.toSeq
-              .map(exclude => Tests.Filter(test => !test.contains(exclude)))
+            _.toSeq.map(exclude =>
+              Tests.Filter(test => !test.contains(exclude)))
           },
           // add arguments for tests excluded by tag
           testOptions in Test <++= excludeTestTags map { tags =>

@@ -11,7 +11,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object LatticeLaws {
-  def apply[A : Eq : Arbitrary] = new LatticeLaws[A] {
+  def apply[A: Eq: Arbitrary] = new LatticeLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -43,8 +43,8 @@ trait LatticeLaws[A] extends Laws {
   def lattice(implicit A: Lattice[A]) = new LatticeProperties(
       name = "lattice",
       parents = Seq(joinSemilattice, meetSemilattice),
-      "absorption" → forAll((x: A,
-          y: A) => ((x join (x meet y)) === x) && ((x meet (x join y)) === x))
+      "absorption" → forAll((x: A, y: A) =>
+        ((x join (x meet y)) === x) && ((x meet (x join y)) === x))
   )
 
   def boundedJoinSemilattice(implicit A: BoundedJoinSemilattice[A]) =
@@ -86,8 +86,7 @@ trait LatticeLaws[A] extends Laws {
       val name: String,
       val parents: Seq[LatticeProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet {
+  ) extends RuleSet {
     val bases = Seq.empty
   }
 }

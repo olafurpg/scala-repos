@@ -27,7 +27,8 @@ object Hashers {
       val hash = hasher.finalizeHash()
 
       MethodDef(static, name, args, resultType, body)(
-          methodDef.optimizerHints, Some(hash))(methodDef.pos)
+          methodDef.optimizerHints,
+          Some(hash))(methodDef.pos)
     }
   }
 
@@ -56,9 +57,8 @@ object Hashers {
     def hexDigit(digit: Int): Char = Character.forDigit(digit, 16)
 
     def append(hash: Array[Byte]): Unit = {
-      for (b <- hash) builder
-        .append(hexDigit(b >> 4))
-        .append(hexDigit(b & 0xF))
+      for (b <- hash)
+        builder.append(hexDigit(b >> 4)).append(hexDigit(b & 0xF))
     }
     append(hash.treeHash)
 

@@ -16,31 +16,37 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] def portRange(
-      role: String, begin: Long, end: Long): PortRange = {
+  private[this] def portRange(role: String,
+                              begin: Long,
+                              end: Long): PortRange = {
     PortRange(role, begin.toInt, end.toInt)
   }
 
   private[this] def withRandomSeeds(
-      input: Seq[PortRange], expectedOutput: Iterable[PortWithRole]): Unit = {
+      input: Seq[PortRange],
+      expectedOutput: Iterable[PortWithRole]): Unit = {
     for (seed <- 1 to 10) {
       withClue(s"seed = $seed") {
         val rand = new Random(new util.Random(seed.toLong))
 
         assert(
-            PortWithRole.lazyRandomPortsFromRanges(rand)(input).to[Set] == expectedOutput
-              .to[Set])
+            PortWithRole
+              .lazyRandomPortsFromRanges(rand)(input)
+              .to[Set] == expectedOutput.to[Set])
       }
     }
   }
 
   test("works for empty seq") {
     assert(
-        PortWithRole.lazyRandomPortsFromRanges()(Seq.empty).to[Seq] == Seq.empty)
+        PortWithRole
+          .lazyRandomPortsFromRanges()(Seq.empty)
+          .to[Seq] == Seq.empty)
   }
 
   test("works for one element range") {
-    assert(PortWithRole
+    assert(
+        PortWithRole
           .lazyRandomPortsFromRanges()(Seq(portRange("role", 10, 10)))
           .to[Seq] == Seq(PortWithRole("role", 10)))
   }
@@ -48,8 +54,8 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
   test("works for one range with four ports") {
     withRandomSeeds(
         input = Seq(
-              portRange("role", 10, 13)
-          ),
+            portRange("role", 10, 13)
+        ),
         expectedOutput = (10 to 13).map(PortWithRole("role", _))
     )
   }
@@ -57,10 +63,10 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
   test("works for multiple ranges") {
     withRandomSeeds(
         input = Seq(
-              portRange("role", 10, 13),
-              portRange("marathon", 14, 20),
-              portRange("role", 21, 30)
-          ),
+            portRange("role", 10, 13),
+            portRange("marathon", 14, 20),
+            portRange("role", 21, 30)
+        ),
         expectedOutput = (10 to 13).map(PortWithRole("role", _)) ++ (14 to 20)
             .map(PortWithRole("marathon", _)) ++ (21 to 30).map(
               PortWithRole("role", _))
@@ -97,7 +103,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+          s"allowing time for test = ${allowTimeForTest.toMillis}ms"
     )
     log.info(s"duration = ${duration.toMillis}ms")
     assert(duration.toMillis < allowTimeForTest.toMillis)
@@ -136,7 +142,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration * 50
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+          s"allowing time for test = ${allowTimeForTest.toMillis}ms"
     )
     log.info(
         s"duration = ${duration.toMillis}ms for $iterations iterations and $numberOfRanges ranges")

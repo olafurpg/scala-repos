@@ -32,7 +32,13 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.event.ActionEvent
 import scalafx.scene.Scene
-import scalafx.scene.control.{Label, Menu, MenuBar, MenuItem, SeparatorMenuItem}
+import scalafx.scene.control.{
+  Label,
+  Menu,
+  MenuBar,
+  MenuItem,
+  SeparatorMenuItem
+}
 import scalafx.scene.layout.{BorderPane, VBox}
 import scalafx.scene.paint.Color
 

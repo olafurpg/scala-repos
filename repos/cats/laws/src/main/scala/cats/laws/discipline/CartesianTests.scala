@@ -10,7 +10,7 @@ import org.typelevel.discipline.Laws
 trait CartesianTests[F[_]] extends Laws {
   def laws: CartesianLaws[F]
 
-  def cartesian[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def cartesian[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit iso: CartesianTests.Isomorphisms[F],
       ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
@@ -20,7 +20,7 @@ trait CartesianTests[F[_]] extends Laws {
         name = "cartesian",
         parent = None,
         "cartesian associativity" -> forAll((fa: F[A], fb: F[B], fc: F[C]) =>
-              iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
+          iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
     )
   }
 }

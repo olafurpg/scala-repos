@@ -9,7 +9,9 @@ import org.scalatest.{FreeSpec, Inside}
 import akka.http.scaladsl.unmarshalling.Unmarshaller._
 
 class ParameterDirectivesSpec
-    extends FreeSpec with GenericRoutingSpec with Inside {
+    extends FreeSpec
+    with GenericRoutingSpec
+    with Inside {
   "when used with 'as[Int]' the parameter directive should" - {
     "extract a parameter value as Int" in {
       Get("/?amount=123") ~> {
@@ -145,7 +147,9 @@ class ParameterDirectivesSpec
       } ~> check {
         inside(rejection) {
           case MalformedQueryParamRejection(
-              "really", "'absolutely' is not a valid Boolean value", None) ⇒
+              "really",
+              "'absolutely' is not a valid Boolean value",
+              None) ⇒
         }
       }
     }

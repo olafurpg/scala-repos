@@ -23,13 +23,14 @@ trait HttpEventConfiguration extends ScallopConf {
   lazy val httpEventEndpoints = opt[String](
       "http_endpoints",
       descr = "The URLs of the event endpoints added to the current list of subscribers on startup. " +
-        "You can manage this list during runtime by using the /v2/eventSubscriptions API endpoint.",
+          "You can manage this list during runtime by using the /v2/eventSubscriptions API endpoint.",
       required = false,
       noshort = true).map(parseHttpEventEndpoints)
 
   lazy val httpEventCallbackSlowConsumerTimeout = opt[Long](
       "http_event_callback_slow_consumer_timeout",
-      descr = "A http event callback consumer is considered slow, if the delivery takes longer than this timeout (ms)",
+      descr =
+        "A http event callback consumer is considered slow, if the delivery takes longer than this timeout (ms)",
       required = false,
       noshort = true,
       default = Some(10.seconds.toMillis))
@@ -60,8 +61,12 @@ class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
       @Named(HttpEventModule.SubscribersKeeperActor) subscribersKeeper: ActorRef,
       metrics: HttpEventActor.HttpEventActorMetrics,
       clock: Clock): ActorRef = {
-    system.actorOf(Props(new HttpEventActor(
-                httpEventConfiguration, subscribersKeeper, metrics, clock)))
+    system.actorOf(
+        Props(
+            new HttpEventActor(httpEventConfiguration,
+                               subscribersKeeper,
+                               metrics,
+                               clock)))
   }
 
   @Provides

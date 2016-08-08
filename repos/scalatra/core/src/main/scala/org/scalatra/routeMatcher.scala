@@ -36,7 +36,8 @@ trait ReversibleRouteMatcher {
   * An implementation of Sinatra's path pattern syntax.
   */
 final class SinatraRouteMatcher(pattern: String)
-    extends RouteMatcher with ReversibleRouteMatcher {
+    extends RouteMatcher
+    with ReversibleRouteMatcher {
 
   lazy val generator: (Builder => Builder) = BuilderGeneratorParser(pattern)
 
@@ -46,8 +47,9 @@ final class SinatraRouteMatcher(pattern: String)
   def reverse(params: Map[String, String], splats: List[String]): String =
     generator(Builder("", params, splats)).get
 
-  case class Builder(
-      path: String, params: Map[String, String], splats: List[String]) {
+  case class Builder(path: String,
+                     params: Map[String, String],
+                     splats: List[String]) {
 
     def addLiteral(text: String): Builder = copy(path = path + text)
 
@@ -131,7 +133,8 @@ final class SinatraRouteMatcher(pattern: String)
   * An implementation of Rails' path pattern syntax
   */
 final class RailsRouteMatcher(pattern: String)
-    extends RouteMatcher with ReversibleRouteMatcher {
+    extends RouteMatcher
+    with ReversibleRouteMatcher {
 
   lazy val generator: (Builder => Builder) = BuilderGeneratorParser(pattern)
 
@@ -155,7 +158,8 @@ final class RailsRouteMatcher(pattern: String)
             "Builder \"%s\" requires param \"%s\"" format (pattern, name))
 
     def optional(builder: Builder => Builder): Builder =
-      try builder(this) catch { case e: Exception => this }
+      try builder(this)
+      catch { case e: Exception => this }
 
     // appends additional params as a query string
     def get: String = {

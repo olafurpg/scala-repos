@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocSyntaxElement
   * Date: 11/21/11
   */
 class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType._
       override def visitWikiSyntax(s: ScDocSyntaxElement) {
@@ -29,7 +29,7 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
 
         if (firstChildElementType == VALID_DOC_HEADER &&
             (lastChildElementType == VALID_DOC_HEADER ||
-                lastChildElementType == DOC_HEADER)) {
+            lastChildElementType == DOC_HEADER)) {
           if (s.getFirstChild.getTextLength != s.getLastChild.getTextLength) {
             holder.registerProblem(
                 holder.getManager.createProblemDescriptor(
@@ -45,18 +45,17 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
           var sibl = s.getNextSibling
           val firstSibl = sibl
           while (sibl != null &&
-          sibl.getNode.getElementType != DOC_COMMENT_END &&
-          sibl.getNode.getElementType != DOC_WHITESPACE) {
+                 sibl.getNode.getElementType != DOC_COMMENT_END &&
+                 sibl.getNode.getElementType != DOC_WHITESPACE) {
             val highlightedElement =
               if (s.getNextSibling != null) s.getNextSibling else s
-            holder.registerProblem(
-                holder.getManager.createProblemDescriptor(
-                    highlightedElement,
-                    highlightedElement,
-                    "All text from header closing tag to end of line will be lost",
-                    ProblemHighlightType.WEAK_WARNING,
-                    isOnTheFly,
-                    new ScalaDocMoveTextToNewLineQuickFix(firstSibl)))
+            holder.registerProblem(holder.getManager.createProblemDescriptor(
+                highlightedElement,
+                highlightedElement,
+                "All text from header closing tag to end of line will be lost",
+                ProblemHighlightType.WEAK_WARNING,
+                isOnTheFly,
+                new ScalaDocMoveTextToNewLineQuickFix(firstSibl)))
             sibl = sibl.getNextSibling
           }
         }
@@ -66,8 +65,9 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
 }
 
 class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
-    extends AbstractFixOnTwoPsiElements(
-        ScalaBundle.message("balance.header"), opening, closing) {
+    extends AbstractFixOnTwoPsiElements(ScalaBundle.message("balance.header"),
+                                        opening,
+                                        closing) {
 
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
@@ -81,14 +81,16 @@ class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
       return
     }
 
-    cl.replace(ScalaPsiElementFactory.createDocHeaderElement(
-            op.getText.length(), op.getManager))
+    cl.replace(
+        ScalaPsiElementFactory.createDocHeaderElement(op.getText.length(),
+                                                      op.getManager))
   }
 }
 
 class ScalaDocMoveTextToNewLineQuickFix(textData: PsiElement)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("move.text.after.header.to.new.line"), textData) {
+        ScalaBundle.message("move.text.after.header.to.new.line"),
+        textData) {
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
   def doApplyFix(project: Project) {
@@ -96,8 +98,10 @@ class ScalaDocMoveTextToNewLineQuickFix(textData: PsiElement)
     if (!data.isValid) return
 
     data.getParent.addBefore(
-        ScalaPsiElementFactory.createDocWhiteSpace(data.getManager), data)
+        ScalaPsiElementFactory.createDocWhiteSpace(data.getManager),
+        data)
     data.getParent.addBefore(
-        ScalaPsiElementFactory.createLeadingAsterisk(data.getManager), data)
+        ScalaPsiElementFactory.createLeadingAsterisk(data.getManager),
+        data)
   }
 }

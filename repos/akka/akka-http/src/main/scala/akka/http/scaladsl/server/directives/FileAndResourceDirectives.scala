@@ -60,7 +60,7 @@ trait FileAndResourceDirectives {
                       FileIO
                         .fromFile(file)
                         .withAttributes(ActorAttributes.dispatcher(
-                                settings.fileIODispatcher)))
+                            settings.fileIODispatcher)))
                 }
             }
           } else complete(HttpEntity.Empty)
@@ -68,9 +68,8 @@ trait FileAndResourceDirectives {
     }
 
   private def conditionalFor(length: Long, lastModified: Long): Directive0 =
-    extractSettings.flatMap(
-        settings ⇒
-          if (settings.fileGetConditional) {
+    extractSettings.flatMap(settings ⇒
+      if (settings.fileGetConditional) {
         val tag = java.lang.Long
           .toHexString(lastModified ^ java.lang.Long.reverse(length))
         val lastModifiedDateTime =
@@ -108,7 +107,7 @@ trait FileAndResourceDirectives {
                           StreamConverters
                             .fromInputStream(() ⇒ url.openStream())
                             .withAttributes(ActorAttributes.dispatcher(
-                                    settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
+                                settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
                     }
                 }
               } else complete(HttpEntity.Empty)
@@ -163,9 +162,10 @@ trait FileAndResourceDirectives {
 
         if (dirs.isEmpty) reject
         else
-          complete(DirectoryListing(pathPrefix + pathString,
-                                    isRoot = pathString == "/",
-                                    dirs.flatMap(_.listFiles)))
+          complete(
+              DirectoryListing(pathPrefix + pathString,
+                               isRoot = pathString == "/",
+                               dirs.flatMap(_.listFiles)))
       }
     }
 
@@ -184,8 +184,9 @@ trait FileAndResourceDirectives {
   def getFromBrowseableDirectories(directories: String*)(
       implicit renderer: DirectoryRenderer,
       resolver: ContentTypeResolver): Route = {
-    directories.map(getFromDirectory).reduceLeft(_ ~ _) ~ listDirectoryContents(
-        directories: _*)
+    directories
+      .map(getFromDirectory)
+      .reduceLeft(_ ~ _) ~ listDirectoryContents(directories: _*)
   }
 
   /**
@@ -193,8 +194,8 @@ trait FileAndResourceDirectives {
     * "resource directory".
     * If the requested resource is itself a directory or cannot be found or read the Route rejects the request.
     */
-  def getFromResourceDirectory(
-      directoryName: String, classLoader: ClassLoader = defaultClassLoader)(
+  def getFromResourceDirectory(directoryName: String,
+                               classLoader: ClassLoader = defaultClassLoader)(
       implicit resolver: ContentTypeResolver): Route = {
     val base =
       if (directoryName.isEmpty) "" else withTrailingSlash(directoryName)
@@ -234,7 +235,7 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
           if (head.indexOf('/') >= 0 || head == "..") {
             log.warning(
                 "File-system path for base [{}] and Uri.Path [{}] contains suspicious path segment [{}], " +
-                "GET access was disallowed",
+                  "GET access was disallowed",
                 base,
                 path,
                 head)
@@ -386,8 +387,9 @@ object DirectoryListing {
         if (!isRoot) {
           val secondToLastSlash =
             path.lastIndexOf('/', path.lastIndexOf('/', path.length - 1) - 1)
-          sb.append("<a href=\"%s/\">../</a>\n" format path.substring(
-                  0, secondToLastSlash))
+          sb.append(
+              "<a href=\"%s/\">../</a>\n" format path
+                .substring(0, secondToLastSlash))
         }
         def lastModified(file: File) =
           DateTime(file.lastModified).toIsoLikeDateTimeString

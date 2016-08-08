@@ -52,8 +52,9 @@ object DeadlineFilter {
     * [[com.twitter.finagle.service.DeadlineFilter]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[
-        param.Stats, DeadlineFilter.Param, ServiceFactory[Req, Rep]] {
+    new Stack.Module2[param.Stats,
+                      DeadlineFilter.Param,
+                      ServiceFactory[Req, Rep]] {
       val role = DeadlineFilter.role
       val description = "Reject requests when their deadline has passed"
 
@@ -97,12 +98,12 @@ object DeadlineFilter {
   * @see The [[https://twitter.github.io/finagle/guide/Servers.html#request-deadline user guide]]
   *      for more details.
   */
-private[finagle] class DeadlineFilter[Req, Rep](
-    tolerance: Duration,
-    rejectPeriod: Duration,
-    maxRejectPercentage: Double,
-    statsReceiver: StatsReceiver,
-    nowMillis: () => Long = Stopwatch.systemMillis)
+private[finagle] class DeadlineFilter[Req, Rep](tolerance: Duration,
+                                                rejectPeriod: Duration,
+                                                maxRejectPercentage: Double,
+                                                statsReceiver: StatsReceiver,
+                                                nowMillis: () => Long =
+                                                  Stopwatch.systemMillis)
     extends SimpleFilter[Req, Rep] {
 
   require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
@@ -133,7 +134,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
       now: Time
   ) =
     s"exceeded request deadline of ${deadline.deadline - deadline.timestamp} " +
-    s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
+      s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
 
   // The request is rejected if the set deadline has expired, the elapsed time
   // since expiry is less than `tolerance`, and there are at least

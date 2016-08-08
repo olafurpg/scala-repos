@@ -28,7 +28,7 @@ package scalafx
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/package-summary.html `javafx.css`]] package.
-  * 
+  *
   * @since 8.0
   */
 package object css {}

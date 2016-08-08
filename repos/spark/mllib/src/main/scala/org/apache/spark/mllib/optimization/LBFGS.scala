@@ -37,7 +37,8 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 class LBFGS(private var gradient: Gradient, private var updater: Updater)
-    extends Optimizer with Logging {
+    extends Optimizer
+    with Logging {
 
   private var numCorrections = 10
   private var convergenceTol = 1E-6
@@ -140,8 +141,8 @@ class LBFGS(private var gradient: Gradient, private var updater: Updater)
     updater
   }
 
-  override def optimize(
-      data: RDD[(Double, Vector)], initialWeights: Vector): Vector = {
+  override def optimize(data: RDD[(Double, Vector)],
+                        initialWeights: Vector): Vector = {
     val (weights, _) = LBFGS.runLBFGS(data,
                                       gradient,
                                       updater,
@@ -197,11 +198,12 @@ object LBFGS extends Logging {
 
     val costFun = new CostFun(data, gradient, updater, regParam, numExamples)
 
-    val lbfgs = new BreezeLBFGS[BDV[Double]](
-        maxNumIterations, numCorrections, convergenceTol)
+    val lbfgs = new BreezeLBFGS[BDV[Double]](maxNumIterations,
+                                             numCorrections,
+                                             convergenceTol)
 
-    val states = lbfgs.iterations(
-        new CachedDiffFunction(costFun), initialWeights.toBreeze.toDenseVector)
+    val states = lbfgs.iterations(new CachedDiffFunction(costFun),
+                                  initialWeights.toBreeze.toDenseVector)
 
     /**
       * NOTE: lossSum and loss is computed using the weights from the previous iteration
@@ -217,7 +219,8 @@ object LBFGS extends Logging {
 
     val lossHistoryArray = lossHistory.result()
 
-    logInfo("LBFGS.runLBFGS finished. Last 10 losses %s".format(
+    logInfo(
+        "LBFGS.runLBFGS finished. Last 10 losses %s".format(
             lossHistoryArray.takeRight(10).mkString(", ")))
 
     (weights, lossHistoryArray)
@@ -243,13 +246,13 @@ object LBFGS extends Logging {
 
       val (gradientSum, lossSum) = data.treeAggregate((Vectors.zeros(n), 0.0))(
           seqOp = (c, v) =>
-              (c, v) match {
+            (c, v) match {
               case ((grad, loss), (label, features)) =>
                 val l = localGradient.compute(features, label, bcW.value, grad)
                 (grad, loss + l)
           },
           combOp = (c1, c2) =>
-              (c1, c2) match {
+            (c1, c2) match {
               case ((grad1, loss1), (grad2, loss2)) =>
                 axpy(1.0, grad2, grad1)
                 (grad1, loss1 + loss2)

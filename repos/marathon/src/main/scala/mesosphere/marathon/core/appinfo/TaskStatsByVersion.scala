@@ -43,8 +43,8 @@ object TaskStatsByVersion {
             versionInfo: VersionInfo,
             tasks: Iterable[Task],
             statuses: Map[Task.Id, Seq[Health]]): TaskStatsByVersion = {
-    TaskStatsByVersion(
-        versionInfo, TaskForStatistics.forTasks(now, tasks, statuses))
+    TaskStatsByVersion(versionInfo,
+                       TaskForStatistics.forTasks(now, tasks, statuses))
   }
 }
 

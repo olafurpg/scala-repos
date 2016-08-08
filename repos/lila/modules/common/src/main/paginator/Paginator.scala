@@ -3,18 +3,18 @@ package paginator
 
 import scalaz.Success
 
-final class Paginator[A] private[paginator](val currentPage: Int,
-                                            val maxPerPage: Int,
-                                            /**
-                                              * Returns the results for the current page.
-                                              * The result is cached.
-                                              */
-                                            val currentPageResults: Seq[A],
-                                            /**
-                                              * Returns the number of results.
-                                              * The result is cached.
-                                              */
-                                            val nbResults: Int) {
+final class Paginator[A] private[paginator] (val currentPage: Int,
+                                             val maxPerPage: Int,
+                                             /**
+                                               * Returns the results for the current page.
+                                               * The result is cached.
+                                               */
+                                             val currentPageResults: Seq[A],
+                                             /**
+                                               * Returns the number of results.
+                                               * The result is cached.
+                                               */
+                                             val nbResults: Int) {
 
   /**
     * Returns the previous page.
@@ -70,8 +70,7 @@ object Paginator {
     if (currentPage < 1) !!("Max per page must be greater than zero")
     else if (maxPerPage <= 0) !!("Current page must be greater than zero")
     else
-      Success(
-          for {
+      Success(for {
         results ← adapter.slice((currentPage - 1) * maxPerPage, maxPerPage)
         nbResults ← adapter.nbResults
       } yield new Paginator(currentPage, maxPerPage, results, nbResults))

@@ -9,7 +9,7 @@ object C {
 }
 
 object Macros {
-  def impl[T : c.WeakTypeTag](c: Context) = {
+  def impl[T: c.WeakTypeTag](c: Context) = {
     import c.universe._
     reify(C[T](c.literal(weakTypeOf[T].toString).splice))
   }

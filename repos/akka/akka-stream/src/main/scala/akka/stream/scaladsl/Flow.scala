@@ -10,7 +10,10 @@ import akka.stream.impl.Stages.{DirectProcessor, StageModule}
 import akka.stream.impl.StreamLayout.{Module}
 import akka.stream.impl._
 import akka.stream.impl.fusing._
-import akka.stream.stage.AbstractStage.{PushPullGraphStage, PushPullGraphStageWithMaterializedValue}
+import akka.stream.stage.AbstractStage.{
+  PushPullGraphStage,
+  PushPullGraphStageWithMaterializedValue
+}
 import akka.stream.stage._
 import org.reactivestreams.{Processor, Publisher, Subscriber, Subscription}
 import scala.annotation.unchecked.uncheckedVariance
@@ -26,15 +29,16 @@ import akka.NotUsed
   * A `Flow` is a set of stream processing steps that has one open input and one open output.
   */
 final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
-    extends FlowOpsMat[Out, Mat] with Graph[FlowShape[In, Out], Mat] {
+    extends FlowOpsMat[Out, Mat]
+    with Graph[FlowShape[In, Out], Mat] {
 
   override val shape: FlowShape[In, Out] =
     module.shape.asInstanceOf[FlowShape[In, Out]]
 
   override def toString: String = s"Flow($shape, $module)"
 
-  override type Repr[+O] = Flow[
-      In @uncheckedVariance, O, Mat @uncheckedVariance]
+  override type Repr[+O] =
+    Flow[In @uncheckedVariance, O, Mat @uncheckedVariance]
   override type ReprMat[+O, +M] = Flow[In @uncheckedVariance, O, M]
 
   override type Closed = Sink[In @uncheckedVariance, Mat @uncheckedVariance]
@@ -50,7 +54,14 @@ final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
       combine: (Mat, Mat2) ⇒ Mat3): Flow[In, T, Mat3] =
     if (this.isIdentity) {
       import Predef.Map.empty
-      import StreamLayout.{CompositeModule, Ignore, IgnorableMatValComp, Transform, Atomic, Combine}
+      import StreamLayout.{
+        CompositeModule,
+        Ignore,
+        IgnorableMatValComp,
+        Transform,
+        Atomic,
+        Combine
+      }
       val m = flow.module
       val mat =
         if (combine == Keep.left) {
@@ -241,7 +252,8 @@ final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
         processorFactory.asInstanceOf[() ⇒ (Processor[Any, Any], Any)])
     if (this.isIdentity) new Flow(op).asInstanceOf[ReprMat[U, Mat2]]
     else
-      new Flow[In, U, Mat2](module
+      new Flow[In, U, Mat2](
+          module
             .fuse(op, shape.out, op.inPort, Keep.right)
             .replaceShape(FlowShape(shape.in, op.outPort)))
   }
@@ -282,8 +294,8 @@ final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
     * the materialized values of the `Source` and `Sink`, e.g. the `Subscriber` of a of a [[Source#subscriber]] and
     * and `Publisher` of a [[Sink#publisher]].
     */
-  def runWith[Mat1, Mat2](
-      source: Graph[SourceShape[In], Mat1], sink: Graph[SinkShape[Out], Mat2])(
+  def runWith[Mat1, Mat2](source: Graph[SourceShape[In], Mat1],
+                          sink: Graph[SinkShape[Out], Mat2])(
       implicit materializer: Materializer): (Mat1, Mat2) =
     Source.fromGraph(source).via(this).toMat(sink)(Keep.both).run()
 
@@ -377,11 +389,10 @@ object Flow {
     * The `combine` function is used to compose the materialized values of the `sink` and `source`
     * into the materialized value of the resulting [[Flow]].
     */
-  def fromSinkAndSourceMat[I, O, M1, M2, M](
-      sink: Graph[SinkShape[I], M1], source: Graph[SourceShape[O], M2])(
+  def fromSinkAndSourceMat[I, O, M1, M2, M](sink: Graph[SinkShape[I], M1],
+                                            source: Graph[SourceShape[O], M2])(
       combine: (M1, M2) ⇒ M): Flow[I, O, M] =
-    fromGraph(
-        GraphDSL.create(sink, source)(combine) { implicit b ⇒ (in, out) ⇒
+    fromGraph(GraphDSL.create(sink, source)(combine) { implicit b ⇒ (in, out) ⇒
       FlowShape(in.in, out.out)
     })
 }
@@ -436,7 +447,7 @@ trait FlowOps[+Out, +Mat] {
   import akka.stream.impl.Stages._
   import GraphDSL.Implicits._
 
-  type Repr [+O] <: FlowOps[O, Mat] {
+  type Repr[+O] <: FlowOps[O, Mat] {
     type Repr[+OO] = FlowOps.this.Repr[OO]
     type Closed = FlowOps.this.Closed
   }
@@ -1262,12 +1273,12 @@ trait FlowOps[+Out, +Mat] {
     * @param maxSubstreams configures the maximum number of substreams (keys)
     *        that are supported; if more distinct keys are encountered then the stream fails
     */
-  def groupBy[K](
-      maxSubstreams: Int, f: Out ⇒ K): SubFlow[Out, Mat, Repr, Closed] = {
+  def groupBy[K](maxSubstreams: Int,
+                 f: Out ⇒ K): SubFlow[Out, Mat, Repr, Closed] = {
     implicit def mat = GraphInterpreter.currentInterpreter.materializer
     val merge = new SubFlowImpl.MergeBack[Out, Repr] {
-      override def apply[T](
-          flow: Flow[Out, T, NotUsed], breadth: Int): Repr[T] =
+      override def apply[T](flow: Flow[Out, T, NotUsed],
+                            breadth: Int): Repr[T] =
         deprecatedAndThen[Source[Out, NotUsed]](
             GroupBy(maxSubstreams, f.asInstanceOf[Any ⇒ Any]))
           .map(_.via(flow))
@@ -1337,8 +1348,8 @@ trait FlowOps[+Out, +Mat] {
   def splitWhen(substreamCancelStrategy: SubstreamCancelStrategy)(
       p: Out ⇒ Boolean): SubFlow[Out, Mat, Repr, Closed] = {
     val merge = new SubFlowImpl.MergeBack[Out, Repr] {
-      override def apply[T](
-          flow: Flow[Out, T, NotUsed], breadth: Int): Repr[T] =
+      override def apply[T](flow: Flow[Out, T, NotUsed],
+                            breadth: Int): Repr[T] =
         via(Split.when(p, substreamCancelStrategy))
           .map(_.via(flow))
           .via(new FlattenMerge(breadth))
@@ -1346,7 +1357,7 @@ trait FlowOps[+Out, +Mat] {
 
     val finish: (Sink[Out, NotUsed]) ⇒ Closed = s ⇒
       via(Split.when(p, substreamCancelStrategy)).to(Sink.foreach(
-              _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
+          _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
 
     new SubFlowImpl(Flow[Out], merge, finish)
   }
@@ -1409,15 +1420,15 @@ trait FlowOps[+Out, +Mat] {
   def splitAfter(substreamCancelStrategy: SubstreamCancelStrategy)(
       p: Out ⇒ Boolean): SubFlow[Out, Mat, Repr, Closed] = {
     val merge = new SubFlowImpl.MergeBack[Out, Repr] {
-      override def apply[T](
-          flow: Flow[Out, T, NotUsed], breadth: Int): Repr[T] =
+      override def apply[T](flow: Flow[Out, T, NotUsed],
+                            breadth: Int): Repr[T] =
         via(Split.after(p, substreamCancelStrategy))
           .map(_.via(flow))
           .via(new FlattenMerge(breadth))
     }
     val finish: (Sink[Out, NotUsed]) ⇒ Closed = s ⇒
       via(Split.after(p, substreamCancelStrategy)).to(Sink.foreach(
-              _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
+          _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
     new SubFlowImpl(Flow[Out], merge, finish)
   }
 
@@ -1460,8 +1471,8 @@ trait FlowOps[+Out, +Mat] {
     *
     * '''Cancels when''' downstream cancels
     */
-  def flatMapMerge[T, M](
-      breadth: Int, f: Out ⇒ Graph[SourceShape[T], M]): Repr[T] =
+  def flatMapMerge[T, M](breadth: Int,
+                         f: Out ⇒ Graph[SourceShape[T], M]): Repr[T] =
     map(f).via(new FlattenMerge[T, M](breadth))
 
   /**
@@ -1526,8 +1537,8 @@ trait FlowOps[+Out, +Mat] {
     *
     * '''Cancels when''' downstream cancels
     */
-  def keepAlive[U >: Out](
-      maxIdle: FiniteDuration, injectedElem: () ⇒ U): Repr[U] =
+  def keepAlive[U >: Out](maxIdle: FiniteDuration,
+                          injectedElem: () ⇒ U): Repr[U] =
     via(new Timers.IdleInject[Out, U](maxIdle, injectedElem))
 
   /**
@@ -1637,8 +1648,8 @@ trait FlowOps[+Out, +Mat] {
     *
     * '''Cancels when''' downstream cancels
     */
-  def log(
-      name: String, extract: Out ⇒ Any = ConstantFun.scalaIdentityFunction)(
+  def log(name: String,
+          extract: Out ⇒ Any = ConstantFun.scalaIdentityFunction)(
       implicit log: LoggingAdapter = null): Repr[Out] =
     andThen(Stages.Log(name, extract.asInstanceOf[Any ⇒ Any], Option(log)))
 
@@ -1681,8 +1692,8 @@ trait FlowOps[+Out, +Mat] {
     via(zipWithGraph(that)(combine))
 
   protected def zipWithGraph[Out2, Out3, M](that: Graph[SourceShape[Out2], M])(
-      combine: (Out,
-      Out2) ⇒ Out3): Graph[FlowShape[Out @uncheckedVariance, Out3], M] =
+      combine: (Out, Out2) ⇒ Out3)
+    : Graph[FlowShape[Out @uncheckedVariance, Out3], M] =
     GraphDSL.create(that) { implicit b ⇒ r ⇒
       val zip = b.add(ZipWith[Out, Out2, Out3](combine))
       r ~> zip.in1
@@ -1712,8 +1723,8 @@ trait FlowOps[+Out, +Mat] {
     *
     * '''Cancels when''' downstream cancels
     */
-  def interleave[U >: Out](
-      that: Graph[SourceShape[U], _], segmentSize: Int): Repr[U] =
+  def interleave[U >: Out](that: Graph[SourceShape[U], _],
+                           segmentSize: Int): Repr[U] =
     via(interleaveGraph(that, segmentSize))
 
   protected def interleaveGraph[U >: Out, M](
@@ -1769,8 +1780,8 @@ trait FlowOps[+Out, +Mat] {
       implicit ord: Ordering[U]): Repr[U] =
     via(mergeSortedGraph(that))
 
-  protected def mergeSortedGraph[U >: Out, M](
-      that: Graph[SourceShape[U], M])(implicit ord: Ordering[U])
+  protected def mergeSortedGraph[U >: Out, M](that: Graph[SourceShape[U], M])(
+      implicit ord: Ordering[U])
     : Graph[FlowShape[Out @uncheckedVariance, U], M] =
     GraphDSL.create(that) { implicit b ⇒ r ⇒
       val merge = b.add(new MergeSorted[U])
@@ -1908,19 +1919,19 @@ trait FlowOps[+Out, +Mat] {
   */
 trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
 
-  type Repr [+O] <: ReprMat[O, Mat] {
+  type Repr[+O] <: ReprMat[O, Mat] {
     type Repr[+OO] = FlowOpsMat.this.Repr[OO]
     type ReprMat[+OO, +MM] = FlowOpsMat.this.ReprMat[OO, MM]
     type Closed = FlowOpsMat.this.Closed
     type ClosedMat[+M] = FlowOpsMat.this.ClosedMat[M]
   }
-  type ReprMat [+O, +M] <: FlowOpsMat[O, M] {
+  type ReprMat[+O, +M] <: FlowOpsMat[O, M] {
     type Repr[+OO] = FlowOpsMat.this.ReprMat[OO, M @uncheckedVariance]
     type ReprMat[+OO, +MM] = FlowOpsMat.this.ReprMat[OO, MM]
     type Closed = FlowOpsMat.this.ClosedMat[M @uncheckedVariance]
     type ClosedMat[+MM] = FlowOpsMat.this.ClosedMat[MM]
   }
-  type ClosedMat [+M] <: Graph[_, M]
+  type ClosedMat[+M] <: Graph[_, M]
 
   /**
     * Transform this [[Flow]] by appending the given processing steps.
@@ -1987,9 +1998,9 @@ trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
     * It is recommended to use the internally optimized `Keep.left` and `Keep.right` combiners
     * where appropriate instead of manually writing functions that pass through one of the values.
     */
-  def zipWithMat[Out2, Out3, Mat2, Mat3](
-      that: Graph[SourceShape[Out2], Mat2])(combine: (Out, Out2) ⇒ Out3)(
-      matF: (Mat, Mat2) ⇒ Mat3): ReprMat[Out3, Mat3] =
+  def zipWithMat[Out2, Out3, Mat2, Mat3](that: Graph[SourceShape[Out2], Mat2])(
+      combine: (Out,
+                Out2) ⇒ Out3)(matF: (Mat, Mat2) ⇒ Mat3): ReprMat[Out3, Mat3] =
     viaMat(zipWithGraph(that)(combine))(matF)
 
   /**
@@ -2001,8 +2012,8 @@ trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
     * It is recommended to use the internally optimized `Keep.left` and `Keep.right` combiners
     * where appropriate instead of manually writing functions that pass through one of the values.
     */
-  def mergeMat[U >: Out, Mat2, Mat3](
-      that: Graph[SourceShape[U], Mat2], eagerComplete: Boolean = false)(
+  def mergeMat[U >: Out, Mat2, Mat3](that: Graph[SourceShape[U], Mat2],
+                                     eagerComplete: Boolean = false)(
       matF: (Mat, Mat2) ⇒ Mat3): ReprMat[U, Mat3] =
     viaMat(mergeGraph(that, eagerComplete))(matF)
 
@@ -2021,8 +2032,8 @@ trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
     * where appropriate instead of manually writing functions that pass through one of the values.
     */
   def interleaveMat[U >: Out, Mat2, Mat3](
-      that: Graph[SourceShape[U], Mat2], request: Int)(
-      matF: (Mat, Mat2) ⇒ Mat3): ReprMat[U, Mat3] =
+      that: Graph[SourceShape[U], Mat2],
+      request: Int)(matF: (Mat, Mat2) ⇒ Mat3): ReprMat[U, Mat3] =
     viaMat(interleaveGraph(that, request))(matF)
 
   /**
@@ -2110,6 +2121,8 @@ trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
     */
   private[akka] def transformMaterializing[T, M](
       mkStageAndMaterialized: () ⇒ (Stage[Out, T], M)): ReprMat[T, M] =
-    viaMat(new PushPullGraphStageWithMaterializedValue[Out, T, NotUsed, M](
-            (attr) ⇒ mkStageAndMaterialized(), Attributes.none))(Keep.right)
+    viaMat(
+        new PushPullGraphStageWithMaterializedValue[Out, T, NotUsed, M](
+            (attr) ⇒ mkStageAndMaterialized(),
+            Attributes.none))(Keep.right)
 }

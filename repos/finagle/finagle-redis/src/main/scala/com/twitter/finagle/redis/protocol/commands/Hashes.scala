@@ -8,8 +8,8 @@ import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 object HDel {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(
-        args.length >= 2, "HDEL requires a hash key and at least one field")
+    RequireClientProtocol(args.length >= 2,
+                          "HDEL requires a hash key and at least one field")
     new HDel(ChannelBuffers.wrappedBuffer(args(0)),
              args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }
@@ -95,8 +95,8 @@ case class HKeys(key: ChannelBuffer) extends StrictKeyCommand {
 
 object HMGet {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(
-        args.length >= 2, "HMGET requires a hash key and at least one field")
+    RequireClientProtocol(args.length >= 2,
+                          "HMGET requires a hash key and at least one field")
     new HMGet(ChannelBuffers.wrappedBuffer(args(0)),
               args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }
@@ -149,12 +149,11 @@ case class HScan(
     cursor: Long,
     count: Option[JLong] = None,
     pattern: Option[ChannelBuffer] = None
-)
-    extends Command {
+) extends Command {
   def command = Commands.HSCAN
   def toChannelBuffer = {
-    val bufs = Seq(
-        CommandBytes.HSCAN, key, StringToChannelBuffer(cursor.toString))
+    val bufs =
+      Seq(CommandBytes.HSCAN, key, StringToChannelBuffer(cursor.toString))
     val withCount = count match {
       case Some(count) =>
         bufs ++ Seq(Count.COUNT_CB, StringToChannelBuffer(count.toString))
@@ -216,8 +215,9 @@ object HSetNx {
                ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
-case class HSetNx(
-    key: ChannelBuffer, field: ChannelBuffer, value: ChannelBuffer)
+case class HSetNx(key: ChannelBuffer,
+                  field: ChannelBuffer,
+                  value: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.HSETNX
   def toChannelBuffer =

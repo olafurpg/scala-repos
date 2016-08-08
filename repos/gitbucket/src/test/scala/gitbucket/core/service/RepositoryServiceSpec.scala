@@ -4,7 +4,9 @@ import gitbucket.core.model._
 import org.scalatest.FunSuite
 
 class RepositoryServiceSpec
-    extends FunSuite with ServiceSpecBase with RepositoryService
+    extends FunSuite
+    with ServiceSpecBase
+    with RepositoryService
     with AccountService {
   test("renameRepository can rename CommitState, ProtectedBranches") {
     withTestDB { implicit session =>
@@ -22,8 +24,11 @@ class RepositoryServiceSpec
           creator = tester,
           now = new java.util.Date)
 
-      service.enableBranchProtection(
-          "root", "repo", "branch", true, Seq("must1", "must2"))
+      service.enableBranchProtection("root",
+                                     "repo",
+                                     "branch",
+                                     true,
+                                     Seq("must1", "must2"))
 
       val orgPbi = service.getProtectedBranchInfo("root", "repo", "branch")
       val org = service.getCommitStatus("root", "repo", id).get
@@ -33,9 +38,10 @@ class RepositoryServiceSpec
       val neo = service
         .getCommitStatus("tester", "repo2", org.commitId, org.context)
         .get
-      assert(neo == org.copy(commitStatusId = neo.commitStatusId,
-                             repositoryName = "repo2",
-                             userName = "tester"))
+      assert(
+          neo == org.copy(commitStatusId = neo.commitStatusId,
+                          repositoryName = "repo2",
+                          userName = "tester"))
       assert(
           service.getProtectedBranchInfo("tester", "repo2", "branch") == orgPbi
             .copy(owner = "tester", repository = "repo2"))

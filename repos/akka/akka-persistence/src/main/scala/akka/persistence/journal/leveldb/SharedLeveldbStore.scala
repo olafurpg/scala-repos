@@ -32,7 +32,8 @@ class SharedLeveldbStore extends {
       val writeResult = (prepared match {
         case Success(prep) ⇒
           // in case the asyncWriteMessages throws
-          try asyncWriteMessages(prep) catch {
+          try asyncWriteMessages(prep)
+          catch {
             case NonFatal(e) ⇒ Future.failed(e)
           }
         case f @ Failure(_) ⇒
@@ -42,7 +43,7 @@ class SharedLeveldbStore extends {
         if (results.nonEmpty && results.size != atomicWriteCount)
           throw new IllegalStateException(
               "asyncWriteMessages returned invalid number of results. " +
-              s"Expected [${prepared.get.size}], but got [${results.size}]")
+                s"Expected [${prepared.get.size}], but got [${results.size}]")
         results
       }
 

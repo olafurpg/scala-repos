@@ -24,9 +24,8 @@ class StreamTestKitSpec extends AkkaSpec {
     "#toStrict with failing source" in {
       val error = intercept[AssertionError] {
         Source
-          .fromIterator(
-              () ⇒
-                new Iterator[Int] {
+          .fromIterator(() ⇒
+            new Iterator[Int] {
               var i = 0
               override def hasNext: Boolean = true
               override def next(): Int = {
@@ -76,8 +75,11 @@ class StreamTestKitSpec extends AkkaSpec {
     }
 
     "#expectError" in {
-      Source.failed[Int](ex).runWith(TestSink.probe).request(1).expectError() should ===(
-          ex)
+      Source
+        .failed[Int](ex)
+        .runWith(TestSink.probe)
+        .request(1)
+        .expectError() should ===(ex)
     }
 
     "#expectError fail if no error signalled" in {
@@ -116,13 +118,17 @@ class StreamTestKitSpec extends AkkaSpec {
     }
 
     "#expectNextN given a number of elements" in {
-      Source(1 to 4).runWith(TestSink.probe).request(4).expectNextN(4) should ===(
-          List(1, 2, 3, 4))
+      Source(1 to 4)
+        .runWith(TestSink.probe)
+        .request(4)
+        .expectNextN(4) should ===(List(1, 2, 3, 4))
     }
 
     "#expectNextN given specific elements" in {
-      Source(1 to 4).runWith(TestSink.probe).request(4).expectNextN(4) should ===(
-          List(1, 2, 3, 4))
+      Source(1 to 4)
+        .runWith(TestSink.probe)
+        .request(4)
+        .expectNextN(4) should ===(List(1, 2, 3, 4))
     }
   }
 }

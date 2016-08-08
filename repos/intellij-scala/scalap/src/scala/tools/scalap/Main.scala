@@ -14,7 +14,10 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.util.{JavaClassPath, ClassPath}
 import scala.tools.nsc.Settings
 import scala.tools.nsc.util.ClassPath.{JavaContext, DefaultJavaContext}
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation,
+  ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 import scala.tools.util.PathResolver
 
@@ -29,7 +32,7 @@ object Main {
 
   val versionMsg =
     "Scala classfile decoder " + Properties.versionString + " -- " +
-    Properties.copyrightString + "\n"
+      Properties.copyrightString + "\n"
 
   /**Verbose program run?
     */
@@ -83,20 +86,20 @@ object Main {
     syms.head.parent match {
       //Partial match
       case Some(p) if (p.name != "<empty>") => {
-          val path = p.path
-          if (!isPackageObject) {
+        val path = p.path
+        if (!isPackageObject) {
+          stream.print("package ")
+          stream.print(path)
+          stream.print("\n")
+        } else {
+          val i = path.lastIndexOf(".")
+          if (i > 0) {
             stream.print("package ")
-            stream.print(path)
+            stream.print(path.substring(0, i))
             stream.print("\n")
-          } else {
-            val i = path.lastIndexOf(".")
-            if (i > 0) {
-              stream.print("package ")
-              stream.print(path.substring(0, i))
-              stream.print("\n")
-            }
           }
         }
+      }
       case _ =>
     }
     // Print classes
@@ -122,8 +125,8 @@ object Main {
     }
   }
 
-  def unpickleFromAnnotation(
-      classFile: ClassFile, isPackageObject: Boolean): String = {
+  def unpickleFromAnnotation(classFile: ClassFile,
+                             isPackageObject: Boolean): String = {
     import classFile._
     classFile.annotation(SCALA_SIG_ANNOTATION) match {
       case None => ""
@@ -326,7 +329,7 @@ object Main {
       // construct a custom class path
       def cparg =
         List("-classpath", "-cp") map (arguments getArgument _) reduceLeft
-        (_ orElse _)
+          (_ orElse _)
       val path = cparg map (fromPathString(_)) getOrElse EmptyClasspath
       // print the classpath if output is verbose
       if (verbose) {

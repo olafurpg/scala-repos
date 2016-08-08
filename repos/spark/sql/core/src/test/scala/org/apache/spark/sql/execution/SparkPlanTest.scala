@@ -85,8 +85,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                               planFunction: Seq[SparkPlan] => SparkPlan,
                               expectedAnswer: Seq[Row],
                               sortAnswers: Boolean = true): Unit = {
-    SparkPlanTest.checkAnswer(
-        input, planFunction, expectedAnswer, sortAnswers, sqlContext) match {
+    SparkPlanTest.checkAnswer(input,
+                              planFunction,
+                              expectedAnswer,
+                              sortAnswers,
+                              sqlContext) match {
       case Some(errorMessage) => fail(errorMessage)
       case None =>
     }
@@ -228,8 +231,8 @@ object SparkPlanTest {
     }
   }
 
-  private def executePlan(
-      outputPlan: SparkPlan, sqlContext: SQLContext): Seq[Row] = {
+  private def executePlan(outputPlan: SparkPlan,
+                          sqlContext: SQLContext): Seq[Row] = {
     // A very simple resolver to make writing tests easier. In contrast to the real resolver
     // this is always case sensitive and does not try to handle scoping or complex type resolution.
     val resolvedPlan = sqlContext.sessionState.prepareForExecution.execute(

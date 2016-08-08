@@ -10,10 +10,9 @@ class TailRec {
   }.length
 
   // transform the body of a function
-  () =>
-    {
-      @tailrec def inner(i: Int): Int = 1 + inner(i)
-      inner(0)
+  () => {
+    @tailrec def inner(i: Int): Int = 1 + inner(i)
+    inner(0)
   }
 
   // transform the qualifier of a Select

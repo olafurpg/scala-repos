@@ -21,11 +21,11 @@ sealed abstract class ImmutableArray[+A] {
 
   def isEmpty: Boolean = length == 0
 
-  def toArray[B >: A : ClassTag]: Array[B]
+  def toArray[B >: A: ClassTag]: Array[B]
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  def ++[B >: A : ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
+  def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
 }
 
 sealed abstract class ImmutableArrayInstances {
@@ -33,8 +33,8 @@ sealed abstract class ImmutableArrayInstances {
   implicit def immutableArrayEqual[A](
       implicit A: Equal[A]): Equal[ImmutableArray[A]] =
     Equal.equal { (a, b) =>
-      (a.length == b.length) && (0 until a.length)
-        .forall(i => A.equal(a(i), b(i)))
+      (a.length == b.length) && (0 until a.length).forall(i =>
+        A.equal(a(i), b(i)))
     }
 
   implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[
@@ -166,7 +166,7 @@ object ImmutableArray extends ImmutableArrayInstances {
     def apply(idx: Int) = arr(idx)
 
     def length = arr.length
-    def toArray[B >: A : ClassTag] = arr.clone.asInstanceOf[Array[B]]
+    def toArray[B >: A: ClassTag] = arr.clone.asInstanceOf[Array[B]]
     def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) {
       arr.copyToArray(xs, start, len)
     }
@@ -174,7 +174,7 @@ object ImmutableArray extends ImmutableArrayInstances {
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
-    override def ++[B >: A : ClassTag](other: ImmutableArray[B]) = {
+    override def ++[B >: A: ClassTag](other: ImmutableArray[B]) = {
       val newArr = new Array(length + other.length)
       this.copyToArray(newArr, 0, length)
       other.copyToArray(newArr, length, other.length)
@@ -237,22 +237,22 @@ object ImmutableArray extends ImmutableArrayInstances {
     def apply(idx: Int) = str(idx)
 
     def length = str.length
-    def toArray[B >: Char : ClassTag] = str.toArray
+    def toArray[B >: Char: ClassTag] = str.toArray
     def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int) {
       str.copyToArray(xs, start, len)
     }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
-    def ++[B >: Char : ClassTag](other: ImmutableArray[B]) =
+    def ++[B >: Char: ClassTag](other: ImmutableArray[B]) =
       other match {
         case other: StringArray => new StringArray(str + other.str)
         case _ => {
-            val newArr = new Array[B](length + other.length)
-            this.copyToArray(newArr, 0, length)
-            other.copyToArray(newArr, length, other.length)
-            fromArray(newArr)
-          }
+          val newArr = new Array[B](length + other.length)
+          this.copyToArray(newArr, 0, length)
+          other.copyToArray(newArr, length, other.length)
+          fromArray(newArr)
+        }
       }
   }
 
@@ -289,7 +289,8 @@ object ImmutableArray extends ImmutableArrayInstances {
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
 
     override protected[this] def newBuilder: Builder[
-        A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
+        A,
+        WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 
   object WrappedImmutableArray {

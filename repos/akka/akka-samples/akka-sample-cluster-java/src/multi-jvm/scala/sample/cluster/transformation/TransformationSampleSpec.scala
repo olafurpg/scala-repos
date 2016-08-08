@@ -42,7 +42,9 @@ object TransformationSampleSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
     """))
@@ -62,8 +64,11 @@ class TransformationSampleSpecMultiJvmNode4 extends TransformationSampleSpec
 class TransformationSampleSpecMultiJvmNode5 extends TransformationSampleSpec
 
 abstract class TransformationSampleSpec
-    extends MultiNodeSpec(TransformationSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(TransformationSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import TransformationSampleSpecConfig._
 

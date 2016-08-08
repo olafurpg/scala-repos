@@ -23,8 +23,8 @@ object Test extends App {
 
     // get the superclass for X and make sure it's correct
     val actualXSuper = (new X).getClass().getSuperclass().getSimpleName()
-    assert(
-        actualXSuper == expectedXSuper, actualXSuper + " != " + expectedXSuper)
+    assert(actualXSuper == expectedXSuper,
+           actualXSuper + " != " + expectedXSuper)
   }
 
   checkSuperClass("x", "Parent")

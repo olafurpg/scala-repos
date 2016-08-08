@@ -18,7 +18,7 @@ import scala.compat.java8.FutureConverters._
 /**
   * Represents one accepted incoming HTTP connection.
   */
-class IncomingConnection private[http](
+class IncomingConnection private[http] (
     delegate: akka.http.scaladsl.Http.IncomingConnection) {
 
   /**
@@ -47,7 +47,8 @@ class IncomingConnection private[http](
     */
   def handleWith[Mat](handler: Flow[HttpRequest, HttpResponse, Mat],
                       materializer: Materializer): Mat =
-    delegate.handleWith(handler
+    delegate.handleWith(
+        handler
           .asInstanceOf[Flow[sm.HttpRequest, sm.HttpResponse, Mat]]
           .asScala)(materializer)
 

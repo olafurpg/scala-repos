@@ -56,16 +56,14 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     extends SFXDelegate[jfxsc.GraphicsContext] {
 
   private def executeWithPoints(action: (Array[Double], Array[Double],
-                                Int) => Unit,
+                                         Int) => Unit,
                                 points: Seq[(Double, Double)]) {
     val xPoints = new ArrayBuffer[Double](points.size)
     val yPoints = new ArrayBuffer[Double](points.size)
 
-    points.foreach(
-        p =>
-          {
-        xPoints += p._1
-        yPoints += p._2
+    points.foreach(p => {
+      xPoints += p._1
+      yPoints += p._2
     })
 
     action(xPoints.toArray, yPoints.toArray, points.size)
@@ -179,8 +177,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX 
-   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and 
+   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX
+   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and
    * setters.
    */
 
@@ -197,8 +195,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there 
-   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX 
+   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there
+   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX
    * class was renamed to fillPath.
    */
 
@@ -241,8 +239,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Fills a polygon with the given points using the currently set fill paint.
     */
-  def fillPolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def fillPolygon(xPoints: Array[Double],
+                  yPoints: Array[Double],
+                  nPoints: Int) {
     delegate.fillPolygon(xPoints, yPoints, nPoints)
   }
 
@@ -464,8 +463,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Strokes a polygon with the given points using the currently set stroke paint.
     */
-  def strokePolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def strokePolygon(xPoints: Array[Double],
+                    yPoints: Array[Double],
+                    nPoints: Int) {
     delegate.strokePolygon(xPoints, yPoints, nPoints)
   }
 
@@ -479,8 +479,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Draws a polyline with the given points using the currently set stroke paint attribute.
     */
-  def strokePolyline(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def strokePolyline(xPoints: Array[Double],
+                     yPoints: Array[Double],
+                     nPoints: Int) {
     delegate.strokePolyline(xPoints, yPoints, nPoints)
   }
 
@@ -542,8 +543,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
 
   /*
    * IMPLEMENTATION NOTE ABOUT TRANSFORM: Although there is more than a getter and setter for Transform. Besides, one
-   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in 
-   * original class. So I decided not to use the Scala pattern for getters and setters. 
+   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in
+   * original class. So I decided not to use the Scala pattern for getters and setters.
    */
 
   /**

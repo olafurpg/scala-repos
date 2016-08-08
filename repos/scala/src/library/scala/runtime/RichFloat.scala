@@ -10,7 +10,8 @@ package scala
 package runtime
 
 final class RichFloat(val self: Float)
-    extends AnyVal with FractionalProxy[Float] {
+    extends AnyVal
+    with FractionalProxy[Float] {
   protected def num = scala.math.Numeric.FloatIsFractional
   protected def ord = scala.math.Ordering.Float
   protected def integralNum = scala.math.Numeric.FloatAsIfIntegral

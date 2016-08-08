@@ -35,8 +35,10 @@ import annotation.tailrec
   *  @define orderDependentFold
   */
 class ListMap[A, B]
-    extends AbstractMap[A, B] with Map[A, B]
-    with MapLike[A, B, ListMap[A, B]] with Serializable {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, ListMap[A, B]]
+    with Serializable {
 
   override def empty = ListMap.empty[A, B]
 
@@ -59,8 +61,9 @@ class ListMap[A, B]
   def -=(key: A) = { elems = remove(key, elems, List()); this }
 
   @tailrec
-  private def remove(
-      key: A, elems: List[(A, B)], acc: List[(A, B)]): List[(A, B)] = {
+  private def remove(key: A,
+                     elems: List[(A, B)],
+                     acc: List[(A, B)]): List[(A, B)] = {
     if (elems.isEmpty) acc
     else if (elems.head._1 == key) { siz -= 1; acc ::: elems.tail } else
       remove(key, elems.tail, elems.head :: acc)

@@ -23,8 +23,8 @@ object FixCertpathDebugLogging {
   val logger = org.slf4j.LoggerFactory
     .getLogger("play.api.libs.ws.ssl.debug.FixCertpathDebugLogging")
 
-  class MonkeyPatchSunSecurityUtilDebugAction(
-      val newDebug: Debug, val newOptions: String)
+  class MonkeyPatchSunSecurityUtilDebugAction(val newDebug: Debug,
+                                              val newOptions: String)
       extends FixLoggingAction {
     val logger = org.slf4j.LoggerFactory.getLogger(
         "play.api.libs.ws.ssl.debug.FixCertpathDebugLogging.MonkeyPatchSunSecurityUtilDebugAction")
@@ -64,7 +64,7 @@ object FixCertpathDebugLogging {
       val debugValue = if (isUsingDebug) newDebug else null
       var isPatched = false
       for (debugClass <- findClasses;
-      debugField <- debugClass.getDeclaredFields) {
+           debugField <- debugClass.getDeclaredFields) {
         if (isValidField(debugField, debugType)) {
           logger.debug(s"run: Patching $debugClass with $debugValue")
           monkeyPatchField(debugField, debugValue)
@@ -113,13 +113,13 @@ object FixCertpathDebugLogging {
         case Some(d) => d
         case None => new Debug()
       }
-      val action = new MonkeyPatchSunSecurityUtilDebugAction(
-          newDebug, newOptions)
+      val action =
+        new MonkeyPatchSunSecurityUtilDebugAction(newDebug, newOptions)
       AccessController.doPrivileged(action)
     } catch {
       case NonFatal(e) =>
-        throw new IllegalStateException(
-            "CertificateDebug configuration error", e)
+        throw new IllegalStateException("CertificateDebug configuration error",
+                                        e)
     }
   }
 }

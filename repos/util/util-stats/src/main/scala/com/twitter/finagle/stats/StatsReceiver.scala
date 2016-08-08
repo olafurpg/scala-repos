@@ -163,8 +163,8 @@ trait StatsReceiver { self =>
     */
   @varargs
   final def scope(namespaces: String*): StatsReceiver =
-    namespaces.foldLeft(this)(
-        (statsReceiver, name) => statsReceiver.scope(name))
+    namespaces.foldLeft(this)((statsReceiver, name) =>
+      statsReceiver.scope(name))
 
   /**
     * Prepend a suffix value to the next scope.

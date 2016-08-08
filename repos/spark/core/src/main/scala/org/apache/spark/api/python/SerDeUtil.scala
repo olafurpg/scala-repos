@@ -167,8 +167,8 @@ private[spark] object SerDeUtil extends Logging {
   /**
     * Convert an RDD of serialized Python objects to RDD of objects, that is usable by PySpark.
     */
-  def pythonToJava(
-      pyRDD: JavaRDD[Array[Byte]], batched: Boolean): JavaRDD[Any] = {
+  def pythonToJava(pyRDD: JavaRDD[Array[Byte]],
+                   batched: Boolean): JavaRDD[Any] = {
     pyRDD.rdd.mapPartitions { iter =>
       initialize()
       val unpickle = new Unpickler
@@ -248,8 +248,8 @@ private[spark] object SerDeUtil extends Logging {
   /**
     * Convert an RDD of serialized Python tuple (K, V) to RDD[(K, V)].
     */
-  def pythonToPairRDD[K, V](
-      pyRDD: RDD[Array[Byte]], batched: Boolean): RDD[(K, V)] = {
+  def pythonToPairRDD[K, V](pyRDD: RDD[Array[Byte]],
+                            batched: Boolean): RDD[(K, V)] = {
     def isPair(obj: Any): Boolean = {
       Option(obj.getClass.getComponentType).exists(!_.isPrimitive) &&
       obj.asInstanceOf[Array[_]].length == 2

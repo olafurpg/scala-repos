@@ -271,7 +271,8 @@ final class Decimal extends Ordered[Decimal] with Serializable {
     if (decimalVal.eq(null) && other.decimalVal.eq(null) &&
         _scale == other._scale) {
       if (longVal < other.longVal) -1
-      else if (longVal == other.longVal) 0 else 1
+      else if (longVal == other.longVal) 0
+      else 1
     } else {
       toBigDecimal.compare(other.toBigDecimal)
     }
@@ -292,8 +293,9 @@ final class Decimal extends Ordered[Decimal] with Serializable {
   def +(that: Decimal): Decimal = {
     if (decimalVal.eq(null) && that.decimalVal.eq(null) &&
         scale == that.scale) {
-      Decimal(
-          longVal + that.longVal, Math.max(precision, that.precision), scale)
+      Decimal(longVal + that.longVal,
+              Math.max(precision, that.precision),
+              scale)
     } else {
       Decimal(toBigDecimal + that.toBigDecimal)
     }
@@ -302,8 +304,9 @@ final class Decimal extends Ordered[Decimal] with Serializable {
   def -(that: Decimal): Decimal = {
     if (decimalVal.eq(null) && that.decimalVal.eq(null) &&
         scale == that.scale) {
-      Decimal(
-          longVal - that.longVal, Math.max(precision, that.precision), scale)
+      Decimal(longVal - that.longVal,
+              Math.max(precision, that.precision),
+              scale)
     } else {
       Decimal(toBigDecimal - that.toBigDecimal)
     }
@@ -373,8 +376,8 @@ object Decimal {
 
   private val BIG_DEC_ZERO = BigDecimal(0)
 
-  private val MATH_CONTEXT = new MathContext(
-      DecimalType.MAX_PRECISION, RoundingMode.HALF_UP)
+  private val MATH_CONTEXT =
+    new MathContext(DecimalType.MAX_PRECISION, RoundingMode.HALF_UP)
 
   private[sql] val ZERO = Decimal(0)
   private[sql] val ONE = Decimal(1)
@@ -431,13 +434,15 @@ object Decimal {
 
   /** A [[scala.math.Fractional]] evidence parameter for Decimals. */
   private[sql] object DecimalIsFractional
-      extends DecimalIsConflicted with Fractional[Decimal] {
+      extends DecimalIsConflicted
+      with Fractional[Decimal] {
     override def div(x: Decimal, y: Decimal): Decimal = x / y
   }
 
   /** A [[scala.math.Integral]] evidence parameter for Decimals. */
   private[sql] object DecimalAsIfIntegral
-      extends DecimalIsConflicted with Integral[Decimal] {
+      extends DecimalIsConflicted
+      with Integral[Decimal] {
     override def quot(x: Decimal, y: Decimal): Decimal = x / y
     override def rem(x: Decimal, y: Decimal): Decimal = x % y
   }

@@ -12,7 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.StdKinds
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
@@ -25,7 +29,8 @@ import scala.collection.mutable
   * Date: 06.03.2008
   */
 class ScForStatementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScForStatement {
+    extends ScalaPsiElementImpl(node)
+    with ScForStatement {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -112,8 +117,8 @@ class ScForStatementImpl(node: ASTNode)
               this,
               collectImplicits = true,
               forName = Some("withFilter")) {
-            override def execute(
-                _element: PsiElement, state: ResolveState): Boolean = {
+            override def execute(_element: PsiElement,
+                                 state: ResolveState): Boolean = {
               super.execute(_element, state)
               if (!levelSet.isEmpty) {
                 filterFound = true
@@ -249,7 +254,9 @@ class ScForStatementImpl(node: ASTNode)
           try {
             Option(
                 ScalaPsiElementFactory.createExpressionWithContextFromText(
-                    text, this.getContext, this))
+                    text,
+                    this.getContext,
+                    this))
           } catch {
             case e: Throwable => None
           }
@@ -265,24 +272,24 @@ class ScForStatementImpl(node: ASTNode)
         enumerators
           .map(e => e.generators.map(g => g.pattern))
           .foreach(patts =>
-                patts.foreach(patt =>
-                      {
-                if (patt != null && patt.desugarizedPatternIndex != -1) {
-                  var element =
-                    expr.findElementAt(patt.desugarizedPatternIndex)
-                  while (element != null &&
-                  (element.getTextLength < patt.getTextLength ||
-                      (!element.isInstanceOf[ScPattern] &&
-                          element.getTextLength == patt.getTextLength))) element = element.getParent
-                  if (element != null && element.getText == patt.getText) {
-                    element match {
-                      case p: ScPattern =>
-                        analogMap.put(p, patt)
-                        patt.analog = p
-                      case _ =>
-                    }
+            patts.foreach(patt => {
+              if (patt != null && patt.desugarizedPatternIndex != -1) {
+                var element =
+                  expr.findElementAt(patt.desugarizedPatternIndex)
+                while (element != null &&
+                       (element.getTextLength < patt.getTextLength ||
+                       (!element.isInstanceOf[ScPattern] &&
+                       element.getTextLength == patt.getTextLength))) element =
+                  element.getParent
+                if (element != null && element.getText == patt.getText) {
+                  element match {
+                    case p: ScPattern =>
+                      analogMap.put(p, patt)
+                      patt.analog = p
+                    case _ =>
                   }
                 }
+              }
             }))
       case _ =>
     }
@@ -350,7 +357,7 @@ class ScForStatementImpl(node: ASTNode)
             case call: ScMethodCall =>
               for {
                 expr <- call.args.exprs.headOption
-                           if expr.isInstanceOf[ScBlockExpr]
+                if expr.isInstanceOf[ScBlockExpr]
                 bl = expr.asInstanceOf[ScBlockExpr]
                 clauses <- bl.caseClauses
                 clause <- clauses.caseClauses.headOption

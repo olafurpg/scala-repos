@@ -32,7 +32,8 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
                                                  sc: SparkContext,
                                                  masters: Array[String])
     extends CoarseGrainedSchedulerBackend(scheduler, sc.env.rpcEnv)
-    with AppClientListener with Logging {
+    with AppClientListener
+    with Logging {
 
   private var client: AppClient = null
   private var stopping = false
@@ -169,12 +170,13 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
                              cores: Int,
                              memory: Int) {
     logInfo(
-        "Granted executor ID %s on hostPort %s with %d cores, %s RAM".format(
-            fullId, hostPort, cores, Utils.megabytesToString(memory)))
+        "Granted executor ID %s on hostPort %s with %d cores, %s RAM"
+          .format(fullId, hostPort, cores, Utils.megabytesToString(memory)))
   }
 
-  override def executorRemoved(
-      fullId: String, message: String, exitStatus: Option[Int]) {
+  override def executorRemoved(fullId: String,
+                               message: String,
+                               exitStatus: Option[Int]) {
     val reason: ExecutorLossReason = exitStatus match {
       case Some(code) => ExecutorExited(code, exitCausedByApp = true, message)
       case None => SlaveLost(message)

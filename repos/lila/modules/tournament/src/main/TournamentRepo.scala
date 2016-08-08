@@ -76,8 +76,8 @@ object TournamentRepo {
   def startedOrFinishedById(id: String): Fu[Option[Tournament]] =
     byId(id) map { _ filterNot (_.isCreated) }
 
-  def createdByIdAndCreator(
-      id: String, userId: String): Fu[Option[Tournament]] =
+  def createdByIdAndCreator(id: String,
+                            userId: String): Fu[Option[Tournament]] =
     createdById(id) map (_ filter (_.createdBy == userId))
 
   def allEnterable: Fu[List[Tournament]] =
@@ -101,7 +101,7 @@ object TournamentRepo {
   def publicStarted: Fu[List[Tournament]] =
     coll
       .find(startedSelect ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false)))
+          "private" -> BSONDocument("$exists" -> false)))
       .sort(BSONDocument("createdAt" -> -1))
       .cursor[Tournament]()
       .collect[List]()
@@ -115,21 +115,22 @@ object TournamentRepo {
 
   def finishedNotable(limit: Int): Fu[List[Tournament]] =
     coll
-      .find(finishedSelect ++ BSONDocument("$or" -> BSONArray(
-                  BSONDocument("nbPlayers" -> BSONDocument("$gte" -> 15)),
-                  scheduledSelect
-              )))
+      .find(
+          finishedSelect ++ BSONDocument("$or" -> BSONArray(
+              BSONDocument("nbPlayers" -> BSONDocument("$gte" -> 15)),
+              scheduledSelect
+          )))
       .sort(BSONDocument("startsAt" -> -1))
       .cursor[Tournament]()
       .collect[List](limit)
 
   def finishedPaginator(maxPerPage: Int, page: Int) =
     Paginator(adapter = new BSONAdapter[Tournament](
-                    collection = coll,
-                    selector = finishedSelect,
-                    projection = BSONDocument(),
-                    sort = BSONDocument("startsAt" -> -1)
-                ),
+                  collection = coll,
+                  selector = finishedSelect,
+                  projection = BSONDocument(),
+                  sort = BSONDocument("startsAt" -> -1)
+              ),
               currentPage = page,
               maxPerPage = maxPerPage)
 
@@ -179,7 +180,7 @@ object TournamentRepo {
         "$or" -> BSONArray(
             BSONDocument("schedule" -> BSONDocument("$exists" -> false)),
             BSONDocument("startsAt" -> BSONDocument("$lt" ->
-                    (DateTime.now plusMinutes aheadMinutes)))
+              (DateTime.now plusMinutes aheadMinutes)))
         )
     )
 
@@ -202,8 +203,8 @@ object TournamentRepo {
   private def stillWorthEntering: Fu[List[Tournament]] =
     coll
       .find(startedSelect ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false)
-          ))
+          "private" -> BSONDocument("$exists" -> false)
+      ))
       .sort(BSONDocument("startsAt" -> 1))
       .toList[Tournament](none) map {
       _.filter(_.isStillWorthEntering)
@@ -265,8 +266,8 @@ object TournamentRepo {
       .reverse
   }
 
-  def lastFinishedScheduledByFreq(
-      freq: Schedule.Freq, since: DateTime): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(freq: Schedule.Freq,
+                                  since: DateTime): Fu[List[Tournament]] =
     coll
       .find(
           finishedSelect ++ sinceSelect(since) ++ variantSelect(
@@ -301,7 +302,7 @@ object TournamentRepo {
 
   def isFinished(id: String): Fu[Boolean] =
     coll.count(BSONDocument("_id" -> id, "status" -> Status.Finished.id).some) map
-    (0 !=)
+      (0 !=)
 
   def toursToWithdrawWhenEntering(tourId: String): Fu[List[Tournament]] =
     coll
@@ -309,9 +310,9 @@ object TournamentRepo {
           enterableSelect ++ BSONDocument(
               "_id" -> BSONDocument("$ne" -> tourId),
               "schedule.freq" -> BSONDocument("$nin" -> List(
-                      Schedule.Freq.Marathon.name,
-                      Schedule.Freq.Unique.name
-                  ))
+                  Schedule.Freq.Marathon.name,
+                  Schedule.Freq.Unique.name
+              ))
           ) ++ nonEmptySelect)
       .cursor[Tournament]()
       .collect[List]()

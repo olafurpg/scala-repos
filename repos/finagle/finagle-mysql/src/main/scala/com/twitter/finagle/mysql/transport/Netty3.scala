@@ -56,9 +56,8 @@ class PacketEncoder extends SimpleChannelDownstreamHandler {
         }
 
       case unknown =>
-        evt.getFuture.setFailure(
-            new ChannelException("Unsupported request type %s".format(
-                    unknown.getClass.getName)))
+        evt.getFuture.setFailure(new ChannelException(
+            "Unsupported request type %s".format(unknown.getClass.getName)))
     }
 }
 

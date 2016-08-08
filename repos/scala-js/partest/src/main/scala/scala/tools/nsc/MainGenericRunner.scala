@@ -50,8 +50,8 @@ class MainGenericRunner {
   }
 
   def process(args: Array[String]): Boolean = {
-    val command = new GenericRunnerCommand(
-        args.toList, (x: String) => errorFn(x))
+    val command =
+      new GenericRunnerCommand(args.toList, (x: String) => errorFn(x))
 
     if (!command.ok) return errorFn("\n" + command.shortUsageMsg)
     else if (command.settings.version)
@@ -66,8 +66,8 @@ class MainGenericRunner {
     val jsConsole = new ScalaConsoleJSConsole
     val semantics = readSemantics()
     val ir =
-      (loadIR(command.settings.classpathURLs) :+ runnerIR(
-              command.thingToRun, command.arguments))
+      (loadIR(command.settings.classpathURLs) :+ runnerIR(command.thingToRun,
+                                                          command.arguments))
 
     val jsRunner = new MemVirtualJSFile("launcher.js")
       .withContent(s"PartestLauncher().launch();")

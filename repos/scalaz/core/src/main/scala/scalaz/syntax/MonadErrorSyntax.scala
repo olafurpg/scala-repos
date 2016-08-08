@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadError` */
-final class MonadErrorOps[F[_], S, A] private[syntax](self: F[A])(
+final class MonadErrorOps[F[_], S, A] private[syntax] (self: F[A])(
     implicit val F: MonadError[F, S]) {
   ////
   final def handleError(f: S => F[A]): F[A] =

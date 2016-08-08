@@ -14,7 +14,12 @@ import org.jetbrains.plugins.scala.compiler.CompilationProcess
 import org.jetbrains.plugins.scala.components.StopWorksheetAction
 import org.jetbrains.plugins.scala.extensions
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, CopyWorksheetAction, RunWorksheetAction, InteractiveStatusDisplay}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction,
+  CopyWorksheetAction,
+  RunWorksheetAction,
+  InteractiveStatusDisplay
+}
 import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner
 import org.jetbrains.plugins.scala.worksheet.processor.WorksheetCompiler
 
@@ -56,13 +61,13 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
 
       if (RunWorksheetAction.isScratchWorksheet(Option(file), project)) {
         addSplitter()
-        addChild(panel,
-                 createSelectClassPathList(
-                     Option(RunWorksheetAction
-                           .getModuleFor(
-                               PsiManager getInstance project findFile file)
-                           .getName),
-                     file))
+        addChild(
+            panel,
+            createSelectClassPathList(
+                Option(RunWorksheetAction
+                  .getModuleFor(PsiManager getInstance project findFile file)
+                  .getName),
+                file))
         addChild(panel, new JLabel("Use class path of module:  "))
       }
 
@@ -83,8 +88,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
     Option(statusDisplayN)
   }
 
-  private def createSelectClassPathList(
-      defaultModule: Option[String], file: VirtualFile) = {
+  private def createSelectClassPathList(defaultModule: Option[String],
+                                        file: VirtualFile) = {
     val modulesBox = new ModulesComboBox()
 
     modulesBox fillModules project
@@ -104,7 +109,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
         if (m == null) return
 
         WorksheetCompiler.setModuleForCpName(
-            PsiManager getInstance project findFile file, m.getName)
+            PsiManager getInstance project findFile file,
+            m.getName)
       }
     })
 
@@ -122,7 +128,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
           new ChangeListener {
             override def stateChanged(e: ChangeEvent) {
               WorksheetCompiler.setMakeBeforeRun(
-                  PsiManager getInstance project findFile file, box.isSelected)
+                  PsiManager getInstance project findFile file,
+                  box.isSelected)
             }
         }
     )
@@ -194,8 +201,8 @@ object WorksheetUiConstructor {
 
   def createSplitter() = {
     val separator = new JSeparator(SwingConstants.VERTICAL)
-    val size = new Dimension(
-        separator.getPreferredSize.width, separator.getMaximumSize.height)
+    val size = new Dimension(separator.getPreferredSize.width,
+                             separator.getMaximumSize.height)
     separator setMaximumSize size
 
     separator

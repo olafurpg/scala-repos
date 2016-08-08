@@ -10,9 +10,11 @@ import breeze.numerics._
   *
   * @author dlwh
   **/
-case class StudentsT(
-    degreesOfFreedom: Double)(implicit randBasis: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+case class StudentsT(degreesOfFreedom: Double)(implicit randBasis: RandBasis =
+                                                 Rand)
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   require(degreesOfFreedom > 0,
           "degreesOfFreedom must be positive, but got " + degreesOfFreedom)
   override def toString: String = ScalaRunTime._toString(this)
@@ -48,13 +50,14 @@ case class StudentsT(
 
   lazy val logNormalizer: Double =
     0.5 * math.log(math.Pi * degreesOfFreedom) + lgamma(degreesOfFreedom / 2) -
-    lgamma((degreesOfFreedom + 1) / 2)
+      lgamma((degreesOfFreedom + 1) / 2)
 
   def mean: Double = innerInstance.getNumericalMean
 
   def variance: Double = innerInstance.getNumericalVariance
 
-  def entropy: Double = ((degreesOfFreedom + 1) / 2 *
+  def entropy: Double =
+    ((degreesOfFreedom + 1) / 2 *
       (digamma((degreesOfFreedom + 1) / 2) - digamma(degreesOfFreedom)) -
       .5 * log(degreesOfFreedom) + lbeta(degreesOfFreedom / 2, 0.5))
 

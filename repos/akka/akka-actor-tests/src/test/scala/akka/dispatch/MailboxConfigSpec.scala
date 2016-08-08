@@ -15,7 +15,9 @@ import scala.concurrent.duration._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class MailboxSpec
-    extends AkkaSpec with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends AkkaSpec
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
   def name: String
 
   def factory: MailboxType ⇒ MessageQueue
@@ -141,22 +143,23 @@ abstract class MailboxSpec
     ensureInitialMailboxState(config, q)
 
     EventFilter.warning(
-        pattern = ".*received dead letter from Actor.*MailboxSpec/deadLetters.*",
+        pattern =
+          ".*received dead letter from Actor.*MailboxSpec/deadLetters.*",
         occurrences = (enqueueN - dequeueN)) intercept {
 
       def createProducer(fromNum: Int, toNum: Int): Future[Vector[Envelope]] =
         spawn {
           val messages =
             Vector() ++
-            (for (i ← fromNum to toNum) yield createMessageInvocation(i))
+              (for (i ← fromNum to toNum) yield createMessageInvocation(i))
           for (i ← messages) q.enqueue(testActor, i)
           messages
         }
 
       val producers = {
         val step = 500
-        val ps = for (i ← (1 to enqueueN by step).toList) yield
-          createProducer(i, Math.min(enqueueN, i + step - 1))
+        val ps = for (i ← (1 to enqueueN by step).toList)
+          yield createProducer(i, Math.min(enqueueN, i + step - 1))
 
         if (parallel == false)
           ps foreach { Await.ready(_, remainingOrDefault) }
@@ -168,7 +171,7 @@ abstract class MailboxSpec
         var r = Vector[Envelope]()
 
         while (producers.exists(_.isCompleted == false) ||
-        q.hasMessages) Option(q.dequeue) foreach { message ⇒
+               q.hasMessages) Option(q.dequeue) foreach { message ⇒
           r = r :+ message
         }
 
@@ -180,8 +183,10 @@ abstract class MailboxSpec
       val ps = producers.map(Await.result(_, remainingOrDefault))
       val cs = consumers.map(Await.result(_, remainingOrDefault))
 
-      ps.map(_.size).sum should ===(enqueueN) //Must have produced 1000 messages
-      cs.map(_.size).sum should ===(dequeueN) //Must have consumed all produced messages
+      ps.map(_.size)
+        .sum should ===(enqueueN) //Must have produced 1000 messages
+      cs.map(_.size)
+        .sum should ===(dequeueN) //Must have consumed all produced messages
       //No message is allowed to be consumed by more than one consumer
       cs.flatten.distinct.size should ===(dequeueN)
       //All consumed messages should have been produced
@@ -289,7 +294,8 @@ class SingleConsumerOnlyMailboxSpec extends MailboxSpec {
 object SingleConsumerOnlyMailboxVerificationSpec {
   case object Ping
   val mailboxConf =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
       akka.actor.serialize-messages = off
       test-unbounded-dispatcher {
       mailbox-type = "akka.dispatch.SingleConsumerOnlyUnboundedMailbox"

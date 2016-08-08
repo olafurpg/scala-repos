@@ -120,8 +120,8 @@ class StatsReportListener(numBatchInfos: Int = 10) extends StreamingListener {
     showMillisDistribution("Processing time: ", _.processingDelay)
   }
 
-  def showMillisDistribution(
-      heading: String, getMetric: BatchInfo => Option[Long]) {
+  def showMillisDistribution(heading: String,
+                             getMetric: BatchInfo => Option[Long]) {
     org.apache.spark.scheduler.StatsReportListener
       .showMillisDistribution(heading, extractDistribution(getMetric))
   }

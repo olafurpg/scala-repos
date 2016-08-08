@@ -11,12 +11,11 @@ import play.api.{Environment, Configuration, Logger}
 /**
   * Default implementation of the DB API.
   */
-class DefaultDBApi(
-    configuration: Map[String, Config],
-    defaultConnectionPool: ConnectionPool = new HikariCPConnectionPool(
-          Environment.simple()),
-    environment: Environment = Environment.simple(),
-    injector: Injector = NewInstanceInjector)
+class DefaultDBApi(configuration: Map[String, Config],
+                   defaultConnectionPool: ConnectionPool =
+                     new HikariCPConnectionPool(Environment.simple()),
+                   environment: Environment = Environment.simple(),
+                   injector: Injector = NewInstanceInjector)
     extends DBApi {
 
   import DefaultDBApi._
@@ -54,7 +53,9 @@ class DefaultDBApi(
       } catch {
         case NonFatal(e) =>
           throw Configuration(configuration(db.name)).reportError(
-              "url", s"Cannot connect to database [${db.name}]", Some(e))
+              "url",
+              s"Cannot connect to database [${db.name}]",
+              Some(e))
       }
     }
   }

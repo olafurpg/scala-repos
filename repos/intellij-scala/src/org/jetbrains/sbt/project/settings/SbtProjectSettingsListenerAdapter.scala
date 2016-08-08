@@ -1,6 +1,9 @@
 package org.jetbrains.sbt.project.settings
 
-import com.intellij.openapi.externalSystem.settings.{DelegatingExternalSystemSettingsListener, ExternalSystemSettingsListener}
+import com.intellij.openapi.externalSystem.settings.{
+  DelegatingExternalSystemSettingsListener,
+  ExternalSystemSettingsListener
+}
 
 /**
   * @author Pavel Fatin
@@ -8,7 +11,8 @@ import com.intellij.openapi.externalSystem.settings.{DelegatingExternalSystemSet
 class SbtProjectSettingsListenerAdapter(
     listener: ExternalSystemSettingsListener[SbtProjectSettings])
     extends DelegatingExternalSystemSettingsListener[SbtProjectSettings](
-        listener) with SbtProjectSettingsListener {
+        listener)
+    with SbtProjectSettingsListener {
 
   def onJdkChanged(oldValue: String, newValue: String) {}
 

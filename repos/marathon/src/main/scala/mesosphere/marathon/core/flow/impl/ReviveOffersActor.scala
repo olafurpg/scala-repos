@@ -6,7 +6,10 @@ import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.core.flow.impl.ReviveOffersActor.OffersWanted
-import mesosphere.marathon.event.{SchedulerReregisteredEvent, SchedulerRegisteredEvent}
+import mesosphere.marathon.event.{
+  SchedulerReregisteredEvent,
+  SchedulerRegisteredEvent
+}
 import mesosphere.marathon.state.Timestamp
 import rx.lang.scala.{Observable, Subscription}
 import scala.annotation.tailrec
@@ -18,8 +21,12 @@ private[flow] object ReviveOffersActor {
             marathonEventStream: EventStream,
             offersWanted: Observable[Boolean],
             driverHolder: MarathonSchedulerDriverHolder): Props = {
-    Props(new ReviveOffersActor(
-            clock, conf, marathonEventStream, offersWanted, driverHolder))
+    Props(
+        new ReviveOffersActor(clock,
+                              conf,
+                              marathonEventStream,
+                              offersWanted,
+                              driverHolder))
   }
 
   private[impl] case object TimedCheck
@@ -35,7 +42,8 @@ private[impl] class ReviveOffersActor(
     marathonEventStream: EventStream,
     offersWanted: Observable[Boolean],
     driverHolder: MarathonSchedulerDriverHolder)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[impl] var subscription: Subscription = _
   private[impl] var offersCurrentlyWanted: Boolean = false

@@ -23,7 +23,15 @@ import org.specs2.mutable.Specification
 
 import common._
 
-import Mailer.{From, To, Subject, PlainMailBodyType, XHTMLMailBodyType, XHTMLPlusImages, PlusImageHolder}
+import Mailer.{
+  From,
+  To,
+  Subject,
+  PlainMailBodyType,
+  XHTMLMailBodyType,
+  XHTMLPlusImages,
+  PlusImageHolder
+}
 
 import scala.io.Source
 
@@ -44,10 +52,8 @@ object MailerSpec extends Specification {
   val myMailer = new Mailer with MailerForTesting {
     @volatile var lastMessage: Box[MimeMessage] = Empty
 
-    testModeSend.default.set(
-        (msg: MimeMessage) =>
-          {
-        lastMessage = Full(msg)
+    testModeSend.default.set((msg: MimeMessage) => {
+      lastMessage = Full(msg)
     })
   }
 

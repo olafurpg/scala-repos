@@ -48,7 +48,7 @@ object CanZipMapValues {
   //
 
   class OpArray[@spec(Double, Int, Float, Long) V,
-                @spec(Double, Int, Float, Long) RV : ClassTag]
+                @spec(Double, Int, Float, Long) RV: ClassTag]
       extends Op[Array[V], V, RV, Array[RV]] {
 
     /**Maps all values from the given collection. */
@@ -64,7 +64,7 @@ object CanZipMapValues {
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanZipMapValues[V, RV] implementations ">
 
-  implicit def opArray[@spec V, @spec RV : ClassTag] = new OpArray[V, RV]
+  implicit def opArray[@spec V, @spec RV: ClassTag] = new OpArray[V, RV]
 
   implicit object OpArrayII extends OpArray[Int, Int]
 

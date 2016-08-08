@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala.annotator.template
 
 import org.jetbrains.plugins.scala.ScalaBundle
-import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error, Message}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorTestBase,
+  Error,
+  Message
+}
 
 /**
   * Pavel Fatin

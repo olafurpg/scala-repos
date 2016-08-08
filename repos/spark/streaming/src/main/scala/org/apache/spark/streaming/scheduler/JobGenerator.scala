@@ -32,8 +32,8 @@ private[scheduler] case class GenerateJobs(time: Time)
     extends JobGeneratorEvent
 private[scheduler] case class ClearMetadata(time: Time)
     extends JobGeneratorEvent
-private[scheduler] case class DoCheckpoint(
-    time: Time, clearCheckpointDataLater: Boolean)
+private[scheduler] case class DoCheckpoint(time: Time,
+                                           clearCheckpointDataLater: Boolean)
     extends JobGeneratorEvent
 private[scheduler] case class ClearCheckpointData(time: Time)
     extends JobGeneratorEvent
@@ -137,8 +137,9 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
         val timedOut =
           (System.currentTimeMillis() - timeWhenStopStarted) > stopTimeoutMs
         if (timedOut) {
-          logWarning("Timed out while stopping the job generator (timeout = " +
-              stopTimeoutMs + ")")
+          logWarning(
+              "Timed out while stopping the job generator (timeout = " +
+                stopTimeoutMs + ")")
         }
         timedOut
       }
@@ -148,7 +149,7 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
       logInfo(
           "Waiting for all received blocks to be consumed for job generation")
       while (!hasTimedOut &&
-      jobScheduler.receiverTracker.hasUnallocatedBlocks) {
+             jobScheduler.receiverTracker.hasUnallocatedBlocks) {
         Thread.sleep(pollTime)
       }
       logInfo(
@@ -237,26 +238,28 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
     val restartTime = new Time(
         timer.getRestartTime(graph.zeroTime.milliseconds))
     val downTimes = checkpointTime.until(restartTime, batchDuration)
-    logInfo("Batches during down time (" + downTimes.size + " batches): " +
-        downTimes.mkString(", "))
+    logInfo(
+        "Batches during down time (" + downTimes.size + " batches): " +
+          downTimes.mkString(", "))
 
     // Batches that were unprocessed before failure
     val pendingTimes = ssc.initialCheckpoint.pendingTimes.sorted(Time.ordering)
     logInfo(
         "Batches pending processing (" + pendingTimes.length + " batches): " +
-        pendingTimes.mkString(", "))
+          pendingTimes.mkString(", "))
     // Reschedule jobs for these times
     val timesToReschedule = (pendingTimes ++ downTimes).filter {
       _ < restartTime
     }.distinct.sorted(Time.ordering)
     logInfo(
         "Batches to reschedule (" + timesToReschedule.length + " batches): " +
-        timesToReschedule.mkString(", "))
+          timesToReschedule.mkString(", "))
     timesToReschedule.foreach { time =>
       // Allocate the related blocks when recovering from failure, because some blocks that were
       // added but not allocated, are dangling in the queue after recovering, we have to allocate
       // those blocks to the next batch, which is the batch they were supposed to go.
-      jobScheduler.receiverTracker.allocateBlocksToBatch(time) // allocate received blocks to batch
+      jobScheduler.receiverTracker
+        .allocateBlocksToBatch(time) // allocate received blocks to batch
       jobScheduler.submitJobSet(JobSet(time, graph.generateJobs(time)))
     }
 
@@ -274,10 +277,11 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
 
     // Checkpoint all RDDs marked for checkpointing to ensure their lineages are
     // truncated periodically. Otherwise, we may run into stack overflows (SPARK-6847).
-    ssc.sparkContext.setLocalProperty(
-        RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
+    ssc.sparkContext
+      .setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
     Try {
-      jobScheduler.receiverTracker.allocateBlocksToBatch(time) // allocate received blocks to batch
+      jobScheduler.receiverTracker
+        .allocateBlocksToBatch(time) // allocate received blocks to batch
       graph.generateJobs(time) // generate jobs using allocated block
     } match {
       case Success(jobs) =>
@@ -328,8 +332,8 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
             ssc.checkpointDuration)) {
       logInfo("Checkpointing graph for time " + time)
       ssc.graph.updateCheckpointData(time)
-      checkpointWriter.write(
-          new Checkpoint(ssc, time), clearCheckpointDataLater)
+      checkpointWriter
+        .write(new Checkpoint(ssc, time), clearCheckpointDataLater)
     }
   }
 

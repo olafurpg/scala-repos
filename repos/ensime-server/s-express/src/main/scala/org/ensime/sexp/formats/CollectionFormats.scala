@@ -13,8 +13,7 @@ import scala.collection.GenTraversable
 /**
   * Support for anything with a `CanBuildFrom`.
   */
-trait CollectionFormats {
-  this: BasicFormats =>
+trait CollectionFormats { this: BasicFormats =>
 
   import scala.language.higherKinds
 
@@ -81,8 +80,7 @@ trait CollectionFormats {
       vf: SexpFormat[V]
   ): SexpFormat[M[K, V]] = new SexpFormat[M[K, V]] {
     def write(m: M[K, V]) =
-      SexpList(
-          m.map {
+      SexpList(m.map {
         case (k, v) => SexpList(k.toSexp, v.toSexp)
       }(breakOut): List[Sexp])
 

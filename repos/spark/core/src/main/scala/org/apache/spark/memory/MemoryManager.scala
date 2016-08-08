@@ -44,11 +44,11 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   @GuardedBy("this")
   protected val storageMemoryPool = new StorageMemoryPool(this)
   @GuardedBy("this")
-  protected val onHeapExecutionMemoryPool = new ExecutionMemoryPool(
-      this, "on-heap execution")
+  protected val onHeapExecutionMemoryPool =
+    new ExecutionMemoryPool(this, "on-heap execution")
   @GuardedBy("this")
-  protected val offHeapExecutionMemoryPool = new ExecutionMemoryPool(
-      this, "off-heap execution")
+  protected val offHeapExecutionMemoryPool =
+    new ExecutionMemoryPool(this, "off-heap execution")
 
   storageMemoryPool.incrementPoolSize(storageMemory)
   onHeapExecutionMemoryPool.incrementPoolSize(onHeapExecutionMemory)
@@ -96,14 +96,16 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     * active tasks) before it is forced to spill. This can happen if the number of tasks increase
     * but an older task had a lot of memory already.
     */
-  private[memory] def acquireExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Long
+  private[memory] def acquireExecutionMemory(numBytes: Long,
+                                             taskAttemptId: Long,
+                                             memoryMode: MemoryMode): Long
 
   /**
     * Release numBytes of execution memory belonging to the given task.
     */
-  private[memory] def releaseExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Unit =
+  private[memory] def releaseExecutionMemory(numBytes: Long,
+                                             taskAttemptId: Long,
+                                             memoryMode: MemoryMode): Unit =
     synchronized {
       memoryMode match {
         case MemoryMode.ON_HEAP =>
@@ -121,7 +123,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   private[memory] def releaseAllExecutionMemoryForTask(
       taskAttemptId: Long): Long = synchronized {
     onHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId) +
-    offHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId)
+      offHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId)
   }
 
   /**
@@ -150,7 +152,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     */
   final def executionMemoryUsed: Long = synchronized {
     onHeapExecutionMemoryPool.memoryUsed +
-    offHeapExecutionMemoryPool.memoryUsed
+      offHeapExecutionMemoryPool.memoryUsed
   }
 
   /**
@@ -166,7 +168,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   private[memory] def getExecutionMemoryUsageForTask(
       taskAttemptId: Long): Long = synchronized {
     onHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId) +
-    offHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId)
+      offHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId)
   }
 
   // -- Fields related to Tungsten managed memory -------------------------------------------------

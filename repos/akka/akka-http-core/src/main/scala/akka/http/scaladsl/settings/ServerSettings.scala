@@ -23,7 +23,7 @@ import scala.language.implicitConversions
 /**
   * Public API but not intended for subclassing
   */
-abstract class ServerSettings private[akka]()
+abstract class ServerSettings private[akka] ()
     extends akka.http.javadsl.settings.ServerSettings {
   self: ServerSettingsImpl ⇒
   def serverHeader: Option[Server]

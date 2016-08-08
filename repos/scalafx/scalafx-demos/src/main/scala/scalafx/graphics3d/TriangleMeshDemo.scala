@@ -37,7 +37,15 @@ import scalafx.scene.input.MouseEvent
 import scalafx.scene.paint.{Color, PhongMaterial}
 import scalafx.scene.shape.{MeshView, TriangleMesh}
 import scalafx.scene.transform.Rotate
-import scalafx.scene.{AmbientLight, Group, Node, PerspectiveCamera, PointLight, Scene, SceneAntialiasing}
+import scalafx.scene.{
+  AmbientLight,
+  Group,
+  Node,
+  PerspectiveCamera,
+  PointLight,
+  Scene,
+  SceneAntialiasing
+}
 
 /**
   * Demonstrates custom 3D shapes.
@@ -150,10 +158,10 @@ object TriangleMeshDemo extends JFXApp {
         1.0f, // Base face, rear point (left face, right point; right face, left point), point 0.
         0.75f,
         (1.0 -
-            sqrt(3.0) / 4.0).toFloat, // Base face, right point (right face, right point; front face, right point), point 1.
+          sqrt(3.0) / 4.0).toFloat, // Base face, right point (right face, right point; front face, right point), point 1.
         0.25f,
         (1.0 -
-            sqrt(3.0) / 4.0).toFloat, // Base face, left point (left face, left point; front face, left point), point 2.
+          sqrt(3.0) / 4.0).toFloat, // Base face, left point (left face, left point; front face, left point), point 2.
         1.0f,
         1.0f, // Right face, top point, point 3.
         0.5f,
@@ -241,14 +249,12 @@ object TriangleMeshDemo extends JFXApp {
 
     node.transforms = Seq(yRotate)
 
-    scene.onMousePressed = (event: MouseEvent) =>
-      {
-        anchorX = event.sceneX
-        anchorAngleY = angleY()
+    scene.onMousePressed = (event: MouseEvent) => {
+      anchorX = event.sceneX
+      anchorAngleY = angleY()
     }
-    scene.onMouseDragged = (event: MouseEvent) =>
-      {
-        angleY() = anchorAngleY + anchorX - event.sceneX
+    scene.onMouseDragged = (event: MouseEvent) => {
+      angleY() = anchorAngleY + anchorX - event.sceneX
     }
   }
 }

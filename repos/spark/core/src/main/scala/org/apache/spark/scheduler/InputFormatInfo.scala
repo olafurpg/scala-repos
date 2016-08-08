@@ -47,7 +47,7 @@ class InputFormatInfo(val configuration: Configuration,
 
   override def toString: String = {
     "InputFormatInfo " + super.toString + " .. inputFormatClazz " +
-    inputFormatClazz + ", " + "path : " + path
+      inputFormatClazz + ", " + "path : " + path
   }
 
   override def hashCode(): Int = {
@@ -60,10 +60,10 @@ class InputFormatInfo(val configuration: Configuration,
   // absolute path .. which is fine, this is best case effort to remove duplicates - right ?
   override def equals(other: Any): Boolean = other match {
     case that: InputFormatInfo => {
-        // not checking config - that should be fine, right ?
-        this.inputFormatClazz == that.inputFormatClazz &&
-        this.path == that.path
-      }
+      // not checking config - that should be fine, right ?
+      this.inputFormatClazz == that.inputFormatClazz &&
+      this.path == that.path
+    }
     case _ => false
   }
 
@@ -83,16 +83,16 @@ class InputFormatInfo(val configuration: Configuration,
       } else {
         throw new IllegalArgumentException(
             "Specified inputformat " + inputFormatClazz +
-            " is NOT a supported input format ? does not implement either of the supported hadoop " +
-            "api's")
+              " is NOT a supported input format ? does not implement either of the supported hadoop " +
+              "api's")
       }
     } catch {
       case e: ClassNotFoundException => {
-          throw new IllegalArgumentException(
-              "Specified inputformat " + inputFormatClazz +
+        throw new IllegalArgumentException(
+            "Specified inputformat " + inputFormatClazz +
               " cannot be found ?",
-              e)
-        }
+            e)
+      }
     }
   }
 
@@ -141,8 +141,8 @@ class InputFormatInfo(val configuration: Configuration,
   private def findPreferredLocations(): Set[SplitInfo] = {
     logDebug(
         "mapreduceInputFormat : " + mapreduceInputFormat +
-        ", mapredInputFormat : " + mapredInputFormat +
-        ", inputFormatClazz : " + inputFormatClazz)
+          ", mapredInputFormat : " + mapredInputFormat +
+          ", inputFormatClazz : " + inputFormatClazz)
     if (mapreduceInputFormat) {
       prefLocsFromMapreduceInputFormat()
     } else {

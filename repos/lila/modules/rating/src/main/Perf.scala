@@ -21,7 +21,8 @@ case class Perf(glicko: Glicko,
   def add(g: Glicko, date: DateTime): Perf =
     copy(glicko = g,
          nb = nb + 1,
-         recent = if (nb < 10) recent
+         recent =
+           if (nb < 10) recent
            else (g.intRating :: recent) take Perf.recentMaxSize,
          latest = date.some)
 
@@ -30,12 +31,13 @@ case class Perf(glicko: Glicko,
     glicko.sanityCheck option add(glicko, date)
   }
 
-  def addOrReset(monitor: lila.mon.IncPath, msg: => String)(
-      r: Rating, date: DateTime): Perf = add(r, date) | {
-    lila.log("rating").error(s"Crazy Glicko2 $msg")
-    lila.mon.incPath(monitor)()
-    add(Glicko.default, date)
-  }
+  def addOrReset(monitor: lila.mon.IncPath,
+                 msg: => String)(r: Rating, date: DateTime): Perf =
+    add(r, date) | {
+      lila.log("rating").error(s"Crazy Glicko2 $msg")
+      lila.mon.incPath(monitor)()
+      add(Glicko.default, date)
+    }
 
   def toRating =
     new Rating(math.max(Glicko.minRating, glicko.rating),

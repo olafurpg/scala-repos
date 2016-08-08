@@ -12,7 +12,8 @@ import akka.persistence.JournalProtocol._
 object PersistentActorJournalProtocolSpec {
 
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
 puppet {
   class = "akka.persistence.JournalPuppet"
   max-message-batch-size = 10
@@ -94,7 +95,8 @@ class JournalPuppet extends Actor {
 import PersistentActorJournalProtocolSpec._
 
 class PersistentActorJournalProtocolSpec
-    extends AkkaSpec(config) with ImplicitSender {
+    extends AkkaSpec(config)
+    with ImplicitSender {
 
   val journal = JournalPuppet(system).probe
 
@@ -123,8 +125,8 @@ class PersistentActorJournalProtocolSpec
     w.messages.foreach {
       case AtomicWrite(msgs) ⇒
         msgs.foreach(msg ⇒
-              w.persistentActor.tell(
-                  WriteMessageSuccess(msg, w.actorInstanceId), msg.sender))
+          w.persistentActor.tell(WriteMessageSuccess(msg, w.actorInstanceId),
+                                 msg.sender))
       case NonPersistentRepr(msg, sender) ⇒ w.persistentActor.tell(msg, sender)
     }
   }

@@ -22,7 +22,7 @@ object intervalGeometricPartialOrder {
     * - I < J if all x \in I, y \in J have x < y
     * - I > J if all x \in I, y \in J have x > y
     */
-  class IntervalGeometricPartialOrder[A : Order]
+  class IntervalGeometricPartialOrder[A: Order]
       extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean = (x == y)
 
@@ -51,6 +51,6 @@ object intervalGeometricPartialOrder {
     }
   }
 
-  implicit def intervalGeometricPartialOrder[A : Order]: PartialOrder[Interval[
-          A]] = new IntervalGeometricPartialOrder[A]
+  implicit def intervalGeometricPartialOrder[A: Order]
+    : PartialOrder[Interval[A]] = new IntervalGeometricPartialOrder[A]
 }

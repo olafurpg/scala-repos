@@ -97,14 +97,12 @@ object SphereAndBoxDemo extends JFXApp {
 
     node.transforms = Seq(yRotate)
 
-    scene.onMousePressed = (event: MouseEvent) =>
-      {
-        anchorX = event.sceneX
-        anchorAngleY = angleY()
+    scene.onMousePressed = (event: MouseEvent) => {
+      anchorX = event.sceneX
+      anchorAngleY = angleY()
     }
-    scene.onMouseDragged = (event: MouseEvent) =>
-      {
-        angleY() = anchorAngleY + anchorX - event.sceneX
+    scene.onMouseDragged = (event: MouseEvent) => {
+      angleY() = anchorAngleY + anchorX - event.sceneX
     }
   }
 }

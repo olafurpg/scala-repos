@@ -22,9 +22,10 @@ object EventBusSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-abstract class EventBusSpec(
-    busName: String, conf: Config = ConfigFactory.empty())
-    extends AkkaSpec(conf) with BeforeAndAfterEach {
+abstract class EventBusSpec(busName: String,
+                            conf: Config = ConfigFactory.empty())
+    extends AkkaSpec(conf)
+    with BeforeAndAfterEach {
   type BusType <: EventBus
 
   def createNewEventBus(): BusType
@@ -35,8 +36,8 @@ abstract class EventBusSpec(
 
   def classifierFor(event: BusType#Event): BusType#Classifier
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit
 
   lazy val bus = createNewEventBus()
 
@@ -86,7 +87,8 @@ abstract class EventBusSpec(
         }
       val events = createEvents(10)
       val classifiers = events map getClassifierFor
-      subscribers.zip(classifiers) forall { case (s, c) ⇒ bus.subscribe(s, c) } should ===(
+      subscribers
+        .zip(classifiers) forall { case (s, c) ⇒ bus.subscribe(s, c) } should ===(
           true)
       subscribers.zip(classifiers) forall {
         case (s, c) ⇒ bus.unsubscribe(s, c)
@@ -162,7 +164,8 @@ abstract class EventBusSpec(
 
 object ActorEventBusSpec {
   class MyActorEventBus(protected val system: ActorSystem)
-      extends ActorEventBus with ManagedActorClassification
+      extends ActorEventBus
+      with ManagedActorClassification
       with ActorClassifier {
 
     type Event = Notification
@@ -199,8 +202,8 @@ class ActorEventBusSpec(conf: Config)
 
   def classifierFor(event: BusType#Event) = event.ref
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit =
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit =
     system.stop(subscriber)
 
   // ManagedActorClassification specific tests
@@ -338,8 +341,8 @@ class ScanningEventBusSpec extends EventBusSpec("ScanningEventBus") {
 
   def classifierFor(event: BusType#Event) = event.toString
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit = ()
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit = ()
 }
 
 object LookupEventBusSpec {
@@ -349,12 +352,12 @@ object LookupEventBusSpec {
     type Classifier = String
 
     override protected def classify(event: Int): String = event.toString
-    override protected def compareSubscribers(
-        a: Procedure[Int], b: Procedure[Int]): Int =
+    override protected def compareSubscribers(a: Procedure[Int],
+                                              b: Procedure[Int]): Int =
       akka.util.Helpers.compareIdentityHash(a, b)
     override protected def mapSize = 32
-    override protected def publish(
-        event: Int, subscriber: Procedure[Int]): Unit =
+    override protected def publish(event: Int,
+                                   subscriber: Procedure[Int]): Unit =
       subscriber(event)
   }
 }
@@ -374,6 +377,6 @@ class LookupEventBusSpec extends EventBusSpec("LookupEventBus") {
 
   def classifierFor(event: BusType#Event) = event.toString
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit = ()
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit = ()
 }

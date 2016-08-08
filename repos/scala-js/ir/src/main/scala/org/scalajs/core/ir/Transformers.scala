@@ -83,9 +83,10 @@ object Transformers {
               tree.tpe)
 
         case ApplyStatically(receiver, cls, method, args) =>
-          ApplyStatically(
-              transformExpr(receiver), cls, method, args map transformExpr)(
-              tree.tpe)
+          ApplyStatically(transformExpr(receiver),
+                          cls,
+                          method,
+                          args map transformExpr)(tree.tpe)
 
         case ApplyStatic(cls, method, args) =>
           ApplyStatic(cls, method, args map transformExpr)(tree.tpe)
@@ -141,8 +142,9 @@ object Transformers {
           JSFunctionApply(transformExpr(fun), args map transformExpr)
 
         case JSDotMethodApply(receiver, method, args) =>
-          JSDotMethodApply(
-              transformExpr(receiver), method, args map transformExpr)
+          JSDotMethodApply(transformExpr(receiver),
+                           method,
+                           args map transformExpr)
 
         case JSBracketMethodApply(receiver, method, args) =>
           JSBracketMethodApply(transformExpr(receiver),
@@ -150,8 +152,9 @@ object Transformers {
                                args map transformExpr)
 
         case JSSuperBracketSelect(cls, qualifier, item) =>
-          JSSuperBracketSelect(
-              cls, transformExpr(qualifier), transformExpr(item))
+          JSSuperBracketSelect(cls,
+                               transformExpr(qualifier),
+                               transformExpr(item))
 
         case JSSuperBracketCall(cls, receiver, method, args) =>
           JSSuperBracketCall(cls,
@@ -178,8 +181,7 @@ object Transformers {
           JSArrayConstr(items map transformExpr)
 
         case JSObjectConstr(fields) =>
-          JSObjectConstr(
-              fields map {
+          JSObjectConstr(fields map {
             case (name, value) => (name, transformExpr(value))
           })
 
@@ -225,7 +227,8 @@ object Transformers {
         case tree: MethodDef =>
           val MethodDef(static, name, args, resultType, body) = tree
           MethodDef(static, name, args, resultType, transformStat(body))(
-              tree.optimizerHints, None)
+              tree.optimizerHints,
+              None)
 
         case PropertyDef(name, getterBody, setterArg, setterBody) =>
           PropertyDef(name,

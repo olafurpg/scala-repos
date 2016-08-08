@@ -47,7 +47,8 @@ object ReadOnlyDoubleWrapper {
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyDoubleWrapper.html javafx.beans.property.ReadOnlyDoubleWrapper]] */
 class ReadOnlyDoubleWrapper(
-    override val delegate: jfxbp.ReadOnlyDoubleWrapper = new jfxbp.ReadOnlyDoubleWrapper(
+    override val delegate: jfxbp.ReadOnlyDoubleWrapper =
+      new jfxbp.ReadOnlyDoubleWrapper(
           ))
     extends DoubleProperty(delegate)
     with SFXDelegate[jfxbp.ReadOnlyDoubleWrapper] {

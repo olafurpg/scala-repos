@@ -20,10 +20,10 @@ object randomclient {
         case 1 =>
           x: Int =>
             x % 2 != 0
-          case 2 =>
+        case 2 =>
           x: Int =>
             x % 2 == 0
-          case _ =>
+        case _ =>
           x: Int =>
             x != 0
       }

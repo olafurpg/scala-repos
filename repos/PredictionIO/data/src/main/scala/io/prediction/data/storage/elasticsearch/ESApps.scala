@@ -29,7 +29,8 @@ import org.json4s.native.Serialization.write
 
 /** Elasticsearch implementation of Items. */
 class ESApps(client: Client, config: StorageClientConfig, index: String)
-    extends Apps with Logging {
+    extends Apps
+    with Logging {
   implicit val formats = DefaultFormats.lossless
   private val estype = "apps"
   private val seq = new ESSequences(client, config, index)
@@ -44,8 +45,8 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+        ("properties" ->
+          ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)

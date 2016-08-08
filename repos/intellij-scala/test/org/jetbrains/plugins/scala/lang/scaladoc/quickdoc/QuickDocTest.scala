@@ -7,7 +7,10 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.editor.documentationProvider.ScalaDocumentationProvider
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
 import org.junit.Assert
 
@@ -21,8 +24,8 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       QuickDocTest.quickDocGenerator.generateDoc(docElement, docElement)
     Assert.assertEquals(
         assumedText,
-        generatedText.substring(
-            generatedText.indexOf("&&") + 2, generatedText.lastIndexOf("&&")))
+        generatedText.substring(generatedText.indexOf("&&") + 2,
+                                generatedText.lastIndexOf("&&")))
   }
 
   private def generateSimpleByText(initialText: String, assumedText: String) {
@@ -39,7 +42,8 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
                              elementName: String,
                              assumedTest: String) {
     configureFromFileTextAdapter(
-        "dummy.scala", fileText.stripMargin('|').replaceAll("\r", "").trim())
+        "dummy.scala",
+        fileText.stripMargin('|').replaceAll("\r", "").trim())
     val td =
       getFileAdapter.asInstanceOf[ScalaFile].getClasses collectFirst {
         case a: ScTemplateDefinition if a.name == className => a
@@ -78,7 +82,7 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "aa\n     <dl><dt><b>See Also:</b></dt> <dd>someting</dd>\n    " +
-      " </dl><br><br><b>Example:</b><br> aaa\n     <br><br><b>Note:</b><br> qwerty"
+        " </dl><br><br><b>Example:</b><br> aaa\n     <br><br><b>Note:</b><br> qwerty"
 
     generateSimpleByText(fileText, testText)
   }
@@ -98,8 +102,8 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "aa\n     <br>\n<DD><DL><DT><b>Parameters:</b><DD><code>i</code> - aaa  " +
-      "<DD><code>j</code> - bbb  <DD><code>k</code> - ccc  </DD></DL></DD><DD><DL><DT>" +
-      "<b>Type parameters:</b><DD><code>&lt;T&gt;</code> -  qqq  <DD><code>&lt;E&gt;</code> -  aaa  bbb"
+        "<DD><code>j</code> - bbb  <DD><code>k</code> - ccc  </DD></DL></DD><DD><DL><DT>" +
+        "<b>Type parameters:</b><DD><code>&lt;T&gt;</code> -  qqq  <DD><code>&lt;E&gt;</code> -  aaa  bbb"
 
     generateSimpleByText(fileText, testText)
   }
@@ -114,7 +118,7 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <br>\n<DD><DL><DT><b>Throws:</b><DD><a href=\"psi_element://java.lang.Exce" +
-      "ption\"><code>Exception</code></a> - aaaaaaaaaaaaaaa"
+        "ption\"><code>Exception</code></a> - aaaaaaaaaaaaaaa"
 
     generateSimpleByText(fileText, testText)
   }
@@ -132,8 +136,8 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <br>\n<DD><DL><DT><b>Parameters:</b><DD><code>o</code> -  <DD><code>f</code> - jhdkfhkl  " +
-      "</DD></DL></DD><DD><DL><DT><b>Type parameters:</b><DD><code>&lt;E&gt;" +
-      "</code> -  <DD><code>&lt;K&gt;</code> -  dsuhf"
+        "</DD></DL></DD><DD><DL><DT><b>Type parameters:</b><DD><code>&lt;E&gt;" +
+        "</code> -  <DD><code>&lt;K&gt;</code> -  dsuhf"
 
     generateSimpleByText(fileText, testText)
   }
@@ -149,7 +153,7 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <br>\n<DD><DL><DT><b>Type parameters:</b><DD><code>&lt;A&gt;" +
-      "</code> -  <DD><code>&lt;B&gt;</code> -  dgjsdaf  <DD><code>&lt;C&gt;</code> -  "
+        "</code> -  <DD><code>&lt;B&gt;</code> -  dgjsdaf  <DD><code>&lt;C&gt;</code> -  "
 
     generateSimpleByText(fileText, testText)
   }
@@ -184,7 +188,7 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <br><br><b>Note:</b><br> <b><u>THIS IS SPARTAAA!!!11</u></b>\n     " +
-      "<br><br><dl><dt><b>See Also:</b></dt> <sub>111<u>anything</u>111</sub><dd>"
+        "<br><br><dl><dt><b>See Also:</b></dt> <sub>111<u>anything</u>111</sub><dd>"
 
     generateSimpleByText(fileText, testText)
   }
@@ -204,12 +208,12 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <a href=\"http://yandex.ru     \">http://yandex.ru     </a>\n     " +
-      "<a href=\"http://jetbrains.com/idea/scala\">  Scala Plugin</a>\n     " +
-      "<a href=\"http://google.com\">This is google</a>" +
-      "\n     <a href=\"http://scala-lang.org\">http://scala-lang.org</a>\n     " +
-      "<sub><u><a href=\"http://jetbrains.com}</u></sub>\n     " +
-      "<a href=\"psi_element://java.lang.String\"><code>String</code></a> " +
-      "<sup><a href=\"psi_element://java.lang.Integer\"><code>Integer</code></a></sup> "
+        "<a href=\"http://jetbrains.com/idea/scala\">  Scala Plugin</a>\n     " +
+        "<a href=\"http://google.com\">This is google</a>" +
+        "\n     <a href=\"http://scala-lang.org\">http://scala-lang.org</a>\n     " +
+        "<sub><u><a href=\"http://jetbrains.com}</u></sub>\n     " +
+        "<a href=\"psi_element://java.lang.String\"><code>String</code></a> " +
+        "<sup><a href=\"psi_element://java.lang.Integer\"><code>Integer</code></a></sup> "
 
     generateSimpleByText(fileText, testText)
   }
@@ -226,7 +230,7 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText =
       "\n     <sup>blah-blah\n    </sup>\n     <u>aaaaaaa<sub>bbbbbbb\n     " +
-      "</sub></u><dl><dt><b>See Also:</b></dt> <dd>something "
+        "</sub></u><dl><dt><b>See Also:</b></dt> <dd>something "
 
     generateSimpleByText(fileText, testText)
   }
@@ -368,11 +372,12 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     val expected =
       """<html><body><PRE>@<a href="psi_element://scala.deprecated"><code>deprecated</code></a>("use 'foo' instead", "1.2.3")
         |@<a href="psi_element://scala.throws"><code>throws</code></a>[<a href="psi_element://scala"><code>scala</code></a>.Exception](classOf[Exception])
-        |def <b>boo</b>(): Unit</PRE></body></html>""".stripMargin.replaceAll(
-          "\r", "")
+        |def <b>boo</b>(): Unit</PRE></body></html>""".stripMargin
+        .replaceAll("\r", "")
 
     configureFromFileTextAdapter(
-        "dummy.scala", fileText.stripMargin('|').replaceAll("\r", "").trim())
+        "dummy.scala",
+        fileText.stripMargin('|').replaceAll("\r", "").trim())
     val element = getFileAdapter.getLastChild
     val generated =
       QuickDocTest.quickDocGenerator.generateDoc(element, element)

@@ -50,9 +50,10 @@ abstract class SubqueryExpression extends LeafExpression {
   *
   * Note: `exprId` is used to have unique name in explain string output.
   */
-case class ScalarSubquery(
-    query: LogicalPlan, exprId: ExprId = NamedExpression.newExprId)
-    extends SubqueryExpression with Unevaluable {
+case class ScalarSubquery(query: LogicalPlan,
+                          exprId: ExprId = NamedExpression.newExprId)
+    extends SubqueryExpression
+    with Unevaluable {
 
   override def plan: LogicalPlan = SubqueryAlias(toString, query)
 
@@ -64,7 +65,7 @@ case class ScalarSubquery(
     if (query.schema.length != 1) {
       TypeCheckResult.TypeCheckFailure(
           "Scalar subquery must return only one column, but got " +
-          query.schema.length.toString)
+            query.schema.length.toString)
     } else {
       TypeCheckResult.TypeCheckSuccess
     }

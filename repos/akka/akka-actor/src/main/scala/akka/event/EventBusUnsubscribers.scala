@@ -19,8 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger
   * subscribe calls * because of the need of linearizing the history message sequence and the possibility of sometimes
   * watching a few actors too much - we opt for the 2nd choice here.
   */
-private[akka] class EventStreamUnsubscriber(
-    eventStream: EventStream, debug: Boolean = false)
+private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
+                                            debug: Boolean = false)
     extends Actor {
 
   import EventStreamUnsubscriber._
@@ -37,11 +37,10 @@ private[akka] class EventStreamUnsubscriber(
   def receive = {
     case Register(actor) ⇒
       if (debug)
-        eventStream.publish(
-            Logging.Debug(
-                simpleName(getClass),
-                getClass,
-                s"watching $actor in order to unsubscribe from EventStream when it terminates"))
+        eventStream.publish(Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"watching $actor in order to unsubscribe from EventStream when it terminates"))
       context watch actor
 
     case UnregisterIfNoMoreSubscribedChannels(actor)
@@ -59,11 +58,10 @@ private[akka] class EventStreamUnsubscriber(
 
     case Terminated(actor) ⇒
       if (debug)
-        eventStream.publish(
-            Logging.Debug(
-                simpleName(getClass),
-                getClass,
-                s"unsubscribe $actor from $eventStream, because it was terminated"))
+        eventStream.publish(Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"unsubscribe $actor from $eventStream, because it was terminated"))
       eventStream unsubscribe actor
   }
 }
@@ -103,8 +101,10 @@ private[akka] object EventStreamUnsubscriber {
   * Watches all actors which subscribe on the given event stream, and unsubscribes them from it when they are Terminated.
   */
 private[akka] class ActorClassificationUnsubscriber(
-    bus: ManagedActorClassification, debug: Boolean)
-    extends Actor with Stash {
+    bus: ManagedActorClassification,
+    debug: Boolean)
+    extends Actor
+    with Stash {
 
   import ActorClassificationUnsubscriber._
 
@@ -147,7 +147,8 @@ private[akka] class ActorClassificationUnsubscriber(
 
     case Terminated(actor) ⇒
       if (debug)
-        context.system.eventStream.publish(Logging.Debug(
+        context.system.eventStream.publish(
+            Logging.Debug(
                 simpleName(getClass),
                 getClass,
                 s"actor $actor has terminated, unsubscribing it from $bus"))
@@ -178,7 +179,7 @@ private[akka] object ActorClassificationUnsubscriber {
       .asInstanceOf[ExtendedActorSystem]
       .systemActorOf(props(bus, debug),
                      "actorClassificationUnsubscriber-" +
-                     unsubscribersCount.incrementAndGet())
+                       unsubscribersCount.incrementAndGet())
   }
 
   private def props(eventBus: ManagedActorClassification, debug: Boolean) =

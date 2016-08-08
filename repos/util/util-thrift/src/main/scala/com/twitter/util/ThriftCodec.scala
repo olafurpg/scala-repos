@@ -1,16 +1,21 @@
 package com.twitter.util
 
 import org.apache.thrift.TBase
-import org.apache.thrift.protocol.{TBinaryProtocol, TCompactProtocol, TProtocolFactory}
+import org.apache.thrift.protocol.{
+  TBinaryProtocol,
+  TCompactProtocol,
+  TProtocolFactory
+}
 
 object ThriftCodec {
-  def apply[T <: TBase[_, _]: Manifest,
-            P <: TProtocolFactory : Manifest]: ThriftCodec[T, P] =
+  def apply[T <: TBase[_, _]: Manifest, P <: TProtocolFactory: Manifest]
+    : ThriftCodec[T, P] =
     new ThriftCodec[T, P]
 }
 
-class ThriftCodec[T <: TBase[_, _]: Manifest, P <: TProtocolFactory : Manifest]
-    extends Codec[T, Array[Byte]] with ThriftSerializer {
+class ThriftCodec[T <: TBase[_, _]: Manifest, P <: TProtocolFactory: Manifest]
+    extends Codec[T, Array[Byte]]
+    with ThriftSerializer {
 
   protected lazy val prototype: T =
     manifest[T].runtimeClass.asInstanceOf[Class[T]].newInstance

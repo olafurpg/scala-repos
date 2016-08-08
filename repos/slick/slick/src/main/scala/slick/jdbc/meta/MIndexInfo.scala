@@ -16,8 +16,9 @@ case class MIndexInfo(table: MQName,
                       filterCondition: Option[String])
 
 object MIndexInfo {
-  def getIndexInfo(
-      table: MQName, unique: Boolean = false, approximate: Boolean = false) =
+  def getIndexInfo(table: MQName,
+                   unique: Boolean = false,
+                   approximate: Boolean = false) =
     ResultSetAction[MIndexInfo](
         _.metaData.getIndexInfo(table.catalog_?,
                                 table.schema_?,

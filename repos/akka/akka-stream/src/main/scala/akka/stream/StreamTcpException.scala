@@ -6,7 +6,8 @@ package akka.stream
 import scala.util.control.NoStackTrace
 
 class StreamTcpException(msg: String)
-    extends RuntimeException(msg) with NoStackTrace
+    extends RuntimeException(msg)
+    with NoStackTrace
 
 abstract class BindFailedException extends StreamTcpException("bind failed")
 

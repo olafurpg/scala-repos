@@ -6,7 +6,11 @@ import java.util
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
-import com.intellij.execution.{Location, RunManager, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  Location,
+  RunManager,
+  RunnerAndConfigurationSettings
+}
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.{PsiElement, PsiFile}
 import org.jetbrains.plugins.scala.extensions._
@@ -50,18 +54,18 @@ class ScalaScriptConfugurationProducer extends {
       case null => null
       case scalaFile: ScalaFile
           if scalaFile.isScriptFile() && !scalaFile.isWorksheetFile => {
-          val settings = RunManager
-            .getInstance(location.getProject)
-            .createRunConfiguration(scalaFile.name, confFactory)
-          val conf: ScalaScriptRunConfiguration =
-            settings.getConfiguration.asInstanceOf[ScalaScriptRunConfiguration]
-          val module = ModuleUtilCore.findModuleForFile(
-              scalaFile.getVirtualFile, scalaFile.getProject)
-          if (module == null || !module.hasScala) return null
-          conf.setModule(module)
-          conf.setScriptPath(scalaFile.getVirtualFile.getPath)
-          settings
-        }
+        val settings = RunManager
+          .getInstance(location.getProject)
+          .createRunConfiguration(scalaFile.name, confFactory)
+        val conf: ScalaScriptRunConfiguration =
+          settings.getConfiguration.asInstanceOf[ScalaScriptRunConfiguration]
+        val module = ModuleUtilCore
+          .findModuleForFile(scalaFile.getVirtualFile, scalaFile.getProject)
+        if (module == null || !module.hasScala) return null
+        conf.setModule(module)
+        conf.setScriptPath(scalaFile.getVirtualFile.getPath)
+        settings
+      }
       case _ => null
     }
   }
@@ -71,10 +75,10 @@ class ScalaScriptConfugurationProducer extends {
       location: Location[_ <: PsiElement]): Boolean = {
     configuration match {
       case conf: ScalaScriptRunConfiguration => {
-          val file: PsiFile = location.getPsiElement.getContainingFile
-          if (file == null || !file.isInstanceOf[ScalaFile]) return false
-          conf.getScriptPath.trim == file.getVirtualFile.getPath.trim
-        }
+        val file: PsiFile = location.getPsiElement.getContainingFile
+        if (file == null || !file.isInstanceOf[ScalaFile]) return false
+        conf.getScriptPath.trim == file.getVirtualFile.getPath.trim
+      }
       case _ => false
     }
   }

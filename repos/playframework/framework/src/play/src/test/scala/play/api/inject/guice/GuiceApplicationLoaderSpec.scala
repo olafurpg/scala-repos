@@ -7,7 +7,10 @@ import org.specs2.mutable.Specification
 
 import com.google.inject.AbstractModule
 
-import play.{Configuration => JavaConfiguration, Environment => JavaEnvironment}
+import play.{
+  Configuration => JavaConfiguration,
+  Environment => JavaEnvironment
+}
 import play.api.{ApplicationLoader, Configuration, Environment}
 import play.api.inject.BuiltinModule
 
@@ -83,15 +86,15 @@ class StaticTestModule extends AbstractModule {
   }
 }
 
-class ScalaConfiguredModule(
-    environment: Environment, configuration: Configuration)
+class ScalaConfiguredModule(environment: Environment,
+                            configuration: Configuration)
     extends AbstractModule {
   def configure(): Unit = {
     bind(classOf[Foo]) to classOf[ScalaConfiguredFoo]
   }
 }
-class JavaConfiguredModule(
-    environment: JavaEnvironment, configuration: JavaConfiguration)
+class JavaConfiguredModule(environment: JavaEnvironment,
+                           configuration: JavaConfiguration)
     extends AbstractModule {
   def configure(): Unit = {
     bind(classOf[Foo]) to classOf[JavaConfiguredFoo]

@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class RowConstraintsSpec
     extends SimpleSFXDelegateSpec[jfxsl.RowConstraints, RowConstraints](
-        classOf[jfxsl.RowConstraints], classOf[RowConstraints])
+        classOf[jfxsl.RowConstraints],
+        classOf[RowConstraints])

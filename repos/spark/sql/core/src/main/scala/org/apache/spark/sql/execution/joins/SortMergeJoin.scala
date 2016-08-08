@@ -22,10 +22,18 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.physical._
-import org.apache.spark.sql.execution.{BinaryNode, CodegenSupport, RowIterator, SparkPlan}
+import org.apache.spark.sql.execution.{
+  BinaryNode,
+  CodegenSupport,
+  RowIterator,
+  SparkPlan
+}
 import org.apache.spark.sql.execution.metric.{LongSQLMetric, SQLMetrics}
 import org.apache.spark.util.collection.BitSet
 
@@ -38,7 +46,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
                          condition: Option[Expression],
                          left: SparkPlan,
                          right: SparkPlan)
-    extends BinaryNode with CodegenSupport {
+    extends BinaryNode
+    with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -238,8 +247,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     keys.map(BindReferences.bindReference(_, input).gen(ctx))
   }
 
-  private def copyKeys(
-      ctx: CodegenContext, vars: Seq[ExprCode]): Seq[ExprCode] = {
+  private def copyKeys(ctx: CodegenContext,
+                       vars: Seq[ExprCode]): Seq[ExprCode] = {
     vars.zipWithIndex.map {
       case (ev, i) =>
         val value = ctx.freshName("value")
@@ -251,8 +260,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     }
   }
 
-  private def genComparision(
-      ctx: CodegenContext, a: Seq[ExprCode], b: Seq[ExprCode]): String = {
+  private def genComparision(ctx: CodegenContext,
+                             a: Seq[ExprCode],
+                             b: Seq[ExprCode]): String = {
     val comparisons = a.zip(b).zipWithIndex.map {
       case ((l, r), i) =>
         s"""
@@ -293,7 +303,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     // Copy the left keys as class members so they could be used in next function call.
     val matchedKeyVars = copyKeys(ctx, leftKeyVars)
 
-    ctx.addNewFunction("findNextInnerJoinRows", s"""
+    ctx.addNewFunction("findNextInnerJoinRows",
+                       s"""
          |private boolean findNextInnerJoinRows(
          |    scala.collection.Iterator leftIter,
          |    scala.collection.Iterator rightIter) {
@@ -358,8 +369,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     * the variables should be declared separately from accessing the columns, we can't use the
     * codegen of BoundReference here.
     */
-  private def createLeftVars(
-      ctx: CodegenContext, leftRow: String): Seq[ExprCode] = {
+  private def createLeftVars(ctx: CodegenContext,
+                             leftRow: String): Seq[ExprCode] = {
     ctx.INPUT_ROW = leftRow
     left.output.zipWithIndex.map {
       case (a, i) =>
@@ -372,7 +383,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
           ctx.addMutableState("boolean", isNull, "")
           val code = s"""
              |$isNull = $leftRow.isNullAt($i);
-             |$value = $isNull ? ${ctx.defaultValue(a.dataType)} : ($valueCode);
+             |$value = $isNull ? ${ctx
+                          .defaultValue(a.dataType)} : ($valueCode);
            """.stripMargin
           ExprCode(code, isNull, value)
         } else {
@@ -385,8 +397,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     * Creates the variables for right part of result row, using BoundReference, since the right
     * part are accessed inside the loop.
     */
-  private def createRightVar(
-      ctx: CodegenContext, rightRow: String): Seq[ExprCode] = {
+  private def createRightVar(ctx: CodegenContext,
+                             rightRow: String): Seq[ExprCode] = {
     ctx.INPUT_ROW = rightRow
     right.output.zipWithIndex.map {
       case (a, i) =>
@@ -421,11 +433,13 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   override def doProduce(ctx: CodegenContext): String = {
     ctx.copyResult = true
     val leftInput = ctx.freshName("leftInput")
-    ctx.addMutableState(
-        "scala.collection.Iterator", leftInput, s"$leftInput = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        leftInput,
+                        s"$leftInput = inputs[0];")
     val rightInput = ctx.freshName("rightInput")
-    ctx.addMutableState(
-        "scala.collection.Iterator", rightInput, s"$rightInput = inputs[1];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        rightInput,
+                        s"$rightInput = inputs[1];")
 
     val (leftRow, matches) = genScanner(ctx)
 
@@ -441,10 +455,10 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
       if (condition.isDefined) {
         // Split the code of creating variables based on whether it's used by condition or not.
         val loaded = ctx.freshName("loaded")
-        val (leftBefore, leftAfter) = splitVarsByCondition(
-            left.output, leftVars)
-        val (rightBefore, rightAfter) = splitVarsByCondition(
-            right.output, rightVars)
+        val (leftBefore, leftAfter) =
+          splitVarsByCondition(left.output, leftVars)
+        val (rightBefore, rightAfter) =
+          splitVarsByCondition(right.output, rightVars)
         // Generate code for condition
         ctx.currentVars = leftVars ++ rightVars
         val cond = BindReferences.bindReference(condition.get, output).gen(ctx)
@@ -679,10 +693,11 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     matchJoinKey = streamedRowKey.copy()
     bufferedMatches.clear()
     do {
-      bufferedMatches += bufferedRow.copy() // need to copy mutable rows before buffering them
+      bufferedMatches += bufferedRow
+        .copy() // need to copy mutable rows before buffering them
       advancedBufferedToRowWithNullFreeJoinKey()
     } while (bufferedRow != null &&
-    keyOrdering.compare(streamedRowKey, bufferedRowKey) == 0)
+      keyOrdering.compare(streamedRowKey, bufferedRowKey) == 0)
   }
 }
 
@@ -694,8 +709,11 @@ private class LeftOuterIterator(smjScanner: SortMergeJoinScanner,
                                 boundCondition: InternalRow => Boolean,
                                 resultProj: InternalRow => InternalRow,
                                 numOutputRows: LongSQLMetric)
-    extends OneSideOuterIterator(
-        smjScanner, rightNullRow, boundCondition, resultProj, numOutputRows) {
+    extends OneSideOuterIterator(smjScanner,
+                                 rightNullRow,
+                                 boundCondition,
+                                 resultProj,
+                                 numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withLeft(row)
@@ -711,8 +729,11 @@ private class RightOuterIterator(smjScanner: SortMergeJoinScanner,
                                  boundCondition: InternalRow => Boolean,
                                  resultProj: InternalRow => InternalRow,
                                  numOutputRows: LongSQLMetric)
-    extends OneSideOuterIterator(
-        smjScanner, leftNullRow, boundCondition, resultProj, numOutputRows) {
+    extends OneSideOuterIterator(smjScanner,
+                                 leftNullRow,
+                                 boundCondition,
+                                 resultProj,
+                                 numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withRight(row)
@@ -876,12 +897,12 @@ private class SortMergeFullOuterJoinScanner(
     rightIndex = 0
 
     while (leftRowKey != null &&
-    keyOrdering.compare(leftRowKey, matchingKey) == 0) {
+           keyOrdering.compare(leftRowKey, matchingKey) == 0) {
       leftMatches += leftRow.copy()
       advancedLeft()
     }
     while (rightRowKey != null &&
-    keyOrdering.compare(rightRowKey, matchingKey) == 0) {
+           keyOrdering.compare(rightRowKey, matchingKey) == 0) {
       rightMatches += rightRow.copy()
       advancedRight()
     }

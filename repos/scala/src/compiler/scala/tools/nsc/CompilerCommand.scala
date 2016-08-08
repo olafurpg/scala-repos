@@ -11,8 +11,9 @@ import io.File
 class CompilerCommand(arguments: List[String], val settings: Settings) {
   def this(arguments: List[String], error: String => Unit) =
     this(arguments, new Settings(error))
-  def this(
-      arguments: List[String], settings: Settings, error: String => Unit) =
+  def this(arguments: List[String],
+           settings: Settings,
+           error: String => Unit) =
     this(arguments, settings withErrorFn error)
 
   type Setting = Settings#Setting
@@ -31,7 +32,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   private def explainAdvanced =
     "\n" +
-    """
+      """
     |-- Notes on option parsing --
     |Boolean settings are always false unless set.
     |Where multiple values are accepted, they should be comma-separated.
@@ -89,8 +90,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   /** Messages explaining usage and options */
   def usageMsg =
-    createUsageMsg(
-        "where possible standard", shouldExplain = false, _.isStandard)
+    createUsageMsg("where possible standard",
+                   shouldExplain = false,
+                   _.isStandard)
   def xusageMsg =
     createUsageMsg("Possible advanced", shouldExplain = true, _.isAdvanced)
   def yusageMsg =
@@ -112,7 +114,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     else if (showPlugins) global.pluginDescriptions
     else if (showPhases)
       global.phaseDescriptions +
-      (if (debug) "\n" + global.phaseFlagDescriptions else "")
+        (if (debug) "\n" + global.phaseFlagDescriptions else "")
     else if (genPhaseGraph.isSetByUser) {
       val components =
         global.phaseNames // global.phaseDescriptors // one initializes

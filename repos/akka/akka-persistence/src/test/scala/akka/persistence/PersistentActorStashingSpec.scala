@@ -166,10 +166,11 @@ object PersistentActorStashingSpec {
 }
 
 abstract class PersistentActorStashingSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentActorStashingSpec._
 
-  def stash[T <: NamedPersistentActor : ClassTag](): Unit = {
+  def stash[T <: NamedPersistentActor: ClassTag](): Unit = {
     "support user stash operations" in {
       val persistentActor = namedPersistentActor[T]
       persistentActor ! Cmd("a")
@@ -181,7 +182,7 @@ abstract class PersistentActorStashingSpec(config: Config)
     }
   }
 
-  def stashWithSeveralMessages[T <: NamedPersistentActor : ClassTag](): Unit = {
+  def stashWithSeveralMessages[T <: NamedPersistentActor: ClassTag](): Unit = {
     "support user stash operations with several stashed messages" in {
       val persistentActor = namedPersistentActor[T]
       val n = 10
@@ -195,7 +196,7 @@ abstract class PersistentActorStashingSpec(config: Config)
     }
   }
 
-  def stashUnderFailures[T <: NamedPersistentActor : ClassTag](): Unit = {
+  def stashUnderFailures[T <: NamedPersistentActor: ClassTag](): Unit = {
     "support user stash operations under failures" in {
       val persistentActor = namedPersistentActor[T]
       val bs = 1 to 10 map ("b-" + _)
@@ -223,16 +224,14 @@ abstract class PersistentActorStashingSpec(config: Config)
 }
 
 class SteppingInMemPersistentActorStashingSpec
-    extends PersistenceSpec(
-        SteppingInmemJournal
-          .config("persistence-stash")
-          .withFallback(PersistenceSpec.config(
-                  "stepping-inmem",
-                  "SteppingInMemPersistentActorStashingSpec")))
+    extends PersistenceSpec(SteppingInmemJournal
+      .config("persistence-stash")
+      .withFallback(PersistenceSpec
+        .config("stepping-inmem", "SteppingInMemPersistentActorStashingSpec")))
     with ImplicitSender {
   import PersistentActorStashingSpec._
 
-  def stash[T <: NamedPersistentActor : ClassTag](): Unit = {
+  def stash[T <: NamedPersistentActor: ClassTag](): Unit = {
     "handle async callback not happening until next message has been stashed" in {
       val persistentActor = namedPersistentActor[T]
       awaitAssert(SteppingInmemJournal.getRef("persistence-stash"), 3.seconds)
@@ -272,8 +271,8 @@ class SteppingInMemPersistentActorStashingSpec
 
 class LeveldbPersistentActorStashingSpec
     extends PersistentActorStashingSpec(
-        PersistenceSpec.config(
-            "leveldb", "LeveldbPersistentActorStashingSpec"))
+        PersistenceSpec.config("leveldb",
+                               "LeveldbPersistentActorStashingSpec"))
 class InmemPersistentActorStashingSpec
     extends PersistentActorStashingSpec(
         PersistenceSpec.config("inmem", "InmemPersistentActorStashingSpec"))

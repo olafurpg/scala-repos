@@ -133,7 +133,8 @@ package object typedarray {
                                                         Float,
                                                         Double) T,
                                            Repr <: TypedArray[T, Repr]](
-      array: scala.Array[T], dest: Repr): Repr = {
+      array: scala.Array[T],
+      dest: Repr): Repr = {
     val len = array.length
     var i = 0
     while (i < len) {
@@ -179,7 +180,8 @@ package object typedarray {
                                                         Float,
                                                         Double) T,
                                            Repr <: TypedArray[T, Repr]](
-      array: Repr, dest: scala.Array[T]): scala.Array[T] = {
+      array: Repr,
+      dest: scala.Array[T]): scala.Array[T] = {
     val len = dest.length
     var i = 0
     while (i < len) {

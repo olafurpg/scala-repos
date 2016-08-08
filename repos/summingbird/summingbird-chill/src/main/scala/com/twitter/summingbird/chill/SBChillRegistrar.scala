@@ -16,7 +16,15 @@ limitations under the License.
 
 package com.twitter.summingbird.chill
 import com.twitter.summingbird.{MutableStringConfig, SummingbirdConfig}
-import com.twitter.chill.{ScalaKryoInstantiator, IKryoRegistrar, Kryo, toRich, ReflectingRegistrar, InjectionDefaultRegistrar, InjectionRegistrar}
+import com.twitter.chill.{
+  ScalaKryoInstantiator,
+  IKryoRegistrar,
+  Kryo,
+  toRich,
+  ReflectingRegistrar,
+  InjectionDefaultRegistrar,
+  InjectionRegistrar
+}
 import com.twitter.chill.java.IterableRegistrar
 import com.twitter.bijection.Codec
 import com.twitter.chill._
@@ -29,14 +37,14 @@ import com.twitter.summingbird.batch.{BatchID, Timestamp}
   */
 object SBChillRegistrar {
 
-  def injectionRegistrar[T : Manifest : Codec]: InjectionRegistrar[T] =
-    InjectionRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], implicitly[Codec[T]])
+  def injectionRegistrar[T: Manifest: Codec]: InjectionRegistrar[T] =
+    InjectionRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                       implicitly[Codec[T]])
 
-  def injectionDefaultRegistrar[
-      T : Manifest : Codec]: InjectionDefaultRegistrar[T] =
-    InjectionDefaultRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], implicitly[Codec[T]])
+  def injectionDefaultRegistrar[T: Manifest: Codec]
+    : InjectionDefaultRegistrar[T] =
+    InjectionDefaultRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                              implicitly[Codec[T]])
 
   def kryoRegClass(clazz: Class[_]*) = { k: Kryo =>
     clazz.filter(k.alreadyRegistered(_)).foreach(k.register(_))
@@ -51,8 +59,8 @@ object SBChillRegistrar {
 
     val defaults = List(
         new ReflectingRegistrar(classOf[BatchID], classOf[BatchIDSerializer]),
-        new ReflectingRegistrar(
-            classOf[Timestamp], classOf[TimestampSerializer]))
+        new ReflectingRegistrar(classOf[Timestamp],
+                                classOf[TimestampSerializer]))
 
     ConfInst.setSerialized(
         kryoConfig,
@@ -60,7 +68,7 @@ object SBChillRegistrar {
         new ScalaKryoInstantiator()
           .withRegistrar(new IterableRegistrar(iterableRegistrars ++ defaults))
           .setReferences(false)
-      )
+    )
     kryoConfig.unwrap
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-13 Miles Sabin 
+ * Copyright (c) 2011-13 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ object sized {
   implicit def stringSizedConv(s: String) = new SizedConv[Char, String](s)
 }
 
-final class SizedConv[
-    A, Repr <% GenTraversableLike[A, Repr]: AdditiveCollection](r: Repr) {
+final class SizedConv[A,
+Repr <% GenTraversableLike[A, Repr]: AdditiveCollection](r: Repr) {
   import ops.nat._
   import Sized._
 

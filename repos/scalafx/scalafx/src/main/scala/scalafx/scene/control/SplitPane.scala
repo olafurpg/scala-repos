@@ -47,7 +47,8 @@ object SplitPane {
   }
 
   class Divider(
-      override val delegate: jfxsc.SplitPane.Divider = new jfxsc.SplitPane.Divider)
+      override val delegate: jfxsc.SplitPane.Divider =
+        new jfxsc.SplitPane.Divider)
       extends SFXDelegate[jfxsc.SplitPane.Divider] {
 
     /**
@@ -74,7 +75,8 @@ object SplitPane {
 }
 
 class SplitPane(override val delegate: jfxsc.SplitPane = new jfxsc.SplitPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.SplitPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.SplitPane] {
 
   /**
     * The orientation for the SplitPane.

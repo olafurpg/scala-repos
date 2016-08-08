@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,9 +30,9 @@ import scalaz.std.list._
 import com.precog.util.IdGen
 
 trait MathLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import Function._
 
@@ -281,8 +281,11 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 1.0, -1.0, 3.4760266448864496, -2.8438669798515654)
+      result2 must contain(0.0,
+                           1.0,
+                           -1.0,
+                           3.4760266448864496,
+                           -2.8438669798515654)
     }
     "compute atan" in {
       val input = dag.Operate(
@@ -418,8 +421,11 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 0.7615941559557649, -0.7615941559557649, 1.0, -1.0)
+      result2 must contain(0.0,
+                           0.7615941559557649,
+                           -0.7615941559557649,
+                           1.0,
+                           -1.0)
     }
     "compute round" in {
       val input = dag.Operate(
@@ -927,8 +933,11 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 1.0, -1.0, 3.4760266448864496, -2.8438669798515654)
+      result2 must contain(0.0,
+                           1.0,
+                           -1.0,
+                           3.4760266448864496,
+                           -2.8438669798515654)
     }
     "compute atan" in {
       val input = dag.Operate(
@@ -1064,8 +1073,11 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 0.7615941559557649, -0.7615941559557649, 1.0, -1.0)
+      result2 must contain(0.0,
+                           0.7615941559557649,
+                           -0.7615941559557649,
+                           1.0,
+                           -1.0)
     }
     "compute round" in {
       val input = dag.Operate(
@@ -1718,8 +1730,21 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0, 10, -7, 14, -3, -12, 6, 13, -5, 7, -14, 11, -9, -13, 15)
+      result2 must contain(0,
+                           10,
+                           -7,
+                           14,
+                           -3,
+                           -12,
+                           6,
+                           13,
+                           -5,
+                           7,
+                           -14,
+                           11,
+                           -9,
+                           -13,
+                           15)
     }
     "compute rint" in {
       val input = dag.Operate(
@@ -1736,8 +1761,21 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0, 10, -7, 14, -3, -12, 6, 13, -5, 7, -14, 11, -9, -13, 15)
+      result2 must contain(0,
+                           10,
+                           -7,
+                           14,
+                           -3,
+                           -12,
+                           6,
+                           13,
+                           -5,
+                           7,
+                           -14,
+                           11,
+                           -9,
+                           -13,
+                           15)
     }
     "compute log1p" in {
       val input = dag.Operate(
@@ -1802,8 +1840,21 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0, 10, -7, 14, -3, -12, 6, 13, -5, 7, -14, 11, -9, -13, 15)
+      result2 must contain(0,
+                           10,
+                           -7,
+                           14,
+                           -3,
+                           -12,
+                           6,
+                           13,
+                           -5,
+                           7,
+                           -14,
+                           11,
+                           -9,
+                           -13,
+                           15)
     }
     "compute toRadians" in {
       val input = dag.Operate(
@@ -1882,8 +1933,21 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0, 10, -7, 14, -3, -12, 6, 13, -5, 7, -14, 11, -9, -13, 15)
+      result2 must contain(0,
+                           10,
+                           -7,
+                           14,
+                           -3,
+                           -12,
+                           6,
+                           13,
+                           -5,
+                           7,
+                           -14,
+                           11,
+                           -9,
+                           -13,
+                           15)
     }
     "compute cosh" in {
       val input = dag.Operate(
@@ -2397,8 +2461,10 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 0.6989700043360189, 1.0791812460476249, 0.3010299956639812)
+      result2 must contain(0.0,
+                           0.6989700043360189,
+                           1.0791812460476249,
+                           0.3010299956639812)
     }
     "compute cos" in {
       val input = dag.Operate(
@@ -2561,8 +2627,11 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.0, 1.4142135623730951, 1.0, 3.4641016151377544, 2.23606797749979)
+      result2 must contain(0.0,
+                           1.4142135623730951,
+                           1.0,
+                           3.4641016151377544,
+                           2.23606797749979)
     }
     "compute floor" in {
       val input = dag.Operate(
@@ -2744,8 +2813,10 @@ trait MathLibSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          0.6931471805599453, 0.0, 2.4849066497880004, 1.6094379124341003)
+      result2 must contain(0.6931471805599453,
+                           0.0,
+                           2.4849066497880004,
+                           1.6094379124341003)
     }
     "compute signum" in {
       val input = dag.Operate(

@@ -18,9 +18,17 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 import scala.StringContext.InvalidEscapeException
 
@@ -29,7 +37,8 @@ import scala.StringContext.InvalidEscapeException
   * Date: 22.02.2008
   */
 class ScLiteralImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScLiteral
+    extends ScalaPsiElementImpl(node)
+    with ScLiteral
     with ContributedReferenceHost {
   def isValidHost: Boolean = getValue.isInstanceOf[String]
 
@@ -227,7 +236,7 @@ class ScLiteralImpl(node: ASTNode)
     if (getFirstChild.getNode.getElementType != ScalaTokenTypes.kNULL)
       assert(assertion = false,
              message = "Only null literals accepted, type: " +
-               getFirstChild.getNode.getElementType)
+                 getFirstChild.getNode.getElementType)
     typeWithoutImplicits = tp
   }
 
@@ -241,8 +250,8 @@ class ScLiteralImpl(node: ASTNode)
 
   /*
    * This part caches literal related annotation owners
-   * todo: think about extracting this feature to a trait  
-   * 
+   * todo: think about extracting this feature to a trait
+   *
    * trait AnnotationBasedInjectionHost {
    *   private[this] var myAnnotationOwner: Option[PsiAnnotationOwner] = None
    *   ...
@@ -269,7 +278,7 @@ class ScLiteralImpl(node: ASTNode)
         myAnnotationOwner.exists(!_.isValid)) {
       myAnnotationOwner = annotationOwnerLookUp(this)
       expirationTime = System.currentTimeMillis() +
-      (2 + expTimeLengthGenerator.nextInt(8)) * 1000
+          (2 + expTimeLengthGenerator.nextInt(8)) * 1000
     }
 
     myAnnotationOwner

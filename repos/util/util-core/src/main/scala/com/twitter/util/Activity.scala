@@ -38,7 +38,8 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     */
   def collect[U](f: PartialFunction[T, U]): Activity[U] = flatMap {
     case t if f.isDefinedAt(t) =>
-      try Activity.value(f(t)) catch {
+      try Activity.value(f(t))
+      catch {
         case NonFatal(exc) => Activity.exception(exc)
       }
     case _ => Activity.pending
@@ -54,10 +55,10 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * The activity which behaves as `f` applied to Ok values.
     */
   def flatMap[U](f: T => Activity[U]): Activity[U] =
-    Activity(
-        run flatMap {
+    Activity(run flatMap {
       case Ok(v) =>
-        val a = try f(v) catch {
+        val a = try f(v)
+        catch {
           case NonFatal(exc) => Activity.exception(exc)
         }
 
@@ -71,9 +72,9 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * of this activity.
     */
   def transform[U](f: Activity.State[T] => Activity[U]): Activity[U] =
-    Activity(
-        run flatMap { act =>
-      val a = try f(act) catch {
+    Activity(run flatMap { act =>
+      val a = try f(act)
+      catch {
         case NonFatal(exc) => Activity.exception(exc)
       }
       a.run
@@ -145,7 +146,7 @@ object Activity {
     *
     *   @inheritdoc
     */
-  def collect[T : ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
+  def collect[T: ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
       implicit newBuilder: CanBuild[T, CC[T]]): Activity[CC[T]] = {
     if (acts.isEmpty) return Activity.value(newBuilder().result)
 
@@ -193,8 +194,9 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C](
-      a: Activity[A], b: Activity[B], c: Activity[C]): Activity[(A, B, C)] =
+  def join[A, B, C](a: Activity[A],
+                    b: Activity[B],
+                    c: Activity[C]): Activity[(A, B, C)] =
     collect(Seq(a, b, c)) map { ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B], ss(2).asInstanceOf[C])
     }

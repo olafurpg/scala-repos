@@ -14,8 +14,8 @@ import akka.testkit.AkkaSpec
 
 class FlowExpandSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -101,7 +101,7 @@ class FlowExpandSpec extends AkkaSpec {
       }.expand(Iterator.continually(_)).runFold(Set.empty[Int])(_ + _)
 
       Await.result(future, 10.seconds) should contain theSameElementsAs
-      (1 to 100).toSet
+        (1 to 100).toSet
     }
 
     "backpressure publisher when subscriber is slower" in {

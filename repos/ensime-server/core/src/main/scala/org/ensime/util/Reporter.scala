@@ -19,7 +19,8 @@ trait ReportHandler {
 }
 
 class PresentationReporter(handler: ReportHandler)
-    extends Reporter with PositionBackCompat {
+    extends Reporter
+    with PositionBackCompat {
 
   val log = LoggerFactory.getLogger(classOf[PresentationReporter])
   private var enabled = true
@@ -33,8 +34,10 @@ class PresentationReporter(handler: ReportHandler)
     }
   }
 
-  override def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean): Unit = {
+  override def info0(pos: Position,
+                     msg: String,
+                     severity: Severity,
+                     force: Boolean): Unit = {
     severity.count += 1
     try {
       if (severity.id == 0) {

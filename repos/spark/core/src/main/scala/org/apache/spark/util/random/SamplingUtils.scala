@@ -30,7 +30,7 @@ private[spark] object SamplingUtils {
     * @param seed random seed
     * @return (samples, input size)
     */
-  def reservoirSampleAndCount[T : ClassTag](
+  def reservoirSampleAndCount[T: ClassTag](
       input: Iterator[T],
       k: Int,
       seed: Long = Random.nextLong()): (Array[T], Long) = {
@@ -161,6 +161,6 @@ private[spark] object BinomialBounds {
     math.min(1,
              math.max(minSamplingRate,
                       fraction + gamma +
-                      math.sqrt(gamma * gamma + 2 * gamma * fraction)))
+                        math.sqrt(gamma * gamma + 2 * gamma * fraction)))
   }
 }

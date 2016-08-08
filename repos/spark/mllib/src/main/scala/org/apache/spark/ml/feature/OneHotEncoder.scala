@@ -44,7 +44,9 @@ import org.apache.spark.sql.types.{DoubleType, NumericType, StructType}
   */
 @Experimental
 class OneHotEncoder(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("oneHot"))
@@ -53,8 +55,8 @@ class OneHotEncoder(override val uid: String)
     * Whether to drop the last category in the encoded vector (default: true)
     * @group param
     */
-  final val dropLast: BooleanParam = new BooleanParam(
-      this, "dropLast", "whether to drop the last category")
+  final val dropLast: BooleanParam =
+    new BooleanParam(this, "dropLast", "whether to drop the last category")
   setDefault(dropLast -> true)
 
   /** @group setParam */
@@ -140,19 +142,17 @@ class OneHotEncoder(override val uid: String)
           .rdd
           .map(_.getDouble(0))
           .aggregate(0.0)(
-              (m, x) =>
-                {
-                  assert(
-                      x <= Int.MaxValue,
-                      s"OneHotEncoder only supports up to ${Int.MaxValue} indices, but got $x")
-                  assert(
-                      x >= 0.0 && x == x.toInt,
-                      s"Values from column $inputColName must be indices, but got $x.")
-                  math.max(m, x)
+              (m, x) => {
+                assert(
+                    x <= Int.MaxValue,
+                    s"OneHotEncoder only supports up to ${Int.MaxValue} indices, but got $x")
+                assert(
+                    x >= 0.0 && x == x.toInt,
+                    s"Values from column $inputColName must be indices, but got $x.")
+                math.max(m, x)
               },
-              (m0, m1) =>
-                {
-                  math.max(m0, m1)
+              (m0, m1) => {
+                math.max(m0, m1)
               }
           )
           .toInt + 1

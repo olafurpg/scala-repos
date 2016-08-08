@@ -22,7 +22,10 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, GradientBoostedTrees => OldGBT}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper,
+  GradientBoostedTrees => OldGBT
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
@@ -37,8 +40,8 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
   import GBTRegressorSuite.compareAPIs
 
   // Combinations for estimators, learning rates and subsamplingRate
-  private val testCombinations = Array(
-      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  private val testCombinations =
+    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   private var data: RDD[LabeledPoint] = _
   private var trainData: RDD[LabeledPoint] = _

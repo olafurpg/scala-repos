@@ -16,7 +16,18 @@ limitations under the License.
 
 package com.twitter.summingbird.batch
 
-import com.twitter.algebird.{Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper, ExclusiveLower, Lower, Upper}
+import com.twitter.algebird.{
+  Universe,
+  Empty,
+  Interval,
+  Intersection,
+  InclusiveLower,
+  ExclusiveUpper,
+  InclusiveUpper,
+  ExclusiveLower,
+  Lower,
+  Upper
+}
 
 import scala.collection.immutable.SortedSet
 import java.util.{Comparator, Date}
@@ -207,8 +218,8 @@ trait Batcher extends Serializable {
     )
   }
 
-  def enclosedBy(
-      extremities: (BatchID, BatchID), other: Batcher): Iterable[BatchID] = {
+  def enclosedBy(extremities: (BatchID, BatchID),
+                 other: Batcher): Iterable[BatchID] = {
     val (bottom, top) = extremities
     SortedSet(
         BatchID.range(bottom, top).toSeq.flatMap(enclosedBy(_, other)): _*

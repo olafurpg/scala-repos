@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -24,8 +24,9 @@ import org.apache.kafka.common.utils.Utils
 object DeleteZKPath {
   def main(args: Array[String]) {
     if (args.length < 2) {
-      println("USAGE: " + DeleteZKPath.getClass.getName +
-          " consumer.properties zk_path")
+      println(
+          "USAGE: " + DeleteZKPath.getClass.getName +
+            " consumer.properties zk_path")
       System.exit(1)
     }
 

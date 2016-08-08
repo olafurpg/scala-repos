@@ -8,7 +8,9 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.ensime.util.EnsimeSpec
 
 class SexpParserCheck
-    extends EnsimeSpec with GeneratorDrivenPropertyChecks with ArbitrarySexp {
+    extends EnsimeSpec
+    with GeneratorDrivenPropertyChecks
+    with ArbitrarySexp {
 
   import SexpParser.parse
 

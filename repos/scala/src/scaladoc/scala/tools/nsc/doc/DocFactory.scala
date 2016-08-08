@@ -71,17 +71,18 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
     with model.ModelFactoryImplicitSupport with model.ModelFactoryTypeSupport
     with model.diagram.DiagramFactory with model.CommentFactory
     with model.TreeFactory with model.MemberLookup {
-      override def templateShouldDocument(
-          sym: compiler.Symbol, inTpl: DocTemplateImpl) =
+      override def templateShouldDocument(sym: compiler.Symbol,
+                                          inTpl: DocTemplateImpl) =
         extraTemplatesToDocument(sym) ||
-        super.templateShouldDocument(sym, inTpl)
+          super.templateShouldDocument(sym, inTpl)
     })
 
     modelFactory.makeModel match {
       case Some(madeModel) =>
         if (!settings.scaladocQuietRun)
-          println("model contains " + modelFactory.templatesCount +
-              " documentable templates")
+          println(
+              "model contains " + modelFactory.templatesCount +
+                " documentable templates")
         Some(madeModel)
       case None =>
         if (!settings.scaladocQuietRun)
@@ -127,7 +128,8 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
       docletInstance.generate()
     }
 
-    try generate() catch documentError
+    try generate()
+    catch documentError
   }
 
   private[doc] def docdbg(msg: String) {

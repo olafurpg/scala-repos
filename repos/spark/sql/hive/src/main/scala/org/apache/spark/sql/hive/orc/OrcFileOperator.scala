@@ -56,7 +56,7 @@ private[orc] object OrcFileOperator extends Logging {
             if oi.getAllStructFieldRefs.size() == 0 =>
           logInfo(
               s"ORC file $path has empty schema, it probably contains no rows. " +
-              "Trying to read another ORC file to figure out the schema.")
+                "Trying to read another ORC file to figure out the schema.")
           false
         case _ => true
       }
@@ -75,8 +75,8 @@ private[orc] object OrcFileOperator extends Logging {
     }
   }
 
-  def readSchema(
-      paths: Seq[String], conf: Option[Configuration]): Option[StructType] = {
+  def readSchema(paths: Seq[String],
+                 conf: Option[Configuration]): Option[StructType] = {
     // Take the first file where we can open a valid reader if we can find one.  Otherwise just
     // return None to indicate we can't infer the schema.
     paths.flatMap(getFileReader(_, conf)).headOption.map { reader =>

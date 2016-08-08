@@ -68,7 +68,8 @@ abstract class Specs2FileStructureViewTest extends Specs2TestCase {
 
   def testHierarchy(): Unit = {
     prepareFile()
-    runFileStructureViewTest(
-        "SpecsFileStrctureViewTest", "\"child1\"", Some("\"parent\""))
+    runFileStructureViewTest("SpecsFileStrctureViewTest",
+                             "\"child1\"",
+                             Some("\"parent\""))
   }
 }

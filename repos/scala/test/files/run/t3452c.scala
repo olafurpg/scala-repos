@@ -64,20 +64,35 @@ trait F7 extends Base[String, String, String] {
 }
 
 abstract class DBag
-    extends D1[String, String] with D2[String, String] with D3[String, String]
-    with D4[String] with D5[String] with D6[String] with D7 {
+    extends D1[String, String]
+    with D2[String, String]
+    with D3[String, String]
+    with D4[String]
+    with D5[String]
+    with D6[String]
+    with D7 {
   def f(x: String, y: String, z: String) =
     println(x.length + y.length + z.length)
 }
 abstract class EBag
-    extends E1[String, String] with E2[String, String] with E3[String, String]
-    with E4[String] with E5[String] with E6[String] with E7 {
+    extends E1[String, String]
+    with E2[String, String]
+    with E3[String, String]
+    with E4[String]
+    with E5[String]
+    with E6[String]
+    with E7 {
   def f(x: String, y: String, z: String) =
     println(x.length + y.length + z.length)
 }
 abstract class FBag
-    extends F1[String, String] with F2[String, String] with F3[String, String]
-    with F4[String] with F5[String] with F6[String] with F7 {
+    extends F1[String, String]
+    with F2[String, String]
+    with F3[String, String]
+    with F4[String]
+    with F5[String]
+    with F6[String]
+    with F7 {
   override def f(x: String, y: String, z: String) =
     println(x.length + y.length + z.length)
 }
@@ -92,8 +107,13 @@ abstract class GBag3 extends GBag2[String] with D7 {
   override def f(x: String, y: String, z: String) = println(z.length)
 }
 class GBag
-    extends GBag3 with D2[String, String] with D3[String, String]
-    with D4[String] with D5[String] with D6[String] with D7 {}
+    extends GBag3
+    with D2[String, String]
+    with D3[String, String]
+    with D4[String]
+    with D5[String]
+    with D6[String]
+    with D7 {}
 
 object Test {
   def f0(x: Base[String, String, String]) = x.f("a", "b", "c")

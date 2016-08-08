@@ -10,8 +10,8 @@ import com.google.common.io.Resources
 //scalastyle:off magic.number
 abstract class HttpRequestHandlerBase extends HttpRequestHandler {
 
-  protected[this] def serveResource(
-      path: String, response: HttpResponse): Unit = {
+  protected[this] def serveResource(path: String,
+                                    response: HttpResponse): Unit = {
     val content = withResource(path) { url =>
       response.body(mediaMime(url), Resources.toByteArray(url))
       response.status(200)

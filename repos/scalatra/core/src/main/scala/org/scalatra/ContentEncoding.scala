@@ -2,9 +2,24 @@ package org.scalatra
 
 import java.io._
 import java.nio.charset.Charset
-import java.util.zip.{DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse, HttpServletResponseWrapper}
-import javax.servlet.{ReadListener, ServletInputStream, ServletOutputStream, WriteListener}
+import java.util.zip.{
+  DeflaterOutputStream,
+  GZIPInputStream,
+  GZIPOutputStream,
+  InflaterInputStream
+}
+import javax.servlet.http.{
+  HttpServletRequest,
+  HttpServletRequestWrapper,
+  HttpServletResponse,
+  HttpServletResponseWrapper
+}
+import javax.servlet.{
+  ReadListener,
+  ServletInputStream,
+  ServletOutputStream,
+  WriteListener
+}
 
 import scala.util.Try
 
@@ -64,8 +79,8 @@ object ContentEncoding {
 
 // - Request decoding --------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
-private class DecodedServletRequest(
-    req: HttpServletRequest, enc: ContentEncoding)
+private class DecodedServletRequest(req: HttpServletRequest,
+                                    enc: ContentEncoding)
     extends HttpServletRequestWrapper(req) {
 
   override lazy val getInputStream: EncodedInputStream = {
@@ -98,8 +113,8 @@ private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
 // - Response encoding -------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 /** Encodes any output written to a servlet response. */
-private class EncodedServletResponse(
-    res: HttpServletResponse, enc: ContentEncoding)
+private class EncodedServletResponse(res: HttpServletResponse,
+                                     enc: ContentEncoding)
     extends HttpServletResponseWrapper(res) {
 
   // Object to flush when complete, if any.

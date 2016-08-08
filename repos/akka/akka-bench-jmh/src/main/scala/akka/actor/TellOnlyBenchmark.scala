@@ -112,12 +112,13 @@ object TellOnlyBenchmark {
   }
 
   case class UnboundedDroppingMailbox()
-      extends MailboxType with ProducesMessageQueue[DroppingMessageQueue] {
+      extends MailboxType
+      with ProducesMessageQueue[DroppingMessageQueue] {
 
     def this(settings: ActorSystem.Settings, config: Config) = this()
 
-    final override def create(
-        owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
+    final override def create(owner: Option[ActorRef],
+                              system: Option[ActorSystem]): MessageQueue =
       new DroppingMessageQueue
   }
 
@@ -135,8 +136,8 @@ object TellOnlyBenchmark {
                          _executorServiceFactoryProvider,
                          _shutdownTimeout) {
 
-    override protected[akka] def dispatch(
-        receiver: ActorCell, invocation: Envelope): Unit = {
+    override protected[akka] def dispatch(receiver: ActorCell,
+                                          invocation: Envelope): Unit = {
       val mbox = receiver.mailbox
       mbox.enqueue(receiver.self, invocation)
       mbox.messageQueue match {
@@ -146,8 +147,8 @@ object TellOnlyBenchmark {
     }
   }
 
-  class DroppingDispatcherConfigurator(
-      config: Config, prerequisites: DispatcherPrerequisites)
+  class DroppingDispatcherConfigurator(config: Config,
+                                       prerequisites: DispatcherPrerequisites)
       extends MessageDispatcherConfigurator(config, prerequisites) {
 
     override def dispatcher(): MessageDispatcher =

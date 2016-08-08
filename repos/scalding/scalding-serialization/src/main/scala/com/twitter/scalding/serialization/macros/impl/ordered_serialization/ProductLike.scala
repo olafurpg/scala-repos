@@ -21,10 +21,11 @@ import scala.reflect.macros.Context
 import com.twitter.scalding._
 
 object ProductLike {
-  def compareBinary(
-      c: Context)(inputStreamA: c.TermName, inputStreamB: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+  def compareBinary(c: Context)(inputStreamA: c.TermName,
+                                inputStreamB: c.TermName)(
+      elementData: List[(c.universe.Type,
+                         c.universe.TermName,
+                         TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -50,8 +51,9 @@ object ProductLike {
   }
 
   def hash(c: Context)(element: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[(c.universe.Type,
+                         c.universe.TermName,
+                         TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -75,8 +77,9 @@ object ProductLike {
   }
 
   def put(c: Context)(inputStream: c.TermName, element: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[(c.universe.Type,
+                         c.universe.TermName,
+                         TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val innerElement = freshT("innerElement")
@@ -92,8 +95,9 @@ object ProductLike {
   }
 
   def length(c: Context)(element: c.Tree)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): CompileTimeLengthTypes[c.type] = {
+      elementData: List[
+          (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : CompileTimeLengthTypes[c.type] = {
     import c.universe._
     import CompileTimeLengthTypes._
     val (constSize, dynamicFunctions, maybeLength, noLength) =
@@ -103,7 +107,7 @@ object ProductLike {
           tBuf.length(q"$element.$accessorSymbol") match {
             case const: ConstantLengthCalculation[_] =>
               (constantLength +
-               const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
+                 const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
                dynamicLength,
                maybeLength,
                noLength)
@@ -166,8 +170,9 @@ object ProductLike {
   }
 
   def compare(c: Context)(elementA: c.TermName, elementB: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[(c.universe.Type,
+                         c.universe.TermName,
+                         TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(id))

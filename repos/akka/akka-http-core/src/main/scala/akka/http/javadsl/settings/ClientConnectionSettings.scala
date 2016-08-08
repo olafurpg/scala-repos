@@ -18,7 +18,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 /**
   * Public API but not intended for subclassing
   */
-abstract class ClientConnectionSettings private[akka]() {
+abstract class ClientConnectionSettings private[akka] () {
   self: ClientConnectionSettingsImpl ⇒
   def getUserAgentHeader: Optional[UserAgent]
   def getConnectingTimeout: FiniteDuration

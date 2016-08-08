@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{ArrayType, StructType}
   */
 @Experimental
 class HashingTF(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("hashingTF"))
@@ -50,8 +52,10 @@ class HashingTF(override val uid: String)
     * (default = 2^18^)
     * @group param
     */
-  val numFeatures = new IntParam(
-      this, "numFeatures", "number of features (> 0)", ParamValidators.gt(0))
+  val numFeatures = new IntParam(this,
+                                 "numFeatures",
+                                 "number of features (> 0)",
+                                 ParamValidators.gt(0))
 
   setDefault(numFeatures -> (1 << 18))
 

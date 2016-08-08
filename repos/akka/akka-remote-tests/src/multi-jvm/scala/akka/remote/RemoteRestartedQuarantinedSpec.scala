@@ -10,7 +10,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociateExplicitly,
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,7 +28,8 @@ object RemoteRestartedQuarantinedSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = WARNING
       akka.remote.log-remote-lifecycle-events = WARNING
 
@@ -57,7 +62,8 @@ class RemoteRestartedQuarantinedSpecMultiJvmNode2
     extends RemoteRestartedQuarantinedSpec
 
 abstract class RemoteRestartedQuarantinedSpec
-    extends MultiNodeSpec(RemoteRestartedQuarantinedSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteRestartedQuarantinedSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteRestartedQuarantinedSpec._
@@ -117,9 +123,9 @@ abstract class RemoteRestartedQuarantinedSpec
         within(10.seconds) {
           awaitAssert {
             EventFilter
-              .warning(
-                  pattern = "The remote system has quarantined this system",
-                  occurrences = 1)
+              .warning(pattern =
+                         "The remote system has quarantined this system",
+                       occurrences = 1)
               .intercept {
                 ref ! "boo!"
               }
@@ -135,7 +141,8 @@ abstract class RemoteRestartedQuarantinedSpec
         Await.result(system.whenTerminated, 10.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}

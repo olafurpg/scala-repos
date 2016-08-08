@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -61,9 +61,10 @@ object IndicesHelper {
 import IndicesHelper._
 
 trait IndicesModule[M[+ _]]
-    extends Logging with TransSpecModule
-    with ColumnarTableTypes[M] with SliceTransforms[M] {
-  self: ColumnarTableModule[M] =>
+    extends Logging
+    with TransSpecModule
+    with ColumnarTableTypes[M]
+    with SliceTransforms[M] { self: ColumnarTableModule[M] =>
 
   // we will warn for tables with >1M rows.
   final def InMemoryLimit = 1000000L
@@ -185,11 +186,8 @@ trait IndicesModule[M[+ _]]
       // values they don't want.
       val params: List[(Seq[Int], Seq[RValue])] = tpls.map {
         case (index, ns, jvs) =>
-          val (ns2, jvs2) = ns
-            .zip(jvs)
-            .filter(_._1 >= 0)
-            .unzip
-            (ns2, jvs2)
+          val (ns2, jvs2) = ns.zip(jvs).filter(_._1 >= 0).unzip
+          (ns2, jvs2)
       }
 
       val sll: List[List[SliceIndex]] = tpls.map(_._1.indices)
@@ -213,13 +211,13 @@ trait IndicesModule[M[+ _]]
   /**
     * Provide fast access to a subslice based on one or more group key
     * values.
-    * 
+    *
     * The SliceIndex currently uses in-memory data structures, although
     * this will have to change eventually. A "group key value" is
     * defined as an (Int, RValue). The Int part corresponds to the key
     * in the sequence of transforms used to build the index, and the
     * RValue part corresponds to the value we want the key to have.
-    * 
+    *
     * SliceIndex is able to create subslices without rescanning the
     * underlying slice due to the fact that it already knows which rows
     * are valid for particular key combinations. For best results
@@ -253,8 +251,8 @@ trait IndicesModule[M[+ _]]
     def getSubTable(keyIds: Seq[Int], keyValues: Seq[RValue]): Table =
       buildSubTable(getRowsForKeys(keyIds, keyValues))
 
-    private def intersectBuffers(
-        as: ArrayIntList, bs: ArrayIntList): ArrayIntList = {
+    private def intersectBuffers(as: ArrayIntList,
+                                 bs: ArrayIntList): ArrayIntList = {
       //assertSorted(as)
       //assertSorted(bs)
       var i = 0
@@ -283,14 +281,15 @@ trait IndicesModule[M[+ _]]
     /**
       * Returns the rows specified by the given group key values.
       */
-    private[table] def getRowsForKeys(
-        keyIds: Seq[Int], keyValues: Seq[RValue]): ArrayIntList = {
+    private[table] def getRowsForKeys(keyIds: Seq[Int],
+                                      keyValues: Seq[RValue]): ArrayIntList = {
       var rows: ArrayIntList =
         dict.getOrElse((keyIds(0), keyValues(0)), emptyBuffer)
       var i: Int = 1
       while (i < keyIds.length && !rows.isEmpty) {
         rows = intersectBuffers(
-            rows, dict.getOrElse((keyIds(i), keyValues(i)), emptyBuffer))
+            rows,
+            dict.getOrElse((keyIds(i), keyValues(i)), emptyBuffer))
         i += 1
       }
       rows
@@ -357,7 +356,7 @@ trait IndicesModule[M[+ _]]
     /**
       * Given a slice, group key transforms, and a value transform,
       * builds a SliceIndex.
-      * 
+      *
       * This is the heart of the indexing algorithm. We'll assemble a
       * 2D array of RValue (by row/group key) and then do all the work
       * necessary to associate them into the maps and sets we
@@ -447,20 +446,20 @@ trait IndicesModule[M[+ _]]
 
         keys(k) = st(slice) map {
           case (_, keySlice) => {
-              val arr = new Array[RValue](n)
+            val arr = new Array[RValue](n)
 
-              var i = 0
-              while (i < n) {
-                val rv = keySlice.toRValue(i)
-                rv match {
-                  case CUndefined =>
-                  case rv => arr(i) = rv
-                }
-                i += 1
+            var i = 0
+            while (i < n) {
+              val rv = keySlice.toRValue(i)
+              rv match {
+                case CUndefined =>
+                case rv => arr(i) = rv
               }
-
-              arr
+              i += 1
             }
+
+            arr
+          }
         }
 
         k += 1
@@ -468,20 +467,20 @@ trait IndicesModule[M[+ _]]
 
       val back = (0 until keys.length)
         .foldLeft(M.point(Vector.fill[Array[RValue]](numKeys)(null))) {
-        case (accM, i) => {
+          case (accM, i) => {
             val arrM = keys(i)
 
             M.apply2(accM, arrM) { (acc, arr) =>
               acc.updated(i, arr)
             }
           }
-      }
+        }
 
       back map { _.toArray }
     }
 
-    private def unionBuffers(
-        as: ArrayIntList, bs: ArrayIntList): ArrayIntList = {
+    private def unionBuffers(as: ArrayIntList,
+                             bs: ArrayIntList): ArrayIntList = {
       //assertSorted(as)
       //assertSorted(bs)
       var i = 0

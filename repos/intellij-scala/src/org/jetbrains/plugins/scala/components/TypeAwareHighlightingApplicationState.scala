@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.statistics.CacheStatistics
     storages = Array(new Storage("scala_config.xml"))
 )
 class TypeAwareHighlightingApplicationState
-    extends ApplicationComponent with PersistentStateComponent[
+    extends ApplicationComponent
+    with PersistentStateComponent[
         TypeAwareHighlightingApplicationState.TypeAwareHighlightingApplicationSettings] {
   import org.jetbrains.plugins.scala.components.TypeAwareHighlightingApplicationState.TypeAwareHighlightingApplicationSettings
   private var myState = new TypeAwareHighlightingApplicationSettings

@@ -26,7 +26,8 @@ import util._
   * Systems under specification for MappedLongForeignKey.
   */
 object MappedLongForeignKeySpec
-    extends Specification with org.specs2.specification.BeforeExample {
+    extends Specification
+    with org.specs2.specification.BeforeExample {
   "MappedLongForeignKey Specification".title
   sequential
 

@@ -30,9 +30,11 @@ private[akka] object InputStreamPublisher {
 }
 
 /** INTERNAL API */
-private[akka] class InputStreamPublisher(
-    is: InputStream, completionPromise: Promise[IOResult], chunkSize: Int)
-    extends akka.stream.actor.ActorPublisher[ByteString] with ActorLogging {
+private[akka] class InputStreamPublisher(is: InputStream,
+                                         completionPromise: Promise[IOResult],
+                                         chunkSize: Int)
+    extends akka.stream.actor.ActorPublisher[ByteString]
+    with ActorLogging {
 
   // TODO possibly de-duplicate with FilePublisher?
 

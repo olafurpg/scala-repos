@@ -42,7 +42,8 @@ class StreamExecution(val sqlContext: SQLContext,
                       override val name: String,
                       private[sql] val logicalPlan: LogicalPlan,
                       val sink: Sink)
-    extends ContinuousQuery with Logging {
+    extends ContinuousQuery
+    with Logging {
 
   /** An monitor used to wait/notify when batches complete. */
   private val awaitBatchLock = new Object
@@ -101,7 +102,8 @@ class StreamExecution(val sqlContext: SQLContext,
   private[sql] def start(): Unit = {
     microBatchThread.setDaemon(true)
     microBatchThread.start()
-    startLatch.await() // Wait until thread started and QueryStart event has been posted
+    startLatch
+      .await() // Wait until thread started and QueryStart event has been posted
   }
 
   /**

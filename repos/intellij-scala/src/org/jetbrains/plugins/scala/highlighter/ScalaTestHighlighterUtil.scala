@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala.highlighter
 
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.scala.settings.{ScalaProjectSettings, ScalaProjectSettingsUtil}
+import org.jetbrains.plugins.scala.settings.{
+  ScalaProjectSettings,
+  ScalaProjectSettingsUtil
+}
 
 /**
   * @author Roman.Shein
@@ -33,11 +36,12 @@ object ScalaTestHighlighterUtil {
                                       "test")
 
   //TODO it is possible for this to create some false-positives, but it is very unlikely
-  def isHighlightableScalaTestKeyword(
-      classFqn: String, methodName: String, project: Project) =
+  def isHighlightableScalaTestKeyword(classFqn: String,
+                                      methodName: String,
+                                      project: Project) =
     classFqn != null && ScalaProjectSettings
       .getInstance(project)
       .isCustomScalatestSyntaxHighlighting &&
-    classFqn.startsWith("org.scalatest") &&
-    scalaTestKeywords.contains(methodName)
+      classFqn.startsWith("org.scalatest") &&
+      scalaTestKeywords.contains(methodName)
 }

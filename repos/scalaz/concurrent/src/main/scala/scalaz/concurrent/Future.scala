@@ -1,7 +1,18 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
-import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
+import java.util.concurrent.{
+  Callable,
+  ConcurrentLinkedQueue,
+  ExecutorService,
+  TimeoutException,
+  ScheduledExecutorService,
+  TimeUnit
+}
+import java.util.concurrent.atomic.{
+  AtomicInteger,
+  AtomicBoolean,
+  AtomicReference
+}
 
 import collection.JavaConversions._
 import scalaz.Tags.Parallel
@@ -89,8 +100,8 @@ sealed abstract class Future[+A] {
     * while stepping through the trampoline, so this should provide a fairly
     * robust means of cancellation.
     */
-  def unsafePerformListenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+  def unsafePerformListenInterruptibly(cb: A => Trampoline[Unit],
+                                       cancel: AtomicBoolean): Unit =
     this.stepInterruptibly(cancel) match {
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
@@ -103,14 +114,14 @@ sealed abstract class Future[+A] {
             x =>
               if (!cancel.get)
                 Trampoline.delay(g(x)) map
-                (_ unsafePerformListenInterruptibly (cb, cancel))
+                  (_ unsafePerformListenInterruptibly (cb, cancel))
               else Trampoline.done(()))
       case _ if cancel.get => ()
     }
 
   @deprecated("use unsafePerformListenInterruptibly", "7.2")
-  def listenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+  def listenInterruptibly(cb: A => Trampoline[Unit],
+                          cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(cb, cancel)
 
   /**
@@ -138,10 +149,10 @@ sealed abstract class Future[+A] {
 
   /**
     * Begins running this `Future` and returns a new future that blocks
-    * waiting for the result. Note that this will start executing side effects 
-    * immediately, and is thus morally equivalent to `unsafePerformIO`. The 
+    * waiting for the result. Note that this will start executing side effects
+    * immediately, and is thus morally equivalent to `unsafePerformIO`. The
     * resulting `Future` cannot be rerun to repeat the effects.
-    * 
+    *
     * Use with care.
     */
   def unsafeStart: Future[A] = {
@@ -176,8 +187,8 @@ sealed abstract class Future[+A] {
     * while stepping through the trampoline, this should provide a fairly
     * robust means of cancellation.
     */
-  def unsafePerformAsyncInterruptibly(
-      cb: A => Unit, cancel: AtomicBoolean): Unit =
+  def unsafePerformAsyncInterruptibly(cb: A => Unit,
+                                      cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
   @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
@@ -188,14 +199,14 @@ sealed abstract class Future[+A] {
   def unsafePerformSync: A = this match {
     case Now(a) => a
     case _ => {
-        val latch = new java.util.concurrent.CountDownLatch(1)
-        @volatile var result: Option[A] = None
-        unsafePerformAsync { a =>
-          result = Some(a); latch.countDown
-        }
-        latch.await
-        result.get
+      val latch = new java.util.concurrent.CountDownLatch(1)
+      @volatile var result: Option[A] = None
+      unsafePerformAsync { a =>
+        result = Some(a); latch.countDown
       }
+      latch.await
+      result.get
+    }
   }
 
   @deprecated("use unsafePerformSync", "7.2")
@@ -224,7 +235,7 @@ sealed abstract class Future[+A] {
   def runFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout)
 
-  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
+  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value.
     * Will not report any other exceptions that may be raised during computation of `A`*/
   def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -233,7 +244,7 @@ sealed abstract class Future[+A] {
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
       -\/(new TimeoutException(
-              s"Timed out after $timeoutInMillis milliseconds"))
+          s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
@@ -255,7 +266,7 @@ sealed abstract class Future[+A] {
     */
   def unsafePerformTimed(timeoutInMillis: Long)(
       implicit scheduler: ScheduledExecutorService): Future[Throwable \/ A] =
-    //instead of run this though chooseAny, it is run through simple primitive, 
+    //instead of run this though chooseAny, it is run through simple primitive,
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
@@ -264,19 +275,21 @@ sealed abstract class Future[+A] {
         def run() {
           if (done.compareAndSet(false, true)) {
             cancel.set(true)
-            cb(-\/(new TimeoutException(
-                        s"Timed out after $timeoutInMillis milliseconds")))
+            cb(
+                -\/(new TimeoutException(
+                    s"Timed out after $timeoutInMillis milliseconds")))
           }
         }
       }, timeoutInMillis, TimeUnit.MILLISECONDS)
 
       unsafePerformAsyncInterruptibly(
-          a => if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
+          a => if (done.compareAndSet(false, true)) cb(\/-(a)),
+          cancel)
     }
 
   def unsafePerformTimed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout.toMillis)
 
   @deprecated("use unsafePerformTimed", "7.2")
@@ -286,8 +299,8 @@ sealed abstract class Future[+A] {
 
   @deprecated("use unsafePerformTimed", "7.2")
   def timed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout)
 
   /**
@@ -320,8 +333,8 @@ object Future {
         fa flatMap f
       def point[A](a: => A): Future[A] = delay(a)
 
-      def chooseAny[A](
-          h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+      def chooseAny[A](h: Future[A],
+                       t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
         Async { cb =>
           // The details of this implementation are a bit tricky, but the general
           // idea is to run all futures in parallel, returning whichever result
@@ -362,7 +375,8 @@ object Future {
                       case (i, _, rf, _, _) if i != ind => rf
                     }))
                   else {
-                    Trampoline.done(()) // noop; another thread will have already invoked `cb` w/ our residual
+                    Trampoline
+                      .done(()) // noop; another thread will have already invoked `cb` w/ our residual
                   }
                 val notifyListener =
                   if (listener.compareAndSet(null, finishedCallback))
@@ -383,8 +397,8 @@ object Future {
 
       // implementation runs all threads, dumping to a shared queue
       // last thread to finish invokes the callback with the results
-      override def reduceUnordered[A, M](
-          fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+      override def reduceUnordered[A, M](fs: Seq[Future[A]])(
+          implicit R: Reducer[A, M]): Future[M] =
         fs match {
           case Seq() => Future.now(R.zero)
           case Seq(f) => f.map(R.unit)
@@ -402,8 +416,8 @@ object Future {
 
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
-                    cb(results.toList.foldLeft(R.zero)((a,
-                            b) => R.append(a, b)))
+                    cb(results.toList.foldLeft(R.zero)((a, b) =>
+                      R.append(a, b)))
                   else Trampoline.done(())
                 }
               }
@@ -439,9 +453,8 @@ object Future {
     * the given `ExecutorService`. Note that this forking is only described
     * by the returned `Future`--nothing occurs until the `Future` is run.
     */
-  def fork[A](a: => Future[A])(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Future[A] =
+  def fork[A](a: => Future[A])(implicit pool: ExecutorService =
+                                 Strategy.DefaultExecutorService): Future[A] =
     Future(a).join
 
   /**
@@ -459,23 +472,22 @@ object Future {
     * exceptions.
     */
   def async[A](listen: (A => Unit) => Unit): Future[A] =
-    Async(
-        (cb: A => Trampoline[Unit]) =>
-          listen { a =>
+    Async((cb: A => Trampoline[Unit]) =>
+      listen { a =>
         cb(a).run
     })
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
-  def apply[A](a: => A)(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Future[A] = Async { cb =>
-    pool.submit { new Callable[Unit] { def call = cb(a).run } }
+  def apply[A](a: => A)(implicit pool: ExecutorService =
+                          Strategy.DefaultExecutorService): Future[A] = Async {
+    cb =>
+      pool.submit { new Callable[Unit] { def call = cb(a).run } }
   }
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(
-      implicit pool: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[A] =
+      implicit pool: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[A] =
     Async { cb =>
       pool.schedule(new Callable[Unit] {
         def call = cb(a).run

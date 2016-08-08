@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -52,7 +52,8 @@ final class JSONIngestProcessing(
     recordStyle: JSONRecordStyle,
     maxFields: Int,
     storage: IngestStore)(implicit M: Monad[Future])
-    extends IngestProcessing with Logging {
+    extends IngestProcessing
+    with Logging {
 
   def forRequest(
       request: HttpRequest[_]): ValidationNel[String, IngestProcessor] = {
@@ -117,8 +118,8 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
-                    overLargeIdx + state.report.ingested -> overLargeMsg)
+                  (overLargeIdx >= 0).option(
+                      overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
                 accumulate(state.update(updatedParser, ingestSize),
@@ -135,8 +136,8 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
-                    overLargeIdx + state.report.ingested -> overLargeMsg)
+                  (overLargeIdx >= 0).option(
+                      overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
                 val completedRecords = records ++ parsed.values
@@ -231,12 +232,11 @@ final class JSONIngestProcessing(
                   storeFailure =>
                     sys.error(
                         "Do something useful with %s" format storeFailure.message),
-                  _ =>
-                    {
-                      val errors =
-                        parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
-                          .map(i => (i, overLargeMsg))
-                      continue(state.update(updatedParser, ingestSize, errors))
+                  _ => {
+                    val errors =
+                      parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
+                        .map(i => (i, overLargeMsg))
+                    continue(state.update(updatedParser, ingestSize, errors))
                   }
               )
             }
@@ -273,14 +273,14 @@ final class JSONIngestProcessing(
                     storeFailure =>
                       sys.error(
                           "Do something useful with%s" format storeFailure.message),
-                    _ =>
-                      {
-                        val errors =
-                          parsed.errors.map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
-                            .option(state.report.ingested +
-                              toIngest.size -> overLargeMsg)
+                    _ => {
+                      val errors =
+                        parsed.errors
+                          .map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
+                          .option(state.report.ingested +
+                            toIngest.size -> overLargeMsg)
 
-                        state.update(updatedParser, ingestSize, errors)
+                      state.update(updatedParser, ingestSize, errors)
                     }
                 )
               }
@@ -324,8 +324,9 @@ final class JSONIngestProcessing(
                   StreamingResult(ingested, errors.headOption.map(_._2))
 
                 case IngestAllPossible =>
-                  BatchResult(
-                      ingested + errors.size, ingested, Vector(errors: _*))
+                  BatchResult(ingested + errors.size,
+                              ingested,
+                              Vector(errors: _*))
               }
           }
 

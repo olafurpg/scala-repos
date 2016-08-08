@@ -136,7 +136,8 @@ private[ui] class ActiveBatchTable(runningBatches: Seq[BatchUIData],
   override protected def renderRows: Seq[Node] = {
     // The "batchTime"s of "waitingBatches" must be greater than "runningBatches"'s, so display
     // waiting batches before running batches
-    waitingBatches.flatMap(batch => <tr>{waitingBatchRow(batch)}</tr>) ++ runningBatches
+    waitingBatches
+      .flatMap(batch => <tr>{waitingBatchRow(batch)}</tr>) ++ runningBatches
       .flatMap(batch => <tr>{runningBatchRow(batch)}</tr>)
   }
 
@@ -162,8 +163,8 @@ private[ui] class ActiveBatchTable(runningBatches: Seq[BatchUIData],
   }
 }
 
-private[ui] class CompletedBatchTable(
-    batches: Seq[BatchUIData], batchInterval: Long)
+private[ui] class CompletedBatchTable(batches: Seq[BatchUIData],
+                                      batchInterval: Long)
     extends BatchTableBase("completed-batches-table", batchInterval) {
 
   private val firstFailureReason = getFirstFailureReason(batches)

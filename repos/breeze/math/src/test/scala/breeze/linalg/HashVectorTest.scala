@@ -36,8 +36,16 @@ class HashVectorTest extends FunSuite {
     val a = HashVector(0.56390, 0.36231, 0.14601, 0.60294, 0.14535)
     val b = HashVector(0.15951, 0.83671, 0.56002, 0.57797, 0.54450)
     val bd = DenseVector(0.15951, 0.83671, 0.56002, 0.57797, 0.54450)
-    val bdSplit = DenseVector(
-        0.0, 0.15951, 0.0, 0.83671, 0.0, 0.56002, 0.0, 0.57797, 0.0, 0.54450)
+    val bdSplit = DenseVector(0.0,
+                              0.15951,
+                              0.0,
+                              0.83671,
+                              0.0,
+                              0.56002,
+                              0.0,
+                              0.57797,
+                              0.0,
+                              0.54450)
     val bdd = bdSplit(1 to 9 by 2)
     assertClose(a dot b, .90249)
 //    assertClose(a dot bd, .90249)
@@ -239,8 +247,9 @@ class HashVectorOps_DoubleTest
   val space = HashVector.space[Double]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (HashVector[Double], HashVector[Double], HashVector[Double])] = {
+  implicit def genTriple: Arbitrary[(HashVector[Double],
+                                     HashVector[Double],
+                                     HashVector[Double])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
@@ -272,8 +281,9 @@ class HashVectorOps_FloatTest
 
   override val TOL: Double = 1E-2
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (HashVector[Float], HashVector[Float], HashVector[Float])] = {
+  implicit def genTriple: Arbitrary[(HashVector[Float],
+                                     HashVector[Float],
+                                     HashVector[Float])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Float].map { _ % 100 }
@@ -307,8 +317,9 @@ class HashVectorOps_IntTest
   val space = HashVector.space[Int]
 
   val N = 100
-  implicit def genTriple: Arbitrary[
-      (HashVector[Int], HashVector[Int], HashVector[Int])] = {
+  implicit def genTriple: Arbitrary[(HashVector[Int],
+                                     HashVector[Int],
+                                     HashVector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 100 }
@@ -338,8 +349,9 @@ class HashVectorOps_ComplexTest
   val space = HashVector.space[Complex]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (HashVector[Complex], HashVector[Complex], HashVector[Complex])] = {
+  implicit def genTriple: Arbitrary[(HashVector[Complex],
+                                     HashVector[Complex],
+                                     HashVector[Complex])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Complex]
@@ -357,7 +369,7 @@ class HashVectorOps_ComplexTest
   }
 
   implicit def genScalar: Arbitrary[Complex] = Arbitrary {
-    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double]) yield
-      Complex(r % 100, i % 100)
+    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double])
+      yield Complex(r % 100, i % 100)
   }
 }

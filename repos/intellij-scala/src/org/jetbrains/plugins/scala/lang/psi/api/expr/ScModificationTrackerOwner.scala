@@ -7,8 +7,15 @@ import com.intellij.psi.{PsiElement, PsiModifiableCodeBlock}
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec
@@ -18,7 +25,8 @@ import scala.annotation.tailrec
   * Date: 11/09/2015
   */
 trait ScModificationTrackerOwner
-    extends ScalaPsiElement with PsiModifiableCodeBlock {
+    extends ScalaPsiElement
+    with PsiModifiableCodeBlock {
   private val blockModificationCount = new AtomicLong(0L)
 
   def rawModificationCount: Long = blockModificationCount.get()
@@ -89,13 +97,13 @@ trait ScModificationTrackerOwner
   }
 
   def createMirror(text: String): PsiElement = {
-    ScalaPsiElementFactory.createExpressionWithContextFromText(
-        text, getContext, this)
+    ScalaPsiElementFactory
+      .createExpressionWithContextFromText(text, getContext, this)
   }
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
-  def getMirrorPositionForCompletion(
-      dummyIdentifier: String, pos: Int): Option[PsiElement] = {
+  def getMirrorPositionForCompletion(dummyIdentifier: String,
+                                     pos: Int): Option[PsiElement] = {
     val text = new StringBuilder(getText)
     text.insert(pos, dummyIdentifier)
     val newBlock = createMirror(text.toString())

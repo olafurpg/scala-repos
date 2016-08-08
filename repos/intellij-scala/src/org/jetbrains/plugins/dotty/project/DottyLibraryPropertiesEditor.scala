@@ -2,11 +2,17 @@ package org.jetbrains.plugins.dotty.project
 
 import java.awt.event.{ActionEvent, ActionListener}
 
-import com.intellij.openapi.roots.libraries.ui.{LibraryEditorComponent, LibraryPropertiesEditor}
+import com.intellij.openapi.roots.libraries.ui.{
+  LibraryEditorComponent,
+  LibraryPropertiesEditor
+}
 import com.intellij.openapi.ui.Messages
 import org.jetbrains.plugins.dotty.project.template.DottyDownloader
 import org.jetbrains.plugins.scala.extensions
-import org.jetbrains.plugins.scala.project.{ScalaLanguageLevel, ScalaLibraryProperties}
+import org.jetbrains.plugins.scala.project.{
+  ScalaLanguageLevel,
+  ScalaLibraryProperties
+}
 
 import scala.runtime.BoxedUnit
 import scala.util.Failure

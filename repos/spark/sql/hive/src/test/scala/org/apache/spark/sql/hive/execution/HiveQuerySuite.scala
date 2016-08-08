@@ -291,7 +291,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   createQueryTest(
       "modulus",
       "SELECT 11 % 10, IF((101.1 % 100.0) BETWEEN 1.01 AND 1.11, \"true\", \"false\"), " +
-      "(101 / 2) % 10 FROM src LIMIT 1")
+        "(101 / 2) % 10 FROM src LIMIT 1")
 
   test("Query expressed in HiveQL") {
     sql("FROM src SELECT key").collect()
@@ -330,8 +330,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   createQueryTest("string literal", "SELECT 'test' FROM src")
 
-  createQueryTest(
-      "Escape sequences", """SELECT key, '\\\t\\' FROM src WHERE key = 86""")
+  createQueryTest("Escape sequences",
+                  """SELECT key, '\\\t\\' FROM src WHERE key = 86""")
 
   createQueryTest("IgnoreExplain", """EXPLAIN SELECT key FROM src""")
 
@@ -344,12 +344,12 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   createQueryTest(
       "small.cartesian",
       "SELECT a.key, b.key FROM (SELECT key FROM src WHERE key < 1) a JOIN " +
-      "(SELECT key FROM src WHERE key = 2) b")
+        "(SELECT key FROM src WHERE key = 2) b")
 
   createQueryTest("length.udf", "SELECT length(\"test\") FROM src LIMIT 1")
 
-  createQueryTest(
-      "partitioned table scan", "SELECT ds, hr, key, value FROM srcpart")
+  createQueryTest("partitioned table scan",
+                  "SELECT ds, hr, key, value FROM srcpart")
 
   createQueryTest("create table as",
                   """
@@ -416,8 +416,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
   }
 
-  createQueryTest(
-      "transform", "SELECT TRANSFORM (key) USING 'cat' AS (tKey) FROM src")
+  createQueryTest("transform",
+                  "SELECT TRANSFORM (key) USING 'cat' AS (tKey) FROM src")
 
   createQueryTest("schema-less transform",
                   """
@@ -427,17 +427,20 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   val delimiter = "'\t'"
 
-  createQueryTest("transform with custom field delimiter", s"""
+  createQueryTest("transform with custom field delimiter",
+                  s"""
       |SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' AS (tKey) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter2", s"""
+  createQueryTest("transform with custom field delimiter2",
+                  s"""
       |SELECT TRANSFORM (key, value) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter3", s"""
+  createQueryTest("transform with custom field delimiter3",
+                  s"""
       |SELECT TRANSFORM (*) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
@@ -524,8 +527,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     """.stripMargin)
   // scalastyle:on
 
-  createQueryTest(
-      "lateral view5", "FROM src SELECT explode(array(key+3, key+4))")
+  createQueryTest("lateral view5",
+                  "FROM src SELECT explode(array(key+3, key+4))")
 
   createQueryTest(
       "lateral view6",
@@ -659,49 +662,49 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   createQueryTest(
       "get_json_object #2",
       "SELECT get_json_object(src_json.json, '$.owner'), get_json_object(src_json.json, '$.store')" +
-      " FROM src_json")
+        " FROM src_json")
 
   createQueryTest(
       "get_json_object #3",
       "SELECT get_json_object(src_json.json, '$.store.bicycle'), " +
-      "get_json_object(src_json.json, '$.store.book') FROM src_json")
+        "get_json_object(src_json.json, '$.store.book') FROM src_json")
 
   createQueryTest(
       "get_json_object #4",
       "SELECT get_json_object(src_json.json, '$.store.book[0]'), " +
-      "get_json_object(src_json.json, '$.store.book[*]') FROM src_json")
+        "get_json_object(src_json.json, '$.store.book[*]') FROM src_json")
 
   createQueryTest(
       "get_json_object #5",
       "SELECT get_json_object(src_json.json, '$.store.book[0].category'), " +
-      "get_json_object(src_json.json, '$.store.book[*].category'), " +
-      "get_json_object(src_json.json, '$.store.book[*].isbn'), " +
-      "get_json_object(src_json.json, '$.store.book[*].reader') FROM src_json")
+        "get_json_object(src_json.json, '$.store.book[*].category'), " +
+        "get_json_object(src_json.json, '$.store.book[*].isbn'), " +
+        "get_json_object(src_json.json, '$.store.book[*].reader') FROM src_json")
 
   createQueryTest(
       "get_json_object #6",
       "SELECT get_json_object(src_json.json, '$.store.book[*].reader[0].age'), " +
-      "get_json_object(src_json.json, '$.store.book[*].reader[*].age') FROM src_json")
+        "get_json_object(src_json.json, '$.store.book[*].reader[*].age') FROM src_json")
 
   createQueryTest(
       "get_json_object #7",
       "SELECT get_json_object(src_json.json, '$.store.basket[0][1]'), " +
-      "get_json_object(src_json.json, '$.store.basket[*]'), " +
-      // Hive returns wrong result with [*][0], so this expression is change to make test pass
-      "get_json_object(src_json.json, '$.store.basket[0][0]'), " +
-      "get_json_object(src_json.json, '$.store.basket[0][*]'), " +
-      "get_json_object(src_json.json, '$.store.basket[*][*]'), " +
-      "get_json_object(src_json.json, '$.store.basket[0][2].b'), " +
-      "get_json_object(src_json.json, '$.store.basket[0][*].b') FROM src_json")
+        "get_json_object(src_json.json, '$.store.basket[*]'), " +
+        // Hive returns wrong result with [*][0], so this expression is change to make test pass
+        "get_json_object(src_json.json, '$.store.basket[0][0]'), " +
+        "get_json_object(src_json.json, '$.store.basket[0][*]'), " +
+        "get_json_object(src_json.json, '$.store.basket[*][*]'), " +
+        "get_json_object(src_json.json, '$.store.basket[0][2].b'), " +
+        "get_json_object(src_json.json, '$.store.basket[0][*].b') FROM src_json")
 
   createQueryTest(
       "get_json_object #8",
       "SELECT get_json_object(src_json.json, '$.non_exist_key'), " +
-      "get_json_object(src_json.json, '$..no_recursive'), " +
-      "get_json_object(src_json.json, '$.store.book[10]'), " +
-      "get_json_object(src_json.json, '$.store.book[0].non_exist_key'), " +
-      "get_json_object(src_json.json, '$.store.basket[*].non_exist_key'), " +
-      "get_json_object(src_json.json, '$.store.basket[0][*].non_exist_key') FROM src_json")
+        "get_json_object(src_json.json, '$..no_recursive'), " +
+        "get_json_object(src_json.json, '$.store.book[10]'), " +
+        "get_json_object(src_json.json, '$.store.book[0].non_exist_key'), " +
+        "get_json_object(src_json.json, '$.store.basket[*].non_exist_key'), " +
+        "get_json_object(src_json.json, '$.store.basket[0][*].non_exist_key') FROM src_json")
 
   createQueryTest(
       "get_json_object #9",
@@ -752,7 +755,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     assertResult(Array(Row(2, "str2"))) {
       sql("SELECT tablealias.A, TABLEALIAS.b FROM reGisteredTABle TableAlias " +
-          "WHERE TableAliaS.a > 1").collect()
+        "WHERE TableAliaS.a > 1").collect()
     }
   }
 
@@ -816,10 +819,10 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   }
 
   test("SPARK-5383 alias for udfs with multi output columns") {
-    assert(
-        sql("select stack(2, key, value, key, value) as (a, b) from src limit 5")
-          .collect()
-          .size == 5)
+    assert(sql(
+        "select stack(2, key, value, key, value) as (a, b) from src limit 5")
+      .collect()
+      .size == 5)
 
     assert(
         sql("select a, b from (select stack(2, key, value, key, value) as (a, b) from src) t limit 5")
@@ -852,7 +855,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
           .map(_.getString(0))
           .contains(databaseName))
 
-    assert(isExplanation(
+    assert(
+        isExplanation(
             sql(s"EXPLAIN SELECT key, COUNT(*) FROM src GROUP BY key")))
 
     TestHive.reset()
@@ -1228,8 +1232,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     sql(s"SET ${testKey + testKey}=${testVal + testVal}")
     assert(hiveconf.get(testKey + testKey, "") == testVal + testVal)
-    assertResult(defaults ++ Set(testKey -> testVal,
-                                 (testKey + testKey) -> (testVal + testVal))) {
+    assertResult(
+        defaults ++ Set(testKey -> testVal,
+                        (testKey + testKey) -> (testVal + testVal))) {
       collectResults(sql("SET"))
     }
 
@@ -1281,7 +1286,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     sql("CREATE DATABASE hive_test_db")
     sql("USE hive_test_db")
-    assert("hive_test_db" == sql("select current_database()")
+    assert(
+        "hive_test_db" == sql("select current_database()")
           .first()
           .getString(0))
 
@@ -1290,7 +1296,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
 
     sql(s"USE $currentDatabase")
-    assert(currentDatabase == sql("select current_database()")
+    assert(
+        currentDatabase == sql("select current_database()")
           .first()
           .getString(0))
   }

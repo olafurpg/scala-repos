@@ -26,7 +26,8 @@ import org.apache.hadoop.mapred.RecordReader
 import org.apache.hadoop.mapred.OutputCollector
 
 class MockMappable[T](val id: String)(implicit tconv: TupleConverter[T])
-    extends ScaldingSource with Mappable[T] {
+    extends ScaldingSource
+    with Mappable[T] {
   def converter[U >: T] = TupleConverter.asSuperConverter(tconv)
   override def toString = id
   override def equals(that: Any) = that match {

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -52,8 +52,8 @@ import scalaz.\/._
 import scalaz.syntax.std.option._
 
 object KafkaEventStore {
-  def apply(
-      config: Configuration, permissionsFinder: PermissionsFinder[Future])(
+  def apply(config: Configuration,
+            permissionsFinder: PermissionsFinder[Future])(
       implicit executor: ExecutionContext)
     : Validation[NEL[String], (EventStore[Future], Stoppable)] = {
     val localConfig = config.detach("local")
@@ -67,8 +67,10 @@ object KafkaEventStore {
       .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
       centralZookeeperHosts =>
         val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
-        val coordination = ZookeeperSystemCoordination(
-            centralZookeeperHosts, serviceUID, yggCheckpointsEnabled = true)
+        val coordination = ZookeeperSystemCoordination(centralZookeeperHosts,
+                                                       serviceUID,
+                                                       yggCheckpointsEnabled =
+                                                         true)
         val agent = serviceUID.hostId + serviceUID.serviceId
 
         val eventIdSeq = SystemEventIdSequence(agent, coordination)
@@ -76,8 +78,10 @@ object KafkaEventStore {
 
         val stoppables =
           if (config[Boolean]("relay_data", true)) {
-            val (_, raStop) = KafkaRelayAgent(
-                permissionsFinder, eventIdSeq, localConfig, centralConfig)
+            val (_, raStop) = KafkaRelayAgent(permissionsFinder,
+                                              eventIdSeq,
+                                              localConfig,
+                                              centralConfig)
             esStop.parent(raStop)
           } else esStop
 
@@ -91,10 +95,11 @@ class LocalKafkaEventStore(
     topic: String,
     maxMessageSize: Int,
     messagePadding: Int)(implicit executor: ExecutionContext)
-    extends EventStore[Future] with Logging {
+    extends EventStore[Future]
+    with Logging {
   logger.info(
-      "Creating LocalKafkaEventStore for %s with max message size = %d".format(
-          topic, maxMessageSize))
+      "Creating LocalKafkaEventStore for %s with max message size = %d"
+        .format(topic, maxMessageSize))
   private[this] val codec = new KafkaEventCodec
   private implicit val M = new blueeyes.bkka.FutureMonad(executor)
 
@@ -114,7 +119,8 @@ class LocalKafkaEventStore(
               logger.error(
                   "Failed to reach reasonable message size for event: %s"
                     .format(event))
-              left(StoreFailure(
+              left(
+                  StoreFailure(
                       "Failed insertion due to excessively large event(s)!"))
             } else {
               encodeAll(postSplit ::: xs, messages)
@@ -163,7 +169,10 @@ object LocalKafkaEventStore {
       new Producer[String, Message](new ProducerConfig(localProperties))
     val stoppable = Stoppable.fromFuture(Future { producer.close })
 
-    Some(new LocalKafkaEventStore(
-            producer, localTopic, maxMessageSize, messagePadding) -> stoppable)
+    Some(
+        new LocalKafkaEventStore(producer,
+                                 localTopic,
+                                 maxMessageSize,
+                                 messagePadding) -> stoppable)
   }
 }

@@ -29,8 +29,9 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   }
 
   "Functor composition" in {
-    val compositionProp = (json: JValue, fa: JValue => JValue,
-    fb: JValue => JValue) => json.map(fb).map(fa) == json.map(fa compose fb)
+    val compositionProp =
+      (json: JValue, fa: JValue => JValue,
+       fb: JValue => JValue) => json.map(fb).map(fa) == json.map(fa compose fb)
 
     forAll(compositionProp)
   }
@@ -43,7 +44,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
   "Monoid associativity" in {
     val assocProp = (x: JValue, y: JValue,
-    z: JValue) => x ++ (y ++ z) == (x ++ y) ++ z
+                     z: JValue) => x ++ (y ++ z) == (x ++ y) ++ z
     forAll(assocProp)
   }
 
@@ -61,7 +62,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   "Diff identity" in {
     val identityProp = (json: JValue) =>
       (json diff JNothing) == Diff(JNothing, JNothing, json) &&
-      (JNothing diff json) == Diff(JNothing, json, JNothing)
+        (JNothing diff json) == Diff(JNothing, json, JNothing)
 
     forAll(identityProp)
   }
@@ -73,10 +74,9 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   }
 
   "Diff is subset of originals" in {
-    val subsetProp = (x: JObject, y: JObject) =>
-      {
-        val Diff(c, a, d) = x diff y
-        y == (y merge (c merge a))
+    val subsetProp = (x: JObject, y: JObject) => {
+      val Diff(c, a, d) = x diff y
+      y == (y merge (c merge a))
     }
     forAll(subsetProp)
   }
@@ -90,16 +90,16 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   "Remove all" in {
     val removeAllProp = (x: JValue) =>
       (x remove { _ =>
-            true
-          }) == JNothing
+        true
+      }) == JNothing
     forAll(removeAllProp)
   }
 
   "Remove nothing" in {
     val removeNothingProp = (x: JValue) =>
       (x remove { _ =>
-            false
-          }) == x
+        false
+      }) == x
     forAll(removeNothingProp)
   }
 
@@ -119,44 +119,43 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   }
 
   "Replace one" in {
-    val anyReplacement = (x: JValue, replacement: JObject) =>
-      {
-        def findOnePath(jv: JValue, l: List[String]): List[String] = jv match {
-          case JObject(fl) =>
-            fl match {
-              case field :: xs => findOnePath(field.value, l)
-              case Nil => l
-            }
-          case _ => l
-        }
-
-        val path = findOnePath(x, Nil).reverse
-        val result = x.replace(path, replacement)
-
-        def replaced(path: List[String], in: JValue): Boolean = {
-          path match {
-            case Nil => x == in
-
-            case name :: Nil =>
-              (in \ name) match {
-                case `replacement` => true
-                case _ => false
-              }
-
-            case name :: xs =>
-              (in \ name) match {
-                case JNothing => false
-                case value => replaced(xs, value)
-              }
+    val anyReplacement = (x: JValue, replacement: JObject) => {
+      def findOnePath(jv: JValue, l: List[String]): List[String] = jv match {
+        case JObject(fl) =>
+          fl match {
+            case field :: xs => findOnePath(field.value, l)
+            case Nil => l
           }
-        }
+        case _ => l
+      }
 
-        replaced(path, result)
+      val path = findOnePath(x, Nil).reverse
+      val result = x.replace(path, replacement)
+
+      def replaced(path: List[String], in: JValue): Boolean = {
+        path match {
+          case Nil => x == in
+
+          case name :: Nil =>
+            (in \ name) match {
+              case `replacement` => true
+              case _ => false
+            }
+
+          case name :: xs =>
+            (in \ name) match {
+              case JNothing => false
+              case value => replaced(xs, value)
+            }
+        }
+      }
+
+      replaced(path, result)
     }
 
     // ensure that we test some JObject instances
-    val fieldReplacement = (x: JObject,
-    replacement: JObject) => anyReplacement(x, replacement)
+    val fieldReplacement =
+      (x: JObject, replacement: JObject) => anyReplacement(x, replacement)
 
     forAll(fieldReplacement)
     forAll(anyReplacement)
@@ -206,7 +205,8 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
             "beta",
             JObject(
                 JField("alpha", JString("bacon")) :: JField(
-                    "charlie", JString("i'm a masseuse")) :: Nil
+                    "charlie",
+                    JString("i'm a masseuse")) :: Nil
             )) :: Nil
     )
 

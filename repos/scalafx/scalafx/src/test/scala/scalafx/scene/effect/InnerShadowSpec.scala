@@ -40,8 +40,10 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class InnerShadowSpec
     extends SimpleSFXDelegateSpec[jfxse.InnerShadow, InnerShadow](
-        classOf[jfxse.InnerShadow], classOf[InnerShadow])
-    with ColorDelegateSpec[InnerShadow] with DimensionDelegateSpec[InnerShadow]
+        classOf[jfxse.InnerShadow],
+        classOf[InnerShadow])
+    with ColorDelegateSpec[InnerShadow]
+    with DimensionDelegateSpec[InnerShadow]
     with InputDelegateSpec[InnerShadow] {
 
   val colorDelegate = getScalaClassInstance

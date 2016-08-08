@@ -11,16 +11,27 @@ import com.intellij.psi.javadoc.PsiDocComment
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions,
+  ScNamedElement,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.light.scala.ScLightBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 import scala.annotation.tailrec
 
 trait ScBindingPattern
-    extends ScPattern with ScNamedElement with ScTypedDefinition
-    with NavigationItem with PsiDocCommentOwner {
+    extends ScPattern
+    with ScNamedElement
+    with ScTypedDefinition
+    with NavigationItem
+    with PsiDocCommentOwner {
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   def isWildcard: Boolean

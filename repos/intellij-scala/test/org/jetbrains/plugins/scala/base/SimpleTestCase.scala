@@ -60,8 +60,8 @@ abstract class SimpleTestCase extends UsefulTestCase {
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue(
-        "actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert
+      .assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def describe(tree: PsiElement): String = toString(tree, 0)
@@ -81,7 +81,7 @@ abstract class SimpleTestCase extends UsefulTestCase {
 
     def parse: ScalaFile = parseText(s)
 
-    def parse[T <: PsiElement : ClassTag]: T =
+    def parse[T <: PsiElement: ClassTag]: T =
       parse(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 
     def parse[T <: PsiElement](aClass: Class[T]): T =

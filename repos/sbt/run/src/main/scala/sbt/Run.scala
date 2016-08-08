@@ -49,7 +49,8 @@ class ForkRun(config: ForkOptions) extends ScalaRun {
       process.destroy()
       1
     }
-    val exitCode = try process.exitValue() catch {
+    val exitCode = try process.exitValue()
+    catch {
       case e: InterruptedException => cancel()
     }
     processExitCode(exitCode, "runner")
@@ -90,8 +91,9 @@ class Run(instance: ScalaInstance, trapExit: Boolean, nativeTmp: File)
     val main = getMainMethod(mainClassName, loader)
     invokeMain(loader, main, options)
   }
-  private def invokeMain(
-      loader: ClassLoader, main: Method, options: Seq[String]): Unit = {
+  private def invokeMain(loader: ClassLoader,
+                         main: Method,
+                         options: Seq[String]): Unit = {
     val currentThread = Thread.currentThread
     val oldLoader = Thread.currentThread.getContextClassLoader
     currentThread.setContextClassLoader(loader)

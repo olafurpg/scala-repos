@@ -10,12 +10,13 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
-/** 
+/**
   * Author: Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScCatchBlockImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCatchBlock {
+    extends ScalaPsiElementImpl(node)
+    with ScCatchBlock {
   override def toString: String = "CatchBlock"
 
   override def accept(visitor: ScalaElementVisitor) {

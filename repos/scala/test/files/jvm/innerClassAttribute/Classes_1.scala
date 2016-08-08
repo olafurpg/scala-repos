@@ -125,14 +125,13 @@ val x = { ((x: String) => x + "1")
 }
 }
 
-class A20 { (s: String) =>
-  {
-    { (s: String) =>
-      ()
-    }
-    { (s: String) => (s: String) =>
-      1
-    }
+class A20 { (s: String) => {
+  { (s: String) =>
+    ()
+  }
+  { (s: String) => (s: String) =>
+    1
+  }
 }
 }
 
@@ -192,18 +191,16 @@ trait A24 extends A24Base {
 
 class SI_9105 {
   //      outerClass       enclMeth
-  val fun = (s: String) =>
-    {
-      class A //        SI_9105           null
-      def m: Object = { class B; new B } //        SI_9105            m$1
-      val f: Object = { class C; new C } //        SI_9105           null
+  val fun = (s: String) => {
+    class A //        SI_9105           null
+    def m: Object = { class B; new B } //        SI_9105            m$1
+    val f: Object = { class C; new C } //        SI_9105           null
   }
   def met =
-    (s: String) =>
-      {
-        class D //        SI_9105            met
-        def m: Object = { class E; new E } //        SI_9105            m$1
-        val f: Object = { class F; new F } //        SI_9105            met
+    (s: String) => {
+      class D //        SI_9105            met
+      def m: Object = { class E; new E } //        SI_9105            m$1
+      val f: Object = { class F; new F } //        SI_9105            met
     }
 
   def byName(op: => Any) = 0
@@ -283,7 +280,8 @@ object NestedInValueClass {
     // A has InnerClass entries for the two closures (and for A and A$). not for B / C
     def f = {
       def g =
-        List().map(x => ((s: String) => x)): @noinline // outer class A, no outer method (g is moved to the companion, doesn't exist in A)
+        List()
+          .map(x => ((s: String) => x)): @noinline // outer class A, no outer method (g is moved to the companion, doesn't exist in A)
       g.map(x => ((s: String) => x)): @noinline // outer class A, outer method f
     }
     // statements and field declarations are not allowed in value classes

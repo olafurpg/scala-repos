@@ -84,8 +84,8 @@ object BarChartWithTableViewDemo extends JFXApp {
       chartData: ObservableBuffer[Position]): BarChart[String, Number] =
     new BarChart(CategoryAxis(), NumberAxis()) {
       title = chartTitle
-      data = XYChart.Series(chartData.map(
-              d => XYChart.Data[String, Number](d.name(), d.value())))
+      data = XYChart.Series(chartData.map(d =>
+        XYChart.Data[String, Number](d.name(), d.value())))
       legendVisible = false
       onMouseClicked = handle { showAsTable(title(), chartData) }
     }

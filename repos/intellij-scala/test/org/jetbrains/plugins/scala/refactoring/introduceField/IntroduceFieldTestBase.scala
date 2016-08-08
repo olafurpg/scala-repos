@@ -13,7 +13,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
-import org.jetbrains.plugins.scala.lang.refactoring.introduceField.{IntroduceFieldContext, IntroduceFieldSettings, ScalaIntroduceFieldFromExpressionHandler}
+import org.jetbrains.plugins.scala.lang.refactoring.introduceField.{
+  IntroduceFieldContext,
+  IntroduceFieldSettings,
+  ScalaIntroduceFieldFromExpressionHandler
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.util.ScalaUtils
 import org.junit.Assert._
@@ -38,8 +42,9 @@ abstract class IntroduceFieldTestBase()
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
 
     val startOffset = fileText.indexOf(startMarker)
     assert(
@@ -80,12 +85,20 @@ abstract class IntroduceFieldTestBase()
     try {
       val handler = new ScalaIntroduceFieldFromExpressionHandler
       val Some((expr, types)) = ScalaRefactoringUtil.getExpression(
-          getProjectAdapter, editor, scalaFile, startOffset, endOffset)
+          getProjectAdapter,
+          editor,
+          scalaFile,
+          startOffset,
+          endOffset)
       val aClass = expr.parents.toList
         .filter(_.isInstanceOf[ScTemplateDefinition])(selectedClassNumber)
         .asInstanceOf[ScTemplateDefinition]
-      val ifc = new IntroduceFieldContext[ScExpression](
-          getProjectAdapter, editor, scalaFile, expr, types, aClass)
+      val ifc = new IntroduceFieldContext[ScExpression](getProjectAdapter,
+                                                        editor,
+                                                        scalaFile,
+                                                        expr,
+                                                        types,
+                                                        aClass)
       val settings = new IntroduceFieldSettings[ScExpression](ifc)
       settings.replaceAll = replaceAll
       initInDecl.foreach(settings.initInDeclaration = _)
@@ -104,7 +117,7 @@ abstract class IntroduceFieldTestBase()
       case e: Exception =>
         assert(assertion = false,
                message = e.getMessage + "\n" +
-                 e.getStackTrace.map(_.toString).mkString("  \n"))
+                   e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

@@ -22,8 +22,8 @@ object MyBuild extends Build {
 
   lazy val root =
     Project("root", file(".")) settings
-    (updateDemo <<= updateDemoInit updateState demoState, check <<= checkInit,
-        inMemorySetting, persistedSetting, inMemoryCheck, persistedCheck)
+      (updateDemo <<= updateDemoInit updateState demoState, check <<= checkInit,
+      inMemorySetting, persistedSetting, inMemoryCheck, persistedCheck)
   def demoState(s: State, i: Int): State = s put (sample, i + 1)
 
   def checkInit: Initialize[InputTask[Unit]] =
@@ -35,17 +35,17 @@ object MyBuild extends Build {
             val prev = s get sample
             assert(value == curExpected,
                    "Expected current value to be " + curExpected + ", got " +
-                   value)
+                     value)
             assert(prev == prevExpected,
                    "Expected previous value to be " + prevExpected + ", got " +
-                   prev)
+                     prev)
         }
     }
 
   def inMemorySetting =
     keep <<=
       getPrevious(keep) map { case None => 3; case Some(x) => x + 1 } keepAs
-    (keep)
+        (keep)
   def persistedSetting =
     persisted <<= loadPrevious(persisted) map {
       case None => 17; case Some(x) => x + 1

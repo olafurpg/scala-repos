@@ -33,8 +33,10 @@ trait ScreenOnActivity extends SActivity {
   */
 trait PreventRotateActivity extends SActivity {
   onResume {
-    setRequestedOrientation(if (Configuration.portrait)
-          SCREEN_ORIENTATION_PORTRAIT else SCREEN_ORIENTATION_LANDSCAPE)
+    setRequestedOrientation(
+        if (Configuration.portrait)
+          SCREEN_ORIENTATION_PORTRAIT
+        else SCREEN_ORIENTATION_LANDSCAPE)
   }
 
   onPause {

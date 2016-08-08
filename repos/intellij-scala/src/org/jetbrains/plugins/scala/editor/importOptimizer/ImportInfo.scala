@@ -2,17 +2,30 @@ package org.jetbrains.plugins.scala.editor.importOptimizer
 
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.editor.importOptimizer.ScalaImportOptimizer._root_prefix
-import org.jetbrains.plugins.scala.extensions.{PsiClassExt, PsiMemberExt, PsiModifierListOwnerExt, PsiNamedElementExt}
+import org.jetbrains.plugins.scala.extensions.{
+  PsiClassExt,
+  PsiMemberExt,
+  PsiModifierListOwnerExt,
+  PsiNamedElementExt
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportExprUsed, ImportSelectorUsed, ImportUsed, ImportWildcardSelectorUsed}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportExprUsed,
+  ImportSelectorUsed,
+  ImportUsed,
+  ImportWildcardSelectorUsed
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScStableCodeReferenceElementImpl
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -75,7 +88,7 @@ case class ImportInfo(prefixQualifier: String,
 
   def isSimpleWildcard =
     hasWildcard && singleNames.isEmpty && renames.isEmpty &&
-    hiddenNames.isEmpty
+      hiddenNames.isEmpty
 
   def namesFromWildcard: Set[String] = {
     if (hasWildcard) allNames -- singleNames -- renames.keySet
@@ -129,16 +142,17 @@ object ImportInfo {
       }
     }
 
-    def addAllNames(
-        ref: ScStableCodeReferenceElement, nameToAdd: String): Unit = {
+    def addAllNames(ref: ScStableCodeReferenceElement,
+                    nameToAdd: String): Unit = {
       if (ref.multiResolve(false).exists(shouldAddName)) allNames += nameToAdd
     }
 
     def collectAllNamesForWildcard(): Unit = {
       val refText = imp.qualifier.getText + ".someIdentifier"
       val reference = ScalaPsiElementFactory
-        .createReferenceFromText(
-            refText, imp.qualifier.getContext, imp.qualifier)
+        .createReferenceFromText(refText,
+                                 imp.qualifier.getContext,
+                                 imp.qualifier)
         .asInstanceOf[ScStableCodeReferenceElementImpl]
       val processor = new CompletionProcessor(StdKinds.stableImportSelector,
                                               reference,
@@ -297,7 +311,8 @@ object ImportInfo {
       if (rootUsed)
         (explicitQualifierString(qualifier, withDeepest = false), false)
       else {
-        val qualifiedDeepRef = try qualifiedRef(deepRef) catch {
+        val qualifiedDeepRef = try qualifiedRef(deepRef)
+        catch {
           case _: IllegalStateException => return None
         }
         val prefixQual =

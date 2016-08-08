@@ -13,8 +13,15 @@ import java.io.{File, PrintWriter, BufferedWriter, FileWriter}
 import org.apache.tools.ant.{Project, AntClassLoader}
 import org.apache.tools.ant.taskdefs.Java
 import org.apache.tools.ant.types.{Path, Reference}
-import org.apache.tools.ant.util.{FileUtils, GlobPatternMapper, SourceFileScanner}
-import org.apache.tools.ant.util.facade.{FacadeTaskHelper, ImplementationSpecificArgument}
+import org.apache.tools.ant.util.{
+  FileUtils,
+  GlobPatternMapper,
+  SourceFileScanner
+}
+import org.apache.tools.ant.util.facade.{
+  FacadeTaskHelper,
+  ImplementationSpecificArgument
+}
 
 import scala.tools.nsc.{Global, Settings, CompilerCommand}
 import scala.tools.nsc.io.{Path => SPath}
@@ -215,8 +222,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     case None => buildError("Member '" + name + "' is empty.")
     case Some(x) => x.list.toList map nameToFile
   }
-  private def createNewPath(
-      getter: () => Option[Path], setter: (Option[Path]) => Unit) = {
+  private def createNewPath(getter: () => Option[Path],
+                            setter: (Option[Path]) => Unit) = {
     if (getter().isEmpty) setter(Some(new Path(getProject)))
 
     getter().get.createPath()
@@ -400,49 +407,49 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setExplaintypes(input: String) {
     explaintypes = Flag toBoolean input orElse buildError(
-        "Unknown explaintypes flag '" + input + "'")
+          "Unknown explaintypes flag '" + input + "'")
   }
 
   /** Set the `deprecation` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setDeprecation(input: String) {
     deprecation = Flag toBoolean input orElse buildError(
-        "Unknown deprecation flag '" + input + "'")
+          "Unknown deprecation flag '" + input + "'")
   }
 
   /** Set the `nobootcp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNobootcp(input: String) {
     nobootcp = Flag toBoolean input orElse buildError(
-        "Unknown nobootcp flag '" + input + "'")
+          "Unknown nobootcp flag '" + input + "'")
   }
 
   /** Set the `nowarn` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNowarn(input: String) {
     nowarn = Flag toBoolean input orElse buildError(
-        "Unknown nowarn flag '" + input + "'")
+          "Unknown nowarn flag '" + input + "'")
   }
 
   /** Set the `optimise` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setOptimise(input: String) {
     optimise = Flag toBoolean input orElse buildError(
-        "Unknown optimisation flag '" + input + "'")
+          "Unknown optimisation flag '" + input + "'")
   }
 
   /** Set the `unchecked` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUnchecked(input: String) {
     unchecked = Flag toBoolean input orElse buildError(
-        "Unknown unchecked flag '" + input + "'")
+          "Unknown unchecked flag '" + input + "'")
   }
 
   /** Set the `usejavacp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUsejavacp(input: String) {
     usejavacp = Flag toBoolean input orElse buildError(
-        "Unknown usejavacp flag '" + input + "'")
+          "Unknown usejavacp flag '" + input + "'")
   }
 
   /** Sets the `failonerror` attribute. Used by [[http://ant.apache.org Ant]].
@@ -601,8 +608,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           if (javaFiles.isEmpty)
             "%d source file%s".format(list.length, plural(list))
           else
-            "%d scala and %d java source files".format(
-                scalaFiles.length, javaFiles.length)
+            "%d scala and %d java source files"
+              .format(scalaFiles.length, javaFiles.length)
         log("Compiling %s to %s".format(str, getDestination.toString))
       } else log("No files selected for compilation", Project.MSG_VERBOSE)
 
@@ -613,10 +620,11 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     // If force is false, only files were the .class file in destination is
     // older than the .scala file will be used.
     val sourceFiles: List[File] = for (originDir <- getOrigin;
-    originFile <- getOriginFiles(originDir)) yield {
-      log(originFile, Project.MSG_DEBUG)
-      nameToFile(originDir)(originFile)
-    }
+                                       originFile <- getOriginFiles(originDir))
+      yield {
+        log(originFile, Project.MSG_DEBUG)
+        nameToFile(originDir)(originFile)
+      }
 
     // Builds-up the compilation settings for Scalac with the existing Ant
     // parameters.
@@ -658,8 +666,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     log("Scalac params = '" + addParams + "'", Project.MSG_DEBUG)
 
     // let CompilerCommand processes all params
-    val command = new CompilerCommand(
-        settings.splitParams(addParams), settings)
+    val command =
+      new CompilerCommand(settings.splitParams(addParams), settings)
 
     // resolve dependenciesFile path from project's basedir, so <ant antfile ...> call from other project works.
     // the dependenciesFile may be relative path to basedir or absolute path, in either case, the following code
@@ -668,9 +676,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       case "none" =>
       case x =>
         val depFilePath = SPath(x)
-        command.settings.dependenciesFile.value = SPath(getProject.getBaseDir).normalize
-          .resolve(depFilePath)
-          .path
+        command.settings.dependenciesFile.value =
+          SPath(getProject.getBaseDir).normalize.resolve(depFilePath).path
     }
 
     (command.settings, sourceFiles, javaOnly)
@@ -718,10 +725,10 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       val out = new PrintWriter(new BufferedWriter(new FileWriter(file)))
 
       try {
-        for (setting <- settings.visibleSettings; arg <- setting.unparse) out println escapeArgument(
-            arg)
-        for (file <- sourceFiles) out println escapeArgument(
-            file.getAbsolutePath)
+        for (setting <- settings.visibleSettings; arg <- setting.unparse)
+          out println escapeArgument(arg)
+        for (file <- sourceFiles)
+          out println escapeArgument(file.getAbsolutePath)
       } finally out.close()
 
       file
@@ -730,7 +737,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     if (failonerror && res != 0)
       buildError(
           "Compilation failed because of an internal compiler error;" +
-          " see the error output for details.")
+            " see the error output for details.")
   }
 
   /** Performs the compilation. */
@@ -738,7 +745,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     val reporter = new ConsoleReporter(settings)
     val compiler = newGlobal(settings, reporter) // compiles the actual code
 
-    try new compiler.Run compile (sourceFiles map (_.toString)) catch {
+    try new compiler.Run compile (sourceFiles map (_.toString))
+    catch {
       case ex: Throwable =>
         ex.printStackTrace()
         val msg =
@@ -746,7 +754,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           else ex.getMessage
         buildError(
             "Compile failed because of an internal compiler error (" + msg +
-            "); see the error output for details.")
+              "); see the error output for details.")
     }
 
     reporter.printSummary()
@@ -756,7 +764,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           .format(reporter.ERROR.count, plural(reporter.ERROR.count))
       if (failonerror) buildError(msg) else log(msg)
     } else if (reporter.WARNING.count > 0)
-      log("Compile succeeded with %d warning%s; see the compiler output for details."
+      log(
+          "Compile succeeded with %d warning%s; see the compiler output for details."
             .format(reporter.WARNING.count, plural(reporter.WARNING.count)))
   }
 }

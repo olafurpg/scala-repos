@@ -15,7 +15,7 @@ object meteor {
   }
 }
 
-// Solver.scala 
+// Solver.scala
 // import scala.collection.mutable._
 
 final class Solver(n: Int) {
@@ -120,9 +120,9 @@ final class Solver(n: Int) {
     printBoard(last)
   }
 
-/*
-   def printPieces() = 
-      for (i <- Iterator.range(0,Board.pieces)) pieces(i).print 
+  /*
+   def printPieces() =
+      for (i <- Iterator.range(0,Board.pieces)) pieces(i).print
  */
 }
 
@@ -152,9 +152,9 @@ final class Board {
   def asString() =
     new String(
         cells map
-        (c =>
-              if (c.piece == null) '-'.toByte
-              else (c.piece.number + 48).toByte))
+          (c =>
+             if (c.piece == null) '-'.toByte
+             else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 
@@ -236,7 +236,7 @@ final class Board {
     a
   }
 
-/*
+  /*
 // Printing all the board cells and their neighbours
 // helps check that they are connected properly
 
@@ -246,9 +246,9 @@ final class Board {
          Console.print(i + "\t")
          for (j <- Iterator.range(0,Cell.sides)){
             val c = cells(i).next(j)
-            if (c == null) 
-               Console.print("-- ") 
-            else 
+            if (c == null)
+               Console.print("-- ")
+            else
                Console.printf("{0,number,00} ")(c.number)
          }
          Console.println("")
@@ -435,7 +435,7 @@ final class Piece(_number: Int) {
     cells(3).next(Cell.SE) = cells(4)
   }
 
-/*
+  /*
    def print() = {
       Console.println("Piece # " + number)
       Console.println("cell\tNW NE W  E  SW SE")
@@ -443,12 +443,12 @@ final class Piece(_number: Int) {
          Console.print(i + "\t")
          for (j <- Iterator.range(0,Cell.sides)){
             val c = cells(i).next(j)
-            if (c == null) 
-               Console.print("-- ") 
-            else 
+            if (c == null)
+               Console.print("-- ")
+            else
                for (k <- Iterator.range(0,Piece.size)){
                   if (cells(k) == c) Console.printf(" {0,number,0} ")(k)
-               }       
+               }
          }
          Console.println("")
       }

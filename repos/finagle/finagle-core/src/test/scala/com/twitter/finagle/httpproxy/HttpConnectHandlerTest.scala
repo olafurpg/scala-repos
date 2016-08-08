@@ -24,16 +24,19 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     when(channel.getPipeline) thenReturn pipeline
     val closeFuture = Channels.future(channel)
     when(channel.getCloseFuture) thenReturn closeFuture
-    val remoteAddress = new InetSocketAddress(
-        InetAddress.getLoopbackAddress, 80)
+    val remoteAddress =
+      new InetSocketAddress(InetAddress.getLoopbackAddress, 80)
     val port = remoteAddress.getPort
     when(channel.getRemoteAddress) thenReturn remoteAddress
     val proxyAddress = mock[SocketAddress]
     val connectFuture = Channels.future(channel, true)
     val connectRequested = new DownstreamChannelStateEvent(
-        channel, connectFuture, ChannelState.CONNECTED, remoteAddress)
-    val ch = HttpConnectHandler.addHandler(
-        proxyAddress, remoteAddress, pipeline, None)
+        channel,
+        connectFuture,
+        ChannelState.CONNECTED,
+        remoteAddress)
+    val ch = HttpConnectHandler
+      .addHandler(proxyAddress, remoteAddress, pipeline, None)
     ch.handleDownstream(ctx, connectRequested)
 
     def checkDidClose() {
@@ -81,8 +84,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     import h._
 
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
   }
@@ -93,8 +97,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     import h._
 
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -107,8 +112,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     import h._
 
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -158,9 +164,11 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
                                     Some(Credentials("user", "pass")))
 
     handler.handleDownstream(ctx, connectRequested)
-    handler.handleUpstream(ctx,
-                           new UpstreamChannelStateEvent(
-                               channel, ChannelState.CONNECTED, remoteAddress))
+    handler.handleUpstream(
+        ctx,
+        new UpstreamChannelStateEvent(channel,
+                                      ChannelState.CONNECTED,
+                                      remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -212,7 +220,8 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
         pipeline,
         None
     )
-    assert(pipeline
+    assert(
+        pipeline
           .get("socketAddressResolver")
           .isInstanceOf[SocketAddressResolveHandler])
   }

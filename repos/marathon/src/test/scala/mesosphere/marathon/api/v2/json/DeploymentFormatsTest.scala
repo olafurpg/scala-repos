@@ -45,7 +45,8 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("Can write/read GroupUpdate") {
     marshalUnmarshal(genGroupUpdate())
-    marshalUnmarshal(genGroupUpdate(
+    marshalUnmarshal(
+        genGroupUpdate(
             Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
   }
 
@@ -131,12 +132,12 @@ class DeploymentFormatsTest extends MarathonSpec {
   def genStep =
     DeploymentStep(
         actions = Seq(
-              StartApplication(genApp, genInt),
-              ScaleApplication(genApp, genInt),
-              StopApplication(genApp),
-              RestartApplication(genApp),
-              ResolveArtifacts(genApp, Map.empty)
-          ))
+            StartApplication(genApp, genInt),
+            ScaleApplication(genApp, genInt),
+            StopApplication(genApp),
+            RestartApplication(genApp),
+            ResolveArtifacts(genApp, Map.empty)
+        ))
 
   def genGroup(children: Set[Group] = Set.empty) =
     Group(genId, Set(genApp, genApp), children, Set(genId), genTimestamp)

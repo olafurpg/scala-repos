@@ -21,7 +21,12 @@ import network.{HtmlFetcher, AbstractHtmlFetcher}
 import org.jsoup.nodes.Element
 import java.util.Date
 import scala.beans.BeanProperty
-import com.gravity.goose.extractors.{StandardContentExtractor, ContentExtractor, AdditionalDataExtractor, PublishDateExtractor}
+import com.gravity.goose.extractors.{
+  StandardContentExtractor,
+  ContentExtractor,
+  AdditionalDataExtractor,
+  PublishDateExtractor
+}
 
 /**
   * Created by Jim Plush
@@ -80,8 +85,8 @@ class Configuration {
   var publishDateExtractor: PublishDateExtractor = new PublishDateExtractor {
     import PublishDateExtractor._
 
-    def extractCandidate(
-        rootElement: Element, selector: String): Seq[java.util.Date] = {
+    def extractCandidate(rootElement: Element,
+                         selector: String): Seq[java.util.Date] = {
       import scala.collection.JavaConversions._
 
       try {

@@ -38,9 +38,11 @@ trait PropertyComparator extends AbstractComparator {
     javaMethod.getName
 
   protected def isSpecialMethodName(name: String) =
-    super.isImplementation(name) || (name == "applyTo") || (name == "create") ||
-    (name == "build") || name.endsWith("Property") || name.startsWith("get") ||
-    name.startsWith("set") || name.startsWith("is")
+    super
+      .isImplementation(name) || (name == "applyTo") || (name == "create") ||
+      (name == "build") || name.endsWith("Property") || name
+      .startsWith("get") ||
+      name.startsWith("set") || name.startsWith("is")
 
   private def assertProperties(javaFxProperties: Set[String],
                                scalaFxClass: Class[_],
@@ -67,8 +69,8 @@ trait PropertyComparator extends AbstractComparator {
     assertProperties(getProperties(javafxClass), scalafxClass, "Properties")
   }
 
-  def comparePropertiesInProxy(
-      javafxClass: Class[_], scalafxPropertyProxy: Class[_]) {
+  def comparePropertiesInProxy(javafxClass: Class[_],
+                               scalafxPropertyProxy: Class[_]) {
     assertProperties(getProperties(javafxClass),
                      scalafxPropertyProxy,
                      "Properties in Proxy")

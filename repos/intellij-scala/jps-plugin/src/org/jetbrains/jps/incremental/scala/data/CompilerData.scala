@@ -6,7 +6,10 @@ import java.io.File
 import org.jetbrains.jps.ModuleChunk
 import org.jetbrains.jps.builders.java.JavaBuilderUtil
 import org.jetbrains.jps.incremental.CompileContext
-import org.jetbrains.jps.incremental.scala.model.{IncrementalityType, LibrarySettings}
+import org.jetbrains.jps.incremental.scala.model.{
+  IncrementalityType,
+  LibrarySettings
+}
 import org.jetbrains.jps.model.java.JpsJavaSdkType
 import org.jetbrains.jps.model.module.JpsModule
 
@@ -34,8 +37,8 @@ object CompilerData {
             Either.cond(absentJars.isEmpty,
                         Some(jars),
                         "Scala compiler JARs not found (module '" +
-                        chunk.representativeTarget().getModule.getName +
-                        "'): " + absentJars.map(_.getPath).mkString(", "))
+                          chunk.representativeTarget().getModule.getName +
+                          "'): " + absentJars.map(_.getPath).mkString(", "))
         }
       } else {
         Right(None)
@@ -70,7 +73,7 @@ object CompilerData {
             }
           } else {
             Option(model.getProject.getSdkReferencesTable.getSdkReference(
-                    JpsJavaSdkType.INSTANCE))
+                JpsJavaSdkType.INSTANCE))
               .flatMap(references => Option(references.resolve))
               .map(_.getProperties)
           }
@@ -114,8 +117,9 @@ object CompilerData {
     library.flatMap { libraryJar =>
       val compiler = find(files, "scala-compiler", ".jar") match {
         case Left(error) =>
-          Left(error + " in Scala compiler classpath in Scala SDK " +
-              sdk.getName)
+          Left(
+              error + " in Scala compiler classpath in Scala SDK " +
+                sdk.getName)
         case right => right
       }
 
@@ -128,7 +132,7 @@ object CompilerData {
             case version if version.startsWith("2.10") =>
               // TODO implement a better version comparison
               find(extraJars, "scala-reflect", ".jar").left.toOption.map(_ +
-                  " in Scala compiler classpath in Scala SDK " + sdk.getName)
+                " in Scala compiler classpath in Scala SDK " + sdk.getName)
             case _ => None
           }
         }
@@ -143,15 +147,14 @@ object CompilerData {
                    prefix: String,
                    suffix: String): Either[String, File] = {
     files.filter(it =>
-          it.getName.startsWith(prefix) && it.getName.endsWith(suffix)) match {
+      it.getName.startsWith(prefix) && it.getName.endsWith(suffix)) match {
       case Seq() =>
         Left("No '%s*%s'".format(prefix, suffix))
       case Seq(file) =>
         Right(file)
       case Seq(duplicates @ _ *) =>
-        Left(
-            "Multiple '%s*%s' files (%s)".format(
-                prefix, suffix, duplicates.map(_.getName).mkString(", ")))
+        Left("Multiple '%s*%s' files (%s)"
+          .format(prefix, suffix, duplicates.map(_.getName).mkString(", ")))
     }
   }
 }

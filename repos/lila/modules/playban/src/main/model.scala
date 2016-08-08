@@ -2,8 +2,9 @@ package lila.playban
 
 import org.joda.time.DateTime
 
-case class UserRecord(
-    _id: String, o: Option[List[Outcome]], b: Option[List[TempBan]]) {
+case class UserRecord(_id: String,
+                      o: Option[List[Outcome]],
+                      b: Option[List[TempBan]]) {
 
   def userId = _id
   def outcomes: List[Outcome] = ~o

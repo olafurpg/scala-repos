@@ -8,7 +8,10 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
-import com.intellij.refactoring.rename.{RenameProcessor, RenamePsiElementProcessor}
+import com.intellij.refactoring.rename.{
+  RenameProcessor,
+  RenamePsiElementProcessor
+}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
@@ -38,8 +41,8 @@ abstract class ScalaRenameTestBase
         "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
     getEditorAdapter.getCaretModel.moveToOffset(offset)
     val element = TargetElementUtil.findTargetElement(
-        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
-            getEditorAdapter, scalaFile),
+        InjectedLanguageUtil
+          .getEditorForInjectedLanguageNoCommit(getEditorAdapter, scalaFile),
         TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
     assert(element != null, "Reference is not specified.")
     val searchInComments = element.getText.contains("Comments")

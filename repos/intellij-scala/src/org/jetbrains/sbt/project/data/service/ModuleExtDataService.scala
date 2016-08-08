@@ -6,7 +6,12 @@ import java.io.File
 import com.intellij.compiler.CompilerConfiguration
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.externalSystem.service.notification.{ExternalSystemNotificationManager, NotificationCategory, NotificationData, NotificationSource}
+import com.intellij.openapi.externalSystem.service.notification.{
+  ExternalSystemNotificationManager,
+  NotificationCategory,
+  NotificationData,
+  NotificationSource
+}
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -26,8 +31,10 @@ class ModuleExtDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ModuleExtData] =
-    new ModuleExtDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new ModuleExtDataService.Importer(toImport,
+                                      projectData,
+                                      project,
+                                      modelsProvider)
 }
 
 object ModuleExtDataService {
@@ -35,8 +42,10 @@ object ModuleExtDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ModuleExtData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[ModuleExtData](dataToImport,
+                                              projectData,
+                                              project,
+                                              modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -48,7 +57,7 @@ object ModuleExtDataService {
       } {
         module.configureScalaCompilerSettingsFrom("SBT", data.scalacOptions)
         data.scalaVersion.foreach(version =>
-              configureScalaSdk(module, version, data.scalacClasspath))
+          configureScalaSdk(module, version, data.scalacClasspath))
         configureOrInheritSdk(module, data.jdk)
         configureLanguageLevel(module, data.javacOptions)
         configureJavacOptions(module, data.javacOptions)
@@ -63,7 +72,7 @@ object ModuleExtDataService {
         val scalaLibrary = scalaLibraries
           .find(_.scalaVersion.contains(compilerVersion))
           .orElse(scalaLibraries.find(_.scalaVersion.exists(
-                      _.toLanguageLevel == compilerVersion.toLanguageLevel)))
+              _.toLanguageLevel == compilerVersion.toLanguageLevel)))
 
         scalaLibrary match {
           case Some(library) if !library.isScalaSdk =>
@@ -87,8 +96,8 @@ object ModuleExtDataService {
       sdk.flatMap(SdkUtils.findProjectSdk).foreach(model.setSdk)
     }
 
-    private def configureLanguageLevel(
-        module: Module, javacOptions: Seq[String]): Unit = {
+    private def configureLanguageLevel(module: Module,
+                                       javacOptions: Seq[String]): Unit = {
       val model = getModifiableRootModel(module)
       val moduleSdk = Option(model.getSdk)
       val languageLevel = SdkUtils
@@ -101,8 +110,8 @@ object ModuleExtDataService {
       }
     }
 
-    private def configureJavacOptions(
-        module: Module, javacOptions: Seq[String]): Unit = {
+    private def configureJavacOptions(module: Module,
+                                      javacOptions: Seq[String]): Unit = {
       for {
         targetPos <- Option(javacOptions.indexOf("-target")).filterNot(_ == -1)
         targetValue <- javacOptions.lift(targetPos + 1)

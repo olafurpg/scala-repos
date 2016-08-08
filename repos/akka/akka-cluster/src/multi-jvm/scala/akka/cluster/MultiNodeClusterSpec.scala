@@ -37,7 +37,8 @@ object MultiNodeClusterSpec {
     else clusterConfig
 
   def clusterConfig: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.cluster {
       jmx.enabled                         = off
@@ -82,8 +83,9 @@ object MultiNodeClusterSpec {
 }
 
 trait MultiNodeClusterSpec
-    extends Suite with STMultiNodeSpec with WatchedByCoroner {
-  self: MultiNodeSpec ⇒
+    extends Suite
+    with STMultiNodeSpec
+    with WatchedByCoroner { self: MultiNodeSpec ⇒
 
   override def initialParticipants = roles.size
 
@@ -248,8 +250,8 @@ trait MultiNodeClusterSpec
     * Assert that the member addresses match the expected addresses in the
     * sort order used by the cluster.
     */
-  def assertMembers(
-      gotMembers: Iterable[Member], expectedAddresses: Address*): Unit = {
+  def assertMembers(gotMembers: Iterable[Member],
+                    expectedAddresses: Address*): Unit = {
     import Member.addressOrdering
     val members = gotMembers.toIndexedSeq
     members.size should ===(expectedAddresses.length)
@@ -287,10 +289,10 @@ trait MultiNodeClusterSpec
       val leader = clusterView.leader
       val isLeader = leader == Some(clusterView.selfAddress)
       assert(isLeader == isNode(expectedLeader),
-             "expectedLeader [%s], got leader [%s], members [%s]".format(
-                 expectedLeader, leader, clusterView.members))
+             "expectedLeader [%s], got leader [%s], members [%s]"
+               .format(expectedLeader, leader, clusterView.members))
       clusterView.status should
-      (be(MemberStatus.Up) or be(MemberStatus.Leaving))
+        (be(MemberStatus.Up) or be(MemberStatus.Leaving))
     }
 
   /**
@@ -302,8 +304,9 @@ trait MultiNodeClusterSpec
                      timeout: FiniteDuration = 25.seconds): Unit = {
     within(timeout) {
       if (!canNotBePartOfMemberRing.isEmpty) // don't run this on an empty set
-        awaitAssert(canNotBePartOfMemberRing foreach
-            (a ⇒ clusterView.members.map(_.address) should not contain (a)))
+        awaitAssert(
+            canNotBePartOfMemberRing foreach
+              (a ⇒ clusterView.members.map(_.address) should not contain (a)))
       awaitAssert(clusterView.members.size should ===(numberOfMembers))
       awaitAssert(
           clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))

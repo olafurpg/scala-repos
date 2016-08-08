@@ -63,8 +63,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     if (isClusterMode) DRIVER_MEMORY_OVERHEAD else AM_MEMORY_OVERHEAD
   val amMemoryOverhead = sparkConf
     .get(amMemoryOverheadEntry)
-    .getOrElse(math.max(
-            (MEMORY_OVERHEAD_FACTOR * amMemory).toLong, MEMORY_OVERHEAD_MIN))
+    .getOrElse(math.max((MEMORY_OVERHEAD_FACTOR * amMemory).toLong,
+                        MEMORY_OVERHEAD_MIN))
     .toInt
 
   val executorMemoryOverhead = sparkConf
@@ -89,8 +89,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
       .orNull
     // If dynamic allocation is enabled, start at the configured initial number of executors.
     // Default to minExecutors if no initialExecutors is set.
-    numExecutors = YarnSparkHadoopUtil.getInitialTargetExecutorNumber(
-        sparkConf, numExecutors)
+    numExecutors = YarnSparkHadoopUtil
+      .getInitialTargetExecutorNumber(sparkConf, numExecutors)
     principal = Option(principal).orElse(sparkConf.get(PRINCIPAL)).orNull
     keytab = Option(keytab).orElse(sparkConf.get(KEYTAB)).orNull
   }
@@ -243,7 +243,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     if (primaryPyFile != null && primaryRFile != null) {
       throw new IllegalArgumentException(
           "Cannot have primary-py-file and primary-r-file" +
-          " at the same time")
+            " at the same time")
     }
   }
 

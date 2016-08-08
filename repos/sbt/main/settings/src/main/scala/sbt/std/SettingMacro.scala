@@ -4,7 +4,13 @@ package std
 import Def.{Initialize, Setting}
 import sbt.internal.util.Types.{idFun, Id}
 import sbt.internal.util.AList
-import sbt.internal.util.appmacro.{Convert, Converted, Instance, MixedBuilder, MonadInstance}
+import sbt.internal.util.appmacro.{
+  Convert,
+  Converted,
+  Instance,
+  MixedBuilder,
+  MonadInstance
+}
 
 object InitializeInstance extends MonadInstance {
   type M[x] = Initialize[x]
@@ -21,8 +27,8 @@ import scala.reflect._
 import reflect.macros._
 
 object InitializeConvert extends Convert {
-  def apply[T : c.WeakTypeTag](c: Context)(
-      nme: String, in: c.Tree): Converted[c.type] =
+  def apply[T: c.WeakTypeTag](c: Context)(nme: String,
+                                          in: c.Tree): Converted[c.type] =
     if (nme == InputWrapper.WrapInitName) {
       val i = c.Expr[Initialize[T]](in)
       val t = c.universe.reify(i.splice).tree
@@ -31,21 +37,25 @@ object InitializeConvert extends Convert {
                nme == InputWrapper.WrapInitTaskName)
       Converted.Failure(in.pos, "A setting cannot depend on a task")
     else if (nme == InputWrapper.WrapPreviousName)
-      Converted.Failure(
-          in.pos, "A setting cannot depend on a task's previous value.")
+      Converted
+        .Failure(in.pos, "A setting cannot depend on a task's previous value.")
     else Converted.NotApplicable
 }
 
 object SettingMacro {
-  def settingMacroImpl[T : c.WeakTypeTag](
-      c: Context)(t: c.Expr[T]): c.Expr[Initialize[T]] =
+  def settingMacroImpl[T: c.WeakTypeTag](c: Context)(
+      t: c.Expr[T]): c.Expr[Initialize[T]] =
     Instance.contImpl[T, Id](
-        c, InitializeInstance, InitializeConvert, MixedBuilder)(
-        Left(t), Instance.idTransform[c.type])
+        c,
+        InitializeInstance,
+        InitializeConvert,
+        MixedBuilder)(Left(t), Instance.idTransform[c.type])
 
-  def settingDynMacroImpl[T : c.WeakTypeTag](
-      c: Context)(t: c.Expr[Initialize[T]]): c.Expr[Initialize[T]] =
+  def settingDynMacroImpl[T: c.WeakTypeTag](c: Context)(
+      t: c.Expr[Initialize[T]]): c.Expr[Initialize[T]] =
     Instance.contImpl[T, Id](
-        c, InitializeInstance, InitializeConvert, MixedBuilder)(
-        Right(t), Instance.idTransform[c.type])
+        c,
+        InitializeInstance,
+        InitializeConvert,
+        MixedBuilder)(Right(t), Instance.idTransform[c.type])
 }

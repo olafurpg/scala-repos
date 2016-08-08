@@ -32,7 +32,11 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.collections.ObservableSet
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 
 /**
   * Companion Object for [[scalafx.print.Printer]].
@@ -54,8 +58,8 @@ object Printer {
     * Companion Object for [[scalafx.print.Printer.MarginType]].
     */
   object MarginType
-      extends SFXEnumDelegateCompanion[
-          jfxp.Printer.MarginType, Printer.MarginType] {
+      extends SFXEnumDelegateCompanion[jfxp.Printer.MarginType,
+                                       Printer.MarginType] {
 
     /**
       * This requests a default 0.75 inch margin on all sides.
@@ -156,8 +160,8 @@ final class Printer(override val delegate: jfxp.Printer)
                        rMargin: Double,
                        tMargin: Double,
                        bMargin: Double): PageLayout =
-    delegate.createPageLayout(
-        paper, orient, lMargin, rMargin, tMargin, bMargin)
+    delegate
+      .createPageLayout(paper, orient, lMargin, rMargin, tMargin, bMargin)
 
   /**
     * Obtain a new PageLayout instance for this printer using the specified parameters.

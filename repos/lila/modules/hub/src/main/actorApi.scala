@@ -9,14 +9,14 @@ import play.twirl.api.Html
 case class SendTo(userId: String, message: JsObject)
 
 object SendTo {
-  def apply[A : Writes](userId: String, typ: String, data: A): SendTo =
+  def apply[A: Writes](userId: String, typ: String, data: A): SendTo =
     SendTo(userId, Json.obj("t" -> typ, "d" -> data))
 }
 
 case class SendTos(userIds: Set[String], message: JsObject)
 
 object SendTos {
-  def apply[A : Writes](userIds: Set[String], typ: String, data: A): SendTos =
+  def apply[A: Writes](userIds: Set[String], typ: String, data: A): SendTos =
     SendTos(userIds, Json.obj("t" -> typ, "d" -> data))
 }
 
@@ -52,8 +52,9 @@ package report {
 package shutup {
   case class RecordPublicForumMessage(userId: String, text: String)
   case class RecordTeamForumMessage(userId: String, text: String)
-  case class RecordPrivateMessage(
-      userId: String, toUserId: String, text: String)
+  case class RecordPrivateMessage(userId: String,
+                                  toUserId: String,
+                                  text: String)
   case class RecordPrivateChat(chatId: String, userId: String, text: String)
   case class RecordPublicChat(chatId: String, userId: String, text: String)
 }
@@ -109,8 +110,10 @@ package timeline {
       extends Atom(s"qa", true)
   case class QaAnswer(userId: String, id: Int, title: String, answerId: Int)
       extends Atom(s"qa", true)
-  case class QaComment(
-      userId: String, id: Int, title: String, commentId: String)
+  case class QaComment(userId: String,
+                       id: Int,
+                       title: String,
+                       commentId: String)
       extends Atom(s"qa", true)
   case class GameEnd(playerId: String,
                      opponent: Option[String],
@@ -169,8 +172,10 @@ package tv {
 }
 
 package message {
-  case class LichessThread(
-      from: String, to: String, subject: String, message: String)
+  case class LichessThread(from: String,
+                           to: String,
+                           subject: String,
+                           message: String)
 }
 
 package router {

@@ -16,8 +16,7 @@ private[akka] object SerializedSuspendableExecutionContext {
 
   def apply(throughput: Int)(implicit context: ExecutionContext)
     : SerializedSuspendableExecutionContext =
-    new SerializedSuspendableExecutionContext(throughput)(
-        context match {
+    new SerializedSuspendableExecutionContext(throughput)(context match {
       case s: SerializedSuspendableExecutionContext ⇒ s.context
       case other ⇒ other
     })
@@ -34,7 +33,9 @@ private[akka] object SerializedSuspendableExecutionContext {
   */
 private[akka] final class SerializedSuspendableExecutionContext(
     throughput: Int)(val context: ExecutionContext)
-    extends AbstractNodeQueue[Runnable] with Runnable with ExecutionContext {
+    extends AbstractNodeQueue[Runnable]
+    with Runnable
+    with ExecutionContext {
   import SerializedSuspendableExecutionContext._
   require(
       throughput > 0,
@@ -69,17 +70,20 @@ private[akka] final class SerializedSuspendableExecutionContext(
         poll() match {
           case null ⇒ ()
           case some ⇒
-            try some.run() catch { case NonFatal(t) ⇒ context reportFailure t }
+            try some.run()
+            catch { case NonFatal(t) ⇒ context reportFailure t }
             run(done + 1)
         }
       }
-    try run(0) finally remState(On)
+    try run(0)
+    finally remState(On)
   }
 
   final def attach(): Unit =
     if (!isEmpty() && state.compareAndSet(Off, On)) context execute this
   override final def execute(task: Runnable): Unit =
-    try add(task) finally attach()
+    try add(task)
+    finally attach()
   override final def reportFailure(t: Throwable): Unit =
     context reportFailure t
 

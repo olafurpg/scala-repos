@@ -16,8 +16,9 @@ package io.prediction.tools.console
 
 import io.prediction.tools.Runner
 
-case class ImportArgs(
-    appId: Int = 0, channel: Option[String] = None, inputPath: String = "")
+case class ImportArgs(appId: Int = 0,
+                      channel: Option[String] = None,
+                      inputPath: String = "")
 
 object Import {
   def fileToEvents(ca: ConsoleArgs): Int = {

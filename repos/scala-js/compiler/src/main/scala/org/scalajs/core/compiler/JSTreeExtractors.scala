@@ -18,8 +18,7 @@ object JSTreeExtractors {
 
     object BlockOrAlone {
       def unapply(tree: Tree): Some[(List[Tree], Tree)] =
-        Some(
-            tree match {
+        Some(tree match {
           case Block(trees) => (trees.init, trees.last)
           case _ => (Nil, tree)
         })
@@ -79,11 +78,11 @@ object JSTreeExtractors {
         // case x -> y
         case Apply(LoadModule(ClassType("s_Predef$ArrowAssoc$")),
                    Ident("$$minus$greater$extension__O__O__T2", _),
-                   List(
-                   Apply(LoadModule(ClassType("s_Predef$")),
-                         Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
-                         List(_1)),
-                   _2)) =>
+                   List(Apply(
+                        LoadModule(ClassType("s_Predef$")),
+                        Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
+                        List(_1)),
+                        _2)) =>
           Some((_1, _2))
         case _ =>
           None

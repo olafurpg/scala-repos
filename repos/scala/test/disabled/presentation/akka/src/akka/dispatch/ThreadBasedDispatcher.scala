@@ -8,7 +8,12 @@ import akka.config.Config.config
 import akka.util.Duration
 
 import java.util.Queue
-import java.util.concurrent.{ConcurrentLinkedQueue, BlockingQueue, TimeUnit, LinkedBlockingQueue}
+import java.util.concurrent.{
+  ConcurrentLinkedQueue,
+  BlockingQueue,
+  TimeUnit,
+  LinkedBlockingQueue
+}
 import akka.actor
 import java.util.concurrent.atomic.AtomicReference
 
@@ -53,6 +58,8 @@ class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
 }
 
 object ThreadBasedDispatcher {
-  val oneThread: ThreadPoolConfig = ThreadPoolConfig(
-      allowCorePoolTimeout = true, corePoolSize = 1, maxPoolSize = 1)
+  val oneThread: ThreadPoolConfig = ThreadPoolConfig(allowCorePoolTimeout =
+                                                       true,
+                                                     corePoolSize = 1,
+                                                     maxPoolSize = 1)
 }

@@ -7,7 +7,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class TaskFailureRepositoryTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   import TaskFailureTestHelper.taskFailure
   import mesosphere.FutureTestSupport._
 
@@ -75,7 +77,7 @@ class TaskFailureRepositoryTest
     )
     lazy val metricRegistry = new MetricRegistry
     lazy val metrics = new Metrics(metricRegistry)
-    lazy val taskFailureRepo = new TaskFailureRepository(
-        entityStore, maxVersions = Some(1), metrics)
+    lazy val taskFailureRepo =
+      new TaskFailureRepository(entityStore, maxVersions = Some(1), metrics)
   }
 }

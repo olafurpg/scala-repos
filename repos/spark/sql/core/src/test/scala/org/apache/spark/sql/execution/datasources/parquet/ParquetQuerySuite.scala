@@ -24,7 +24,10 @@ import org.apache.hadoop.fs.Path
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.{InternalRow, TableIdentifier}
 import org.apache.spark.sql.catalyst.expressions.SpecificMutableRow
-import org.apache.spark.sql.execution.datasources.parquet.TestingUDT.{NestedStruct, NestedStructUDT}
+import org.apache.spark.sql.execution.datasources.parquet.TestingUDT.{
+  NestedStruct,
+  NestedStructUDT
+}
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
@@ -34,7 +37,9 @@ import org.apache.spark.util.Utils
   * A test suite that tests various Parquet queries.
   */
 class ParquetQuerySuite
-    extends QueryTest with ParquetTest with SharedSQLContext {
+    extends QueryTest
+    with ParquetTest
+    with SharedSQLContext {
   import testImplicits._
 
   test("simple select queries") {
@@ -160,7 +165,10 @@ class ParquetQuerySuite
         Utils.deleteRecursively(new File(basePath + "/foo=1/_metadata"))
         Utils.deleteRecursively(new File(basePath + "/foo=1/_common_metadata"))
         assert(
-            sqlContext.read.parquet(basePath).columns.length === expectedColumnNumber)
+            sqlContext.read
+              .parquet(basePath)
+              .columns
+              .length === expectedColumnNumber)
       }
     }
 
@@ -190,7 +198,10 @@ class ParquetQuerySuite
           .write
           .parquet(new Path(basePath, "foo=2").toString)
         assert(
-            sqlContext.read.parquet(basePath).columns.length === expectedColumnNumber)
+            sqlContext.read
+              .parquet(basePath)
+              .columns
+              .length === expectedColumnNumber)
       }
     }
 
@@ -576,11 +587,12 @@ class ParquetQuerySuite
         ArrayType(elementType = new NestedStructUDT, containsNull = false),
         nullable = true)
 
-    val expected = new StructType().add(
-        "n",
-        ArrayType(elementType = new NestedStructUDT().sqlType,
-                  containsNull = false),
-        nullable = true)
+    val expected =
+      new StructType().add("n",
+                           ArrayType(elementType =
+                                       new NestedStructUDT().sqlType,
+                                     containsNull = false),
+                           nullable = true)
 
     assert(CatalystReadSupport.expandUDT(schema) === expected)
   }

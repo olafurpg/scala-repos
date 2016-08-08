@@ -98,7 +98,8 @@ object VersionVector {
   */
 @SerialVersionUID(1L)
 sealed abstract class VersionVector
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = VersionVector
@@ -177,8 +178,8 @@ sealed abstract class VersionVector
     *
     * If you send in the ordering FullOrder, you will get a full comparison.
     */
-  private final def compareOnlyTo(
-      that: VersionVector, order: Ordering): Ordering = {
+  private final def compareOnlyTo(that: VersionVector,
+                                  order: Ordering): Ordering = {
     def nextOrElse[A](iter: Iterator[A], default: A): A =
       if (iter.hasNext) iter.next() else default
 
@@ -235,8 +236,9 @@ sealed abstract class VersionVector
           }
         }
 
-      compareNext(
-          nextOrElse(i1, cmpEndMarker), nextOrElse(i2, cmpEndMarker), Same)
+      compareNext(nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  Same)
     }
 
     if (this eq that) Same
@@ -272,14 +274,14 @@ sealed abstract class VersionVector
 
   override def needPruningFrom(removedNode: UniqueAddress): Boolean
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): VersionVector
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector
 }
 
-final case class OneVersionVector private[akka](
-    node: UniqueAddress, version: Long)
+final case class OneVersionVector private[akka] (node: UniqueAddress,
+                                                 version: Long)
     extends VersionVector {
   import VersionVector.Timestamp
 
@@ -325,8 +327,8 @@ final case class OneVersionVector private[akka](
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     node == removedNode
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): VersionVector =
     (if (node == removedNode) VersionVector.empty else this) + collapseInto
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector =
@@ -389,8 +391,8 @@ final case class ManyVersionVector(versions: TreeMap[UniqueAddress, Long])
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     versions.contains(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): VersionVector =
     VersionVector(versions = versions - removedNode) + collapseInto
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector =

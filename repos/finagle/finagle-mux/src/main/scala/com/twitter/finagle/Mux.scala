@@ -31,8 +31,7 @@ object Mux
   private[finagle] abstract class ProtoTracing(
       process: String,
       val role: Stack.Role
-  )
-      extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
+  ) extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
     val description = s"Mux specific $process traces"
 
     private[this] val tracingFilter =
@@ -116,12 +115,12 @@ object Mux
 
   val client = Client()
 
-  def newService(
-      dest: Name, label: String): Service[mux.Request, mux.Response] =
+  def newService(dest: Name,
+                 label: String): Service[mux.Request, mux.Response] =
     client.newService(dest, label)
 
-  def newClient(
-      dest: Name, label: String): ServiceFactory[mux.Request, mux.Response] =
+  def newClient(dest: Name,
+                label: String): ServiceFactory[mux.Request, mux.Response] =
     client.newClient(dest, label)
 
   private[finagle] class ServerProtoTracing

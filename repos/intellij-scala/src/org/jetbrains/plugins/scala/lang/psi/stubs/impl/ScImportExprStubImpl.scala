@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScImportExprStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScImportExpr](parent, elemType)
     with ScImportExprStub {
 
@@ -29,8 +29,8 @@ class ScImportExprStubImpl[ParentPsi <: PsiElement](
       Option[ScStableCodeReferenceElement]] = null
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            refText: String,
            singleWildcard: Boolean) {
     this(
@@ -46,7 +46,7 @@ class ScImportExprStubImpl[ParentPsi <: PsiElement](
       val referenceElement = myReference.get
       if (referenceElement != null &&
           (referenceElement.isEmpty ||
-              (referenceElement.get.getContext eq getPsi))) {
+          (referenceElement.get.getContext eq getPsi))) {
         return referenceElement
       }
     }
@@ -54,11 +54,13 @@ class ScImportExprStubImpl[ParentPsi <: PsiElement](
       if (referenceText == StringRef.fromString("")) None
       else {
         val psi = ScalaPsiElementFactory.createReferenceFromText(
-            StringRef.toString(referenceText), getPsi, null)
+            StringRef.toString(referenceText),
+            getPsi,
+            null)
         Option(psi)
       }
-    myReference = new SofterReference[Option[ScStableCodeReferenceElement]](
-        res)
+    myReference =
+      new SofterReference[Option[ScStableCodeReferenceElement]](res)
     res
   }
 

@@ -32,7 +32,7 @@ object ProjectTests extends TestSuite {
 
     val pythonFiles: Seq[String] = listFiles(new java.io.File(path.toString))
       .filter(path =>
-            path.toString.endsWith(".py") && !ignored.exists(path.endsWith))
+        path.toString.endsWith(".py") && !ignored.exists(path.endsWith))
       .map(_.toString)
       .toSeq
 

@@ -46,11 +46,12 @@ abstract class ExternalCatalog {
   // Databases
   // --------------------------------------------------------------------------
 
-  def createDatabase(
-      dbDefinition: CatalogDatabase, ignoreIfExists: Boolean): Unit
+  def createDatabase(dbDefinition: CatalogDatabase,
+                     ignoreIfExists: Boolean): Unit
 
-  def dropDatabase(
-      db: String, ignoreIfNotExists: Boolean, cascade: Boolean): Unit
+  def dropDatabase(db: String,
+                   ignoreIfNotExists: Boolean,
+                   cascade: Boolean): Unit
 
   /**
     * Alter a database whose name matches the one specified in `dbDefinition`,
@@ -75,8 +76,9 @@ abstract class ExternalCatalog {
   // Tables
   // --------------------------------------------------------------------------
 
-  def createTable(
-      db: String, tableDefinition: CatalogTable, ignoreIfExists: Boolean): Unit
+  def createTable(db: String,
+                  tableDefinition: CatalogTable,
+                  ignoreIfExists: Boolean): Unit
 
   def dropTable(db: String, table: String, ignoreIfNotExists: Boolean): Unit
 
@@ -127,8 +129,9 @@ abstract class ExternalCatalog {
     * Note: If the underlying implementation does not support altering a certain field,
     * this becomes a no-op.
     */
-  def alterPartitions(
-      db: String, table: String, parts: Seq[CatalogTablePartition]): Unit
+  def alterPartitions(db: String,
+                      table: String,
+                      parts: Seq[CatalogTablePartition]): Unit
 
   def getPartition(db: String,
                    table: String,
@@ -194,8 +197,8 @@ case class CatalogColumn(name: String,
   * @param spec partition spec values indexed by column name
   * @param storage storage format of the partition
   */
-case class CatalogTablePartition(
-    spec: ExternalCatalog.TablePartitionSpec, storage: CatalogStorageFormat)
+case class CatalogTablePartition(spec: ExternalCatalog.TablePartitionSpec,
+                                 storage: CatalogStorageFormat)
 
 /**
   * A table defined in the catalog.
@@ -225,15 +228,18 @@ case class CatalogTable(name: TableIdentifier,
   def qualifiedName: String = name.unquotedString
 
   /** Syntactic sugar to update a field in `storage`. */
-  def withNewStorage(
-      locationUri: Option[String] = storage.locationUri,
-      inputFormat: Option[String] = storage.inputFormat,
-      outputFormat: Option[String] = storage.outputFormat,
-      serde: Option[String] = storage.serde,
-      serdeProperties: Map[String, String] = storage.serdeProperties)
-    : CatalogTable = {
-    copy(storage = CatalogStorageFormat(
-              locationUri, inputFormat, outputFormat, serde, serdeProperties))
+  def withNewStorage(locationUri: Option[String] = storage.locationUri,
+                     inputFormat: Option[String] = storage.inputFormat,
+                     outputFormat: Option[String] = storage.outputFormat,
+                     serde: Option[String] = storage.serde,
+                     serdeProperties: Map[String, String] =
+                       storage.serdeProperties): CatalogTable = {
+    copy(
+        storage = CatalogStorageFormat(locationUri,
+                                       inputFormat,
+                                       outputFormat,
+                                       serde,
+                                       serdeProperties))
   }
 }
 
@@ -264,8 +270,9 @@ object ExternalCatalog {
 /**
   * A [[LogicalPlan]] that wraps [[CatalogTable]].
   */
-case class CatalogRelation(
-    db: String, metadata: CatalogTable, alias: Option[String] = None)
+case class CatalogRelation(db: String,
+                           metadata: CatalogTable,
+                           alias: Option[String] = None)
     extends LeafNode {
 
   // TODO: implement this

@@ -257,8 +257,9 @@ object Stack {
     * Nodes materialize by transforming the underlying stack in
     * some way.
     */
-  case class Node[T](
-      head: Stack.Head, mk: (Params, Stack[T]) => Stack[T], next: Stack[T])
+  case class Node[T](head: Stack.Head,
+                     mk: (Params, Stack[T]) => Stack[T],
+                     next: Stack[T])
       extends Stack[T] {
     def make(params: Params) = mk(params, next).make(params)
   }
@@ -333,13 +334,13 @@ object Stack {
     /**
       * Get the current value of the P-typed parameter.
       */
-    def apply[P : Param]: P
+    def apply[P: Param]: P
 
     /**
       * Returns true if there is a non-default value for
       * the P-typed parameter.
       */
-    def contains[P : Param]: Boolean
+    def contains[P: Param]: Boolean
 
     /**
       * Iterator of all `Param`s and their associated values.
@@ -350,7 +351,7 @@ object Stack {
       * Produce a new parameter map, overriding any previous
       * `P`-typed value.
       */
-    def +[P : Param](p: P): Params
+    def +[P: Param](p: P): Params
 
     /**
       * Alias for [[addAll(Params)]].
@@ -398,7 +399,7 @@ object Stack {
   trait Parameterized[+T] {
     def params: Stack.Params
 
-    def configured[P : Stack.Param](p: P): T =
+    def configured[P: Stack.Param](p: P): T =
       withParams(params + p)
 
     def configured[P](psp: (P, Stack.Param[P])): T = {
@@ -469,7 +470,7 @@ object Stack {
   }
 
   /** A module of 1 parameter. */
-  abstract class Module1[P1 : Param, T] extends Stackable[T] {
+  abstract class Module1[P1: Param, T] extends Stackable[T] {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]])
     def make(p1: P1, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
@@ -479,23 +480,22 @@ object Stack {
   }
 
   /** A module of 2 parameters. */
-  abstract class Module2[P1 : Param, P2 : Param, T] extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(
-        implicitly[Param[P1]], implicitly[Param[P2]])
+  abstract class Module2[P1: Param, P2: Param, T] extends Stackable[T] {
+    final val parameters: Seq[Stack.Param[_]] =
+      Seq(implicitly[Param[P1]], implicitly[Param[P2]])
     def make(p1: P1, p2: P2, next: T): T
     def toStack(next: Stack[T]) =
       Node(this,
            (prms,
-           next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
+            next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
            next)
   }
 
   /** A module of 3 parameters. */
-  abstract class Module3[P1 : Param, P2 : Param, P3 : Param, T]
+  abstract class Module3[P1: Param, P2: Param, P3: Param, T]
       extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
-                                                    implicitly[Param[P2]],
-                                                    implicitly[Param[P3]])
+    final val parameters: Seq[Stack.Param[_]] =
+      Seq(implicitly[Param[P1]], implicitly[Param[P2]], implicitly[Param[P3]])
     def make(p1: P1, p2: P2, p3: P3, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
       Node(this,
@@ -505,7 +505,7 @@ object Stack {
   }
 
   /** A module of 4 parameters. */
-  abstract class Module4[P1 : Param, P2 : Param, P3 : Param, P4 : Param, T]
+  abstract class Module4[P1: Param, P2: Param, P3: Param, P4: Param, T]
       extends Stackable[T] {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
                                                     implicitly[Param[P2]],
@@ -524,7 +524,7 @@ object Stack {
 
   /** A module of 5 parameters. */
   abstract class Module5[
-      P1 : Param, P2 : Param, P3 : Param, P4 : Param, P5 : Param, T]
+      P1: Param, P2: Param, P3: Param, P4: Param, P5: Param, T]
       extends Stackable[T] {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
                                                     implicitly[Param[P2]],
@@ -546,13 +546,8 @@ object Stack {
   }
 
   /** A module of 6 parameters. */
-  abstract class Module6[P1 : Param,
-                         P2 : Param,
-                         P3 : Param,
-                         P4 : Param,
-                         P5 : Param,
-                         P6 : Param,
-                         T]
+  abstract class Module6[
+      P1: Param, P2: Param, P3: Param, P4: Param, P5: Param, P6: Param, T]
       extends Stackable[T] {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
                                                     implicitly[Param[P2]],

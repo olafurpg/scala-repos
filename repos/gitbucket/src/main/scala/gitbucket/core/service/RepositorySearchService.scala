@@ -59,8 +59,8 @@ trait RepositorySearchService { self: IssuesService =>
       }
     }
 
-  private def searchRepositoryFiles(
-      git: Git, query: String): List[(String, String)] = {
+  private def searchRepositoryFiles(git: Git,
+                                    query: String): List[(String, String)] = {
     val revWalk = new RevWalk(git.getRepository)
     val objectId = git.getRepository.resolve("HEAD")
     val revCommit = revWalk.parseCommit(objectId)
@@ -113,14 +113,14 @@ object RepositorySearchService {
         .replaceAll(
             "(?i)(" + keywords.map("\\Q" + _ + "\\E").mkString("|") + ")",
             "<span class=\"highlight\">$1</span>")
-        (highlightText, lineNumber + 1)
+      (highlightText, lineNumber + 1)
     } else {
       (content.split("\n").take(5).mkString("\n"), 1)
     }
   }
 
-  case class SearchResult(
-      files: List[(String, String)], issues: List[(Issue, Int, String)])
+  case class SearchResult(files: List[(String, String)],
+                          issues: List[(Issue, Int, String)])
 
   case class IssueSearchResult(issueId: Int,
                                isPullRequest: Boolean,

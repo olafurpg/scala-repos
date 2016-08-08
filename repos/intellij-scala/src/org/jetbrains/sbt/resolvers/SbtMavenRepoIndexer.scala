@@ -6,9 +6,17 @@ import java.io.{IOException, Closeable, File, FileNotFoundException}
 import com.intellij.openapi.progress.ProgressIndicator
 import org.apache.maven.index._
 import org.apache.maven.index.artifact.DefaultArtifactPackagingMapper
-import org.apache.maven.index.context.{IndexCreator, IndexUtils, IndexingContext}
+import org.apache.maven.index.context.{
+  IndexCreator,
+  IndexUtils,
+  IndexingContext
+}
 import org.apache.maven.index.incremental.DefaultIncrementalHandler
-import org.apache.maven.index.updater.{DefaultIndexUpdater, IndexUpdateRequest, WagonHelper}
+import org.apache.maven.index.updater.{
+  DefaultIndexUpdater,
+  IndexUpdateRequest,
+  WagonHelper
+}
 import org.apache.maven.wagon.events.TransferEvent
 import org.apache.maven.wagon.observers.AbstractTransferListener
 import org.apache.maven.wagon.{ResourceDoesNotExistException, Wagon}
@@ -35,10 +43,11 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
 
   private val indexerEngine = new DefaultIndexerEngine
   private val queryCreator = new DefaultQueryCreator
-  private val indexer = new DefaultIndexer(
-      new DefaultSearchEngine, indexerEngine, queryCreator)
+  private val indexer =
+    new DefaultIndexer(new DefaultSearchEngine, indexerEngine, queryCreator)
   private val updater = new DefaultIndexUpdater(
-      new DefaultIncrementalHandler, java.util.Collections.emptyList())
+      new DefaultIncrementalHandler,
+      java.util.Collections.emptyList())
   private val httpWagon = container.lookup(classOf[Wagon], "http")
 
   private val indexers = Seq(
@@ -104,7 +113,8 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
     // TODO: when guys from maven-indexer fix their code (or at least Scanner class will work as it should)
     val nexusIndexer = new DefaultNexusIndexer(
         indexer,
-        new DefaultScanner(new DefaultArtifactContextProducer(
+        new DefaultScanner(
+            new DefaultArtifactContextProducer(
                 new DefaultArtifactPackagingMapper)),
         indexerEngine,
         queryCreator
@@ -135,8 +145,9 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
   private def updateRemote(progressIndicator: Option[ProgressIndicator]) {
     val transferListener = new AbstractTransferListener {
       var downloadedBytes = 0
-      override def transferProgress(
-          evt: TransferEvent, bytes: Array[Byte], length: Int) =
+      override def transferProgress(evt: TransferEvent,
+                                    bytes: Array[Byte],
+                                    length: Int) =
         progressIndicator foreach { indicator =>
           downloadedBytes += length
           val done =
@@ -159,7 +170,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
   def foreach(f: (ArtifactInfo => Unit),
               progressIndicator: Option[ProgressIndicator]) {
     progressIndicator foreach
-    (_.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
+      (_.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
     val searcher = context.acquireIndexSearcher()
     try {
       val reader = searcher.getIndexReader
@@ -170,7 +181,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
           IndexUtils.constructArtifactInfo(reader.document(i - 1), context)
         if (info != null) f(info)
         progressIndicator foreach
-        (_.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
+          (_.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
       }
     } finally {
       context.releaseIndexSearcher(searcher)

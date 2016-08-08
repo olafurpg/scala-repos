@@ -8,7 +8,10 @@ import javax.swing.border.MatteBorder
 import javax.swing.event.ChangeEvent
 import javax.swing.table.TableCellEditor
 
-import com.intellij.codeInsight.daemon.impl.analysis.{FileHighlightingSetting, HighlightLevelUtil}
+import com.intellij.codeInsight.daemon.impl.analysis.{
+  FileHighlightingSetting,
+  HighlightLevelUtil
+}
 import com.intellij.openapi.actionSystem.{AnActionEvent, CustomShortcutSet}
 import com.intellij.openapi.editor.event.{DocumentAdapter, DocumentEvent}
 import com.intellij.openapi.fileTypes.LanguageFileType
@@ -16,15 +19,27 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.{util => _, _}
-import com.intellij.refactoring.changeSignature.{CallerChooserBase, ChangeSignatureDialogBase, ParameterTableModelItemBase}
-import com.intellij.refactoring.ui.{CodeFragmentTableCellEditorBase, StringTableCellEditor, VisibilityPanelBase}
+import com.intellij.refactoring.changeSignature.{
+  CallerChooserBase,
+  ChangeSignatureDialogBase,
+  ParameterTableModelItemBase
+}
+import com.intellij.refactoring.ui.{
+  CodeFragmentTableCellEditorBase,
+  StringTableCellEditor,
+  VisibilityPanelBase
+}
 import com.intellij.refactoring.{BaseRefactoringProcessor, RefactoringBundle}
 import com.intellij.ui.table.{JBTable, TableView}
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{util => _, _}
 import com.intellij.util.Consumer
 import com.intellij.util.ui.UIUtil
-import com.intellij.util.ui.table.{JBListTable, JBTableRowEditor, JBTableRowRenderer}
+import com.intellij.util.ui.table.{
+  JBListTable,
+  JBTableRowEditor,
+  JBTableRowRenderer
+}
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaCodeFragment
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
@@ -43,8 +58,8 @@ import scala.collection.mutable.ListBuffer
   * Nikolay.Tropin
   * 2014-08-29
   */
-class ScalaChangeSignatureDialog(
-    val project: Project, val method: ScalaMethodDescriptor)
+class ScalaChangeSignatureDialog(val project: Project,
+                                 val method: ScalaMethodDescriptor)
     extends {
   private var defaultValuesUsagePanel: DefaultValuesUsagePanel = null
 } with ChangeSignatureDialogBase[ScalaParameterInfo,
@@ -52,8 +67,10 @@ class ScalaChangeSignatureDialog(
                                  String,
                                  ScalaMethodDescriptor,
                                  ScalaParameterTableModelItem,
-                                 ScalaParameterTableModel](
-    project, method, false, method.fun) {
+                                 ScalaParameterTableModel](project,
+                                                           method,
+                                                           false,
+                                                           method.fun) {
   override def getFileType: LanguageFileType = ScalaFileType.SCALA_FILE_TYPE
 
   override def createCallerChooser(title: String,
@@ -133,15 +150,16 @@ class ScalaChangeSignatureDialog(
         }
       }
 
-      override def prepareEditor(
-          editor: TableCellEditor, row: Int, column: Int): Component = {
+      override def prepareEditor(editor: TableCellEditor,
+                                 row: Int,
+                                 column: Int): Component = {
         val listener: DocumentAdapter = new DocumentAdapter() {
           override def documentChanged(e: DocumentEvent) {
             val ed: TableCellEditor = parametersTable.getCellEditor
             if (ed != null) {
               val editorValue: AnyRef = ed.getCellEditorValue
-              myParametersTableModel.setValueAtWithoutUpdate(
-                  editorValue, row, column)
+              myParametersTableModel
+                .setValueAtWithoutUpdate(editorValue, row, column)
               updateSignature()
             }
           }
@@ -169,7 +187,8 @@ class ScalaChangeSignatureDialog(
     val text = method.returnTypeText
     val fragment = new ScalaCodeFragment(project, text)
     HighlightLevelUtil.forceRootHighlighting(
-        fragment, FileHighlightingSetting.SKIP_HIGHLIGHTING)
+        fragment,
+        FileHighlightingSetting.SKIP_HIGHLIGHTING)
     fragment.setContext(method.fun.getParent, method.fun)
     fragment
   }
@@ -178,7 +197,8 @@ class ScalaChangeSignatureDialog(
     new ScalaParametersListTable()
 
   protected override def getTableEditor(
-      t: JTable, item: ParameterTableModelItemBase[ScalaParameterInfo])
+      t: JTable,
+      item: ParameterTableModelItemBase[ScalaParameterInfo])
     : JBTableRowEditor = {
     val scalaItem = item match {
       case si: ScalaParameterTableModelItem => si
@@ -192,8 +212,10 @@ class ScalaChangeSignatureDialog(
     def nameAndType(item: ScalaParameterTableModelItem) = {
       if (item.parameter.name == "") ""
       else
-        ScalaExtractMethodUtils.typedName(
-            item.parameter.name, item.typeText, project, byName = false)
+        ScalaExtractMethodUtils.typedName(item.parameter.name,
+                                          item.typeText,
+                                          project,
+                                          byName = false)
     }
 
     def itemText(item: ScalaParameterTableModelItem) =
@@ -250,7 +272,7 @@ class ScalaChangeSignatureDialog(
     paramItems.foreach {
       case item
           if item.parameter.isRepeatedParameter &&
-          !splittedItems.flatMap(_.lastOption).contains(item) =>
+            !splittedItems.flatMap(_.lastOption).contains(item) =>
         problems += ScalaBundle.message(
             "change.signature.vararg.should.be.last.in.clause")
       case _ =>
@@ -264,7 +286,7 @@ class ScalaChangeSignatureDialog(
     if (!getTableComponent.isEditing) {
       for {
         item <- parameterItems if item.parameter.oldIndex < 0 &&
-               StringUtil.isEmpty(item.defaultValueCodeFragment.getText)
+          StringUtil.isEmpty(item.defaultValueCodeFragment.getText)
       } {
         val stuff =
           if (isAddDefaultArgs) "Default arguments" else "Method calls"
@@ -326,8 +348,8 @@ class ScalaChangeSignatureDialog(
     if (myReturnTypeCodeFragment == null) StdType.ANY
     else {
       val fragment = myReturnTypeCodeFragment
-      ScalaPsiElementFactory.createTypeFromText(
-          fragment.getText, fragment.getContext, fragment)
+      ScalaPsiElementFactory
+        .createTypeFromText(fragment.getText, fragment.getContext, fragment)
     }
   }
 
@@ -351,23 +373,22 @@ class ScalaChangeSignatureDialog(
   }
 
   protected def createAddClauseButton() = {
-    val addClauseButton = new AnActionButton(
-        "Add parameter clause", null, Icons.ADD_CLAUSE) {
-      override def actionPerformed(e: AnActionEvent): Unit = {
-        val table = parametersTable
-        val editedColumn = editingColumn(table)
-        TableUtil.stopEditing(table)
-        val selected = table.getSelectedRow
-        if (selected > 0) {
-          val item = myParametersTableModel.getItem(selected)
-          item.startsNewClause = true
-          myParametersTableModel.fireTableDataChanged()
+    val addClauseButton =
+      new AnActionButton("Add parameter clause", null, Icons.ADD_CLAUSE) {
+        override def actionPerformed(e: AnActionEvent): Unit = {
+          val table = parametersTable
+          val editedColumn = editingColumn(table)
+          TableUtil.stopEditing(table)
+          val selected = table.getSelectedRow
+          if (selected > 0) {
+            val item = myParametersTableModel.getItem(selected)
+            item.startsNewClause = true
+            myParametersTableModel.fireTableDataChanged()
+          }
+          finishAndRestoreEditing(editedColumn)
         }
-        finishAndRestoreEditing(editedColumn)
       }
-    }
-    addClauseButton.addCustomUpdater(
-        new AnActionButtonUpdater {
+    addClauseButton.addCustomUpdater(new AnActionButtonUpdater {
       override def isEnabled(e: AnActionEvent): Boolean = {
         val selected = parametersTable.getSelectedRow
         selected > 0 &&
@@ -379,8 +400,9 @@ class ScalaChangeSignatureDialog(
   }
 
   protected def createRemoveClauseButton() = {
-    val removeClauseButton = new AnActionButton(
-        "Remove parameter clause", null, Icons.REMOVE_CLAUSE) {
+    val removeClauseButton = new AnActionButton("Remove parameter clause",
+                                                null,
+                                                Icons.REMOVE_CLAUSE) {
       override def actionPerformed(e: AnActionEvent): Unit = {
         val table = parametersTable
         val editedColumn = editingColumn(table)
@@ -394,8 +416,7 @@ class ScalaChangeSignatureDialog(
         finishAndRestoreEditing(editedColumn)
       }
     }
-    removeClauseButton.addCustomUpdater(
-        new AnActionButtonUpdater {
+    removeClauseButton.addCustomUpdater(new AnActionButtonUpdater {
       override def isEnabled(e: AnActionEvent): Boolean = {
         val selected = parametersTable.getSelectedRow
         selected > 0 &&
@@ -516,8 +537,11 @@ class ScalaChangeSignatureDialog(
                   byName /*already in type text*/ = false)
           val defText = defaultText(item)
           val text = s"$nameAndType $defText"
-          val comp = JBListTable.createEditorTextFieldPresentation(
-              project, getFileType, " " + text, selected, focused)
+          val comp = JBListTable.createEditorTextFieldPresentation(project,
+                                                                   getFileType,
+                                                                   " " + text,
+                                                                   selected,
+                                                                   focused)
 
           if (item.parameter.isIntroducedParameter) {
             val fields = UIUtil

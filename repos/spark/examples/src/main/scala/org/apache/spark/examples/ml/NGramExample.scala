@@ -33,11 +33,10 @@ object NGramExample {
     // $example on$
     val wordDataFrame = sqlContext
       .createDataFrame(Seq(
-              (0, Array("Hi", "I", "heard", "about", "Spark")),
-              (1,
-               Array("I", "wish", "Java", "could", "use", "case", "classes")),
-              (2, Array("Logistic", "regression", "models", "are", "neat"))
-          ))
+          (0, Array("Hi", "I", "heard", "about", "Spark")),
+          (1, Array("I", "wish", "Java", "could", "use", "case", "classes")),
+          (2, Array("Logistic", "regression", "models", "are", "neat"))
+      ))
       .toDF("label", "words")
 
     val ngram = new NGram().setInputCol("words").setOutputCol("ngrams")

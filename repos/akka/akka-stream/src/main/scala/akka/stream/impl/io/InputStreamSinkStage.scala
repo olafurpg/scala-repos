@@ -134,13 +134,13 @@ private[akka] class InputStreamAdapter(
     require(begin + length <= a.length,
             "begin + length must be smaller or equal to the array length")
 
-    executeIfNotClosed(
-        () ⇒
-          if (isStageAlive) {
+    executeIfNotClosed(() ⇒
+      if (isStageAlive) {
         detachedChunk match {
           case None ⇒
             try {
-              sharedBuffer.poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
+              sharedBuffer
+                .poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
                 case Data(data) ⇒
                   detachedChunk = Some(data)
                   readBytes(a, begin, length)
@@ -175,12 +175,10 @@ private[akka] class InputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   override def close(): Unit = {
-    executeIfNotClosed(
-        () ⇒
-          {
-        // at this point Subscriber may be already terminated
-        if (isStageAlive) sendToStage(Close)
-        isActive = false
+    executeIfNotClosed(() ⇒ {
+      // at this point Subscriber may be already terminated
+      if (isStageAlive) sendToStage(Close)
+      isActive = false
     })
   }
 

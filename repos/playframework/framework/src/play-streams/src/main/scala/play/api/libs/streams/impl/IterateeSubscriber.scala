@@ -35,8 +35,8 @@ private[streams] object IterateeSubscriber {
     * @param subs The Subscription the Subscriber is subscribed to.
     * @param result A Promise of the eventual result of this Subscriber.
     */
-  case class SubscribedNoStep[T, R](
-      subs: Subscription, result: Promise[Iteratee[T, R]])
+  case class SubscribedNoStep[T, R](subs: Subscription,
+                                    result: Promise[Iteratee[T, R]])
       extends State[T, R]
 
   /**
@@ -46,8 +46,8 @@ private[streams] object IterateeSubscriber {
     * @param cont The current Step of the Iteratee.
     * @param result A Promise of the eventual result of this Subscriber.
     */
-  case class NotSubscribedWithCont[T, R](
-      cont: Step.Cont[T, R], result: Promise[Iteratee[T, R]])
+  case class NotSubscribedWithCont[T, R](cont: Step.Cont[T, R],
+                                         result: Promise[Iteratee[T, R]])
       extends State[T, R]
 
   /**
@@ -247,7 +247,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * has been called. This is done by feeding EOF to the Cont Iteratee.
     */
   private def finishWithCompletedCont(
-      cont: Step.Cont[T, R], result: Promise[Iteratee[T, R]]): Unit = {
+      cont: Step.Cont[T, R],
+      result: Promise[Iteratee[T, R]]): Unit = {
     val nextIteratee = cont.k(Input.EOF)
     result.success(nextIteratee)
     state = Finished(nextIteratee)
@@ -257,8 +258,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * Finishes the Subscription when onError has been called. This is done by
     * setting the Iteratee Future to an failed state.
     */
-  private def finishWithError(
-      cause: Throwable, result: Promise[Iteratee[T, R]]): Unit = {
+  private def finishWithError(cause: Throwable,
+                              result: Promise[Iteratee[T, R]]): Unit = {
     result.failure(cause)
     state = Finished(promiseToIteratee(result))
   }
@@ -268,7 +269,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * setting the result to the Step's iteratee.
     */
   private def finishWithDoneOrErrorStep(
-      step: Step[T, R], result: Promise[Iteratee[T, R]]): Unit = {
+      step: Step[T, R],
+      result: Promise[Iteratee[T, R]]): Unit = {
     val nextIteratee = step.it
     result.success(nextIteratee)
     state = Finished(nextIteratee)

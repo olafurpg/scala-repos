@@ -15,7 +15,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinition
   * Date: 20.02.2008
   */
 trait ScObject
-    extends ScTypeDefinition with ScTypedDefinition with ScMember
+    extends ScTypeDefinition
+    with ScTypedDefinition
+    with ScMember
     with ScDeclaredElementsHolder {
   //Is this object generated as case class companion module
   private var isSyntheticCaseClassCompanion: Boolean = false

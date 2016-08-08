@@ -22,7 +22,8 @@ import scala.concurrent.duration._
 class FlowMapBenchmark {
 
   val config = ConfigFactory
-    .parseString("""
+    .parseString(
+        """
       akka {
         log-config-on-start = off
         log-dead-letters-during-shutdown = off
@@ -70,8 +71,8 @@ class FlowMapBenchmark {
 
   @Setup
   def setup(): Unit = {
-    val settings = ActorMaterializerSettings(system).withInputBuffer(
-        initialInputBufferSize, initialInputBufferSize)
+    val settings = ActorMaterializerSettings(system)
+      .withInputBuffer(initialInputBufferSize, initialInputBufferSize)
 
     materializer = ActorMaterializer(settings)
 

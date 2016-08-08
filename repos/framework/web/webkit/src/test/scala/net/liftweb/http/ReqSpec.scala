@@ -130,7 +130,8 @@ object ReqSpec extends Specification with XmlMatchers with Mockito {
     }
 
     class mockJsonReq(
-        jsonString: String = """{ "booyan": "shazam", "booyak": 5, "bazam": 2.5 }""")
+        jsonString: String =
+          """{ "booyan": "shazam", "booyak": 5, "bazam": 2.5 }""")
         extends mockReq {
       val testJson = jsonString
       val parsedJson =
@@ -142,7 +143,8 @@ object ReqSpec extends Specification with XmlMatchers with Mockito {
     }
 
     class mockXmlReq(
-        xmlString: String = """<boom><slam attribute="do it">Oh yeah</slam></boom>""")
+        xmlString: String =
+          """<boom><slam attribute="do it">Oh yeah</slam></boom>""")
         extends mockReq {
       val testXml = xmlString
       val parsedXml = tryo(XML.loadString(xmlString)) openOr "totally failed"

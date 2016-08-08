@@ -34,7 +34,11 @@ import org.scalatest.concurrent.Eventually._
 import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.launcher._
-import org.apache.spark.scheduler.{SparkListener, SparkListenerApplicationStart, SparkListenerExecutorAdded}
+import org.apache.spark.scheduler.{
+  SparkListener,
+  SparkListenerApplicationStart,
+  SparkListenerExecutorAdded
+}
 import org.apache.spark.scheduler.cluster.ExecutorInfo
 import org.apache.spark.tags.ExtendedYarnTest
 import org.apache.spark.util.Utils
@@ -155,8 +159,8 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     // creates the pyspark archive. Instead, let's use PYSPARK_ARCHIVES_PATH to point at the
     // needed locations.
     val sparkHome = sys.props("spark.test.home")
-    val pythonPath = Seq(
-        s"$sparkHome/python/lib/py4j-0.9.2-src.zip", s"$sparkHome/python")
+    val pythonPath =
+      Seq(s"$sparkHome/python/lib/py4j-0.9.2-src.zip", s"$sparkHome/python")
     val extraEnv = Map("PYSPARK_ARCHIVES_PATH" -> pythonPath
                          .map("local:" + _)
                          .mkString(File.pathSeparator),
@@ -193,8 +197,8 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     // Create a jar file that contains a different version of "test.resource".
     val originalJar =
       TestUtils.createJarWithFiles(Map("test.resource" -> "ORIGINAL"), tempDir)
-    val userJar = TestUtils.createJarWithFiles(
-        Map("test.resource" -> "OVERRIDDEN"), tempDir)
+    val userJar = TestUtils
+      .createJarWithFiles(Map("test.resource" -> "OVERRIDDEN"), tempDir)
     val driverResult = File.createTempFile("driver", null, tempDir)
     val executorResult = File.createTempFile("executor", null, tempDir)
     val finalState = runSpark(
@@ -241,11 +245,10 @@ private object YarnClusterDriver extends Logging with Matchers {
       System.exit(1)
     }
 
-    val sc = new SparkContext(
-        new SparkConf()
-          .set("spark.extraListeners", classOf[SaveExecutorInfo].getName)
-          .setAppName(
-              "yarn \"test app\" 'with quotes' and \\back\\slashes and $dollarSigns"))
+    val sc = new SparkContext(new SparkConf()
+      .set("spark.extraListeners", classOf[SaveExecutorInfo].getName)
+      .setAppName(
+          "yarn \"test app\" 'with quotes' and \\back\\slashes and $dollarSigns"))
     val conf = sc.getConf
     val status = new File(args(0))
     var result = "failure"

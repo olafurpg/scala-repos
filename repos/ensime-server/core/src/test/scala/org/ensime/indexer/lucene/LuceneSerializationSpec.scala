@@ -8,8 +8,8 @@ import org.ensime.util.EnsimeSpec
 
 class LuceneSerializationSpec extends EnsimeSpec {
 
-  def thereAndBackAgain[T](t: T)(
-      implicit p: DocumentProvider[T], r: DocumentRecovery[T]): Unit = {
+  def thereAndBackAgain[T](t: T)(implicit p: DocumentProvider[T],
+                                 r: DocumentRecovery[T]): Unit = {
     val doc = p.toDocument(t)
     val back = r.toEntity(doc)
     t should ===(back)

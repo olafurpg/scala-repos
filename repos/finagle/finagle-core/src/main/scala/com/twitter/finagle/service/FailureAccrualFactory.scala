@@ -49,8 +49,8 @@ object FailureAccrualFactory {
     Backoff.equalJittered(5.seconds, 300.seconds)
 
   private[finagle] val defaultPolicy = () =>
-    FailureAccrualPolicy.consecutiveFailures(
-        defaultConsecutiveFailures, jitteredBackoff)
+    FailureAccrualPolicy
+      .consecutiveFailures(defaultConsecutiveFailures, jitteredBackoff)
 
   /**
     * Add jitter in `markDeadFor` to reduce correlation.
@@ -61,10 +61,9 @@ object FailureAccrualFactory {
       perturbation: Float = 0.1f,
       rand: Random = rng
   ): () => Duration =
-    () =>
-      {
-        val ms = markDeadFor.inMilliseconds
-        (ms + ms * rand.nextFloat() * perturbation).toInt.milliseconds
+    () => {
+      val ms = markDeadFor.inMilliseconds
+      (ms + ms * rand.nextFloat() * perturbation).toInt.milliseconds
     }
 
   val role = Stack.Role("FailureAccrual")
@@ -112,10 +111,9 @@ object FailureAccrualFactory {
     *      for more details.
     */
   def Param(numFailures: Int, markDeadFor: () => Duration): Param =
-    Param.Configured(
-        () =>
-          FailureAccrualPolicy.consecutiveFailures(
-              numFailures, Backoff.fromFunction(markDeadFor)))
+    Param.Configured(() =>
+      FailureAccrualPolicy
+        .consecutiveFailures(numFailures, Backoff.fromFunction(markDeadFor)))
 
   /**
     * Configures the [[FailureAccrualFactory]].
@@ -129,8 +127,8 @@ object FailureAccrualFactory {
   def Param(numFailures: Int, markDeadFor: Duration): Param =
     Param.Configured(
         () =>
-          FailureAccrualPolicy.consecutiveFailures(
-              numFailures, Backoff.const(markDeadFor)))
+          FailureAccrualPolicy.consecutiveFailures(numFailures,
+                                                   Backoff.const(markDeadFor)))
 
   /**
     * Configures the [[FailureAccrualFactory]].
@@ -243,7 +241,7 @@ object FailureAccrualFactory {
   * @see The [[https://twitter.github.io/finagle/guide/Clients.html#failure-accrual user guide]]
   *      for more details.
   */
-class FailureAccrualFactory[Req, Rep] private[finagle](
+class FailureAccrualFactory[Req, Rep] private[finagle] (
     underlying: ServiceFactory[Req, Rep],
     failureAccrualPolicy: FailureAccrualPolicy,
     timer: Timer,
@@ -267,8 +265,8 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
       responseClassifier: ResponseClassifier
   ) =
     this(underlying,
-         FailureAccrualPolicy.consecutiveFailures(
-             numFailures, Backoff.const(markDeadFor)),
+         FailureAccrualPolicy.consecutiveFailures(numFailures,
+                                                  Backoff.const(markDeadFor)),
          timer,
          statsReceiver,
          label,
@@ -287,8 +285,8 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
       endpoint: Address
   ) =
     this(underlying,
-         FailureAccrualPolicy.consecutiveFailures(
-             numFailures, Backoff.const(markDeadFor)),
+         FailureAccrualPolicy.consecutiveFailures(numFailures,
+                                                  Backoff.const(markDeadFor)),
          timer,
          statsReceiver,
          label,

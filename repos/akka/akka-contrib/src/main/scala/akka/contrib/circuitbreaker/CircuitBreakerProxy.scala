@@ -75,8 +75,9 @@ object CircuitBreakerProxy {
   case object Closed extends CircuitBreakerState
   case object HalfOpen extends CircuitBreakerState
 
-  final case class CircuitBreakerStateData(
-      failureCount: Int = 0, firstHalfOpenMessageSent: Boolean = false)
+  final case class CircuitBreakerStateData(failureCount: Int = 0,
+                                           firstHalfOpenMessageSent: Boolean =
+                                             false)
 
   final case class CircuitBreakerPropsBuilder(
       maxFailures: Int,
@@ -129,7 +130,8 @@ final class CircuitBreakerProxy(target: ActorRef,
                                 circuitEventListener: Option[ActorRef],
                                 failureDetector: Any ⇒ Boolean,
                                 failureMap: CircuitOpenFailure ⇒ Any)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with FSM[CircuitBreakerState, CircuitBreakerStateData] {
 
   import CircuitBreakerInternalEvents._
@@ -143,8 +145,9 @@ final class CircuitBreakerProxy(target: ActorRef,
       log.debug(
           "Received call succeeded notification in state {} resetting counter",
           state)
-      goto(Closed) using CircuitBreakerStateData(
-          failureCount = 0, firstHalfOpenMessageSent = false)
+      goto(Closed) using CircuitBreakerStateData(failureCount = 0,
+                                                 firstHalfOpenMessageSent =
+                                                   false)
   }
 
   def passthroughHandling: StateFunction = {

@@ -93,7 +93,7 @@ trait CheckAnalysis {
               if order.isEmpty || frame != RowFrame || l != h =>
             failAnalysis(
                 "An offset window function can only be evaluated in an ordered " +
-                s"row-based window frame with a single offset: $w")
+                  s"row-based window frame with a single offset: $w")
 
           case w @ WindowExpression(e, s) =>
             // Only allow window functions with an aggregate expression or an offset window
@@ -117,17 +117,18 @@ trait CheckAnalysis {
         operator match {
           case f: Filter if f.condition.dataType != BooleanType =>
             failAnalysis(s"filter expression '${f.condition.sql}' " +
-                s"of type ${f.condition.dataType.simpleString} is not a boolean.")
+              s"of type ${f.condition.dataType.simpleString} is not a boolean.")
 
           case j @ Join(_, _, UsingJoin(_, cols), _) =>
             val from = operator.inputSet.map(_.name).mkString(", ")
-            failAnalysis(s"using columns [${cols.mkString(",")}] " +
-                s"can not be resolved given input columns: [$from] ")
+            failAnalysis(
+                s"using columns [${cols.mkString(",")}] " +
+                  s"can not be resolved given input columns: [$from] ")
 
           case j @ Join(_, _, _, Some(condition))
               if condition.dataType != BooleanType =>
             failAnalysis(s"join condition '${condition.sql}' " +
-                s"of type ${condition.dataType.simpleString} is not a boolean.")
+              s"of type ${condition.dataType.simpleString} is not a boolean.")
 
           case j @ Join(_, _, _, Some(condition)) =>
             def checkValidJoinConditionExprs(expr: Expression): Unit =
@@ -139,11 +140,11 @@ trait CheckAnalysis {
                 case e if e.dataType.isInstanceOf[BinaryType] =>
                   failAnalysis(
                       s"binary type expression ${e.sql} cannot be used " +
-                      "in join conditions")
+                        "in join conditions")
                 case e if e.dataType.isInstanceOf[MapType] =>
                   failAnalysis(
                       s"map type expression ${e.sql} cannot be used " +
-                      "in join conditions")
+                        "in join conditions")
                 case _ => // OK
               }
 
@@ -158,24 +159,23 @@ trait CheckAnalysis {
                       case agg: AggregateExpression =>
                         failAnalysis(
                             s"It is not allowed to use an aggregate function in the argument of " +
-                            s"another aggregate function. Please use the inner aggregate function " +
-                            s"in a sub-query.")
+                              s"another aggregate function. Please use the inner aggregate function " +
+                              s"in a sub-query.")
                       case other => // OK
                     }
 
                     if (!child.deterministic) {
-                      failAnalysis(
-                          s"nondeterministic expression ${expr.sql} should not " +
-                          s"appear in the arguments of an aggregate function.")
+                      failAnalysis(s"nondeterministic expression ${expr.sql} should not " +
+                        s"appear in the arguments of an aggregate function.")
                     }
                   }
                 case e: Attribute
                     if !groupingExprs.exists(_.semanticEquals(e)) =>
                   failAnalysis(
                       s"expression '${e.sql}' is neither present in the group by, " +
-                      s"nor is it an aggregate function. " +
-                      "Add to group by or wrap in first() (or first_value) if you don't care " +
-                      "which value you get.")
+                        s"nor is it an aggregate function. " +
+                        "Add to group by or wrap in first() (or first_value) if you don't care " +
+                        "which value you get.")
                 case e if groupingExprs.exists(_.semanticEquals(e)) => // OK
                 case e if e.references.isEmpty => // OK
                 case e => e.children.foreach(checkValidAggregateExpression)
@@ -186,8 +186,8 @@ trait CheckAnalysis {
               if (!RowOrdering.isOrderable(expr.dataType)) {
                 failAnalysis(
                     s"expression ${expr.sql} cannot be used as a grouping expression " +
-                    s"because its data type ${expr.dataType.simpleString} is not a orderable " +
-                    s"data type.")
+                      s"because its data type ${expr.dataType.simpleString} is not a orderable " +
+                      s"data type.")
               }
 
               if (!expr.deterministic) {
@@ -196,7 +196,7 @@ trait CheckAnalysis {
                 // a Project node.
                 failAnalysis(
                     s"nondeterministic expression ${expr.sql} should not " +
-                    s"appear in grouping expression.")
+                      s"appear in grouping expression.")
               }
             }
 
@@ -215,8 +215,8 @@ trait CheckAnalysis {
               if left.output.length != right.output.length =>
             failAnalysis(
                 s"${s.nodeName} can only be performed on tables with the same number of columns, " +
-                s"but the left table has ${left.output.length} columns and the right has " +
-                s"${right.output.length}")
+                  s"but the left table has ${left.output.length} columns and the right has " +
+                  s"${right.output.length}")
 
           case s: Union
               if s.children.exists(
@@ -239,7 +239,7 @@ trait CheckAnalysis {
 
             failAnalysis(
                 s"resolved attribute(s) $missingAttributes missing from $input " +
-                s"in operator ${operator.simpleString}")
+                  s"in operator ${operator.simpleString}")
 
           case p @ Project(exprs, _) if containsMultipleGenerators(exprs) =>
             failAnalysis(
@@ -252,7 +252,8 @@ trait CheckAnalysis {
             failAnalysis(s"""
                  |Failure when resolving conflicting references in Join:
                  |$plan
-                 |Conflicting attributes: ${conflictingAttributes.mkString(",")}
+                 |Conflicting attributes: ${conflictingAttributes
+                              .mkString(",")}
                  |""".stripMargin)
 
           case i: Intersect if !i.duplicateResolved =>
@@ -261,7 +262,8 @@ trait CheckAnalysis {
             failAnalysis(s"""
                  |Failure when resolving conflicting references in Intersect:
                  |$plan
-                 |Conflicting attributes: ${conflictingAttributes.mkString(",")}
+                 |Conflicting attributes: ${conflictingAttributes
+                              .mkString(",")}
                  |""".stripMargin)
 
           case o if !o.resolved =>
@@ -269,8 +271,8 @@ trait CheckAnalysis {
 
           case o
               if o.expressions.exists(!_.deterministic) &&
-              !o.isInstanceOf[Project] && !o.isInstanceOf[Filter] &&
-              !o.isInstanceOf[Aggregate] && !o.isInstanceOf[Window] =>
+                !o.isInstanceOf[Project] && !o.isInstanceOf[Filter] &&
+                !o.isInstanceOf[Aggregate] && !o.isInstanceOf[Window] =>
             // The rule above is used to check Aggregate operator.
             failAnalysis(s"""nondeterministic expressions are only allowed in
                  |Project, Filter, Aggregate or Window, found:
@@ -281,7 +283,7 @@ trait CheckAnalysis {
           case _ => // Analysis successful!
         }
     }
-    extendedCheckRules.foreach(_ (plan))
+    extendedCheckRules.foreach(_(plan))
 
     plan.foreach(_.setAnalyzed())
   }

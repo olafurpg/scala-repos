@@ -23,7 +23,7 @@ class ConvertToParenthesesIntention extends PsiElementBaseIntentionAction {
       case e @ Parent(_: ScForStatement) =>
         List(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tRBRACE)
           .contains(e.getNode.getElementType) &&
-        IntentionAvailabilityChecker.checkIntention(this, element)
+          IntentionAvailabilityChecker.checkIntention(this, element)
       case _ => false
     }
   }
@@ -33,24 +33,24 @@ class ConvertToParenthesesIntention extends PsiElementBaseIntentionAction {
     val manager = statement.getManager
     val block = ScalaPsiElementFactory.parseElement("(_)", manager)
 
-    for (lBrace <- Option(
-        statement.findFirstChildByType(ScalaTokenTypes.tLBRACE))) {
+    for (lBrace <- Option(statement.findFirstChildByType(
+                      ScalaTokenTypes.tLBRACE))) {
       lBrace.replace(block.getFirstChild)
     }
 
-    for (rBrace <- Option(
-        statement.findFirstChildByType(ScalaTokenTypes.tRBRACE))) {
+    for (rBrace <- Option(statement.findFirstChildByType(
+                      ScalaTokenTypes.tRBRACE))) {
       rBrace.replace(block.getLastChild)
     }
 
     for (enumerators <- statement.enumerators;
-    cr <- enumerators.findChildrenByType(TokenType.WHITE_SPACE)
-             if cr.getText.contains('\n')) {
+         cr <- enumerators.findChildrenByType(TokenType.WHITE_SPACE)
+         if cr.getText.contains('\n')) {
       cr.replace(ScalaPsiElementFactory.createSemicolon(manager))
     }
 
     for (cr <- statement.findChildrenByType(TokenType.WHITE_SPACE)
-                  if cr.getText.contains('\n')) {
+         if cr.getText.contains('\n')) {
       cr.delete()
     }
   }

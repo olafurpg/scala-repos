@@ -24,7 +24,11 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, Complete, Count}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression,
+  Complete,
+  Count
+}
 import org.apache.spark.sql.catalyst.plans.{Inner, PlanTest}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
@@ -307,8 +311,10 @@ class ColumnPruningSuite extends PlanTest {
     val input2 = LocalRelation('c.int, 'd.string, 'e.double)
     val query = Project('b :: Nil, Union(input1 :: input2 :: Nil)).analyze
     val expected = Project('b :: Nil,
-                           Union(Project('b :: Nil, input1) :: Project(
-                                   'd :: Nil, input2) :: Nil)).analyze
+                           Union(
+                               Project('b :: Nil, input1) :: Project(
+                                   'd :: Nil,
+                                   input2) :: Nil)).analyze
     comparePlans(Optimize.execute(query), expected)
   }
 
@@ -332,7 +338,7 @@ class ColumnPruningSuite extends PlanTest {
     comparePlans(optimized, expected)
   }
 
-  implicit private def productEncoder[T <: Product : TypeTag] =
+  implicit private def productEncoder[T <: Product: TypeTag] =
     ExpressionEncoder[T]()
   private val func = identity[Iterator[OtherTuple]] _
 

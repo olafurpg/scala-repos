@@ -32,7 +32,11 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scalafx.Includes._
-import scalafx.testutil.{AlignmentDelegateSpec, RunOnApplicationThread, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  AlignmentDelegateSpec,
+  RunOnApplicationThread,
+  SimpleSFXDelegateSpec
+}
 
 /**
   * TextField Spec tests.
@@ -40,12 +44,13 @@ import scalafx.testutil.{AlignmentDelegateSpec, RunOnApplicationThread, SimpleSF
 @RunWith(classOf[JUnitRunner])
 class TextFieldSpec
     extends SimpleSFXDelegateSpec[jfxsc.TextField, TextField](
-        classOf[jfxsc.TextField], classOf[TextField])
+        classOf[jfxsc.TextField],
+        classOf[TextField])
     with AlignmentDelegateSpec[jfxsc.TextField, TextField]
     with RunOnApplicationThread {
 
   it should "have a Property class that exposes all the JavaFX properties" in {
-    comparePropertiesInProxy(
-        classOf[jfxsc.TextField], classOf[TextFieldProperty])
+    comparePropertiesInProxy(classOf[jfxsc.TextField],
+                             classOf[TextFieldProperty])
   }
 }

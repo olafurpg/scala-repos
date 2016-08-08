@@ -42,7 +42,7 @@ trait LocaleTypedField extends TypedField[String] {
     SHtml.select(buildDisplayList,
                  Full(valueBox.map(_.toString) openOr ""),
                  locale => setBox(Full(locale))) %
-    ("tabindex" -> tabIndex.toString)
+      ("tabindex" -> tabIndex.toString)
 
   override def toForm: Box[NodeSeq] =
     uniqueFieldId match {
@@ -52,7 +52,8 @@ trait LocaleTypedField extends TypedField[String] {
 }
 
 class LocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends StringField(rec, 16) with LocaleTypedField {
+    extends StringField(rec, 16)
+    with LocaleTypedField {
 
   override def defaultValue = Locale.getDefault.toString
 
@@ -66,7 +67,8 @@ class LocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalLocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends OptionalStringField(rec, 16) with LocaleTypedField {
+    extends OptionalStringField(rec, 16)
+    with LocaleTypedField {
 
   /** Label for the selection item representing Empty, show when this field is optional. Defaults to the empty string. */
   def emptyOptionLabel: String = ""

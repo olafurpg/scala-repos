@@ -7,15 +7,24 @@ import com.intellij.psi.impl.file.PsiPackageImpl
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.plugins.scala.ScalaFileType
-import org.jetbrains.plugins.scala.caches.{CachesUtil, ScalaShortNamesCacheManager}
+import org.jetbrains.plugins.scala.caches.{
+  CachesUtil,
+  ScalaShortNamesCacheManager
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScPackage
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticClasses
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ResolveProcessor}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor,
+  ResolveProcessor
+}
 
 import scala.util.control.ControlThrowable
 
@@ -24,8 +33,8 @@ import scala.util.control.ControlThrowable
   * Date: 22.04.2010
   */
 class ScPackageImpl private (val pack: PsiPackage)
-    extends PsiPackageImpl(
-        pack.getManager.asInstanceOf[PsiManagerEx], pack.getQualifiedName)
+    extends PsiPackageImpl(pack.getManager.asInstanceOf[PsiManagerEx],
+                           pack.getQualifiedName)
     with ScPackage {
   def superProcessDeclarations(processor: PsiScopeProcessor,
                                state: ResolveState,
@@ -70,8 +79,11 @@ class ScPackageImpl private (val pack: PsiPackage)
         }
       }
     } else {
-      if (!ResolveUtils.packageProcessDeclarations(
-              pack, processor, state, lastParent, place)) return false
+      if (!ResolveUtils.packageProcessDeclarations(pack,
+                                                   processor,
+                                                   state,
+                                                   lastParent,
+                                                   place)) return false
     }
 
     //for Scala
@@ -81,16 +93,17 @@ class ScPackageImpl private (val pack: PsiPackage)
         case _ => place.getResolveScope
       }
       if (getQualifiedName == "scala") {
-        ScPackageImpl.implicitlyImportedObject(
-            place.getManager, scope, "scala") match {
+        ScPackageImpl
+          .implicitlyImportedObject(place.getManager, scope, "scala") match {
           case Some(obj: ScObject) =>
             var newState = state
             obj.getType(TypingContext.empty).foreach {
               case tp: ScType =>
                 newState = state.put(BaseProcessor.FROM_TYPE_KEY, tp)
             }
-            if (!obj.processDeclarations(
-                    processor, newState, lastParent, place)) return false
+            if (!obj
+                  .processDeclarations(processor, newState, lastParent, place))
+              return false
           case _ =>
         }
       } else {
@@ -101,8 +114,9 @@ class ScPackageImpl private (val pack: PsiPackage)
               case tp: ScType =>
                 newState = state.put(BaseProcessor.FROM_TYPE_KEY, tp)
             }
-            if (!obj.processDeclarations(
-                    processor, newState, lastParent, place)) return false
+            if (!obj
+                  .processDeclarations(processor, newState, lastParent, place))
+              return false
           case _ =>
         }
       }
@@ -130,8 +144,8 @@ class ScPackageImpl private (val pack: PsiPackage)
     if (lastDot < 0) {
       ScPackageImpl.findPackage(getProject, "")
     } else {
-      ScPackageImpl.findPackage(
-          getProject, myQualifiedName.substring(0, lastDot))
+      ScPackageImpl
+        .findPackage(getProject, myQualifiedName.substring(0, lastDot))
     }
   }
 

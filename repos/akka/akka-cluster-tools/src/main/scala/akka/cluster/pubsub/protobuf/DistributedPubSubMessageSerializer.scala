@@ -27,7 +27,8 @@ import akka.serialization.SerializerWithStringManifest
   */
 private[akka] class DistributedPubSubMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
 
   private lazy val serialization = SerializationExtension(system)
 
@@ -80,7 +81,8 @@ private[akka] class DistributedPubSubMessageSerializer(
   private def compress(msg: MessageLite): Array[Byte] = {
     val bos = new ByteArrayOutputStream(BufferSize)
     val zip = new GZIPOutputStream(bos)
-    try msg.writeTo(zip) finally zip.close()
+    try msg.writeTo(zip)
+    finally zip.close()
     bos.toByteArray
   }
 
@@ -96,7 +98,8 @@ private[akka] class DistributedPubSubMessageSerializer(
         readChunk()
     }
 
-    try readChunk() finally in.close()
+    try readChunk()
+    finally in.close()
     out.toByteArray
   }
 
@@ -136,9 +139,8 @@ private[akka] class DistributedPubSubMessageSerializer(
     statusFromProto(dm.Status.parseFrom(decompress(bytes)))
 
   private def statusFromProto(status: dm.Status): Status =
-    Status(
-        status.getVersionsList.asScala
-          .map(v ⇒ addressFromProto(v.getAddress) -> v.getTimestamp)(breakOut))
+    Status(status.getVersionsList.asScala.map(v ⇒
+      addressFromProto(v.getAddress) -> v.getTimestamp)(breakOut))
 
   private def deltaToProto(delta: Delta): dm.Delta = {
     val buckets = delta.buckets.map { b ⇒
@@ -164,8 +166,7 @@ private[akka] class DistributedPubSubMessageSerializer(
     deltaFromProto(dm.Delta.parseFrom(decompress(bytes)))
 
   private def deltaFromProto(delta: dm.Delta): Delta =
-    Delta(
-        delta.getBucketsList.asScala.toVector.map { b ⇒
+    Delta(delta.getBucketsList.asScala.toVector.map { b ⇒
       val content: TreeMap[String, ValueHolder] =
         b.getContentList.asScala.map { entry ⇒
           entry.getKey -> ValueHolder(entry.getVersion,
@@ -193,8 +194,9 @@ private[akka] class DistributedPubSubMessageSerializer(
     sendFromProto(dm.Send.parseFrom(bytes))
 
   private def sendFromProto(send: dm.Send): Send =
-    Send(
-        send.getPath, payloadFromProto(send.getPayload), send.getLocalAffinity)
+    Send(send.getPath,
+         payloadFromProto(send.getPayload),
+         send.getLocalAffinity)
 
   private def sendToAllToProto(sendToAll: SendToAll): dm.SendToAll = {
     dm.SendToAll

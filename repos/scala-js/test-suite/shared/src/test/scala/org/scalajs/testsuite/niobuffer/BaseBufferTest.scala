@@ -7,7 +7,12 @@
 \*                                                                      */
 package org.scalajs.testsuite.niobuffer
 
-import java.nio.{ReadOnlyBufferException, BufferUnderflowException, InvalidMarkException, BufferOverflowException}
+import java.nio.{
+  ReadOnlyBufferException,
+  BufferUnderflowException,
+  InvalidMarkException,
+  BufferOverflowException
+}
 
 import org.junit.Test
 import org.junit.Assert._
@@ -268,8 +273,8 @@ abstract class BaseBufferTest {
     val buf = allocBuffer(10)
     if (!createsReadOnly) {
       buf.put(Array[ElementType](6, 7, 12))
-      assertArrayEquals(
-          boxedElemsFromInt(6, 7, 12, 0), boxed((0 to 3).map(buf.get).toArray))
+      assertArrayEquals(boxedElemsFromInt(6, 7, 12, 0),
+                        boxed((0 to 3).map(buf.get).toArray))
       assertEquals(3, buf.position())
 
       buf.position(2)

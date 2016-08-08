@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -54,7 +54,7 @@ object TableSpec extends Specification with ArbitrarySlice {
 
         val r2 = VColumnRef(DynColumnId(1), CLong)
         val v2 = new Table(
-          1, Set(r2), 
+          1, Set(r2),
           List(
             ArraySlice(
               VectorCase(Array(0L, 2L, 3L, 4L, 5L, 5L, 6L, 8L, 8L)),
@@ -77,7 +77,7 @@ object TableSpec extends Specification with ArbitrarySlice {
           middle3((8L, 8L)),
           middle3((8L, 8L)),
           middle3((8L, 8L)),
-          middle3((8L, 8L)) 
+          middle3((8L, 8L))
         )
 
         val results = v1.cogroup(v2, 1)(CogroupMerge.second)
@@ -85,21 +85,21 @@ object TableSpec extends Specification with ArbitrarySlice {
 
         expected.zipWithIndex.foldLeft(ok: MatchResult[Any]) {
           case (result, (Left3(v), i)) =>
-            result and 
+            result and
             (slice.column(VColumnRef(DynColumnId(0), CLong)).get.isDefinedAt(i) must beTrue) and
             (slice.column(VColumnRef(DynColumnId(0), CLong)).get.apply(i) must_== v)
 
           case (result, (Middle3((l, r)), i)) =>
-            result and 
+            result and
             (slice.column(VColumnRef(DynColumnId(0), CLong)).get.isDefinedAt(i) must beTrue) and
             (slice.column(VColumnRef(DynColumnId(0), CLong)).get.apply(i) must_== l) and
             (slice.column(VColumnRef(DynColumnId(1), CLong)).get.isDefinedAt(i) must beTrue) and
-            (slice.column(VColumnRef(DynColumnId(1), CLong)).get.apply(i) must_== r) 
+            (slice.column(VColumnRef(DynColumnId(1), CLong)).get.apply(i) must_== r)
 
           case (result, (Right3(v), i)) =>
-            result and 
+            result and
             (slice.column(VColumnRef(DynColumnId(1), CLong)).get.isDefinedAt(i) must beTrue) and
-            (slice.column(VColumnRef(DynColumnId(1), CLong)).get.apply(i) must_== v) 
+            (slice.column(VColumnRef(DynColumnId(1), CLong)).get.apply(i) must_== v)
         }
       }
        */

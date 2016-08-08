@@ -128,7 +128,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
       response.header(HeaderNames.CONTENT_TYPE) returns Some(
           "application/xrds+xml")
       response.xml returns scala.xml.XML.loadString(readFixture(
-              "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml"))
+          "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml"))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
           "http://openidprovider-opid.example.com")
@@ -203,8 +203,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl), identifierSelection, returnTo)
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 identifierSelection,
+                                 returnTo)
       }
 
       "should fall back to HTML based discovery if OP Identifier cannot be found in the XRDS" in {
@@ -214,7 +215,8 @@ object DiscoveryClientSpec extends Specification with Mockito {
             "discovery/html/openIDProvider.html")
         ws.response.xml returns scala.xml.XML
           .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
             "application/xrds+xml")
 
         val returnTo = "http://foo.bar.com/openid"
@@ -241,7 +243,8 @@ object DiscoveryClientSpec extends Specification with Mockito {
             "discovery/html/openIDProvider-OpenID-1.1.html")
         ws.response.xml returns scala.xml.XML
           .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
             "application/xrds+xml")
 
         val returnTo = "http://foo.bar.com/openid"
@@ -279,8 +282,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl), openId, returnTo)
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 openId,
+                                 returnTo)
       }
 
       "when given a response that includes a local identifier (using openid2.local_id openid.delegate)" in {
@@ -298,11 +302,11 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "http://www.example.com:8080/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl),
-            "http://example.com/",
-            returnTo,
-            opLocalIdentifier = Some("http://exampleuser.example.com/"))
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 "http://example.com/",
+                                 returnTo,
+                                 opLocalIdentifier =
+                                   Some("http://exampleuser.example.com/"))
       }
     }
   }
@@ -340,8 +344,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
   }
 
   // Define matchers based on the expected value. Param must be absent if the expected value is None, it must match otherwise
-  private def verifyOptionalParam(
-      params: Params, key: String, expected: Option[String] = None) =
+  private def verifyOptionalParam(params: Params,
+                                  key: String,
+                                  expected: Option[String] = None) =
     expected match {
       case Some(value) => params.get(key) must_== Some(Seq(value))
       case _ => params.get(key) must beNone

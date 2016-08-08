@@ -4,7 +4,11 @@ package project.converter
 import java.io.{File, StringReader}
 
 import com.google.common.io.Files
-import com.intellij.conversion.{CannotConvertException, ConversionContext, ModuleSettings}
+import com.intellij.conversion.{
+  CannotConvertException,
+  ConversionContext,
+  ModuleSettings
+}
 import com.intellij.openapi.components.StorageScheme
 import org.jdom.input.SAXBuilder
 import org.jdom.xpath.XPath
@@ -41,8 +45,8 @@ private case class ScalaSdkData(name: String,
     }
   }
 
-  private def addDirectoryBasedLibrary(
-      library: Elem, context: ConversionContext): File = {
+  private def addDirectoryBasedLibrary(library: Elem,
+                                       context: ConversionContext): File = {
     val file = {
       val fileName = name.replaceAll("\\W", "_")
       suggestLibraryFile(fileName, context)
@@ -53,8 +57,8 @@ private case class ScalaSdkData(name: String,
     file
   }
 
-  private def addProjectBasedLibrary(
-      library: Elem, context: ConversionContext) {
+  private def addProjectBasedLibrary(library: Elem,
+                                     context: ConversionContext) {
     val libraryTableElement = {
       val rootElement = context.getProjectSettings.getRootElement
       XPath
@@ -151,17 +155,17 @@ private object ScalaSdkData {
     document.detachRootElement()
   }
 
-  private def suggestLibraryFile(
-      name: String, context: ConversionContext): File = {
-    val base = Option(context.getSettingsBaseDir)
-      .getOrElse(throw new CannotConvertException(
+  private def suggestLibraryFile(name: String,
+                                 context: ConversionContext): File = {
+    val base = Option(context.getSettingsBaseDir).getOrElse(
+        throw new CannotConvertException(
             "Only directory-based IDEA projects are supported"))
 
     val candidates = {
       val suffixes =
         Iterator.single("") ++ Iterator.from(2).map("_" + _.toString)
-      suffixes.map(
-          suffix => new File(new File(base, "libraries"), s"$name$suffix.xml"))
+      suffixes.map(suffix =>
+        new File(new File(base, "libraries"), s"$name$suffix.xml"))
     }
 
     candidates

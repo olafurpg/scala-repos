@@ -64,37 +64,56 @@ object ErrorMapping {
   // 32: INVALID_TIMESTAMP
 
   private val exceptionToCode = Map[Class[Throwable], Short](
-      classOf[OffsetOutOfRangeException].asInstanceOf[Class[Throwable]] -> OffsetOutOfRangeCode,
-      classOf[InvalidMessageException].asInstanceOf[Class[Throwable]] -> InvalidMessageCode,
-      classOf[UnknownTopicOrPartitionException].asInstanceOf[Class[Throwable]] -> UnknownTopicOrPartitionCode,
-      classOf[InvalidMessageSizeException].asInstanceOf[Class[Throwable]] -> InvalidFetchSizeCode,
-      classOf[LeaderNotAvailableException].asInstanceOf[Class[Throwable]] -> LeaderNotAvailableCode,
-      classOf[NotLeaderForPartitionException].asInstanceOf[Class[Throwable]] -> NotLeaderForPartitionCode,
-      classOf[RequestTimedOutException].asInstanceOf[Class[Throwable]] -> RequestTimedOutCode,
-      classOf[BrokerNotAvailableException].asInstanceOf[Class[Throwable]] -> BrokerNotAvailableCode,
-      classOf[ReplicaNotAvailableException].asInstanceOf[Class[Throwable]] -> ReplicaNotAvailableCode,
-      classOf[MessageSizeTooLargeException].asInstanceOf[Class[Throwable]] -> MessageSizeTooLargeCode,
-      classOf[ControllerMovedException].asInstanceOf[Class[Throwable]] -> StaleControllerEpochCode,
-      classOf[OffsetMetadataTooLargeException].asInstanceOf[Class[Throwable]] -> OffsetMetadataTooLargeCode,
-      classOf[OffsetsLoadInProgressException].asInstanceOf[Class[Throwable]] -> OffsetsLoadInProgressCode,
+      classOf[OffsetOutOfRangeException]
+        .asInstanceOf[Class[Throwable]] -> OffsetOutOfRangeCode,
+      classOf[InvalidMessageException]
+        .asInstanceOf[Class[Throwable]] -> InvalidMessageCode,
+      classOf[UnknownTopicOrPartitionException]
+        .asInstanceOf[Class[Throwable]] -> UnknownTopicOrPartitionCode,
+      classOf[InvalidMessageSizeException]
+        .asInstanceOf[Class[Throwable]] -> InvalidFetchSizeCode,
+      classOf[LeaderNotAvailableException]
+        .asInstanceOf[Class[Throwable]] -> LeaderNotAvailableCode,
+      classOf[NotLeaderForPartitionException]
+        .asInstanceOf[Class[Throwable]] -> NotLeaderForPartitionCode,
+      classOf[RequestTimedOutException]
+        .asInstanceOf[Class[Throwable]] -> RequestTimedOutCode,
+      classOf[BrokerNotAvailableException]
+        .asInstanceOf[Class[Throwable]] -> BrokerNotAvailableCode,
+      classOf[ReplicaNotAvailableException]
+        .asInstanceOf[Class[Throwable]] -> ReplicaNotAvailableCode,
+      classOf[MessageSizeTooLargeException]
+        .asInstanceOf[Class[Throwable]] -> MessageSizeTooLargeCode,
+      classOf[ControllerMovedException]
+        .asInstanceOf[Class[Throwable]] -> StaleControllerEpochCode,
+      classOf[OffsetMetadataTooLargeException]
+        .asInstanceOf[Class[Throwable]] -> OffsetMetadataTooLargeCode,
+      classOf[OffsetsLoadInProgressException]
+        .asInstanceOf[Class[Throwable]] -> OffsetsLoadInProgressCode,
       classOf[ConsumerCoordinatorNotAvailableException]
         .asInstanceOf[Class[Throwable]] -> ConsumerCoordinatorNotAvailableCode,
       classOf[NotCoordinatorForConsumerException]
         .asInstanceOf[Class[Throwable]] -> NotCoordinatorForConsumerCode,
-      classOf[InvalidTopicException].asInstanceOf[Class[Throwable]] -> InvalidTopicCode,
-      classOf[MessageSetSizeTooLargeException].asInstanceOf[Class[Throwable]] -> MessageSetSizeTooLargeCode,
-      classOf[NotEnoughReplicasException].asInstanceOf[Class[Throwable]] -> NotEnoughReplicasCode,
+      classOf[InvalidTopicException]
+        .asInstanceOf[Class[Throwable]] -> InvalidTopicCode,
+      classOf[MessageSetSizeTooLargeException]
+        .asInstanceOf[Class[Throwable]] -> MessageSetSizeTooLargeCode,
+      classOf[NotEnoughReplicasException]
+        .asInstanceOf[Class[Throwable]] -> NotEnoughReplicasCode,
       classOf[NotEnoughReplicasAfterAppendException]
         .asInstanceOf[Class[Throwable]] -> NotEnoughReplicasAfterAppendCode,
-      classOf[TopicAuthorizationException].asInstanceOf[Class[Throwable]] -> TopicAuthorizationCode,
-      classOf[GroupAuthorizationException].asInstanceOf[Class[Throwable]] -> GroupAuthorizationCode,
-      classOf[ClusterAuthorizationException].asInstanceOf[Class[Throwable]] -> ClusterAuthorizationCode
+      classOf[TopicAuthorizationException]
+        .asInstanceOf[Class[Throwable]] -> TopicAuthorizationCode,
+      classOf[GroupAuthorizationException]
+        .asInstanceOf[Class[Throwable]] -> GroupAuthorizationCode,
+      classOf[ClusterAuthorizationException]
+        .asInstanceOf[Class[Throwable]] -> ClusterAuthorizationCode
   ).withDefaultValue(UnknownCode)
 
   /* invert the mapping */
   private val codeToException =
-    (Map[Short, Class[Throwable]]() ++ exceptionToCode.iterator.map(
-            p => (p._2, p._1))).withDefaultValue(classOf[UnknownException])
+    (Map[Short, Class[Throwable]]() ++ exceptionToCode.iterator.map(p =>
+      (p._2, p._1))).withDefaultValue(classOf[UnknownException])
 
   def codeFor(exception: Class[Throwable]): Short = exceptionToCode(exception)
 

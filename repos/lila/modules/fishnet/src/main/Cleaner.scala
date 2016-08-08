@@ -34,7 +34,8 @@ private final class Cleaner(repo: FishnetRepo,
 
   private def cleanAnalysis: Funit =
     analysisColl
-      .find(BSONDocument(
+      .find(
+          BSONDocument(
               "acquired.date" -> BSONDocument(
                   "$lt" -> durationAgo(analysisTimeoutBase))
           ))

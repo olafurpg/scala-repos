@@ -2,16 +2,33 @@ package org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.simulacrum
 
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSimpleTypeElement, ScParameterizedTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScAnnotation}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScSimpleTypeElement,
+  ScParameterizedTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScAnnotation
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause,
+  ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector.Kind
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * @author Alefas
@@ -28,8 +45,9 @@ class SimulacrumInjection extends SyntheticMembersInjector {
       case obj: ScObject =>
         obj.fakeCompanionClassOrCompanionClass match {
           case clazz: ScTypeDefinition
-              if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
-              clazz.typeParameters.length == 1 =>
+              if clazz
+                .findAnnotationNoAliases("simulacrum.typeclass") != null &&
+                clazz.typeParameters.length == 1 =>
             val tpName = clazz.typeParameters.head.name
 
             val tpText =
@@ -46,14 +64,16 @@ class SimulacrumInjection extends SyntheticMembersInjector {
       case obj: ScObject =>
         ScalaPsiUtil.getCompanionModule(obj) match {
           case Some(clazz)
-              if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
-              clazz.typeParameters.length == 1 =>
+              if clazz
+                .findAnnotationNoAliases("simulacrum.typeclass") != null &&
+                clazz.typeParameters.length == 1 =>
             val clazzTypeParam = clazz.typeParameters.head
             val tpName = clazzTypeParam.name
             val tpText = ScalaPsiUtil.typeParamString(clazzTypeParam)
             val tpAdditional =
               if (clazzTypeParam.typeParameters.nonEmpty)
-                Some(s"Lifted$tpName") else None
+                Some(s"Lifted$tpName")
+              else None
             val additionalWithComma = tpAdditional.map(", " + _).getOrElse("")
             val additionalWithBracket =
               tpAdditional.map("[" + _ + "]").getOrElse("")
@@ -118,7 +138,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                                 new ScTypeParameterType(
                                     ScalaPsiElementFactory
                                       .createTypeParameterFromText(
-                                        tpAdditional.get, source.getManager),
+                                          tpAdditional.get,
+                                          source.getManager),
                                     ScSubstitutor.empty
                                 ))
                             Some(subst)
@@ -137,7 +158,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                           p.parameters
                             .map(paramText)
                             .mkString("(" +
-                                      (if (p.isImplicit) "implicit " else ""),
+                                        (if (p.isImplicit) "implicit "
+                                         else ""),
                                       ", ",
                                       ")")
                         }
@@ -175,14 +197,14 @@ class SimulacrumInjection extends SyntheticMembersInjector {
 
             val AllOpsSupers = clazz.extendsBlock.templateParents.toSeq
               .flatMap(parents =>
-                    parents.typeElements.flatMap {
+                parents.typeElements.flatMap {
                   case te =>
                     te.getType(TypingContext.empty) match {
                       case Success(ScParameterizedType(classType, Seq(tp)), _)
                           if isProperTpt(tp).isDefined =>
                         def fromType: Seq[String] = {
-                          ScType.extractClass(
-                              classType, Some(clazz.getProject)) match {
+                          ScType.extractClass(classType,
+                                              Some(clazz.getProject)) match {
                             case Some(cl: ScTypeDefinition) =>
                               Seq(s" with ${cl.qualifiedName}.AllOps[$tpName$additionalWithComma]")
                             case _ => Seq.empty

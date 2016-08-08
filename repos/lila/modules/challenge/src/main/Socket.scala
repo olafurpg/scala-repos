@@ -29,17 +29,17 @@ private final class Socket(challengeId: String,
       }
 
     case PingVersion(uid, v) => {
-        ping(uid)
-        timeBomb.delay
-        withMember(uid) { m =>
-          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
+      ping(uid)
+      timeBomb.delay
+      withMember(uid) { m =>
+        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
       }
+    }
 
     case Broom => {
-        broom
-        if (timeBomb.boom) self ! PoisonPill
-      }
+      broom
+      if (timeBomb.boom) self ! PoisonPill
+    }
 
     case GetVersion => sender ! history.version
 

@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package codeInspection.collections
 
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.{PsiElement, SmartPointerManager, SmartPsiElementPointer}
+import com.intellij.psi.{
+  PsiElement,
+  SmartPointerManager,
+  SmartPsiElementPointer
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.language.implicitConversions
@@ -16,7 +20,7 @@ case class Simplification(exprToReplace: SmartPsiElementPointer[ScExpression],
                           hint: String,
                           rangeInParent: TextRange)
 
-class SimplificationBuilder private[collections](
+class SimplificationBuilder private[collections] (
     val exprToReplace: ScExpression) {
   private var rangeInParent: TextRange = {
     val exprToHighlightFrom: ScExpression = exprToReplace match {
@@ -40,14 +44,14 @@ class SimplificationBuilder private[collections](
     highlightElem(refNameId(exprToReplace).getOrElse(exprToReplace))
 
   def highlightElem(elem: PsiElement) = {
-    this.rangeInParent = elem.getTextRange.shiftRight(
-        -exprToReplace.getTextOffset)
+    this.rangeInParent =
+      elem.getTextRange.shiftRight(-exprToReplace.getTextOffset)
     this
   }
 
   def highlightRange(start: Int, end: Int) = {
-    this.rangeInParent = new TextRange(start, end)
-      .shiftRight(-exprToReplace.getTextOffset)
+    this.rangeInParent =
+      new TextRange(start, end).shiftRight(-exprToReplace.getTextOffset)
     this
   }
 

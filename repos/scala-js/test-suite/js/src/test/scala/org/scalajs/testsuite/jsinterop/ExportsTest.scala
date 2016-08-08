@@ -275,7 +275,7 @@ class ExportsTest {
     class UhOh {
       // Something no one should export
       @JSExport
-      def ahem[T : Comparable](x: T)(implicit y: Int): Nothing = ???
+      def ahem[T: Comparable](x: T)(implicit y: Int): Nothing = ???
     }
 
     val x = (new UhOh).asInstanceOf[js.Dynamic]
@@ -650,7 +650,8 @@ class ExportsTest {
   }
 
   @Test
-  def exports_for_classes_with_qualified_name_SJSDefinedExportedClass(): Unit = {
+  def exports_for_classes_with_qualified_name_SJSDefinedExportedClass()
+    : Unit = {
     val constr = js.Dynamic.global.qualified.testclass.SJSDefinedExportedClass
     assertJSNotUndefined(constr)
     assertEquals("function", js.typeOf(constr))
@@ -681,8 +682,8 @@ class ExportsTest {
     assertEquals("a", js.Dynamic.newInstance(constr)("a").result)
     assertEquals("a|b", js.Dynamic.newInstance(constr)("a", "b").result)
     assertEquals("a|b|c", js.Dynamic.newInstance(constr)("a", "b", "c").result)
-    assertEquals(
-        "Number: <5>|a", js.Dynamic.newInstance(constr)(5, "a").result)
+    assertEquals("Number: <5>|a",
+                 js.Dynamic.newInstance(constr)(5, "a").result)
   }
 
   @Test def export_for_classes_with_default_parameters_in_ctor(): Unit = {
@@ -912,7 +913,8 @@ class ExportsTest {
   }
 
   @Test
-  def should_reject_bad_values_for_arguments_of_primitive_value_type(): Unit = {
+  def should_reject_bad_values_for_arguments_of_primitive_value_type()
+    : Unit = {
     assumeTrue(hasCompliantAsInstanceOfs)
 
     @JSExportAll
@@ -1010,7 +1012,8 @@ class ExportsTest {
     assertEquals(jsPackage.ExportObjSetterNamed_=().x, 1)
   }
 
-  @Test def should_expose_public_members_of_new_js_Object_issue_1899(): Unit = {
+  @Test
+  def should_expose_public_members_of_new_js_Object_issue_1899(): Unit = {
 
     // Test that the bug is fixed for js.Any classes.
 
@@ -1138,7 +1141,7 @@ class ExportsTest {
 
     import scala.language.reflectiveCalls
 
-    val obj2 = getObj().asInstanceOf[ {
+    val obj2 = getObj().asInstanceOf[{
       val x1: String; var y1: String; def z1(): String
     }]
 
@@ -1171,7 +1174,8 @@ class ExportsTest {
   }
 
   @Test
-  def auto_exports_for_Scala_js_defined_JS_objects_extending_a_trait(): Unit = {
+  def auto_exports_for_Scala_js_defined_JS_objects_extending_a_trait()
+    : Unit = {
     val accessor =
       js.Dynamic.global.org.scalajs.testsuite.jsinterop.SJSDefinedAutoExportedTraitObject
     assertJSNotUndefined(accessor)
@@ -1182,7 +1186,8 @@ class ExportsTest {
   }
 
   @Test
-  def auto_exports_for_Scala_js_defined_JS_objects_extending_a_class(): Unit = {
+  def auto_exports_for_Scala_js_defined_JS_objects_extending_a_class()
+    : Unit = {
     val accessor =
       js.Dynamic.global.org.scalajs.testsuite.jsinterop.SJSDefinedAutoExportedClassObject
     assertJSNotUndefined(accessor)
@@ -1283,7 +1288,8 @@ class ExportsTest {
   }
 
   @Test
-  def auto_exports_for_Scala_js_defined_JS_classes_extending_a_trait(): Unit = {
+  def auto_exports_for_Scala_js_defined_JS_classes_extending_a_trait()
+    : Unit = {
     val ctor =
       js.Dynamic.global.org.scalajs.testsuite.jsinterop.SJSDefinedAutoExportedTraitClass
     assertJSNotUndefined(ctor)
@@ -1296,7 +1302,8 @@ class ExportsTest {
   }
 
   @Test
-  def auto_exports_for_Scala_js_defined_JS_classes_extending_a_class(): Unit = {
+  def auto_exports_for_Scala_js_defined_JS_classes_extending_a_class()
+    : Unit = {
     val ctor =
       js.Dynamic.global.org.scalajs.testsuite.jsinterop.SJSDefinedAutoExportedClassClass
     assertJSNotUndefined(ctor)

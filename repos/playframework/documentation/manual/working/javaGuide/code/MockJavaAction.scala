@@ -7,14 +7,20 @@ package javaguide.testhelpers {
 
   import akka.stream.Materializer
   import play.api.mvc.{Action, Request}
-  import play.core.j.{DefaultJavaHandlerComponents, JavaHelpers, JavaActionAnnotations, JavaAction}
+  import play.core.j.{
+    DefaultJavaHandlerComponents,
+    JavaHelpers,
+    JavaActionAnnotations,
+    JavaAction
+  }
   import play.http.DefaultActionCreator
   import play.mvc.{Controller, Http, Result}
   import play.api.test.Helpers
   import java.lang.reflect.Method
 
   abstract class MockJavaAction
-      extends Controller with Action[Http.RequestBody] { self =>
+      extends Controller
+      with Action[Http.RequestBody] { self =>
 
     private lazy val components = new DefaultJavaHandlerComponents(
         play.api.Play.current.injector,
@@ -56,8 +62,7 @@ package javaguide.testhelpers {
              requestBuilder: play.mvc.Http.RequestBuilder)(
         implicit mat: Materializer): Result = {
       Helpers
-        .await(
-            requestBuilder.body() match {
+        .await(requestBuilder.body() match {
           case null =>
             action.apply(requestBuilder.build()._underlyingRequest)
           case other =>
@@ -73,8 +78,8 @@ package javaguide.testhelpers {
         requestBuilder: play.mvc.Http.RequestBuilder,
         body: String)(implicit mat: Materializer): Result = {
       Helpers
-        .await(Helpers.call(
-                action, requestBuilder.build()._underlyingRequest, body))
+        .await(Helpers
+          .call(action, requestBuilder.build()._underlyingRequest, body))
         .asJava
     }
 

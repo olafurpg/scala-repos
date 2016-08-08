@@ -43,16 +43,16 @@ private final class Streaming(system: ActorSystem,
             val twitch =
               WS.url("https://api.twitch.tv/kraken/streams")
                 .withQueryString("channel" -> streamers
-                      .filter(_.twitch)
-                      .map(_.streamerName)
-                      .mkString(","))
+                  .filter(_.twitch)
+                  .map(_.streamerName)
+                  .mkString(","))
                 .withHeaders("Accept" -> "application/vnd.twitchtv.v3+json")
                 .get() map {
                 res =>
                   res.json.validate[Twitch.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"twitch ${res.status} $err ${~res.body.lines.toList.headOption}")
@@ -61,15 +61,15 @@ private final class Streaming(system: ActorSystem,
               }
             val hitbox =
               WS.url("http://api.hitbox.tv/media/live/" + streamers
-                      .filter(_.twitch)
-                      .map(_.streamerName)
-                      .mkString(","))
+                  .filter(_.twitch)
+                  .map(_.streamerName)
+                  .mkString(","))
                 .get() map {
                 res =>
                   res.json.validate[Hitbox.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"hitbox ${res.status} $err ${~res.body.lines.toList.headOption}")
@@ -90,21 +90,20 @@ private final class Streaming(system: ActorSystem,
                   res.json.validate[Youtube.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"youtube ${res.status} $err ${~res.body.lines.toList.headOption}")
                       Nil
                   }
               }
-            (twitch |+| hitbox |+| youtube) map {
-              ss =>
-                StreamsOnAir {
-                  ss.foldLeft(List.empty[StreamOnAir]) {
-                    case (acc, s) if acc.exists(_.id == s.id) => acc
-                    case (acc, s) => acc :+ s
-                  }
+            (twitch |+| hitbox |+| youtube) map { ss =>
+              StreamsOnAir {
+                ss.foldLeft(List.empty[StreamOnAir]) {
+                  case (acc, s) if acc.exists(_.id == s.id) => acc
+                  case (acc, s) => acc :+ s
                 }
+              }
             } pipeTo self
         }
 

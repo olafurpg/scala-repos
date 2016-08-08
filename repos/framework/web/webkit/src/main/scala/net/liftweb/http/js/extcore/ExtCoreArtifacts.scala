@@ -80,9 +80,9 @@ object ExtCoreArtifacts extends JSArtifacts {
         """
 	  try {
 	  var parent1 = document.getElementById(""" + id.encJs +
-        """);
+          """);
 	  parent1.innerHTML = """ + html +
-        """;
+          """;
 	  for (var i = 0; i < parent1.childNodes.length; i++) {
 	    var node = parent1.childNodes[i];
 	    parent1.parentNode.insertBefore(node.cloneNode(true), parent1);
@@ -102,7 +102,7 @@ object ExtCoreArtifacts extends JSArtifacts {
   def setHtml(id: String, xml: NodeSeq): JsCmd = new JsCmd {
     def toJsCmd = fixHtmlCmdFunc(id, xml) { s =>
       "try { Ext.fly(" + id.encJs + ").dom.innerHTML = " + s +
-      "; } catch (e) {}"
+        "; } catch (e) {}"
     }
   }
 
@@ -135,15 +135,17 @@ object ExtCoreArtifacts extends JSArtifacts {
       "Ext.urlDecode(Ext.Ajax.serializeForm(" + formId.encJs + "));"
   }
 
-  private def toJson(
-      info: AjaxInfo, server: String, path: String => JsExp): String =
+  private def toJson(info: AjaxInfo,
+                     server: String,
+                     path: String => JsExp): String =
     (("url : liftAjax.addPageName(" + path(server).toJsCmd +
-            ")") :: "params : " + info.data.toJsCmd ::
-        ("method : " + info.action.encJs) ::
+      ")") :: "params : " + info.data.toJsCmd ::
+      ("method : " + info.action.encJs) ::
         ("dataType : " + info.dataType.encJs) :: "timeout : " +
-        info.timeout :: "disableCaching : " +
-        !info.cache :: "success: function(response, options) { res = Ext.lift.eval(response.responseText);" +
-        info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure: " +
-        info.failFunc.openOr("function(arg) {alert('Ajax request failed');}") :: Nil) mkString
-    ("{ ", ", ", " }")
+          info.timeout :: "disableCaching : " +
+          !info.cache :: "success: function(response, options) { res = Ext.lift.eval(response.responseText);" +
+          info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure: " +
+          info.failFunc
+            .openOr("function(arg) {alert('Ajax request failed');}") :: Nil) mkString
+      ("{ ", ", ", " }")
 }

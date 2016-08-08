@@ -10,7 +10,8 @@ import breeze.util._
   * @author dlwh
   */
 case class Geometric(p: Double)(implicit rand: RandBasis = Rand)
-    extends DiscreteDistr[Int] with Moments[Double, Double] {
+    extends DiscreteDistr[Int]
+    with Moments[Double, Double] {
   require(p >= 0)
   require(p <= 1)
 
@@ -72,8 +73,8 @@ object Geometric
 
   def predictive(parameter: conjugateFamily.Parameter) = TODO
 
-  def posterior(
-      prior: conjugateFamily.Parameter, evidence: TraversableOnce[Int]) = {
+  def posterior(prior: conjugateFamily.Parameter,
+                evidence: TraversableOnce[Int]) = {
     evidence.foldLeft(prior) { (acc, x) =>
       (acc._1 + 1, acc._2 + x)
     }

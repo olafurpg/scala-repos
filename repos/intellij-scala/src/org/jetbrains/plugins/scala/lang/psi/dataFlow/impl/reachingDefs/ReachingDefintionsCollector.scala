@@ -8,10 +8,22 @@ import com.intellij.psi.{PsiElement, PsiMethod, PsiNamedElement, PsiPackage}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScFunction, ScTypeAlias, ScValueDeclaration}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun,
+  ScFunction,
+  ScTypeAlias,
+  ScValueDeclaration
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.controlFlow.Instruction
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{DefinitionInstruction, ExtractMethodControlFlowPolicy, ReadWriteVariableInstruction}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{
+  DefinitionInstruction,
+  ExtractMethodControlFlowPolicy,
+  ReadWriteVariableInstruction
+}
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.DfaEngine
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefinitions._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticNamedElement
@@ -24,30 +36,33 @@ import scala.collection.mutable.ArrayBuffer
   */
 object ReachingDefintionsCollector {
 
-  def collectVariableInfo(
-      fragment: Seq[PsiElement], place: PsiElement): FragmentVariableInfos = {
+  def collectVariableInfo(fragment: Seq[PsiElement],
+                          place: PsiElement): FragmentVariableInfos = {
     // CFG -> DFA
     val commonParent = findCommonParent(fragment: _*)
-    val cfowner = getParentOfType(
-        commonParent.getContext, classOf[ScControlFlowOwner], false)
+    val cfowner = getParentOfType(commonParent.getContext,
+                                  classOf[ScControlFlowOwner],
+                                  false)
     if (cfowner == null) {
       val message =
         "cfowner == null: " +
-        fragment.map(_.getText).mkString("(", ", ", ")") + "\n" + "files: " +
-        fragment.map(_.getContainingFile.getName).mkString("(", ", ", ")")
+          fragment.map(_.getText).mkString("(", ", ", ")") + "\n" + "files: " +
+          fragment.map(_.getContainingFile.getName).mkString("(", ", ", ")")
       throw new RuntimeException(message)
     }
     val cfg =
-      cfowner.getControlFlow(policy = ExtractMethodControlFlowPolicy) //todo: make cache more right to not get PsiInvalidAccess
-    val engine = new DfaEngine(
-        cfg, ReachingDefinitionsInstance, ReachingDefinitionsLattice)
+      cfowner
+        .getControlFlow(policy = ExtractMethodControlFlowPolicy) //todo: make cache more right to not get PsiInvalidAccess
+    val engine = new DfaEngine(cfg,
+                               ReachingDefinitionsInstance,
+                               ReachingDefinitionsLattice)
     val dfaResult = engine.performDFA
 
     // instructions in given fragment
     val fragmentInstructions = filterByFragment(cfg, fragment)
 
-    val inputInfos = computeInputVaribles(fragmentInstructions).filter(
-        info => !isVisible(info.element, place))
+    val inputInfos = computeInputVaribles(fragmentInstructions).filter(info =>
+      !isVisible(info.element, place))
     val outputInfos = computeOutputVariables(fragmentInstructions, dfaResult)
 
     FragmentVariableInfos(inputInfos, outputInfos)
@@ -72,26 +87,36 @@ object ReachingDefintionsCollector {
       case fun: ScFunction => fun.isSynthetic
       case _ => false
     }
-    import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory.{createDeclarationFromText, createExpressionWithContextFromText}
+    import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory.{
+      createDeclarationFromText,
+      createExpressionWithContextFromText
+    }
     val resolvesAtNewPlace = element match {
       case _: PsiMethod | _: ScFun =>
-        checkResolve(createExpressionWithContextFromText(
-                element.name + " _", place.getContext, place).getFirstChild)
+        checkResolve(
+            createExpressionWithContextFromText(element.name + " _",
+                                                place.getContext,
+                                                place).getFirstChild)
       case _: ScObject =>
-        checkResolve(createExpressionWithContextFromText(
-                element.name, place.getContext, place))
+        checkResolve(
+            createExpressionWithContextFromText(element.name,
+                                                place.getContext,
+                                                place))
       case _: ScTypeAlias | _: ScTypeDefinition =>
         val decl = createDeclarationFromText(
-            s"val dummyVal: ${element.name}", place.getContext, place)
-          .asInstanceOf[ScValueDeclaration]
+            s"val dummyVal: ${element.name}",
+            place.getContext,
+            place).asInstanceOf[ScValueDeclaration]
         decl.typeElement match {
           case Some(st: ScSimpleTypeElement) =>
             st.reference.exists(checkResolve)
           case _ => false
         }
       case _ =>
-        checkResolve(createExpressionWithContextFromText(
-                element.name, place.getContext, place))
+        checkResolve(
+            createExpressionWithContextFromText(element.name,
+                                                place.getContext,
+                                                place))
     }
     isInstanceMethod || isSynthetic || resolvesAtNewPlace
   }
@@ -99,8 +124,8 @@ object ReachingDefintionsCollector {
   private def isInFragment(element: PsiElement, fragment: Seq[PsiElement]) =
     fragment.exists(PsiTreeUtil.isAncestor(_, element, false))
 
-  private def filterByFragment(
-      cfg: Seq[Instruction], fragment: Seq[PsiElement]) = cfg.filter { i =>
+  private def filterByFragment(cfg: Seq[Instruction],
+                               fragment: Seq[PsiElement]) = cfg.filter { i =>
     i.element.exists(isInFragment(_, fragment))
   }
 
@@ -109,8 +134,10 @@ object ReachingDefintionsCollector {
       dfaResult: mutable.Map[Instruction, RDSet]): Iterable[VariableInfo] = {
     val buffer = new ArrayBuffer[PsiNamedElement]
     for {
-      (read @ ReadWriteVariableInstruction(
-       _, readRef, Some(definitionToRead), false),
+      (read @ ReadWriteVariableInstruction(_,
+                                           readRef,
+                                           Some(definitionToRead),
+                                           false),
        rdset) <- dfaResult if !innerInstructions.contains(read)
       reaching <- rdset if innerInstructions.contains(reaching)
     } {

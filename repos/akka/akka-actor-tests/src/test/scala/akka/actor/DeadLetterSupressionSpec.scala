@@ -32,8 +32,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream.subscribe(
-        suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream
+      .subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])
@@ -60,8 +60,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream.subscribe(
-        suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream
+      .subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])
@@ -70,7 +70,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.deadLetters ! NormalMsg
 
     deadListener.expectMsg(
-        200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
+        200.millis,
+        DeadLetter(NormalMsg, testActor, system.deadLetters))
 
     suppressedListener.expectMsg(
         200.millis,
@@ -79,8 +80,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     allListener.expectMsg(
         200.millis,
         SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
-    allListener.expectMsg(
-        200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
+    allListener.expectMsg(200.millis,
+                          DeadLetter(NormalMsg, testActor, system.deadLetters))
 
     Thread.sleep(200)
     deadListener.expectNoMsg(Duration.Zero)

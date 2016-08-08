@@ -17,7 +17,11 @@ package squerylrecord
 import common.{Box, Full}
 import record.{BaseField, MetaRecord, Record, TypedField, OwnedField}
 import record.field._
-import org.squeryl.internals.{FieldMetaData, PosoMetaData, FieldMetaDataFactory}
+import org.squeryl.internals.{
+  FieldMetaData,
+  PosoMetaData,
+  FieldMetaDataFactory
+}
 import org.squeryl.annotations.Column
 import java.lang.reflect.{Method, Field}
 import java.lang.annotation.Annotation
@@ -42,10 +46,10 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
         case Full(f: BaseField) => f
         case Full(_) =>
           org.squeryl.internals.Utils.throwError("field " + name +
-              " in Record metadata for " + clasz + " is not a TypedField")
+            " in Record metadata for " + clasz + " is not a TypedField")
         case _ =>
           org.squeryl.internals.Utils.throwError("failed to find field " +
-              name + " in Record metadata for " + clasz)
+            name + " in Record metadata for " + clasz)
       }
 
     metaRecordsByClass get clasz match {
@@ -58,9 +62,9 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           fieldFrom(mr)
         } catch {
           case ex: Exception =>
-            org.squeryl.internals.Utils
-              .throwError("failed to find MetaRecord for " + clasz +
-                " due to exception " + ex.toString)
+            org.squeryl.internals.Utils.throwError(
+                "failed to find MetaRecord for " + clasz +
+                  " due to exception " + ex.toString)
         }
     }
   }
@@ -68,8 +72,10 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
   /** Build a Squeryl FieldMetaData for a particular field in a Record */
   def build(parentMetaData: PosoMetaData[_],
             name: String,
-            property: (Option[Field], Option[Method], Option[Method],
-            Set[Annotation]),
+            property: (Option[Field],
+                       Option[Method],
+                       Option[Method],
+                       Set[Annotation]),
             sampleInstance4OptionTypeDeduction: AnyRef,
             isOptimisticCounter: Boolean): FieldMetaData = {
     if (!isRecord(parentMetaData.clasz) || isOptimisticCounter) {
@@ -84,8 +90,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           isOptimisticCounter)
     }
 
-    val metaField = findMetaField(
-        parentMetaData.clasz.asInstanceOf[Class[Rec]], name)
+    val metaField =
+      findMetaField(parentMetaData.clasz.asInstanceOf[Class[Rec]], name)
 
     val (field, getter, setter, annotations) = property
 
@@ -111,8 +117,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       case _ =>
         org.squeryl.internals.Utils.throwError(
             "Unsupported field type. Consider implementing " +
-            "SquerylRecordField for defining the persistent class." +
-            "Field: " + metaField)
+              "SquerylRecordField for defining the persistent class." +
+              "Field: " + metaField)
     }
 
     new FieldMetaData(
@@ -135,15 +141,15 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           case (stringTypedField: StringTypedField) =>
             Some(stringTypedField.maxLength)
           case decimalField: DecimalField[_] => {
-              val precision = decimalField.context.getPrecision();
-              if (precision != 0) Some(precision)
-              else None
-            }
+            val precision = decimalField.context.getPrecision();
+            if (precision != 0) Some(precision)
+            else None
+          }
           case decimalField: OptionalDecimalField[_] => {
-              val precision = decimalField.context.getPrecision();
-              if (precision != 0) Some(precision)
-              else None
-            }
+            val precision = decimalField.context.getPrecision();
+            if (precision != 0) Some(precision)
+            else None
+          }
           case _ => None
         }
         fieldLength getOrElse super.length
@@ -164,7 +170,7 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
         case other =>
           org.squeryl.internals.Utils.throwError(
               "Field's used with Squeryl must inherit from net.liftweb.record.TypedField : " +
-              other)
+                other)
       }
 
       /**
@@ -180,11 +186,12 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
         case other =>
           org.squeryl.internals.Utils.throwError(
               "RecordMetaDataFactory can not set fields on non Record objects : " +
-              other)
+                other)
       }
 
-      override def setFromResultSet(
-          target: AnyRef, rs: ResultSet, index: Int) =
+      override def setFromResultSet(target: AnyRef,
+                                    rs: ResultSet,
+                                    index: Int) =
         set(target, resultSetHandler(rs, index))
 
       /**
@@ -237,8 +244,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       .get(null)
       .asInstanceOf[MetaRecord[_]]
 
-      () =>
-        metaRecord.createRecord.asInstanceOf[AnyRef]
+    () =>
+      metaRecord.createRecord.asInstanceOf[AnyRef]
   }
 
   /**

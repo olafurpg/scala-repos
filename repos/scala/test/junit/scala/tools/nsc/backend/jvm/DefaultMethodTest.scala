@@ -35,9 +35,8 @@ class DefaultMethodTest extends ClearAfterClass {
         case _ => super.transform(tree)
       }
     }
-    val asmClasses: List[ClassNode] = readAsmClasses(
-        compileTransformed(compiler)(
-            code, Nil, makeFooDefaultMethod.transform(_)))
+    val asmClasses: List[ClassNode] = readAsmClasses(compileTransformed(
+        compiler)(code, Nil, makeFooDefaultMethod.transform(_)))
     val foo = asmClasses.head.methods.iterator.asScala.toList.last
     assertTrue("default method should not be abstract",
                (foo.access & Opcodes.ACC_ABSTRACT) == 0)

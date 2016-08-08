@@ -46,18 +46,17 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
     private var _index: Array[Int],
     private var _data: Array[E],
     private var used: Int,
-    var length: Int)(implicit ring: Semiring[E],
-                     zero: Zero[E])
-    extends NumericOps[VectorBuilder[E]] with Serializable {
+    var length: Int)(implicit ring: Semiring[E], zero: Zero[E])
+    extends NumericOps[VectorBuilder[E]]
+    with Serializable {
 
   def this(length: Int, initialNonZero: Int = 0)(implicit ring: Semiring[E],
                                                  man: ClassTag[E],
                                                  zero: Zero[E]) =
     this(new Array[Int](0), new Array[E](0), 0, length)
 
-  def this()(implicit ring: Semiring[E],
-             man: ClassTag[E],
-             zero: Zero[E]) = this(-1)
+  def this()(implicit ring: Semiring[E], man: ClassTag[E], zero: Zero[E]) =
+    this(-1)
 
   def size = length
 
@@ -141,8 +140,10 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
   }
 
   def zerosLike: VectorBuilder[E] = {
-    new VectorBuilder[E](
-        new Array[Int](0), ArrayUtil.newArrayLike(data, 0), 0, size)
+    new VectorBuilder[E](new Array[Int](0),
+                         ArrayUtil.newArrayLike(data, 0),
+                         0,
+                         size)
   }
 
   def reserve(nnz: Int) {
@@ -266,11 +267,11 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 
   override def equals(p1: Any): Boolean =
     (this eq p1.asInstanceOf[AnyRef]) ||
-    (p1 match {
-          case vb: VectorBuilder[_] =>
-            this.length == vb.length && vb.toHashVector == this.toHashVector
-          case _ => false
-        })
+      (p1 match {
+        case vb: VectorBuilder[_] =>
+          this.length == vb.length && vb.toHashVector == this.toHashVector
+        case _ => false
+      })
 
   /**
     * Sets the underlying sparse array to use this data
@@ -319,23 +320,26 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 
 object VectorBuilder extends VectorBuilderOps {
 
-  def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero](
-      size: Int, initialNonzero: Int = 16) =
+  def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero](
+      size: Int,
+      initialNonzero: Int = 16) =
     new VectorBuilder(size, initialNonzero)
-  def apply[@spec(Double, Int, Float, Long) V : Semiring : Zero](
+  def apply[@spec(Double, Int, Float, Long) V: Semiring: Zero](
       values: Array[V]) =
-    new VectorBuilder(
-        Array.range(0, values.length), values, values.length, values.length)
+    new VectorBuilder(Array.range(0, values.length),
+                      values,
+                      values.length,
+                      values.length)
 
-  def apply[V : ClassTag : Semiring : Zero](values: V*): VectorBuilder[V] =
+  def apply[V: ClassTag: Semiring: Zero](values: V*): VectorBuilder[V] =
     apply(values.toArray)
-  def fill[@spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero](
+  def fill[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero](
       size: Int)(v: => V): VectorBuilder[V] = apply(Array.fill(size)(v))
-  def tabulate[@spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero](
+  def tabulate[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero](
       size: Int)(f: Int => V): VectorBuilder[V] =
     apply(Array.tabulate(size)(f))
 
-  def apply[V : ClassTag : Semiring : Zero](length: Int)(values: (Int, V)*) = {
+  def apply[V: ClassTag: Semiring: Zero](length: Int)(values: (Int, V)*) = {
     val r = zeros[V](length)
     for ((i, v) <- values) {
       r.add(i, v)
@@ -345,7 +349,7 @@ object VectorBuilder extends VectorBuilderOps {
 
   // implicits
   class CanCopyBuilder[
-      @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]
+      @spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
       extends CanCopy[VectorBuilder[V]] {
     def apply(v1: VectorBuilder[V]) = {
       v1.copy
@@ -353,27 +357,24 @@ object VectorBuilder extends VectorBuilderOps {
   }
 
   class CanZerosBuilder[
-      @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]
+      @spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
       extends CanCreateZerosLike[VectorBuilder[V], VectorBuilder[V]] {
     def apply(v1: VectorBuilder[V]) = {
       v1.zerosLike
     }
   }
 
-  implicit def canCopyBuilder[
-      @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]: CanCopyBuilder[
-      V] = {
+  implicit def canCopyBuilder[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
+    : CanCopyBuilder[V] = {
     new CanCopyBuilder[V]
   }
-  implicit def canZerosBuilder[
-      @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]: CanZerosBuilder[
-      V] = {
+  implicit def canZerosBuilder[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
+    : CanZerosBuilder[V] = {
     new CanZerosBuilder[V]
   }
 
-  implicit def canZeroBuilder[
-      @spec(Double, Int, Float, Long) V : Semiring : Zero : ClassTag]: CanCreateZeros[
-      VectorBuilder[V], Int] = {
+  implicit def canZeroBuilder[@spec(Double, Int, Float, Long) V: Semiring: Zero: ClassTag]
+    : CanCreateZeros[VectorBuilder[V], Int] = {
     new CanCreateZeros[VectorBuilder[V], Int] {
       def apply(d: Int): VectorBuilder[V] = zeros(d)
     }

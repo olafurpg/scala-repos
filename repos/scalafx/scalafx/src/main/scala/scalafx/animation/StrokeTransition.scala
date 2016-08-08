@@ -69,7 +69,8 @@ object StrokeTransition extends AnimationStatics {
   */
 class StrokeTransition(
     override val delegate: jfxa.StrokeTransition = new jfxa.StrokeTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.StrokeTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.StrokeTransition] {
 
   // CONSTRUCTORS
 
@@ -81,8 +82,10 @@ class StrokeTransition(
     * @param fromValue The start value of the color-animation
     * @param toValue The end value of the color-animation
     */
-  def this(
-      duration: Duration, shape: Shape, fromValue: Color, toValue: Color) =
+  def this(duration: Duration,
+           shape: Shape,
+           fromValue: Color,
+           toValue: Color) =
     this(new jfxa.StrokeTransition(duration, shape, fromValue, toValue))
 
   /**

@@ -28,7 +28,8 @@ class BoyerMooreSpec extends WordSpec with Matchers {
       val haystackLen = 1000
       (0 to 9) foreach { run ⇒
         val alphabet =
-          alphabetBase.take(4 + random.nextInt(5)) // 4 to 8 distinct alphanumeric chars
+          alphabetBase
+            .take(4 + random.nextInt(5)) // 4 to 8 distinct alphanumeric chars
         val randomAlphabetChars =
           Stream.continually(alphabet(random.nextInt(alphabet.length)))
         def randomBytes(num: Int): ByteString =
@@ -77,12 +78,14 @@ class BoyerMooreSpec extends WordSpec with Matchers {
            skipFindsThatStartInFinds: Boolean = false): Seq[Int] = {
     val boyerMoore = new BoyerMoore(needle.toArray[Byte])
     @tailrec def rec(offset: Int, result: Seq[Int]): Seq[Int] = {
-      val ix = try boyerMoore.nextIndex(haystack, offset) catch {
+      val ix = try boyerMoore.nextIndex(haystack, offset)
+      catch {
         case NotEnoughDataException ⇒ -1
       }
       if (ix >= 0)
         rec(if (skipFindsThatStartInFinds) ix + needle.length else ix + 1,
-            result :+ ix) else result
+            result :+ ix)
+      else result
     }
     rec(0, Seq.empty)
   }

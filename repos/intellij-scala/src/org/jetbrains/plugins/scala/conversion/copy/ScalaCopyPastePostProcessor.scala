@@ -9,7 +9,10 @@ import com.intellij.diagnostic.LogMessageEx
 import com.intellij.openapi.diagnostic.{Attachment, Logger}
 import com.intellij.openapi.editor.{Editor, RangeMarker}
 import com.intellij.openapi.progress.util.AbstractProgressIndicatorBase
-import com.intellij.openapi.progress.{ProcessCanceledException, ProgressManager}
+import com.intellij.openapi.progress.{
+  ProcessCanceledException,
+  ProgressManager
+}
 import com.intellij.openapi.project.{DumbService, Project}
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.{Ref, TextRange}
@@ -50,38 +53,34 @@ class ScalaCopyPastePostProcessor
     try {
       ProgressManager
         .getInstance()
-        .runProcess(
-            new Runnable {
-              override def run(): Unit = {
-                breakable {
-                  for ((startOffset, endOffset) <- startOffsets.zip(
-                      endOffsets);
-                  element <- getElementsStrictlyInRange(
-                      file, startOffset, endOffset);
-                  reference <- element.asOptionOf[ScReferenceElement];
-                  dependency <- Dependency.dependencyFor(reference)
-                                   if dependency.isExternal;
-                  range = dependency.source.getTextRange
-                    .shiftRight(-startOffset)) {
-                    if (System.currentTimeMillis > timeBound) {
-                      Log.warn(
-                          "Time-out while collecting dependencies in %s:\n%s"
-                            .format(
-                              file.getName,
-                              file.getText.substring(startOffset, endOffset)))
-                      break()
-                    }
-                    associations ::=
-                      Association(dependency.kind, range, dependency.path)
-                  }
+        .runProcess(new Runnable {
+          override def run(): Unit = {
+            breakable {
+              for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
+                   element <- getElementsStrictlyInRange(file,
+                                                         startOffset,
+                                                         endOffset);
+                   reference <- element.asOptionOf[ScReferenceElement];
+                   dependency <- Dependency.dependencyFor(reference)
+                   if dependency.isExternal;
+                   range = dependency.source.getTextRange.shiftRight(
+                       -startOffset)) {
+                if (System.currentTimeMillis > timeBound) {
+                  Log.warn("Time-out while collecting dependencies in %s:\n%s"
+                    .format(file.getName,
+                            file.getText.substring(startOffset, endOffset)))
+                  break()
                 }
+                associations ::=
+                  Association(dependency.kind, range, dependency.path)
               }
-            },
-            new AbstractProgressIndicatorBase {
-              override def isCanceled: scala.Boolean = {
-                System.currentTimeMillis > timeBound || super.isCanceled
-              }
-            })
+            }
+          }
+        }, new AbstractProgressIndicatorBase {
+          override def isCanceled: scala.Boolean = {
+            System.currentTimeMillis > timeBound || super.isCanceled
+          }
+        })
     } catch {
       case p: ProcessCanceledException =>
         Log.warn(
@@ -89,10 +88,10 @@ class ScalaCopyPastePostProcessor
                 file.getName,
                 file.getText.substring(startOffsets(0), endOffsets(0))))
       case e: Exception =>
-        val selections = (startOffsets, endOffsets).zipped
-          .map((a, b) => file.getText.substring(a, b))
-        val attachments = selections.zipWithIndex.map(
-            p => new Attachment(s"Selection-${p._2 + 1}.scala", p._1))
+        val selections = (startOffsets, endOffsets).zipped.map((a, b) =>
+          file.getText.substring(a, b))
+        val attachments = selections.zipWithIndex.map(p =>
+          new Attachment(s"Selection-${p._2 + 1}.scala", p._1))
         Log.error(
             LogMessageEx.createEvent(e.getMessage,
                                      ExceptionUtil.getThrowableText(e),
@@ -104,7 +103,8 @@ class ScalaCopyPastePostProcessor
   protected def extractTransferableData0(content: Transferable) = {
     content
       .isDataFlavorSupported(Associations.Flavor)
-      .ifTrue(content
+      .ifTrue(
+          content
             .getTransferData(Associations.Flavor)
             .asInstanceOf[Associations])
       .orNull
@@ -118,7 +118,9 @@ class ScalaCopyPastePostProcessor
                                          value: Associations) {
     if (DumbService.getInstance(project).isDumb) return
 
-    if (ScalaApplicationSettings.getInstance().ADD_IMPORTS_ON_PASTE == CodeInsightSettings.NO)
+    if (ScalaApplicationSettings
+          .getInstance()
+          .ADD_IMPORTS_ON_PASTE == CodeInsightSettings.NO)
       return
 
     val file =
@@ -131,7 +133,9 @@ class ScalaCopyPastePostProcessor
     val offset = bounds.getStartOffset
 
     doRestoreAssociations(value, file, offset, project) { bindingsToRestore =>
-      if (ScalaApplicationSettings.getInstance().ADD_IMPORTS_ON_PASTE == CodeInsightSettings.ASK) {
+      if (ScalaApplicationSettings
+            .getInstance()
+            .ADD_IMPORTS_ON_PASTE == CodeInsightSettings.ASK) {
         val dialog =
           new RestoreReferencesDialog(project,
                                       bindingsToRestore
@@ -149,21 +153,26 @@ class ScalaCopyPastePostProcessor
     }
   }
 
-  def restoreAssociations(
-      value: Associations, file: PsiFile, offset: Int, project: Project) {
+  def restoreAssociations(value: Associations,
+                          file: PsiFile,
+                          offset: Int,
+                          project: Project) {
     doRestoreAssociations(value, file, offset, project)(identity)
   }
 
   private def doRestoreAssociations(
-      value: Associations, file: PsiFile, offset: Int, project: Project)(
-      filter: Seq[Binding] => Seq[Binding]) {
+      value: Associations,
+      file: PsiFile,
+      offset: Int,
+      project: Project)(filter: Seq[Binding] => Seq[Binding]) {
     val bindings = (for {
       association <- value.associations
       element <- elementFor(association, file, offset)
-                    if !association.isSatisfiedIn(element)
+      if !association.isSatisfiedIn(element)
     } yield
       Binding(element,
-              association.path.asString(ScalaCodeStyleSettings
+              association.path.asString(
+                  ScalaCodeStyleSettings
                     .getInstance(project)
                     .isImportMembersUsingUnderScore))).filter {
       case Binding(_, path) =>
@@ -180,8 +189,8 @@ class ScalaCopyPastePostProcessor
 
     inWriteAction {
       for (Binding(ref, path) <- bindingsToRestore;
-      holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject)) holder
-        .addImportForPath(path, ref)
+           holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject))
+        holder.addImportForPath(path, ref)
     }
   }
 
@@ -191,11 +200,12 @@ class ScalaCopyPastePostProcessor
     val range = dependency.range.shiftRight(offset)
 
     for (ref <- Option(file.findElementAt(range.getStartOffset));
-    parent <- ref.parent if parent.getTextRange == range) yield parent
+         parent <- ref.parent if parent.getTextRange == range) yield parent
   }
 
-  private def getElementsStrictlyInRange(
-      file: PsiFile, startOffset: Int, endOffset: Int): Seq[PsiElement] = {
+  private def getElementsStrictlyInRange(file: PsiFile,
+                                         startOffset: Int,
+                                         endOffset: Int): Seq[PsiElement] = {
     val range = TextRange.create(startOffset, endOffset)
     CollectHighlightsUtil
       .getElementsInRange(file, startOffset, endOffset)

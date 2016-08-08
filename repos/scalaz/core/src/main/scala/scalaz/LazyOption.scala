@@ -163,12 +163,12 @@ sealed abstract class LazyOptionInstances {
         }
     }
 
-  implicit def lazyOptionEqual[A : Equal]: Equal[LazyOption[A]] = {
+  implicit def lazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = {
     import std.option._
     Equal.equalBy(_.toOption)
   }
 
-  implicit def lazyOptionMonoid[A : Semigroup]: Monoid[LazyOption[A]] =
+  implicit def lazyOptionMonoid[A: Semigroup]: Monoid[LazyOption[A]] =
     new Monoid[LazyOption[A]] {
       def zero = LazyNone
 

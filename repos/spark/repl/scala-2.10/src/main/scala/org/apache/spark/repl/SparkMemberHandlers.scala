@@ -161,8 +161,8 @@ private[repl] trait SparkMemberHandlers {
     override def resultExtractionCode(req: Request) = {
       val lhsType = string2code(req lookupTypeOf name)
       val res = string2code(req fullPath name)
-      """ + "%s: %s = " + %s + "\n" """.format(
-          string2code(lhs.toString), lhsType, res) + "\n"
+      """ + "%s: %s = " + %s + "\n" """
+        .format(string2code(lhs.toString), lhsType, res) + "\n"
     }
   }
 
@@ -240,7 +240,8 @@ private[repl] trait SparkMemberHandlers {
     /** The names imported by this statement */
     override lazy val importedNames: List[Name] =
       wildcardNames ++ individualNames
-    lazy val importsSymbolNamed: Set[String] = importedNames map (_.toString) toSet
+    lazy val importsSymbolNamed: Set[String] =
+      importedNames map (_.toString) toSet
 
     def importString = imp.toString
     override def resultExtractionCode(req: Request) =

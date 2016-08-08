@@ -68,17 +68,16 @@ case class AppUpdate(id: Option[PathId] = None,
       backoff = backoff.getOrElse(app.backoff),
       backoffFactor = backoffFactor.getOrElse(app.backoffFactor),
       maxLaunchDelay = maxLaunchDelay.getOrElse(app.maxLaunchDelay),
-      container = container
-          .filterNot(_ == Container.Empty)
-          .orElse(app.container),
+      container =
+        container.filterNot(_ == Container.Empty).orElse(app.container),
       healthChecks = healthChecks.getOrElse(app.healthChecks),
       dependencies = dependencies
-          .map(_.map(_.canonicalPath(app.id)))
-          .getOrElse(app.dependencies),
+        .map(_.map(_.canonicalPath(app.id)))
+        .getOrElse(app.dependencies),
       upgradeStrategy = upgradeStrategy.getOrElse(app.upgradeStrategy),
       labels = labels.getOrElse(app.labels),
-      acceptedResourceRoles = acceptedResourceRoles.orElse(
-            app.acceptedResourceRoles),
+      acceptedResourceRoles =
+        acceptedResourceRoles.orElse(app.acceptedResourceRoles),
       ipAddress = ipAddress.orElse(app.ipAddress),
       // The versionInfo may never be overridden by an AppUpdate.
       // Setting the version in AppUpdate means that the user wants to revert to that version. In that

@@ -6,21 +6,41 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCompositePattern, ScInfixPattern, ScPattern, ScPatternArgumentList}
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScInfixTypeElement, ScSequenceArg}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCompositePattern,
+  ScInfixPattern,
+  ScPattern,
+  ScPatternArgumentList
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScInfixTypeElement,
+  ScSequenceArg
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause, ScParameters}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause,
+  ScParameters
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock,
+  ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
   * @author Alexander Podkhalyuzin
   */
 object ScalaWrapManager {
-  def suggestedWrap(
-      block: ScalaBlock, scalaSettings: ScalaCodeStyleSettings): Wrap = {
+  def suggestedWrap(block: ScalaBlock,
+                    scalaSettings: ScalaCodeStyleSettings): Wrap = {
     val settings = block.getCommonSettings
     val node = block.getNode
     val psi = node.getPsi
@@ -30,10 +50,10 @@ object ScalaWrapManager {
       psi.getParent match {
         case parent: PsiElement if elementMatch(parent) =>
           import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils.priority
-          val parentPriority = priority(
-              elementOperation(parent).getText, assignments)
-          val childPriority = priority(
-              elementOperation(psi).getText, assignments)
+          val parentPriority =
+            priority(elementOperation(parent).getText, assignments)
+          val childPriority =
+            priority(elementOperation(psi).getText, assignments)
           val notSamePriority = parentPriority != childPriority
           if (notSamePriority) {
             Wrap.createChildWrap(block.getWrap,
@@ -81,7 +101,7 @@ object ScalaWrapManager {
         return Wrap.createWrap(settings.CALL_PARAMETERS_WRAP, false)
       case _
           if node.getElementType == ScalaTokenTypes.kEXTENDS &&
-          block.myLastNode != null =>
+            block.myLastNode != null =>
         return Wrap.createChildWrap(
             block.getWrap,
             WrapType.byLegacyRepresentation(settings.EXTENDS_LIST_WRAP),
@@ -188,7 +208,7 @@ object ScalaWrapManager {
         else return null
       case _
           if parentNode.getElementType == ScalaTokenTypes.kEXTENDS &&
-          parent.myLastNode != null =>
+            parent.myLastNode != null =>
         val e: ScExtendsBlock =
           PsiTreeUtil.getParentOfType(parentPsi, classOf[ScExtendsBlock])
         val first: PsiElement = e.earlyDefinitions match {

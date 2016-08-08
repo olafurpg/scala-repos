@@ -47,11 +47,12 @@ object SerializationBugs extends Specification {
     val rightOp = plan.rightOperand.get
 
     (g2.buy.size mustEqual 1) and (leftOp.functionName mustEqual "f1") and
-    (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
-    (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some("A")) and
-    (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
-    (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
-    (rightOp.subOperand mustEqual None)
+      (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
+      (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some(
+        "A")) and
+      (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
+      (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
+      (rightOp.subOperand mustEqual None)
   }
 
   "null serialization bug" in {
@@ -85,7 +86,7 @@ object SerializationBugs extends Specification {
     val o2 = OptionalUUID(Some(UUID.randomUUID))
 
     (read[OptionalUUID](swrite(o1)) mustEqual o1) and
-    (read[OptionalUUID](swrite(o2)) mustEqual o2)
+      (read[OptionalUUID](swrite(o2)) mustEqual o2)
   }
 
   "TypeInfo is not correctly constructed for customer serializer -- 970" in {
@@ -156,12 +157,9 @@ object SerializationBugs extends Specification {
       def serialize(implicit format: Formats) = {
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
-          JObject(
-              List(JField("val",
-                          JArray(x
-                                .asInstanceOf[Vector[Double]]
-                                .toList
-                                .map(JDouble(_))))))
+          JObject(List(JField(
+              "val",
+              JArray(x.asInstanceOf[Vector[Double]].toList.map(JDouble(_))))))
       }
     }
 
@@ -176,9 +174,9 @@ object SerializationBugs extends Specification {
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
     (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
-            TypeA("string"))) and
-    (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
-            TypeB("string")))
+        TypeA("string"))) and
+      (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
+          TypeB("string")))
   }
 }
 

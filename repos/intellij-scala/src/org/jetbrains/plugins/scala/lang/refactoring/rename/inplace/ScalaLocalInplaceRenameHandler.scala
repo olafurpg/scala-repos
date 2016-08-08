@@ -7,25 +7,31 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile, PsiNamedElement}
-import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, VariableInplaceRenameHandler, VariableInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  InplaceRefactoring,
+  VariableInplaceRenameHandler,
+  VariableInplaceRenamer
+}
 
 /**
   * Nikolay.Tropin
   * 1/20/14
   */
 class ScalaLocalInplaceRenameHandler
-    extends VariableInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends VariableInplaceRenameHandler
+    with ScalaInplaceRenameHandler {
 
-  override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+  override def isAvailable(element: PsiElement,
+                           editor: Editor,
+                           file: PsiFile): Boolean = {
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
     element.getUseScope.isInstanceOf[LocalSearchScope]
   }
 
-  override def createRenamer(
-      elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer = {
+  override def createRenamer(elementToRename: PsiElement,
+                             editor: Editor): VariableInplaceRenamer = {
     elementToRename match {
       case named: PsiNamedElement =>
         new ScalaLocalInplaceRenamer(named, editor)

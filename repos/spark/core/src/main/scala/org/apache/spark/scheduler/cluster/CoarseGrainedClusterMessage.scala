@@ -40,10 +40,12 @@ private[spark] object CoarseGrainedClusterMessages {
   sealed trait RegisterExecutorResponse
 
   case class RegisteredExecutor(hostname: String)
-      extends CoarseGrainedClusterMessage with RegisterExecutorResponse
+      extends CoarseGrainedClusterMessage
+      with RegisterExecutorResponse
 
   case class RegisterExecutorFailed(message: String)
-      extends CoarseGrainedClusterMessage with RegisterExecutorResponse
+      extends CoarseGrainedClusterMessage
+      with RegisterExecutorResponse
 
   // Executors to driver
   case class RegisterExecutor(executorId: String,
@@ -85,8 +87,9 @@ private[spark] object CoarseGrainedClusterMessages {
       extends CoarseGrainedClusterMessage
 
   // Exchanged between the driver and the AM in Yarn client mode
-  case class AddWebUIFilter(
-      filterName: String, filterParams: Map[String, String], proxyBase: String)
+  case class AddWebUIFilter(filterName: String,
+                            filterParams: Map[String, String],
+                            proxyBase: String)
       extends CoarseGrainedClusterMessage
 
   // Messages exchanged between the driver and the cluster manager for executor allocation

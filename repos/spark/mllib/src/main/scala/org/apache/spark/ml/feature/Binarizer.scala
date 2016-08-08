@@ -36,7 +36,9 @@ import org.apache.spark.sql.types._
   */
 @Experimental
 final class Binarizer(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("binarizer"))
@@ -49,7 +51,9 @@ final class Binarizer(override val uid: String)
     * @group param
     */
   val threshold: DoubleParam = new DoubleParam(
-      this, "threshold", "threshold used to binarize continuous features")
+      this,
+      "threshold",
+      "threshold used to binarize continuous features")
 
   /** @group getParam */
   def getThreshold: Double = $(threshold)

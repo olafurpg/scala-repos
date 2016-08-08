@@ -36,19 +36,19 @@ object Dist {
       distExclude := Seq.empty,
       distAllClasspaths <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          dependencyClasspath.task in Compile),
+            dependencyClasspath.task in Compile),
       distDependencies <<= distAllClasspaths map {
         _.flatten.map(_.data).filter(ClasspathUtilities.isArchive).distinct
       },
       distLibJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageBin.task in Compile),
+            packageBin.task in Compile),
       distSrcJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageSrc.task in Compile),
+            packageSrc.task in Compile),
       distDocJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageDoc.task in Compile),
+            packageDoc.task in Compile),
       distSources <<= (distDependencies,
                        distLibJars,
                        distSrcJars,

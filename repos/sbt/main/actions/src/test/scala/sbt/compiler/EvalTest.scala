@@ -30,10 +30,11 @@ object EvalTest extends Properties("eval") {
   property("type mismatch") = forAll { (i: Int, l: Int) =>
     val line = math.abs(l)
     val src = "mismatch"
-    throws(classOf[RuntimeException])(eval.eval(i.toString,
-                                                tpeName = Some(BooleanType),
-                                                line = line,
-                                                srcName = src)) &&
+    throws(classOf[RuntimeException])(
+        eval.eval(i.toString,
+                  tpeName = Some(BooleanType),
+                  line = line,
+                  srcName = src)) &&
     hasErrors(line + 1, src)
   }
 
@@ -41,10 +42,8 @@ object EvalTest extends Properties("eval") {
     IO.withTemporaryDirectory { dir =>
       val eval = new Eval(_ => reporter, backing = Some(dir))
       val result = eval.eval(local(i))
-      val v = value(result)
-        .asInstanceOf[ { def i: Int }]
-        .i
-        (label("Value", v) |: (v == i)) &&
+      val v = value(result).asInstanceOf[{ def i: Int }].i
+      (label("Value", v) |: (v == i)) &&
       (label("Type", result.tpe) |: (result.tpe == LocalType)) &&
       (label("Files", result.generated) |: result.generated.nonEmpty)
     }
@@ -67,8 +66,11 @@ val p = {
 
   property("val test") = secure {
     val defs = (ValTestContent, 1 to 7) :: Nil
-    val res = eval.evalDefinitions(
-        defs, new EvalImports(Nil, ""), "<defs>", None, "scala.Int" :: Nil)
+    val res = eval.evalDefinitions(defs,
+                                   new EvalImports(Nil, ""),
+                                   "<defs>",
+                                   None,
+                                   "scala.Int" :: Nil)
     label("Val names", res.valNames) |: (res.valNames.toSet == ValTestNames)
   }
 

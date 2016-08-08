@@ -23,7 +23,7 @@ class OpenSynFileIntention extends PsiElementBaseIntentionAction {
     element.getContainingFile match {
       case scalaFile: ScalaFile
           if (ScalaMacroDebuggingUtil.isEnabled) &&
-          (ScalaMacroDebuggingUtil isLoaded scalaFile) =>
+            (ScalaMacroDebuggingUtil isLoaded scalaFile) =>
         true
       case _ => false
     }

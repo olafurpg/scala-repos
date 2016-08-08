@@ -89,12 +89,12 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
     * @param status The final status of the AM.
     * @param diagnostics Diagnostics message to include in the final status.
     */
-  def unregister(
-      status: FinalApplicationStatus, diagnostics: String = ""): Unit =
+  def unregister(status: FinalApplicationStatus,
+                 diagnostics: String = ""): Unit =
     synchronized {
       if (registered) {
-        amClient.unregisterApplicationMaster(
-            status, diagnostics, uiHistoryAddress)
+        amClient
+          .unregisterApplicationMaster(status, diagnostics, uiHistoryAddress)
       }
     }
 
@@ -104,8 +104,8 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
   }
 
   /** Returns the configuration for the AmIpFilter to add to the Spark UI. */
-  def getAmIpFilterParams(
-      conf: YarnConfiguration, proxyBase: String): Map[String, String] = {
+  def getAmIpFilterParams(conf: YarnConfiguration,
+                          proxyBase: String): Map[String, String] = {
     // Figure out which scheme Yarn is using. Note the method seems to have been added after 2.2,
     // so not all stable releases have it.
     val prefix = Try(
@@ -116,8 +116,8 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
 
     // If running a new enough Yarn, use the HA-aware API for retrieving the RM addresses.
     try {
-      val method = classOf[WebAppUtils].getMethod(
-          "getProxyHostsAndPortsForAmFilter", classOf[Configuration])
+      val method = classOf[WebAppUtils]
+        .getMethod("getProxyHostsAndPortsForAmFilter", classOf[Configuration])
       val proxies = method.invoke(null, conf).asInstanceOf[JList[String]]
       val hosts = proxies.asScala.map { proxy =>
         proxy.split(":")(0)
@@ -137,8 +137,8 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
   }
 
   /** Returns the maximum number of attempts to register the AM. */
-  def getMaxRegAttempts(
-      sparkConf: SparkConf, yarnConf: YarnConfiguration): Int = {
+  def getMaxRegAttempts(sparkConf: SparkConf,
+                        yarnConf: YarnConfiguration): Int = {
     val sparkMaxAttempts = sparkConf.get(MAX_APP_ATTEMPTS).map(_.toInt)
     val yarnMaxAttempts = yarnConf.getInt(
         YarnConfiguration.RM_AM_MAX_ATTEMPTS,

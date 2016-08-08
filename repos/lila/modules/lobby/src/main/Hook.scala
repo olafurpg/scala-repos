@@ -35,9 +35,9 @@ case class Hook(
 
   def compatibleWith(h: Hook) =
     compatibilityProperties == h.compatibilityProperties &&
-    (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
+      (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
       .fold(isAuth && h.isAuth, true) && ratingRangeCompatibleWith(h) &&
-    h.ratingRangeCompatibleWith(this)
+      h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Hook) = realRatingRange.fold(true) {
     range =>

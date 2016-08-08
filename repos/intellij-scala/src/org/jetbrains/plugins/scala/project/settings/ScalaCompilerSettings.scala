@@ -94,8 +94,10 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
   }
 
   def sbtIncOptions =
-    SbtIncrementalOptions(
-        nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction)
+    SbtIncrementalOptions(nameHashing,
+                          recompileOnMacroDef,
+                          transitiveStep,
+                          recompileAllFraction)
 
   private def initFrom0(options: Seq[String]) {
     val optionToSetter = ToggleOptions.map(it => (it._1, it._3)).toMap

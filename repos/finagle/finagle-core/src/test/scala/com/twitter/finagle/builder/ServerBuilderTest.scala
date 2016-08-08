@@ -18,7 +18,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 @RunWith(classOf[JUnitRunner])
 class ServerBuilderTest
-    extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with MockitoSugar
     with IntegrationBase {
 
   trait ServerBuilderHelper {
@@ -109,8 +112,8 @@ class ServerBuilderTest
     ServerBuilder().name("test").codec(cfServer).bindTo(loopback).build(svc)
   }
 
-  verifyProtocolRegistry(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory#Server)FancyCodec",
+                         expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {
@@ -132,8 +135,8 @@ class ServerBuilderTest
       .build(svc)
   }
 
-  verifyServerBoundAddress(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+  verifyServerBoundAddress("#codec(CodecFactory#Server)FancyCodec",
+                           expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {

@@ -39,8 +39,8 @@ trait CanResolveAsync[ResolvableType, ResolvedType] {
     * See `CanResolveFuture` and `CanResolveLAFuture` in `lift-webkit` for
     * example usages.
     */
-  def resolveAsync(
-      resolvable: ResolvableType, onResolved: (ResolvedType) => Unit): Unit
+  def resolveAsync(resolvable: ResolvableType,
+                   onResolved: (ResolvedType) => Unit): Unit
 }
 
 trait LowPriorityCanResolveAsyncImplicits { self: CanResolveAsync.type =>

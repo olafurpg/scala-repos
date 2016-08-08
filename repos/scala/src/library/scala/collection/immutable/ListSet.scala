@@ -74,9 +74,11 @@ object ListSet extends ImmutableSetFactory[ListSet] {
     "The semantics of immutable collections makes inheriting from ListSet error-prone.",
     "2.11.0")
 class ListSet[A]
-    extends AbstractSet[A] with Set[A] with GenericSetTemplate[A, ListSet]
-    with SetLike[A, ListSet[A]] with Serializable {
-  self =>
+    extends AbstractSet[A]
+    with Set[A]
+    with GenericSetTemplate[A, ListSet]
+    with SetLike[A, ListSet[A]]
+    with Serializable { self =>
   override def companion: GenericCompanion[ListSet] = ListSet
 
   /** Returns the number of elements in this set.
@@ -148,7 +150,8 @@ class ListSet[A]
   /** Represents an entry in the `ListSet`.
     */
   protected class Node(override val head: A)
-      extends ListSet[A] with Serializable {
+      extends ListSet[A]
+      with Serializable {
     override private[ListSet] def unchecked_outer = self
 
     /** Returns the number of elements in this set.

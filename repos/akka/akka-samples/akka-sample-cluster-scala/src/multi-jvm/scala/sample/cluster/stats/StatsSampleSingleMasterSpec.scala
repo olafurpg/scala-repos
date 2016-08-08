@@ -46,7 +46,9 @@ object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -76,8 +78,11 @@ class StatsSampleSingleMasterSpecMultiJvmNode3
     extends StatsSampleSingleMasterSpec
 
 abstract class StatsSampleSingleMasterSpec
-    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSingleMasterSpecConfig._
 
@@ -103,12 +108,13 @@ abstract class StatsSampleSingleMasterSpec
 
       Cluster(system).unsubscribe(testActor)
 
-      system.actorOf(ClusterSingletonManager.props(
-                         singletonProps = Props[StatsService],
-                         terminationMessage = PoisonPill,
-                         settings = ClusterSingletonManagerSettings(system)
-                             .withRole("compute")),
-                     name = "statsService")
+      system.actorOf(
+          ClusterSingletonManager.props(
+              singletonProps = Props[StatsService],
+              terminationMessage = PoisonPill,
+              settings =
+                ClusterSingletonManagerSettings(system).withRole("compute")),
+          name = "statsService")
 
       system.actorOf(
           ClusterSingletonProxy.props(

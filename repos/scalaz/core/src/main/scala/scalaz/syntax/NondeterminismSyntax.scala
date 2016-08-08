@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Nondeterminism` */
-final class NondeterminismOps[F[_], A] private[syntax](val self: F[A])(
+final class NondeterminismOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Nondeterminism[F])
     extends Ops[F[A]] {
   ////

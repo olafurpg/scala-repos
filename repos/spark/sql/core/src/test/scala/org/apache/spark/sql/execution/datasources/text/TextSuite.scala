@@ -25,7 +25,13 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.SequenceFile.CompressionType
 import org.apache.hadoop.io.compress.GzipCodec
 
-import org.apache.spark.sql.{AnalysisException, DataFrame, QueryTest, Row, SaveMode}
+import org.apache.spark.sql.{
+  AnalysisException,
+  DataFrame,
+  QueryTest,
+  Row,
+  SaveMode
+}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{StringType, StructType}
 import org.apache.spark.util.Utils
@@ -95,21 +101,22 @@ class TextSuite extends QueryTest with SharedSQLContext {
         .mode(SaveMode.Overwrite)
         .text(tempDirPath)
     }
-    assert(errMsg.getMessage.contains(
+    assert(
+        errMsg.getMessage.contains(
             "Codec [illegal] is not available. " + "Known codecs are"))
   }
 
   test("SPARK-13543 Write the output as uncompressed via option()") {
     val clonedConf = new Configuration(hadoopConfiguration)
-    hadoopConfiguration.set(
-        "mapreduce.output.fileoutputformat.compress", "true")
+    hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress",
+                            "true")
     hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.type",
                             CompressionType.BLOCK.toString)
     hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.codec",
                             classOf[GzipCodec].getName)
     hadoopConfiguration.set("mapreduce.map.output.compress", "true")
-    hadoopConfiguration.set(
-        "mapreduce.map.output.compress.codec", classOf[GzipCodec].getName)
+    hadoopConfiguration.set("mapreduce.map.output.compress.codec",
+                            classOf[GzipCodec].getName)
     withTempDir { dir =>
       try {
         val testDf = sqlContext.read.text(testFile)
@@ -125,8 +132,8 @@ class TextSuite extends QueryTest with SharedSQLContext {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }

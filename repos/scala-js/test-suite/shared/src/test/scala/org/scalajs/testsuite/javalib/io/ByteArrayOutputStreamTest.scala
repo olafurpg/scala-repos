@@ -20,8 +20,8 @@ class ByteArrayOutputStreamTest extends CommonStreamsTests {
 
     for (i <- 0 to 9) out.write(i)
 
-    assertArrayEquals(
-        Array[Byte](0, 1, 2, 3, 4, 5, 6, 7, 8, 9), out.toByteArray)
+    assertArrayEquals(Array[Byte](0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                      out.toByteArray)
   }
 
   @Test def should_support_simple_write_byte_array(): Unit = {
@@ -31,8 +31,8 @@ class ByteArrayOutputStreamTest extends CommonStreamsTests {
     out.write(arr, 1, 4)
     out.write(arr)
 
-    assertArrayEquals(
-        Array[Byte](1, 2, 3, 4, 0, 1, 2, 3, 4, 5), out.toByteArray)
+    assertArrayEquals(Array[Byte](1, 2, 3, 4, 0, 1, 2, 3, 4, 5),
+                      out.toByteArray)
   }
 
   @Test def should_support_write_byte_array_with_buffer_resize(): Unit = {
@@ -116,7 +116,7 @@ class ByteArrayOutputStreamTest extends CommonStreamsTests {
     out.reset()
     for (i <- 0 to 9) out.write(i)
 
-    assertArrayEquals(
-        Array[Byte](0, 1, 2, 3, 4, 5, 6, 7, 8, 9), out.toByteArray)
+    assertArrayEquals(Array[Byte](0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                      out.toByteArray)
   }
 }

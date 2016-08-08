@@ -96,8 +96,8 @@ object ValidatePullRequest extends AutoPlugin {
 
   def changedDirectoryIsDependency(changedDirs: Set[String],
                                    name: String,
-                                   graphsToTest: Seq[
-                                       (Configuration, ModuleGraph)])(
+                                   graphsToTest: Seq[(Configuration,
+                                                      ModuleGraph)])(
       log: Logger): Boolean = {
     val dirsOrExperimental =
       changedDirs.flatMap(dir => Set(dir, s"$dir-experimental"))
@@ -132,7 +132,7 @@ object ValidatePullRequest extends AutoPlugin {
         sys.env.get(SourceBranchEnvVarName) orElse sys.env
           .get(SourcePullIdJenkinsEnvVarName)
           .map("pullreq/" + _) getOrElse // Set by "GitHub pull request builder plugin"
-        "HEAD"
+          "HEAD"
       },
       targetBranch in Global in ValidatePR := {
         (localTargetBranch, jenkinsTargetBranch) match {
@@ -190,8 +190,8 @@ object ValidatePullRequest extends AutoPlugin {
         val diffedModuleNames = diffOutput
           .map(l => l.trim)
           .filter(l =>
-                l.startsWith("akka-") ||
-                (l.startsWith("project") && l != "project/MiMa.scala"))
+            l.startsWith("akka-") ||
+              (l.startsWith("project") && l != "project/MiMa.scala"))
           .map(l ⇒ l.takeWhile(_ != '/'))
           .toSet
 
@@ -206,13 +206,13 @@ object ValidatePullRequest extends AutoPlugin {
               .toSet
             log.info(
                 "Detected uncomitted changes in directories (including in dependency analysis): " +
-                dirtyDirectories.mkString("[", ",", "]"))
+                  dirtyDirectories.mkString("[", ",", "]"))
             dirtyDirectories
           }
 
         val allModuleNames = dirtyModuleNames ++ diffedModuleNames
         log.info("Detected changes in directories: " +
-            allModuleNames.mkString("[", ", ", "]"))
+          allModuleNames.mkString("[", ", ", "]"))
         allModuleNames
       }
   )
@@ -233,13 +233,15 @@ object ValidatePullRequest extends AutoPlugin {
           val githubCommandEnforcedBuildAll =
             (githubEnforcedBuildAll in ValidatePR).value
 
-          val thisProjectId = CrossVersion(
-              scalaVersion.value, scalaBinaryVersion.value)(projectID.value)
+          val thisProjectId =
+            CrossVersion(scalaVersion.value, scalaBinaryVersion.value)(
+                projectID.value)
 
           def graphFor(updateReport: UpdateReport,
                        config: Configuration): (Configuration, ModuleGraph) =
             config -> SbtUpdateReport.fromConfigurationReport(
-                updateReport.configuration(config.name).get, thisProjectId)
+                updateReport.configuration(config.name).get,
+                thisProjectId)
 
           def isDependency: Boolean =
             changedDirectoryIsDependency(
@@ -266,11 +268,11 @@ object ValidatePullRequest extends AutoPlugin {
 
           val validationTasks =
             buildMode.task.toSeq ++
-            (buildMode match {
-                  case BuildSkip =>
-                    Seq.empty // do not run the additional task if project is skipped during pr validation
-                  case _ => (additionalTasks in ValidatePR).value
-                })
+              (buildMode match {
+                case BuildSkip =>
+                  Seq.empty // do not run the additional task if project is skipped during pr validation
+                case _ => (additionalTasks in ValidatePR).value
+              })
 
           // Create a task for every validation task key and
           // then zip all of the tasks together discarding outputs.

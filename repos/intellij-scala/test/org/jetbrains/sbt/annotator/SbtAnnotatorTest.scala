@@ -7,7 +7,10 @@ import com.intellij.ide.startup.impl.StartupManagerImpl
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants
 import com.intellij.openapi.module.{Module, ModuleManager, ModuleUtilCore}
 import com.intellij.openapi.projectRoots.{JavaSdk, Sdk}
-import com.intellij.openapi.roots.{ModifiableRootModel, ModuleRootModificationUtil}
+import com.intellij.openapi.roots.{
+  ModifiableRootModel,
+  ModuleRootModificationUtil
+}
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtilCore}
 import com.intellij.psi.PsiManager
@@ -61,8 +64,8 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
   override def getTestProjectJdk: Sdk =
     JavaSdk.getInstance().createJdk("java sdk", TestUtils.getDefaultJdk, false)
 
-  private def runTest(
-      sbtVersion: String, expectedMessages: Seq[Message]): Unit = {
+  private def runTest(sbtVersion: String,
+                      expectedMessages: Seq[Message]): Unit = {
     setSbtVersion(sbtVersion)
     val actualMessages = annotate().asJava
     UsefulTestCase.assertSameElements(actualMessages, expectedMessages: _*)
@@ -98,18 +101,20 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     projectSettings.setModules(
         java.util.Collections.singleton(getModule.getModuleFilePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
-    getModule.setOption(
-        ExternalSystemConstants.ROOT_PROJECT_PATH_KEY, getProject.getBasePath)
+    getModule.setOption(ExternalSystemConstants.ROOT_PROJECT_PATH_KEY,
+                        getProject.getBasePath)
   }
 
   private def addTestFileToModuleSources(): Unit = {
-    ModuleRootModificationUtil.updateModel(
-        getModule, new Consumer[ModifiableRootModel] {
-      override def consume(model: ModifiableRootModel): Unit = {
-        val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
-        model.addContentEntry(testdataUrl).addSourceFolder(testdataUrl, false)
-      }
-    })
+    ModuleRootModificationUtil
+      .updateModel(getModule, new Consumer[ModifiableRootModel] {
+        override def consume(model: ModifiableRootModel): Unit = {
+          val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
+          model
+            .addContentEntry(testdataUrl)
+            .addSourceFolder(testdataUrl, false)
+        }
+      })
     preventLeakageOfVfsPointers()
   }
 }
@@ -121,8 +126,8 @@ object Expectations {
       Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
       Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
       Error("organization",
-            SbtBundle(
-                "sbt.annotation.expressionMustConform", "SettingKey[String]")),
+            SbtBundle("sbt.annotation.expressionMustConform",
+                      "SettingKey[String]")),
       Error("\"some string\"",
             SbtBundle("sbt.annotation.expressionMustConform", "String"))
   )

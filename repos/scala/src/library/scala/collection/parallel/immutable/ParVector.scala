@@ -10,7 +10,11 @@ package scala
 package collection
 package parallel.immutable
 
-import scala.collection.generic.{GenericParTemplate, CanCombineFrom, ParFactory}
+import scala.collection.generic.{
+  GenericParTemplate,
+  CanCombineFrom,
+  ParFactory
+}
 import scala.collection.parallel.ParSeqLike
 import scala.collection.parallel.Combiner
 import scala.collection.parallel.SeqSplitter
@@ -36,8 +40,10 @@ import immutable.VectorIterator
   *  @define coll immutable parallel vector
   */
 class ParVector[+T](private[this] val vector: Vector[T])
-    extends ParSeq[T] with GenericParTemplate[T, ParVector]
-    with ParSeqLike[T, ParVector[T], Vector[T]] with Serializable {
+    extends ParSeq[T]
+    with GenericParTemplate[T, ParVector]
+    with ParSeqLike[T, ParVector[T], Vector[T]]
+    with Serializable {
   override def companion = ParVector
 
   def this() = this(Vector())
@@ -57,7 +63,8 @@ class ParVector[+T](private[this] val vector: Vector[T])
   override def toVector: Vector[T] = vector
 
   class ParVectorIterator(_start: Int, _end: Int)
-      extends VectorIterator[T](_start, _end) with SeqSplitter[T] {
+      extends VectorIterator[T](_start, _end)
+      with SeqSplitter[T] {
     def remaining: Int = remainingElementCount
     def dup: SeqSplitter[T] = (new ParVector(remainingVector)).splitter
     def split: Seq[ParVectorIterator] = {
@@ -72,8 +79,8 @@ class ParVector[+T](private[this] val vector: Vector[T])
         splitted += remvector.take(sz)
         remvector = remvector.drop(sz)
       }
-      splitted.map(
-          v => new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
+      splitted.map(v =>
+        new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
     }
   }
 }

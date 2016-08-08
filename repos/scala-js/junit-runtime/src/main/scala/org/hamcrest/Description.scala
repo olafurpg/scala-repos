@@ -47,8 +47,10 @@ trait Description {
 
   def appendValue(value: AnyRef): Description
 
-  def appendValueList[T](
-      start: String, separator: String, end: String, values: T*): Description
+  def appendValueList[T](start: String,
+                         separator: String,
+                         end: String,
+                         values: T*): Description
 
   def appendValueList[T](start: String,
                          separator: String,

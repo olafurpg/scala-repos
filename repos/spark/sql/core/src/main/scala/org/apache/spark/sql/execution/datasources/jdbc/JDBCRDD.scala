@@ -17,7 +17,14 @@
 
 package org.apache.spark.sql.execution.datasources.jdbc
 
-import java.sql.{Connection, Date, ResultSet, ResultSetMetaData, SQLException, Timestamp}
+import java.sql.{
+  Connection,
+  Date,
+  ResultSet,
+  ResultSetMetaData,
+  SQLException,
+  Timestamp
+}
 import java.util.Properties
 
 import scala.util.control.NonFatal
@@ -52,8 +59,10 @@ private[sql] object JDBCRDD extends Logging {
     * @param sqlType - A field of java.sql.Types
     * @return The Catalyst type corresponding to sqlType.
     */
-  private def getCatalystType(
-      sqlType: Int, precision: Int, scale: Int, signed: Boolean): DataType = {
+  private def getCatalystType(sqlType: Int,
+                              precision: Int,
+                              scale: Int,
+                              signed: Boolean): DataType = {
     val answer = sqlType match {
       // scalastyle:off
       case java.sql.Types.ARRAY => null
@@ -118,8 +127,9 @@ private[sql] object JDBCRDD extends Logging {
     * @throws SQLException if the table specification is garbage.
     * @throws SQLException if the table contains an unsupported type.
     */
-  def resolveTable(
-      url: String, table: String, properties: Properties): StructType = {
+  def resolveTable(url: String,
+                   table: String,
+                   properties: Properties): StructType = {
     val dialect = JdbcDialects.get(url)
     val conn: Connection = JdbcUtils.createConnectionFactory(url, properties)()
     try {
@@ -147,8 +157,8 @@ private[sql] object JDBCRDD extends Logging {
               .getCatalystType(dataType, typeName, fieldSize, metadata)
               .getOrElse(
                   getCatalystType(dataType, fieldSize, fieldScale, isSigned))
-            fields(i) = StructField(
-                columnName, columnType, nullable, metadata.build())
+            fields(i) =
+              StructField(columnName, columnType, nullable, metadata.build())
             i = i + 1
           }
           return new StructType(fields)
@@ -173,8 +183,8 @@ private[sql] object JDBCRDD extends Logging {
     *
     * @return A Catalyst schema corresponding to columns in the given order.
     */
-  private def pruneSchema(
-      schema: StructType, columns: Array[String]): StructType = {
+  private def pruneSchema(schema: StructType,
+                          columns: Array[String]): StructType = {
     val fieldMap = Map(
         schema.fields.map(x => x.metadata.getString("name") -> x): _*)
     new StructType(columns.map(name => fieldMap(name)))
@@ -203,7 +213,7 @@ private[sql] object JDBCRDD extends Logging {
       case EqualTo(attr, value) => s"$attr = ${compileValue(value)}"
       case EqualNullSafe(attr, value) =>
         s"(NOT ($attr != ${compileValue(value)} OR $attr IS NULL OR " +
-        s"${compileValue(value)} IS NULL) OR ($attr IS NULL AND ${compileValue(value)} IS NULL))"
+          s"${compileValue(value)} IS NULL) OR ($attr IS NULL AND ${compileValue(value)} IS NULL))"
       case LessThan(attr, value) => s"$attr < ${compileValue(value)}"
       case GreaterThan(attr, value) => s"$attr > ${compileValue(value)}"
       case LessThanOrEqual(attr, value) => s"$attr <= ${compileValue(value)}"
@@ -352,8 +362,8 @@ private[sql] class JDBCRDD(sc: SparkContext,
   def getConversions(schema: StructType): Array[JDBCConversion] =
     schema.fields.map(sf => getConversions(sf.dataType, sf.metadata))
 
-  private def getConversions(
-      dt: DataType, metadata: Metadata): JDBCConversion = dt match {
+  private def getConversions(dt: DataType,
+                             metadata: Metadata): JDBCConversion = dt match {
     case BooleanType => BooleanConversion
     case DateType => DateConversion
     case DecimalType.Fixed(p, s) => DecimalConversion(p, s)
@@ -376,8 +386,8 @@ private[sql] class JDBCRDD(sc: SparkContext,
     * Runs the SQL query against the JDBC driver.
     *
     */
-  override def compute(
-      thePart: Partition, context: TaskContext): Iterator[InternalRow] =
+  override def compute(thePart: Partition,
+                       context: TaskContext): Iterator[InternalRow] =
     new Iterator[InternalRow] {
       var closed = false
       var finished = false
@@ -400,8 +410,9 @@ private[sql] class JDBCRDD(sc: SparkContext,
       val myWhereClause = getWhereClause(part)
 
       val sqlText = s"SELECT $columnList FROM $fqTable $myWhereClause"
-      val stmt = conn.prepareStatement(
-          sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+      val stmt = conn.prepareStatement(sqlText,
+                                       ResultSet.TYPE_FORWARD_ONLY,
+                                       ResultSet.CONCUR_READ_ONLY)
       val fetchSize = properties.getProperty("fetchsize", "0").toInt
       stmt.setFetchSize(fetchSize)
       val rs = stmt.executeQuery()
@@ -473,8 +484,8 @@ private[sql] class JDBCRDD(sc: SparkContext,
                     case TimestampConversion =>
                       array.asInstanceOf[Array[java.sql.Timestamp]].map {
                         timestamp =>
-                          nullSafeConvert(
-                              timestamp, DateTimeUtils.fromJavaTimestamp)
+                          nullSafeConvert(timestamp,
+                                          DateTimeUtils.fromJavaTimestamp)
                       }
                     case StringConversion =>
                       array
@@ -488,7 +499,8 @@ private[sql] class JDBCRDD(sc: SparkContext,
                       array.asInstanceOf[Array[java.math.BigDecimal]].map {
                         decimal =>
                           nullSafeConvert[java.math.BigDecimal](
-                              decimal, d => Decimal(d, p, s))
+                              decimal,
+                              d => Decimal(d, p, s))
                       }
                     case BinaryLongConversion =>
                       throw new IllegalArgumentException(

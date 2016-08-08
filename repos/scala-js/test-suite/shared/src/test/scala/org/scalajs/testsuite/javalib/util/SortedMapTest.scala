@@ -48,5 +48,5 @@ object SortedMapFactory {
 }
 
 trait SortedMapFactory extends MapFactory {
-  def empty[K : ClassTag, V : ClassTag]: ju.SortedMap[K, V]
+  def empty[K: ClassTag, V: ClassTag]: ju.SortedMap[K, V]
 }

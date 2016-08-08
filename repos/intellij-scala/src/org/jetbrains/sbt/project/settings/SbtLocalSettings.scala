@@ -31,7 +31,7 @@ class SbtLocalSettings(project: Project)
   }
 
   def loadState(state: SbtLocalSettingsState) {
-    super [AbstractExternalSystemLocalSettings].loadState(state)
+    super[AbstractExternalSystemLocalSettings].loadState(state)
     sbtSupportSuggested = state.getSbtSupportSuggested
     lastUpdateTimestamp = state.getLastUpdateTimestamp
   }

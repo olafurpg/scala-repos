@@ -78,12 +78,12 @@ private[sql] object SparkSqlSerializer {
     }
   }
 
-  def serialize[T : ClassTag](o: T): Array[Byte] =
+  def serialize[T: ClassTag](o: T): Array[Byte] =
     acquireRelease { k =>
       JavaUtils.bufferToArray(k.serialize(o))
     }
 
-  def deserialize[T : ClassTag](bytes: Array[Byte]): T =
+  def deserialize[T: ClassTag](bytes: Array[Byte]): T =
     acquireRelease { k =>
       k.deserialize[T](ByteBuffer.wrap(bytes))
     }

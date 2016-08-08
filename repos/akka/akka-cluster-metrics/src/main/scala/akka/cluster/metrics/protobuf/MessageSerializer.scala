@@ -3,24 +3,39 @@
   */
 package akka.cluster.metrics.protobuf
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectOutputStream
+}
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 import java.{lang ⇒ jl}
 import akka.actor.{Address, ExtendedActorSystem}
 import akka.cluster.metrics.protobuf.msg.{ClusterMetricsMessages ⇒ cm}
-import akka.cluster.metrics.{EWMA, Metric, MetricsGossip, MetricsGossipEnvelope, NodeMetrics}
+import akka.cluster.metrics.{
+  EWMA,
+  Metric,
+  MetricsGossip,
+  MetricsGossipEnvelope,
+  NodeMetrics
+}
 import akka.serialization.BaseSerializer
 import akka.util.ClassLoaderObjectInputStream
 import akka.protobuf.{ByteString, MessageLite}
 import scala.annotation.tailrec
-import scala.collection.JavaConverters.{asJavaIterableConverter, asScalaBufferConverter, setAsJavaSetConverter}
+import scala.collection.JavaConverters.{
+  asJavaIterableConverter,
+  asScalaBufferConverter,
+  setAsJavaSetConverter
+}
 import akka.serialization.SerializerWithStringManifest
 
 /**
   * Protobuf serializer for [[akka.cluster.metrics.ClusterMetricsMessage]] types.
   */
 class MessageSerializer(val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
 
   private final val BufferSize = 4 * 1024
 
@@ -44,7 +59,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
   def compress(msg: MessageLite): Array[Byte] = {
     val bos = new ByteArrayOutputStream(BufferSize)
     val zip = new GZIPOutputStream(bos)
-    try msg.writeTo(zip) finally zip.close()
+    try msg.writeTo(zip)
+    finally zip.close()
     bos.toByteArray
   }
 
@@ -60,7 +76,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
         readChunk()
     }
 
-    try readChunk() finally in.close()
+    try readChunk()
+    finally in.close()
     out.toByteArray
   }
 
@@ -118,8 +135,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
             address.getHostname,
             address.getPort)
 
-  private def mapWithErrorMessage[T](
-      map: Map[T, Int], value: T, unknown: String): Int =
+  private def mapWithErrorMessage[T](map: Map[T, Int],
+                                     value: T,
+                                     unknown: String): Int =
     map.get(value) match {
       case Some(x) ⇒ x
       case _ ⇒
@@ -134,8 +152,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
     val addressMapping = allAddresses.zipWithIndex.toMap
     val allMetricNames: Vector[String] = allNodeMetrics
-      .foldLeft(Set.empty[String])(
-          (s, n) ⇒ s ++ n.metrics.iterator.map(_.name))
+      .foldLeft(Set.empty[String])((s, n) ⇒
+        s ++ n.metrics.iterator.map(_.name))
       .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =
@@ -200,11 +218,10 @@ class MessageSerializer(val system: ExtendedActorSystem)
       .newBuilder()
       .setFrom(addressToProto(envelope.from))
       .setGossip(cm.MetricsGossip
-            .newBuilder()
-            .addAllAllAddresses(
-                allAddresses.map(addressToProto(_).build()).asJava)
-            .addAllAllMetricNames(allMetricNames.asJava)
-            .addAllNodeMetrics(nodeMetrics.asJava))
+        .newBuilder()
+        .addAllAllAddresses(allAddresses.map(addressToProto(_).build()).asJava)
+        .addAllAllMetricNames(allMetricNames.asJava)
+        .addAllNodeMetrics(nodeMetrics.asJava))
       .setReply(envelope.reply)
       .build
   }

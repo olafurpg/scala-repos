@@ -14,15 +14,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScPatternList
   */
 class ScPatternListStubImpl[ParentPsi <: PsiElement] private (
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScPatternList](parent, elemType)
     with ScPatternListStub {
   var patternsSimple: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            patternsSimple: Boolean) {
     this(parent, elemType)
     this.patternsSimple = patternsSimple

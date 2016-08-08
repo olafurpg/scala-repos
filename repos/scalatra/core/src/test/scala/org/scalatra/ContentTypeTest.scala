@@ -48,9 +48,7 @@ class ContentTypeTestServlet(system: ActorSystem) extends ScalatraServlet {
 
   implicit val timeout: Timeout = 5 seconds
 
-  val conductor = system.actorOf(
-      Props(
-          new Actor {
+  val conductor = system.actorOf(Props(new Actor {
 
     var firstSender: ActorRef = _
 
@@ -171,7 +169,7 @@ class ContentTypeTest extends ScalatraFunSuite with BeforeAndAfterAll {
 
     post("/echo",
          headers = Map("Content-Type" ->
-               ("application/x-www-form-urlencoded; charset=" + charset)),
+           ("application/x-www-form-urlencoded; charset=" + charset)),
          body = ("echo=" + message.urlEncode(Charset.forName(charset)))) {
       body should equal(message)
     }

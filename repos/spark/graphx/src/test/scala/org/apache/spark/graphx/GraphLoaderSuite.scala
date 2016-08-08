@@ -37,8 +37,8 @@ class GraphLoaderSuite extends SparkFunSuite with LocalSparkContext {
       writer.close()
       try {
         val graph = GraphLoader.edgeListFile(sc, tmpDir.getAbsolutePath)
-        val neighborAttrSums = graph.aggregateMessages[Int](
-            ctx => ctx.sendToDst(ctx.srcAttr), _ + _)
+        val neighborAttrSums = graph
+          .aggregateMessages[Int](ctx => ctx.sendToDst(ctx.srcAttr), _ + _)
         assert(neighborAttrSums.collect.toSet === Set((0: VertexId, 100)))
       } finally {
         Utils.deleteRecursively(tmpDir)

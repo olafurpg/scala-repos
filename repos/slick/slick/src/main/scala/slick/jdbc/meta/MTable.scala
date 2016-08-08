@@ -18,8 +18,8 @@ case class MTable(name: MQName,
   def getExportedKeys = MForeignKey.getExportedKeys(name)
   def getVersionColumns = MVersionColumn.getVersionColumns(name)
   def getTablePrivileges = MTablePrivilege.getTablePrivileges(name)
-  def getBestRowIdentifier(
-      scope: MBestRowIdentifierColumn.Scope, nullable: Boolean = false) =
+  def getBestRowIdentifier(scope: MBestRowIdentifierColumn.Scope,
+                           nullable: Boolean = false) =
     MBestRowIdentifierColumn.getBestRowIdentifier(name, scope, nullable)
 
   /** @param unique when true, return only indices for unique values; when false, return indices regardless of whether unique or not */

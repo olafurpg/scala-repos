@@ -36,8 +36,12 @@ import BitSetLike.{LogWL, MaxSize}
   */
 @SerialVersionUID(8483111450368547763L)
 class BitSet(protected final var elems: Array[Long])
-    extends AbstractSet[Int] with SortedSet[Int] with scala.collection.BitSet
-    with BitSetLike[BitSet] with SetLike[Int, BitSet] with Serializable {
+    extends AbstractSet[Int]
+    with SortedSet[Int]
+    with scala.collection.BitSet
+    with BitSetLike[BitSet]
+    with SetLike[Int, BitSet]
+    with Serializable {
 
   override def empty = BitSet.empty
 
@@ -167,8 +171,8 @@ class BitSet(protected final var elems: Array[Long])
     */
   @deprecated(
       "If this BitSet contains a value that is 128 or greater, the result of this method is an 'immutable' " +
-      "BitSet that shares state with this mutable BitSet. Thus, if the mutable BitSet is modified, it will violate the " +
-      "immutability of the result.",
+        "BitSet that shares state with this mutable BitSet. Thus, if the mutable BitSet is modified, it will violate the " +
+        "immutability of the result.",
       "2.11.6")
   def toImmutable = immutable.BitSet.fromBitMaskNoCopy(elems)
 

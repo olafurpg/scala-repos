@@ -7,7 +7,7 @@ import spire.implicits._
 import org.scalatest.FunSuite
 
 class NRootTest extends FunSuite {
-  def testIntegralNRoot[A : Ring : NRoot : ClassTag]: Unit = {
+  def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
     test("Integral NRoot (%s)" format cls) {
       val one = Rig[A].one

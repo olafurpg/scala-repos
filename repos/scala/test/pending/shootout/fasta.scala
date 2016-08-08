@@ -10,12 +10,12 @@ object fasta {
 
     val ALU =
       "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG" +
-      "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA" +
-      "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT" +
-      "ACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCA" +
-      "GCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGG" +
-      "AGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCC" +
-      "AGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
+        "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA" +
+        "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT" +
+        "ACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCA" +
+        "GCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGG" +
+        "AGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCC" +
+        "AGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
 
     val _IUB = Array(
         ('a', 0.27),
@@ -64,11 +64,11 @@ object fasta {
   def makeCumulative(a: Array[Tuple2[Char, Double]]) = {
     var cp = 0.0
     a map
-    (frequency =>
-          frequency match {
-            case (code, percent) =>
-              cp = cp + percent; new Frequency(code.toByte, cp)
-        })
+      (frequency =>
+         frequency match {
+           case (code, percent) =>
+             cp = cp + percent; new Frequency(code.toByte, cp)
+         })
   }
 }
 

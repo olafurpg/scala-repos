@@ -1,6 +1,11 @@
 package com.twitter.io
 
-import java.nio.charset.{Charset, CharsetDecoder, CharsetEncoder, CodingErrorAction}
+import java.nio.charset.{
+  Charset,
+  CharsetDecoder,
+  CharsetEncoder,
+  CodingErrorAction
+}
 import java.util
 
 /**

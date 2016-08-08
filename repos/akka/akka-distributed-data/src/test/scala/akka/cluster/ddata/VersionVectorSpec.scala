@@ -12,8 +12,10 @@ import org.scalatest.Matchers
 import org.scalatest.WordSpecLike
 
 class VersionVectorSpec
-    extends TestKit(ActorSystem("VersionVectorSpec")) with WordSpecLike
-    with Matchers with BeforeAndAfterAll {
+    extends TestKit(ActorSystem("VersionVectorSpec"))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)

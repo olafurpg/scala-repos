@@ -8,7 +8,9 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 class CheckedTest
-    extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
+    with Matchers {
   import Checked.checked
   import Arbitrary.arbitrary
 
@@ -133,47 +135,47 @@ class CheckedTest
     } should equal(Some(Int.MaxValue.toLong + 2))
 
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Long.MaxValue
-          val y = 2
-          x * y
-        })
+      (checked {
+        val x = Long.MaxValue
+        val y = 2
+        x * y
+      })
 
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Long.MaxValue
-          val y = 2
-          y * x
-        })
+      (checked {
+        val x = Long.MaxValue
+        val y = 2
+        y * x
+      })
   }
 
   test("Byte and Short upgrade to Int when mixed") {
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Int.MaxValue
-          val y = (2: Byte)
-          x * y
-        })
+      (checked {
+        val x = Int.MaxValue
+        val y = (2: Byte)
+        x * y
+      })
 
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Int.MaxValue
-          val y = (2: Byte)
-          y * x
-        })
+      (checked {
+        val x = Int.MaxValue
+        val y = (2: Byte)
+        y * x
+      })
 
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Int.MaxValue
-          val y = (2: Short)
-          x * y
-        })
+      (checked {
+        val x = Int.MaxValue
+        val y = (2: Short)
+        x * y
+      })
 
     an[ArithmeticException] should be thrownBy
-    (checked {
-          val x = Int.MaxValue
-          val y = (2: Short)
-          y * x
-        })
+      (checked {
+        val x = Int.MaxValue
+        val y = (2: Short)
+        y * x
+      })
   }
 }

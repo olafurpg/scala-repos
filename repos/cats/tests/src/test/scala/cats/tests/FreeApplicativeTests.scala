@@ -3,7 +3,11 @@ package tests
 
 import cats.arrow.NaturalTransformation
 import cats.free.FreeApplicative
-import cats.laws.discipline.{CartesianTests, ApplicativeTests, SerializableTests}
+import cats.laws.discipline.{
+  CartesianTests,
+  ApplicativeTests,
+  SerializableTests
+}
 import cats.laws.discipline.eq.{tuple3Eq, tuple2Eq}
 import cats.data.State
 

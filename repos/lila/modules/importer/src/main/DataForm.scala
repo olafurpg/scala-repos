@@ -2,7 +2,15 @@ package lila.importer
 
 import chess.format.Forsyth
 import chess.format.pgn.{Parser, Reader, ParsedPgn, Tag, TagType}
-import chess.{Game => ChessGame, Board, Replay, Color, Mode, MoveOrDrop, Status}
+import chess.{
+  Game => ChessGame,
+  Board,
+  Replay,
+  Color,
+  Mode,
+  MoveOrDrop,
+  Status
+}
 import play.api.data._
 import play.api.data.Forms._
 import scalaz.Validation.FlatMap._
@@ -22,8 +30,9 @@ private[importer] final class DataForm {
 }
 
 private[importer] case class Result(status: Status, winner: Option[Color])
-private[importer] case class Preprocessed(
-    game: Game, replay: Replay, result: Option[Result])
+private[importer] case class Preprocessed(game: Game,
+                                          replay: Replay,
+                                          result: Option[Result])
 
 case class ImportData(pgn: String, analyse: Option[String]) {
 
@@ -82,10 +91,9 @@ case class ImportData(pgn: String, analyse: Option[String]) {
                   mode = Mode.Casual,
                   variant = variant,
                   source = Source.Import,
-                  pgnImport = PgnImport
-                      .make(user = user, date = date, pgn = pgn)
-                      .some
-                )
+                  pgnImport =
+                    PgnImport.make(user = user, date = date, pgn = pgn).some
+              )
               .copy(
                   binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
               )

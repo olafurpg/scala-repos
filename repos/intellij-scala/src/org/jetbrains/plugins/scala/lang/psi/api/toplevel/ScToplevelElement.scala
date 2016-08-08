@@ -55,7 +55,8 @@ trait ScToplevelElement extends ScalaPsiElement {
     }
     if (stub != null) {
       stub.getChildrenByType[ScPackaging](
-          ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
+          ScalaElementTypes.PACKAGING,
+          JavaArrayFactoryUtil.ScPackagingFactory)
     } else {
       val buffer = new ArrayBuffer[ScPackaging]
       var curr = getFirstChild

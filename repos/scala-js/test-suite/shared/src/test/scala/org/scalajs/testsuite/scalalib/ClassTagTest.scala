@@ -72,11 +72,11 @@ class ClassTagTest {
 
     assertSame(classOf[Array[_]], classTag[Array[_]].runtimeClass)
     assertSame(classOf[Array[Object]], classTag[Array[Object]].runtimeClass)
-    assertSame(
-        classOf[Array[_ <: AnyRef]], classTag[Array[_ <: AnyRef]].runtimeClass)
+    assertSame(classOf[Array[_ <: AnyRef]],
+               classTag[Array[_ <: AnyRef]].runtimeClass)
     assertSame(classOf[Array[String]], classTag[Array[String]].runtimeClass)
-    assertSame(
-        classOf[Array[_ <: Seq[_]]], classTag[Array[_ <: Seq[_]]].runtimeClass)
+    assertSame(classOf[Array[_ <: Seq[_]]],
+               classTag[Array[_ <: Seq[_]]].runtimeClass)
     assertSame(classOf[Array[Int]], classTag[Array[Int]].runtimeClass)
     assertSame(classOf[Array[Unit]], classTag[Array[Unit]].runtimeClass)
 
@@ -92,22 +92,22 @@ class ClassTagTest {
     assertSame(classOf[Seq[_]], ClassTag(classOf[Seq[_]]).runtimeClass)
 
     assertSame(classOf[Array[_]], ClassTag(classOf[Array[_]]).runtimeClass)
-    assertSame(
-        classOf[Array[Object]], ClassTag(classOf[Array[Object]]).runtimeClass)
+    assertSame(classOf[Array[Object]],
+               ClassTag(classOf[Array[Object]]).runtimeClass)
     assertSame(classOf[Array[_ <: AnyRef]],
                ClassTag(classOf[Array[_ <: AnyRef]]).runtimeClass)
-    assertSame(
-        classOf[Array[String]], ClassTag(classOf[Array[String]]).runtimeClass)
+    assertSame(classOf[Array[String]],
+               ClassTag(classOf[Array[String]]).runtimeClass)
     assertSame(classOf[Array[_ <: Seq[_]]],
                ClassTag(classOf[Array[_ <: Seq[_]]]).runtimeClass)
     assertSame(classOf[Array[Int]], ClassTag(classOf[Array[Int]]).runtimeClass)
-    assertSame(
-        classOf[Array[Unit]], ClassTag(classOf[Array[Unit]]).runtimeClass)
+    assertSame(classOf[Array[Unit]],
+               ClassTag(classOf[Array[Unit]]).runtimeClass)
 
     // These work as expected, though
     assertSame(classOf[Array[Nothing]],
                ClassTag(classOf[Array[Nothing]]).runtimeClass)
-    assertSame(
-        classOf[Array[Null]], ClassTag(classOf[Array[Null]]).runtimeClass)
+    assertSame(classOf[Array[Null]],
+               ClassTag(classOf[Array[Null]]).runtimeClass)
   }
 }

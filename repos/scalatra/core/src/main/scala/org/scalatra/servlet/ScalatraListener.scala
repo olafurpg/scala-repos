@@ -1,7 +1,11 @@
 package org.scalatra
 package servlet
 
-import javax.servlet.{ServletContext, ServletContextEvent, ServletContextListener}
+import javax.servlet.{
+  ServletContext,
+  ServletContextEvent,
+  ServletContextListener
+}
 
 import grizzled.slf4j.Logger
 import org.scalatra.util.RicherString._
@@ -23,7 +27,7 @@ class ScalatraListener extends ServletContextListener {
     } catch {
       case e: Throwable =>
         logger.error("Failed to initialize scalatra application at " +
-                     sce.getServletContext.getContextPath,
+                       sce.getServletContext.getContextPath,
                      e)
         throw e
     }
@@ -45,7 +49,7 @@ class ScalatraListener extends ServletContextListener {
       Option(servletContext.getInitParameter(LifeCycleKey))
         .flatMap(_.blankOption) getOrElse DefaultLifeCycle
     logger info
-    ("The cycle class name from the config: " +
+      ("The cycle class name from the config: " +
         (if (cycleClassName == null) "null" else cycleClassName))
 
     val lifeCycleClass: Class[_] = try {

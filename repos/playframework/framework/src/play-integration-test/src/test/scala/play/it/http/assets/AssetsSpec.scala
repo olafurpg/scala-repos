@@ -15,10 +15,12 @@ import play.it._
 
 object NettyAssetsSpec extends AssetsSpec with NettyIntegrationSpecification
 object AkkaHttpAssetsSpec
-    extends AssetsSpec with AkkaHttpIntegrationSpecification
+    extends AssetsSpec
+    with AkkaHttpIntegrationSpecification
 
 trait AssetsSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -117,7 +119,8 @@ trait AssetsSpec
     "return not modified when multiple etags supply and one matches" in withServer {
       client =>
         val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
-        val result = await(client
+        val result = await(
+            client
               .url("/foo.txt")
               .withHeaders(IF_NONE_MATCH -> ("\"foo\", " + etag + ", \"bar\""))
               .get())
@@ -127,7 +130,8 @@ trait AssetsSpec
     }
 
     "return asset when etag doesn't match" in withServer { client =>
-      val result = await(client
+      val result = await(
+          client
             .url("/foo.txt")
             .withHeaders(IF_NONE_MATCH -> "\"foobar\"")
             .get())
@@ -139,7 +143,8 @@ trait AssetsSpec
     "return not modified when not modified since" in withServer { client =>
       val Some(timestamp) =
         await(client.url("/foo.txt").get()).header(LAST_MODIFIED)
-      val result = await(client
+      val result = await(
+          client
             .url("/foo.txt")
             .withHeaders(IF_MODIFIED_SINCE -> timestamp)
             .get())
@@ -154,7 +159,8 @@ trait AssetsSpec
     }
 
     "return asset when modified since" in withServer { client =>
-      val result = await(client
+      val result = await(
+          client
             .url("/foo.txt")
             .withHeaders(IF_MODIFIED_SINCE -> "Tue, 13 Mar 2012 13:08:36 GMT")
             .get())
@@ -180,7 +186,8 @@ trait AssetsSpec
 
     "return the asset if the if modified since header can't be parsed" in withServer {
       client =>
-        val result = await(client
+        val result = await(
+            client
               .url("/foo.txt")
               .withHeaders(IF_MODIFIED_SINCE -> "Not a date")
               .get())
@@ -204,7 +211,8 @@ trait AssetsSpec
     }
 
     "serve a versioned asset" in withServer { client =>
-      val result = await(client
+      val result = await(
+          client
             .url("/versioned/sub/12345678901234567890123456789012-foo.txt")
             .get())
 

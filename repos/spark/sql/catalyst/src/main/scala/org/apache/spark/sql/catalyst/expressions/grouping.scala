@@ -61,7 +61,8 @@ case class Grouping(child: Expression) extends Expression with Unevaluable {
   * If groupByExprs is empty, it means all grouping expressions in GroupingSets.
   */
 case class GroupingID(groupByExprs: Seq[Expression])
-    extends Expression with Unevaluable {
+    extends Expression
+    with Unevaluable {
   override def references: AttributeSet =
     AttributeSet(VirtualColumn.groupingIdAttribute :: Nil)
   override def children: Seq[Expression] = groupByExprs

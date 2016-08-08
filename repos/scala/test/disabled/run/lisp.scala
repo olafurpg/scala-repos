@@ -49,10 +49,10 @@ object LispCaseClasses extends Lisp {
     override def toString() = "(" + elemsToString() + ")";
     override def elemsToString() =
       car.toString() +
-      (cdr match {
-            case NIL() => ""
-            case _ => " " + cdr.elemsToString();
-          })
+        (cdr match {
+          case NIL() => ""
+          case _ => " " + cdr.elemsToString();
+        })
   }
   case class NIL() extends Data {
     // !!! use case object
@@ -160,8 +160,8 @@ object LispCaseClasses extends Lisp {
               CONS(CONS(SYM(name), args), CONS(body, CONS(expr, NIL())))) =>
       normalize(
           list(SYM("def"), SYM(name), list(SYM("lambda"), args, body), expr))
-    case CONS(
-        SYM("cond"), CONS(CONS(SYM("else"), CONS(expr, NIL())), NIL())) =>
+    case CONS(SYM("cond"),
+              CONS(CONS(SYM("else"), CONS(expr, NIL())), NIL())) =>
       normalize(expr)
     case CONS(SYM("cond"), CONS(CONS(test, CONS(expr, NIL())), rest)) =>
       normalize(list(SYM("if"), test, expr, CONS(SYM("cond"), rest)))
@@ -216,8 +216,9 @@ object LispCaseClasses extends Lisp {
 
   def mkLambda(params: Data, expr: Data, env: Environment): Data = {
 
-    def extendEnv(
-        env: Environment, ps: List[String], args: List[Data]): Environment =
+    def extendEnv(env: Environment,
+                  ps: List[String],
+                  args: List[Data]): Environment =
       (ps, args) match {
         case (List(), List()) =>
           env
@@ -419,8 +420,9 @@ object LispAny extends Lisp {
 
   def mkLambda(params: Data, expr: Data, env: Environment): Data = {
 
-    def extendEnv(
-        env: Environment, ps: List[String], args: List[Data]): Environment =
+    def extendEnv(env: Environment,
+                  ps: List[String],
+                  args: List[Data]): Environment =
       (ps, args) match {
         case (List(), List()) =>
           env
@@ -519,13 +521,14 @@ class LispUser(lisp: Lisp) {
 
     Console.println(
         "faculty(10) = " + evaluate("(def (faculty n) " + "(if (= n 0) " +
-            "1 " + "(* n (faculty (- n 1)))) " + "(faculty 10))"));
-    Console.println("faculty(10) = " + evaluate(
+          "1 " + "(* n (faculty (- n 1)))) " + "(faculty 10))"));
+    Console.println(
+        "faculty(10) = " + evaluate(
             "(def (faculty n) " + "(cond " + "((= n 0) 1) " +
-            "(else (* n (faculty (- n 1))))) " + "(faculty 10))"));
+              "(else (* n (faculty (- n 1))))) " + "(faculty 10))"));
     Console.println(
         "foobar = " +
-        evaluate("(def (foo n) " +
+          evaluate("(def (foo n) " +
             "(cond " +
             "((= n 0) \"a\")" + "((= n 1) \"b\")" + "((= (/ n 2) 1) " +
             "(cond " + "((= n 2) \"c\")" + "(else    \"d\")))" + "(else " +

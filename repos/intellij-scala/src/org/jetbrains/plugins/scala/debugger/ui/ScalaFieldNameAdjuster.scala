@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.debugger.ui
 
-import com.intellij.debugger.ui.tree.{FieldDescriptor, NodeDescriptor, NodeDescriptorNameAdjuster}
+import com.intellij.debugger.ui.tree.{
+  FieldDescriptor,
+  NodeDescriptor,
+  NodeDescriptorNameAdjuster
+}
 import com.sun.jdi.{ClassType, ReferenceType}
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 import org.jetbrains.plugins.scala.debugger.ui.ScalaFieldNameAdjuster.objectSuffix
@@ -16,7 +20,7 @@ class ScalaFieldNameAdjuster extends NodeDescriptorNameAdjuster {
     descriptor match {
       case fd: FieldDescriptor if fd.getObject != null =>
         DebuggerUtil.isScala(fd.getObject.referenceType()) &&
-        isObscureName(fd.getField.name())
+          isObscureName(fd.getField.name())
       case _ => false
     }
   }

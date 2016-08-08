@@ -20,8 +20,9 @@ trait Collections {
     *  the function is true for all the triples.
     */
   @tailrec final def corresponds3[A, B, C](
-      xs1: List[A], xs2: List[B], xs3: List[C])(
-      f: (A, B, C) => Boolean): Boolean =
+      xs1: List[A],
+      xs2: List[B],
+      xs3: List[C])(f: (A, B, C) => Boolean): Boolean =
     (if (xs1.isEmpty) xs2.isEmpty && xs3.isEmpty
      else
        !xs2.isEmpty && !xs3.isEmpty && f(xs1.head, xs2.head, xs3.head) &&
@@ -79,8 +80,8 @@ trait Collections {
     loop(as)
   }
 
-  final def map2[A, B, C](xs1: List[A], xs2: List[B])(
-      f: (A, B) => C): List[C] = {
+  final def map2[A, B, C](xs1: List[A], xs2: List[B])(f: (A,
+                                                          B) => C): List[C] = {
     val lb = new ListBuffer[C]
     var ys1 = xs1
     var ys2 = xs2
@@ -117,7 +118,7 @@ trait Collections {
         } else {
           val b = if (mapped eq null) new ListBuffer[A] else mapped
           var xc = unchanged
-          while ( (xc ne pending0) && (xc ne pending1)) {
+          while ((xc ne pending0) && (xc ne pending1)) {
             b += xc.head
             xc = xc.tail
           }

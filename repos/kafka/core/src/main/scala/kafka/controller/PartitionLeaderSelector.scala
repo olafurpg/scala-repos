@@ -20,7 +20,12 @@ import kafka.admin.AdminUtils
 import kafka.api.LeaderAndIsr
 import kafka.log.LogConfig
 import kafka.utils.Logging
-import kafka.common.{LeaderElectionNotNeededException, TopicAndPartition, StateChangeFailedException, NoReplicaOnlineException}
+import kafka.common.{
+  LeaderElectionNotNeededException,
+  TopicAndPartition,
+  StateChangeFailedException,
+  NoReplicaOnlineException
+}
 import kafka.server.{ConfigType, KafkaConfig}
 
 trait PartitionLeaderSelector {
@@ -46,9 +51,10 @@ trait PartitionLeaderSelector {
   * Replicas to receive LeaderAndIsr request = live assigned replicas
   * Once the leader is successfully registered in zookeeper, it updates the allLeaders cache
   */
-class OfflinePartitionLeaderSelector(
-    controllerContext: ControllerContext, config: KafkaConfig)
-    extends PartitionLeaderSelector with Logging {
+class OfflinePartitionLeaderSelector(controllerContext: ControllerContext,
+                                     config: KafkaConfig)
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[OfflinePartitionLeaderSelector]: "
 
   def selectLeader(
@@ -56,10 +62,10 @@ class OfflinePartitionLeaderSelector(
       currentLeaderAndIsr: LeaderAndIsr): (LeaderAndIsr, Seq[Int]) = {
     controllerContext.partitionReplicaAssignment.get(topicAndPartition) match {
       case Some(assignedReplicas) =>
-        val liveAssignedReplicas = assignedReplicas.filter(
-            r => controllerContext.liveBrokerIds.contains(r))
-        val liveBrokersInIsr = currentLeaderAndIsr.isr.filter(
-            r => controllerContext.liveBrokerIds.contains(r))
+        val liveAssignedReplicas = assignedReplicas.filter(r =>
+          controllerContext.liveBrokerIds.contains(r))
+        val liveBrokersInIsr = currentLeaderAndIsr.isr.filter(r =>
+          controllerContext.liveBrokerIds.contains(r))
         val currentLeaderEpoch = currentLeaderAndIsr.leaderEpoch
         val currentLeaderIsrZkPathVersion = currentLeaderAndIsr.zkVersion
         val newLeaderAndIsr = liveBrokersInIsr.isEmpty match {
@@ -75,25 +81,23 @@ class OfflinePartitionLeaderSelector(
                   .uncleanLeaderElectionEnable) {
               throw new NoReplicaOnlineException(
                   ("No broker in ISR for partition " +
-                      "%s is alive. Live brokers are: [%s],".format(
-                          topicAndPartition,
-                          controllerContext.liveBrokerIds)) +
-                  " ISR brokers are: [%s]".format(
-                      currentLeaderAndIsr.isr.mkString(",")))
+                    "%s is alive. Live brokers are: [%s],".format(
+                        topicAndPartition,
+                        controllerContext.liveBrokerIds)) +
+                    " ISR brokers are: [%s]".format(
+                        currentLeaderAndIsr.isr.mkString(",")))
             }
 
-            debug(
-                "No broker in ISR is alive for %s. Pick the leader from the alive assigned replicas: %s"
-                  .format(
-                    topicAndPartition, liveAssignedReplicas.mkString(",")))
+            debug("No broker in ISR is alive for %s. Pick the leader from the alive assigned replicas: %s"
+              .format(topicAndPartition, liveAssignedReplicas.mkString(",")))
             liveAssignedReplicas.isEmpty match {
               case true =>
                 throw new NoReplicaOnlineException(
                     ("No replica for partition " +
-                        "%s is alive. Live brokers are: [%s],".format(
-                            topicAndPartition,
-                            controllerContext.liveBrokerIds)) +
-                    " Assigned replicas are: [%s]".format(assignedReplicas))
+                      "%s is alive. Live brokers are: [%s],".format(
+                          topicAndPartition,
+                          controllerContext.liveBrokerIds)) +
+                      " Assigned replicas are: [%s]".format(assignedReplicas))
               case false =>
                 ControllerStats.uncleanLeaderElectionRate.mark()
                 val newLeader = liveAssignedReplicas.head
@@ -121,8 +125,9 @@ class OfflinePartitionLeaderSelector(
                              liveBrokersInIsr.toList,
                              currentLeaderIsrZkPathVersion + 1)
         }
-        info("Selected new leader and ISR %s for offline partition %s".format(
-                newLeaderAndIsr.toString(), topicAndPartition))
+        info(
+            "Selected new leader and ISR %s for offline partition %s"
+              .format(newLeaderAndIsr.toString(), topicAndPartition))
         (newLeaderAndIsr, liveAssignedReplicas)
       case None =>
         throw new NoReplicaOnlineException(
@@ -138,7 +143,8 @@ class OfflinePartitionLeaderSelector(
   * Replicas to receive LeaderAndIsr request = reassigned replicas
   */
 class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[ReassignedPartitionLeaderSelector]: "
 
   /**
@@ -155,7 +161,7 @@ class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
     val aliveReassignedInSyncReplicas = reassignedInSyncReplicas.filter(
         r =>
           controllerContext.liveBrokerIds.contains(r) &&
-          currentLeaderAndIsr.isr.contains(r))
+            currentLeaderAndIsr.isr.contains(r))
     val newLeaderOpt = aliveReassignedInSyncReplicas.headOption
     newLeaderOpt match {
       case Some(newLeader) =>
@@ -169,13 +175,13 @@ class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
           case 0 =>
             throw new NoReplicaOnlineException(
                 "List of reassigned replicas for partition " +
-                " %s is empty. Current leader and ISR: [%s]".format(
-                    topicAndPartition, currentLeaderAndIsr))
+                  " %s is empty. Current leader and ISR: [%s]"
+                    .format(topicAndPartition, currentLeaderAndIsr))
           case _ =>
             throw new NoReplicaOnlineException(
                 "None of the reassigned replicas for partition " +
-                "%s are in-sync with the leader. Current leader and ISR: [%s]"
-                  .format(topicAndPartition, currentLeaderAndIsr))
+                  "%s are in-sync with the leader. Current leader and ISR: [%s]"
+                    .format(topicAndPartition, currentLeaderAndIsr))
         }
     }
   }
@@ -188,7 +194,8 @@ class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
   */
 class PreferredReplicaPartitionLeaderSelector(
     controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[PreferredReplicaPartitionLeaderSelector]: "
 
   def selectLeader(
@@ -210,7 +217,7 @@ class PreferredReplicaPartitionLeaderSelector(
       info(
           "Current leader %d for partition %s is not the preferred replica."
             .format(currentLeader, topicAndPartition) +
-          " Trigerring preferred replica leader election")
+            " Trigerring preferred replica leader election")
       // check if preferred replica is not the current leader and is alive and in the isr
       if (controllerContext.liveBrokerIds.contains(preferredReplica) &&
           currentLeaderAndIsr.isr.contains(preferredReplica)) {
@@ -222,8 +229,8 @@ class PreferredReplicaPartitionLeaderSelector(
       } else {
         throw new StateChangeFailedException(
             "Preferred replica %d for partition ".format(preferredReplica) +
-            "%s is either not alive or not in the isr. Current leader and ISR: [%s]"
-              .format(topicAndPartition, currentLeaderAndIsr))
+              "%s is either not alive or not in the isr. Current leader and ISR: [%s]"
+                .format(topicAndPartition, currentLeaderAndIsr))
       }
     }
   }
@@ -235,7 +242,8 @@ class PreferredReplicaPartitionLeaderSelector(
   * Replicas to receive LeaderAndIsr request = live assigned replicas
   */
 class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
 
   this.logIdent = "[ControlledShutdownLeaderSelector]: "
 
@@ -255,12 +263,13 @@ class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
       assignedReplicas.filter(r => liveOrShuttingDownBrokerIds.contains(r))
 
     val newIsr = currentLeaderAndIsr.isr.filter(brokerId =>
-          !controllerContext.shuttingDownBrokerIds.contains(brokerId))
+      !controllerContext.shuttingDownBrokerIds.contains(brokerId))
     val newLeaderOpt = newIsr.headOption
     newLeaderOpt match {
       case Some(newLeader) =>
-        debug("Partition %s : current leader = %d, new leader = %d".format(
-                topicAndPartition, currentLeader, newLeader))
+        debug(
+            "Partition %s : current leader = %d, new leader = %d"
+              .format(topicAndPartition, currentLeader, newLeader))
         (LeaderAndIsr(newLeader,
                       currentLeaderEpoch + 1,
                       newIsr,
@@ -269,7 +278,7 @@ class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
       case None =>
         throw new StateChangeFailedException(
             ("No other replicas in ISR %s for %s besides" +
-                " shutting down brokers %s").format(
+              " shutting down brokers %s").format(
                 currentLeaderAndIsr.isr.mkString(","),
                 topicAndPartition,
                 controllerContext.shuttingDownBrokerIds.mkString(",")))
@@ -282,7 +291,8 @@ class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
   * set of replicas assigned to a given topic/partition.
   */
 class NoOpLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
 
   this.logIdent = "[NoOpLeaderSelector]: "
 

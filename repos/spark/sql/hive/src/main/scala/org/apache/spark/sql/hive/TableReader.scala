@@ -23,10 +23,17 @@ import org.apache.hadoop.fs.{Path, PathFilter}
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants._
 import org.apache.hadoop.hive.ql.exec.Utilities
-import org.apache.hadoop.hive.ql.metadata.{HiveUtils, Partition => HivePartition, Table => HiveTable}
+import org.apache.hadoop.hive.ql.metadata.{
+  HiveUtils,
+  Partition => HivePartition,
+  Table => HiveTable
+}
 import org.apache.hadoop.hive.ql.plan.TableDesc
 import org.apache.hadoop.hive.serde2.Deserializer
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspectorConverters, StructObjectInspector}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspectorConverters,
+  StructObjectInspector
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive._
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.{FileInputFormat, InputFormat, JobConf}
@@ -59,7 +66,8 @@ private[hive] class HadoopTableReader(
     @transient private val relation: MetastoreRelation,
     @transient private val sc: HiveContext,
     hiveExtraConf: HiveConf)
-    extends TableReader with Logging {
+    extends TableReader
+    with Logging {
 
   // Hadoop honors "mapred.map.tasks" as hint, but will ignore when mapred.job.tracker is "local".
   // https://hadoop.apache.org/docs/r1.0.4/mapred-default.html
@@ -123,8 +131,11 @@ private[hive] class HadoopTableReader(
       val hconf = broadcastedHiveConf.value.value
       val deserializer = deserializerClass.newInstance()
       deserializer.initialize(hconf, tableDesc.getProperties)
-      HadoopTableReader.fillObject(
-          iter, deserializer, attrsWithIndex, mutableRow, deserializer)
+      HadoopTableReader.fillObject(iter,
+                                   deserializer,
+                                   attrsWithIndex,
+                                   mutableRow,
+                                   deserializer)
     }
 
     deserializedHadoopRDD
@@ -134,8 +145,8 @@ private[hive] class HadoopTableReader(
       partitions: Seq[HivePartition]): RDD[InternalRow] = {
     val partitionToDeserializer = partitions
       .map(part =>
-            (part,
-             part.getDeserializer.getClass.asInstanceOf[Class[Deserializer]]))
+        (part,
+         part.getDeserializer.getClass.asInstanceOf[Class[Deserializer]]))
       .toMap
     makeRDDForPartitionedTable(partitionToDeserializer, filterOpt = None)
   }
@@ -169,8 +180,8 @@ private[hive] class HadoopTableReader(
               val pathPattern = new Path(pathPatternStr)
               val fs = pathPattern.getFileSystem(sc.hiveconf)
               val matches = fs.globStatus(pathPattern)
-              matches.foreach(
-                  fileStatus => existPathSet += fileStatus.getPath.toString)
+              matches.foreach(fileStatus =>
+                existPathSet += fileStatus.getPath.toString)
             }
             // convert  /demo/data/year/month/day  to  /demo/data/*/*/*/
             def getPathPatternByPath(parNum: Int, tempPath: Path): String = {
@@ -230,8 +241,8 @@ private[hive] class HadoopTableReader(
               relation.partitionKeys.contains(attr)
           }
 
-        def fillPartitionKeys(
-            rawPartValues: Array[String], row: MutableRow): Unit = {
+        def fillPartitionKeys(rawPartValues: Array[String],
+                              row: MutableRow): Unit = {
           partitionKeyAttrs.foreach {
             case (attr, ordinal) =>
               val partOrdinal = relation.partitionKeys.indexOf(attr)
@@ -252,8 +263,11 @@ private[hive] class HadoopTableReader(
           tableSerDe.initialize(hconf, tableDesc.getProperties)
 
           // fill the non partition key attributes
-          HadoopTableReader.fillObject(
-              iter, deserializer, nonPartitionKeyAttrs, mutableRow, tableSerDe)
+          HadoopTableReader.fillObject(iter,
+                                       deserializer,
+                                       nonPartitionKeyAttrs,
+                                       mutableRow,
+                                       tableSerDe)
         }
     }.toSeq
 
@@ -269,8 +283,8 @@ private[hive] class HadoopTableReader(
     * If `filterOpt` is defined, then it will be used to filter files from `path`. These files are
     * returned in a single, comma-separated string.
     */
-  private def applyFilterIfNeeded(
-      path: Path, filterOpt: Option[PathFilter]): String = {
+  private def applyFilterIfNeeded(path: Path,
+                                  filterOpt: Option[PathFilter]): String = {
     filterOpt match {
       case Some(filter) =>
         val fs = path.getFileSystem(sc.hiveconf)
@@ -313,8 +327,9 @@ private[hive] object HiveTableUtil {
   // copied from PlanUtils.configureJobPropertiesForStorageHandler(tableDesc)
   // that calls Hive.get() which tries to access metastore, but it's not valid in runtime
   // it would be fixed in next version of hive but till then, we should use this instead
-  def configureJobPropertiesForStorageHandler(
-      tableDesc: TableDesc, jobConf: JobConf, input: Boolean) {
+  def configureJobPropertiesForStorageHandler(tableDesc: TableDesc,
+                                              jobConf: JobConf,
+                                              input: Boolean) {
     val property = tableDesc.getProperties.getProperty(META_TABLE_STORAGE)
     val storageHandler = HiveUtils.getStorageHandler(jobConf, property)
     if (storageHandler != null) {
@@ -341,8 +356,8 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
       jobConf: JobConf) {
     FileInputFormat.setInputPaths(jobConf, Seq[Path](new Path(path)): _*)
     if (tableDesc != null) {
-      HiveTableUtil.configureJobPropertiesForStorageHandler(
-          tableDesc, jobConf, true)
+      HiveTableUtil
+        .configureJobPropertiesForStorageHandler(tableDesc, jobConf, true)
       Utilities.copyTableJobPropertiesToConf(tableDesc, jobConf)
     }
     val bufferSize = System.getProperty("spark.buffer.size", "65536")
@@ -371,8 +386,8 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
         rawDeser.getObjectInspector.asInstanceOf[StructObjectInspector]
       } else {
         ObjectInspectorConverters
-          .getConvertedOI(
-              rawDeser.getObjectInspector, tableDeser.getObjectInspector)
+          .getConvertedOI(rawDeser.getObjectInspector,
+                          tableDeser.getObjectInspector)
           .asInstanceOf[StructObjectInspector]
       }
 
@@ -392,51 +407,51 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
         case oi: BooleanObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setBoolean(ordinal, oi.get(value))
-          case oi: ByteObjectInspector =>
+        case oi: ByteObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setByte(ordinal, oi.get(value))
-          case oi: ShortObjectInspector =>
+        case oi: ShortObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setShort(ordinal, oi.get(value))
-          case oi: IntObjectInspector =>
+        case oi: IntObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setInt(ordinal, oi.get(value))
-          case oi: LongObjectInspector =>
+        case oi: LongObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setLong(ordinal, oi.get(value))
-          case oi: FloatObjectInspector =>
+        case oi: FloatObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setFloat(ordinal, oi.get(value))
-          case oi: DoubleObjectInspector =>
+        case oi: DoubleObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setDouble(ordinal, oi.get(value))
-          case oi: HiveVarcharObjectInspector =>
+        case oi: HiveVarcharObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal,
                        UTF8String.fromString(
                            oi.getPrimitiveJavaObject(value).getValue))
-          case oi: HiveCharObjectInspector =>
+        case oi: HiveCharObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal,
                        UTF8String.fromString(
                            oi.getPrimitiveJavaObject(value).getValue))
-          case oi: HiveDecimalObjectInspector =>
+        case oi: HiveDecimalObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal, HiveShim.toCatalystDecimal(oi, value))
-          case oi: TimestampObjectInspector =>
+        case oi: TimestampObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setLong(ordinal,
                         DateTimeUtils.fromJavaTimestamp(
                             oi.getPrimitiveJavaObject(value)))
-          case oi: DateObjectInspector =>
+        case oi: DateObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setInt(
                 ordinal,
                 DateTimeUtils.fromJavaDate(oi.getPrimitiveJavaObject(value)))
-          case oi: BinaryObjectInspector =>
+        case oi: BinaryObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal, oi.getPrimitiveJavaObject(value))
-          case oi =>
+        case oi =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row(ordinal) = unwrap(value, oi)
       }

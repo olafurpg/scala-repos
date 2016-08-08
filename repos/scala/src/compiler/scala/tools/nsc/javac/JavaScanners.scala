@@ -203,7 +203,8 @@ trait JavaScanners extends ast.parser.ScannersCommon {
       case SLASHEQ => "`/='"
       case TILDE => "`~'"
       case _ =>
-        try ("`" + tokenName(token) + "'") catch {
+        try ("`" + tokenName(token) + "'")
+        catch {
           case _: ArrayIndexOutOfBoundsException =>
             "`<" + token + ">'"
           case _: NullPointerException =>
@@ -217,7 +218,9 @@ trait JavaScanners extends ast.parser.ScannersCommon {
     *  @author     Martin Odersky
     */
   abstract class JavaScanner
-      extends AbstractJavaScanner with JavaTokenData with Cloneable
+      extends AbstractJavaScanner
+      with JavaTokenData
+      with Cloneable
       with ScannerCommon {
     override def intVal = super.intVal // todo: needed?
     override def floatVal = super.floatVal
@@ -308,7 +311,7 @@ trait JavaScanners extends ast.parser.ScannersCommon {
               case '\"' =>
                 in.next()
                 while (in.ch != '\"' &&
-                (in.isUnicode || in.ch != CR && in.ch != LF && in.ch != SU)) {
+                       (in.isUnicode || in.ch != CR && in.ch != LF && in.ch != SU)) {
                   getlitch()
                 }
                 if (in.ch == '\"') {
@@ -782,7 +785,7 @@ trait JavaScanners extends ast.parser.ScannersCommon {
       }
       if (base <= 10 &&
           (in.ch == 'e' || in.ch == 'E' || in.ch == 'f' || in.ch == 'F' ||
-              in.ch == 'd' || in.ch == 'D')) {
+          in.ch == 'd' || in.ch == 'D')) {
         return getFraction()
       }
       setName()
@@ -843,8 +846,9 @@ trait JavaScanners extends ast.parser.ScannersCommon {
   }
 
   class JavaUnitScanner(unit: CompilationUnit) extends JavaScanner {
-    in = new JavaCharArrayReader(
-        unit.source.content, !settings.nouescape.value, syntaxError)
+    in = new JavaCharArrayReader(unit.source.content,
+                                 !settings.nouescape.value,
+                                 syntaxError)
     init()
     def error(pos: Int, msg: String) = reporter.error(pos, msg)
     def incompleteInputError(pos: Int, msg: String) =

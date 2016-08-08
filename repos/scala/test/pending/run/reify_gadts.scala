@@ -16,9 +16,7 @@ object Test extends App {
     case class IsZero(t: Term[Int]) extends Term[Boolean]
 
     /* An 'if' expression. */
-    case class If[T](c: Term[Boolean],
-                     t1: Term[T],
-                     t2: Term[T])
+    case class If[T](c: Term[Boolean], t1: Term[T], t2: Term[T])
         extends Term[T]
 
     /** A type-safe eval function. The right-hand sides can

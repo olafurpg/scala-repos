@@ -12,11 +12,11 @@ object build extends Build {
 
   lazy val p1 =
     Project("p1", file("p1")) settings
-    (checkTask(expectedMongo), libraryDependencies +=
-          "org.mongodb" %% "casbah" % "2.4.1" pomOnly ())
+      (checkTask(expectedMongo), libraryDependencies +=
+        "org.mongodb" %% "casbah" % "2.4.1" pomOnly ())
   lazy val p2 =
     Project("p2", file("p2")) dependsOn (p1) settings
-    (checkTask(expectedInter))
+      (checkTask(expectedInter))
 
   lazy val expectedMongo = <dependency>
 			<groupId>org.mongodb</groupId>
@@ -45,6 +45,6 @@ object build extends Build {
       val actualString = dropTopElem(pp.formatNodes(actual))
       assert(expectedString == actualString,
              "Expected dependencies section:\n" + expectedString +
-             "\n\nActual:\n" + actualString)
+               "\n\nActual:\n" + actualString)
     }
 }

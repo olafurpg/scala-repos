@@ -4,30 +4,31 @@ package std
 trait EitherInstances extends EitherInstances1 {
   implicit val eitherBitraverse: Bitraverse[Either] = new Bitraverse[Either] {
     def bitraverse[G[_], A, B, C, D](fab: Either[A, B])(
-        f: A => G[C], g: B => G[D])(
-        implicit G: Applicative[G]): G[Either[C, D]] =
+        f: A => G[C],
+        g: B => G[D])(implicit G: Applicative[G]): G[Either[C, D]] =
       fab match {
         case Left(a) => G.map(f(a))(Left(_))
         case Right(b) => G.map(g(b))(Right(_))
       }
 
-    def bifoldLeft[A, B, C](
-        fab: Either[A, B], c: C)(f: (C, A) => C, g: (C, B) => C): C =
+    def bifoldLeft[A, B, C](fab: Either[A, B], c: C)(f: (C, A) => C,
+                                                     g: (C, B) => C): C =
       fab match {
         case Left(a) => f(c, a)
         case Right(b) => g(c, b)
       }
 
     def bifoldRight[A, B, C](fab: Either[A, B], c: Eval[C])(
-        f: (A, Eval[C]) => Eval[C], g: (B, Eval[C]) => Eval[C]): Eval[C] =
+        f: (A, Eval[C]) => Eval[C],
+        g: (B, Eval[C]) => Eval[C]): Eval[C] =
       fab match {
         case Left(a) => f(a, c)
         case Right(b) => g(b, c)
       }
   }
 
-  implicit def eitherInstances[A]: Monad[Either[A, ?]] with Traverse[Either[
-          A, ?]] =
+  implicit def eitherInstances[A]
+    : Monad[Either[A, ?]] with Traverse[Either[A, ?]] =
     new Monad[Either[A, ?]] with Traverse[Either[A, ?]] {
       def pure[B](b: B): Either[A, B] = Right(b)
 
@@ -52,8 +53,8 @@ trait EitherInstances extends EitherInstances1 {
         fa.fold(_ => lc, b => f(b, lc))
     }
 
-  implicit def eitherOrder[A, B](
-      implicit A: Order[A], B: Order[B]): Order[Either[A, B]] =
+  implicit def eitherOrder[A, B](implicit A: Order[A],
+                                 B: Order[B]): Order[Either[A, B]] =
     new Order[Either[A, B]] {
       def compare(x: Either[A, B], y: Either[A, B]): Int = x.fold(
           a => y.fold(A.compare(a, _), _ => -1),
@@ -61,8 +62,8 @@ trait EitherInstances extends EitherInstances1 {
       )
     }
 
-  implicit def eitherShow[A, B](
-      implicit A: Show[A], B: Show[B]): Show[Either[A, B]] =
+  implicit def eitherShow[A, B](implicit A: Show[A],
+                                B: Show[B]): Show[Either[A, B]] =
     new Show[Either[A, B]] {
       def show(f: Either[A, B]): String = f.fold(
           a => s"Left(${A.show(a)})",

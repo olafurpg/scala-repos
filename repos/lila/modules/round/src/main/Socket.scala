@@ -57,13 +57,13 @@ private[round] final class Socket(gameId: String,
     private def isBye = bye > 0
 
     private def isHostingSimul: Fu[Boolean] = userId ?? { u =>
-      simulActor ? lila.hub.actorApi.simul.GetHostIds mapTo manifest[Set[
-              String]] map (_ contains u)
+      simulActor ? lila.hub.actorApi.simul.GetHostIds mapTo manifest[
+          Set[String]] map (_ contains u)
     }
 
     def isGone =
       if (time <
-          (nowMillis -
+            (nowMillis -
               isBye.fold(ragequitTimeout, disconnectTimeout).toMillis))
         isHostingSimul map (!_)
       else fuccess(false)
@@ -81,8 +81,8 @@ private[round] final class Socket(gameId: String,
   override def postStop() {
     super.postStop()
     lilaBus.unsubscribe(self)
-    lilaBus.publish(
-        lila.hub.actorApi.round.SocketEvent.Stop(gameId), 'roundDoor)
+    lilaBus
+      .publish(lila.hub.actorApi.round.SocketEvent.Stop(gameId), 'roundDoor)
   }
 
   private def refreshSubscriptions {
@@ -161,8 +161,7 @@ private[round] final class Socket(gameId: String,
     case eventList: EventList => notify(eventList.events)
 
     case lila.chat.actorApi.ChatLine(chatId, line) =>
-      notify(
-          List(line match {
+      notify(List(line match {
         case l: lila.chat.UserLine =>
           Event.UserMessage(l, chatId endsWith "/w")
         case l: lila.chat.PlayerLine => Event.PlayerMessage(l)
@@ -221,7 +220,7 @@ private[round] final class Socket(gameId: String,
     }
   }
 
-  def notifyOwner[A : Writes](color: Color, t: String, data: A) {
+  def notifyOwner[A: Writes](color: Color, t: String, data: A) {
     ownerOf(color) foreach { m =>
       m push makeMessage(t, data)
     }

@@ -5,9 +5,20 @@ package akka.stream.impl.fusing
 
 import akka.event.Logging
 import akka.stream._
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, Failed, GraphAssembly, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic,
+  Failed,
+  GraphAssembly,
+  UpstreamBoundaryStageLogic
+}
 import akka.stream.stage.AbstractStage.PushPullGraphStage
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler, _}
+import akka.stream.stage.{
+  GraphStage,
+  GraphStageLogic,
+  InHandler,
+  OutHandler,
+  _
+}
 import akka.testkit.AkkaSpec
 import akka.stream.testkit.Utils.TE
 import akka.stream.impl.fusing.GraphInterpreter.GraphAssembly
@@ -101,7 +112,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
 
         for ((downstream, i) ← downstreams.zipWithIndex) {
           _interpreter.attachDownstreamBoundary(
-              i + upstreams.size + connections.size, downstream._2)
+              i + upstreams.size + connections.size,
+              downstream._2)
         }
 
         _interpreter.init(null)
@@ -345,7 +357,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
     def toGS: PushPullGraphStage[Any, Any, Any] = {
       val s = stage
       new PushPullGraphStage[Any, Any, Any](
-          (_) ⇒ s.asInstanceOf[Stage[Any, Any]], Attributes.none)
+          (_) ⇒ s.asInstanceOf[Stage[Any, Any]],
+          Attributes.none)
     }
   }
 

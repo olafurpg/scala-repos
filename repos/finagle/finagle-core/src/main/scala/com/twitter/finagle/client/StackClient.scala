@@ -2,8 +2,17 @@ package com.twitter.finagle.client
 
 import com.twitter.finagle._
 import com.twitter.finagle.context.Contexts
-import com.twitter.finagle.factory.{BindingFactory, RefcountedFactory, StatsFactoryWrapper, TimeoutFactory}
-import com.twitter.finagle.filter.{DtabStatsFilter, ExceptionSourceFilter, MonitorFilter}
+import com.twitter.finagle.factory.{
+  BindingFactory,
+  RefcountedFactory,
+  StatsFactoryWrapper,
+  TimeoutFactory
+}
+import com.twitter.finagle.filter.{
+  DtabStatsFilter,
+  ExceptionSourceFilter,
+  MonitorFilter
+}
 import com.twitter.finagle.loadbalancer.LoadBalancerFactory
 import com.twitter.finagle.param._
 import com.twitter.finagle.service._
@@ -358,7 +367,7 @@ object StackClient {
     */
   val defaultParams: Stack.Params =
     Stack.Params.empty + Stats(ClientStatsReceiver) +
-    LoadBalancerFactory.HostStats(LoadedHostStatsReceiver)
+      LoadBalancerFactory.HostStats(LoadedHostStatsReceiver)
 }
 
 /**
@@ -396,7 +405,7 @@ trait StackClient[Req, Rep]
 
   // these are necessary to have the right types from Java
   def withParams(ps: Stack.Params): StackClient[Req, Rep]
-  def configured[P : Stack.Param](p: P): StackClient[Req, Rep]
+  def configured[P: Stack.Param](p: P): StackClient[Req, Rep]
   def configured[P](psp: (P, Stack.Param[P])): StackClient[Req, Rep]
 }
 
@@ -410,11 +419,14 @@ trait StackClient[Req, Rep]
   *      clients.
   */
 trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
-    extends StackClient[Req, Rep] with Stack.Parameterized[This]
-    with CommonParams[This] with ClientParams[This]
-    with WithClientAdmissionControl[This] with WithClientTransport[This]
-    with WithSession[This] with WithSessionQualifier[This] {
-  self =>
+    extends StackClient[Req, Rep]
+    with Stack.Parameterized[This]
+    with CommonParams[This]
+    with ClientParams[This]
+    with WithClientAdmissionControl[This]
+    with WithClientTransport[This]
+    with WithSession[This]
+    with WithSessionQualifier[This] { self =>
 
   /**
     * The type we write into the transport.
@@ -458,7 +470,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
   /**
     * Creates a new StackClient with parameter `p`.
     */
-  override def configured[P : Stack.Param](p: P): This =
+  override def configured[P: Stack.Param](p: P): This =
     withParams(params + p)
 
   /**
@@ -544,7 +556,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     val clientStack = stack ++ (endpointer +: nilStack)
     val clientParams =
       params + Label(clientLabel) + Stats(stats.scope(clientLabel)) +
-      BindingFactory.Dest(dest)
+        BindingFactory.Dest(dest)
 
     clientStack.make(clientParams)
   }

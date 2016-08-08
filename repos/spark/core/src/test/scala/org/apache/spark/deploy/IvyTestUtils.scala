@@ -65,8 +65,8 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Returns the directory for the given groupId based on standard ivy or maven format. */
-  private def getBaseGroupDirectory(
-      artifact: MavenCoordinate, useIvyLayout: Boolean): String = {
+  private def getBaseGroupDirectory(artifact: MavenCoordinate,
+                                    useIvyLayout: Boolean): String = {
     if (!useIvyLayout) {
       artifact.groupId.replace(".", File.separator)
     } else {
@@ -75,8 +75,9 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Write the contents to a file to the supplied directory. */
-  private[deploy] def writeFile(
-      dir: File, fileName: String, contents: String): File = {
+  private[deploy] def writeFile(dir: File,
+                                fileName: String,
+                                contents: String): File = {
     val outputFile = new File(dir, fileName)
     val outputStream = new FileOutputStream(outputFile)
     outputStream.write(contents.toCharArray.map(_.toByte))
@@ -128,8 +129,9 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Create a simple testable Class. */
-  private def createJavaClass(
-      dir: File, className: String, packageName: String): File = {
+  private def createJavaClass(dir: File,
+                              className: String,
+                              packageName: String): File = {
     val contents = s"""package $packageName;
         |
         |import java.lang.Integer;
@@ -141,7 +143,8 @@ private[deploy] object IvyTestUtils {
         |}
       """.stripMargin
     val sourceFile = new JavaSourceFromString(
-        new File(dir, className).getAbsolutePath, contents)
+        new File(dir, className).getAbsolutePath,
+        contents)
     createCompiledClass(className, dir, sourceFile, Seq.empty)
   }
 
@@ -161,12 +164,12 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Helper method to write artifact information in the pom. */
-  private def pomArtifactWriter(
-      artifact: MavenCoordinate, tabCount: Int = 1): String = {
+  private def pomArtifactWriter(artifact: MavenCoordinate,
+                                tabCount: Int = 1): String = {
     var result =
       "\n" + "  " * tabCount + s"<groupId>${artifact.groupId}</groupId>"
     result += "\n" + "  " * tabCount +
-    s"<artifactId>${artifact.artifactId}</artifactId>"
+      s"<artifactId>${artifact.artifactId}</artifactId>"
     result +=
       "\n" + "  " * tabCount + s"<version>${artifact.version}</version>"
     result
@@ -315,8 +318,8 @@ private[deploy] object IvyTestUtils {
       }
       val jarFile = packJar(jarPath, artifact, allFiles, useIvyLayout, withR)
       assert(jarFile.exists(), "Problem creating Jar file")
-      val descriptor = createDescriptor(
-          tempPath, artifact, dependencies, useIvyLayout)
+      val descriptor =
+        createDescriptor(tempPath, artifact, dependencies, useIvyLayout)
       assert(descriptor.exists(), "Problem creating Pom file")
     } finally {
       FileUtils.deleteDirectory(root)
@@ -341,12 +344,19 @@ private[deploy] object IvyTestUtils {
       withPython: Boolean = false,
       withR: Boolean = false): File = {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
-    val mainRepo = createLocalRepository(
-        artifact, deps, rootDir, useIvyLayout, withPython, withR)
+    val mainRepo = createLocalRepository(artifact,
+                                         deps,
+                                         rootDir,
+                                         useIvyLayout,
+                                         withPython,
+                                         withR)
     deps.foreach { seq =>
       seq.foreach { dep =>
-        createLocalRepository(
-            dep, None, Some(mainRepo), useIvyLayout, withPython = false)
+        createLocalRepository(dep,
+                              None,
+                              Some(mainRepo),
+                              useIvyLayout,
+                              withPython = false)
       }
     }
     mainRepo
@@ -372,8 +382,12 @@ private[deploy] object IvyTestUtils {
       ivySettings: IvySettings = new IvySettings)(f: String => Unit): Unit = {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
     purgeLocalIvyCache(artifact, deps, ivySettings)
-    val repo = createLocalRepositoryForTests(
-        artifact, dependencies, rootDir, useIvyLayout, withPython, withR)
+    val repo = createLocalRepositoryForTests(artifact,
+                                             dependencies,
+                                             rootDir,
+                                             useIvyLayout,
+                                             withPython,
+                                             withR)
     try {
       f(repo.toURI.toString)
     } finally {

@@ -6,10 +6,20 @@ import java.util
 import javax.swing.Icon
 
 import com.intellij.codeHighlighting.Pass
-import com.intellij.codeInsight.daemon.{DaemonCodeAnalyzerSettings, LineMarkerInfo, LineMarkerProvider}
+import com.intellij.codeInsight.daemon.{
+  DaemonCodeAnalyzerSettings,
+  LineMarkerInfo,
+  LineMarkerProvider
+}
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.colors.{CodeInsightColors, EditorColorsManager}
-import com.intellij.openapi.editor.markup.{GutterIconRenderer, SeparatorPlacement}
+import com.intellij.openapi.editor.colors.{
+  CodeInsightColors,
+  EditorColorsManager
+}
+import com.intellij.openapi.editor.markup.{
+  GutterIconRenderer,
+  SeparatorPlacement
+}
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi._
 import com.intellij.psi.search.searches.ClassInheritorsSearch
@@ -23,7 +33,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher
 import org.jetbrains.plugins.scala.lang.psi.types.Signature
 
@@ -36,7 +50,8 @@ import scala.collection.{Seq, mutable}
   */
 class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
                               colorsManager: EditorColorsManager)
-    extends LineMarkerProvider with ScalaSeparatorProvider {
+    extends LineMarkerProvider
+    with ScalaSeparatorProvider {
 
   def getLineMarkerInfo(element: PsiElement): LineMarkerInfo[_ <: PsiElement] = {
     if (!element.isValid) return null
@@ -81,8 +96,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
       def getParent: PsiElement = {
         var e = element
         def test(x: PsiElement) = x match {
-          case _: ScFunction | _: ScValue |
-              _: ScVariable | _: ScTypeDefinition | _: ScTypeAlias =>
+          case _: ScFunction | _: ScValue | _: ScVariable |
+              _: ScTypeDefinition | _: ScTypeAlias =>
             true
           case _ => false
         }
@@ -115,7 +130,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
             .toSeq
           val icon =
             if (GutterUtil.isOverrides(method, signatures))
-              OVERRIDING_METHOD_ICON else IMPLEMENTING_METHOD_ICON
+              OVERRIDING_METHOD_ICON
+            else IMPLEMENTING_METHOD_ICON
           val typez = ScalaMarkerType.OVERRIDING_MEMBER
           if (signatures.nonEmpty) {
             return marker(method.nameId, icon, typez)
@@ -128,8 +144,9 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
             case v: ScDeclaredElementsHolder => v.declaredElements
             case _ => return null
           }
-          for (z <- bindings) signatures ++=
-            ScalaPsiUtil.superValsSignatures(z, withSelfType = true)
+          for (z <- bindings)
+            signatures ++=
+              ScalaPsiUtil.superValsSignatures(z, withSelfType = true)
           val icon =
             if (GutterUtil.isOverrides(x, signatures)) OVERRIDING_METHOD_ICON
             else IMPLEMENTING_METHOD_ICON
@@ -261,7 +278,7 @@ private object GutterUtil {
       members: ArrayBuffer[PsiElement],
       result: util.Collection[LineMarkerInfo[_ <: PsiElement]]) {
     for (member <- members if !member.isInstanceOf[PsiMethod] ||
-                  !member.asInstanceOf[PsiMethod].isConstructor) {
+           !member.asInstanceOf[PsiMethod].isConstructor) {
       ProgressManager.checkCanceled()
       val offset = member.getTextOffset
       val members = member match {
@@ -271,9 +288,10 @@ private object GutterUtil {
         case _ => Array[PsiNamedElement]()
       }
       val overrides = new ArrayBuffer[PsiNamedElement]
-      for (member <- members) overrides ++=
-        ScalaOverridingMemberSearcher.search(
-          member, deep = false, withSelfType = true)
+      for (member <- members)
+        overrides ++=
+          ScalaOverridingMemberSearcher
+            .search(member, deep = false, withSelfType = true)
       if (overrides.nonEmpty) {
         val icon =
           if (!GutterUtil.isAbstract(member)) OVERRIDEN_METHOD_MARKER_RENDERER

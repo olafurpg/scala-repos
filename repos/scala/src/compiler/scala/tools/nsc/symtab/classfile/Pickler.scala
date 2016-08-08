@@ -115,7 +115,7 @@ abstract class Pickler extends SubComponent {
       */
     private def isLocalToPickle(sym: Symbol): Boolean =
       (sym != NoSymbol) && !sym.isPackageClass &&
-      (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
+        (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
           sym.hasFlag(EXISTENTIAL) // existential param
           || sym.isParameter || isLocalToPickle(sym.owner))
     private def isExternalSymbol(sym: Symbol): Boolean =
@@ -196,15 +196,17 @@ abstract class Pickler extends SubComponent {
                 val parents =
                   (if (sym.isTrait) List(definitions.ObjectTpe) else Nil) ::: List(
                       sym.tpe)
-                globals + sym.newClassWithInfo(
-                    tpnme.LOCAL_CHILD, parents, EmptyScope, pos = sym.pos)
+                globals + sym.newClassWithInfo(tpnme.LOCAL_CHILD,
+                                               parents,
+                                               EmptyScope,
+                                               pos = sym.pos)
               }
 
             putChildren(sym, children.toList sortBy (_.sealedSortName))
           }
-          for (annot <-
-          (sym.annotations filter (ann => ann.isStatic && !ann.isErroneous)).reverse) putAnnotation(
-              sym, annot)
+          for (annot <- (sym.annotations filter (ann =>
+                                                   ann.isStatic && !ann.isErroneous)).reverse)
+            putAnnotation(sym, annot)
         } else if (sym != NoSymbol) {
           putEntry(if (sym.isModuleClass) sym.name.toTermName else sym.name)
           if (!sym.owner.isRoot) putSymbol(sym.owner)
@@ -397,7 +399,8 @@ abstract class Pickler extends SubComponent {
       @inline private def asRefs[T](body: => T): T = {
         val saved = refs
         refs = true
-        try body finally refs = saved
+        try body
+        finally refs = saved
       }
       override def traverseModifiers(mods: Modifiers): Unit =
         if (refs) writeRef(mods) else super.traverseModifiers(mods)

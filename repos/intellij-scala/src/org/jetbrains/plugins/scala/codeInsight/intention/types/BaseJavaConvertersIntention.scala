@@ -53,8 +53,8 @@ abstract class BaseJavaConvertersIntention(methodName: String)
   def isAlreadyConvertedCollection(typeResult: TypeResult[ScType]): Boolean =
     typeResult.exists { scType =>
       ScType.extractClass(scType) exists { psiClass =>
-        alreadyConvertedPrefixes.exists(
-            prefix => psiClass.getQualifiedName.startsWith(prefix))
+        alreadyConvertedPrefixes.exists(prefix =>
+          psiClass.getQualifiedName.startsWith(prefix))
       }
     }
 
@@ -69,7 +69,8 @@ abstract class BaseJavaConvertersIntention(methodName: String)
     def appendAsMethod() {
       val expression: ScExpression = getTargetExpression(element)
       val replacement = ScalaPsiElementFactory.createExpressionFromText(
-          s"${expression.getText}.$methodName", expression.getManager)
+          s"${expression.getText}.$methodName",
+          expression.getManager)
       CodeEditUtil.replaceChild(expression.getParent.getNode,
                                 expression.getNode,
                                 replacement.getNode)

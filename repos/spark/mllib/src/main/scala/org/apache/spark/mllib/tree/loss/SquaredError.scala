@@ -44,8 +44,8 @@ object SquaredError extends Loss {
     -2.0 * (label - prediction)
   }
 
-  override private[spark] def computeError(
-      prediction: Double, label: Double): Double = {
+  override private[spark] def computeError(prediction: Double,
+                                           label: Double): Double = {
     val err = label - prediction
     err * err
   }

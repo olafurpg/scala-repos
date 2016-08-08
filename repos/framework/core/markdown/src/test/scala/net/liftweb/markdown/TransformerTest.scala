@@ -224,7 +224,8 @@ paragraph""") should equal(
 else in the doc, define the link:
 
   [id]: http://example.com/  "Title"
-""") should equal("""<p>An <a href="http://example.com/" title="Title">example</a>. Then, anywhere
+""") should equal(
+        """<p>An <a href="http://example.com/" title="Title">example</a>. Then, anywhere
 else in the doc, define the link:</p>
 """)
   }

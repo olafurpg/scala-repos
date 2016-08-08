@@ -7,7 +7,11 @@ import akka.event.EventStream
 import akka.pattern.pipe
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.event.http.HttpEventStreamHandleActor.WorkDone
-import mesosphere.marathon.event.{EventStreamAttached, EventStreamDetached, MarathonEvent}
+import mesosphere.marathon.event.{
+  EventStreamAttached,
+  EventStreamDetached,
+  MarathonEvent
+}
 import mesosphere.util.ThreadPoolContext
 import play.api.libs.json.Json
 
@@ -17,7 +21,8 @@ import scala.util.Try
 class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
                                  stream: EventStream,
                                  maxOutStanding: Int)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[http] var outstanding = List.empty[MarathonEvent]
 
@@ -61,8 +66,8 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       context.become(stashEvents)
       val sendFuture = Future {
         toSend.foreach(event =>
-              handle.sendEvent(event.eventType,
-                               Json.stringify(eventToJson(event))))
+          handle.sendEvent(event.eventType,
+                           Json.stringify(eventToJson(event))))
         WorkDone
       }(ThreadPoolContext.ioContext)
 

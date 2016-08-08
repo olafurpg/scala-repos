@@ -18,7 +18,13 @@ package com.twitter.scalding.parquet.thrift
 
 import cascading.scheme.Scheme
 import com.twitter.scalding._
-import com.twitter.scalding.parquet.{StrictColumnProjectionString, DeprecatedColumnProjectionString, HasColumnProjection, HasFilterPredicate, ParquetValueScheme}
+import com.twitter.scalding.parquet.{
+  StrictColumnProjectionString,
+  DeprecatedColumnProjectionString,
+  HasColumnProjection,
+  HasFilterPredicate,
+  ParquetValueScheme
+}
 import com.twitter.scalding.source.{DailySuffixSource, HourlySuffixSource}
 import java.io.Serializable
 import org.apache.thrift.{TBase, TFieldIdEnum}
@@ -28,8 +34,12 @@ object ParquetThrift extends Serializable {
 }
 
 trait ParquetThriftBase[T]
-    extends FileSource with SingleMappable[T] with TypedSink[T]
-    with LocalTapSource with HasFilterPredicate with HasColumnProjection {
+    extends FileSource
+    with SingleMappable[T]
+    with TypedSink[T]
+    with LocalTapSource
+    with HasFilterPredicate
+    with HasColumnProjection {
 
   def mf: Manifest[T]
 
@@ -107,13 +117,18 @@ trait ParquetThrift[T <: ParquetThrift.ThriftBase]
   * }}}
   */
 class DailySuffixParquetThrift[T <: ParquetThrift.ThriftBase](
-    path: String, dateRange: DateRange)(implicit override val mf: Manifest[T])
-    extends DailySuffixSource(path, dateRange) with ParquetThrift[T]
+    path: String,
+    dateRange: DateRange)(implicit override val mf: Manifest[T])
+    extends DailySuffixSource(path, dateRange)
+    with ParquetThrift[T]
 
 class HourlySuffixParquetThrift[T <: ParquetThrift.ThriftBase](
-    path: String, dateRange: DateRange)(implicit override val mf: Manifest[T])
-    extends HourlySuffixSource(path, dateRange) with ParquetThrift[T]
+    path: String,
+    dateRange: DateRange)(implicit override val mf: Manifest[T])
+    extends HourlySuffixSource(path, dateRange)
+    with ParquetThrift[T]
 
 class FixedPathParquetThrift[T <: ParquetThrift.ThriftBase](paths: String*)(
     implicit override val mf: Manifest[T])
-    extends FixedPathSource(paths: _*) with ParquetThrift[T]
+    extends FixedPathSource(paths: _*)
+    with ParquetThrift[T]

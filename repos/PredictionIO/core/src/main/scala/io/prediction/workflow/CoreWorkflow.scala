@@ -85,8 +85,8 @@ object CoreWorkflow {
     } catch {
       case e @ (_: StopAfterReadInterruption |
           _: StopAfterPrepareInterruption) => {
-          logger.info(s"Training interrupted by $e.")
-        }
+        logger.info(s"Training interrupted by $e.")
+      }
     } finally {
       logger.debug("Stopping SparkContext")
       sc.stop()

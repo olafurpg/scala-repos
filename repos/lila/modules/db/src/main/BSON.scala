@@ -6,7 +6,8 @@ import org.joda.time.DateTime
 import reactivemongo.bson._
 
 abstract class BSON[T]
-    extends BSONHandler[BSONDocument, T] with BSONDocumentReader[T]
+    extends BSONHandler[BSONDocument, T]
+    with BSONDocumentReader[T]
     with BSONDocumentWriter[T] {
 
   import BSON._
@@ -41,8 +42,8 @@ object BSON {
           // mutable optimized implementation
           val b = collection.immutable.Map.newBuilder[String, V]
           for (tuple <- bson.elements)
-          // assume that all values in the document are BSONDocuments
-          b += (tuple._1 -> vr.read(tuple._2.asInstanceOf[BSONDocument]))
+            // assume that all values in the document are BSONDocuments
+            b += (tuple._1 -> vr.read(tuple._2.asInstanceOf[BSONDocument]))
           b.result
         }
       }
@@ -77,8 +78,9 @@ object BSON {
           val valueReader = vr.asInstanceOf[BSONReader[BSONValue, V]]
           // mutable optimized implementation
           val b = collection.immutable.Map.newBuilder[String, V]
-          for (tuple <- bson.elements) b +=
-          (tuple._1 -> valueReader.read(tuple._2))
+          for (tuple <- bson.elements)
+            b +=
+              (tuple._1 -> valueReader.read(tuple._2))
           b.result
         }
       }
@@ -104,8 +106,8 @@ object BSON {
       }
   }
 
-  private def readStream[T](
-      array: BSONArray, reader: BSONReader[BSONValue, T]): Stream[T] = {
+  private def readStream[T](array: BSONArray,
+                            reader: BSONReader[BSONValue, T]): Stream[T] = {
     array.stream.filter(_.isSuccess).map { v =>
       reader.read(v.get)
     }
@@ -139,8 +141,9 @@ object BSON {
     val map = {
       // mutable optimized implementation
       val b = collection.immutable.Map.newBuilder[String, BSONValue]
-      for (tuple <- doc.stream if tuple.isSuccess) b +=
-      (tuple.get._1 -> tuple.get._2)
+      for (tuple <- doc.stream if tuple.isSuccess)
+        b +=
+          (tuple.get._1 -> tuple.get._2)
       b.result
     }
 
@@ -230,8 +233,8 @@ object BSON {
     doc.values.toList.map(debug).mkString("[", ", ", "]")
   def debugDoc(doc: BSONDocument): String =
     (doc.elements.toList map {
-          case (k, v) => s"$k: ${debug(v)}"
-        }).mkString("{", ", ", "}")
+      case (k, v) => s"$k: ${debug(v)}"
+    }).mkString("{", ", ", "}")
 
   def asStrings(vs: List[BSONValue]): List[String] = {
     val b = new scala.collection.mutable.ListBuffer[String]

@@ -28,7 +28,8 @@ object Test extends InteractiveTest {
 
   import interactive.Global
   trait InteractiveScaladocAnalyzer
-      extends interactive.InteractiveAnalyzer with doc.ScaladocAnalyzer {
+      extends interactive.InteractiveAnalyzer
+      with doc.ScaladocAnalyzer {
     val global: Global
     override def newTyper(context: Context) =
       new Typer(context) with InteractiveTyper with ScaladocTyper {
@@ -127,7 +128,7 @@ object Test extends InteractiveTest {
 
     val beta =
       (mean((xs, ys).zipped.map(_ * _)) - meanXs * meanYs) /
-      (mean(xs.map(x => x * x)) - meanXs * meanXs)
+        (mean(xs.map(x => x * x)) - meanXs * meanXs)
     val alfa = meanYs - beta * meanXs
 
     (alfa, beta)

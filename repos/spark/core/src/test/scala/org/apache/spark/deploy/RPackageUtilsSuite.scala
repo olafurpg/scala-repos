@@ -36,15 +36,17 @@ import org.apache.spark.deploy.SparkSubmitUtils.MavenCoordinate
 import org.apache.spark.util.ResetSystemProperties
 
 class RPackageUtilsSuite
-    extends SparkFunSuite with BeforeAndAfterEach with ResetSystemProperties {
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with ResetSystemProperties {
 
   private val main = MavenCoordinate("a", "b", "c")
   private val dep1 = MavenCoordinate("a", "dep1", "c")
   private val dep2 = MavenCoordinate("a", "dep2", "d")
 
   private def getJarPath(coord: MavenCoordinate, repo: File): File = {
-    new File(IvyTestUtils.pathFromCoordinate(
-                 coord, repo, "jar", useIvyLayout = false),
+    new File(IvyTestUtils
+               .pathFromCoordinate(coord, repo, "jar", useIvyLayout = false),
              IvyTestUtils.artifactName(coord, useIvyLayout = false, ".jar"))
   }
 
@@ -72,8 +74,8 @@ class RPackageUtilsSuite
   test("pick which jars to unpack using the manifest") {
     val deps = Seq(dep1, dep2).mkString(",")
     IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map(
-          c => new JarFile(getJarPath(c, new File(new URI(repo)))))
+      val jars = Seq(main, dep1, dep2).map(c =>
+        new JarFile(getJarPath(c, new File(new URI(repo)))))
       assert(RPackageUtils.checkManifestForR(jars(0)), "should have R code")
       assert(!RPackageUtils.checkManifestForR(jars(1)),
              "should not have R code")
@@ -89,13 +91,15 @@ class RPackageUtilsSuite
       val jars = Seq(main, dep1, dep2).map { c =>
         getJarPath(c, new File(new URI(repo)))
       }.mkString(",")
-      RPackageUtils.checkAndBuildRPackage(
-          jars, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jars,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val firstJar = jars.substring(0, jars.indexOf(","))
       val output = lineBuffer.mkString("\n")
       assert(output.contains("Building R package"))
       assert(output.contains("Extracting"))
-      assert(output.contains(
+      assert(
+          output.contains(
               s"$firstJar contains R source code. Now installing package."))
       assert(output.contains("doesn't contain R source code, skipping..."))
     }
@@ -108,8 +112,9 @@ class RPackageUtilsSuite
       val jars = Seq(main, dep1, dep2).map { c =>
         getJarPath(c, new File(new URI(repo))) + "dummy"
       }.mkString(",")
-      RPackageUtils.checkAndBuildRPackage(
-          jars, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jars,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val individualJars = jars.split(",")
       val output = lineBuffer.mkString("\n")
       individualJars.foreach { jarFile =>
@@ -131,8 +136,9 @@ class RPackageUtilsSuite
                                      useIvyLayout = false,
                                      withR = false,
                                      Some(manifest))
-      RPackageUtils.checkAndBuildRPackage(
-          jar.getAbsolutePath, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jar.getAbsolutePath,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val output = lineBuffer.mkString("\n")
       assert(output.contains(RPackageUtils.RJarDoc))
     }

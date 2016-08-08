@@ -57,20 +57,23 @@ class MatrixFactorizationModel @Since("0.8.0")(
     @Since("0.8.0") val rank: Int,
     @Since("0.8.0") val userFeatures: RDD[(Int, Array[Double])],
     @Since("0.8.0") val productFeatures: RDD[(Int, Array[Double])])
-    extends Saveable with Serializable with Logging {
+    extends Saveable
+    with Serializable
+    with Logging {
 
   require(rank > 0)
   validateFeatures("User", userFeatures)
   validateFeatures("Product", productFeatures)
 
   /** Validates factors and warns users if there are performance concerns. */
-  private def validateFeatures(
-      name: String, features: RDD[(Int, Array[Double])]): Unit = {
+  private def validateFeatures(name: String,
+                               features: RDD[(Int, Array[Double])]): Unit = {
     require(features.first()._2.length == rank,
             s"$name feature dimension does not match the rank $rank.")
     if (features.partitioner.isEmpty) {
-      logWarning(s"$name factor does not have a partitioner. " +
-          "Prediction on individual records could be slow.")
+      logWarning(
+          s"$name factor does not have a partitioner. " +
+            "Prediction on individual records could be slow.")
     }
     if (features.getStorageLevel == StorageLevel.NONE) {
       logWarning(s"$name factor is not cached. Prediction could be slow.")
@@ -98,18 +101,16 @@ class MatrixFactorizationModel @Since("0.8.0")(
     val zeroCounterProduct = new HyperLogLogPlus(4, 0)
     val aggregated =
       usersProducts.aggregate((zeroCounterUser, zeroCounterProduct))(
-          (hllTuple: (HyperLogLogPlus, HyperLogLogPlus), v: (Int, Int)) =>
-            {
-              hllTuple._1.offer(v._1)
-              hllTuple._2.offer(v._2)
-              hllTuple
+          (hllTuple: (HyperLogLogPlus, HyperLogLogPlus), v: (Int, Int)) => {
+            hllTuple._1.offer(v._1)
+            hllTuple._2.offer(v._2)
+            hllTuple
           },
-          (h1: (HyperLogLogPlus,
-          HyperLogLogPlus), h2: (HyperLogLogPlus, HyperLogLogPlus)) =>
-            {
-              h1._1.addAll(h2._1)
-              h1._2.addAll(h2._2)
-              h1
+          (h1: (HyperLogLogPlus, HyperLogLogPlus),
+           h2: (HyperLogLogPlus, HyperLogLogPlus)) => {
+            h1._1.addAll(h2._1)
+            h1._2.addAll(h2._2)
+            h1
           })
     (aggregated._1.cardinality(), aggregated._2.cardinality())
   }
@@ -355,10 +356,9 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       case (className, "1.0") if className == classNameV1_0 =>
         SaveLoadV1_0.load(sc, path)
       case _ =>
-        throw new IOException(
-            "MatrixFactorizationModel.load did not recognize model with" +
-            s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+        throw new IOException("MatrixFactorizationModel.load did not recognize model with" +
+          s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
+          s"  ($classNameV1_0, 1.0)")
     }
   }
 
@@ -377,8 +377,9 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       val sc = model.userFeatures.sparkContext
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
+      val metadata = compact(
+          render(("class" -> thisClassName) ~
+            ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
       model.userFeatures.toDF("id", "features").write.parquet(userPath(path))
       model.productFeatures

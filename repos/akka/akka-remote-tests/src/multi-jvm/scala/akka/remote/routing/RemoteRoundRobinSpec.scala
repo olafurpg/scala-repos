@@ -74,8 +74,10 @@ class RemoteRoundRobinMultiJvmNode3 extends RemoteRoundRobinSpec
 class RemoteRoundRobinMultiJvmNode4 extends RemoteRoundRobinSpec
 
 class RemoteRoundRobinSpec
-    extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteRoundRobinMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -102,7 +104,8 @@ class RemoteRoundRobinSpec
         }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5 seconds, messages = connectionCount * iterationCount) {
+            5 seconds,
+            messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,
@@ -198,7 +201,8 @@ class RemoteRoundRobinSpec
         }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5 seconds, messages = connectionCount * iterationCount) {
+            5 seconds,
+            messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,

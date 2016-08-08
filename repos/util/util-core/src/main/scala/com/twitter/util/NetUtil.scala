@@ -92,7 +92,7 @@ object NetUtil {
       case inetAddress: Inet4Address =>
         val addr = inetAddress.getAddress
         ((addr(0) & 0xff) << 24) | ((addr(1) & 0xff) << 16) |
-        ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
+          ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
       case _ =>
         throw new IllegalArgumentException(
             "non-Inet4Address cannot be converted to an Int")
@@ -125,8 +125,8 @@ object NetUtil {
     case (netIp, mask) => (mask & ip) == netIp
   }
 
-  def isInetAddressInBlock(
-      inetAddress: InetAddress, ipBlock: (Int, Int)): Boolean =
+  def isInetAddressInBlock(inetAddress: InetAddress,
+                           ipBlock: (Int, Int)): Boolean =
     isIpInBlock(inetAddressToInt(inetAddress), ipBlock)
 
   def isIpInBlocks(ip: Int, ipBlocks: Iterable[(Int, Int)]): Boolean = {
@@ -139,8 +139,8 @@ object NetUtil {
     isIpInBlocks(ipToInt(ip), ipBlocks)
   }
 
-  def isInetAddressInBlocks(
-      inetAddress: InetAddress, ipBlocks: Iterable[(Int, Int)]): Boolean =
+  def isInetAddressInBlocks(inetAddress: InetAddress,
+                            ipBlocks: Iterable[(Int, Int)]): Boolean =
     isIpInBlocks(inetAddressToInt(inetAddress), ipBlocks)
 
   def getLocalHostName(): String = {

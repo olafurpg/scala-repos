@@ -9,15 +9,16 @@ import scala.util.control.NoStackTrace
 
 object SwitchableLoggedBehaviorSpec {
   object TestException
-      extends AkkaException("Test exception") with NoStackTrace
+      extends AkkaException("Test exception")
+      with NoStackTrace
 }
 
 class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
   import akka.remote.transport.SwitchableLoggedBehaviorSpec._
 
   private def defaultBehavior =
-    new SwitchableLoggedBehavior[Unit, Int](
-        (_) ⇒ Promise.successful(3).future, (_) ⇒ ())
+    new SwitchableLoggedBehavior[Unit, Int]((_) ⇒ Promise.successful(3).future,
+                                            (_) ⇒ ())
 
   "A SwitchableLoggedBehavior" must {
 
@@ -97,7 +98,8 @@ class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
     "log calls and parametrers" in {
       val logPromise = Promise[Int]()
       val behavior = new SwitchableLoggedBehavior[Int, Int](
-          (i) ⇒ Promise.successful(3).future, (i) ⇒ logPromise.success(i))
+          (i) ⇒ Promise.successful(3).future,
+          (i) ⇒ logPromise.success(i))
 
       behavior(11)
       Await.result(logPromise.future, timeout.duration) should ===(11)

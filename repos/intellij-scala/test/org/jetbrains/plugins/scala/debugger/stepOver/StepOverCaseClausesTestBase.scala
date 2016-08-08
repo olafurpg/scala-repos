@@ -6,7 +6,8 @@ import org.jetbrains.plugins.scala.debugger.ScalaVersion_2_11
   * @author Nikolay.Tropin
   */
 class StepOverCaseClausesTest
-    extends StepOverCaseClausesTestBase with ScalaVersion_2_11
+    extends StepOverCaseClausesTestBase
+    with ScalaVersion_2_11
 
 abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
   addFileWithBreakpoints("Simple.scala",

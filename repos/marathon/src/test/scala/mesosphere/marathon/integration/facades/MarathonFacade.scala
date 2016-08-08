@@ -65,8 +65,9 @@ case class ITDeployment(id: String, affectedApps: Seq[String])
   * @param url the url of the remote marathon instance
   */
 class MarathonFacade(
-    url: String, baseGroup: PathId, waitTime: Duration = 30.seconds)(
-    implicit val system: ActorSystem)
+    url: String,
+    baseGroup: PathId,
+    waitTime: Duration = 30.seconds)(implicit val system: ActorSystem)
     extends PlayJsonSupport {
   import SprayHttpResponse._
 
@@ -96,10 +97,11 @@ class MarathonFacade(
 
   implicit lazy val itEnrichedTaskFormat: Format[ITEnrichedTask] =
     ((__ \ "appId").format[String] ~ (__ \ "id").format[String] ~ (__ \ "host")
-          .format[String] ~ (__ \ "ports").formatNullable[Seq[Int]] ~
-        (__ \ "startedAt").formatNullable[Date] ~ (__ \ "stagedAt")
-          .formatNullable[Date] ~ (__ \ "version").formatNullable[String])(
-        ITEnrichedTask(_, _, _, _, _, _, _), unlift(ITEnrichedTask.unapply))
+      .format[String] ~ (__ \ "ports").formatNullable[Seq[Int]] ~
+      (__ \ "startedAt").formatNullable[Date] ~ (__ \ "stagedAt")
+      .formatNullable[Date] ~ (__ \ "version").formatNullable[String])(
+        ITEnrichedTask(_, _, _, _, _, _, _),
+        unlift(ITEnrichedTask.unapply))
 
   def isInBaseGroup(pathId: PathId): Boolean = {
     pathId.path.startsWith(baseGroup.path)
@@ -136,8 +138,8 @@ class MarathonFacade(
     result(pipeline(Post(s"$url/v2/apps", app)), waitTime)
   }
 
-  def deleteApp(
-      id: PathId, force: Boolean = false): RestResult[ITDeploymentResult] = {
+  def deleteApp(id: PathId,
+                force: Boolean = false): RestResult[ITDeploymentResult] = {
     requireInBaseGroup(id)
     val pipeline = marathonSendReceive ~> read[ITDeploymentResult]
     result(pipeline(Delete(s"$url/v2/apps$id?force=$force")), waitTime)
@@ -154,8 +156,8 @@ class MarathonFacade(
     result(pipeline(Put(putUrl, app)), waitTime)
   }
 
-  def restartApp(
-      id: PathId, force: Boolean = false): RestResult[ITDeploymentResult] = {
+  def restartApp(id: PathId,
+                 force: Boolean = false): RestResult[ITDeploymentResult] = {
     requireInBaseGroup(id)
     val pipeline = marathonSendReceive ~> read[ITDeploymentResult]
     result(pipeline(Post(s"$url/v2/apps$id/restart?force=$force")), waitTime)
@@ -182,12 +184,12 @@ class MarathonFacade(
     res.map(_.tasks.toList)
   }
 
-  def killAllTasks(
-      appId: PathId, scale: Boolean = false): RestResult[ITListTasks] = {
+  def killAllTasks(appId: PathId,
+                   scale: Boolean = false): RestResult[ITListTasks] = {
     requireInBaseGroup(appId)
     val pipeline = marathonSendReceive ~> read[ITListTasks]
-    result(
-        pipeline(Delete(s"$url/v2/apps$appId/tasks?scale=$scale")), waitTime)
+    result(pipeline(Delete(s"$url/v2/apps$appId/tasks?scale=$scale")),
+           waitTime)
   }
 
   def killAllTasksAndScale(appId: PathId): RestResult[ITDeploymentPlan] = {
@@ -231,8 +233,8 @@ class MarathonFacade(
     result(pipeline(Post(s"$url/v2/groups", group)), waitTime)
   }
 
-  def deleteGroup(
-      id: PathId, force: Boolean = false): RestResult[ITDeploymentResult] = {
+  def deleteGroup(id: PathId,
+                  force: Boolean = false): RestResult[ITDeploymentResult] = {
     requireInBaseGroup(id)
     val pipeline = marathonSendReceive ~> read[ITDeploymentResult]
     result(pipeline(Delete(s"$url/v2/groups$id?force=$force")), waitTime)
@@ -272,8 +274,8 @@ class MarathonFacade(
     }
   }
 
-  def deleteDeployment(
-      id: String, force: Boolean = false): RestResult[HttpResponse] = {
+  def deleteDeployment(id: String,
+                       force: Boolean = false): RestResult[HttpResponse] = {
     val pipeline = marathonSendReceive ~> responseResult
     result(pipeline(Delete(s"$url/v2/deployments/$id?force=$force")), waitTime)
   }
@@ -358,12 +360,13 @@ object MarathonFacade {
   def extractDeploymentIds(
       app: RestResult[AppDefinition]): scala.collection.Seq[String] = {
     try {
-      for (deployment <- (app.entityJson \ "deployments").as[JsArray].value) yield
-      (deployment \ "id").as[String]
+      for (deployment <- (app.entityJson \ "deployments").as[JsArray].value)
+        yield (deployment \ "id").as[String]
     } catch {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while parsing:\n${app.entityPrettyJsonString}", e)
+            s"while parsing:\n${app.entityPrettyJsonString}",
+            e)
     }
   }
 }

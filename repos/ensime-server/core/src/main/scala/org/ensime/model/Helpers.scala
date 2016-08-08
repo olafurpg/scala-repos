@@ -127,9 +127,9 @@ trait Helpers { self: Global =>
       }
     if (withTpeArgs) {
       withoutArgs +
-      (if (tpe.typeArgs.size > 0) {
-         "[" + tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") + "]"
-       } else { "" })
+        (if (tpe.typeArgs.size > 0) {
+           "[" + tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") + "]"
+         } else { "" })
     } else withoutArgs
   }
 
@@ -147,7 +147,8 @@ trait Helpers { self: Global =>
     * Returns the type, object, or package symbol uniquely identified by name.
     */
   protected def symbolByName(
-      name: String, rootSymbol: Symbol = RootClass): Option[Symbol] = {
+      name: String,
+      rootSymbol: Symbol = RootClass): Option[Symbol] = {
     def segments(name: String): List[Name] = {
       val len = name.length
       if (len == 0) {
@@ -259,7 +260,7 @@ trait Helpers { self: Global =>
         s != EmptyPackage && !isRoot(s) &&
         // This check is necessary to prevent infinite looping..
         ((isRoot(s.owner) && isRoot(parent)) ||
-            (s.owner.fullName == parent.fullName))
+        (s.owner.fullName == parent.fullName))
       }
 
       // the nameString operation is depressingly expensive - mapping to tuples first reduces the overhead.

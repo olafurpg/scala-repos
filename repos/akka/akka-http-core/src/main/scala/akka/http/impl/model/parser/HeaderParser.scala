@@ -15,15 +15,25 @@ import akka.http.scaladsl.model._
 /**
   * INTERNAL API.
   */
-private[http] class HeaderParser(
-    val input: ParserInput,
-    settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
-    extends Parser with DynamicRuleHandler[HeaderParser, HttpHeader :: HNil]
-    with CommonRules with AcceptCharsetHeader with AcceptEncodingHeader
-    with AcceptHeader with AcceptLanguageHeader with CacheControlHeader
-    with ContentDispositionHeader with ContentTypeHeader with CommonActions
-    with IpAddressParsing with LinkHeader with SimpleHeaders
-    with StringBuilding with WebSocketHeaders {
+private[http] class HeaderParser(val input: ParserInput,
+                                 settings: HeaderParser.Settings =
+                                   HeaderParser.DefaultSettings)
+    extends Parser
+    with DynamicRuleHandler[HeaderParser, HttpHeader :: HNil]
+    with CommonRules
+    with AcceptCharsetHeader
+    with AcceptEncodingHeader
+    with AcceptHeader
+    with AcceptLanguageHeader
+    with CacheControlHeader
+    with ContentDispositionHeader
+    with ContentTypeHeader
+    with CommonActions
+    with IpAddressParsing
+    with LinkHeader
+    with SimpleHeaders
+    with StringBuilding
+    with WebSocketHeaders {
   import CharacterClasses._
 
   // http://www.rfc-editor.org/errata_search.php?rfc=7230 errata id 4189
@@ -95,15 +105,14 @@ private[http] object HeaderParser {
     import akka.parboiled2.EOI
     val v =
       value +
-      EOI // this makes sure the parser isn't broken even if there's no trailing garbage in this value
+        EOI // this makes sure the parser isn't broken even if there's no trailing garbage in this value
     val parser = new HeaderParser(v, settings)
     dispatch(parser, headerName) match {
       case r @ Right(_) if parser.cursor == v.length ⇒ r
       case r @ Right(_) ⇒
-        Left(
-            ErrorInfo(
-                "Header parsing error",
-                s"Rule for $headerName accepted trailing garbage. Is the parser missing a trailing EOI?"))
+        Left(ErrorInfo(
+            "Header parsing error",
+            s"Rule for $headerName accepted trailing garbage. Is the parser missing a trailing EOI?"))
       case Left(e) ⇒
         Left(
             e.copy(summary = e.summary.filterNot(_ == EOI),
@@ -175,10 +184,9 @@ private[http] object HeaderParser {
     def uriParsingMode: Uri.ParsingMode
     def cookieParsingMode: ParserSettings.CookieParsingMode
   }
-  def Settings(
-      uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed,
-      cookieParsingMode: ParserSettings.CookieParsingMode = ParserSettings.CookieParsingMode.RFC6265)
-    : Settings = {
+  def Settings(uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed,
+               cookieParsingMode: ParserSettings.CookieParsingMode =
+                 ParserSettings.CookieParsingMode.RFC6265): Settings = {
     val _uriParsingMode = uriParsingMode
     val _cookieParsingMode = cookieParsingMode
 

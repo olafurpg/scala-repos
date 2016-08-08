@@ -35,8 +35,8 @@ object ScalaTestUtil {
     List("org.scalatest.junit.JUnit3Suite")
 
   def getJUnitSuiteBases: List[String] =
-    List(
-        "org.scalatest.junit.JUnitSuite", "org.scalatest.junit.JUnitSuiteLike")
+    List("org.scalatest.junit.JUnitSuite",
+         "org.scalatest.junit.JUnitSuiteLike")
 
   def getPropSpecBases: List[String] =
     List("org.scalatest.PropSpec",

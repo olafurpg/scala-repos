@@ -36,8 +36,9 @@ abstract class ImplicitsTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
@@ -53,9 +54,13 @@ abstract class ImplicitsTestBase
 
     val addOne =
       if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+                                      classOf[ScExpression]) != null) 0
+      else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+        scalaFile,
+        startOffset + addOne,
+        endOffset,
+        classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val implicitConversions = expr.getImplicitConversions(fromUnder = false)
     val res =
@@ -63,13 +68,12 @@ abstract class ImplicitsTestBase
         .map(_.name)
         .sorted
         .mkString("Seq(", ",\n    ", ")") + ",\n" +
-      (implicitConversions._2 match {
-            case None => "None"
-            case Some(elem: PsiNamedElement) => "Some(" + elem.name + ")"
-            case _ =>
-              assert(
-                  assertion = false, message = "elem is not PsiNamedElement")
-          })
+        (implicitConversions._2 match {
+          case None => "None"
+          case Some(elem: PsiNamedElement) => "Some(" + elem.name + ")"
+          case _ =>
+            assert(assertion = false, message = "elem is not PsiNamedElement")
+        })
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
     val output = lastPsi.getNode.getElementType match {

@@ -63,8 +63,8 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
 
   def score(game: Game): Int = math.round {
     (heuristics map {
-          case (fn, coefficient) => heuristicBox(fn(game)) * coefficient
-        }).sum * 1000
+      case (fn, coefficient) => heuristicBox(fn(game)) * coefficient
+    }).sum * 1000
   }
 
   type Heuristic = Game => Float

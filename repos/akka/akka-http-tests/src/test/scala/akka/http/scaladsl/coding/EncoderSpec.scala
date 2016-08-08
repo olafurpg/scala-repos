@@ -25,8 +25,9 @@ class EncoderSpec extends WordSpec with CodecSpecSupport {
       val encoded = DummyEncoder.encode(request)
       encoded.headers shouldEqual List(
           `Content-Encoding`(DummyEncoder.encoding))
-      encoded.entity.toStrict(1.second).awaitResult(1.second) shouldEqual HttpEntity(
-          dummyCompress(smallText))
+      encoded.entity
+        .toStrict(1.second)
+        .awaitResult(1.second) shouldEqual HttpEntity(dummyCompress(smallText))
     }
   }
 

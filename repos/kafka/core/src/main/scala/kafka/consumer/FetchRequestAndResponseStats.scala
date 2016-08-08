@@ -61,7 +61,8 @@ class FetchRequestAndResponseStats(clientId: String) {
       ): FetchRequestAndResponseMetrics = allBrokersStats
 
   def getFetchRequestAndResponseStats(
-      brokerHost: String, brokerPort: Int): FetchRequestAndResponseMetrics = {
+      brokerHost: String,
+      brokerPort: Int): FetchRequestAndResponseMetrics = {
     stats.getAndMaybePut(
         new ClientIdAndBroker(clientId, brokerHost, brokerPort))
   }

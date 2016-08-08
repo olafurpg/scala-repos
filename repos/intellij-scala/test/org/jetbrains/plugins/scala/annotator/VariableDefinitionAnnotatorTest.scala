@@ -69,8 +69,8 @@ class VariableDefinitionAnnotatorTest extends SimpleTestCase {
     val annotator = new VariableDefinitionAnnotator() {}
     val mock = new AnnotatorHolderMock
 
-    annotator.annotateVariableDefinition(
-        definition, mock, highlightErrors = true)
+    annotator
+      .annotateVariableDefinition(definition, mock, highlightErrors = true)
     mock.annotations
   }
 

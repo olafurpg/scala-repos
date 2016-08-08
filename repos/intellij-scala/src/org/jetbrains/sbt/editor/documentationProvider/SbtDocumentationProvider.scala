@@ -5,7 +5,12 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.editor.documentationProvider.ScalaDocumentationProvider
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr, ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScInfixExpr,
+  ScMethodCall,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
@@ -19,8 +24,8 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
 
   private val scalaDocProvider = new ScalaDocumentationProvider
 
-  override def getQuickNavigateInfo(
-      element: PsiElement, originalElement: PsiElement): String = {
+  override def getQuickNavigateInfo(element: PsiElement,
+                                    originalElement: PsiElement): String = {
     val scalaDoc = Option(
         scalaDocProvider.getQuickNavigateInfo(element, originalElement))
     scalaDoc.map { doc =>
@@ -28,8 +33,8 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
     }.orNull
   }
 
-  override def generateDoc(
-      element: PsiElement, originalElement: PsiElement): String = {
+  override def generateDoc(element: PsiElement,
+                           originalElement: PsiElement): String = {
     val scalaDoc = Option(
         scalaDocProvider.generateDoc(element, originalElement))
     scalaDoc.map { doc =>

@@ -41,7 +41,7 @@ object MarathonBuild extends Build {
     .dependsOn(pluginInterface)
     // run mesos-simulation/test:test when running test
     .settings((test in Test) <<= (test in Test) dependsOn
-        (test in Test in LocalProject("mesos-simulation")))
+      (test in Test in LocalProject("mesos-simulation")))
 
   lazy val mesosSimulation: Project = Project(
       id = "mesos-simulation",
@@ -176,7 +176,7 @@ object MarathonBuild extends Build {
           .setPreference(SpaceInsideParentheses, false)
           .setPreference(SpacesWithinPatternBinders, true)
           .setPreference(FormatXml, true)
-      )
+    )
 
   /**
     * This is the standard release process without
@@ -226,7 +226,8 @@ object MarathonBuild extends Build {
 
   lazy val publishSettings =
     S3Resolver.defaults ++ Seq(
-        publishTo := Some(s3resolver.value(
+        publishTo := Some(
+            s3resolver.value(
                 "Mesosphere Public Repo (S3)",
                 s3("downloads.mesosphere.io/maven")
             )),
@@ -242,8 +243,8 @@ object Dependencies {
       guava % "compile"
   )
 
-  val excludeSlf4jLog4j12 = ExclusionRule(
-      organization = "org.slf4j", name = "slf4j-log4j12")
+  val excludeSlf4jLog4j12 =
+    ExclusionRule(organization = "org.slf4j", name = "slf4j-log4j12")
   val excludeLog4j = ExclusionRule(organization = "log4j")
   val excludeJCL = ExclusionRule(organization = "commons-logging")
 
@@ -282,7 +283,8 @@ object Dependencies {
       Test.scalatest % "test",
       Test.mockito % "test",
       Test.akkaTestKit % "test"
-  ).map(_.excludeAll(excludeSlf4jLog4j12)
+  ).map(
+      _.excludeAll(excludeSlf4jLog4j12)
         .excludeAll(excludeLog4j)
         .excludeAll(excludeJCL))
 }
@@ -350,10 +352,10 @@ object Dependency {
   val jGraphT = "org.javabits.jgrapht" % "jgrapht-core" % V.JGraphT
   val hadoopHdfs =
     "org.apache.hadoop" % "hadoop-hdfs" % V.Hadoop excludeAll
-    (excludeMortbayJetty, excludeJavaxServlet)
+      (excludeMortbayJetty, excludeJavaxServlet)
   val hadoopCommon =
     "org.apache.hadoop" % "hadoop-common" % V.Hadoop excludeAll
-    (excludeMortbayJetty, excludeJavaxServlet)
+      (excludeMortbayJetty, excludeJavaxServlet)
   val beanUtils = "commons-beanutils" % "commons-beanutils" % "1.9.2"
   val scallop = "org.rogach" %% "scallop" % V.Scallop
   val jsonSchemaValidator =
@@ -366,7 +368,7 @@ object Dependency {
   val graphite = "io.dropwizard.metrics" % "metrics-graphite" % V.Graphite
   val datadog =
     "org.coursera" % "dropwizard-metrics-datadog" % V.DataDog exclude
-    ("ch.qos.logback", "logback-classic")
+      ("ch.qos.logback", "logback-classic")
   val wixAccord = "com.wix" %% "accord-core" % V.WixAccord
 
   object Test {

@@ -26,11 +26,12 @@ class ScPatternListElementType[Func <: ScPatternList]
     new ScPatternListStubImpl(parentStub, this, psi.allPatternsSimple)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScPatternListStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScPatternListStub = {
     val patternsSimple = dataStream.readBoolean
-    new ScPatternListStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, patternsSimple)
+    new ScPatternListStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                              this,
+                              patternsSimple)
   }
 
   def indexStub(stub: ScPatternListStub, sink: IndexSink): Unit = {}

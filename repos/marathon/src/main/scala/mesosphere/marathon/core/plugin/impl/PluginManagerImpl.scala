@@ -4,7 +4,11 @@ import java.net.{URL, URLClassLoader}
 import java.util.ServiceLoader
 
 import mesosphere.marathon.core.plugin.impl.PluginManagerImpl._
-import mesosphere.marathon.core.plugin.{PluginDefinition, PluginDefinitions, PluginManager}
+import mesosphere.marathon.core.plugin.{
+  PluginDefinition,
+  PluginDefinitions,
+  PluginManager
+}
 import mesosphere.marathon.io.IO
 import mesosphere.marathon.plugin.plugin.PluginConfiguration
 import mesosphere.marathon.{MarathonConf, WrongConfigurationException}
@@ -27,8 +31,8 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
   private[this] var pluginHolders: List[PluginHolder[_]] =
     List.empty[PluginHolder[_]]
 
-  val classLoader: URLClassLoader = new URLClassLoader(
-      urls.toArray, this.getClass.getClassLoader)
+  val classLoader: URLClassLoader =
+    new URLClassLoader(urls.toArray, this.getClass.getClassLoader)
 
   /**
     * Load plugin for a specific type.
@@ -36,7 +40,7 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
   private[this] def load[T](implicit ct: ClassTag[T]): PluginHolder[T] = {
     log.info(
         s"Loading plugins implementing '${ct.runtimeClass.getName}' from these urls: [${urls
-      .mkString(", ")}]")
+          .mkString(", ")}]")
     def configure(plugin: T, definition: PluginDefinition): T = plugin match {
       case cf: PluginConfiguration if definition.configuration.isDefined =>
         log.info(
@@ -55,9 +59,9 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
           providers
             .find(_.getClass.getName == definition.implementation)
             .map(plugin =>
-                  PluginReference(configure(plugin, definition), definition))
+              PluginReference(configure(plugin, definition), definition))
             .getOrElse(throw new WrongConfigurationException(
-                    s"Plugin not found: $definition"))
+                s"Plugin not found: $definition"))
       }
     log.info(s"Found ${plugins.size} plugins.")
     PluginHolder(ct, plugins)
@@ -86,8 +90,8 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
 
 object PluginManagerImpl {
   case class PluginReference[T](plugin: T, definition: PluginDefinition)
-  case class PluginHolder[T](
-      classTag: ClassTag[T], plugins: Seq[PluginReference[T]])
+  case class PluginHolder[T](classTag: ClassTag[T],
+                             plugins: Seq[PluginReference[T]])
   implicit val definitionFormat = Json.format[PluginDefinition]
 
   def parse(fileName: String): PluginDefinitions = {

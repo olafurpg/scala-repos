@@ -60,13 +60,11 @@ private[testadapter] object FingerprintSerializers {
   final class DeserializedAnnotatedFingerprint(
       val isModule: Boolean,
       val annotationName: String
-  )
-      extends AnnotatedFingerprint
+  ) extends AnnotatedFingerprint
 
   final class DeserializedSubclassFingerprint(
       val isModule: Boolean,
       val superclassName: String,
       val requireNoArgConstructor: Boolean
-  )
-      extends SubclassFingerprint
+  ) extends SubclassFingerprint
 }

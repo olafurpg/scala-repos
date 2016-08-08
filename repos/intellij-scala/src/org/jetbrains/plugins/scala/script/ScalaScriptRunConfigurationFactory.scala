@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala
 package script
 
-import com.intellij.execution.configurations.{ConfigurationFactory, ConfigurationType, RunConfiguration}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory,
+  ConfigurationType,
+  RunConfiguration
+}
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.project._
 
@@ -18,7 +22,8 @@ class ScalaScriptRunConfigurationFactory(val typez: ConfigurationType)
   }
 
   override def createConfiguration(
-      name: String, template: RunConfiguration): RunConfiguration = {
+      name: String,
+      template: RunConfiguration): RunConfiguration = {
     val configuration = (super
       .createConfiguration(name, template))
       .asInstanceOf[ScalaScriptRunConfiguration]

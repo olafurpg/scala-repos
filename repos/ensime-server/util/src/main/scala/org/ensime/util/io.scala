@@ -18,8 +18,10 @@ package object io {
       * endeavours to close everything afterward (even on failure).
       */
     def drain(in: InputStream): Unit =
-      try ByteStreams.copy(in, os) finally {
-        try in.close() finally os.close()
+      try ByteStreams.copy(in, os)
+      finally {
+        try in.close()
+        finally os.close()
       }
   }
 }

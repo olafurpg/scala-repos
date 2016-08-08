@@ -5,7 +5,7 @@ import scala.tools.reflect.ToolBox
 
 object Test extends App {
   var q = 0
-  def foo[T : TypeTag](ys: List[T]): Int => Int = {
+  def foo[T: TypeTag](ys: List[T]): Int => Int = {
     val z = 1
     var y = 0
     val fun = reify { (x: Int) =>

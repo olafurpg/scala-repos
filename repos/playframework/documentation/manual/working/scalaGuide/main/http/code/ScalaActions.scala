@@ -56,14 +56,14 @@ package scalaguide.http.scalaactions {
 
       "allow specifying a parser" in {
         testAction(action = //#json-parser-action
-                     Action(parse.json) { implicit request =>
+                   Action(parse.json) { implicit request =>
                      Ok("Got request [" + request + "]")
                    }
                    //#json-parser-action
                    ,
                    request = FakeRequest()
-                       .withBody(Json.obj())
-                       .withHeaders(CONTENT_TYPE -> "application/json"))
+                     .withBody(Json.obj())
+                     .withHeaders(CONTENT_TYPE -> "application/json"))
       }
 
       "work for a full controller class" in {
@@ -161,9 +161,9 @@ package scalaguide.http.scalaactions {
       }
     }
 
-    def assertAction[A, T : AsResult](action: Action[A],
-                                      expectedResponse: Int = OK,
-                                      request: Request[A] = FakeRequest())(
+    def assertAction[A, T: AsResult](action: Action[A],
+                                     expectedResponse: Int = OK,
+                                     request: Request[A] = FakeRequest())(
         assertions: Future[Result] => T) = {
       running() { _ =>
         val result = action(request)

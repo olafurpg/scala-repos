@@ -21,7 +21,11 @@ import scala.collection.JavaConverters._
 
 import org.apache.spark.{SparkContext, SparkFunSuite}
 import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.ml.attribute.{AttributeGroup, NominalAttribute, NumericAttribute}
+import org.apache.spark.ml.attribute.{
+  AttributeGroup,
+  NominalAttribute,
+  NumericAttribute
+}
 import org.apache.spark.ml.tree._
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
@@ -95,8 +99,8 @@ private[ml] object TreeTests extends SparkFunSuite {
       case ex: Exception =>
         throw new AssertionError(
             "checkEqual failed since the two trees were not identical.\n" +
-            "TREE A:\n" + a.toDebugString +
-            "\n" + "TREE B:\n" + b.toDebugString + "\n",
+              "TREE A:\n" + a.toDebugString +
+              "\n" + "TREE B:\n" + b.toDebugString + "\n",
             ex)
     }
   }
@@ -152,10 +156,15 @@ private[ml] object TreeTests extends SparkFunSuite {
     val rightWeight = rightImp.count / parentImp.count.toDouble
     val gain =
       parentImp.calculate() -
-      (leftWeight * leftImp.calculate() + rightWeight * rightImp.calculate())
+        (leftWeight * leftImp.calculate() + rightWeight * rightImp.calculate())
     val pred = parentImp.predict
-    new InternalNode(
-        pred, parentImp.calculate(), gain, left, right, split, parentImp)
+    new InternalNode(pred,
+                     parentImp.calculate(),
+                     gain,
+                     left,
+                     right,
+                     split,
+                     parentImp)
   }
 
   /**

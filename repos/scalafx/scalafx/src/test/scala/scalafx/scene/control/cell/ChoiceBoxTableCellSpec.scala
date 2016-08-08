@@ -41,7 +41,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ChoiceBoxTableCellSpec[S, T]
-    extends SimpleSFXDelegateSpec[
-        jfxscc.ChoiceBoxTableCell[S, T], ChoiceBoxTableCell[S, T]](
+    extends SimpleSFXDelegateSpec[jfxscc.ChoiceBoxTableCell[S, T],
+                                  ChoiceBoxTableCell[S, T]](
         classOf[jfxscc.ChoiceBoxTableCell[S, T]],
-        classOf[ChoiceBoxTableCell[S, T]]) with RunOnApplicationThread
+        classOf[ChoiceBoxTableCell[S, T]])
+    with RunOnApplicationThread

@@ -112,10 +112,10 @@ object SecurityHeadersConfig {
         frameOptions = config.get[Option[String]]("frameOptions"),
         xssProtection = config.get[Option[String]]("xssProtection"),
         contentTypeOptions = config.get[Option[String]]("contentTypeOptions"),
-        permittedCrossDomainPolicies = config
-            .get[Option[String]]("permittedCrossDomainPolicies"),
-        contentSecurityPolicy = config.get[Option[String]](
-              "contentSecurityPolicy"))
+        permittedCrossDomainPolicies =
+          config.get[Option[String]]("permittedCrossDomainPolicies"),
+        contentSecurityPolicy =
+          config.get[Option[String]]("contentSecurityPolicy"))
   }
 }
 

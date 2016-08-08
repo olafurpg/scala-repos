@@ -3,11 +3,23 @@ package com.twitter.finagle.mux
 import com.twitter.concurrent.AsyncQueue
 import com.twitter.conversions.time._
 import com.twitter.finagle.mux.transport.Message
-import com.twitter.finagle.stats.{NullStatsReceiver, InMemoryStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  NullStatsReceiver,
+  InMemoryStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.transport.{Transport, QueueTransport}
 import com.twitter.finagle.{Failure, Dtab, Path, Status}
 import com.twitter.io.Charsets
-import com.twitter.util.{Await, Return, Throw, Time, TimeControl, Duration, Future}
+import com.twitter.util.{
+  Await,
+  Return,
+  Throw,
+  Time,
+  TimeControl,
+  Duration,
+  Future
+}
 import java.nio.charset.Charset
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.runner.RunWith
@@ -21,12 +33,12 @@ private class ClientSessionTest extends FunSuite {
     val clientToServer = new AsyncQueue[Message]
     val serverToClient = new AsyncQueue[Message]
 
-    val transport = new QueueTransport(
-        writeq = clientToServer, readq = serverToClient)
+    val transport =
+      new QueueTransport(writeq = clientToServer, readq = serverToClient)
 
     val stats = new InMemoryStatsReceiver
-    val session = new ClientSession(
-        transport, FailureDetector.NullConfig, "test", stats)
+    val session =
+      new ClientSession(transport, FailureDetector.NullConfig, "test", stats)
 
     def send(msg: Message) = {
       Await.result(session.write(msg))

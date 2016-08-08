@@ -58,8 +58,8 @@ class MessageWriterTest extends JUnitSuite {
     new Message(bb)
   }
 
-  private def compress(
-      bytes: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+  private def compress(bytes: Array[Byte],
+                       codec: CompressionCodec): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val out = CompressionFactory(codec, baos)
     out.write(bytes)
@@ -67,8 +67,8 @@ class MessageWriterTest extends JUnitSuite {
     baos.toByteArray
   }
 
-  private def decompress(
-      compressed: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+  private def decompress(compressed: Array[Byte],
+                         codec: CompressionCodec): Array[Byte] = {
     toArray(CompressionFactory(codec, new ByteArrayInputStream(compressed)))
   }
 
@@ -111,16 +111,18 @@ class MessageWriterTest extends JUnitSuite {
   def testWithNoCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
     val actual = mkMessageWithWriter(bytes = bytes, codec = NoCompressionCodec)
-    val expected = new Message(
-        bytes, Message.NoTimestamp, NoCompressionCodec, Message.MagicValue_V1)
+    val expected = new Message(bytes,
+                               Message.NoTimestamp,
+                               NoCompressionCodec,
+                               Message.MagicValue_V1)
     assertEquals(expected.buffer, actual.buffer)
   }
 
   @Test
   def testWithCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(
-        bytes = bytes, codec = SnappyCompressionCodec)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, codec = SnappyCompressionCodec)
     val expected = new Message(compress(bytes, SnappyCompressionCodec),
                                Message.NoTimestamp,
                                SnappyCompressionCodec,
@@ -136,8 +138,8 @@ class MessageWriterTest extends JUnitSuite {
   def testWithKey(): Unit = {
     val key = mkRandomArray(123)
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(
-        bytes = bytes, key = key, codec = NoCompressionCodec)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, key = key, codec = NoCompressionCodec)
     val expected = new Message(bytes = bytes,
                                key = key,
                                timestamp = Message.NoTimestamp,

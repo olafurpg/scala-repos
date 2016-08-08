@@ -36,8 +36,8 @@ import org.apache.spark.util.Utils
   * Parses and encapsulates arguments from the spark-submit script.
   * The env argument is used for testing.
   */
-private[deploy] class SparkSubmitArguments(
-    args: Seq[String], env: Map[String, String] = sys.env)
+private[deploy] class SparkSubmitArguments(args: Seq[String],
+                                           env: Map[String, String] = sys.env)
     extends SparkSubmitArgumentsParser {
   var master: String = null
   var deployMode: String = null
@@ -120,8 +120,8 @@ private[deploy] class SparkSubmitArguments(
     */
   private def mergeDefaultSparkProperties(): Unit = {
     // Use common defaults file, if not specified by user
-    propertiesFile = Option(propertiesFile).getOrElse(
-        Utils.getDefaultPropertiesFile(env))
+    propertiesFile =
+      Option(propertiesFile).getOrElse(Utils.getDefaultPropertiesFile(env))
     // Honor --conf before the defaults file
     defaultSparkProperties.foreach {
       case (k, v) =>
@@ -195,9 +195,8 @@ private[deploy] class SparkSubmitArguments(
       .orNull
     numExecutors = Option(numExecutors).getOrElse(
         sparkProperties.get("spark.executor.instances").orNull)
-    keytab = Option(keytab)
-      .orElse(sparkProperties.get("spark.yarn.keytab"))
-      .orNull
+    keytab =
+      Option(keytab).orElse(sparkProperties.get("spark.yarn.keytab")).orNull
     principal = Option(principal)
       .orElse(sparkProperties.get("spark.yarn.principal"))
       .orNull
@@ -212,8 +211,8 @@ private[deploy] class SparkSubmitArguments(
           try {
             val jar = new JarFile(uri.getPath)
             // Note that this might still return null if no main-class is set; we catch that later
-            mainClass = jar.getManifest.getMainAttributes
-              .getValue("Main-Class")
+            mainClass =
+              jar.getManifest.getMainAttributes.getValue("Main-Class")
           } catch {
             case e: Exception =>
               SparkSubmit.printErrorAndExit(
@@ -222,7 +221,7 @@ private[deploy] class SparkSubmitArguments(
         case _ =>
           SparkSubmit.printErrorAndExit(
               s"Cannot load main class from JAR $primaryResource with URI $uriScheme. " +
-              "Please specify a class through --class.")
+                "Please specify a class through --class.")
       }
     }
 
@@ -274,9 +273,8 @@ private[deploy] class SparkSubmitArguments(
       val hasHadoopEnv =
         env.contains("HADOOP_CONF_DIR") || env.contains("YARN_CONF_DIR")
       if (!hasHadoopEnv && !Utils.isTesting) {
-        throw new Exception(
-            s"When running with master '$master' " +
-            "either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.")
+        throw new Exception(s"When running with master '$master' " +
+          "either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.")
       }
     }
 
@@ -483,12 +481,13 @@ private[deploy] class SparkSubmitArguments(
       SparkSubmit.printErrorAndExit(s"Unrecognized option '$opt'.")
     }
 
-    primaryResource = if (!SparkSubmit.isShell(opt) &&
-                          !SparkSubmit.isInternal(opt)) {
-      Utils.resolveURI(opt).toString
-    } else {
-      opt
-    }
+    primaryResource =
+      if (!SparkSubmit.isShell(opt) &&
+          !SparkSubmit.isInternal(opt)) {
+        Utils.resolveURI(opt).toString
+      } else {
+        opt
+      }
     isPython = SparkSubmit.isPython(opt)
     isR = SparkSubmit.isR(opt)
     false
@@ -498,8 +497,8 @@ private[deploy] class SparkSubmitArguments(
     childArgs ++= extra.asScala
   }
 
-  private def printUsageAndExit(
-      exitCode: Int, unknownParam: Any = null): Unit = {
+  private def printUsageAndExit(exitCode: Int,
+                                unknownParam: Any = null): Unit = {
     // scalastyle:off println
     val outStream = SparkSubmit.printStream
     if (unknownParam != null) {
@@ -507,7 +506,8 @@ private[deploy] class SparkSubmitArguments(
     }
     val command = sys.env
       .get("_SPARK_CMD_USAGE")
-      .getOrElse("""Usage: spark-submit [options] <app jar | python file> [app arguments]
+      .getOrElse(
+          """Usage: spark-submit [options] <app jar | python file> [app arguments]
         |Usage: spark-submit --kill [submission ID] --master [spark://...]
         |Usage: spark-submit --status [submission ID] --master [spark://...]""".stripMargin)
     outStream.println(command)

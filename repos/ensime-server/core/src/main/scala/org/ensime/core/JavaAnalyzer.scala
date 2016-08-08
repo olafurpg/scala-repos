@@ -16,8 +16,9 @@ class JavaAnalyzer(
     search: SearchService,
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
-)
-    extends Actor with Stash with ActorLogging {
+) extends Actor
+    with Stash
+    with ActorLogging {
 
   protected var javaCompiler: JavaCompiler = _
 
@@ -62,8 +63,8 @@ class JavaAnalyzer(
       sender() ! VoidResponse
 
     case CompletionsReq(file, point, maxResults, caseSens, _) =>
-      sender() ! javaCompiler.askCompletionsAtPoint(
-          file, point, maxResults, caseSens)
+      sender() ! javaCompiler
+        .askCompletionsAtPoint(file, point, maxResults, caseSens)
 
     case DocUriAtPointReq(file, range) =>
       sender() ! javaCompiler.askDocSignatureAtPoint(file, range.from)

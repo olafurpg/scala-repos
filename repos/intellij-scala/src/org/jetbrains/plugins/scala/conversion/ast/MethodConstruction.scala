@@ -24,4 +24,5 @@ case class PrimaryConstruction(
     superCall: IntermediateNode,
     body: Seq[IntermediateNode],
     modifiers: IntermediateNode)
-    extends IntermediateNode with Constructor
+    extends IntermediateNode
+    with Constructor

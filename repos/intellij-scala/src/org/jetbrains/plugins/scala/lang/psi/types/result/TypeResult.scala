@@ -37,16 +37,16 @@ object TypeResult {
     case None => new Failure("", None)
   }
 
-  def ap2[A, B, Z](
-      tr1: TypeResult[A], tr2: TypeResult[B])(f: (A, B) => Z): TypeResult[Z] =
+  def ap2[A, B, Z](tr1: TypeResult[A], tr2: TypeResult[B])(
+      f: (A, B) => Z): TypeResult[Z] =
     for {
       t1 <- tr1
       t2 <- tr2
     } yield f(t1, t2)
 
-  def ap3[A, B, C, Z](
-      tr1: TypeResult[A], tr2: TypeResult[B], tr3: TypeResult[C])(
-      f: (A, B, C) => Z): TypeResult[Z] =
+  def ap3[A, B, C, Z](tr1: TypeResult[A],
+                      tr2: TypeResult[B],
+                      tr3: TypeResult[C])(f: (A, B, C) => Z): TypeResult[Z] =
     for {
       t1 <- tr1
       t2 <- tr2

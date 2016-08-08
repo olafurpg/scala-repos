@@ -40,7 +40,7 @@ object LEventAggregator {
     events.toList
       .groupBy(_.entityId)
       .mapValues(_.sortBy(_.eventTime.getMillis)
-            .foldLeft[Prop](Prop())(propAggregator))
+        .foldLeft[Prop](Prop())(propAggregator))
       .filter { case (k, v) => v.dm.isDefined }
       .mapValues { v =>
         require(v.firstUpdated.isDefined,
@@ -87,23 +87,23 @@ object LEventAggregator {
   val eventNames = List("$set", "$unset", "$delete")
 
   private def dataMapAggregator: ((Option[DataMap],
-  Event) => Option[DataMap]) = { (p, e) =>
+                                   Event) => Option[DataMap]) = { (p, e) =>
     {
       e.event match {
         case "$set" => {
-            if (p == None) {
-              Some(e.properties)
-            } else {
-              p.map(_ ++ e.properties)
-            }
+          if (p == None) {
+            Some(e.properties)
+          } else {
+            p.map(_ ++ e.properties)
           }
+        }
         case "$unset" => {
-            if (p == None) {
-              None
-            } else {
-              p.map(_ -- e.properties.keySet)
-            }
+          if (p == None) {
+            None
+          } else {
+            p.map(_ -- e.properties.keySet)
           }
+        }
         case "$delete" => None
         case _ => p // do nothing for others
       }
@@ -114,16 +114,16 @@ object LEventAggregator {
     {
       e.event match {
         case "$set" | "$unset" | "$delete" => {
-            Prop(
-                dm = dataMapAggregator(p.dm, e),
-                firstUpdated = p.firstUpdated.map { t =>
-                  first(t, e.eventTime)
-                }.orElse(Some(e.eventTime)),
-                lastUpdated = p.lastUpdated.map { t =>
-                  last(t, e.eventTime)
-                }.orElse(Some(e.eventTime))
-            )
-          }
+          Prop(
+              dm = dataMapAggregator(p.dm, e),
+              firstUpdated = p.firstUpdated.map { t =>
+                first(t, e.eventTime)
+              }.orElse(Some(e.eventTime)),
+              lastUpdated = p.lastUpdated.map { t =>
+                last(t, e.eventTime)
+              }.orElse(Some(e.eventTime))
+          )
+        }
         case _ => p // do nothing for others
       }
     }

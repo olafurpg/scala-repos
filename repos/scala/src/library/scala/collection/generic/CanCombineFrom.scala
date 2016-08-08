@@ -21,7 +21,8 @@ import scala.collection.parallel._
   *  @since 2.8
   */
 trait CanCombineFrom[-From, -Elem, +To]
-    extends CanBuildFrom[From, Elem, To] with Parallel {
+    extends CanBuildFrom[From, Elem, To]
+    with Parallel {
   def apply(from: From): Combiner[Elem, To]
   def apply(): Combiner[Elem, To]
 }

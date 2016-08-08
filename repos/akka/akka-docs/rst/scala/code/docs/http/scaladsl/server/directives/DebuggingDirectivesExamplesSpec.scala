@@ -6,7 +6,11 @@ package docs.http.scaladsl.server.directives
 
 import akka.event.Logging
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry, LoggingMagnet}
+import akka.http.scaladsl.server.directives.{
+  DebuggingDirectives,
+  LogEntry,
+  LoggingMagnet
+}
 import docs.http.scaladsl.server.RoutingSpec
 
 class DebuggingDirectivesExamplesSpec extends RoutingSpec {
@@ -61,7 +65,8 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
 
     // This one doesn't use the implicit LoggingContext but uses `println` for logging
     def printRequestMethodAndResponseStatus(req: HttpRequest)(res: Any): Unit =
-      println(requestMethodAndResponseStatusAsInfo(req)(res)
+      println(
+          requestMethodAndResponseStatusAsInfo(req)(res)
             .map(_.obj.toString)
             .getOrElse(""))
     val logRequestResultPrintln = DebuggingDirectives.logRequestResult(

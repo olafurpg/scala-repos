@@ -62,7 +62,8 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
                   new IllegalStateException("Batch was executed inline!"))
             else if (count.incrementAndGet == 100) p.trySuccess(()) //Done
             else if (lock.compareAndSet(0, 1)) {
-              try Thread.sleep(10) finally lock.compareAndSet(1, 0)
+              try Thread.sleep(10)
+              finally lock.compareAndSet(1, 0)
             } else
               p.tryFailure(
                   new IllegalStateException("Executed batch in parallel!"))
@@ -144,8 +145,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     "work with same-thread executor plus blocking" in {
       val ec = akka.dispatch.ExecutionContexts.sameThreadExecutionContext
       var x = 0
-      ec.execute(
-          new Runnable {
+      ec.execute(new Runnable {
         override def run = {
           ec.execute(new Runnable {
             override def run = blocking {
@@ -158,8 +158,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     }
 
     "work with same-thread dispatcher plus blocking" in {
-      val a = TestActorRef(
-          Props(new Actor {
+      val a = TestActorRef(Props(new Actor {
         def receive = {
           case msg ⇒
             blocking {
@@ -167,8 +166,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
             }
         }
       }))
-      val b = TestActorRef(
-          Props(new Actor {
+      val b = TestActorRef(Props(new Actor {
         def receive = {
           case msg ⇒ a forward msg
         }

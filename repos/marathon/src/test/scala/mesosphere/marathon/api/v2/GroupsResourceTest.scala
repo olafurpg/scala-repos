@@ -9,7 +9,12 @@ import mesosphere.marathon.core.appinfo._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ConflictingChangeException, UnknownGroupException, MarathonConf, MarathonSpec}
+import mesosphere.marathon.{
+  ConflictingChangeException,
+  UnknownGroupException,
+  MarathonConf,
+  MarathonSpec
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsObject, Json}
 
@@ -17,7 +22,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class GroupsResourceTest
-    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
+    extends MarathonSpec
+    with Matchers
+    with Mockito
+    with GivenWhenThen {
   test("dry run update") {
     Given("A real Group Manager with no groups")
     useRealGroupManager()
@@ -31,8 +39,8 @@ class GroupsResourceTest
 
     When("Doing a dry run update")
     val body = Json.stringify(Json.toJson(update)).getBytes
-    val result = groupsResource.update(
-        "/test", force = false, dryRun = true, body, auth.request)
+    val result = groupsResource
+      .update("/test", force = false, dryRun = true, body, auth.request)
     val json = Json.parse(result.getEntity.toString)
 
     Then("The deployment plan is correct")
@@ -72,8 +80,8 @@ class GroupsResourceTest
     create.getStatus should be(auth.NotAuthenticatedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource.createWithPath(
-        "/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource
+      .createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
     Then("we receive a NotAuthenticated response")
     createWithPath.getStatus should be(auth.NotAuthenticatedStatus)
 
@@ -120,8 +128,8 @@ class GroupsResourceTest
     create.getStatus should be(auth.UnauthorizedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource.createWithPath(
-        "/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource
+      .createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
     Then("we receive a Not Authorized response")
     createWithPath.getStatus should be(auth.UnauthorizedStatus)
 
@@ -261,8 +269,8 @@ class GroupsResourceTest
     auth = new TestAuthFixture
     config = mock[MarathonConf]
     groupManager = mock[GroupManager]
-    groupsResource = new GroupsResource(
-        groupManager, groupInfo, auth.auth, auth.auth, config)
+    groupsResource =
+      new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
 
     config.zkTimeoutDuration returns 1.second
   }
@@ -275,7 +283,7 @@ class GroupsResourceTest
 
     config.zkTimeoutDuration returns 1.second
 
-    groupsResource = new GroupsResource(
-        groupManager, groupInfo, auth.auth, auth.auth, config)
+    groupsResource =
+      new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
   }
 }

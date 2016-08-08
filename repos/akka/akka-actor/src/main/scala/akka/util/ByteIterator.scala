@@ -17,8 +17,9 @@ object ByteIterator {
     protected[akka] def apply(array: Array[Byte]): ByteArrayIterator =
       new ByteArrayIterator(array, 0, array.length)
 
-    protected[akka] def apply(
-        array: Array[Byte], from: Int, until: Int): ByteArrayIterator =
+    protected[akka] def apply(array: Array[Byte],
+                              from: Int,
+                              until: Int): ByteArrayIterator =
       new ByteArrayIterator(array, from, until)
 
     val empty: ByteArrayIterator = apply(emptyArray)
@@ -96,8 +97,9 @@ object ByteIterator {
       this
     }
 
-    final override def copyToArray[B >: Byte](
-        xs: Array[B], start: Int, len: Int): Unit = {
+    final override def copyToArray[B >: Byte](xs: Array[B],
+                                              start: Int,
+                                              len: Int): Unit = {
       val n = 0 max ((xs.length - start) min this.len min len)
       Array.copy(this.array, from, xs, start, n)
       this.drop(n)
@@ -273,7 +275,7 @@ object ByteIterator {
     final override def take(n: Int): this.type = {
       var rest = n
       val builder = new ListBuffer[ByteArrayIterator]
-      while ( (rest > 0) && !iterators.isEmpty) {
+      while ((rest > 0) && !iterators.isEmpty) {
         current.take(rest)
         if (current.hasNext) {
           rest -= current.len
@@ -317,11 +319,12 @@ object ByteIterator {
         if (dropMore) dropWhile(p) else this
       } else this
 
-    final override def copyToArray[B >: Byte](
-        xs: Array[B], start: Int, len: Int): Unit = {
+    final override def copyToArray[B >: Byte](xs: Array[B],
+                                              start: Int,
+                                              len: Int): Unit = {
       var pos = start
       var rest = len
-      while ( (rest > 0) && !iterators.isEmpty) {
+      while ((rest > 0) && !iterators.isEmpty) {
         val n = 0 max ((xs.length - pos) min current.len min rest)
         current.copyToArray(xs, pos, n)
         pos += n
@@ -347,9 +350,11 @@ object ByteIterator {
       }
     }
 
-    @tailrec protected final def getToArray[A](
-        xs: Array[A], offset: Int, n: Int, elemSize: Int)(
-        getSingle: ⇒ A)(getMult: (Array[A], Int, Int) ⇒ Unit): this.type =
+    @tailrec protected final def getToArray[A](xs: Array[A],
+                                               offset: Int,
+                                               n: Int,
+                                               elemSize: Int)(getSingle: ⇒ A)(
+        getMult: (Array[A], Int, Int) ⇒ Unit): this.type =
       if (n <= 0) this
       else {
         if (isEmpty) Iterator.empty.next
@@ -555,10 +560,10 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   def getInt(implicit byteOrder: ByteOrder): Int = {
     if (byteOrder == ByteOrder.BIG_ENDIAN)
       ((next() & 0xff) << 24 | (next() & 0xff) << 16 | (next() & 0xff) << 8 |
-          (next() & 0xff) << 0)
+        (next() & 0xff) << 0)
     else if (byteOrder == ByteOrder.LITTLE_ENDIAN)
       ((next() & 0xff) << 0 | (next() & 0xff) << 8 | (next() & 0xff) << 16 |
-          (next() & 0xff) << 24)
+        (next() & 0xff) << 24)
     else throw new IllegalArgumentException("Unknown byte order " + byteOrder)
   }
 
@@ -568,14 +573,14 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   def getLong(implicit byteOrder: ByteOrder): Long = {
     if (byteOrder == ByteOrder.BIG_ENDIAN)
       ((next().toLong & 0xff) << 56 | (next().toLong & 0xff) << 48 |
-          (next().toLong & 0xff) << 40 | (next().toLong & 0xff) << 32 |
-          (next().toLong & 0xff) << 24 | (next().toLong & 0xff) << 16 |
-          (next().toLong & 0xff) << 8 | (next().toLong & 0xff) << 0)
+        (next().toLong & 0xff) << 40 | (next().toLong & 0xff) << 32 |
+        (next().toLong & 0xff) << 24 | (next().toLong & 0xff) << 16 |
+        (next().toLong & 0xff) << 8 | (next().toLong & 0xff) << 0)
     else if (byteOrder == ByteOrder.LITTLE_ENDIAN)
       ((next().toLong & 0xff) << 0 | (next().toLong & 0xff) << 8 |
-          (next().toLong & 0xff) << 16 | (next().toLong & 0xff) << 24 |
-          (next().toLong & 0xff) << 32 | (next().toLong & 0xff) << 40 |
-          (next().toLong & 0xff) << 48 | (next().toLong & 0xff) << 56)
+        (next().toLong & 0xff) << 16 | (next().toLong & 0xff) << 24 |
+        (next().toLong & 0xff) << 32 | (next().toLong & 0xff) << 40 |
+        (next().toLong & 0xff) << 48 | (next().toLong & 0xff) << 56)
     else throw new IllegalArgumentException("Unknown byte order " + byteOrder)
   }
 

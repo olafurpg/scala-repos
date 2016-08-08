@@ -24,7 +24,8 @@ class CachedWithoutModificationCount(
     valueWrapper: ValueWrapper,
     addToBuffer: ArrayBuffer[_ <: java.util.Map[_ <: Any, _ <: Any]]*)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro CachedWithoutModificationCount.cachedWithoutModificationCountImpl
+  def macroTransform(annottees: Any*): Any =
+    macro CachedWithoutModificationCount.cachedWithoutModificationCountImpl
 }
 
 object CachedWithoutModificationCount {
@@ -184,8 +185,8 @@ object CachedWithoutModificationCount {
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           $functionContentsInSynchronizedBlock
         """
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           ..$fields
           $updatedDef

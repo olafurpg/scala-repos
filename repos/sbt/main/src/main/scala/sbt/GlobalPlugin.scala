@@ -1,6 +1,13 @@
 package sbt
 
-import sbt.librarymanagement.{Configuration, Configurations, ModuleID, Resolver, SbtArtifacts, UpdateReport}
+import sbt.librarymanagement.{
+  Configuration,
+  Configurations,
+  ModuleID,
+  Resolver,
+  SbtArtifacts,
+  UpdateReport
+}
 import sbt.internal.util.Attributed
 
 import Load.{BuildStructure => _, _}
@@ -29,7 +36,8 @@ object GlobalPlugin {
         injectInternalClasspath(Compile, gp.internalClasspath)
     )
   private[this] def injectInternalClasspath(
-      config: Configuration, cp: Seq[Attributed[File]]): Setting[_] =
+      config: Configuration,
+      cp: Seq[Attributed[File]]): Setting[_] =
     internalDependencyClasspath in config ~= { prev =>
       (prev ++ cp).distinct
     }
@@ -39,22 +47,23 @@ object GlobalPlugin {
             config: LoadBuildConfiguration): (BuildStructure, State) = {
     val newInject = config.injectSettings.copy(
         global = config.injectSettings.global ++ globalPluginSettings)
-    val globalConfig = config.copy(
-        injectSettings = newInject,
-        pluginManagement = config.pluginManagement.forGlobalPlugin)
+    val globalConfig = config.copy(injectSettings = newInject,
+                                   pluginManagement =
+                                     config.pluginManagement.forGlobalPlugin)
     val (eval, structure) = Load(base, s, globalConfig)
     val session = Load.initialSession(structure, eval)
     (structure, Project.setProject(session, structure, s))
   }
-  def load(
-      base: File, s: State, config: LoadBuildConfiguration): GlobalPlugin = {
+  def load(base: File,
+           s: State,
+           config: LoadBuildConfiguration): GlobalPlugin = {
     val (structure, state) = build(base, s, config)
     val (newS, data) = extract(state, structure)
     Project.runUnloadHooks(newS) // discard state
     GlobalPlugin(data, structure, inject(data), base)
   }
-  def extract(
-      state: State, structure: BuildStructure): (State, GlobalPluginData) = {
+  def extract(state: State,
+              structure: BuildStructure): (State, GlobalPluginData) = {
     import structure.{data, root, rootProject}
     val p: Scope = Scope.GlobalScope in ProjectRef(root, rootProject(root))
 
@@ -86,8 +95,8 @@ object GlobalPlugin {
     import EvaluateTask._
     withStreams(structure, state) { str =>
       val nv = nodeView(state, str, roots)
-      val config = EvaluateTask.extractedTaskConfig(
-          Project.extract(state), structure, state)
+      val config = EvaluateTask
+        .extractedTaskConfig(Project.extract(state), structure, state)
       val (newS, result) =
         runTask(t, state, str, structure.index.triggers, config)(nv)
       (newS, processResult(result, newS.log))

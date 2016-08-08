@@ -20,7 +20,12 @@ package org.apache.spark.sql
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
-import org.apache.spark.sql.catalyst.analysis.{Star, UnresolvedAlias, UnresolvedAttribute, UnresolvedFunction}
+import org.apache.spark.sql.catalyst.analysis.{
+  Star,
+  UnresolvedAlias,
+  UnresolvedAttribute,
+  UnresolvedFunction
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.plans.logical.{Aggregate, Pivot}
@@ -36,7 +41,7 @@ import org.apache.spark.sql.types.NumericType
   *
   * @since 2.0.0
   */
-class RelationalGroupedDataset protected[sql](
+class RelationalGroupedDataset protected[sql] (
     df: DataFrame,
     groupingExprs: Seq[Expression],
     groupType: RelationalGroupedDataset.GroupType) {
@@ -95,7 +100,7 @@ class RelationalGroupedDataset protected[sql](
           if (!namedExpr.dataType.isInstanceOf[NumericType]) {
             throw new AnalysisException(
                 s""""$colName" is not a numeric column. """ +
-                "Aggregation function can only be applied on a numeric column.")
+                  "Aggregation function can only be applied on a numeric column.")
           }
           namedExpr
         }
@@ -161,8 +166,7 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   def agg(exprs: Map[String, String]): DataFrame = {
-    toDF(
-        exprs.map {
+    toDF(exprs.map {
       case (colName, expr) =>
         strToExpr(expr)(df(colName).expr)
     }.toSeq)
@@ -322,11 +326,10 @@ class RelationalGroupedDataset protected[sql](
       .toSeq
 
     if (values.length > maxValues) {
-      throw new AnalysisException(
-          s"The pivot column $pivotColumn has more than $maxValues distinct values, " +
-          "this could indicate an error. " +
-          s"If this was intended, set ${SQLConf.DATAFRAME_PIVOT_MAX_VALUES.key} " +
-          "to at least the number of distinct values of the pivot column.")
+      throw new AnalysisException(s"The pivot column $pivotColumn has more than $maxValues distinct values, " +
+        "this could indicate an error. " +
+        s"If this was intended, set ${SQLConf.DATAFRAME_PIVOT_MAX_VALUES.key} " +
+        "to at least the number of distinct values of the pivot column.")
     }
 
     pivot(pivotColumn, values)
@@ -356,8 +359,8 @@ class RelationalGroupedDataset protected[sql](
         new RelationalGroupedDataset(
             df,
             groupingExprs,
-            RelationalGroupedDataset.PivotType(
-                df.resolve(pivotColumn), values.map(Literal.apply)))
+            RelationalGroupedDataset.PivotType(df.resolve(pivotColumn),
+                                               values.map(Literal.apply)))
       case _: RelationalGroupedDataset.PivotType =>
         throw new UnsupportedOperationException(
             "repeated pivots are not supported")

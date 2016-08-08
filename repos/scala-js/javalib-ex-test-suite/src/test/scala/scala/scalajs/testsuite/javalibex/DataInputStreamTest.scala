@@ -531,11 +531,11 @@ object DataInputStreamTest extends JasmineTest {
     }
   }
 
-  tests("java.io.DataInputStream - generic case")(
-      bytes => new ByteArrayInputStream(bytes.toArray))
+  tests("java.io.DataInputStream - generic case")(bytes =>
+    new ByteArrayInputStream(bytes.toArray))
 
   tests("java.io.DataInputStream - ArrayBufferInputStream case")(bytes =>
-        new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))
+    new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))
 
   tests(
       "java.io.DataInputStream - partially consumed ArrayBufferInputStream case") {

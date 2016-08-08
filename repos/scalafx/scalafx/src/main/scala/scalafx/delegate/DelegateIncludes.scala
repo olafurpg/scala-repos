@@ -46,8 +46,8 @@ trait DelegateIncludes {
     * @return A new Java's ObjectProperty
     */
   implicit def sfxObjectPropertyWithSFXDelegate2jfxObjectProperty[
-      D <: Object, S <: SFXDelegate[D]](
-      obj: ObjectProperty[S]): jfxbp.ObjectProperty[D] =
+      D <: Object,
+      S <: SFXDelegate[D]](obj: ObjectProperty[S]): jfxbp.ObjectProperty[D] =
     new jfxbp.SimpleObjectProperty[D](obj.get.delegate)
 
   /**
@@ -60,7 +60,8 @@ trait DelegateIncludes {
     * @return A new Java's ObjectProperty
     */
   implicit def sfxReadOnlyObjectWrapperWithSFXDelegate2jfxReadOnlyObjectWrapper[
-      D <: Object, S <: SFXDelegate[D]](
+      D <: Object,
+      S <: SFXDelegate[D]](
       obj: ReadOnlyObjectWrapper[S]): jfxbp.ReadOnlyObjectWrapper[D] =
     new jfxbp.ReadOnlyObjectWrapper[D](obj.get.delegate)
 }

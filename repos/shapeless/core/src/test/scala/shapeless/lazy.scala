@@ -174,8 +174,8 @@ class LazyStrictTests {
   }
 
   object LazyShows extends CommonShows {
-    implicit def showCons[T](
-        implicit st: Lazy[Show[T]], sl: Lazy[Show[List[T]]]): Show[Cons[T]] =
+    implicit def showCons[T](implicit st: Lazy[Show[T]],
+                             sl: Lazy[Show[List[T]]]): Show[Cons[T]] =
       new Show[Cons[T]] {
         def apply(t: Cons[T]) =
           s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
@@ -191,12 +191,12 @@ class LazyStrictTests {
   }
 
   object LazyStrictMixShows extends CommonShows {
-    implicit def showCons[T](
-        implicit st: Strict[Show[T]],
-        sl: Strict[Show[List[T]]]): Show[Cons[T]] = new Show[Cons[T]] {
-      def apply(t: Cons[T]) =
-        s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
-    }
+    implicit def showCons[T](implicit st: Strict[Show[T]],
+                             sl: Strict[Show[List[T]]]): Show[Cons[T]] =
+      new Show[Cons[T]] {
+        def apply(t: Cons[T]) =
+          s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
+      }
 
     implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] =
       new Show[List[T]] {

@@ -34,9 +34,8 @@ object FSM {
 
     def schedule(actor: ActorRef, timeout: Duration) {
       if (repeat) {
-        ref = Some(
-            Scheduler.schedule(
-                actor, this, timeout.length, timeout.length, timeout.unit))
+        ref = Some(Scheduler
+          .schedule(actor, this, timeout.length, timeout.length, timeout.unit))
       } else {
         ref = Some(
             Scheduler.scheduleOnce(actor, this, timeout.length, timeout.unit))
@@ -146,8 +145,7 @@ object FSM {
   *   timerActive_? ("tock")
   * </pre>
   */
-trait FSM[S, D] extends ListenerManagement {
-  this: Actor =>
+trait FSM[S, D] extends ListenerManagement { this: Actor =>
 
   import FSM._
 
@@ -239,8 +237,10 @@ trait FSM[S, D] extends ListenerManagement {
     * @param repeat send once if false, scheduleAtFixedRate if true
     * @return current state descriptor
     */
-  protected final def setTimer(
-      name: String, msg: AnyRef, timeout: Duration, repeat: Boolean): State = {
+  protected final def setTimer(name: String,
+                               msg: AnyRef,
+                               timeout: Duration,
+                               repeat: Boolean): State = {
     if (timers contains name) {
       timers(name).cancel
     }
@@ -430,13 +430,13 @@ trait FSM[S, D] extends ListenerManagement {
     case UnsubscribeTransitionCallBack(actorRef) =>
       removeListener(actorRef)
     case value => {
-        if (timeoutFuture.isDefined) {
-          timeoutFuture.get.cancel(true)
-          timeoutFuture = None
-        }
-        generation += 1
-        processEvent(value)
+      if (timeoutFuture.isDefined) {
+        timeoutFuture.get.cancel(true)
+        timeoutFuture = None
       }
+      generation += 1
+      processEvent(value)
+    }
   }
 
   private def processEvent(value: Any) = {
@@ -478,8 +478,8 @@ trait FSM[S, D] extends ListenerManagement {
       val t = timeout.get
       if (t.finite_? && t.length >= 0) {
         timeoutFuture = Some(
-            Scheduler.scheduleOnce(
-                self, TimeoutMarker(generation), t.length, t.unit))
+            Scheduler
+              .scheduleOnce(self, TimeoutMarker(generation), t.length, t.unit))
       }
     }
   }

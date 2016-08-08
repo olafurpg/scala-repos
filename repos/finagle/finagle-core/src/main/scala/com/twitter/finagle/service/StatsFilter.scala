@@ -2,7 +2,11 @@ package com.twitter.finagle.service
 
 import com.twitter.finagle.Filter.TypeAgnostic
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{MultiCategorizingExceptionStatsHandler, ExceptionStatsHandler, StatsReceiver}
+import com.twitter.finagle.stats.{
+  MultiCategorizingExceptionStatsHandler,
+  ExceptionStatsHandler,
+  StatsReceiver
+}
 import com.twitter.jsr166e.LongAdder
 import com.twitter.util.{Try, Future, Stopwatch, Throw}
 import java.util.concurrent.TimeUnit
@@ -54,7 +58,8 @@ object StatsFilter {
 
   /** Basic categorizer with all exceptions under 'failures'. */
   val DefaultExceptions = new MultiCategorizingExceptionStatsHandler(
-      mkFlags = Failure.flagsOf, mkSource = SourcedException.unapply)
+      mkFlags = Failure.flagsOf,
+      mkSource = SourcedException.unapply)
 
   private val SyntheticException =
     new ResponseClassificationSyntheticException()
@@ -196,8 +201,8 @@ private[finagle] object StatsServiceFactory {
     }
 }
 
-class StatsServiceFactory[Req, Rep](
-    factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver)
+class StatsServiceFactory[Req, Rep](factory: ServiceFactory[Req, Rep],
+                                    statsReceiver: StatsReceiver)
     extends ServiceFactoryProxy[Req, Rep](factory) {
   private[this] val availableGauge = statsReceiver.addGauge("available") {
     if (isAvailable) 1F else 0F

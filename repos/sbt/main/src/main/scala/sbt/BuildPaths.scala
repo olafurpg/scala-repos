@@ -69,14 +69,14 @@ object BuildPaths {
                 DependencyBaseProperty,
                 defaultDependencyBase(globalBase))(state)
 
-  private[this] def fileSetting(
-      stateKey: AttributeKey[File], property: String, default: File)(
-      state: State): File =
+  private[this] def fileSetting(stateKey: AttributeKey[File],
+                                property: String,
+                                default: File)(state: State): File =
     getFileSetting(stateKey, property, default)(state)
 
-  def getFileSetting(
-      stateKey: AttributeKey[File], property: String, default: => File)(
-      state: State): File =
+  def getFileSetting(stateKey: AttributeKey[File],
+                     property: String,
+                     default: => File)(state: State): File =
     state get stateKey orElse getFileProperty(property) getOrElse default
 
   def getFileProperty(name: String): Option[File] =
@@ -129,8 +129,8 @@ object BuildPaths {
   def crossPath(base: File, instance: xsbti.compile.ScalaInstance): File =
     base / ("scala_" + instance.version)
 
-  private[this] def globalDirTransitionWarning(
-      unversioned: File, versioned: File): String =
+  private[this] def globalDirTransitionWarning(unversioned: File,
+                                               versioned: File): String =
     s"""The global sbt directory is now versioned and is located at $versioned.
   You are seeing this warning because there is global configuration in $unversioned but not in $versioned.
   The global sbt directory may be changed via the $GlobalBaseProperty system property.

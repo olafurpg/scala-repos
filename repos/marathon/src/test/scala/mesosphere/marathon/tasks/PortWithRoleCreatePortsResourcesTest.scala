@@ -23,7 +23,8 @@ class PortWithRoleCreatePortsResourcesTest extends MarathonSpec {
   test("one ranges resource for multiple ports of the same role") {
     val result = PortWithRole.createPortsResources(
         Seq(PortWithRole("*", 2), PortWithRole("*", 10)))
-    assert(result == Seq(
+    assert(
+        result == Seq(
             rangesResource(Seq(Range(2, 2), Range(10, 10)), role = "*")))
   }
 
@@ -49,7 +50,8 @@ class PortWithRoleCreatePortsResourcesTest extends MarathonSpec {
             PortWithRole("*", 2),
             PortWithRole("*", 3)
         ))
-    assert(result == Seq(
+    assert(
+        result == Seq(
             rangesResource(Seq(Range(2, 3)), role = "*")
         ))
   }

@@ -17,8 +17,7 @@ package com.twitter.scalding.platform
 
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
-trait HadoopSharedPlatformTest extends BeforeAndAfterAll {
-  this: Suite =>
+trait HadoopSharedPlatformTest extends BeforeAndAfterAll { this: Suite =>
   org.apache.log4j.Logger
     .getLogger("org.apache.hadoop")
     .setLevel(org.apache.log4j.Level.ERROR)
@@ -43,7 +42,8 @@ trait HadoopSharedPlatformTest extends BeforeAndAfterAll {
   //TODO is there a way to buffer such that we see test results AFTER afterEach? Otherwise the results
   // get lost in the logging
   override def afterAll() {
-    try super.afterAll() finally {
+    try super.afterAll()
+    finally {
       // Necessary because afterAll can be called from a different thread and we want to make sure that the state
       // is visible. Note that this assumes there is no contention for LocalCluster (which LocalCluster ensures),
       // otherwise there could be deadlock.

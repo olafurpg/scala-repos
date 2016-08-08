@@ -19,15 +19,18 @@ class ConstraintTest extends MarathonSpec with Matchers {
       assert(value == constraint.getValue)
     }
 
-    shouldMatch(
-        """["hostname","UNIQUE"]""", "hostname", Constraint.Operator.UNIQUE)
+    shouldMatch("""["hostname","UNIQUE"]""",
+                "hostname",
+                Constraint.Operator.UNIQUE)
     shouldMatch("""["rackid","GROUP_BY","1"]""",
                 "rackid",
                 Constraint.Operator.GROUP_BY,
                 "1")
     shouldMatch("""["jdk","LIKE","7"]""", "jdk", Constraint.Operator.LIKE, "7")
-    shouldMatch(
-        """["jdk","UNLIKE","7"]""", "jdk", Constraint.Operator.UNLIKE, "7")
+    shouldMatch("""["jdk","UNLIKE","7"]""",
+                "jdk",
+                Constraint.Operator.UNLIKE,
+                "7")
   }
 
   test("Read should allow only valid Constraints (regression for #2951)") {
@@ -38,8 +41,9 @@ class ConstraintTest extends MarathonSpec with Matchers {
         empty)
     Json.parse("""["foo", "CLUSTER", "bla"]""").asOpt[Constraint] should be(
         defined)
-    Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").asOpt[Constraint] should be(
-        empty)
+    Json
+      .parse("""["foo", "CLUSTER", "bla", "bla2"]""")
+      .asOpt[Constraint] should be(empty)
     val ex = intercept[JsResultException](
         Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").as[Constraint])
     ex.errors should have size 1

@@ -24,7 +24,8 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                                     val authenticator: Authenticator,
                                     val authorizer: Authorizer,
                                     val config: MarathonConf)
-    extends AuthResource with Logging {
+    extends AuthResource
+    with Logging {
 
   @GET
   def running(@Context req: HttpServletRequest): Response =
@@ -59,7 +60,8 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
           case plan: DeploymentPlan =>
             // create a new deployment to return to the previous state
             deploymentResult(
-                result(groupManager.update(
+                result(
+                    groupManager.update(
                         plan.original.id,
                         plan.revert,
                         force = true

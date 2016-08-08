@@ -32,24 +32,24 @@ case class PlayerAggregateAssessment(user: User,
   def action = {
     val markable: Boolean =
       !isGreatUser && isWorthLookingAt &&
-      ((cheatingSum >= 3 || cheatingSum + likelyCheatingSum >= 6)
-          // more than 10 percent of games are cheating
+        ((cheatingSum >= 3 || cheatingSum + likelyCheatingSum >= 6)
+        // more than 10 percent of games are cheating
           &&
-          (cheatingSum.toDouble / assessmentsCount >= 0.1 - relationModifier
-              // or more than 20 percent of games are likely cheating
+            (cheatingSum.toDouble / assessmentsCount >= 0.1 - relationModifier
+            // or more than 20 percent of games are likely cheating
               || (cheatingSum + likelyCheatingSum).toDouble / assessmentsCount >= 0.20 -
-              relationModifier))
+                relationModifier))
 
     val reportable: Boolean =
       isWorthLookingAt &&
-      ((cheatingSum >= 2 || cheatingSum + likelyCheatingSum >=
-              (isNewRatedUser.fold(2, 4)))
-          // more than 5 percent of games are cheating
+        ((cheatingSum >= 2 || cheatingSum + likelyCheatingSum >=
+          (isNewRatedUser.fold(2, 4)))
+        // more than 5 percent of games are cheating
           &&
-          (cheatingSum.toDouble / assessmentsCount >= 0.05 - relationModifier
-              // or more than 10 percent of games are likely cheating
+            (cheatingSum.toDouble / assessmentsCount >= 0.05 - relationModifier
+            // or more than 10 percent of games are likely cheating
               || (cheatingSum + likelyCheatingSum).toDouble / assessmentsCount >= 0.10 -
-              relationModifier))
+                relationModifier))
 
     val bannable: Boolean =
       (relatedCheatersCount == relatedUsersCount) && relatedUsersCount >= 1
@@ -130,7 +130,7 @@ case class PlayerAggregateAssessment(user: User,
       .take(maxGames)
       .map { a =>
         a.assessment.emoticon + " http://lichess.org/" + a.gameId +
-        "/" + a.color.name
+          "/" + a.color.name
       })
       .mkString("\n")
 
@@ -143,8 +143,8 @@ case class PlayerAggregateAssessment(user: User,
 
 object PlayerAggregateAssessment {
 
-  case class WithGames(
-      pag: PlayerAggregateAssessment, games: List[lila.game.Game]) {
+  case class WithGames(pag: PlayerAggregateAssessment,
+                       games: List[lila.game.Game]) {
     def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map {
       lila.game.Pov(_, pa.color)
     }

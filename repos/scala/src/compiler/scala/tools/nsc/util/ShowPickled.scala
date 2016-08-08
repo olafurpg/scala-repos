@@ -18,12 +18,14 @@ import scala.reflect.internal.pickling.{PickleBuffer, PickleFormat}
 object ShowPickled extends Names {
   import PickleFormat._
 
-  case class PickleBufferEntry(
-      num: Int, startIndex: Int, tag: Int, bytes: Array[Byte]) {
+  case class PickleBufferEntry(num: Int,
+                               startIndex: Int,
+                               tag: Int,
+                               bytes: Array[Byte]) {
     def isName = tag == TERMname || tag == TYPEname
     def hasName = tag match {
-      case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym |
-          EXTref | EXTMODCLASSref =>
+      case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym | EXTref |
+          EXTMODCLASSref =>
         true
       case _ => false
     }
@@ -116,7 +118,7 @@ object ShowPickled extends Names {
       b = data(idx).toLong
       idx += 1
       result = (result << 7) + (b & 0x7f)
-    } while ( (b & 0x80) != 0L)
+    } while ((b & 0x80) != 0L)
 
     result.toInt
   }
@@ -271,7 +273,7 @@ object ShowPickled extends Names {
                 buf.bytes
                   .slice(index(i), (end max buf.readIndex))
                   .mkString(", ")
-              ))
+            ))
       }
     }
 
@@ -280,7 +282,8 @@ object ShowPickled extends Names {
 
   def fromFile(path: String) = fromBytes(io.File(path).toByteArray())
   def fromBytes(data: => Array[Byte]): Option[PickleBuffer] =
-    try Some(new PickleBuffer(data, 0, data.length)) catch {
+    try Some(new PickleBuffer(data, 0, data.length))
+    catch {
       case _: Exception => None
     }
 

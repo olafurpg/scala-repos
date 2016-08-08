@@ -25,7 +25,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Attribute
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.trees.TreeNodeRef
 import org.apache.spark.sql.internal.SQLConf
 
@@ -72,7 +75,8 @@ package object debug {
   }
 
   private[sql] case class DebugNode(child: SparkPlan)
-      extends UnaryNode with CodegenSupport {
+      extends UnaryNode
+      with CodegenSupport {
     def output: Seq[Attribute] = child.output
 
     implicit object SetAccumulatorParam
@@ -82,8 +86,8 @@ package object debug {
         initialValue
       }
 
-      def addInPlace(
-          v1: HashSet[String], v2: HashSet[String]): HashSet[String] = {
+      def addInPlace(v1: HashSet[String],
+                     v2: HashSet[String]): HashSet[String] = {
         v1 ++= v2
         v1
       }
@@ -95,8 +99,8 @@ package object debug {
       *                     causing the wrong data to be projected.
       */
     case class ColumnMetrics(
-        elementTypes: Accumulator[HashSet[String]] = sparkContext.accumulator(
-              HashSet.empty))
+        elementTypes: Accumulator[HashSet[String]] =
+          sparkContext.accumulator(HashSet.empty))
 
     val tupleCount: Accumulator[Int] = sparkContext.accumulator[Int](0)
 
@@ -145,8 +149,9 @@ package object debug {
       child.asInstanceOf[CodegenSupport].produce(ctx, this)
     }
 
-    override def doConsume(
-        ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+    override def doConsume(ctx: CodegenContext,
+                           input: Seq[ExprCode],
+                           row: String): String = {
       consume(ctx, input)
     }
   }

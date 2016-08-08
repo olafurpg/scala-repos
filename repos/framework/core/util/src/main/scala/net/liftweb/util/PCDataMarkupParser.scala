@@ -19,7 +19,13 @@ package util
 
 import common._
 
-import scala.xml.parsing.{MarkupParser, MarkupHandler, FatalError, ConstructingHandler, ExternalSources}
+import scala.xml.parsing.{
+  MarkupParser,
+  MarkupHandler,
+  FatalError,
+  ConstructingHandler,
+  ExternalSources
+}
 import scala.xml.dtd._
 import scala.xml._
 import java.io.InputStream
@@ -287,8 +293,9 @@ object HtmlEntities {
   val entMap: Map[String, Char] =
     Map.empty ++ entList.map { case (name, value) => (name, value.toChar) }
 
-  val revMap: Map[Char, String] = Map(
-      entList.map { case (name, value) => (value.toChar, name) }: _*)
+  val revMap: Map[Char, String] = Map(entList.map {
+    case (name, value) => (value.toChar, name)
+  }: _*)
 
   val entities = entList.map {
     case (name, value) =>
@@ -327,7 +334,8 @@ trait PCDataMarkupParser[PCM <: MarkupParser with MarkupHandler]
 }
 
 class PCDataXmlParser(val input: Source)
-    extends ConstructingHandler with PCDataMarkupParser[PCDataXmlParser]
+    extends ConstructingHandler
+    with PCDataMarkupParser[PCDataXmlParser]
     with ExternalSources {
   val preserveWS = true
   ent ++= HtmlEntities()
@@ -426,7 +434,7 @@ object PCDataXmlParser {
     for {
       p <- tryo { new PCDataXmlParser(source) }
       _ = while (p.ch != '<' &&
-      p.curInput.hasNext) p.nextch // side effects, baby
+                 p.curInput.hasNext) p.nextch // side effects, baby
       bd <- tryo(p.document)
       doc <- Box !! bd
     } yield (doc.children: NodeSeq)
@@ -645,17 +653,18 @@ object AltXML {
         x.buildString(sb)
 
       case g: Group =>
-        for (c <- g.nodes) toXML(c,
-                                 x.scope,
-                                 sb,
-                                 stripComment,
-                                 convertAmp,
-                                 legacyIeCompatibilityMode)
+        for (c <- g.nodes)
+          toXML(c,
+                x.scope,
+                sb,
+                stripComment,
+                convertAmp,
+                legacyIeCompatibilityMode)
 
       case e: Elem
           if !legacyIeCompatibilityMode &&
-          ((e.child eq null) || e.child.isEmpty) &&
-          inlineTags.contains(e.label) =>
+            ((e.child eq null) || e.child.isEmpty) &&
+            inlineTags.contains(e.label) =>
         sb.append('<')
         e.nameToString(sb)
         if (e.attributes ne null) e.attributes.buildString(sb)
@@ -664,8 +673,8 @@ object AltXML {
 
       case e: Elem
           if legacyIeCompatibilityMode &&
-          ((e.child eq null) || e.child.isEmpty) &&
-          ieBadTags.contains(e.label) =>
+            ((e.child eq null) || e.child.isEmpty) &&
+            ieBadTags.contains(e.label) =>
         sb.append('<')
         e.nameToString(sb)
         if (e.attributes ne null) e.attributes.buildString(sb)

@@ -12,15 +12,24 @@ import mesosphere.marathon.{MarathonTestHelper, TaskUpgradeCanceledException}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.scalatest.{
+  BeforeAndAfter,
+  BeforeAndAfterAll,
+  FunSuiteLike,
+  Matchers
+}
 
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class TaskKillActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with BeforeAndAfterAll with BeforeAndAfter with MockitoSugar {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfter
+    with MockitoSugar {
 
   var taskTracker: TaskTracker = _
   var driver: SchedulerDriver = _
@@ -38,12 +47,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -80,12 +90,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -103,12 +114,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = system.actorOf(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -132,12 +144,13 @@ class TaskKillActorTest
       .thenReturn(mutable.Iterable.empty[Task])
 
     val ref = TestActorRef[TaskKillActor](
-        Props(new TaskKillActor(driver,
-                                app.id,
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              app.id,
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
     watch(ref)
 
     ref.underlyingActor.periodicalCheck.cancel()
@@ -158,12 +171,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef[TaskKillActor](
-        Props(new TaskKillActor(driver,
-                                appId,
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              appId,
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     when(taskTracker.appTasksLaunchedSync(appId))
       .thenReturn(Iterable(taskA, taskB))

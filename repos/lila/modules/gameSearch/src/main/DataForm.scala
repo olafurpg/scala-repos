@@ -45,9 +45,9 @@ private[gameSearch] final class DataForm {
             "status" -> optional(numberIn(Query.statuses)),
             "analysed" -> optional(number),
             "sort" -> optional(mapping(
-                    "field" -> stringIn(Sorting.fields),
-                    "order" -> stringIn(Sorting.orders)
-                )(SearchSort.apply)(SearchSort.unapply))
+                "field" -> stringIn(Sorting.fields),
+                "order" -> stringIn(Sorting.orders)
+            )(SearchSort.apply)(SearchSort.unapply))
         )(SearchData.apply)(SearchData.unapply)) fill SearchData()
 }
 
@@ -59,27 +59,27 @@ private[gameSearch] object DataForm {
   val dateField = optional(nonEmptyText.verifying(dateConstraint))
 }
 
-private[gameSearch] case class SearchData(
-    players: SearchPlayer = SearchPlayer(),
-    winnerColor: Option[Int] = None,
-    perf: Option[Int] = None,
-    source: Option[Int] = None,
-    mode: Option[Int] = None,
-    turnsMin: Option[Int] = None,
-    turnsMax: Option[Int] = None,
-    ratingMin: Option[Int] = None,
-    ratingMax: Option[Int] = None,
-    hasAi: Option[Int] = None,
-    aiLevelMin: Option[Int] = None,
-    aiLevelMax: Option[Int] = None,
-    durationMin: Option[Int] = None,
-    durationMax: Option[Int] = None,
-    clock: SearchClock = SearchClock(),
-    dateMin: Option[String] = None,
-    dateMax: Option[String] = None,
-    status: Option[Int] = None,
-    analysed: Option[Int] = None,
-    sort: Option[SearchSort] = None) {
+private[gameSearch] case class SearchData(players: SearchPlayer =
+                                            SearchPlayer(),
+                                          winnerColor: Option[Int] = None,
+                                          perf: Option[Int] = None,
+                                          source: Option[Int] = None,
+                                          mode: Option[Int] = None,
+                                          turnsMin: Option[Int] = None,
+                                          turnsMax: Option[Int] = None,
+                                          ratingMin: Option[Int] = None,
+                                          ratingMax: Option[Int] = None,
+                                          hasAi: Option[Int] = None,
+                                          aiLevelMin: Option[Int] = None,
+                                          aiLevelMax: Option[Int] = None,
+                                          durationMin: Option[Int] = None,
+                                          durationMax: Option[Int] = None,
+                                          clock: SearchClock = SearchClock(),
+                                          dateMin: Option[String] = None,
+                                          dateMax: Option[String] = None,
+                                          status: Option[Int] = None,
+                                          analysed: Option[Int] = None,
+                                          sort: Option[SearchSort] = None) {
 
   def sortOrDefault = sort | SearchSort()
 
@@ -96,8 +96,8 @@ private[gameSearch] case class SearchData(
           hasAi = hasAi map (_ == 1),
           aiLevel = Range(aiLevelMin, aiLevelMax),
           duration = Range(durationMin, durationMax),
-          clock = Clocking(
-                clock.initMin, clock.initMax, clock.incMin, clock.incMax),
+          clock =
+            Clocking(clock.initMin, clock.initMax, clock.incMin, clock.incMax),
           date = Range(dateMin flatMap toDate, dateMax flatMap toDate),
           status = status,
           analysed = analysed map (_ == 1),
@@ -140,7 +140,8 @@ private[gameSearch] case class SearchPlayer(a: Option[String] = None,
 }
 
 private[gameSearch] case class SearchSort(
-    field: String = Sorting.default.f, order: String = Sorting.default.order)
+    field: String = Sorting.default.f,
+    order: String = Sorting.default.order)
 
 private[gameSearch] case class SearchClock(initMin: Option[Int] = None,
                                            initMax: Option[Int] = None,

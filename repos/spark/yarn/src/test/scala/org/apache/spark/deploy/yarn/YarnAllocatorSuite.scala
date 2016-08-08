@@ -48,7 +48,9 @@ class MockResolver extends DNSToSwitchMapping {
 }
 
 class YarnAllocatorSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach {
   val conf = new Configuration()
   conf.setClass(
       CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY,
@@ -117,8 +119,12 @@ class YarnAllocatorSuite
     val containerId = ContainerId.newInstance(appAttemptId, containerNum)
     containerNum += 1
     val nodeId = NodeId.newInstance(host, 1000)
-    Container.newInstance(
-        containerId, nodeId, "", containerResource, RM_REQUEST_PRIORITY, null)
+    Container.newInstance(containerId,
+                          nodeId,
+                          "",
+                          containerResource,
+                          RM_REQUEST_PRIORITY,
+                          null)
   }
 
   test("single container allocated") {
@@ -259,8 +265,8 @@ class YarnAllocatorSuite
     }
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus.newInstance(
-          c.getId(), ContainerState.COMPLETE, "Finished", 0)
+      ContainerStatus
+        .newInstance(c.getId(), ContainerState.COMPLETE, "Finished", 0)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)
@@ -281,8 +287,8 @@ class YarnAllocatorSuite
     handler.requestTotalExecutorsWithPreferredLocalities(2, 0, Map())
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus.newInstance(
-          c.getId(), ContainerState.COMPLETE, "Failed", -1)
+      ContainerStatus
+        .newInstance(c.getId(), ContainerState.COMPLETE, "Failed", -1)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)
@@ -296,8 +302,8 @@ class YarnAllocatorSuite
   test("memory exceeded diagnostic regexes") {
     val diagnostics =
       "Container [pid=12465,containerID=container_1412887393566_0003_01_000002] is running " +
-      "beyond physical memory limits. Current usage: 2.1 MB of 2 GB physical memory used; " +
-      "5.8 GB of 4.2 GB virtual memory used. Killing container."
+        "beyond physical memory limits. Current usage: 2.1 MB of 2 GB physical memory used; " +
+        "5.8 GB of 4.2 GB virtual memory used. Killing container."
     val vmemMsg =
       memLimitExceededLogMessage(diagnostics, VMEM_EXCEEDED_PATTERN)
     val pmemMsg =

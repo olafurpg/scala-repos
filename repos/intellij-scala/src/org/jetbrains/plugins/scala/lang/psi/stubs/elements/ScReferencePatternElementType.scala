@@ -23,8 +23,8 @@ class ScReferencePatternElementType[Func <: ScReferencePattern]
     new ScReferencePatternStubImpl[ParentPsi](parentStub, this, psi.name)
   }
 
-  def serialize(
-      stub: ScReferencePatternStub, dataStream: StubOutputStream): Unit = {
+  def serialize(stub: ScReferencePatternStub,
+                dataStream: StubOutputStream): Unit = {
     dataStream.writeName(stub.getName)
   }
 
@@ -32,11 +32,13 @@ class ScReferencePatternElementType[Func <: ScReferencePattern]
     new ScReferencePatternImpl(stub)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScReferencePatternStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScReferencePatternStub = {
     val name = dataStream.readName
     new ScReferencePatternStubImpl(
-        parentStub.asInstanceOf[StubElement[_ <: PsiElement]], this, name)
+        parentStub.asInstanceOf[StubElement[_ <: PsiElement]],
+        this,
+        name)
   }
 
   def indexStub(stub: ScReferencePatternStub, sink: IndexSink): Unit = {}

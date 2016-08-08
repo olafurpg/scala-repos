@@ -1,6 +1,6 @@
 object SCL7544A {
   trait Relationsz {
-    type ZeroOne [Int]
+    type ZeroOne[Int]
 
     implicit def zeroOneOps[T]: ZeroOneOps[T]
 

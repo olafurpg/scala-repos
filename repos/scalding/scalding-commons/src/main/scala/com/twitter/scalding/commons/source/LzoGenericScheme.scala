@@ -23,7 +23,10 @@ import com.twitter.chill.Externalizer
 import com.twitter.elephantbird.cascading2.scheme.LzoBinaryScheme
 import com.twitter.elephantbird.mapreduce.input.combine.DelegateCombineFileInputFormat
 import com.twitter.elephantbird.mapreduce.io.{BinaryConverter, GenericWritable}
-import com.twitter.elephantbird.mapreduce.input.{BinaryConverterProvider, MultiInputFormat}
+import com.twitter.elephantbird.mapreduce.input.{
+  BinaryConverterProvider,
+  MultiInputFormat
+}
 import com.twitter.elephantbird.mapreduce.output.LzoGenericBlockOutputFormat
 import com.twitter.elephantbird.mapred.output.DeprecatedOutputFormatWrapper
 
@@ -94,12 +97,13 @@ private[source] class ConfigBinaryConverterProvider[M](
 }
 
 object LzoGenericScheme {
-  def apply[M : ClassTag](conv: BinaryConverter[M]): LzoGenericScheme[M] =
+  def apply[M: ClassTag](conv: BinaryConverter[M]): LzoGenericScheme[M] =
     new LzoGenericScheme(
-        conv, implicitly[ClassTag[M]].runtimeClass.asInstanceOf[Class[M]])
+        conv,
+        implicitly[ClassTag[M]].runtimeClass.asInstanceOf[Class[M]])
 
-  def apply[M](
-      conv: BinaryConverter[M], clazz: Class[M]): LzoGenericScheme[M] =
+  def apply[M](conv: BinaryConverter[M],
+               clazz: Class[M]): LzoGenericScheme[M] =
     new LzoGenericScheme(conv, clazz)
 
   /**
@@ -142,13 +146,16 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
       conf: JobConf): Unit = {
 
     LzoGenericScheme.setConverter(
-        conv, conf, SourceConfigBinaryConverterProvider.ProviderConfKey)
+        conv,
+        conf,
+        SourceConfigBinaryConverterProvider.ProviderConfKey)
     MultiInputFormat.setClassConf(clazz, conf)
     MultiInputFormat.setGenericConverterClassConf(
-        classOf[SourceConfigBinaryConverterProvider[_]], conf)
+        classOf[SourceConfigBinaryConverterProvider[_]],
+        conf)
 
-    DelegateCombineFileInputFormat.setDelegateInputFormat(
-        conf, classOf[MultiInputFormat[_]])
+    DelegateCombineFileInputFormat
+      .setDelegateInputFormat(conf, classOf[MultiInputFormat[_]])
   }
 
   override def sinkConfInit(
@@ -156,11 +163,14 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
       tap: Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]],
       conf: JobConf): Unit = {
     LzoGenericScheme.setConverter(
-        conv, conf, SinkConfigBinaryConverterProvider.ProviderConfKey)
+        conv,
+        conf,
+        SinkConfigBinaryConverterProvider.ProviderConfKey)
     LzoGenericBlockOutputFormat.setClassConf(clazz, conf)
     LzoGenericBlockOutputFormat.setGenericConverterClassConf(
-        classOf[SinkConfigBinaryConverterProvider[_]], conf)
-    DeprecatedOutputFormatWrapper.setOutputFormat(
-        classOf[LzoGenericBlockOutputFormat[_]], conf)
+        classOf[SinkConfigBinaryConverterProvider[_]],
+        conf)
+    DeprecatedOutputFormatWrapper
+      .setOutputFormat(classOf[LzoGenericBlockOutputFormat[_]], conf)
   }
 }

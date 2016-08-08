@@ -2,17 +2,25 @@ package org.jetbrains.plugins.scala
 package lang.psi.impl.base
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.plugins.scala.lang.psi.api.base.{InterpolatedStringType, ScInterpolatedStringLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  InterpolatedStringType,
+  ScInterpolatedStringLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 3/17/12
   */
 class ScInterpolatedStringLiteralImpl(node: ASTNode)
-    extends ScLiteralImpl(node) with ScInterpolatedStringLiteral {
+    extends ScLiteralImpl(node)
+    with ScInterpolatedStringLiteral {
   def getType: InterpolatedStringType.StringType =
     getNode.getFirstChildNode.getText match {
       case "s" => InterpolatedStringType.STANDART

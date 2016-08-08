@@ -18,7 +18,12 @@ import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.MarathonActorSupport
-import mesosphere.marathon.upgrade.{DeploymentManager, DeploymentPlan, DeploymentStep, StopApplication}
+import mesosphere.marathon.upgrade.{
+  DeploymentManager,
+  DeploymentPlan,
+  DeploymentStep,
+  StopApplication
+}
 import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.TaskID
 import mesosphere.util.state.FrameworkIdUtil
@@ -36,8 +41,12 @@ import scala.concurrent.{ExecutionContext, Promise, Future}
 import scala.concurrent.duration._
 
 class MarathonSchedulerActorTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Matchers with ImplicitSender with test.Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
+    with Matchers
+    with ImplicitSender
+    with test.Mockito {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -49,8 +58,9 @@ class MarathonSchedulerActorTest
     val schedulerActor = createActor()
     try {
       schedulerActor ! LocalLeadershipEvent.ElectedAsLeader
-      awaitAssert(
-          verify(hcManager).reconcileWith(app.id), 5.seconds, 10.millis)
+      awaitAssert(verify(hcManager).reconcileWith(app.id),
+                  5.seconds,
+                  10.millis)
       verify(deploymentRepo, times(1)).all()
     } finally {
       stopActor(schedulerActor)
@@ -64,7 +74,7 @@ class MarathonSchedulerActorTest
     when(repo.allPathIds()).thenReturn(Future.successful(Seq(app.id)))
     when(taskTracker.tasksByApp()(any[ExecutionContext])).thenReturn(
         Future.successful(TaskTracker.TasksByApp.of(
-                TaskTracker.AppTasks("nope".toPath, tasks)))
+            TaskTracker.AppTasks("nope".toPath, tasks)))
     )
     when(repo.currentVersion(app.id)).thenReturn(Future.successful(Some(app)))
 
@@ -91,7 +101,7 @@ class MarathonSchedulerActorTest
     when(repo.allPathIds()).thenReturn(Future.successful(Seq(app.id)))
     when(taskTracker.appTasksSync(app.id)).thenReturn(Iterable.empty[Task])
     when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.of(
-            TaskTracker.AppTasks.forTasks("nope".toPath, tasks)))
+        TaskTracker.AppTasks.forTasks("nope".toPath, tasks)))
     when(taskTracker.appTasksSync("nope".toPath)).thenReturn(tasks)
     when(repo.currentVersion(app.id)).thenReturn(Future.successful(Some(app)))
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(0)
@@ -159,13 +169,13 @@ class MarathonSchedulerActorTest
         version = app.version.toString
     )
 
-    when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
-        new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(statusUpdateEvent)
-        Status.DRIVER_RUNNING
-      }
-    })
+    when(driver.killTask(taskA.taskId.mesosTaskId))
+      .thenAnswer(new Answer[Status] {
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(statusUpdateEvent)
+          Status.DRIVER_RUNNING
+        }
+      })
 
     val schedulerActor = createActor()
     try {
@@ -219,13 +229,13 @@ class MarathonSchedulerActorTest
         timestamp = app.version.toString
     )
 
-    when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
-        new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(statusUpdateEvent)
-        Status.DRIVER_RUNNING
-      }
-    })
+    when(driver.killTask(taskA.taskId.mesosTaskId))
+      .thenAnswer(new Answer[Status] {
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(statusUpdateEvent)
+          Status.DRIVER_RUNNING
+        }
+      })
 
     val schedulerActor = createActor()
     try {
@@ -304,23 +314,23 @@ class MarathonSchedulerActorTest
 
     when(driver.killTask(taskA.taskId.mesosTaskId))
       .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(
-            MesosStatusUpdateEvent(
-                slaveId = "",
-                taskId = taskA.taskId,
-                taskStatus = "TASK_KILLED",
-                message = "",
-                appId = app.id,
-                host = "",
-                ipAddresses = Nil,
-                ports = Nil,
-                version = app.version.toString
-            )
-        )
-        Status.DRIVER_RUNNING
-      }
-    })
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(
+              MesosStatusUpdateEvent(
+                  slaveId = "",
+                  taskId = taskA.taskId,
+                  taskStatus = "TASK_KILLED",
+                  message = "",
+                  appId = app.id,
+                  host = "",
+                  ipAddresses = Nil,
+                  ports = Nil,
+                  version = app.version.toString
+              )
+          )
+          Status.DRIVER_RUNNING
+        }
+      })
 
     system.eventStream.subscribe(probe.ref, classOf[UpgradeEvent])
 
@@ -593,8 +603,8 @@ class MarathonSchedulerActorTest
               hcManager,
               system.eventStream
           ))
-    historyActorProps = Props(
-        new HistoryActor(system.eventStream, taskFailureEventRepository))
+    historyActorProps =
+      Props(new HistoryActor(system.eventStream, taskFailureEventRepository))
     schedulerActions = ref =>
       new SchedulerActions(repo,
                            groupRepo,
@@ -605,12 +615,12 @@ class MarathonSchedulerActorTest
                            ref,
                            mock[MarathonConf])(system.dispatcher)
 
-    when(deploymentRepo.store(any)).thenAnswer(
-        new Answer[Future[DeploymentPlan]] {
-      override def answer(p1: InvocationOnMock): Future[DeploymentPlan] = {
-        Future.successful(p1.getArguments()(0).asInstanceOf[DeploymentPlan])
-      }
-    })
+    when(deploymentRepo.store(any))
+      .thenAnswer(new Answer[Future[DeploymentPlan]] {
+        override def answer(p1: InvocationOnMock): Future[DeploymentPlan] = {
+          Future.successful(p1.getArguments()(0).asInstanceOf[DeploymentPlan])
+        }
+      })
 
     when(deploymentRepo.expunge(any)).thenReturn(Future.successful(Seq(true)))
     when(deploymentRepo.all()).thenReturn(Future.successful(Nil))

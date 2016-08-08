@@ -131,7 +131,7 @@ object FoldableTest extends SpecLite {
     "findMapM: finding the first element performs transform and only runs only necessary effects" ! forAll {
       (x: Int, xs: List[Int]) =>
         (x :: xs).findMapM[StateInt, Int](found).run(0) must_==
-        (1 -> Some(x * 2))
+          (1 -> Some(x * 2))
     }
 
     "findMapM: finding the last element performs transform and runs all effects (once only)" ! forAll {
@@ -146,7 +146,7 @@ object FoldableTest extends SpecLite {
     "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
       (xs: List[Int]) =>
         xs.findMapM[StateInt, Int](_ => notfound).run(0) must_==
-        (xs.length -> None)
+          (xs.length -> None)
     }
 
     "findLeft" ! forAll { (x: Int, xs: List[Int]) =>
@@ -165,8 +165,9 @@ object FoldableTest extends SpecLite {
   }
 
   "product foldLeft equivalence" ! forAll { (l: List[Int], l2: List[Int]) =>
-    (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs) must_===
-        ((l ++ l2).reverse))
+    (L.product(L)
+      .foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs) must_===
+      ((l ++ l2).reverse))
   }
 }
 
@@ -193,14 +194,14 @@ object FoldableTests {
       i === expected
     }
 
-  def anyConsistent[F[_], A](
-      f: A => Boolean)(implicit F: Foldable[F], fa: Arbitrary[F[A]]) =
+  def anyConsistent[F[_], A](f: A => Boolean)(implicit F: Foldable[F],
+                                              fa: Arbitrary[F[A]]) =
     forAll { fa: F[A] =>
       F.any(fa)(f) === F.toList(fa).exists(f)
     }
 
-  def allConsistent[F[_], A](
-      f: A => Boolean)(implicit F: Foldable[F], fa: Arbitrary[F[A]]) =
+  def allConsistent[F[_], A](f: A => Boolean)(implicit F: Foldable[F],
+                                              fa: Arbitrary[F[A]]) =
     forAll { fa: F[A] =>
       F.all(fa)(f) === F.toList(fa).forall(f)
     }

@@ -11,7 +11,10 @@ import javax.net.ssl.SSLPeerUnverifiedException
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
-import com.typesafe.netty.http.{DefaultStreamedHttpResponse, StreamedHttpRequest}
+import com.typesafe.netty.http.{
+  DefaultStreamedHttpResponse,
+  StreamedHttpRequest
+}
 import io.netty.buffer.{ByteBuf, Unpooled}
 import io.netty.handler.codec.http._
 import io.netty.handler.ssl.SslHandler
@@ -20,7 +23,11 @@ import play.api.Logger
 import play.api.http.HeaderNames._
 import play.api.http.{Status, HttpChunk, HttpEntity}
 import play.api.mvc._
-import play.core.server.common.{ConnectionInfo, ServerResultUtils, ForwardedHeaderHandler}
+import play.core.server.common.{
+  ConnectionInfo,
+  ServerResultUtils,
+  ForwardedHeaderHandler
+}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Try}
@@ -66,8 +73,12 @@ private[server] class NettyModelConversion(
       }
       // wrapping into URI to handle absoluteURI
       val path = new URI(uri.path()).getRawPath
-      createRequestHeader(
-          request, requestId, path, parameters, remoteAddress, sslHandler)
+      createRequestHeader(request,
+                          requestId,
+                          path,
+                          parameters,
+                          remoteAddress,
+                          sslHandler)
     }
   }
 
@@ -90,8 +101,9 @@ private[server] class NettyModelConversion(
       override def queryString = parameters
       override val headers = new NettyHeadersWrapper(request.headers)
       private lazy val remoteConnection: ConnectionInfo = {
-        forwardedHeaderHandler.remoteConnection(
-            _remoteAddress.getAddress, sslHandler.isDefined, headers)
+        forwardedHeaderHandler.remoteConnection(_remoteAddress.getAddress,
+                                                sslHandler.isDefined,
+                                                headers)
       }
       override def remoteAddress = remoteConnection.address.getHostAddress
       override def secure = remoteConnection.secure
@@ -159,8 +171,8 @@ private[server] class NettyModelConversion(
           Some(Source.single(content))
         }
       case streamed: StreamedHttpRequest =>
-        Some(Source.fromPublisher(SynchronousMappedStreams.map(
-                    streamed, httpContentToByteString)))
+        Some(Source.fromPublisher(
+            SynchronousMappedStreams.map(streamed, httpContentToByteString)))
     }
   }
 
@@ -177,8 +189,9 @@ private[server] class NettyModelConversion(
 
   /** Create a Netty response from the result */
   def convertResult(
-      result: Result, requestHeader: RequestHeader, httpVersion: HttpVersion)(
-      implicit mat: Materializer): HttpResponse = {
+      result: Result,
+      requestHeader: RequestHeader,
+      httpVersion: HttpVersion)(implicit mat: Materializer): HttpResponse = {
 
     val responseStatus = result.header.reasonPhrase match {
       case Some(phrase) => new HttpResponseStatus(result.header.status, phrase)
@@ -193,12 +206,14 @@ private[server] class NettyModelConversion(
 
       case any if skipEntity =>
         ServerResultUtils.cancelEntity(any)
-        new DefaultFullHttpResponse(
-            httpVersion, responseStatus, Unpooled.EMPTY_BUFFER)
+        new DefaultFullHttpResponse(httpVersion,
+                                    responseStatus,
+                                    Unpooled.EMPTY_BUFFER)
 
       case HttpEntity.Strict(data, _) =>
-        new DefaultFullHttpResponse(
-            httpVersion, responseStatus, byteStringToByteBuf(data))
+        new DefaultFullHttpResponse(httpVersion,
+                                    responseStatus,
+                                    byteStringToByteBuf(data))
 
       case HttpEntity.Streamed(stream, _, _) =>
         createStreamedResponse(stream, httpVersion, responseStatus)
@@ -273,20 +288,20 @@ private[server] class NettyModelConversion(
   }
 
   /** Create a Netty streamed response. */
-  private def createStreamedResponse(stream: Source[ByteString, _],
-                                     httpVersion: HttpVersion,
-                                     responseStatus: HttpResponseStatus)(
-      implicit mat: Materializer) = {
-    val publisher = SynchronousMappedStreams.map(
-        stream.runWith(Sink.asPublisher(false)), byteStringToHttpContent)
+  private def createStreamedResponse(
+      stream: Source[ByteString, _],
+      httpVersion: HttpVersion,
+      responseStatus: HttpResponseStatus)(implicit mat: Materializer) = {
+    val publisher = SynchronousMappedStreams
+      .map(stream.runWith(Sink.asPublisher(false)), byteStringToHttpContent)
     new DefaultStreamedHttpResponse(httpVersion, responseStatus, publisher)
   }
 
   /** Create a Netty chunked response. */
-  private def createChunkedResponse(chunks: Source[HttpChunk, _],
-                                    httpVersion: HttpVersion,
-                                    responseStatus: HttpResponseStatus)(
-      implicit mat: Materializer) = {
+  private def createChunkedResponse(
+      chunks: Source[HttpChunk, _],
+      httpVersion: HttpVersion,
+      responseStatus: HttpResponseStatus)(implicit mat: Materializer) = {
 
     val publisher = chunks.runWith(Sink.asPublisher(false))
 
@@ -303,8 +318,9 @@ private[server] class NettyModelConversion(
           lastChunk
       })
 
-    val response = new DefaultStreamedHttpResponse(
-        httpVersion, responseStatus, httpContentPublisher)
+    val response = new DefaultStreamedHttpResponse(httpVersion,
+                                                   responseStatus,
+                                                   httpContentPublisher)
     HttpHeaders.setTransferEncodingChunked(response)
     response
   }

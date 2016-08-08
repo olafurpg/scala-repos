@@ -1,6 +1,11 @@
 package org.jetbrains.jps.incremental.scala.local
 
-import java.io.{BufferedOutputStream, ObjectOutputStream, File, FileOutputStream}
+import java.io.{
+  BufferedOutputStream,
+  ObjectOutputStream,
+  File,
+  FileOutputStream
+}
 import java.util.regex.Pattern
 
 import com.intellij.openapi.application.PathManager
@@ -62,8 +67,8 @@ object ScalaReflectMacroExpansionParser {
         val matcher = expansionRegex.matcher(message)
         if (!matcher.matches()) reset()
         else {
-          expansions(expansions.length - 1) = MacroExpansion(
-              expansions.last.place, matcher.group(1))
+          expansions(expansions.length - 1) =
+            MacroExpansion(expansions.last.place, matcher.group(1))
           parsingState = EXPANSION
         }
     }
@@ -72,9 +77,8 @@ object ScalaReflectMacroExpansionParser {
   def reset() = parsingState = ParsingState.INIT
 
   def serializeExpansions(context: CompileContext) = {
-    val file = new File(
-        System.getProperty("java.io.tmpdir") +
-        s"/../../expansion-${context.getProjectDescriptor.getProject.getName}")
+    val file = new File(System.getProperty("java.io.tmpdir") +
+      s"/../../expansion-${context.getProjectDescriptor.getProject.getName}")
     val fo = new BufferedOutputStream(new FileOutputStream(file))
     val so = new ObjectOutputStream(fo)
     for (expansion <- expansions) {

@@ -148,13 +148,13 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
 
       js.toJsCmd must be matching
-      ("""(?s)\Qlift.onEvent("lift-event-js-\E[^"]+\Q","event",function(event) {doStuff;});
+        ("""(?s)\Qlift.onEvent("lift-event-js-\E[^"]+\Q","event",function(event) {doStuff;});
         |lift.onEvent("hello","event",function(event) {doStuff2;});
         |lift.onEvent("lift-event-js-\E[^"]+\Q","event",function(event) {doStuff3;});\E"""
-            .stripMargin('|')
-            .lines
-            .mkString("\n")
-            .r)
+          .stripMargin('|')
+          .lines
+          .mkString("\n")
+          .r)
     }
 
     "extract events from hrefs and actions" in {
@@ -176,14 +176,14 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
       (html \ "myelement").map(_ \@ "href").filter(_.nonEmpty) must beEmpty
       (html \ "myelement").map(_ \@ "action").filter(_.nonEmpty) must beEmpty
       js.toJsCmd must be matching
-      ("""(?s)\Qlift.onEvent("lift-event-js-\E[^"]+\Q","click",function(event) {doStuff; event.preventDefault();});
+        ("""(?s)\Qlift.onEvent("lift-event-js-\E[^"]+\Q","click",function(event) {doStuff; event.preventDefault();});
         |lift.onEvent("hello","submit",function(event) {doStuff2; event.preventDefault();});
         |lift.onEvent("hello2","click",function(event) {doStuff3; event.preventDefault();});
         |lift.onEvent("lift-event-js-\E[^"]+\Q","submit",function(event) {/doStuff4; event.preventDefault();});\E"""
-            .stripMargin('|')
-            .lines
-            .mkString("\n")
-            .r)
+          .stripMargin('|')
+          .lines
+          .mkString("\n")
+          .r)
     }
 
     "not extract events from hrefs and actions without the proper prefix" in {
@@ -231,7 +231,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "link").map(_ \@ "href") must_==
+      (result \\ "link").map(_ \@ "href") must_==
         "/context-path/testlink" :: "/context-path/testlink2" :: "/context-path/testlink3" :: Nil
     }
 
@@ -261,7 +261,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "script").map(_ \@ "src") must_==
+      (result \\ "script").map(_ \@ "src") must_==
         "/context-path/testscript" :: "/context-path/testscript2" :: Nil
     }
 
@@ -291,7 +291,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "a").map(_ \@ "href") must_==
+      (result \\ "a").map(_ \@ "href") must_==
         "/context-path/testa1" :: "/context-path/testa2" :: "testa3" :: "testa4" :: "/context-path/testa5" :: "/context-path/testa6" :: Nil
     }
 
@@ -321,7 +321,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "form").map(_ \@ "action") must_==
+      (result \\ "form").map(_ \@ "action") must_==
         "/context-path/testform1" :: "/context-path/testform2" :: "testform3" :: "testform4" :: "/context-path/testform5" :: "/context-path/testform6" :: Nil
     }
 

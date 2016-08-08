@@ -100,8 +100,7 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
   private def createDescriptor(process: Process, consumer: MessageConsumer) =
     new MyProcessDescriptor(
         process,
-        myExecutor.submit(
-            new Runnable {
+        myExecutor.submit(new Runnable {
           override def run() {
             process.waitFor()
           }

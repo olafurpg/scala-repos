@@ -79,7 +79,7 @@ private[mllib] object EigenValueDecomposition {
 
     require(
         n * ncv.toLong <= Integer.MAX_VALUE &&
-        ncv * (ncv.toLong + 8) <= Integer.MAX_VALUE,
+          ncv * (ncv.toLong + 8) <= Integer.MAX_VALUE,
         s"k = $k and/or n = $n are too large to compute an eigendecomposition")
 
     var ido = new intW(0)
@@ -113,9 +113,8 @@ private[mllib] object EigenValueDecomposition {
     // ido = 99 : done flag in reverse communication
     while (ido.`val` != 99) {
       if (ido.`val` != -1 && ido.`val` != 1) {
-        throw new IllegalStateException(
-            "ARPACK returns ido = " + ido.`val` +
-            " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
+        throw new IllegalStateException("ARPACK returns ido = " + ido.`val` +
+          " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
       }
       // multiply working vector with the matrix
       val inputOffset = ipntr(0) - 1
@@ -147,16 +146,16 @@ private[mllib] object EigenValueDecomposition {
         case 1 =>
           throw new IllegalStateException(
               "ARPACK returns non-zero info = " + info.`val` +
-              " Maximum number of iterations taken. (Refer ARPACK user guide for details)")
+                " Maximum number of iterations taken. (Refer ARPACK user guide for details)")
         case 3 =>
           throw new IllegalStateException(
               "ARPACK returns non-zero info = " + info.`val` +
-              " No shifts could be applied. Try to increase NCV. " +
-              "(Refer ARPACK user guide for details)")
+                " No shifts could be applied. Try to increase NCV. " +
+                "(Refer ARPACK user guide for details)")
         case _ =>
           throw new IllegalStateException(
               "ARPACK returns non-zero info = " + info.`val` +
-              " Please refer ARPACK user guide for error message.")
+                " Please refer ARPACK user guide for error message.")
       }
     }
 

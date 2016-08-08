@@ -8,8 +8,14 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionContributor
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
@@ -44,7 +50,7 @@ class ScalaDocCompletionContributor extends ScalaCompletionContributor {
                       MyScaladocParsing.PARAM_TAG)
                 case _ =>
                   MyScaladocParsing.allTags -- MyScaladocParsing.tagsWithParameters -
-                  MyScaladocParsing.RETURN_TAG
+                    MyScaladocParsing.RETURN_TAG
               }
 
             for (tag <- allowedTags) {

@@ -5,7 +5,22 @@ import chess.format.Uci
 import chess.Pos.piotr, chess.Role.forsyth
 import chess.variant.{Variant, Crazyhouse}
 import chess.opening.{FullOpening, FullOpeningDB}
-import chess.{History => ChessHistory, CheckCount, Castles, Role, Board, MoveOrDrop, Pos, Game => ChessGame, Clock, Status, Color, Piece, Mode, PositionHash}
+import chess.{
+  History => ChessHistory,
+  CheckCount,
+  Castles,
+  Role,
+  Board,
+  MoveOrDrop,
+  Pos,
+  Game => ChessGame,
+  Clock,
+  Status,
+  Color,
+  Piece,
+  Mode,
+  PositionHash
+}
 import org.joda.time.DateTime
 import scala.concurrent.duration.FiniteDuration
 
@@ -161,11 +176,11 @@ case class Game(
     val (history, situation) = (game.board.history, game.situation)
 
     def copyPlayer(player: Player) = player.copy(
-        blurs = math.min(playerMoves(player.color),
-                         player.blurs +
-                         (blur &&
-                             moveOrDrop.fold(_.color, _.color) == player.color)
-                           .fold(1, 0))
+        blurs = math.min(
+            playerMoves(player.color),
+            player.blurs +
+              (blur &&
+                moveOrDrop.fold(_.color, _.color) == player.color).fold(1, 0))
     )
 
     val updated = copy(
@@ -178,19 +193,19 @@ case class Game(
         checkCount = history.checkCount,
         crazyData = situation.board.crazyData,
         castleLastMoveTime = CastleLastMoveTime(
-              castles = history.castles,
-              lastMove = history.lastMove.map(_.origDest),
-              lastMoveTime = Some(
-                    ((nowMillis - createdAt.getMillis) / 100).toInt),
-              check = situation.kingPos ifTrue situation.check),
+            castles = history.castles,
+            lastMove = history.lastMove.map(_.origDest),
+            lastMoveTime =
+              Some(((nowMillis - createdAt.getMillis) / 100).toInt),
+            check = situation.kingPos ifTrue situation.check),
         binaryMoveTimes = isPgnImport.fold(
-              ByteArray.empty,
-              BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
+            ByteArray.empty,
+            BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
               moveTimes :+ {
                 (nowTenths - lmt - (lag.??(_.toMillis) / 100)).toInt max 0
               }
             }
-          ),
+        ),
         status = situation.status | status,
         clock = game.clock)
 
@@ -226,8 +241,8 @@ case class Game(
   def check = castleLastMoveTime.check
 
   def updatePlayer(color: Color, f: Player => Player) =
-    color.fold(
-        copy(whitePlayer = f(whitePlayer)), copy(blackPlayer = f(blackPlayer)))
+    color.fold(copy(whitePlayer = f(whitePlayer)),
+               copy(blackPlayer = f(blackPlayer)))
 
   def updatePlayers(f: Player => Player) =
     copy(whitePlayer = f(whitePlayer), blackPlayer = f(blackPlayer))
@@ -291,18 +306,18 @@ case class Game(
 
   def playerCanOfferDraw(color: Color) =
     started && playable && turns >= 2 && !player(color).isOfferingDraw &&
-    !(opponent(color).isAi) && !(playerHasOfferedDraw(color))
+      !(opponent(color).isAi) && !(playerHasOfferedDraw(color))
 
   def playerHasOfferedDraw(color: Color) =
     player(color).lastDrawOffer ?? (_ >= turns - 1)
 
   def playerCanRematch(color: Color) =
     !player(color).isOfferingRematch && finishedOrAborted && nonMandatory &&
-    !boosted
+      !boosted
 
   def playerCanProposeTakeback(color: Color) =
     started && playable && !isTournament && !isSimul && bothPlayersHaveMoved &&
-    !player(color).isProposingTakeback && !opponent(color).isProposingTakeback
+      !player(color).isProposingTakeback && !opponent(color).isProposingTakeback
 
   def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < 10
 
@@ -318,7 +333,7 @@ case class Game(
     clock.ifTrue(berserkable && !player(color).berserk).map { c =>
       val newClock = c berserk color
       withClock(newClock).map(_.withPlayer(color, _.goBerserk)) +
-      Event.Clock(newClock) + Event.Berserk(color)
+        Event.Clock(newClock) + Event.Berserk(color)
     }
 
   def withPlayer(color: Color, f: Player => Player) =
@@ -410,7 +425,8 @@ case class Game(
   def estimateClockTotalTime = clock.map(_.estimateTotalTime)
 
   def estimateTotalTime =
-    estimateClockTotalTime orElse correspondenceClock.map(_.estimateTotalTime) getOrElse 1200
+    estimateClockTotalTime orElse correspondenceClock
+      .map(_.estimateTotalTime) getOrElse 1200
 
   def playerWhoDidNotMove: Option[Player] = playedTurns match {
     case 0 => player(White).some
@@ -444,8 +460,8 @@ case class Game(
 
   def abandoned =
     (status <= Status.Started) &&
-    ((updatedAt | createdAt) isBefore hasAi.fold(Game.aiAbandonedDate,
-                                                 Game.abandonedDate))
+      ((updatedAt | createdAt) isBefore hasAi.fold(Game.aiAbandonedDate,
+                                                   Game.abandonedDate))
 
   def forecastable = started && playable && isCorrespondence && !hasAi
 
@@ -533,15 +549,16 @@ object Game {
     Game(id = IdGenerator.game,
          whitePlayer = whitePlayer,
          blackPlayer = blackPlayer,
-         binaryPieces = if (game.isStandardInit) BinaryFormat.piece.standard
+         binaryPieces =
+           if (game.isStandardInit) BinaryFormat.piece.standard
            else BinaryFormat.piece write game.board.pieces,
          binaryPgn = ByteArray.empty,
          status = Status.Created,
          turns = game.turns,
          startedAtTurn = game.startedAtTurn,
          clock = game.clock,
-         castleLastMoveTime = CastleLastMoveTime.init.copy(
-               castles = game.board.history.castles),
+         castleLastMoveTime =
+           CastleLastMoveTime.init.copy(castles = game.board.history.castles),
          daysPerTurn = daysPerTurn,
          mode = mode,
          variant = variant,

@@ -1,7 +1,12 @@
 package org.jetbrains.plugins.scala
 package runner
 
-import com.intellij.execution.configurations.{ConfigurationFactory, JavaParameters, ModuleBasedConfiguration, RunConfigurationModule}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory,
+  JavaParameters,
+  ModuleBasedConfiguration,
+  RunConfigurationModule
+}
 import com.intellij.execution.{CantRunException, ExecutionException}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -21,7 +26,9 @@ abstract class BaseRunConfiguration(
     val configurationFactory: ConfigurationFactory,
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory) {
+        name,
+        new RunConfigurationModule(project),
+        configurationFactory) {
   def mainClass: String
   val defaultJavaOptions = "-Djline.terminal=NONE"
   val useJavaCp = "-usejavacp"

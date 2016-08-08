@@ -22,7 +22,9 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.test.SQLTestUtils
 
 class MultiDatabaseSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   private lazy val df = sqlContext.range(10).coalesce(1).toDF()
 
   private def checkTablePath(dbName: String, tableName: String): Unit = {
@@ -30,7 +32,7 @@ class MultiDatabaseSuite
       hiveContext.sessionState.catalog.client.getTable(dbName, tableName)
     val expectedPath =
       hiveContext.sessionState.catalog.client.getDatabase(dbName).locationUri +
-      "/" + tableName
+        "/" + tableName
 
     assert(metastoreTable.storage.serdeProperties("path") === expectedPath)
   }

@@ -33,8 +33,8 @@ object ProducerPool {
   /**
     * Used in ProducerPool to initiate a SyncProducer connection with a broker.
     */
-  def createSyncProducer(
-      config: ProducerConfig, broker: BrokerEndPoint): SyncProducer = {
+  def createSyncProducer(config: ProducerConfig,
+                         broker: BrokerEndPoint): SyncProducer = {
     val props = new Properties()
     props.put("host", broker.host)
     props.put("port", broker.port.toString)
@@ -52,24 +52,20 @@ class ProducerPool(val config: ProducerConfig) extends Logging {
 
   def updateProducer(topicMetadata: Seq[TopicMetadata]) {
     val newBrokers = new collection.mutable.HashSet[BrokerEndPoint]
-    topicMetadata.foreach(
-        tmd =>
-          {
-        tmd.partitionsMetadata.foreach(pmd =>
-              {
-            if (pmd.leader.isDefined) {
-              newBrokers += pmd.leader.get
-            }
-        })
+    topicMetadata.foreach(tmd => {
+      tmd.partitionsMetadata.foreach(pmd => {
+        if (pmd.leader.isDefined) {
+          newBrokers += pmd.leader.get
+        }
+      })
     })
     lock synchronized {
-      newBrokers.foreach(b =>
-            {
-          if (syncProducers.contains(b.id)) {
-            syncProducers(b.id).close()
-            syncProducers.put(b.id, ProducerPool.createSyncProducer(config, b))
-          } else
-            syncProducers.put(b.id, ProducerPool.createSyncProducer(config, b))
+      newBrokers.foreach(b => {
+        if (syncProducers.contains(b.id)) {
+          syncProducers(b.id).close()
+          syncProducers.put(b.id, ProducerPool.createSyncProducer(config, b))
+        } else
+          syncProducers.put(b.id, ProducerPool.createSyncProducer(config, b))
       })
     }
   }

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -52,8 +52,9 @@ import TableModule._
 import PrecogJValueOrder._
 
 trait BlockSortSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
-  self =>
+    extends BlockStoreTestSupport[M]
+    with Specification
+    with ScalaCheck { self =>
   def testSortDense(sample: SampleData,
                     sortOrder: DesiredSortOrder,
                     unique: Boolean,
@@ -94,8 +95,8 @@ trait BlockSortSpec[M[+ _]]
 
     val resultM = for {
       sorted <- module
-        .fromSample(sample)
-        .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
+                 .fromSample(sample)
+                 .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
       json <- sorted.toJson
     } yield (json, sorted)
 
@@ -200,8 +201,11 @@ trait BlockSortSpec[M[+ _]]
         )
     )
 
-    testSortDense(
-        sampleData, SortAscending, false, JPath(".uid"), JPath(".hW"))
+    testSortDense(sampleData,
+                  SortAscending,
+                  false,
+                  JPath(".uid"),
+                  JPath(".hW"))
   }
 
   def heterogeneousBaseValueTypeSample = {
@@ -271,7 +275,8 @@ trait BlockSortSpec[M[+ _]]
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSample2 = {
     val sampleData = SampleData(
-        (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe(
+            """[
         {"key":[1,4,3],"value":{"b0":["",{"alxk":-1},-5.170005125478374E+307],"y":{"pvbT":[-1458654748381439976,{}]}}},
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}

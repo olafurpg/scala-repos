@@ -1,15 +1,21 @@
 package org.jetbrains.plugins.scala.debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * User: Alefas
   * Date: 20.10.11
   */
 class ScalaThisAndSuperEvaluationTest
-    extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_11
+    extends ScalaThisAndSuperEvaluationTestBaseClass
+    with ScalaVersion_2_11
 class ScalaThisAndSuperEvaluationTest_212
-    extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_12
+    extends ScalaThisAndSuperEvaluationTestBaseClass
+    with ScalaVersion_2_12
 
 abstract class ScalaThisAndSuperEvaluationTestBaseClass
     extends ScalaDebuggerTestCase {

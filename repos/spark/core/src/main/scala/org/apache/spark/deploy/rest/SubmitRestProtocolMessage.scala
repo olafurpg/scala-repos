@@ -20,7 +20,11 @@ package org.apache.spark.deploy.rest
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
+import com.fasterxml.jackson.databind.{
+  DeserializationFeature,
+  ObjectMapper,
+  SerializationFeature
+}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
@@ -37,8 +41,8 @@ import org.apache.spark.util.Utils
   *   (3) an optional message
   */
 @JsonInclude(Include.NON_NULL)
-@JsonAutoDetect(
-    getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.ANY,
+                setterVisibility = Visibility.ANY)
 @JsonPropertyOrder(alphabetic = true)
 private[rest] abstract class SubmitRestProtocolMessage {
   @JsonIgnore
@@ -69,7 +73,8 @@ private[rest] abstract class SubmitRestProtocolMessage {
     } catch {
       case e: Exception =>
         throw new SubmitRestProtocolException(
-            s"Validation of message $messageType failed!", e)
+            s"Validation of message $messageType failed!",
+            e)
     }
   }
 
@@ -149,8 +154,8 @@ private[spark] object SubmitRestProtocolMessage {
     * inferring it from the action field. This is useful for deserializing JSON that
     * represents custom user-defined messages.
     */
-  def fromJson[T <: SubmitRestProtocolMessage](
-      json: String, clazz: Class[T]): T = {
+  def fromJson[T <: SubmitRestProtocolMessage](json: String,
+                                               clazz: Class[T]): T = {
     mapper.readValue(json, clazz)
   }
 }

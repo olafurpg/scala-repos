@@ -8,7 +8,8 @@ case class RWLock[T](private val value: T) {
 
   private[this] def withLock[U](lock: Lock)(f: T => U): U = {
     scala.concurrent.blocking(lock.lock())
-    try f(value) finally lock.unlock()
+    try f(value)
+    finally lock.unlock()
   }
 
   /**

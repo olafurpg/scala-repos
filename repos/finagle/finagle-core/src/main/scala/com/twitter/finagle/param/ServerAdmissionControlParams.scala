@@ -56,7 +56,8 @@ class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
     * @see [[https://twitter.github.io/finagle/guide/Servers.html#request-deadline]]
     */
   def deadlineMaxRejectedPercentage(percentage: Double): A =
-    self.configured(self
+    self.configured(
+        self
           .params[DeadlineFilter.Param]
           .copy(maxRejectPercentage = percentage))
 }

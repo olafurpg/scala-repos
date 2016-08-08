@@ -23,8 +23,9 @@ class ALSModel(override val rank: Int,
     extends MatrixFactorizationModel(rank, userFeatures, productFeatures)
     with IPersistentModel[ALSAlgorithmParams] {
 
-  def recommendProductsFromCategory(
-      user: Int, num: Int, categoryItems: Array[Set[Int]]) = {
+  def recommendProductsFromCategory(user: Int,
+                                    num: Int,
+                                    categoryItems: Array[Set[Int]]) = {
     val filteredProductFeatures = productFeatures.filter {
       case (id, _) => categoryItems.exists(_.contains(id))
     }
@@ -59,13 +60,13 @@ class ALSModel(override val rank: Int,
 
   override def toString = {
     s"userFeatures: [${userFeatures.count()}]" +
-    s"(${userFeatures.take(2).toList}...)" +
-    s" productFeatures: [${productFeatures.count()}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" userStringIntMap: [${userStringIntMap.size}]" +
-    s"(${userStringIntMap.take(2)}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2)}...)"
+      s"(${userFeatures.take(2).toList}...)" +
+      s" productFeatures: [${productFeatures.count()}]" +
+      s"(${productFeatures.take(2).toList}...)" +
+      s" userStringIntMap: [${userStringIntMap.size}]" +
+      s"(${userStringIntMap.take(2)}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2)}...)"
   }
 }
 
@@ -76,13 +77,13 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
         productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
         userStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/userStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/userStringIntMap")
+          .first,
         itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+          .first,
         categoryItemsMap = sc.get
-            .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
-            .first)
+          .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
+          .first)
   }
 }

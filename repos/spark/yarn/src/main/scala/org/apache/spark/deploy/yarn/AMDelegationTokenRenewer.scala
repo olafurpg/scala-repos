@@ -51,8 +51,8 @@ import org.apache.spark.util.ThreadUtils
  * appeared, it will read the credentials and update the currently running UGI with it. This
  * process happens again once 80% of the validity of this has expired.
  */
-private[yarn] class AMDelegationTokenRenewer(
-    sparkConf: SparkConf, hadoopConf: Configuration)
+private[yarn] class AMDelegationTokenRenewer(sparkConf: SparkConf,
+                                             hadoopConf: Configuration)
     extends Logging {
 
   private var lastCredentialsFileSuffix = 0
@@ -67,7 +67,8 @@ private[yarn] class AMDelegationTokenRenewer(
   private val daysToKeepFiles = sparkConf.get(CREDENTIALS_FILE_MAX_RETENTION)
   private val numFilesToKeep = sparkConf.get(CREDENTIAL_FILE_MAX_COUNT)
   private val freshHadoopConf = hadoopUtil.getConfBypassingFSCache(
-      hadoopConf, new Path(credentialsFile).toUri.getScheme)
+      hadoopConf,
+      new Path(credentialsFile).toUri.getScheme)
 
   /**
     * Schedule a login from the keytab and principal set using the --principal and --keytab
@@ -94,8 +95,8 @@ private[yarn] class AMDelegationTokenRenewer(
         runnable.run()
       } else {
         logInfo(s"Scheduling login from keytab in $renewalInterval millis.")
-        delegationTokenRenewer.schedule(
-            runnable, renewalInterval, TimeUnit.MILLISECONDS)
+        delegationTokenRenewer
+          .schedule(runnable, renewalInterval, TimeUnit.MILLISECONDS)
       }
     }
 
@@ -110,7 +111,7 @@ private[yarn] class AMDelegationTokenRenewer(
             // Log the error and try to write new tokens back in an hour
             logWarning(
                 "Failed to write out new credentials to HDFS, will try again in an " +
-                "hour! If this happens too often tasks will fail.",
+                  "hour! If this happens too often tasks will fail.",
                 e)
             delegationTokenRenewer.schedule(this, 1, TimeUnit.HOURS)
             return
@@ -146,7 +147,7 @@ private[yarn] class AMDelegationTokenRenewer(
       case e: Exception =>
         logWarning(
             "Error while attempting to cleanup old tokens. If you are seeing many such " +
-            "warnings there may be an issue with your HDFS cluster.",
+              "warnings there may be an issue with your HDFS cluster.",
             e)
     }
   }
@@ -182,8 +183,8 @@ private[yarn] class AMDelegationTokenRenewer(
       override def run(): Void = {
         val nns = YarnSparkHadoopUtil.get.getNameNodesToAccess(sparkConf) + dst
         hadoopUtil.obtainTokensForNamenodes(nns, freshHadoopConf, tempCreds)
-        hadoopUtil.obtainTokenForHiveMetastore(
-            sparkConf, freshHadoopConf, tempCreds)
+        hadoopUtil
+          .obtainTokenForHiveMetastore(sparkConf, freshHadoopConf, tempCreds)
         hadoopUtil.obtainTokenForHBase(sparkConf, freshHadoopConf, tempCreds)
         null
       }
@@ -202,14 +203,14 @@ private[yarn] class AMDelegationTokenRenewer(
                          SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .lastOption
         .foreach { status =>
-          lastCredentialsFileSuffix = hadoopUtil.getSuffixForCredentialsPath(
-              status.getPath)
+          lastCredentialsFileSuffix =
+            hadoopUtil.getSuffixForCredentialsPath(status.getPath)
         }
     }
     val nextSuffix = lastCredentialsFileSuffix + 1
     val tokenPathStr =
       credentialsFile + SparkHadoopUtil.SPARK_YARN_CREDS_COUNTER_DELIM +
-      nextSuffix
+        nextSuffix
     val tokenPath = new Path(tokenPathStr)
     val tempTokenPath = new Path(
         tokenPathStr + SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)

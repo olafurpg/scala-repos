@@ -412,17 +412,16 @@ trait Solving extends Logic {
         relevantLits.map(lit => -lit)
       }
 
-      final case class TseitinSolution(
-          model: TseitinModel, unassigned: List[Int]) {
+      final case class TseitinSolution(model: TseitinModel,
+                                       unassigned: List[Int]) {
         def projectToSolution(symForVar: Map[Int, Sym]) =
           Solution(projectToModel(model, symForVar), unassigned map symForVar)
       }
 
-      def findAllModels(
-          clauses: Array[Clause],
-          models: List[TseitinSolution],
-          recursionDepthAllowed: Int = AnalysisBudget.maxDPLLdepth)
-        : List[TseitinSolution] =
+      def findAllModels(clauses: Array[Clause],
+                        models: List[TseitinSolution],
+                        recursionDepthAllowed: Int =
+                          AnalysisBudget.maxDPLLdepth): List[TseitinSolution] =
         if (recursionDepthAllowed == 0) {
           uncheckedWarning(pos, AnalysisBudget.recursionDepthReached)
           models
@@ -471,8 +470,8 @@ trait Solving extends Logic {
     }
 
     def findModelFor(solvable: Solvable): Model = {
-      projectToModel(
-          findTseitinModelFor(solvable.cnf), solvable.symbolMapping.symForVar)
+      projectToModel(findTseitinModelFor(solvable.cnf),
+                     solvable.symbolMapping.symForVar)
     }
 
     def findTseitinModelFor(clauses: Array[Clause]): TseitinModel = {
@@ -528,8 +527,8 @@ trait Solving extends Logic {
       satisfiableWithModel
     }
 
-    private def projectToModel(
-        model: TseitinModel, symForVar: Map[Int, Sym]): Model =
+    private def projectToModel(model: TseitinModel,
+                               symForVar: Map[Int, Sym]): Model =
       if (model == NoTseitinModel) NoModel
       else if (model == EmptyTseitinModel) EmptyModel
       else {

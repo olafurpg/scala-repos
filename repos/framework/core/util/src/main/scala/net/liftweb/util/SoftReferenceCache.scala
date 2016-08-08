@@ -52,8 +52,7 @@ object SoftReferenceCache {
   def initialize = {
     // A daemon thread is more approapriate here then an Actor as
     // we'll do blocking reads from the reference queue
-    val thread = new Thread(
-        new Runnable() {
+    val thread = new Thread(new Runnable() {
       def run() {
         processQueue
       }

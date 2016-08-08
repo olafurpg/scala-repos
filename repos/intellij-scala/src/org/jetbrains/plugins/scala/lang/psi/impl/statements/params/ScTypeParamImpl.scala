@@ -29,10 +29,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScTypeParamImpl private (
-    stub: StubElement[ScTypeParam], nodeType: IElementType, node: ASTNode)
+class ScTypeParamImpl private (stub: StubElement[ScTypeParam],
+                               nodeType: IElementType,
+                               node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTypeBoundsOwnerImpl with ScTypeParam with PsiClassFake {
+    with ScTypeBoundsOwnerImpl
+    with ScTypeParam
+    with PsiClassFake {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScTypeParamStub) = {
     this(stub, ScalaElementTypes.TYPE_PARAM, null)

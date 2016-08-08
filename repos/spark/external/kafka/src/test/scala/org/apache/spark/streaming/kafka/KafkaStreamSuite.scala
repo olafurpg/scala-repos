@@ -31,7 +31,9 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 class KafkaStreamSuite
-    extends SparkFunSuite with Eventually with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with Eventually
+    with BeforeAndAfterAll {
   private var ssc: StreamingContext = _
   private var kafkaTestUtils: KafkaTestUtils = _
 
@@ -69,7 +71,10 @@ class KafkaStreamSuite
 
     val stream =
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
-          ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
+          ssc,
+          kafkaParams,
+          Map(topic -> 1),
+          StorageLevel.MEMORY_ONLY)
     val result = new mutable.HashMap[String, Long]()
     stream.map(_._2).countByValue().foreachRDD { r =>
       r.collect().foreach { kv =>

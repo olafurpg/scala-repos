@@ -37,7 +37,8 @@ import org.apache.spark.sql.types.DataType
   */
 @Experimental
 class DCT(override val uid: String)
-    extends UnaryTransformer[Vector, Vector, DCT] with DefaultParamsWritable {
+    extends UnaryTransformer[Vector, Vector, DCT]
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("dct"))
 

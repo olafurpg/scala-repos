@@ -12,9 +12,9 @@ object Test {
     else println(s"!! ExecutionContext.global == $ec")
 
     val u = ExecutionContext.global
-      .asInstanceOf[ { def executor: Executor }]
+      .asInstanceOf[{ def executor: Executor }]
       .executor
-      .asInstanceOf[ {
+      .asInstanceOf[{
         def getUncaughtExceptionHandler: Thread.UncaughtExceptionHandler
       }]
       .getUncaughtExceptionHandler

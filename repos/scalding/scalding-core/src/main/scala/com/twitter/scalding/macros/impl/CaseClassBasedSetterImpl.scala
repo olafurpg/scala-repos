@@ -110,8 +110,7 @@ object CaseClassBasedSetterImpl {
           OptionSetter(matchField(innerType))
         case tpe
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
-          CaseClassSetter(
-              expandMethod(normalized(tpe)).map {
+          CaseClassSetter(expandMethod(normalized(tpe)).map {
             case (fn, tpe) =>
               (fn, matchField(tpe))
           })
@@ -126,8 +125,9 @@ object CaseClassBasedSetterImpl {
       outerTpe.declarations.collect {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
-        val fieldType = normalized(accessorMethod.returnType.asSeenFrom(
-                outerTpe, outerTpe.typeSymbol.asClass))
+        val fieldType = normalized(
+            accessorMethod.returnType.asSeenFrom(outerTpe,
+                                                 outerTpe.typeSymbol.asClass))
 
         ({ pTree: Tree =>
           q"""$pTree.$accessorMethod"""

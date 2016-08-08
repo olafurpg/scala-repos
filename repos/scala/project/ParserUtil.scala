@@ -41,36 +41,34 @@ object ParserUtil {
             if (preFile.getParentFile == null) f.relativeTo(cwd).getOrElse(f)
             else f
           if (f1.isDirectory && !fileFilter.accept(f1))
-            ensureSuffix(f1.getPath, "/") else f1.getPath
+            ensureSuffix(f1.getPath, "/")
+          else f1.getPath
         }
         val childFilter =
           GlobFilter(preFile.name + "*") &&
-          ((IsDirectoryFilter && dirFilter) || fileFilter)
+            ((IsDirectoryFilter && dirFilter) || fileFilter)
         val children = parent.*(childFilter).get
         children.map(pathOf).toList
       } else Nil
     }
     def displayPath = Completions.single(Completion.displayOnly("<path>"))
-    token(
-        StringBasic,
-        TokenCompletions.fixed(
-            (seen, level) =>
-              if (seen.isEmpty) displayPath
-              else
-                matching(seen) match {
-              case Nil => displayPath
-              case x :: Nil =>
-                if (fileFilter.accept(file(x)))
-                  Completions.strict(
-                      Set(Completion.tokenDisplay(x.stripPrefix(seen), x)))
-                else
-                  Completions.strict(
-                      Set(Completion.suggestion(x.stripPrefix(seen))))
-              case xs =>
-                Completions.strict(xs
-                      .map(
-                          x => Completion.tokenDisplay(x.stripPrefix(seen), x))
-                      .toSet)
-          })).filter(!_.startsWith("-"), x => x)
+    token(StringBasic,
+          TokenCompletions.fixed((seen, level) =>
+            if (seen.isEmpty) displayPath
+            else
+              matching(seen) match {
+                case Nil => displayPath
+                case x :: Nil =>
+                  if (fileFilter.accept(file(x)))
+                    Completions.strict(
+                        Set(Completion.tokenDisplay(x.stripPrefix(seen), x)))
+                  else
+                    Completions.strict(
+                        Set(Completion.suggestion(x.stripPrefix(seen))))
+                case xs =>
+                  Completions.strict(xs
+                    .map(x => Completion.tokenDisplay(x.stripPrefix(seen), x))
+                    .toSet)
+            })).filter(!_.startsWith("-"), x => x)
   }
 }

@@ -9,10 +9,18 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.{PhysicalSignature, ScSubstitutor, ScType, Signature}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  PhysicalSignature,
+  ScSubstitutor,
+  ScType,
+  Signature
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor.QualifiedName
 
 import scala.collection.{Set, mutable}
@@ -37,7 +45,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                           forName: Option[String] = None,
                           postProcess: ScalaResolveResult => Unit = r => {},
                           val includePrefixImports: Boolean = true)
-    extends BaseProcessor(kinds) with PrecedenceHelper[QualifiedName] {
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[QualifiedName] {
   protected val precedence: mutable.HashMap[QualifiedName, Int] =
     new mutable.HashMap[QualifiedName, Int]()
 
@@ -58,8 +67,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
     precedence.put(getQualifiedName(result), i)
   }
 
-  override protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+  override protected def filterNot(p: ScalaResolveResult,
+                                   n: ScalaResolveResult): Boolean = {
     getQualifiedName(p) == getQualifiedName(n) && super.filterNot(p, n)
   }
 
@@ -144,14 +153,14 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
         return true //do not add constructor
       case td: ScTypeDefinition =>
         if (kindMatches(td)) {
-          val result = new ScalaResolveResult(
-              td,
-              substitutor,
-              nameShadow = isRenamed,
-              implicitFunction = implFunction,
-              fromType = fromType,
-              importsUsed = importsUsed,
-              prefixCompletion = prefixCompletion)
+          val result = new ScalaResolveResult(td,
+                                              substitutor,
+                                              nameShadow = isRenamed,
+                                              implicitFunction = implFunction,
+                                              fromType = fromType,
+                                              importsUsed = importsUsed,
+                                              prefixCompletion =
+                                                prefixCompletion)
           _addResult(result)
         }
         ScalaPsiUtil.getCompanionModule(td) match {

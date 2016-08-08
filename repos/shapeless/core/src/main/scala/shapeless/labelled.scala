@@ -48,8 +48,8 @@ object DefaultSymbolicLabelling {
   def apply[T](implicit lab: DefaultSymbolicLabelling[T]): Aux[T, lab.Out] =
     lab
 
-  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] = macro LabelledMacros
-    .mkDefaultSymbolicLabellingImpl[T]
+  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] =
+    macro LabelledMacros.mkDefaultSymbolicLabellingImpl[T]
 }
 
 /**
@@ -88,7 +88,8 @@ trait FieldOf[V] {
 
 @macrocompat.bundle
 class LabelledMacros(val c: whitebox.Context)
-    extends SingletonTypeUtils with CaseClassMacros {
+    extends SingletonTypeUtils
+    with CaseClassMacros {
   import labelled._
   import c.universe._
 

@@ -6,6 +6,6 @@ package base
 package patterns;
 
 /**
-  * @author ilyas 
+  * @author ilyas
   */
 trait ScCompositePattern extends ScPattern {}

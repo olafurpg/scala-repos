@@ -26,7 +26,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.apache.spark.SparkFunSuite
 
 class SerializationDebuggerSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   import SerializationDebugger.find
 
@@ -164,7 +165,8 @@ class SerializationDebuggerSuite
     findAndAssert(
         false,
         new SerializableClassWithWriteReplace(
-            new ExternalizableClass(new SerializableSubclass(
+            new ExternalizableClass(
+                new SerializableSubclass(
                     new SerializableArray(
                         Array(new SerializableClass1,
                               new SerializableClass2(new NotSerializable))
@@ -174,7 +176,8 @@ class SerializationDebuggerSuite
     findAndAssert(
         true,
         new SerializableClassWithWriteReplace(
-            new ExternalizableClass(new SerializableSubclass(
+            new ExternalizableClass(
+                new SerializableSubclass(
                     new SerializableArray(
                         Array(new SerializableClass1,
                               new SerializableClass2(new SerializableClass1))
@@ -206,7 +209,8 @@ class SerializationDebuggerSuite
 
     val originalException = new NotSerializableException("someClass")
     // verify that original exception is returned on failure
-    assert(SerializationDebugger
+    assert(
+        SerializationDebugger
           .improveException(o, originalException)
           .eq(originalException))
   }

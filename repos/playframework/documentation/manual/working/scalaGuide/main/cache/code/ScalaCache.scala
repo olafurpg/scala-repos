@@ -131,10 +131,10 @@ package scalaguide.cache {
       }
     }
 
-    def assertAction[A, T : AsResult](action: EssentialAction,
-                                      request: => Request[A] = FakeRequest(),
-                                      expectedResponse: Int = OK)(
-        assertions: Future[Result] => T) = {
+    def assertAction[A, T: AsResult](
+        action: EssentialAction,
+        request: => Request[A] = FakeRequest(),
+        expectedResponse: Int = OK)(assertions: Future[Result] => T) = {
       running() { app =>
         implicit val mat = ActorMaterializer()(app.actorSystem)
         val result = action(request).run()
@@ -171,8 +171,7 @@ package scalaguide.cache {
 
     class Application @Inject()(
         @NamedCache("session-cache") sessionCache: CacheApi
-    )
-        extends Controller {}
+    ) extends Controller {}
 //#qualified
   }
 

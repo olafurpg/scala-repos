@@ -3,7 +3,16 @@ package scala.sys.process
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
-import java.io.{InputStream, OutputStream, PipedInputStream, PipedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, IOException, Closeable}
+import java.io.{
+  InputStream,
+  OutputStream,
+  PipedInputStream,
+  PipedOutputStream,
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  IOException,
+  Closeable
+}
 import java.lang.reflect.InvocationTargetException
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration, SECONDS}
@@ -61,14 +70,15 @@ class PipedProcessTest {
                        defaultIO: ProcessIO,
                        toError: Boolean)
       extends Process.PipedProcesses(a, b, defaultIO, toError) {
-    def callRunAndExitValue(
-        source: Process.PipeSource, sink: Process.PipeSink) = {
+    def callRunAndExitValue(source: Process.PipeSource,
+                            sink: Process.PipeSink) = {
       val m = classOf[Process.PipedProcesses].getDeclaredMethod(
           "runAndExitValue",
           classOf[Process.PipeSource],
           classOf[Process.PipeSink])
       m.setAccessible(true)
-      try m.invoke(this, source, sink).asInstanceOf[Option[Int]] catch {
+      try m.invoke(this, source, sink).asInstanceOf[Option[Int]]
+      catch {
         case err: InvocationTargetException => throw err.getTargetException
       }
     }
@@ -229,7 +239,8 @@ class PipeSourceSinkTest {
   }
   class DebugOutputStream extends ByteArrayOutputStream with CloseChecking
   class DebugInputStream(s: String)
-      extends ByteArrayInputStream(s.getBytes()) with CloseChecking
+      extends ByteArrayInputStream(s.getBytes())
+      with CloseChecking
   class DebugInfinityInputStream extends InputStream with CloseChecking {
     def read() = 1
   }

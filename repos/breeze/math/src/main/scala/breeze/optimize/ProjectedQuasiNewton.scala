@@ -19,7 +19,10 @@ package breeze.optimize
 import breeze.linalg._
 import breeze.collection.mutable.RingBuffer
 import breeze.math.MutableInnerProductModule
-import breeze.optimize.FirstOrderMinimizer.{ConvergenceCheck, ConvergenceReason}
+import breeze.optimize.FirstOrderMinimizer.{
+  ConvergenceCheck,
+  ConvergenceReason
+}
 import breeze.util.SerializableLogging
 
 // Compact representation of an n x n Hessian, maintained via L-BFGS updates
@@ -51,8 +54,7 @@ class CompactHessian(M: DenseMatrix[Double],
     // D_k is the k x k diagonal matrix D_k = diag [s_0^Ty_0, ...,s_{k-1}^Ty_{k-1}].
     // L_k is the k x k matrix with (L_k)_{i,j} = if( i > j ) s_i^T y_j else 0
     // (this is a lower triangular matrix with the diagonal set to all zeroes)
-    val D = diag(
-        DenseVector.tabulate[Double](k) { i =>
+    val D = diag(DenseVector.tabulate[Double](k) { i =>
       S(i) dot Y(i)
     })
     val L = DenseMatrix.tabulate[Double](k, k) { (i, j) =>
@@ -68,8 +70,8 @@ class CompactHessian(M: DenseMatrix[Double],
 
     // M is the 2k x 2k matrix given by: M = [ \sigma * S_k^T S_k    L_k ]
     //                                       [         L_k^T        -D_k ]
-    val M = DenseMatrix.vertcat(
-        DenseMatrix.horzcat(STS, L), DenseMatrix.horzcat(L.t, -D))
+    val M = DenseMatrix
+      .vertcat(DenseMatrix.horzcat(STS, L), DenseMatrix.horzcat(L.t, -D))
 
     val newB = new CompactHessian(M, Y, S, sigma, m)
     newB
@@ -98,9 +100,10 @@ class ProjectedQuasiNewton(
     val gamma: Double,
     val projection: DenseVector[Double] => DenseVector[Double])(
     implicit space: MutableInnerProductModule[DenseVector[Double], Double])
-    extends FirstOrderMinimizer[
-        DenseVector[Double], DiffFunction[DenseVector[Double]]](
-        convergenceCheck) with Projecting[DenseVector[Double]]
+    extends FirstOrderMinimizer[DenseVector[Double],
+                                DiffFunction[DenseVector[Double]]](
+        convergenceCheck)
+    with Projecting[DenseVector[Double]]
     with SerializableLogging {
   type BDV = DenseVector[Double]
   def this(tolerance: Double = 1e-6,
@@ -114,9 +117,11 @@ class ProjectedQuasiNewton(
            relativeTolerance: Boolean = true)(
       implicit space: MutableInnerProductModule[DenseVector[Double], Double]) =
     this(
-        convergenceCheck = FirstOrderMinimizer
-            .defaultConvergenceCheck[DenseVector[Double]](
-              maxIter, tolerance, relativeTolerance),
+        convergenceCheck =
+          FirstOrderMinimizer.defaultConvergenceCheck[DenseVector[Double]](
+              maxIter,
+              tolerance,
+              relativeTolerance),
         m = m,
         initFeas = initFeas,
         testOpt = testOpt,
@@ -124,13 +129,13 @@ class ProjectedQuasiNewton(
         gamma = gamma,
         projection = projection,
         innerOptimizer = new SpectralProjectedGradient[DenseVector[Double]](
-              tolerance = tolerance,
-              maxIter = 50,
-              bbMemory = 5,
-              initFeas = true,
-              fvalMemory = 10,
-              projection = projection
-          )
+            tolerance = tolerance,
+            maxIter = 50,
+            bbMemory = 5,
+            initFeas = true,
+            fvalMemory = 10,
+            projection = projection
+        )
     )
 
   type History = CompactHessian
@@ -146,8 +151,8 @@ class ProjectedQuasiNewton(
       newVal: Double): (Double, DenseVector[Double]) =
     (newVal, projectedVector(newX, -newGrad))
 
-  private def computeGradient(
-      x: DenseVector[Double], g: DenseVector[Double]): DenseVector[Double] =
+  private def computeGradient(x: DenseVector[Double],
+                              g: DenseVector[Double]): DenseVector[Double] =
     projectedVector(x, -g)
 
   protected def chooseDescentDirection(
@@ -161,9 +166,12 @@ class ProjectedQuasiNewton(
       //B.update(y, s)
       // Solve subproblem; we use the current iterate x as a guess
       val subprob = new ProjectedQuasiNewton.QuadraticSubproblem(
-          state.adjustedValue, x, grad, history)
-      val spgResult = innerOptimizer.minimizeAndReturnState(
-          new CachedDiffFunction(subprob), x)
+          state.adjustedValue,
+          x,
+          grad,
+          history)
+      val spgResult = innerOptimizer
+        .minimizeAndReturnState(new CachedDiffFunction(subprob), x)
       logger.info(
           f"ProjectedQuasiNewton: outerIter ${state.iter} innerIters ${spgResult.iter}")
       spgResult.x - x
@@ -190,8 +198,10 @@ class ProjectedQuasiNewton(
     val ff = LineSearch.functionFromSearchDirection(f, x, dir)
     val search = new BacktrackingLineSearch(state.value,
                                             maxIterations = maxSrchIt,
-                                            shrinkStep = if (state.iter < 1)
-                                                0.1 else 0.5)
+                                            shrinkStep =
+                                              if (state.iter < 1)
+                                                0.1
+                                              else 0.5)
     var alpha = if (state.iter == 0.0) min(1.0, 1.0 / norm(dir)) else 1.0
     alpha = search.minimize(ff, alpha)
 

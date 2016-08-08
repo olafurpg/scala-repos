@@ -30,7 +30,8 @@ object Writer {
   import JavaStreamEnrichments._
 
   def write[@specialized(Boolean, Byte, Short, Int, Long, Float, Double) T](
-      os: OutputStream, t: T)(implicit w: Writer[T]): Unit =
+      os: OutputStream,
+      t: T)(implicit w: Writer[T]): Unit =
     w.write(os, t)
   /*
    * Instances below
@@ -67,7 +68,7 @@ object Writer {
     }
   }
 
-  implicit def option[T : Writer]: Writer[Option[T]] = new Writer[Option[T]] {
+  implicit def option[T: Writer]: Writer[Option[T]] = new Writer[Option[T]] {
     val w = implicitly[Writer[T]]
     // Don't use pattern matching in a performance-critical section
     @SuppressWarnings(
@@ -79,7 +80,7 @@ object Writer {
       } else os.write(0: Byte)
   }
 
-  implicit def either[L : Writer, R : Writer]: Writer[Either[L, R]] =
+  implicit def either[L: Writer, R: Writer]: Writer[Either[L, R]] =
     new Writer[Either[L, R]] {
       val lw = implicitly[Writer[L]]
       val rw = implicitly[Writer[R]]
@@ -93,7 +94,7 @@ object Writer {
       }
     }
 
-  implicit def tuple2[T1 : Writer, T2 : Writer]: Writer[(T1, T2)] =
+  implicit def tuple2[T1: Writer, T2: Writer]: Writer[(T1, T2)] =
     new Writer[(T1, T2)] {
       val w1 = implicitly[Writer[T1]]
       val w2 = implicitly[Writer[T2]]
@@ -109,7 +110,7 @@ object Writer {
                                   Int,
                                   Long,
                                   Float,
-                                  Double) T : Writer]: Writer[Array[T]] =
+                                  Double) T: Writer]: Writer[Array[T]] =
     new Writer[Array[T]] {
       val writerT = implicitly[Writer[T]]
       def write(os: OutputStream, a: Array[T]) = {
@@ -125,7 +126,7 @@ object Writer {
     }
 
   // Scala has problems with this being implicit
-  def collection[T : Writer, C <: Iterable[T]]: Writer[C] = new Writer[C] {
+  def collection[T: Writer, C <: Iterable[T]]: Writer[C] = new Writer[C] {
     val writerT = implicitly[Writer[T]]
     def write(os: OutputStream, c: C) = {
       val size = c.size

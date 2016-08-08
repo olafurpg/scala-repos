@@ -29,8 +29,8 @@ private[scalding] class ConfPropertiesHfsTap(
     stringPath: String,
     sinkMode: SinkMode)
     extends Hfs(scheme, stringPath, sinkMode) {
-  override def sourceConfInit(
-      process: FlowProcess[JobConf], conf: JobConf): Unit = {
+  override def sourceConfInit(process: FlowProcess[JobConf],
+                              conf: JobConf): Unit = {
     config.toMap.foreach {
       case (k, v) =>
         conf.set(k, v)
@@ -38,8 +38,8 @@ private[scalding] class ConfPropertiesHfsTap(
     super.sourceConfInit(process, conf)
   }
 
-  override def sinkConfInit(
-      process: FlowProcess[JobConf], conf: JobConf): Unit = {
+  override def sinkConfInit(process: FlowProcess[JobConf],
+                            conf: JobConf): Unit = {
     config.toMap.foreach {
       case (k, v) =>
         conf.set(k, v)

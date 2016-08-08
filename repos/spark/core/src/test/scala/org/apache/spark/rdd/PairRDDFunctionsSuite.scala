@@ -22,11 +22,20 @@ import java.io.IOException
 import scala.collection.mutable.{ArrayBuffer, HashSet}
 import scala.util.Random
 
-import org.apache.commons.math3.distribution.{BinomialDistribution, PoissonDistribution}
+import org.apache.commons.math3.distribution.{
+  BinomialDistribution,
+  PoissonDistribution
+}
 import org.apache.hadoop.conf.{Configurable, Configuration}
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.mapred._
-import org.apache.hadoop.mapreduce.{JobContext => NewJobContext, OutputCommitter => NewOutputCommitter, OutputFormat => NewOutputFormat, RecordWriter => NewRecordWriter, TaskAttemptContext => NewTaskAttempContext}
+import org.apache.hadoop.mapreduce.{
+  JobContext => NewJobContext,
+  OutputCommitter => NewOutputCommitter,
+  OutputFormat => NewOutputFormat,
+  RecordWriter => NewRecordWriter,
+  TaskAttemptContext => NewTaskAttempContext
+}
 import org.apache.hadoop.util.Progressable
 
 import org.apache.spark._
@@ -100,8 +109,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // vary fractionPositive
@@ -111,8 +120,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // Use the same data for the rest of the tests
@@ -130,8 +139,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
   }
 
@@ -145,8 +154,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // vary fractionPositive
@@ -156,8 +165,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // Use the same data for the rest of the tests
@@ -170,14 +179,14 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     // vary seed
     for (seed <- defaultSeed to defaultSeed + 5L) {
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, seed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, seed, n)
     }
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
   }
 
@@ -426,8 +435,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     assert(joined.size === 4)
     val joinedSet = joined
       .map(x =>
-            (x._1,
-             (x._2._1.toList, x._2._2.toList, x._2._3.toList, x._2._4.toList)))
+        (x._1,
+         (x._2._1.toList, x._2._2.toList, x._2._3.toList, x._2._4.toList)))
       .toSet
     assert(
         joinedSet === Set(
@@ -446,7 +455,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       assert(file.collect().toList === Nil)
       // Test that a shuffle on the file works, because this used to be a bug
       assert(
-          file.map(line => (line, 1)).reduceByKey(_ + _).collect().toList === Nil)
+          file
+            .map(line => (line, 1))
+            .reduceByKey(_ + _)
+            .collect()
+            .toList === Nil)
     } finally {
       Utils.deleteRecursively(emptyDir)
     }
@@ -779,8 +792,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
           }
         }
       }
-      takeSample.foreach(
-          x => assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
+      takeSample.foreach(x =>
+        assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
     }
   }
 }

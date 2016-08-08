@@ -18,8 +18,8 @@ import com.twitter.util.{Future, Promise}
   *
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
-class PipeliningDispatcher[Req, Rep](
-    trans: Transport[Req, Rep], statsReceiver: StatsReceiver)
+class PipeliningDispatcher[Req, Rep](trans: Transport[Req, Rep],
+                                     statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Req, Rep, Req, Rep](trans, statsReceiver) {
 
   def this(trans: Transport[Req, Rep]) =
@@ -34,7 +34,8 @@ class PipeliningDispatcher[Req, Rep](
 
   private[this] val transRead: Promise[Rep] => Unit = p =>
     trans.read().respond { res =>
-      try p.update(res) finally loop()
+      try p.update(res)
+      finally loop()
   }
 
   private[this] def loop(): Unit =

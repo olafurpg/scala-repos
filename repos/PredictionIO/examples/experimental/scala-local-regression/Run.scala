@@ -33,18 +33,21 @@ case class TrainingData(x: Vector[Vector[Double]], y: Vector[Double])
 }
 
 case class LocalDataSource(val dsp: DataSourceParams)
-    extends LDataSource[
-        DataSourceParams, String, TrainingData, Vector[Double], Double] {
+    extends LDataSource[DataSourceParams,
+                        String,
+                        TrainingData,
+                        Vector[Double],
+                        Double] {
   override def read(
       ): Seq[(String, TrainingData, Seq[(Vector[Double], Double)])] = {
     val lines =
       Source.fromFile(dsp.filepath).getLines.toSeq.map(_.split(" ", 2))
 
     // FIXME: Use different training / testing data.
-    val x = lines.map { _ (1).split(' ').map { _.toDouble } }.map { e =>
+    val x = lines.map { _(1).split(' ').map { _.toDouble } }.map { e =>
       Vector(e: _*)
     }
-    val y = lines.map { _ (0).toDouble }
+    val y = lines.map { _(0).toDouble }
 
     val td = TrainingData(Vector(x: _*), Vector(y: _*))
 
@@ -74,8 +77,11 @@ case class LocalPreparator(val pp: PreparatorParams = PreparatorParams())
 }
 
 case class LocalAlgorithm()
-    extends LAlgorithm[
-        EmptyParams, TrainingData, Array[Double], Vector[Double], Double] {
+    extends LAlgorithm[EmptyParams,
+                       TrainingData,
+                       Array[Double],
+                       Vector[Double],
+                       Double] {
 
   def train(td: TrainingData): Array[Double] = {
     val xArray: Array[Double] = td.x.foldLeft(Vector[Double]())(_ ++ _).toArray
@@ -95,9 +101,8 @@ case class LocalAlgorithm()
 }
 
 class VectorSerializer
-    extends CustomSerializer[Vector[Double]](
-        format =>
-          ({
+    extends CustomSerializer[Vector[Double]](format =>
+      ({
         case JArray(s) =>
           s.map {
             case JDouble(x) => x
@@ -118,8 +123,9 @@ object RegressionEngineFactory extends IEngineFactory {
 }
 
 object Run {
-  val workflowParams = WorkflowParams(
-      batch = "Imagine: Local Regression", verbose = 3, saveModel = true)
+  val workflowParams = WorkflowParams(batch = "Imagine: Local Regression",
+                                      verbose = 3,
+                                      saveModel = true)
 
   def runComponents() {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath

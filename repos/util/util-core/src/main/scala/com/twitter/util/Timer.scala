@@ -213,14 +213,18 @@ class JavaTimer(isDaemon: Boolean, name: Option[String]) extends Timer {
   }
 
   protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+        try f
+        catch catcher)
     underlying.schedule(task, safeTime(when).toDate)
     toTimerTask(task)
   }
 
   protected def schedulePeriodically(when: Time, period: Duration)(
       f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+        try f
+        catch catcher)
     underlying.schedule(task, safeTime(when).toDate, period.inMillis)
     toTimerTask(task)
   }
@@ -288,8 +292,8 @@ class ScheduledThreadPoolTimer(
 
   protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
     val runnable = toRunnable(f)
-    val javaFuture = underlying.schedule(
-        runnable, when.sinceNow.inMillis, TimeUnit.MILLISECONDS)
+    val javaFuture = underlying
+      .schedule(runnable, when.sinceNow.inMillis, TimeUnit.MILLISECONDS)
     new TimerTask {
       def cancel(): Unit = {
         javaFuture.cancel(true)
@@ -304,8 +308,10 @@ class ScheduledThreadPoolTimer(
 
   def schedule(wait: Duration, period: Duration)(f: => Unit): TimerTask = {
     val runnable = toRunnable(f)
-    val javaFuture = underlying.scheduleAtFixedRate(
-        runnable, wait.inMillis, period.inMillis, TimeUnit.MILLISECONDS)
+    val javaFuture = underlying.scheduleAtFixedRate(runnable,
+                                                    wait.inMillis,
+                                                    period.inMillis,
+                                                    TimeUnit.MILLISECONDS)
     new TimerTask {
       def cancel(): Unit = {
         javaFuture.cancel(true)

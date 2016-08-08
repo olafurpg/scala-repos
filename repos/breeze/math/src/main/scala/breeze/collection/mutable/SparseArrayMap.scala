@@ -6,13 +6,14 @@ import breeze.storage.Zero
 import scala.reflect.ClassTag
 
 /**
-  * 
+  *
   * @author dlwh
   */
-class SparseArrayMap[@specialized T : ClassTag : Zero](
-    val length: Int, default: => T)
+class SparseArrayMap[@specialized T: ClassTag: Zero](val length: Int,
+                                                     default: => T)
     extends scala.collection.mutable.Map[Int, T]
-    with MapLike[Int, T, SparseArrayMap[T]] with Serializable {
+    with MapLike[Int, T, SparseArrayMap[T]]
+    with Serializable {
   val array = new SparseArray[T](length)
 
   def activeSize = array.activeSize
@@ -47,8 +48,8 @@ class SparseArrayMap[@specialized T : ClassTag : Zero](
 }
 
 object SparseArrayMap {
-  implicit def canMapValues[T, U : ClassTag : Zero]: CanBuildFrom[
-      SparseArrayMap[T], (Int, U), SparseArrayMap[U]] =
+  implicit def canMapValues[T, U: ClassTag: Zero]
+    : CanBuildFrom[SparseArrayMap[T], (Int, U), SparseArrayMap[U]] =
     new CanBuildFrom[SparseArrayMap[T], (Int, U), SparseArrayMap[U]] {
       def apply(): Builder[(Int, U), SparseArrayMap[U]] =
         new Builder[(Int, U), SparseArrayMap[U]] {

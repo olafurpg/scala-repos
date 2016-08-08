@@ -21,7 +21,8 @@ import play.server.api.SSLEngineProvider
 class WrongSSLEngineProvider {}
 
 class RightSSLEngineProvider(appPro: ApplicationProvider)
-    extends SSLEngineProvider with Mockito {
+    extends SSLEngineProvider
+    with Mockito {
   override def createSSLEngine: SSLEngine = {
     require(appPro != null)
     mock[SSLEngine]
@@ -29,7 +30,8 @@ class RightSSLEngineProvider(appPro: ApplicationProvider)
 }
 
 class JavaSSLEngineProvider(appPro: play.server.ApplicationProvider)
-    extends play.server.SSLEngineProvider with Mockito {
+    extends play.server.SSLEngineProvider
+    with Mockito {
   override def createSSLEngine: SSLEngine = {
     require(appPro != null)
     mock[SSLEngine]
@@ -41,7 +43,9 @@ class ServerSSLEngineSpec extends Specification with Mockito {
   sequential
 
   trait ApplicationContext
-      extends Mockito with Scope with MustThrownExpectations {}
+      extends Mockito
+      with Scope
+      with MustThrownExpectations {}
 
   trait TempConfDir extends After {
     val tempDir = File.createTempFile("ServerSSLEngine", ".tmp")
@@ -64,13 +68,14 @@ class ServerSSLEngineSpec extends Specification with Mockito {
     ServerConfig(rootDir = tempDir, port = Some(9000), properties = props)
   }
 
-  def createEngine(
-      engineProvider: Option[String], tempDir: Option[File] = None) = {
+  def createEngine(engineProvider: Option[String],
+                   tempDir: Option[File] = None) = {
     val app = mock[ApplicationProvider]
     app.get returns Failure(new Exception("no app"))
     ServerSSLEngine
       .createSSLEngineProvider(
-          serverConfig(tempDir.getOrElse(new File(".")), engineProvider), app)
+          serverConfig(tempDir.getOrElse(new File(".")), engineProvider),
+          app)
       .createSSLEngine()
   }
 

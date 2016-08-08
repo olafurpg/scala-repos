@@ -35,15 +35,17 @@ object Test extends DirectTest {
 
     object analyzerPlugin extends AnalyzerPlugin {
       val templates: m.Map[Symbol, (Template, Typer)] = m.Map()
-      override def pluginsTypeSig(
-          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
+      override def pluginsTypeSig(tpe: Type,
+                                  typer: Typer,
+                                  defTree: Tree,
+                                  pt: Type): Type = {
         defTree match {
           case impl: Template =>
             templates += typer.context.owner -> (impl, typer)
 
           case dd: DefDef
               if dd.symbol.isPrimaryConstructor &&
-              templates.contains(dd.symbol.owner) =>
+                templates.contains(dd.symbol.owner) =>
             val (impl, templTyper) = templates(dd.symbol.owner)
             for (stat <- impl.body.filterNot(_.isDef)) {
               println("typing " + stat)

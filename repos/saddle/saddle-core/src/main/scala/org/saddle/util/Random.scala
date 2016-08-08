@@ -139,7 +139,8 @@ object XorShift {
     var seedL = seed
     val (a, b, c) = tup
     () =>
-      seedL ^= (seedL << a); seedL ^= (seedL >> b); seedL ^= (seedL << c); seedL
+      seedL ^= (seedL << a); seedL ^= (seedL >> b); seedL ^= (seedL << c);
+      seedL
   }
 }
 
@@ -164,7 +165,7 @@ object LFib4 {
         c += 1
         c &= 0xFF
         state(c) = state(c) + state((c + 58) & 0xFF) +
-        state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
+            state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
         state(c)
       }
   }

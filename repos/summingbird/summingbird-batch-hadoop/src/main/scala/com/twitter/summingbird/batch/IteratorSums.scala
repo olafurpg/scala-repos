@@ -23,10 +23,12 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
 
   def sumWith[T](it: Iterator[T], summer: StatefulSummer[T]): Iterator[T] =
     // this is for MAXIMUM speed. Any ideas to speed it up, say so + benchmark
-    it.map(summer.put(_)).filter(_.isDefined).map(_.get) ++ summer.flush.iterator
+    it.map(summer.put(_))
+      .filter(_.isDefined)
+      .map(_.get) ++ summer.flush.iterator
 
   // get a big block, but not so big to OOM
-  def optimizedPairSemigroup[T1 : Semigroup, T2 : Semigroup](
+  def optimizedPairSemigroup[T1: Semigroup, T2: Semigroup](
       blockSize: Int): Semigroup[(T1, T2)] =
     new Semigroup[(T1, T2)] {
       def plus(a: (T1, T2), b: (T1, T2)) = {
@@ -70,13 +72,13 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
     }
   }
 
-  def bufferStatefulSummer[V : Semigroup](sz: Int): StatefulSummer[V] =
+  def bufferStatefulSummer[V: Semigroup](sz: Int): StatefulSummer[V] =
     new BufferOp[V](sz) with StatefulSummer[V] {
       def semigroup = implicitly[Semigroup[V]]
       def operate(items: Seq[V]) = Semigroup.sumOption(items)
     }
 
-  def groupedStatefulSummer[K : Equiv, V : Semigroup](
+  def groupedStatefulSummer[K: Equiv, V: Semigroup](
       sz: Int): StatefulSummer[(K, V)] = new StatefulSummer[(K, V)] {
     require(sz > 0, "buffer <= 0 not allowed")
 
@@ -116,8 +118,9 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
     }
   }
 
-  def groupedSum[K1 : Equiv, V1 : Semigroup](
-      in: Iterator[(K1, V1)], bufferSize: Int = 1000): Iterator[(K1, V1)] =
+  def groupedSum[K1: Equiv, V1: Semigroup](
+      in: Iterator[(K1, V1)],
+      bufferSize: Int = 1000): Iterator[(K1, V1)] =
     sumWith(in, groupedStatefulSummer(bufferSize))
 
   /**
@@ -125,7 +128,7 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
     * goes through the values and gives you the sumOption just before
     * this value and the current value
     */
-  def partials[U, V : Semigroup](
+  def partials[U, V: Semigroup](
       in: Iterator[(U, V)]): Iterator[(U, (Option[V], V))] = {
     var prev: Option[V] = None
     in.map {

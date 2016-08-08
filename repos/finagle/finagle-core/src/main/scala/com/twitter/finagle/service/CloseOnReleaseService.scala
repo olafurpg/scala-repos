@@ -1,6 +1,12 @@
 package com.twitter.finagle.service
 
-import com.twitter.finagle.{Status, Service, ServiceClosedException, ServiceProxy, WriteException}
+import com.twitter.finagle.{
+  Status,
+  Service,
+  ServiceClosedException,
+  ServiceProxy,
+  WriteException
+}
 import com.twitter.util.{Future, Time}
 import java.util.concurrent.atomic.AtomicBoolean
 

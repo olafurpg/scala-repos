@@ -10,8 +10,24 @@
 package scala
 
 object Product18 {
-  def unapply[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18](
+  def unapply[T1,
+              T2,
+              T3,
+              T4,
+              T5,
+              T6,
+              T7,
+              T8,
+              T9,
+              T10,
+              T11,
+              T12,
+              T13,
+              T14,
+              T15,
+              T16,
+              T17,
+              T18](
       x: Product18[T1,
                    T2,
                    T3,
@@ -29,24 +45,25 @@ object Product18 {
                    T15,
                    T16,
                    T17,
-                   T18]): Option[Product18[T1,
-                                           T2,
-                                           T3,
-                                           T4,
-                                           T5,
-                                           T6,
-                                           T7,
-                                           T8,
-                                           T9,
-                                           T10,
-                                           T11,
-                                           T12,
-                                           T13,
-                                           T14,
-                                           T15,
-                                           T16,
-                                           T17,
-                                           T18]] =
+                   T18]): Option[
+      Product18[T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18]] =
     Some(x)
 }
 
@@ -71,7 +88,8 @@ trait Product18[+T1,
                 +T16,
                 +T17,
                 +T18]
-    extends Any with Product {
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 18

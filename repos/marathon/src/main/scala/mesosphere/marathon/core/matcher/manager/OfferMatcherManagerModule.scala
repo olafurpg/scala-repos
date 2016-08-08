@@ -5,7 +5,11 @@ import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.leadership.LeadershipModule
 import mesosphere.marathon.core.matcher.base.OfferMatcher
 import mesosphere.marathon.core.matcher.base.util.ActorOfferMatcher
-import mesosphere.marathon.core.matcher.manager.impl.{OfferMatcherManagerActor, OfferMatcherManagerActorMetrics, OfferMatcherManagerDelegate}
+import mesosphere.marathon.core.matcher.manager.impl.{
+  OfferMatcherManagerActor,
+  OfferMatcherManagerActorMetrics,
+  OfferMatcherManagerDelegate
+}
 import mesosphere.marathon.metrics.Metrics
 import rx.lang.scala.subjects.PublishSubject
 import rx.lang.scala.{Observable, Subject}
@@ -42,8 +46,8 @@ class OfferMatcherManagerModule(clock: Clock,
     * offers.
     */
   val globalOfferMatcherWantsOffers: Observable[Boolean] = offersWanted
-  val globalOfferMatcher: OfferMatcher = new ActorOfferMatcher(
-      clock, offerMatcherMultiplexer, None)
+  val globalOfferMatcher: OfferMatcher =
+    new ActorOfferMatcher(clock, offerMatcherMultiplexer, None)
   val subOfferMatcherManager: OfferMatcherManager =
     new OfferMatcherManagerDelegate(offerMatcherMultiplexer)
 }

@@ -131,8 +131,8 @@ class PrintStreamTest {
                0xe3,
                0x81,
                0xaf))
-    test(
-        _.print("ημέρ"), Array(0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
+    test(_.print("ημέρ"),
+         Array(0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
 
     test(_.print("\ud83d\udca9"), Array(0xf0, 0x9f, 0x92, 0xa9))
     test(_.print("b\ud83d\udca9c"), Array('b', 0xf0, 0x9f, 0x92, 0xa9, 'c'))
@@ -177,11 +177,13 @@ class PrintStreamTest {
     testPrintlnForwards(_.println('Z'), "Z\n", autoFlush = true)
     testPrintlnForwards(_.println('\n'), "\n\n", autoFlush = true)
     testPrintlnForwards(_.println(5), "5\n", autoFlush = true)
-    testPrintlnForwards(
-        _.println(1234567891011L), "1234567891011\n", autoFlush = true)
+    testPrintlnForwards(_.println(1234567891011L),
+                        "1234567891011\n",
+                        autoFlush = true)
     testPrintlnForwards(_.println(1.5f), "1.5\n", autoFlush = true)
-    testPrintlnForwards(
-        _.println(Math.PI), "3.141592653589793\n", autoFlush = true)
+    testPrintlnForwards(_.println(Math.PI),
+                        "3.141592653589793\n",
+                        autoFlush = true)
     testPrintlnForwards(_.println(Array('A', '\n')), "A\n\n", autoFlush = true)
     testPrintlnForwards(_.println("hello\n"), "hello\n\n", autoFlush = true)
     testPrintlnForwards(_.println(null: String), "null\n", autoFlush = true)
@@ -195,13 +197,16 @@ class PrintStreamTest {
     testPrintlnForwards(_.println('Z'), "Z\n", autoFlush = false)
     testPrintlnForwards(_.println('\n'), "\n\n", autoFlush = false)
     testPrintlnForwards(_.println(5), "5\n", autoFlush = false)
-    testPrintlnForwards(
-        _.println(1234567891011L), "1234567891011\n", autoFlush = false)
+    testPrintlnForwards(_.println(1234567891011L),
+                        "1234567891011\n",
+                        autoFlush = false)
     testPrintlnForwards(_.println(1.5f), "1.5\n", autoFlush = false)
-    testPrintlnForwards(
-        _.println(Math.PI), "3.141592653589793\n", autoFlush = false)
-    testPrintlnForwards(
-        _.println(Array('A', '\n')), "A\n\n", autoFlush = false)
+    testPrintlnForwards(_.println(Math.PI),
+                        "3.141592653589793\n",
+                        autoFlush = false)
+    testPrintlnForwards(_.println(Array('A', '\n')),
+                        "A\n\n",
+                        autoFlush = false)
     testPrintlnForwards(_.println("hello\n"), "hello\n\n", autoFlush = false)
     testPrintlnForwards(_.println(null: String), "null\n", autoFlush = false)
     testPrintlnForwards(_.println((1, 2)), "(1,2)\n", autoFlush = false)
@@ -221,13 +226,15 @@ class PrintStreamTest {
 
   @Test def printf_format_which_flushes_when_autoFlush_is_true(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = true)
-    testPrintfFormat(
-        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = true)
+    testPrintfFormat(_.format("%.5f", Double.box(Math.PI)),
+                     "3.14159",
+                     autoFlush = true)
   }
   @Test def printf_format_which_flushes_when_autoFlush_is_false(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = false)
-    testPrintfFormat(
-        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = false)
+    testPrintfFormat(_.format("%.5f", Double.box(Math.PI)),
+                     "3.14159",
+                     autoFlush = false)
   }
 
   private def testPrintfFormat(body: PrintStream => Unit,
@@ -321,8 +328,8 @@ class PrintStreamTest {
     ps.write('Z')
     assertArrayEquals(Array[Byte]('A', 'Z'), bos.toByteArray)
     ps.print('\udca9')
-    assertArrayEquals(
-        Array[Byte]('A', 'Z', -16, -97, -110, -87), bos.toByteArray)
+    assertArrayEquals(Array[Byte]('A', 'Z', -16, -97, -110, -87),
+                      bos.toByteArray)
   }
 
   /** A PrintStream that exposes various hooks for testing purposes. */

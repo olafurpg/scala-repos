@@ -17,7 +17,8 @@ import scala.tools.nsc.reporters.ConsoleReporter
 import scala.util.Properties
 
 class RichPresentationCompilerThatNeedsJavaLibsSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -30,8 +31,10 @@ class RichPresentationCompilerThatNeedsJavaLibsSpec
       cc.search.refreshResolver()
       Await.result(cc.search.refresh(), Duration.Inf)
 
-      runForPositionInCompiledSource(
-          config, cc, "package com.example", "import java.io.File@0@") {
+      runForPositionInCompiledSource(config,
+                                     cc,
+                                     "package com.example",
+                                     "import java.io.File@0@") {
         (p, label, cc) =>
           val sym = cc.askSymbolInfoAt(p).get
           inside(sym.declPos) {
@@ -45,7 +48,8 @@ class RichPresentationCompilerThatNeedsJavaLibsSpec
 }
 
 class RichPresentationCompilerSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -269,8 +273,12 @@ class RichPresentationCompilerSpec
            "wait",
            "wait",
            DeclaredAs.Nil)
-    verify(
-        "java$", Some("lang"), None, "lang", "java.lang$", DeclaredAs.Object)
+    verify("java$",
+           Some("lang"),
+           None,
+           "lang",
+           "java.lang$",
+           DeclaredAs.Object)
     verify("scala$",
            Some("Option$"),
            None,
@@ -739,8 +747,9 @@ class RichPresentationCompilerSpec
 trait RichPresentationCompilerTestUtils {
   val scala210 = Properties.versionNumberString.startsWith("2.10")
 
-  def compileScala(
-      paths: List[String], target: File, classPath: String): Unit = {
+  def compileScala(paths: List[String],
+                   target: File,
+                   classPath: String): Unit = {
     val settings = new Settings
     settings.outputDirs.setSingleOutput(target.getAbsolutePath)
     val reporter = new ConsoleReporter(settings)
@@ -770,7 +779,8 @@ trait RichPresentationCompilerTestUtils {
 }
 
 trait ReallyRichPresentationCompilerFixture {
-  this: RichPresentationCompilerFixture with RichPresentationCompilerTestUtils =>
+  this: RichPresentationCompilerFixture
+    with RichPresentationCompilerTestUtils =>
 
   // conveniences for accessing the fixtures
   final def withPresCompiler(
@@ -796,10 +806,11 @@ trait ReallyRichPresentationCompilerFixture {
 object ReallyRichPresentationCompilerFixture
     extends RichPresentationCompilerTestUtils {
 
-  def runForPositionInCompiledSource(
-      config: EnsimeConfig, cc: RichPresentationCompiler, lines: String*)(
+  def runForPositionInCompiledSource(config: EnsimeConfig,
+                                     cc: RichPresentationCompiler,
+                                     lines: String*)(
       testCode: (OffsetPosition, String,
-      RichPresentationCompiler) => Any): Any = {
+                 RichPresentationCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0
     var points = Queue.empty[(Int, String)]

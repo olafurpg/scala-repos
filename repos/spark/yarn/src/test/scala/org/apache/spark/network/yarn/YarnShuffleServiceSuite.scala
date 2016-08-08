@@ -23,7 +23,10 @@ import scala.annotation.tailrec
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.yarn.api.records.ApplicationId
 import org.apache.hadoop.yarn.conf.YarnConfiguration
-import org.apache.hadoop.yarn.server.api.{ApplicationInitializationContext, ApplicationTerminationContext}
+import org.apache.hadoop.yarn.server.api.{
+  ApplicationInitializationContext,
+  ApplicationTerminationContext
+}
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 import org.apache.spark.SparkFunSuite
@@ -31,7 +34,9 @@ import org.apache.spark.network.shuffle.ShuffleTestAccessor
 import org.apache.spark.network.shuffle.protocol.ExecutorShuffleInfo
 
 class YarnShuffleServiceSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach {
   private[yarn] var yarnConfig: YarnConfiguration = new YarnConfiguration
 
   override def beforeEach(): Unit = {
@@ -100,9 +105,11 @@ class YarnShuffleServiceSuite
 
     blockResolver.registerExecutor(app1Id.toString, "exec-1", shuffleInfo1)
     blockResolver.registerExecutor(app2Id.toString, "exec-2", shuffleInfo2)
-    ShuffleTestAccessor.getExecutorInfo(app1Id, "exec-1", blockResolver) should be(
+    ShuffleTestAccessor
+      .getExecutorInfo(app1Id, "exec-1", blockResolver) should be(
         Some(shuffleInfo1))
-    ShuffleTestAccessor.getExecutorInfo(app2Id, "exec-2", blockResolver) should be(
+    ShuffleTestAccessor
+      .getExecutorInfo(app2Id, "exec-2", blockResolver) should be(
         Some(shuffleInfo2))
 
     if (!execStateFile.exists()) {

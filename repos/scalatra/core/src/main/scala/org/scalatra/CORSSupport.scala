@@ -29,7 +29,9 @@ object CorsSupport {
       "ACCEPT-LANGUAGE",
       "CONTENT-LANGUAGE")
   private val SimpleContentTypes: Seq[String] = List(
-      "APPLICATION/X-WWW-FORM-URLENCODED", "MULTIPART/FORM-DATA", "TEXT/PLAIN")
+      "APPLICATION/X-WWW-FORM-URLENCODED",
+      "MULTIPART/FORM-DATA",
+      "TEXT/PLAIN")
 
   val CorsHeaders: Seq[String] = List(OriginHeader,
                                       AccessControlAllowCredentialsHeader,
@@ -128,8 +130,8 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     augmentSimpleRequest()
     // 5.2.8
     if (corsConfig.preflightMaxAge > 0)
-      response
-        .headers(AccessControlMaxAgeHeader) = corsConfig.preflightMaxAge.toString
+      response.headers(AccessControlMaxAgeHeader) =
+        corsConfig.preflightMaxAge.toString
     // 5.2.9
     response
       .headers(AccessControlAllowMethodsHeader) = corsConfig.allowedMethods mkString ","
@@ -164,16 +166,17 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
   private[this] def originMatches: Boolean =
     // 6.2.2
     corsConfig.allowedOrigins.contains(AnyOrigin) ||
-    (corsConfig.allowedOrigins contains request.headers
-          .get(OriginHeader)
-          .getOrElse(""))
+      (corsConfig.allowedOrigins contains request.headers
+        .get(OriginHeader)
+        .getOrElse(""))
 
   private[this] def isEnabled: Boolean =
     !("Upgrade".equalsIgnoreCase(
-            request.headers.get("Connection").getOrElse("")) &&
-        "WebSocket".equalsIgnoreCase(
-            request.headers.get("Upgrade").getOrElse(""))) &&
-    !requestPath.contains("eb_ping") // don't do anything for the ping endpoint
+        request.headers.get("Connection").getOrElse("")) &&
+      "WebSocket".equalsIgnoreCase(
+          request.headers.get("Upgrade").getOrElse(""))) &&
+      !requestPath
+        .contains("eb_ping") // don't do anything for the ping endpoint
 
   private[this] def isValidRoute: Boolean =
     routes.matchingMethods(requestPath).nonEmpty
@@ -190,7 +193,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     val allowsHeaders = headersAreAllowed
     val result =
       isCors && validRoute && isPreflight && enabled && matchesOrigin &&
-      methodAllowed && allowsHeaders
+        methodAllowed && allowsHeaders
     result
   }
 
@@ -202,14 +205,12 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     val ho = header.blankOption
     ho.isDefined &&
     (ho forall { h ⇒
-          val hu = h.toUpperCase(ENGLISH)
-          SimpleHeaders.contains(hu) ||
-          (hu == "CONTENT-TYPE" &&
-              SimpleContentTypes.exists((request.contentType
-                    .getOrElse(""))
-                    .toUpperCase(ENGLISH)
-                    .startsWith))
-        })
+      val hu = h.toUpperCase(ENGLISH)
+      SimpleHeaders.contains(hu) ||
+      (hu == "CONTENT-TYPE" &&
+      SimpleContentTypes.exists(
+          (request.contentType.getOrElse("")).toUpperCase(ENGLISH).startsWith))
+    })
   }
 
   private[this] def allOriginsMatch: Boolean = {
@@ -225,7 +226,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     val allOrigins = allOriginsMatch
     val res =
       isCors && enabled && allOrigins &&
-      request.headers.keys.forall(isSimpleHeader)
+        request.headers.keys.forall(isSimpleHeader)
     //    logger debug "This is a simple request: %s, because: %s, %s, %s".format(res, isCors, enabled, allOrigins)
     res
   }
@@ -251,29 +252,29 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       corsConfig.allowedHeaders.map(_.trim.toUpperCase(ENGLISH))
     val requestedHeaders = for (header <- request.headers.getMulti(
                                              AccessControlRequestHeadersHeader)
-                                             if header.nonBlank) yield
-      header.toUpperCase(ENGLISH)
+                                if header.nonBlank)
+      yield header.toUpperCase(ENGLISH)
 
-    requestedHeaders.forall(
-        h => isSimpleHeader(h) || allowedHeaders.contains(h))
+    requestedHeaders.forall(h =>
+      isSimpleHeader(h) || allowedHeaders.contains(h))
   }
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse): Unit = {
     if (corsConfig.enabled) {
       withRequestResponse(req, res) {
         request.requestMethod match {
           case Options if isPreflightRequest ⇒ {
-              handlePreflightRequest()
-            }
+            handlePreflightRequest()
+          }
           case Get | Post | Head if isSimpleRequest ⇒ {
-              augmentSimpleRequest()
-              super.handle(req, res)
-            }
+            augmentSimpleRequest()
+            super.handle(req, res)
+          }
           case _ if isCORSRequest ⇒ {
-              augmentSimpleRequest()
-              super.handle(req, res)
-            }
+            augmentSimpleRequest()
+            super.handle(req, res)
+          }
           case _ ⇒ super.handle(req, res)
         }
       }

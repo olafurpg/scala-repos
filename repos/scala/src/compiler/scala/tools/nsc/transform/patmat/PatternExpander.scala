@@ -40,8 +40,9 @@ trait PatternExpander[Pattern, Type] {
     *
     *  sequenceType is Seq[T], elementType is T, repeatedType is T*.
     */
-  sealed case class Repeated(
-      sequenceType: Type, elementType: Type, repeatedType: Type) {
+  sealed case class Repeated(sequenceType: Type,
+                             elementType: Type,
+                             repeatedType: Type) {
     def exists = elementType != NoType
 
     def elementList = if (exists) elementType :: Nil else Nil

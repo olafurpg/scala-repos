@@ -10,7 +10,10 @@ import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.util.{IntentionAvailabilityChecker, IntentionUtils}
+import org.jetbrains.plugins.scala.util.{
+  IntentionAvailabilityChecker,
+  IntentionUtils
+}
 
 /**
   * @author Ksenia.Sautina
@@ -25,8 +28,9 @@ class ConvertToInfixExpressionIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     if (!IntentionAvailabilityChecker.checkIntention(this, element))
       return false
     val methodCallExpr: ScMethodCall =
@@ -68,7 +72,7 @@ class ConvertToInfixExpressionIntention extends PsiElementBaseIntentionAction {
     val start = methodCallExpr.getTextRange.getStartOffset
     val diff =
       editor.getCaretModel.getOffset -
-      referenceExpr.nameId.getTextRange.getStartOffset
+        referenceExpr.nameId.getTextRange.getStartOffset
 
     var putArgsFirst = false
     val argsBuilder = new StringBuilder
@@ -119,7 +123,8 @@ class ConvertToInfixExpressionIntention extends PsiElementBaseIntentionAction {
     }
 
     val text = expr.toString()
-    ScalaPsiElementFactory.createExpressionFromText(text, element.getManager) match {
+    ScalaPsiElementFactory
+      .createExpressionFromText(text, element.getManager) match {
       case infixExpr: ScInfixExpr =>
         infixExpr
           .asInstanceOf[ScInfixExpr]

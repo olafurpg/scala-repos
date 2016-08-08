@@ -42,8 +42,7 @@ object MergeableStoreFactory {
   def fromOnlineOnly[K, V](store: => MergeableStore[K, V])
     : MergeableStoreFactory[(K, BatchID), V] = {
     implicit val batcher = Batcher.unit
-    from(
-        store.convert { k: (K, BatchID) =>
+    from(store.convert { k: (K, BatchID) =>
       k._1
     })
   }

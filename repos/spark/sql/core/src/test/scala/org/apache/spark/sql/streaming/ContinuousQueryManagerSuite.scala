@@ -29,11 +29,18 @@ import org.scalatest.time.SpanSugar._
 
 import org.apache.spark.SparkException
 import org.apache.spark.sql.{ContinuousQuery, Dataset, StreamTest}
-import org.apache.spark.sql.execution.streaming.{MemorySink, MemoryStream, StreamExecution, StreamingRelation}
+import org.apache.spark.sql.execution.streaming.{
+  MemorySink,
+  MemoryStream,
+  StreamExecution,
+  StreamingRelation
+}
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ContinuousQueryManagerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
 
   import AwaitTerminationTester._
   import testImplicits._
@@ -234,8 +241,9 @@ class ContinuousQueryManagerSuite
           try {
             val df = ds.toDF
             query = sqlContext.streams
-              .startQuery(
-                  StreamExecution.nextName, df, new MemorySink(df.schema))
+              .startQuery(StreamExecution.nextName,
+                          df,
+                          new MemorySink(df.schema))
               .asInstanceOf[StreamExecution]
           } catch {
             case NonFatal(e) =>
@@ -272,13 +280,13 @@ class ContinuousQueryManagerSuite
       }
     }
 
-    AwaitTerminationTester.test(
-        expectedBehavior, awaitTermFunc, testBehaviorFor)
+    AwaitTerminationTester
+      .test(expectedBehavior, awaitTermFunc, testBehaviorFor)
   }
 
   /** Stop a random active query either with `stop()` or with an error */
-  private def stopRandomQueryAsync(
-      stopAfter: Span, withError: Boolean): ContinuousQuery = {
+  private def stopRandomQueryAsync(stopAfter: Span,
+                                   withError: Boolean): ContinuousQuery = {
 
     import scala.concurrent.ExecutionContext.Implicits.global
 

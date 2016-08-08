@@ -125,10 +125,11 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
     value
   }
 
-  private[this] val serverSetOf = Memoize[
-      (ServiceDiscoverer, String), Var[Activity.State[Seq[(Entry, Double)]]]] {
-    case (discoverer, path) => discoverer(path).run
-  }
+  private[this] val serverSetOf =
+    Memoize[(ServiceDiscoverer, String),
+            Var[Activity.State[Seq[(Entry, Double)]]]] {
+      case (discoverer, path) => discoverer(path).run
+    }
 
   private[this] val addrOf_ =
     Memoize[(ServiceDiscoverer, String, Option[String]), Var[Addr]] {
@@ -161,8 +162,12 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
             val endpoint = endpointOption.getOrElse(null)
             val subseq =
               eps collect {
-                case (Endpoint(
-                      names, host, port, shard, Endpoint.Status.Alive, _),
+                case (Endpoint(names,
+                               host,
+                               port,
+                               shard,
+                               Endpoint.Status.Alive,
+                               _),
                       weight) if names.contains(endpoint) && host != null =>
                   val metadata =
                     ZkMetadata.toAddrMetadata(ZkMetadata(Some(shard)))
@@ -205,33 +210,33 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
 
           val reg = (discoverer.health.changes joinLast states)
             .register(Witness { tuple =>
-            val (clientHealth, state) = tuple
+              val (clientHealth, state) = tuple
 
-            if (chatty()) {
-              eprintf("New state for %s!%s: %s\n",
-                      path,
-                      endpointOption getOrElse "default",
-                      state)
-            }
-
-            synchronized {
-              val State(addr, _nlimbo, _size) = state
-              nlimbo = _nlimbo
-              size = _size
-
-              val newAddr =
-                if (clientHealth == ClientHealth.Unhealthy) {
-                  logger.info(
-                      "ZkResolver reports unhealthy. resolution moving to Addr.Pending")
-                  Addr.Pending
-                } else addr
-
-              if (lastu != newAddr) {
-                lastu = newAddr
-                u() = newAddr
+              if (chatty()) {
+                eprintf("New state for %s!%s: %s\n",
+                        path,
+                        endpointOption getOrElse "default",
+                        state)
               }
-            }
-          })
+
+              synchronized {
+                val State(addr, _nlimbo, _size) = state
+                nlimbo = _nlimbo
+                size = _size
+
+                val newAddr =
+                  if (clientHealth == ClientHealth.Unhealthy) {
+                    logger.info(
+                        "ZkResolver reports unhealthy. resolution moving to Addr.Pending")
+                    Addr.Pending
+                  } else addr
+
+                if (lastu != newAddr) {
+                  lastu = newAddr
+                  u() = newAddr
+                }
+              }
+            })
 
           Closable.make { deadline =>
             reg.close(deadline) ensure {
@@ -264,8 +269,9 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
   /**
     * Construct a Var[Addr] from the components of a ServerSet path.
     */
-  private[twitter] def addrOf(
-      hosts: String, path: String, endpoint: Option[String]): Var[Addr] =
+  private[twitter] def addrOf(hosts: String,
+                              path: String,
+                              endpoint: Option[String]): Var[Addr] =
     addrOf_((mkDiscoverer(hosts), path, endpoint))
 
   /**

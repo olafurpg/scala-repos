@@ -28,7 +28,7 @@ class ElseFilter extends ElementFilter {
           case x: ScIfStmt => x
           case x
               if x.isInstanceOf[PsiWhiteSpace] ||
-              x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
+                x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
             x.getPrevSibling match {
               case x: ScIfStmt => x
               case _ => null
@@ -38,7 +38,7 @@ class ElseFilter extends ElementFilter {
         var text = ""
         if (ifStmt == null) {
           while (parent != null &&
-          !parent.isInstanceOf[ScIfStmt]) parent = parent.getParent
+                 !parent.isInstanceOf[ScIfStmt]) parent = parent.getParent
           if (parent == null) return false
           text = parent.getText
           text = Pattern

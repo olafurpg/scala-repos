@@ -120,7 +120,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // over topics. Compare it against nonEmptyTinyCorpus instead of tinyCorpus
     val nonEmptyTinyCorpus = getNonEmptyDoc(tinyCorpus)
     assert(topicDistributions.length === nonEmptyTinyCorpus.length)
-    assert(nonEmptyTinyCorpus.map(_._1).toSet === topicDistributions
+    assert(
+        nonEmptyTinyCorpus.map(_._1).toSet === topicDistributions
           .map(_._1)
           .toSet)
     //  Ensure we have proper distributions
@@ -150,11 +151,9 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // Compare it with top documents per topic derived from topicDistributions
     val topDocsByTopicDistributions = { n: Int =>
       Range(0, k).map { topic =>
-        val (doc, docWeights) = topicDistributions
-          .sortBy(-_._2(topic))
-          .take(n)
-          .unzip
-          (doc.toArray, docWeights.map(_ (topic)).toArray)
+        val (doc, docWeights) =
+          topicDistributions.sortBy(-_._2(topic)).take(n).unzip
+        (doc.toArray, docWeights.map(_(topic)).toArray)
       }.toArray
     }
 
@@ -185,8 +184,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
           assert(inds.length === doc.numNonzeros)
           // For "term" in actual doc,
           // check that it has a topic assigned.
-          doc.foreachActive(
-              (term, wcnt) => assert(wcnt === 0 || inds.contains(term)))
+          doc.foreachActive((term, wcnt) =>
+            assert(wcnt === 0 || inds.contains(term)))
         } else {
           assert(doc.numNonzeros === 0)
         }
@@ -269,7 +268,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // override lambda to simulate an intermediate state
     //    [[ 1.1  1.2  1.3  0.9  0.8  0.7]
     //     [ 0.9  0.8  0.7  1.1  1.2  1.3]]
-    op.setLambda(new BDM[Double](
+    op.setLambda(
+        new BDM[Double](
             k,
             vocabSize,
             Array(1.1, 0.9, 1.2, 0.8, 1.3, 0.7, 0.9, 1.1, 0.8, 1.2, 0.7, 1.3)))
@@ -323,12 +323,12 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val docsSingleWord = sc.parallelize(
         Array(Vectors.sparse(6, Array(0), Array(1))).zipWithIndex.map {
-      case (wordCounts, docId) => (docId.toLong, wordCounts)
-    })
+          case (wordCounts, docId) => (docId.toLong, wordCounts)
+        })
     val docsRepeatedWord = sc.parallelize(
         Array(Vectors.sparse(6, Array(0), Array(5))).zipWithIndex.map {
-      case (wordCounts, docId) => (docId.toLong, wordCounts)
-    })
+          case (wordCounts, docId) => (docId.toLong, wordCounts)
+        })
 
     /* Verify results using gensim:
        import numpy as np
@@ -424,7 +424,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
         assert(expected._1 === actual._1 &&
-            (expected._2 ~== actual._2 relTol 1E-3D))
+          (expected._2 ~== actual._2 relTol 1E-3D))
     }
 
     docs
@@ -521,7 +521,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       > [ 0.42582646  0.43511073]
      */
 
-    assert(ldaModel.docConcentration ~==
+    assert(
+        ldaModel.docConcentration ~==
           Vectors.dense(0.42582646, 0.43511073) absTol 0.05)
   }
 
@@ -581,7 +582,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
 
       val graph = distributedModel.graph
       val sameGraph = sameDistributedModel.graph
-      assert(graph.vertices.sortByKey().collect() === sameGraph.vertices
+      assert(
+          graph.vertices.sortByKey().collect() === sameGraph.vertices
             .sortByKey()
             .collect())
       val edge = graph.edges.map {
@@ -644,16 +646,14 @@ private[clustering] object LDASuite {
       Array[Double](0.2, 0.2, 0.05, 0.05, 0.5) // topic 2
   )
   def tinyTopics: Matrix =
-    new DenseMatrix(
-        numRows = tinyVocabSize,
-        numCols = tinyK,
-        values = tinyTopicsAsArray.fold(Array.empty[Double])(_ ++ _))
+    new DenseMatrix(numRows = tinyVocabSize,
+                    numCols = tinyK,
+                    values =
+                      tinyTopicsAsArray.fold(Array.empty[Double])(_ ++ _))
   def tinyTopicDescription: Array[(Array[Int], Array[Double])] =
     tinyTopicsAsArray.map { topic =>
-      val (termWeights, terms) = topic.zipWithIndex
-        .sortBy(-_._1)
-        .unzip
-        (terms.toArray, termWeights.toArray)
+      val (termWeights, terms) = topic.zipWithIndex.sortBy(-_._1).unzip
+      (terms.toArray, termWeights.toArray)
     }
 
   def tinyCorpus: Array[(Long, Vector)] =
@@ -719,7 +719,10 @@ private[clustering] object LDASuite {
                                                 1.94615165,
                                                 1.95204124))
     val ldaModel: LocalLDAModel = new LocalLDAModel(
-        topics, Vectors.dense(Array.fill(k)(alpha)), eta, gammaShape)
+        topics,
+        Vectors.dense(Array.fill(k)(alpha)),
+        eta,
+        gammaShape)
     ldaModel
   }
 }

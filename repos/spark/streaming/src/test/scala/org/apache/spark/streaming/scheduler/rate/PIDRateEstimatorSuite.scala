@@ -98,8 +98,8 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val elements = List.fill(50)(1) // no processing
     val proc = List.fill(50)(20) // 20ms of processing
     val sched = List.fill(50)(100) // strictly positive accumulation
-    val res = for (i <- List.range(0, 50)) yield
-      p.compute(times(i), elements(i), proc(i), sched(i))
+    val res = for (i <- List.range(0, 50))
+      yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
     res.tail should equal(List.fill(49)(Some(minRate)))
   }
@@ -114,8 +114,8 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val elements = List.tabulate(50)(x => (x + 1) * 20) // increasing
     val proc = List.fill(50)(20) // 20ms of processing
     val sched = List.fill(50)(0)
-    val res = for (i <- List.range(0, 50)) yield
-      p.compute(times(i), elements(i), proc(i), sched(i))
+    val res = for (i <- List.range(0, 50))
+      yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
     res.tail should equal(List.tabulate(50)(x => Some((x + 1) * 1000D)).tail)
   }
@@ -131,8 +131,8 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val elements = List.tabulate(50)(x => (50 - x) * 20) // decreasing
     val proc = List.fill(50)(20) // 20ms of processing
     val sched = List.fill(50)(0)
-    val res = for (i <- List.range(0, 50)) yield
-      p.compute(times(i), elements(i), proc(i), sched(i))
+    val res = for (i <- List.range(0, 50))
+      yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
     res.tail should equal(List.tabulate(50)(x => Some((50 - x) * 1000D)).tail)
   }
@@ -149,8 +149,8 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val sched = List.tabulate(50)(x => rng.nextInt(19) + 1) // random wait
     val speeds = elements map ((x) => x.toDouble / procDelayMs * 1000)
 
-    val res = for (i <- List.range(0, 50)) yield
-      p.compute(times(i), elements(i), proc(i), sched(i))
+    val res = for (i <- List.range(0, 50))
+      yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
     forAll(List.range(1, 50)) { (n) =>
       res(n) should not be None

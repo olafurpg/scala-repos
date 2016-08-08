@@ -25,7 +25,9 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.test.SQLTestData._
 
 class PartitionBatchPruningSuite
-    extends SparkFunSuite with BeforeAndAfterEach with SharedSQLContext {
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with SharedSQLContext {
 
   import testImplicits._
 
@@ -101,20 +103,23 @@ class PartitionBatchPruningSuite
   }
 
   // IS NOT NULL
-  checkBatchPruning(
-      "SELECT key FROM pruningData WHERE value IS NOT NULL", 5, 5) {
+  checkBatchPruning("SELECT key FROM pruningData WHERE value IS NOT NULL",
+                    5,
+                    5) {
     (11 to 20) ++ (31 to 40) ++ (51 to 60) ++ (71 to 80) ++ (91 to 100)
   }
 
   // Conjunction and disjunction
+  checkBatchPruning("SELECT key FROM pruningData WHERE key > 8 AND key <= 21",
+                    2,
+                    3)(9 to 21)
+  checkBatchPruning("SELECT key FROM pruningData WHERE key < 2 OR key > 99",
+                    2,
+                    2)(Seq(1, 100))
   checkBatchPruning(
-      "SELECT key FROM pruningData WHERE key > 8 AND key <= 21", 2, 3)(9 to 21)
-  checkBatchPruning(
-      "SELECT key FROM pruningData WHERE key < 2 OR key > 99", 2, 2)(
-      Seq(1, 100))
-  checkBatchPruning(
-      "SELECT key FROM pruningData WHERE key < 12 AND key IS NOT NULL", 1, 2)(
-      1 to 11)
+      "SELECT key FROM pruningData WHERE key < 12 AND key IS NOT NULL",
+      1,
+      2)(1 to 11)
   checkBatchPruning(
       "SELECT key FROM pruningData WHERE key < 2 OR (key > 78 AND key < 92)",
       3,
@@ -141,10 +146,10 @@ class PartitionBatchPruningSuite
     }
   }
 
-  def checkBatchPruning(query: String,
-                        expectedReadPartitions: Int,
-                        expectedReadBatches: Int)(
-      expectedQueryResult: => Seq[Int]): Unit = {
+  def checkBatchPruning(
+      query: String,
+      expectedReadPartitions: Int,
+      expectedReadBatches: Int)(expectedQueryResult: => Seq[Int]): Unit = {
 
     test(query) {
       val df = sql(query)
@@ -152,7 +157,7 @@ class PartitionBatchPruningSuite
 
       assertResult(expectedQueryResult.toArray,
                    s"Wrong query result: $queryExecution") {
-        df.collect().map(_ (0)).toArray
+        df.collect().map(_(0)).toArray
       }
 
       val (readPartitions, readBatches) = df.queryExecution.sparkPlan.collect {

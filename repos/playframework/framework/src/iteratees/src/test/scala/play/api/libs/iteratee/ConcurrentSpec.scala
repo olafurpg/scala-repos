@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 object ConcurrentSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Concurrent.broadcast (0-arg)" should {
@@ -23,9 +24,9 @@ object ConcurrentSpec
         val results = Future.sequence(
             Range(1, 20)
               .map(_ =>
-                    Iteratee.fold[String, String]("") { (s, e) =>
-              s + e
-            }(foldEC))
+                Iteratee.fold[String, String]("") { (s, e) =>
+                  s + e
+                }(foldEC))
               .map(broadcaster.apply)
               .map(_.flatMap(_.run)))
         pushHere.push("beep")
@@ -125,13 +126,13 @@ object ConcurrentSpec
           Enumerator[Long](1, 2, 3, 4, 5, 6, 7, 8, 9, 10) >>> Enumerator.eof
         val preparedMapEC = mapEC.prepare()
         val result =
-          fastEnumerator |>>> (Concurrent.buffer(20) &>> slowIteratee).flatMap {
-            l =>
-              Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
+          fastEnumerator |>>> (Concurrent
+            .buffer(20) &>> slowIteratee).flatMap { l =>
+            Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
           }(flatMapEC)
 
         Await.result(result, Duration.Inf) must not equalTo
-        (List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+          (List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
         flatMapEC.executionCount must beGreaterThan(0)
         mapEC.executionCount must equalTo(flatMapEC.executionCount)
       }
@@ -155,7 +156,7 @@ object ConcurrentSpec
 
       val fastEnumerator = Enumerator((1 to 10): _*) >>> Enumerator.eof
       val result = Try(await(fastEnumerator &> Concurrent.lazyAndErrIfNotReady(
-                  50) |>>> slowIteratee))
+          50) |>>> slowIteratee))
       // We've got our result (hopefully a timeout), so let the iteratee
       // complete.
       gotResult.countDown()
@@ -172,16 +173,15 @@ object ConcurrentSpec
         val completeCount = new AtomicInteger()
         val errorCount = new AtomicInteger()
         val enumerator = Concurrent.unicast[String](
-            c =>
-              {
-                startCount.incrementAndGet()
-                c.push(a)
-                c.push(b)
-                c.eofAndEnd()
+            c => {
+              startCount.incrementAndGet()
+              c.push(a)
+              c.push(b)
+              c.eofAndEnd()
             },
             () => completeCount.incrementAndGet(),
             (_: String,
-            _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
+             _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
         val promise =
           (enumerator |>> Iteratee.fold[String, String]("")(_ ++ _)(foldEC))
             .flatMap(_.run)
@@ -306,7 +306,8 @@ object ConcurrentSpec
         val e = Concurrent.patchPanel[Int] { pp =>
           pp.patchIn(Enumerator.eof)
         }(ppEC)
-        Await.result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
+        Await
+          .result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
             Nil)
       }
     }
@@ -352,15 +353,17 @@ object ConcurrentSpec
   "Concurrent.runPartial" should {
     "redeem the iteratee with the result and the partial enumerator" in {
       val (a, remaining) =
-        await(Concurrent.runPartial(Enumerator("foo", "bar"),
-                                    Iteratee.head[String]))
+        await(
+            Concurrent.runPartial(Enumerator("foo", "bar"),
+                                  Iteratee.head[String]))
       a must beSome("foo")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Seq("bar")
     }
     "work when there is no input left in the enumerator" in {
       val (a, remaining) =
-        await(Concurrent.runPartial(Enumerator("foo", "bar"),
-                                    Iteratee.getChunks[String]))
+        await(
+            Concurrent.runPartial(Enumerator("foo", "bar"),
+                                  Iteratee.getChunks[String]))
       a must_== Seq("foo", "bar")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Nil
     }

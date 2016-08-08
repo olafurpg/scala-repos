@@ -12,7 +12,10 @@ import javax.inject.{Singleton, Inject, Provider}
 import org.asynchttpclient.netty.ssl.JsseSslEngineFactory
 import org.slf4j.LoggerFactory
 
-import org.asynchttpclient.{DefaultAsyncHttpClientConfig, AsyncHttpClientConfig}
+import org.asynchttpclient.{
+  DefaultAsyncHttpClientConfig,
+  AsyncHttpClientConfig
+}
 
 import javax.net.ssl._
 import play.api.{ConfigLoader, PlayConfig, Environment, Configuration}
@@ -68,7 +71,7 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
   def parse(): AhcWSClientConfig = {
 
     val playConfig = PlayConfig(configuration)
-    def get[A : ConfigLoader](name: String): A =
+    def get[A: ConfigLoader](name: String): A =
       playConfig.getDeprecated[A](s"play.ws.ahc.$name", s"play.ws.ning.$name")
 
     val maximumConnectionsPerHost = get[Int]("maxConnectionsPerHost")
@@ -241,8 +244,8 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
     definedProtocols
   }
 
-  def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
+  def configureCipherSuites(existingCiphers: Array[String],
+                            sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
@@ -280,8 +283,9 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(
-            sslConfig, keyManagerFactory, trustManagerFactory).build()
+        new ConfigSSLContextBuilder(sslConfig,
+                                    keyManagerFactory,
+                                    trustManagerFactory).build()
       }
 
     // protocols!
@@ -330,13 +334,14 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
       tmf.getTrustManagers()(0).asInstanceOf[X509TrustManager]
 
     val constraints = sslConfig.disabledKeyAlgorithms
-      .map(a =>
+      .map(
+          a =>
             AlgorithmConstraintsParser
               .parseAll(AlgorithmConstraintsParser.expression, a)
               .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(
-        keyConstraints = constraints, signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
+                                                signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)

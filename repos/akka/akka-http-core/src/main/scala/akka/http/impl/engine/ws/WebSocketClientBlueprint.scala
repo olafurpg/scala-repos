@@ -23,9 +23,20 @@ import akka.http.scaladsl.model.{HttpResponse, HttpMethods}
 import akka.http.scaladsl.model.headers.Host
 
 import akka.http.impl.engine.parsing.HttpMessageParser.StateResult
-import akka.http.impl.engine.parsing.ParserOutput.{RemainingBytes, ResponseStart, NeedMoreData}
-import akka.http.impl.engine.parsing.{ParserOutput, HttpHeaderParser, HttpResponseParser}
-import akka.http.impl.engine.rendering.{HttpRequestRendererFactory, RequestRenderingContext}
+import akka.http.impl.engine.parsing.ParserOutput.{
+  RemainingBytes,
+  ResponseStart,
+  NeedMoreData
+}
+import akka.http.impl.engine.parsing.{
+  ParserOutput,
+  HttpHeaderParser,
+  HttpResponseParser
+}
+import akka.http.impl.engine.rendering.{
+  HttpRequestRendererFactory,
+  RequestRenderingContext
+}
 import akka.http.impl.engine.ws.Handshake.Client.NegotiatedWebSocketSettings
 import akka.http.impl.util.StreamUtils
 
@@ -37,10 +48,11 @@ object WebSocketClientBlueprint {
   def apply(request: WebSocketRequest,
             settings: ClientConnectionSettings,
             log: LoggingAdapter): Http.WebSocketClientLayer =
-    (simpleTls.atopMat(handshake(request, settings, log))(Keep.right) atop WebSocket.framing atop WebSocket
-          .stack(serverSide = false,
-                 maskingRandomFactory = settings.websocketRandomFactory,
-                 log = log)).reversed
+    (simpleTls
+      .atopMat(handshake(request, settings, log))(Keep.right) atop WebSocket.framing atop WebSocket
+      .stack(serverSide = false,
+             maskingRandomFactory = settings.websocketRandomFactory,
+             log = log)).reversed
 
   /**
     * A bidi flow that injects and inspects the WS handshake and then goes out of the way. This BidiFlow
@@ -66,7 +78,9 @@ object WebSocketClientBlueprint {
         settings.websocketRandomFactory())
     val hostHeader = Host(uri.authority)
     val renderedInitialRequest = HttpRequestRendererFactory.renderStrict(
-        RequestRenderingContext(initialRequest, hostHeader), settings, log)
+        RequestRenderingContext(initialRequest, hostHeader),
+        settings,
+        log)
 
     class UpgradeStage extends StatefulStage[ByteString, ByteString] {
       type State = StageState[ByteString, ByteString]
@@ -81,8 +95,8 @@ object WebSocketClientBlueprint {
             HttpHeaderParser(settings.parserSettings)()) {
           var first = true
           override def handleInformationalResponses = false
-          override protected def parseMessage(
-              input: ByteString, offset: Int): StateResult = {
+          override protected def parseMessage(input: ByteString,
+                                              offset: Int): StateResult = {
             if (first) {
               first = false
               super.parseMessage(input, offset)
@@ -100,8 +114,8 @@ object WebSocketClientBlueprint {
             case NeedMoreData ⇒ ctx.pull()
             case ResponseStart(status, protocol, headers, entity, close) ⇒
               val response = HttpResponse(status, headers, protocol = protocol)
-              Handshake.Client.validateResponse(
-                  response, subprotocol.toList, key) match {
+              Handshake.Client
+                .validateResponse(response, subprotocol.toList, key) match {
                 case Right(NegotiatedWebSocketSettings(protocol)) ⇒
                   result.success(ValidUpgrade(response, protocol))
 
@@ -120,11 +134,12 @@ object WebSocketClientBlueprint {
                           s"unexpected element of type ${other.getClass}")
                   }
                 case Left(problem) ⇒
-                  result.success(InvalidUpgradeResponse(
+                  result.success(
+                      InvalidUpgradeResponse(
                           response,
                           s"WebSocket server at $uri returned $problem"))
                   ctx.fail(new IllegalArgumentException(
-                          s"WebSocket upgrade did not finish because of '$problem'"))
+                      s"WebSocket upgrade did not finish because of '$problem'"))
               }
             case other ⇒
               throw new IllegalStateException(
@@ -139,8 +154,7 @@ object WebSocketClientBlueprint {
       }
     }
 
-    BidiFlow.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+    BidiFlow.fromGraph(GraphDSL.create() { implicit b ⇒
       import GraphDSL.Implicits._
 
       val networkIn = b.add(Flow[ByteString].transform(() ⇒ new UpgradeStage))
@@ -160,8 +174,11 @@ object WebSocketClientBlueprint {
     }) mapMaterializedValue (_ ⇒ result.future)
   }
 
-  def simpleTls: BidiFlow[
-      SslTlsInbound, ByteString, ByteString, SendBytes, NotUsed] =
+  def simpleTls: BidiFlow[SslTlsInbound,
+                          ByteString,
+                          ByteString,
+                          SendBytes,
+                          NotUsed] =
     BidiFlow.fromFlowsMat(Flow[SslTlsInbound].collect {
       case SessionBytes(_, bytes) ⇒ bytes
     }, Flow[ByteString].map(SendBytes))(Keep.none)

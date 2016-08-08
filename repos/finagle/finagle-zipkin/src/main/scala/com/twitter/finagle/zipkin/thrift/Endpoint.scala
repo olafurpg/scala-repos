@@ -17,7 +17,8 @@ case class Endpoint(ipv4: Int, port: Short) {
     */
   def boundEndpoint: Endpoint = {
     if (ipv4 == 0 || ipv4 == Endpoint.Loopback)
-      this.copy(ipv4 = Endpoint.getLocalHost) else this
+      this.copy(ipv4 = Endpoint.getLocalHost)
+    else this
   }
 
   def toThrift: thrift.Endpoint = {
@@ -60,8 +61,8 @@ object Endpoint {
   def fromSocketAddress(socketAddress: SocketAddress): Endpoint = {
     socketAddress match {
       case inet: InetSocketAddress => {
-          Endpoint(toIpv4(inet.getAddress), inet.getPort.toShort)
-        }
+        Endpoint(toIpv4(inet.getAddress), inet.getPort.toShort)
+      }
       case _ => Endpoint.Unknown
     }
   }

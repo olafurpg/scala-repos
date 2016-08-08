@@ -69,8 +69,9 @@ object PairingRepo {
         }.toSet
       }
 
-  def recentIdsByTourAndUserId(
-      tourId: String, userId: String, nb: Int): Fu[List[String]] =
+  def recentIdsByTourAndUserId(tourId: String,
+                               userId: String,
+                               nb: Int): Fu[List[String]] =
     coll
       .find(
           selectTourUser(tourId, userId),
@@ -83,8 +84,9 @@ object PairingRepo {
         _.flatMap(_.getAs[String]("_id"))
       }
 
-  def byTourUserNb(
-      tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
+  def byTourUserNb(tourId: String,
+                   userId: String,
+                   nb: Int): Fu[Option[Pairing]] =
     (nb > 0) ?? coll
       .find(
           selectTourUser(tourId, userId)
@@ -131,8 +133,8 @@ object PairingRepo {
   def findPlaying(tourId: String, userId: String): Fu[Option[Pairing]] =
     coll.find(selectTourUser(tourId, userId) ++ selectPlaying).one[Pairing]
 
-  def finishedByPlayerChronological(
-      tourId: String, userId: String): Fu[Pairings] =
+  def finishedByPlayerChronological(tourId: String,
+                                    userId: String): Fu[Pairings] =
     coll
       .find(
           selectTourUser(tourId, userId) ++ selectFinished
@@ -178,14 +180,14 @@ object PairingRepo {
                       Unwind("u"),
                       Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
       .map(_.documents.headOption
-            .flatMap(_.getAs[Set[String]]("ids"))
-            .getOrElse(Set.empty[String]))
+        .flatMap(_.getAs[Set[String]]("ids"))
+        .getOrElse(Set.empty[String]))
 
   def playingGameIds(tourId: String): Fu[List[String]] =
     coll
       .aggregate(Match(selectTour(tourId) ++ selectPlaying),
                  List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
       .map(_.documents.headOption
-            .flatMap(_.getAs[List[String]]("ids"))
-            .getOrElse(List.empty[String]))
+        .flatMap(_.getAs[List[String]]("ids"))
+        .getOrElse(List.empty[String]))
 }

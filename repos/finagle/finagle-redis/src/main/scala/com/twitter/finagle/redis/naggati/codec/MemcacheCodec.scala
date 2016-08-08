@@ -20,28 +20,28 @@ package codec
 import java.nio.ByteBuffer
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
-case class MemcacheRequest(
-    line: List[String], data: Option[ByteBuffer], bytesRead: Int) {
+case class MemcacheRequest(line: List[String],
+                           data: Option[ByteBuffer],
+                           bytesRead: Int) {
   override def toString = {
     "<Request: " + line.mkString("[", " ", "]") +
-    (data match {
-          case None => ""
-          case Some(x) => " data=" + x.remaining
-        }) + " read=" + bytesRead + ">"
+      (data match {
+        case None => ""
+        case Some(x) => " data=" + x.remaining
+      }) + " read=" + bytesRead + ">"
   }
 }
 
 case class MemcacheResponse(
     line: String,
     data: Option[ByteBuffer] = None
-)
-    extends Codec.Signalling {
+) extends Codec.Signalling {
   override def toString = {
     "<Response: " + line +
-    (data match {
-          case None => ""
-          case Some(x) => " data=" + x.remaining
-        }) + ">"
+      (data match {
+        case None => ""
+        case Some(x) => " data=" + x.remaining
+      }) + ">"
   }
 
   val lineData = line.getBytes("ISO-8859-1")
@@ -69,13 +69,13 @@ case class MemcacheResponse(
 object MemcacheCodec {
   import Stages._
 
-  val STORAGE_COMMANDS = List(
-      "set", "add", "replace", "append", "prepend", "cas")
+  val STORAGE_COMMANDS =
+    List("set", "add", "replace", "append", "prepend", "cas")
   val END = "\r\nEND\r\n".getBytes
   val CRLF = "\r\n".getBytes
 
-  def asciiCodec(
-      bytesReadCounter: Int => Unit, bytesWrittenCounter: Int => Unit) =
+  def asciiCodec(bytesReadCounter: Int => Unit,
+                 bytesWrittenCounter: Int => Unit) =
     new Codec(readAscii, writeAscii, bytesReadCounter, bytesWrittenCounter)
 
   def asciiCodec() = new Codec(readAscii, writeAscii)
@@ -96,8 +96,10 @@ object MemcacheCodec {
         buffer.readBytes(bytes)
         bytes.flip()
         buffer.skipBytes(2)
-        emit(MemcacheRequest(
-                segments.toList, Some(bytes), line.length + dataBytes + 4))
+        emit(
+            MemcacheRequest(segments.toList,
+                            Some(bytes),
+                            line.length + dataBytes + 4))
       }
     } else {
       emit(MemcacheRequest(segments.toList, None, line.length + 2))

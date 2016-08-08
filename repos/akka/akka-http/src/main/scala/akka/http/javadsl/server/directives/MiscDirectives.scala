@@ -7,7 +7,11 @@ package directives
 
 import java.lang.{Boolean ⇒ JBoolean}
 
-import akka.http.impl.server.RouteStructure.{DynamicDirectiveRoute2, Validated, DynamicDirectiveRoute1}
+import akka.http.impl.server.RouteStructure.{
+  DynamicDirectiveRoute2,
+  Validated,
+  DynamicDirectiveRoute1
+}
 
 import scala.annotation.varargs
 import akka.japi.function.{Function2, Function}
@@ -56,7 +60,8 @@ abstract class MiscDirectives extends MethodDirectives {
                        innerRoute: Route,
                        moreInnerRoutes: Route*): Route =
     new DynamicDirectiveRoute2[T1, T2](value1, value2)(
-        innerRoute, moreInnerRoutes.toList) {
+        innerRoute,
+        moreInnerRoutes.toList) {
       def createDirective(t1: T1, t2: T2): Directive =
         Directives.custom(Validated(check.apply(t1, t2), errorMsg))
     }

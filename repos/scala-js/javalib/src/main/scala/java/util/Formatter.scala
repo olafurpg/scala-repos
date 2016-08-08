@@ -7,7 +7,8 @@ import java.io._
 import java.lang._
 
 final class Formatter(private val dest: Appendable)
-    extends Closeable with Flushable {
+    extends Closeable
+    with Flushable {
   import Formatter._
 
   var closed = false
@@ -181,9 +182,9 @@ final class Formatter(private val dest: Appendable)
                 case formattable: Formattable =>
                   val flags = {
                     (if (hasFlag("-")) FormattableFlags.LEFT_JUSTIFY else 0) |
-                    (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
-                    (if (isConversionUpperCase) FormattableFlags.UPPERCASE
-                     else 0)
+                      (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
+                      (if (isConversionUpperCase) FormattableFlags.UPPERCASE
+                       else 0)
                   }
                   formattable.formatTo(this,
                                        flags,
@@ -241,7 +242,7 @@ final class Formatter(private val dest: Appendable)
               // JavaDoc: at least 2 digits
               if ('e' == exp.charAt(exp.length - 3)) {
                 exp.substring(0, exp.length - 1) + "0" +
-                exp.charAt(exp.length - 1)
+                  exp.charAt(exp.length - 1)
               } else exp
             }, numberArg.isNaN || numberArg.isInfinite)
           }
@@ -278,7 +279,6 @@ object Formatter {
   private val DoublePercent = new RegExpExtractor(
       new js.RegExp("""^\x25{2}"""))
   private val EOLChunk = new RegExpExtractor(new js.RegExp("""^\x25n"""))
-  private val FormattedChunk = new RegExpExtractor(
-      new js.RegExp(
-          """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
+  private val FormattedChunk = new RegExpExtractor(new js.RegExp(
+      """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
 }

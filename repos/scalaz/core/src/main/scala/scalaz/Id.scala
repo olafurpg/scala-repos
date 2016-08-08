@@ -17,9 +17,9 @@ trait IdInstances {
 
   val id: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[
       Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[
-      Id] = new Traverse1[Id]
-  with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id]
-  with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] {
+      Id] = new Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id]
+  with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id]
+  with Cozip[Id] with Optional[Id] {
     def point[A](a: => A): A = a
 
     def bind[A, B](a: A)(f: A => B): B = f(a)

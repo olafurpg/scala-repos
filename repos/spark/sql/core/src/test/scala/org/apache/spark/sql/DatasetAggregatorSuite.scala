@@ -24,7 +24,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
 
 /** An `Aggregator` that adds up any numeric type returned by the given function. */
-class SumOf[I, N : Numeric](f: I => N) extends Aggregator[I, N, N] {
+class SumOf[I, N: Numeric](f: I => N) extends Aggregator[I, N, N] {
   val numeric = implicitly[Numeric[N]]
 
   override def zero: N = numeric.zero
@@ -39,8 +39,8 @@ class SumOf[I, N : Numeric](f: I => N) extends Aggregator[I, N, N] {
 object TypedAverage extends Aggregator[(String, Int), (Long, Long), Double] {
   override def zero: (Long, Long) = (0, 0)
 
-  override def reduce(
-      countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
+  override def reduce(countAndSum: (Long, Long),
+                      input: (String, Int)): (Long, Long) = {
     (countAndSum._1 + 1, countAndSum._2 + input._2)
   }
 
@@ -57,8 +57,8 @@ object ComplexResultAgg
 
   override def zero: (Long, Long) = (0, 0)
 
-  override def reduce(
-      countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
+  override def reduce(countAndSum: (Long, Long),
+                      input: (String, Int)): (Long, Long) = {
     (countAndSum._1 + 1, countAndSum._2 + input._2)
   }
 
@@ -120,14 +120,16 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
 
   import testImplicits._
 
-  def sum[I, N : Numeric : Encoder](f: I => N): TypedColumn[I, N] =
+  def sum[I, N: Numeric: Encoder](f: I => N): TypedColumn[I, N] =
     new SumOf(f).toColumn
 
   test("typed aggregation: TypedAggregator") {
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
 
-    checkDataset(
-        ds.groupByKey(_._1).agg(sum(_._2)), ("a", 30), ("b", 3), ("c", 1))
+    checkDataset(ds.groupByKey(_._1).agg(sum(_._2)),
+                 ("a", 30),
+                 ("b", 3),
+                 ("c", 1))
   }
 
   test("typed aggregation: TypedAggregator, expr, expr") {
@@ -162,8 +164,8 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
     val ds = Seq(1, 3, 2, 5).toDS()
 
     checkDataset(ds.select(sum((i: Int) => i)), 11)
-    checkDataset(
-        ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)), 11 -> 22)
+    checkDataset(ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)),
+                 11 -> 22)
   }
 
   test("typed aggregation: class input") {

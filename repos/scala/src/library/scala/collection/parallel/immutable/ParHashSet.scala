@@ -39,10 +39,11 @@ import scala.collection.parallel.Task
   *  @define coll immutable parallel hash set
   */
 @SerialVersionUID(1L)
-class ParHashSet[T] private[immutable](private[this] val trie: HashSet[T])
-    extends ParSet[T] with GenericParTemplate[T, ParHashSet]
-    with ParSetLike[T, ParHashSet[T], HashSet[T]] with Serializable {
-  self =>
+class ParHashSet[T] private[immutable] (private[this] val trie: HashSet[T])
+    extends ParSet[T]
+    with GenericParTemplate[T, ParHashSet]
+    with ParSetLike[T, ParHashSet[T], HashSet[T]]
+    with Serializable { self =>
 
   def this() = this(HashSet.empty[T])
 
@@ -64,8 +65,8 @@ class ParHashSet[T] private[immutable](private[this] val trie: HashSet[T])
 
   override def size = trie.size
 
-  protected override def reuse[S, That](
-      oldc: Option[Combiner[S, That]], newc: Combiner[S, That]) = oldc match {
+  protected override def reuse[S, That](oldc: Option[Combiner[S, That]],
+                                        newc: Combiner[S, That]) = oldc match {
     case Some(old) => old
     case None => newc
   }
@@ -131,8 +132,11 @@ object ParHashSet extends ParSetFactory[ParHashSet] {
 }
 
 private[immutable] abstract class HashSetCombiner[T]
-    extends scala.collection.parallel.BucketCombiner[
-        T, ParHashSet[T], Any, HashSetCombiner[T]](HashSetCombiner.rootsize) {
+    extends scala.collection.parallel.BucketCombiner[T,
+                                                     ParHashSet[T],
+                                                     Any,
+                                                     HashSetCombiner[T]](
+        HashSetCombiner.rootsize) {
 //self: EnvironmentPassingCombiner[T, ParHashSet[T]] =>
   import HashSetCombiner._
   val emptyTrie = HashSet.empty[T]

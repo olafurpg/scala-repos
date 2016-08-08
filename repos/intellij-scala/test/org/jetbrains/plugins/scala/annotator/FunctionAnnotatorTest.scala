@@ -98,7 +98,8 @@ class FunctionAnnotatorTest extends SimpleTestCase {
   }
 
   def testTry(): Unit = {
-    assertMatches(messages(
+    assertMatches(
+        messages(
             """
         |def myFunc(): Int = {
         |  try {

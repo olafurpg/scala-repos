@@ -81,8 +81,8 @@ class JavaDStream[T](val dstream: DStream[T])(
     *                       the new DStream will generate RDDs); must be a multiple of this
     *                       DStream's batching interval
     */
-  def window(
-      windowDuration: Duration, slideDuration: Duration): JavaDStream[T] =
+  def window(windowDuration: Duration,
+             slideDuration: Duration): JavaDStream[T] =
     dstream.window(windowDuration, slideDuration)
 
   /**
@@ -106,6 +106,6 @@ object JavaDStream {
     * Convert a scala [[org.apache.spark.streaming.dstream.DStream]] to a Java-friendly
     * [[org.apache.spark.streaming.api.java.JavaDStream]].
     */
-  implicit def fromDStream[T : ClassTag](dstream: DStream[T]): JavaDStream[T] =
+  implicit def fromDStream[T: ClassTag](dstream: DStream[T]): JavaDStream[T] =
     new JavaDStream[T](dstream)
 }

@@ -149,11 +149,11 @@ class BinaryClassificationMetrics @Since("1.3.0")(
     // and then sort by score values in descending order.
     val counts = scoreAndLabels
       .combineByKey(
-          createCombiner = (label: Double) =>
-              new BinaryLabelCounter(0L, 0L) += label,
+          createCombiner =
+            (label: Double) => new BinaryLabelCounter(0L, 0L) += label,
           mergeValue = (c: BinaryLabelCounter, label: Double) => c += label,
           mergeCombiners = (c1: BinaryLabelCounter,
-            c2: BinaryLabelCounter) => c1 += c2
+                            c2: BinaryLabelCounter) => c1 += c2
       )
       .sortByKey(ascending = false)
 
@@ -178,8 +178,7 @@ class BinaryClassificationMetrics @Since("1.3.0")(
                 s"Curve too large ($countsSize) for $numBins bins; capping at ${Int.MaxValue}")
             grouping = Int.MaxValue
           }
-          counts.mapPartitions(
-              _.grouped(grouping.toInt).map { pairs =>
+          counts.mapPartitions(_.grouped(grouping.toInt).map { pairs =>
             // The score of the combined point will be just the first one's score
             val firstScore = pairs.head._1
             // The point will contain all counts in this chunk
@@ -200,14 +199,13 @@ class BinaryClassificationMetrics @Since("1.3.0")(
     val totalCount = partitionwiseCumulativeCounts.last
     logInfo(s"Total counts: $totalCount")
     val cumulativeCounts = binnedCounts.mapPartitionsWithIndex(
-        (index: Int, iter: Iterator[(Double, BinaryLabelCounter)]) =>
-          {
-            val cumCount = partitionwiseCumulativeCounts(index)
-            iter.map {
-              case (score, c) =>
-                cumCount += c
-                (score, cumCount.clone())
-            }
+        (index: Int, iter: Iterator[(Double, BinaryLabelCounter)]) => {
+          val cumCount = partitionwiseCumulativeCounts(index)
+          iter.map {
+            case (score, c) =>
+              cumCount += c
+              (score, cumCount.clone())
+          }
         },
         preservesPartitioning = true)
     cumulativeCounts.persist()

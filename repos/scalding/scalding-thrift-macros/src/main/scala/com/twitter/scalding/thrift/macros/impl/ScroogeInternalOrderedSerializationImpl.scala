@@ -18,7 +18,12 @@ package com.twitter.scalding.thrift.macros.impl
 import com.twitter.scalding.serialization.macros.impl.OrderedSerializationProviderImpl
 import com.twitter.scalding.serialization.macros.impl.ordered_serialization._
 import com.twitter.scalding.serialization.OrderedSerialization
-import com.twitter.scalding.thrift.macros.impl.ordered_serialization.{ScroogeEnumOrderedBuf, ScroogeUnionOrderedBuf, ScroogeOrderedBuf, ScroogeOuterOrderedBuf}
+import com.twitter.scalding.thrift.macros.impl.ordered_serialization.{
+  ScroogeEnumOrderedBuf,
+  ScroogeUnionOrderedBuf,
+  ScroogeOrderedBuf,
+  ScroogeOuterOrderedBuf
+}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.Context
@@ -45,7 +50,7 @@ object ScroogeInternalOrderedSerializationImpl {
       .orElse(scroogeUnionDispatcher)
       .orElse(scroogeOuterOrderedBuf)
       .orElse(OrderedSerializationProviderImpl.scaldingBasicDispatchers(c)(
-              buildDispatcher))
+          buildDispatcher))
       .orElse(OrderedSerializationProviderImpl.fallbackImplicitDispatcher(c))
       .orElse {
         case tpe: Type =>

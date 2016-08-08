@@ -7,14 +7,22 @@ import slick.ast._
 import slick.ast.TypeUtil.:@
 import slick.compiler.{Phase, QueryCompiler, InsertCompiler}
 import slick.lifted._
-import slick.relational.{RelationalProfile, CompiledMapping, SimpleFastPathResultConverter}
+import slick.relational.{
+  RelationalProfile,
+  CompiledMapping,
+  SimpleFastPathResultConverter
+}
 import slick.sql.SqlProfile
 
 /** Abstract profile for accessing SQL databases via JDBC. */
 trait JdbcProfile
-    extends SqlProfile with JdbcActionComponent with JdbcInvokerComponent
-    with JdbcTypesComponent with JdbcModelComponent
-    /* internal: */ with JdbcStatementBuilderComponent
+    extends SqlProfile
+    with JdbcActionComponent
+    with JdbcInvokerComponent
+    with JdbcTypesComponent
+    with JdbcModelComponent
+    /* internal: */
+    with JdbcStatementBuilderComponent
     with JdbcMappingCompilerComponent {
 
   @deprecated(
@@ -106,7 +114,8 @@ trait JdbcProfile
   def runSynchronousQuery[R](tree: Node, param: Any)(
       implicit session: Backend#Session): R = tree match {
     case rsm @ ResultSetMapping(_, _, CompiledMapping(_, elemType)) :@ CollectionType(
-        cons, el) =>
+        cons,
+        el) =>
       val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, R]]
       createQueryInvoker[Any](rsm, param, null).foreach({ x =>
         b += x

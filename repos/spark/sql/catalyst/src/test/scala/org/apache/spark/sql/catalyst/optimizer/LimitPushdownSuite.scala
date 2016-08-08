@@ -21,7 +21,12 @@ import org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions.Add
-import org.apache.spark.sql.catalyst.plans.{FullOuter, LeftOuter, PlanTest, RightOuter}
+import org.apache.spark.sql.catalyst.plans.{
+  FullOuter,
+  LeftOuter,
+  PlanTest,
+  RightOuter
+}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
@@ -76,8 +81,11 @@ class LimitPushdownSuite extends PlanTest {
     val unionQuery =
       Union(testRelation.limit(1), testRelation2.select('d).limit(1)).limit(2)
     val unionOptimized = Optimize.execute(unionQuery.analyze)
-    val unionCorrectAnswer = Limit(
-        2, Union(testRelation.limit(1), testRelation2.select('d).limit(1))).analyze
+    val unionCorrectAnswer = Limit(2,
+                                   Union(testRelation.limit(1),
+                                         testRelation2
+                                           .select('d)
+                                           .limit(1))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 

@@ -4,7 +4,9 @@ package utils
 import scala.tools.nsc.Global
 
 trait Utils
-    extends NodePrinters with Extractors with SymbolTables
+    extends NodePrinters
+    with Extractors
+    with SymbolTables
     with StdAttachments {
 
   val global: Global

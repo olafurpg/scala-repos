@@ -1,7 +1,12 @@
 package org.jetbrains.plugins.scala.lang.completion
 
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementDecorator, LookupElementPresentation, LookupElementRenderer}
+import com.intellij.codeInsight.lookup.{
+  LookupElement,
+  LookupElementDecorator,
+  LookupElementPresentation,
+  LookupElementRenderer
+}
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
@@ -13,7 +18,11 @@ import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypedDeclaration, ScValueDeclaration, ScVariableDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypedDeclaration,
+  ScValueDeclaration,
+  ScVariableDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
@@ -67,10 +76,10 @@ class ScalaAotCompletionContributor extends ScalaCompletionContributor {
         }
       })
 
-  private def addCompletions0(parameters: CompletionParameters,
-                              result: CompletionResultSet,
-                              typed: Boolean)(
-      factory: (String, PsiElement) => PsiElement) {
+  private def addCompletions0(
+      parameters: CompletionParameters,
+      result: CompletionResultSet,
+      typed: Boolean)(factory: (String, PsiElement) => PsiElement) {
 
     val element = positionFromParameters(parameters)
     val settings = ScalaProjectSettings.getInstance(element.getProject)
@@ -85,11 +94,13 @@ class ScalaAotCompletionContributor extends ScalaCompletionContributor {
     val identifier = factory(prefix + ": " + capitalize(text), element)
 
     val parameters0 = parameters.withPosition(
-        identifier, identifier.getTextRange.getStartOffset + prefix.length)
+        identifier,
+        identifier.getTextRange.getStartOffset + prefix.length)
     val result0 = result.withPrefixMatcher(
         result.getPrefixMatcher.cloneWithPrefix(capitalize(prefix)))
-    result0.runRemainingContributors(
-        parameters0, new MyConsumer(prefix, typed, result0), true)
+    result0.runRemainingContributors(parameters0,
+                                     new MyConsumer(prefix, typed, result0),
+                                     true)
   }
 
   private def isSuitableIdentifier(s: String) =
@@ -111,21 +122,22 @@ private object ScalaAotCompletionContributor {
     if (s.length == 0) s else s.substring(0, 1).toUpperCase + s.substring(1)
 
   def createParameterFrom(text: String, original: PsiElement): ScParameter = {
-    val clauses = ScalaPsiElementFactory.createParamClausesWithContext(
-        s"($text)", original.getContext, original)
+    val clauses = ScalaPsiElementFactory
+      .createParamClausesWithContext(s"($text)", original.getContext, original)
     clauses.params.head
   }
 
-  def createValueDeclarationFrom(
-      text: String, original: PsiElement): ScValueDeclaration = {
+  def createValueDeclarationFrom(text: String,
+                                 original: PsiElement): ScValueDeclaration = {
     ScalaPsiElementFactory
       .createDeclarationFromText(s"val $text", original.getContext, original)
       .asInstanceOf[ScValueDeclaration]
   }
 }
 
-private class MyConsumer(
-    prefix: String, typed: Boolean, resultSet: CompletionResultSet)
+private class MyConsumer(prefix: String,
+                         typed: Boolean,
+                         resultSet: CompletionResultSet)
     extends Consumer[CompletionResult] {
   private var consumed = Set[String]()
 
@@ -134,11 +146,11 @@ private class MyConsumer(
 
     val name = suggestNameFor(prefix, element.getLookupString)
 
-    val renderingDecorator = LookupElementDecorator.withRenderer(
-        element, new MyElementRenderer(name, typed))
+    val renderingDecorator = LookupElementDecorator
+      .withRenderer(element, new MyElementRenderer(name, typed))
 
-    val insertionDecorator = LookupElementDecorator.withInsertHandler(
-        renderingDecorator, new MyInsertHandler(name, typed))
+    val insertionDecorator = LookupElementDecorator
+      .withInsertHandler(renderingDecorator, new MyInsertHandler(name, typed))
 
     if (typed) {
       resultSet.consume(insertionDecorator)
@@ -199,11 +211,11 @@ private class MyInsertHandler(name: String, typed: Boolean)
 }
 
 private object MyInsertHandler {
-  private def contextWith(
-      context: InsertionContext, range: TextRange): InsertionContext = {
+  private def contextWith(context: InsertionContext,
+                          range: TextRange): InsertionContext = {
     val map = new OffsetMap(context.getDocument)
-    map.addOffset(
-        CompletionInitializationContext.START_OFFSET, range.getStartOffset)
+    map.addOffset(CompletionInitializationContext.START_OFFSET,
+                  range.getStartOffset)
     map.addOffset(InsertionContext.TAIL_OFFSET, range.getEndOffset)
 
     new InsertionContext(map,

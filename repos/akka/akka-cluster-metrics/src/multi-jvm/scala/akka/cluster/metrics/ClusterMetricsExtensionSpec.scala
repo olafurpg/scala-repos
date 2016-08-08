@@ -30,7 +30,7 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
     nodeConfig(role) {
       parseString(
           "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
-          role.name)
+            role.name)
     }
   }
 
@@ -40,14 +40,16 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
 
   // Enable metrics extension in akka-cluster-metrics.
   def enableMetricsExtension =
-    parseString("""
+    parseString(
+        """
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = on
     """)
 
   // Disable metrics extension in akka-cluster-metrics.
   def disableMetricsExtension =
-    parseString("""
+    parseString(
+        """
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = off
     """)
@@ -91,7 +93,8 @@ class ClusterMetricsEnabledMultiJvmNode5 extends ClusterMetricsEnabledSpec
 
 abstract class ClusterMetricsEnabledSpec
     extends MultiNodeSpec(ClusterMetricsEnabledConfig)
-    with MultiNodeClusterSpec with RedirectLogging {
+    with MultiNodeClusterSpec
+    with RedirectLogging {
   import ClusterMetricsEnabledConfig._
 
   def isSigar(collector: MetricsCollector): Boolean =
@@ -114,7 +117,7 @@ abstract class ClusterMetricsEnabledSpec
 
   "Cluster metrics" must {
     "periodically collect metrics on each node, publish to the event stream, " +
-    "and gossip metrics around the node ring" in within(60 seconds) {
+      "and gossip metrics around the node ring" in within(60 seconds) {
       awaitClusterUp(roles: _*)
       enterBarrier("cluster-started")
       awaitAssert(
@@ -152,7 +155,8 @@ class ClusterMetricsDisabledMultiJvmNode5 extends ClusterMetricsDisabledSpec
 
 abstract class ClusterMetricsDisabledSpec
     extends MultiNodeSpec(ClusterMetricsDisabledConfig)
-    with MultiNodeClusterSpec with RedirectLogging {
+    with MultiNodeClusterSpec
+    with RedirectLogging {
   import akka.cluster.ClusterEvent.CurrentClusterState
 
   val metricsView = new ClusterMetricsView(cluster.system)

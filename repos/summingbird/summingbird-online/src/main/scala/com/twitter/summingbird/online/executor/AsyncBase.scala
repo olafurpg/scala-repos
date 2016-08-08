@@ -17,7 +17,11 @@ limitations under the License.
 package com.twitter.summingbird.online.executor
 
 import com.twitter.summingbird.online.Queue
-import com.twitter.summingbird.online.option.{MaxWaitingFutures, MaxFutureWaitTime, MaxEmitPerExecute}
+import com.twitter.summingbird.online.option.{
+  MaxWaitingFutures,
+  MaxFutureWaitTime,
+  MaxEmitPerExecute
+}
 import com.twitter.util.{Await, Future}
 import scala.util.{Try, Success, Failure}
 import java.util.concurrent.TimeoutException
@@ -26,7 +30,8 @@ import org.slf4j.{LoggerFactory, Logger}
 abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
                                          maxWaitingTime: MaxFutureWaitTime,
                                          maxEmitPerExec: MaxEmitPerExecute)
-    extends Serializable with OperationContainer[I, O, S, D, RC] {
+    extends Serializable
+    with OperationContainer[I, O, S, D, RC] {
 
   @transient protected lazy val logger: Logger =
     LoggerFactory.getLogger(getClass)
@@ -47,14 +52,12 @@ abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
     Queue.linkedNonBlocking[(Seq[S], Try[TraversableOnce[O]])]
 
   override def executeTick =
-    finishExecute(
-        tick.onFailure { thr =>
+    finishExecute(tick.onFailure { thr =>
       responses.put(((Seq(), Failure(thr))))
     })
 
   override def execute(state: S, data: I) =
-    finishExecute(
-        apply(state, data).onFailure { thr =>
+    finishExecute(apply(state, data).onFailure { thr =>
       responses.put(((List(state), Failure(thr))))
     })
 
@@ -115,8 +118,8 @@ abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
         Await.ready(Future.collect(toForce), maxWaitingTime.get)
       } catch {
         case te: TimeoutException =>
-          logger.error(
-              "forceExtra failed on %d Futures".format(toForce.size), te)
+          logger
+            .error("forceExtra failed on %d Futures".format(toForce.size), te)
       }
     }
   }

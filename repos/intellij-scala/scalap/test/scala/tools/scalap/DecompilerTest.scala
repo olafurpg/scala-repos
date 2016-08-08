@@ -30,11 +30,10 @@ class DecompilerTest extends TestCase {
         (new File(new jFile(insidePath)).toByteArray(), insidePath + ".test")
       }
 
-    val expectedResult = new File(new jFile(expectedFilePath))
-      .slurp()
-      .replace("\r", "")
+    val expectedResult =
+      new File(new jFile(expectedFilePath)).slurp().replace("\r", "")
 
-      (Decompiler.decompile(fileName, bytes): @unchecked) match {
+    (Decompiler.decompile(fileName, bytes): @unchecked) match {
       case Some((_, text)) =>
         Assert.assertEquals(expectedResult, text)
     }

@@ -20,7 +20,12 @@ import java.io.IOException
 import java.net._
 import java.nio.{ByteBuffer, ByteOrder}
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.{ArrayBlockingQueue, LinkedBlockingQueue, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  LinkedBlockingQueue,
+  TimeUnit,
+  ThreadPoolExecutor
+}
 import java.util.{Arrays, logging => javalog}
 
 import com.twitter.concurrent.NamedPoolThreadFactory
@@ -169,8 +174,8 @@ class ScribeHandler(hostname: String,
   // Could be rewritten using a simple Condition (await/notify) or producer/consumer
   // with timed batching
   private[logging] val flusher = {
-    val threadFactory = new NamedPoolThreadFactory(
-        "ScribeFlusher-" + category, true)
+    val threadFactory =
+      new NamedPoolThreadFactory("ScribeFlusher-" + category, true)
     // should be 1, but this is a crude form of retry
     val queue = new ArrayBlockingQueue[Runnable](5)
     val rejectionHandler = new ThreadPoolExecutor.DiscardPolicy()
@@ -219,32 +224,32 @@ class ScribeHandler(hostname: String,
       serverType = socket match {
         case None => Unknown
         case Some(s) => {
-            val outStream = s.getOutputStream()
+          val outStream = s.getOutputStream()
 
-            try {
-              val fakeMessageWithOldScribePrefix: Array[Byte] = {
-                val prefix = OLD_SCRIBE_PREFIX
-                val messageSize = prefix.length + 5
-                val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
-                buffer.order(ByteOrder.BIG_ENDIAN)
-                buffer.putInt(messageSize)
-                buffer.put(prefix)
-                buffer.putInt(0)
-                buffer.put(0: Byte)
-                buffer.array
-              }
-
-              outStream.write(fakeMessageWithOldScribePrefix)
-              readResponseExpecting(s, OLD_SCRIBE_REPLY)
-
-              // Didn't get exception, so the server must be archaic.
-              log.debug(
-                  "Scribe server is archaic; changing to old protocol for future requests.")
-              Archaic
-            } catch {
-              case NonFatal(_) => Modern
+          try {
+            val fakeMessageWithOldScribePrefix: Array[Byte] = {
+              val prefix = OLD_SCRIBE_PREFIX
+              val messageSize = prefix.length + 5
+              val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
+              buffer.order(ByteOrder.BIG_ENDIAN)
+              buffer.putInt(messageSize)
+              buffer.put(prefix)
+              buffer.putInt(0)
+              buffer.put(0: Byte)
+              buffer.array
             }
+
+            outStream.write(fakeMessageWithOldScribePrefix)
+            readResponseExpecting(s, OLD_SCRIBE_REPLY)
+
+            // Didn't get exception, so the server must be archaic.
+            log.debug(
+                "Scribe server is archaic; changing to old protocol for future requests.")
+            Archaic
+          } catch {
+            case NonFatal(_) => Modern
           }
+        }
       }
     }
 
@@ -291,8 +296,8 @@ class ScribeHandler(hostname: String,
       }
     }
 
-    def readResponseExpecting(
-        socket: Socket, expectedReply: Array[Byte]): Unit = {
+    def readResponseExpecting(socket: Socket,
+                              expectedReply: Array[Byte]): Unit = {
       var offset = 0
 
       val inStream = socket.getInputStream()
@@ -312,8 +317,7 @@ class ScribeHandler(hostname: String,
       }
     }
 
-    flusher.execute(
-        new Runnable {
+    flusher.execute(new Runnable {
       def run() { sendBatch() }
     })
   }
@@ -386,7 +390,7 @@ class ScribeHandler(hostname: String,
 
   override def toString = {
     ("<%s level=%s hostname=%s port=%d scribe_buffer=%s " +
-        "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
+      "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
         getClass.getName,
         getLevel,
         hostname,

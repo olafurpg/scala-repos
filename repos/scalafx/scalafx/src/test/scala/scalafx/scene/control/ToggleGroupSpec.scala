@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ToggleGroupSpec
     extends SimpleSFXDelegateSpec[jfxsc.ToggleGroup, ToggleGroup](
-        classOf[jfxsc.ToggleGroup], classOf[ToggleGroup])
+        classOf[jfxsc.ToggleGroup],
+        classOf[ToggleGroup])

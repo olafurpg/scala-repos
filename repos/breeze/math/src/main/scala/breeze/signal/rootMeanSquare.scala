@@ -17,8 +17,8 @@ object rootMeanSquare extends UFunc {
 
   @expand
   @expand.valify
-  implicit def rms1D[@expand.args(Float, Double) T]: rootMeanSquare.Impl[
-      DenseVector[T], T] = {
+  implicit def rms1D[@expand.args(Float, Double) T]
+    : rootMeanSquare.Impl[DenseVector[T], T] = {
     new rootMeanSquare.Impl[DenseVector[T], T] {
       def apply(v: DenseVector[T]): T = {
         val temp: T = mean(v.map((elem: T) => elem * elem))

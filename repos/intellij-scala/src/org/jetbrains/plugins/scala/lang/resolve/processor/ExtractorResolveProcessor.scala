@@ -8,9 +8,15 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.FakeCompanionClassOrCom
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_11
 
@@ -32,8 +38,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         def resultsFor(unapplyName: String) = {
           val typeResult = getFromType(state) match {
             case Some(tp) =>
-              Success(
-                  ScProjectionType(tp, obj, superReference = false), Some(obj))
+              Success(ScProjectionType(tp, obj, superReference = false),
+                      Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, unapplyName)
@@ -72,7 +78,7 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           obj match {
             case FakeCompanionClassOrCompanionClass(cl: ScClass)
                 if cl.tooBigForUnapply &&
-                cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
+                  cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
               addResult(
                   new ScalaResolveResult(named,
                                          ScSubstitutor.empty,
@@ -107,8 +113,7 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
                 for (paramType <- clauses(0).parameters
                                    .apply(0)
                                    .getType(TypingContext.empty)
-                                     if tp conforms r.substitutor.subst(
-                                     paramType)) return true
+                     if tp conforms r.substitutor.subst(paramType)) return true
               }
               false
             case _ => true
@@ -119,7 +124,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         else if (filtered.size == 1) filtered
         else {
           new MostSpecificUtil(ref, 1).mostSpecificForResolveResult(
-              filtered, expandInnerResult = false) match {
+              filtered,
+              expandInnerResult = false) match {
             case Some(r) => mutable.HashSet(r)
             case None => candidates
           }

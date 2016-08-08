@@ -34,9 +34,8 @@ private case class LibraryReference(level: Level, name: String) {
   }
 
   def removeFrom(module: ModuleSettings) {
-    val element = findOrderEntryIn(module).getOrElse(
-        throw new IllegalArgumentException(
-            s"Cannot remove library (${level.title}/$name}) dependency in module ${module.getModuleName}"))
+    val element = findOrderEntryIn(module).getOrElse(throw new IllegalArgumentException(
+        s"Cannot remove library (${level.title}/$name}) dependency in module ${module.getModuleName}"))
 
     element.detach()
   }
@@ -63,8 +62,8 @@ private case class LibraryReference(level: Level, name: String) {
   private def directoryBasedLibraryFileIn(
       context: ConversionContext): Option[File] = {
     val libraryFiles = {
-      val librariesDirectory = new File(
-          context.getSettingsBaseDir, "libraries")
+      val librariesDirectory =
+        new File(context.getSettingsBaseDir, "libraries")
       val files =
         Option(librariesDirectory.listFiles).map(_.toSeq).getOrElse(Seq.empty)
       files.filter(_.getName.endsWith(".xml"))

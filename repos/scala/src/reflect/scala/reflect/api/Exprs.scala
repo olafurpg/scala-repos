@@ -120,8 +120,8 @@ trait Exprs { self: Universe =>
 
     override def equals(x: Any) =
       x.isInstanceOf[Expr[_]] &&
-      this.mirror == x.asInstanceOf[Expr[_]].mirror &&
-      this.tree == x.asInstanceOf[Expr[_]].tree
+        this.mirror == x.asInstanceOf[Expr[_]].mirror &&
+        this.tree == x.asInstanceOf[Expr[_]].tree
 
     override def hashCode = mirror.hashCode * 31 + tree.hashCode
 
@@ -138,14 +138,14 @@ trait Exprs { self: Universe =>
     *  @group Expressions
     */
   object Expr {
-    def apply[T : WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
-                               treec: TreeCreator): Expr[T] =
+    def apply[T: WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
+                              treec: TreeCreator): Expr[T] =
       new ExprImpl[T](mirror.asInstanceOf[Mirror], treec)
     def unapply[T](expr: Expr[T]): Option[Tree] = Some(expr.tree)
   }
 
-  private class ExprImpl[+T : WeakTypeTag](
-      val mirror: Mirror, val treec: TreeCreator)
+  private class ExprImpl[+T: WeakTypeTag](val mirror: Mirror,
+                                          val treec: TreeCreator)
       extends Expr[T] {
     def in[U <: Universe with Singleton](
         otherMirror: scala.reflect.api.Mirror[U]): U#Expr[T] = {
@@ -181,8 +181,8 @@ trait Exprs { self: Universe =>
 }
 
 @SerialVersionUID(1L)
-private[scala] class SerializedExpr(
-    var treec: TreeCreator, var tag: ru.WeakTypeTag[_])
+private[scala] class SerializedExpr(var treec: TreeCreator,
+                                    var tag: ru.WeakTypeTag[_])
     extends Serializable {
   import scala.reflect.runtime.universe.{Expr, runtimeMirror}
 

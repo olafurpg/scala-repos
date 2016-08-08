@@ -11,7 +11,10 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{ResolveResult, PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.codeInspection.functionExpressions.MatchToPartialFunctionInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions.childOf
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
@@ -30,16 +33,17 @@ import scala.collection.JavaConverters._
 class MatchToPartialFunctionInspection
     extends AbstractInspection(inspectionId) {
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case fun @ ScFunctionExpr(
-        Seq(param), Some(ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
+    case fun @ ScFunctionExpr(Seq(param),
+                              Some(
+                              ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
         if ref.resolve() == param && !(param.typeElement.isDefined &&
-            notExpectedType(fun)) && checkSameResolve(fun) =>
+          notExpectedType(fun)) && checkSameResolve(fun) =>
       registerProblem(holder, ms, fun)
     case fun @ ScFunctionExpr(
         Seq(param),
         Some(ScBlock(ms @ ScMatchStmt(ref: ScReferenceExpression, _))))
         if ref.resolve() == param && !(param.typeElement.isDefined &&
-            notExpectedType(fun)) && checkSameResolve(fun) =>
+          notExpectedType(fun)) && checkSameResolve(fun) =>
       registerProblem(holder, ms, fun) //if fun is last statement in block, result can be block without braces
     case ms @ ScMatchStmt(und: ScUnderscoreSection, _)
         if checkSameResolve(ms) =>
@@ -96,7 +100,9 @@ class MatchToPartialFunctionInspection
     }
 
     val newCall = ScalaPsiElementFactory.createExpressionWithContextFromText(
-        refText + dummyCaseClauses, call.getContext, call)
+        refText + dummyCaseClauses,
+        call.getContext,
+        call)
     newCall match {
       case ScMethodCall(ref: ScReferenceExpression, _) =>
         ref.resolve() == oldResolve
@@ -111,10 +117,11 @@ object MatchToPartialFunctionInspection {
     "Convert match statement to pattern matching anonymous function"
 }
 
-class MatchToPartialFunctionQuickFix(
-    matchStmt: ScMatchStmt, fExprToReplace: ScExpression)
-    extends AbstractFixOnTwoPsiElements(
-        inspectionName, matchStmt, fExprToReplace) {
+class MatchToPartialFunctionQuickFix(matchStmt: ScMatchStmt,
+                                     fExprToReplace: ScExpression)
+    extends AbstractFixOnTwoPsiElements(inspectionName,
+                                        matchStmt,
+                                        fExprToReplace) {
   def doApplyFix(project: Project) {
     val mStmt = getFirstElement
     val fExpr = getSecondElement
@@ -123,10 +130,10 @@ class MatchToPartialFunctionQuickFix(
     if (leftBrace == null) return
 
     addNamingPatterns(matchStmtCopy, needNamingPattern(mStmt))
-    matchStmtCopy.deleteChildRange(
-        matchStmtCopy.getFirstChild, leftBrace.getPrevSibling)
-    val newBlock = ScalaPsiElementFactory.createExpressionFromText(
-        matchStmtCopy.getText, mStmt.getManager)
+    matchStmtCopy
+      .deleteChildRange(matchStmtCopy.getFirstChild, leftBrace.getPrevSibling)
+    val newBlock = ScalaPsiElementFactory
+      .createExpressionFromText(matchStmtCopy.getText, mStmt.getManager)
     CodeEditUtil.setOldIndentation(
         newBlock.getNode.asInstanceOf[TreeElement],
         CodeEditUtil.getOldIndentation(matchStmtCopy.getNode))
@@ -158,28 +165,26 @@ class MatchToPartialFunctionQuickFix(
           .asScala
         for {
           (clause, index) <- matchStmt.caseClauses.zipWithIndex if refs.exists(
-                                ref =>
-                                  PsiTreeUtil.isAncestor(
-                                      clause, ref.getElement, false))
+              ref => PsiTreeUtil.isAncestor(clause, ref.getElement, false))
         } yield index
       case _ => Nil
     }
   }
 
-  private def addNamingPatterns(
-      matchStmt: ScMatchStmt, indexes: Seq[Int]): Unit = {
+  private def addNamingPatterns(matchStmt: ScMatchStmt,
+                                indexes: Seq[Int]): Unit = {
     val clauses = matchStmt.caseClauses
     val name = matchStmt.expr.map(_.getText).getOrElse(return )
     indexes.map(i => clauses(i).pattern).foreach {
       case Some(w: ScWildcardPattern) =>
-        w.replace(ScalaPsiElementFactory.createPatternFromText(
-                name, matchStmt.getManager))
+        w.replace(ScalaPsiElementFactory
+          .createPatternFromText(name, matchStmt.getManager))
       case Some(p: ScPattern) =>
         val newPatternText =
           if (needParentheses(p)) s"$name @ (${p.getText})"
           else s"$name @ ${p.getText}"
-        p.replace(ScalaPsiElementFactory.createPatternFromText(
-                newPatternText, matchStmt.getManager))
+        p.replace(ScalaPsiElementFactory
+          .createPatternFromText(newPatternText, matchStmt.getManager))
       case _ =>
     }
   }

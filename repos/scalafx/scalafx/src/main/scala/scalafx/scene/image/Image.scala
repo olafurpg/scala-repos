@@ -31,7 +31,11 @@ import javafx.scene.{image => jfxsi}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  ReadOnlyBooleanProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object Image {
@@ -82,8 +86,11 @@ class Image(override val delegate: jfxsi.Image)
            preserveRatio: Boolean,
            smooth: Boolean) =
     this(
-        new jfxsi.Image(
-            url, requestedWidth, requestedWidth, preserveRatio, smooth))
+        new jfxsi.Image(url,
+                        requestedWidth,
+                        requestedWidth,
+                        preserveRatio,
+                        smooth))
 
   /**
     * Construct a new Image with the specified parameters.

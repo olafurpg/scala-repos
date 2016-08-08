@@ -26,8 +26,7 @@ import net.liftweb.common._
   * Add this trait to a Mapper to add support for many-to-many relationships
   * @author nafg
   */
-trait ManyToMany extends BaseKeyedMapper {
-  this: KeyedMapper[_, _] =>
+trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
 
   private[this] type K = TheKeyType
   private[this] type T = KeyedMapperType
@@ -223,14 +222,14 @@ trait ManyToMany extends BaseKeyedMapper {
       _joins foreach {
         thisField
           .actualField(_)
-          .asInstanceOf[
-              MappedForeignKey[K, O, X] forSome { type X <: KeyedMapper[K, X] }] set ManyToMany.this.primaryKeyField.get
-          .asInstanceOf[K]
+          .asInstanceOf[MappedForeignKey[K, O, X] forSome {
+            type X <: KeyedMapper[K, X]
+          }] set ManyToMany.this.primaryKeyField.get.asInstanceOf[K]
       }
 
       removedJoins.forall { _.delete_! } &
-      (// continue saving even if deleting fails
-          children.forall(_.save) && joins.forall(_.save))
+        (// continue saving even if deleting fails
+        children.forall(_.save) && joins.forall(_.save))
     }
 
     /**

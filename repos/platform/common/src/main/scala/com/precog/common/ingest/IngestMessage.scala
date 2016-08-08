@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,7 +32,10 @@ import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.json.serialization.IsoSerialization._
 import blueeyes.json.serialization.Extractor._
 import blueeyes.json.serialization.Versioned._
-import blueeyes.json.serialization.JodaSerializationImplicits.{InstantExtractor, InstantDecomposer}
+import blueeyes.json.serialization.JodaSerializationImplicits.{
+  InstantExtractor,
+  InstantDecomposer
+}
 
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -60,8 +63,8 @@ sealed trait EventMessage {
 }
 
 object EventMessage {
-  type EventMessageExtraction = (APIKey, Path,
-  Authorities => EventMessage) \/ EventMessage
+  type EventMessageExtraction =
+    (APIKey, Path, Authorities => EventMessage) \/ EventMessage
 
   // an instant that's close enough to the start of timestamping for our purposes
   val defaultTimestamp = new Instant(1362465101979L)
@@ -133,8 +136,8 @@ case class IngestMessage(apiKey: APIKey,
   }
 
   override def toString =
-    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)".format(
-        apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
+    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)"
+      .format(apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
 }
 
 object IngestMessage {
@@ -145,8 +148,8 @@ object IngestMessage {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" ::
-    ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
-  implicit def seqExtractor[A : Extractor]: Extractor[Seq[A]] =
+      ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
+  implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
   val decomposerV1: Decomposer[IngestMessage] =
@@ -164,35 +167,36 @@ object IngestMessage {
       override def validated(
           obj: JValue): Validation[Error, EventMessageExtraction] =
         obj.validated[Ingest]("event").flatMap { ingest =>
-          (obj.validated[Int]("producerId") |@| obj.validated[Int]("eventId")) {
-            (producerId, sequenceId) =>
-              val eventRecords =
-                ingest.data map { jv =>
-                  IngestRecord(EventId(producerId, sequenceId), jv)
-                }
-              ingest.writeAs map { authorities =>
-                assert(ingest.data.size == 1)
-                \/.right(IngestMessage(ingest.apiKey,
-                                       ingest.path,
-                                       authorities,
-                                       eventRecords,
-                                       ingest.jobId,
-                                       defaultTimestamp,
-                                       StreamRef.Append))
-              } getOrElse {
-                \/.left(
-                    (ingest.apiKey,
-                     ingest.path,
-                     (authorities: Authorities) =>
-                       IngestMessage(ingest.apiKey,
-                                     ingest.path,
-                                     authorities,
-                                     eventRecords,
-                                     ingest.jobId,
-                                     defaultTimestamp,
-                                     StreamRef.Append))
-                )
+          (obj.validated[Int]("producerId") |@| obj
+            .validated[Int]("eventId")) { (producerId, sequenceId) =>
+            val eventRecords =
+              ingest.data map { jv =>
+                IngestRecord(EventId(producerId, sequenceId), jv)
               }
+            ingest.writeAs map { authorities =>
+              assert(ingest.data.size == 1)
+              \/.right(
+                  IngestMessage(ingest.apiKey,
+                                ingest.path,
+                                authorities,
+                                eventRecords,
+                                ingest.jobId,
+                                defaultTimestamp,
+                                StreamRef.Append))
+            } getOrElse {
+              \/.left(
+                  (ingest.apiKey,
+                   ingest.path,
+                   (authorities: Authorities) =>
+                     IngestMessage(ingest.apiKey,
+                                   ingest.path,
+                                   authorities,
+                                   eventRecords,
+                                   ingest.jobId,
+                                   defaultTimestamp,
+                                   StreamRef.Append))
+              )
+            }
           }
         }
     }
@@ -227,8 +231,8 @@ object ArchiveMessage {
     extractorV[ArchiveMessage](schemaV1, Some("1.0".v))
   val extractorV0: Extractor[ArchiveMessage] = new Extractor[ArchiveMessage] {
     override def validated(obj: JValue): Validation[Error, ArchiveMessage] = {
-      (obj.validated[Int]("producerId") |@| obj.validated[Int]("deletionId") |@| obj
-            .validated[Archive]("deletion")) {
+      (obj.validated[Int]("producerId") |@| obj
+        .validated[Int]("deletionId") |@| obj.validated[Archive]("deletion")) {
         (producerId, sequenceId, archive) =>
           ArchiveMessage(archive.apiKey,
                          archive.path,

@@ -19,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   * Date: 22.07.2008
   */
 class ScDocTagImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocTag {
+    extends ScalaPsiElementImpl(node)
+    with ScDocTag {
   override def toString: String = "DocTag"
 
   override def accept(visitor: PsiElementVisitor) {

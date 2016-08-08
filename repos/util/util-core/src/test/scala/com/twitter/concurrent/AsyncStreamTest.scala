@@ -175,9 +175,8 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     new Ctx(s => s.withFilter(_ => true))
     new Ctx(s => s.take(2))
     new Ctx(s => s.takeWhile(_ => true))
-    new Ctx(
-        s =>
-          s.scanLeft(Future.Done) { (_, _) =>
+    new Ctx(s =>
+      s.scanLeft(Future.Done) { (_, _) =>
         Future.Done
     })
     new Ctx(s => s ++ s)

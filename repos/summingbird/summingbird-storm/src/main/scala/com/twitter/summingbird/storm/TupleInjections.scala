@@ -45,9 +45,7 @@ class KeyValueInjection[K, V] extends Injection[(K, V), JList[AnyRef]] {
 
   override def invert(vin: JList[AnyRef]) = Inversion.attempt(vin) { v =>
     val key = v.get(0).asInstanceOf[K]
-    val value = v
-      .get(1)
-      .asInstanceOf[V]
-      (key, value)
+    val value = v.get(1).asInstanceOf[V]
+    (key, value)
   }
 }

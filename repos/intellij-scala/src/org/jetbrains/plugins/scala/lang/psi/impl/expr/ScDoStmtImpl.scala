@@ -11,12 +11,13 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScDoStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDoStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScDoStmt {
   override def toString: String = "DoStatement"
 
   def getExprBody: Option[ScExpression] = findChild(classOf[ScExpression])
@@ -31,7 +32,8 @@ class ScDoStmtImpl(node: ASTNode)
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
     val c =
       if (rpar != null)
-        PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression]) else null
+        PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression])
+      else null
     if (c == null) None else Some(c)
   }
 

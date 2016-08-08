@@ -4,7 +4,18 @@ package math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-import spire.algebra.{Eq, EuclideanRing, Field, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
+import spire.algebra.{
+  Eq,
+  EuclideanRing,
+  Field,
+  IsReal,
+  IsRational,
+  NRoot,
+  Order,
+  Ring,
+  Signed,
+  Trig
+}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -646,7 +657,8 @@ private[math] trait NumberIsRing extends Ring[Number] {
 }
 
 private[math] trait NumberIsEuclideanRing
-    extends EuclideanRing[Number] with NumberIsRing {
+    extends EuclideanRing[Number]
+    with NumberIsRing {
   def quot(a: Number, b: Number): Number = a / b
   def mod(a: Number, b: Number): Number = a % b
   override def quotmod(a: Number, b: Number): (Number, Number) = a /% b
@@ -654,7 +666,8 @@ private[math] trait NumberIsEuclideanRing
 }
 
 private[math] trait NumberIsField
-    extends Field[Number] with NumberIsEuclideanRing {
+    extends Field[Number]
+    with NumberIsEuclideanRing {
   def div(a: Number, b: Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
@@ -707,7 +720,9 @@ private[math] trait NumberIsSigned extends Signed[Number] {
 }
 
 private[math] trait NumberIsReal
-    extends IsRational[Number] with NumberOrder with NumberIsSigned {
+    extends IsRational[Number]
+    with NumberOrder
+    with NumberIsSigned {
   def toDouble(x: Number): Double = x.toDouble
   def ceil(a: Number): Number = a.ceil
   def floor(a: Number): Number = a.floor
@@ -718,5 +733,8 @@ private[math] trait NumberIsReal
 
 @SerialVersionUID(0L)
 class NumberAlgebra
-    extends NumberIsField with NumberIsNRoot with NumberIsTrig
-    with NumberIsReal with Serializable
+    extends NumberIsField
+    with NumberIsNRoot
+    with NumberIsTrig
+    with NumberIsReal
+    with Serializable

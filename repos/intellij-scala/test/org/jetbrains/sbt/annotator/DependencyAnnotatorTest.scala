@@ -4,7 +4,11 @@ package annotator
 import _root_.junit.framework.Assert._
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.util.io.FileUtil
-import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, Error, Message}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorHolderMock,
+  Error,
+  Message
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.util.TestUtils

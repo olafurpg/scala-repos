@@ -104,7 +104,8 @@ object Duration {
     * The extractor will not match for malformed strings or non-finite durations.
     */
   def unapply(s: String): Option[(Long, TimeUnit)] =
-    (try Some(apply(s)) catch { case _: RuntimeException => None }) flatMap unapply
+    (try Some(apply(s))
+    catch { case _: RuntimeException => None }) flatMap unapply
 
   /**
     * Extract length and time unit out of a duration, if it is finite.
@@ -214,7 +215,7 @@ object Duration {
       case _: Infinite => Double.NaN
       case x =>
         Double.PositiveInfinity *
-        (if ((this > Zero) ^ (divisor >= Zero)) -1 else 1)
+          (if ((this > Zero) ^ (divisor >= Zero)) -1 else 1)
     }
 
     final def isFinite() = false
@@ -656,8 +657,8 @@ final class FiniteDuration(val length: Long, val unit: TimeUnit)
       throw new IllegalArgumentException("integer overflow")
     a + b
   }
-  private[this] def add(
-      otherLength: Long, otherUnit: TimeUnit): FiniteDuration = {
+  private[this] def add(otherLength: Long,
+                        otherUnit: TimeUnit): FiniteDuration = {
     val commonUnit = if (otherUnit.convert(1, unit) == 0) unit else otherUnit
     val totalLength = safeAdd(commonUnit.convert(length, unit),
                               commonUnit.convert(otherLength, otherUnit))

@@ -28,8 +28,9 @@ private[game] object GameDiff {
       }
     }
 
-    def dOpt[A, B <: BSONValue](
-        name: String, getter: Game => A, toBson: A => Option[B]) {
+    def dOpt[A, B <: BSONValue](name: String,
+                                getter: Game => A,
+                                toBson: A => Option[B]) {
       val (va, vb) = (getter(a), getter(b))
       if (va != vb) {
         if (vb == None || vb == null || vb == "")
@@ -92,6 +93,6 @@ private[game] object GameDiff {
     case Nil => Nil
     case sets =>
       (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler.write(
-              DateTime.now)) :: sets
+          DateTime.now)) :: sets
   }
 }

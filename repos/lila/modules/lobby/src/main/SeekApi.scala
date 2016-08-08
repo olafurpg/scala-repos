@@ -1,7 +1,13 @@
 package lila.lobby
 
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument,
+  BSONInteger,
+  BSONRegex,
+  BSONArray,
+  BSONBoolean
+}
 import reactivemongo.core.commands._
 import scala.concurrent.duration._
 
@@ -86,9 +92,11 @@ final class SeekApi(coll: Coll,
   def archive(seek: Seek, gameId: String) = {
     val archiveDoc =
       Seek.seekBSONHandler.write(seek) ++ BSONDocument(
-          "gameId" -> gameId, "archivedAt" -> DateTime.now)
-    coll.remove(BSONDocument("_id" -> seek.id)).void >> cache.clear >> archiveColl
-      .insert(archiveDoc)
+          "gameId" -> gameId,
+          "archivedAt" -> DateTime.now)
+    coll
+      .remove(BSONDocument("_id" -> seek.id))
+      .void >> cache.clear >> archiveColl.insert(archiveDoc)
   }
 
   def findArchived(gameId: String): Fu[Option[Seek]] =
@@ -96,7 +104,8 @@ final class SeekApi(coll: Coll,
 
   def removeBy(seekId: String, userId: String) =
     coll
-      .remove(BSONDocument(
+      .remove(
+          BSONDocument(
               "_id" -> seekId,
               "user.id" -> userId
           ))

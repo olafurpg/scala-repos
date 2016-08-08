@@ -94,8 +94,8 @@ trait BasicDirectives {
   /**
     * Injects the given values into a directive.
     */
-  def tprovide[L : Tuple](values: L): Directive[L] =
-    Directive { _ (values) }
+  def tprovide[L: Tuple](values: L): Directive[L] =
+    Directive { _(values) }
 
   /**
     * Extracts a single value using the given function.
@@ -106,7 +106,7 @@ trait BasicDirectives {
   /**
     * Extracts a number of values using the given function.
     */
-  def textract[L : Tuple](f: RequestContext ⇒ L): Directive[L] =
+  def textract[L: Tuple](f: RequestContext ⇒ L): Directive[L] =
     Directive { inner ⇒ ctx ⇒
       inner(f(ctx))(ctx)
     }

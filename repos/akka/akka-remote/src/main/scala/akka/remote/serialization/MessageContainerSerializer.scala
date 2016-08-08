@@ -72,8 +72,8 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
     builder.build().toByteArray
   }
 
-  private def buildPattern(
-      matcher: Option[String], tpe: ContainerFormats.PatternType)
+  private def buildPattern(matcher: Option[String],
+                           tpe: ContainerFormats.PatternType)
     : ContainerFormats.Selection.Builder = {
     val builder = ContainerFormats.Selection.newBuilder().setType(tpe)
     matcher foreach builder.setMatcher
@@ -84,7 +84,8 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
     val selectionEnvelope = ContainerFormats.SelectionEnvelope.parseFrom(bytes)
     val manifest =
       if (selectionEnvelope.hasMessageManifest)
-        selectionEnvelope.getMessageManifest.toStringUtf8 else ""
+        selectionEnvelope.getMessageManifest.toStringUtf8
+      else ""
     val msg = serialization
       .deserialize(selectionEnvelope.getEnclosedMessage.toByteArray,
                    selectionEnvelope.getSerializerId,
@@ -102,7 +103,8 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
       }(collection.breakOut)
     val wildcardFanOut =
       if (selectionEnvelope.hasWildcardFanOut)
-        selectionEnvelope.getWildcardFanOut else false
+        selectionEnvelope.getWildcardFanOut
+      else false
     ActorSelectionMessage(msg, elements, wildcardFanOut)
   }
 }

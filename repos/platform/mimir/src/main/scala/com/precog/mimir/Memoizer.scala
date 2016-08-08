@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -38,8 +38,8 @@ trait Memoizer extends DAG {
 
   def scaleMemoPriority(count: Int): Int = count // TODO exponential function?
 
-  private def applyMemoizations(
-      target: DepGraph, refs: Map[DepGraph, Set[OpSide]]): DepGraph = {
+  private def applyMemoizations(target: DepGraph,
+                                refs: Map[DepGraph, Set[OpSide]]): DepGraph = {
     import OpSide._
 
     // todo investigate why if we use a `DepGraphWrapper` here, tests fail in MiscStackSpecs
@@ -62,32 +62,32 @@ trait Memoizer extends DAG {
         case dag.Undefined() => target
 
         case target @ dag.New(parent) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.New(memoized(parent))(target.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.New(memoized(parent))(target.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.New(memoized(parent))(target.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.New(memoized(parent))(target.loc)
+        }
 
         case node @ dag.Morph1(m, parent) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Morph1(m, memoized(parent))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Morph1(m, memoized(parent))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Morph1(m, memoized(parent))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Morph1(m, memoized(parent))(node.loc)
+        }
 
         case node @ dag.Morph2(m, left, right) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Morph2(m, memoized(left), memoized(right))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Morph2(m, memoized(left), memoized(right))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Morph2(m, memoized(left), memoized(right))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Morph2(m, memoized(left), memoized(right))(node.loc)
+        }
 
         case node @ dag.Distinct(parent) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Distinct(memoized(parent))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Distinct(memoized(parent))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Distinct(memoized(parent))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Distinct(memoized(parent))(node.loc)
+        }
 
         case target @ dag.AbsoluteLoad(parent, jtpe) =>
           dag.AbsoluteLoad(memoized(parent), jtpe)(target.loc)
@@ -99,91 +99,90 @@ trait Memoizer extends DAG {
           dag.Operate(op, memoized(parent))(target.loc)
 
         case node @ dag.Reduce(red, parent) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Reduce(red, memoized(parent))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Reduce(red, memoized(parent))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Reduce(red, memoized(parent))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Reduce(red, memoized(parent))(node.loc)
+        }
 
         case node @ dag.MegaReduce(reds, parent) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.MegaReduce(reds, memoized(parent)),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.MegaReduce(reds, memoized(parent))
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.MegaReduce(reds, memoized(parent)),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.MegaReduce(reds, memoized(parent))
+        }
 
         case s @ dag.Split(spec, child, id) => {
-            val spec2 = memoizedSpec(spec)
-            val child2 = memoized(child)
-            val result: dag.Split = dag.Split(spec2, child2, id)(s.loc)
+          val spec2 = memoizedSpec(spec)
+          val child2 = memoized(child)
+          val result: dag.Split = dag.Split(spec2, child2, id)(s.loc)
 
-            if (numRefs(s) > MemoThreshold)
-              Memoize(result, scaleMemoPriority(numRefs(s)))
-            else result
-          }
+          if (numRefs(s) > MemoThreshold)
+            Memoize(result, scaleMemoPriority(numRefs(s)))
+          else result
+        }
 
         case node @ dag.Assert(pred, child) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Assert(memoized(pred), memoized(child))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Assert(memoized(pred), memoized(child))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Assert(memoized(pred), memoized(child))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Assert(memoized(pred), memoized(child))(node.loc)
+        }
 
         case node @ dag.Cond(pred, left, leftJoin, right, rightJoin) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Cond(memoized(pred),
-                               memoized(left),
-                               leftJoin,
-                               memoized(right),
-                               rightJoin)(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else
-              dag.Cond(memoized(pred),
-                       memoized(left),
-                       leftJoin,
-                       memoized(right),
-                       rightJoin)(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Cond(memoized(pred),
+                             memoized(left),
+                             leftJoin,
+                             memoized(right),
+                             rightJoin)(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else
+            dag.Cond(memoized(pred),
+                     memoized(left),
+                     leftJoin,
+                     memoized(right),
+                     rightJoin)(node.loc)
+        }
 
         case node @ dag.Observe(data, samples) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Observe(memoized(data), memoized(samples))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Observe(memoized(data), memoized(samples))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Observe(memoized(data), memoized(samples))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Observe(memoized(data), memoized(samples))(node.loc)
+        }
 
         case node @ dag.IUI(union, left, right) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(
-                  dag.IUI(union, memoized(left), memoized(right))(node.loc),
-                  scaleMemoPriority(numRefs(node)))
-            else dag.IUI(union, memoized(left), memoized(right))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.IUI(union, memoized(left), memoized(right))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.IUI(union, memoized(left), memoized(right))(node.loc)
+        }
 
         case node @ dag.Diff(left, right) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Diff(memoized(left), memoized(right))(node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else dag.Diff(memoized(left), memoized(right))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Diff(memoized(left), memoized(right))(node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else dag.Diff(memoized(left), memoized(right))(node.loc)
+        }
 
         case node @ dag.Join(op, joinSort, left, right) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Join(op, joinSort, memoized(left), memoized(right))(
-                          node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else
-              dag.Join(op, joinSort, memoized(left), memoized(right))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Join(op, joinSort, memoized(left), memoized(right))(
+                        node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else
+            dag.Join(op, joinSort, memoized(left), memoized(right))(node.loc)
+        }
 
         case node @ dag.Filter(joinSort, left, right) => {
-            if (numRefs(node) > MemoThreshold)
-              Memoize(dag.Filter(joinSort, memoized(left), memoized(right))(
-                          node.loc),
-                      scaleMemoPriority(numRefs(node)))
-            else
-              dag.Filter(joinSort, memoized(left), memoized(right))(node.loc)
-          }
+          if (numRefs(node) > MemoThreshold)
+            Memoize(dag.Filter(joinSort, memoized(left), memoized(right))(
+                        node.loc),
+                    scaleMemoPriority(numRefs(node)))
+          else
+            dag.Filter(joinSort, memoized(left), memoized(right))(node.loc)
+        }
 
         case dag.AddSortKey(parent, sortField, valueField, id) =>
           dag.AddSortKey(memoized(parent), sortField, valueField, id)
@@ -220,20 +219,21 @@ trait Memoizer extends DAG {
     memoized(target)
   }
 
-  private def findForcingRefsInSpec(
-      spec: BucketSpec, split: Split): Map[DepGraph, Set[OpSide]] =
+  private def findForcingRefsInSpec(spec: BucketSpec,
+                                    split: Split): Map[DepGraph, Set[OpSide]] =
     spec match {
       case UnionBucketSpec(left, right) =>
-        findForcingRefsInSpec(left, split) |+| findForcingRefsInSpec(
-            right, split)
+        findForcingRefsInSpec(left, split) |+| findForcingRefsInSpec(right,
+                                                                     split)
 
       case IntersectBucketSpec(left, right) =>
-        findForcingRefsInSpec(left, split) |+| findForcingRefsInSpec(
-            right, split)
+        findForcingRefsInSpec(left, split) |+| findForcingRefsInSpec(right,
+                                                                     split)
 
       case Group(id, target, forest) =>
         findForcingRefs(target, OpSide.Center(split)) |+| findForcingRefsInSpec(
-            forest, split)
+            forest,
+            split)
 
       case UnfixedSolution(_, solution) =>
         findForcingRefs(solution, OpSide.Center(split))
@@ -242,8 +242,8 @@ trait Memoizer extends DAG {
         findForcingRefs(expr, OpSide.Center(split))
     }
 
-  private def findForcingRefs(
-      graph: DepGraph, force: OpSide): Map[DepGraph, Set[OpSide]] =
+  private def findForcingRefs(graph: DepGraph,
+                              force: OpSide): Map[DepGraph, Set[OpSide]] =
     graph match {
       case _: SplitParam | _: SplitGroup | Const(_) | Undefined() => Map()
 
@@ -254,11 +254,12 @@ trait Memoizer extends DAG {
         updateMap(findForcingRefs(parent, OpSide.Center(graph)), graph, force)
 
       case Morph2(_, left, right) => {
-          val merged =
-            findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+        val merged =
+          findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
+              right,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       case Distinct(parent) =>
         updateMap(findForcingRefs(parent, OpSide.Center(graph)), graph, force)
@@ -279,123 +280,133 @@ trait Memoizer extends DAG {
         updateMap(findForcingRefs(parent, OpSide.Center(graph)), graph, force)
 
       case graph @ Split(spec, child, _) => {
-          val childRefs =
-            findForcingRefs(child, OpSide.Center(graph)) // TODO is this right?
-          val specRefs = findForcingRefsInSpec(spec, graph)
+        val childRefs =
+          findForcingRefs(child, OpSide.Center(graph)) // TODO is this right?
+        val specRefs = findForcingRefsInSpec(spec, graph)
 
-          updateMap(childRefs |+| specRefs, graph, force)
-        }
+        updateMap(childRefs |+| specRefs, graph, force)
+      }
 
       case Assert(pred, child) => {
-          val merged =
-            findForcingRefs(pred, OpSide.Left(graph)) |+| findForcingRefs(
-                child, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+        val merged =
+          findForcingRefs(pred, OpSide.Left(graph)) |+| findForcingRefs(
+              child,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       case Cond(pred, left, Cross(_), right, _)
           if !pred.isInstanceOf[Root] && !left.isInstanceOf[Root] => {
-          // no, the sides here are *not* typos; don't change them
-          val merged =
-            findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
-                left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Left(graph))
+        // no, the sides here are *not* typos; don't change them
+        val merged =
+          findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
+              left,
+              OpSide.Left(graph)) |+| findForcingRefs(right,
+                                                      OpSide.Left(graph))
 
-          updateMap(merged, graph, force)
-        }
+        updateMap(merged, graph, force)
+      }
 
       case Cond(pred, left, _, right, Cross(_))
           if !pred.isInstanceOf[Root] && !right.isInstanceOf[Root] => {
-          // no, the sides here are *not* typos; don't change them
-          val merged =
-            findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
-                left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Left(graph))
+        // no, the sides here are *not* typos; don't change them
+        val merged =
+          findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
+              left,
+              OpSide.Left(graph)) |+| findForcingRefs(right,
+                                                      OpSide.Left(graph))
 
-          updateMap(merged, graph, force)
-        }
+        updateMap(merged, graph, force)
+      }
 
       case Cond(pred, left, IdentitySort | ValueSort(_), right, _)
           if pred.identities != left.identities => {
-          // no, the sides here are *not* typos; don't change them
-          val merged =
-            findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
-                left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Left(graph))
+        // no, the sides here are *not* typos; don't change them
+        val merged =
+          findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
+              left,
+              OpSide.Left(graph)) |+| findForcingRefs(right,
+                                                      OpSide.Left(graph))
 
-          updateMap(merged, graph, force)
-        }
+        updateMap(merged, graph, force)
+      }
 
       case Cond(pred, left, _, right, IdentitySort | ValueSort(_))
           if pred.identities != right.identities => {
-          // no, the sides here are *not* typos; don't change them
-          val merged =
-            findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
-                left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Left(graph))
+        // no, the sides here are *not* typos; don't change them
+        val merged =
+          findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
+              left,
+              OpSide.Left(graph)) |+| findForcingRefs(right,
+                                                      OpSide.Left(graph))
 
-          updateMap(merged, graph, force)
-        }
+        updateMap(merged, graph, force)
+      }
 
       case Cond(pred, left, leftJoin, right, rightJoin) => {
-          // no, the sides here are *not* typos; don't change them
-          findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
-              left, OpSide.Left(graph)) |+| findForcingRefs(
-              right, OpSide.Left(graph))
-        }
+        // no, the sides here are *not* typos; don't change them
+        findForcingRefs(pred, OpSide.Right(graph)) |+| findForcingRefs(
+            left,
+            OpSide.Left(graph)) |+| findForcingRefs(right, OpSide.Left(graph))
+      }
 
       case Observe(data, samples) => {
-          val merged =
-            findForcingRefs(data, OpSide.Left(graph)) |+| findForcingRefs(
-                samples, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+        val merged =
+          findForcingRefs(data, OpSide.Left(graph)) |+| findForcingRefs(
+              samples,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       case IUI(_, left, right) => {
-          val merged =
-            findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+        val merged =
+          findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
+              right,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       case Diff(left, right) => {
-          val merged =
-            findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+        val merged =
+          findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
+              right,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       case Join(_, Cross(_), left, right)
           if left.isInstanceOf[Root] || right.isInstanceOf[Root] =>
         findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
-            right, OpSide.Right(graph))
+            right,
+            OpSide.Right(graph))
 
       // an approximation of table heritage that *should* be accurate
-      case Join(_, _, left, right) /*if left.identities != right.identities*/ =>
-        {
-          val merged =
-            findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
-                right, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+      case Join(_, _, left, right) /*if left.identities != right.identities*/ => {
+        val merged =
+          findForcingRefs(left, OpSide.Left(graph)) |+| findForcingRefs(
+              right,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       //case Join(_, _, left, right) =>
       //  findForcingRefs(left, force) |+| findForcingRefs(right, force)
 
       case Filter(Cross(_), target, boolean)
           if target.isInstanceOf[Root] || boolean.isInstanceOf[Root] => {
-          findForcingRefs(target, OpSide.Left(graph)) |+| findForcingRefs(
-              boolean, OpSide.Right(graph))
-        }
+        findForcingRefs(target, OpSide.Left(graph)) |+| findForcingRefs(
+            boolean,
+            OpSide.Right(graph))
+      }
 
       // an approximation of table heritage that *should* be accurate
-      case Filter(_, target, boolean) /*if target.identities != boolean.identities*/ =>
-        {
-          val merged =
-            findForcingRefs(target, OpSide.Left(graph)) |+| findForcingRefs(
-                boolean, OpSide.Right(graph))
-          updateMap(merged, graph, force)
-        }
+      case Filter(_, target, boolean) /*if target.identities != boolean.identities*/ => {
+        val merged =
+          findForcingRefs(target, OpSide.Left(graph)) |+| findForcingRefs(
+              boolean,
+              OpSide.Right(graph))
+        updateMap(merged, graph, force)
+      }
 
       //case Filter(_, target, boolean) =>
       //  findForcingRefs(target, force) |+| findForcingRefs(boolean, force)

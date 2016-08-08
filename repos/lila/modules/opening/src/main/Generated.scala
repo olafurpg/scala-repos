@@ -6,8 +6,8 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import scalaz.Validation.FlatMap._
 
-private[opening] case class Generated(
-    fen: String, moves: Map[String, Generated.Move]) {
+private[opening] case class Generated(fen: String,
+                                      moves: Map[String, Generated.Move]) {
 
   def toOpening: Try[Opening.ID => Opening] =
     (chess.format.Forsyth <<< fen) match {
@@ -20,9 +20,10 @@ private[opening] case class Generated(
               pgn <- Generated.toPgn(parsed.situation,
                                      first :: move.line.split(' ').toList)
               cp <- parseIntOption(move.cp) match {
-                case None => Failure(new Exception(s"Invalid cp ${move.cp}"))
-                case Some(cp) => Success(cp)
-              }
+                     case None =>
+                       Failure(new Exception(s"Invalid cp ${move.cp}"))
+                     case Some(cp) => Success(cp)
+                   }
             } yield Move(first = first, cp = cp, line = pgn)
         }.foldLeft(Try(List[Move]())) {
             case (Success(acc), Success(l)) => Success(l :: acc)
@@ -51,10 +52,9 @@ private[opening] object Generated {
       case (game, moveStr) =>
         game flatMap { g =>
           (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
-                case Uci.Move(orig, dest, prom) =>
-                  g(orig, dest, prom) map (_._1)
-              })
-            .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
+            case Uci.Move(orig, dest, prom) =>
+              g(orig, dest, prom) map (_._1)
+          }).fold(errs => Failure(new Exception(errs.shows)), Success.apply)
         }
     }) map (_.pgnMoves)
   }

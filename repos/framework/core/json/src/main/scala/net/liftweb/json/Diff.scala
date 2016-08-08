@@ -103,8 +103,7 @@ object Diff {
     diffRec(vs1, vs2)
   }
 
-  private[json] trait Diffable {
-    this: JValue =>
+  private[json] trait Diffable { this: JValue =>
 
     /** Return a diff.
       * @see net.liftweb.json.Diff#diff

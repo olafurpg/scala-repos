@@ -19,7 +19,7 @@ object ArraysTest extends Requires.TypedArray
 
 class ArraysTest extends javalib.util.ArraysTest {
 
-  override def Array[T : ClassTag](v: T*): scala.Array[T] = classTag[T] match {
+  override def Array[T: ClassTag](v: T*): scala.Array[T] = classTag[T] match {
     case ClassTag.Byte =>
       new Int8Array(v.asInstanceOf[Seq[Byte]].toJSArray).toArray
         .asInstanceOf[scala.Array[T]]

@@ -11,8 +11,9 @@ import slick.SlickException
 
 /** Configure Java Beans reflectively, using Typesafe Config for data type conversions. */
 object BeanConfigurator extends Logging {
-  def configure(
-      o: AnyRef, p: Properties, allowed: Set[String] = Set.empty): Unit = {
+  def configure(o: AnyRef,
+                p: Properties,
+                allowed: Set[String] = Set.empty): Unit = {
     val pds = Introspector
       .getBeanInfo(o.getClass)
       .getPropertyDescriptors

@@ -42,7 +42,7 @@ class TraversableOnceTest {
   }
 
   // Ensure that it always returns the first match if more than one element have the same largest/smallest f(x).
-  // Note that this behavior is not explicitly stated before. 
+  // Note that this behavior is not explicitly stated before.
   // To make it compatible with the previous implementation, I add this behavior to docs.
   @Test
   def testReturnTheFirstMatch() = {
@@ -61,11 +61,9 @@ class TraversableOnceTest {
   def testOnlyEvaluateOnce() = {
     var evaluatedCountOfMaxBy = 0
 
-    val max = list.maxBy(
-        x =>
-          {
-        evaluatedCountOfMaxBy += 1
-        x * 10
+    val max = list.maxBy(x => {
+      evaluatedCountOfMaxBy += 1
+      x * 10
     })
     assert(
         evaluatedCountOfMaxBy == list.length,
@@ -73,11 +71,9 @@ class TraversableOnceTest {
 
     var evaluatedCountOfMinBy = 0
 
-    val min = list.minBy(
-        x =>
-          {
-        evaluatedCountOfMinBy += 1
-        x * 10
+    val min = list.minBy(x => {
+      evaluatedCountOfMinBy += 1
+      x * 10
     })
     assert(
         evaluatedCountOfMinBy == list.length,

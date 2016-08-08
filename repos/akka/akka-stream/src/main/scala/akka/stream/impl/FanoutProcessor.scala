@@ -11,7 +11,8 @@ private[akka] abstract class FanoutOutputs(val maxBufferSize: Int,
                                            val initialBufferSize: Int,
                                            self: ActorRef,
                                            val pump: Pump)
-    extends DefaultOutputTransferStates with SubscriberManagement[Any] {
+    extends DefaultOutputTransferStates
+    with SubscriberManagement[Any] {
 
   override type S = ActorSubscriptionWithCursor[_ >: Any]
   override def createSubscription(subscriber: Subscriber[_ >: Any]): S =

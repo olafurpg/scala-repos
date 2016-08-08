@@ -42,11 +42,11 @@ object Test {
   ((x: Int) => 0): TwoAbstract
   ((x: Int) => 0): DerivedOneAbstract // okay
   ((x: Int) =>
-    0): NonClassType // "class type required". I think we should avoid SAM translation here.
+     0): NonClassType // "class type required". I think we should avoid SAM translation here.
   ((x: Int) => 0): NoEmptyConstructor
   ((x: Int) => 0): OneEmptyConstructor // okay
   ((x: Int) =>
-    0): OneEmptySecondaryConstructor // derived class must have an empty *primary* to call.
+     0): OneEmptySecondaryConstructor // derived class must have an empty *primary* to call.
   ((x: Int) => 0): MultipleConstructorLists
   ((x: Int) => 0): MultipleMethodLists
   ((x: Int) => 0): ImplicitConstructorParam

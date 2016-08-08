@@ -31,7 +31,8 @@ import slick.util.ConfigExtensionMethods.configExtensionMethods
   * @param model Slick data model for which code should be generated.
   */
 class SourceCodeGenerator(model: m.Model)
-    extends AbstractSourceCodeGenerator(model) with OutputHelpers {
+    extends AbstractSourceCodeGenerator(model)
+    with OutputHelpers {
   // "Tying the knot": making virtual classes concrete
   type Table = TableDef
   def Table = new TableDef(_)
@@ -81,11 +82,11 @@ object SourceCodeGenerator {
                               password = password.getOrElse(null),
                               keepAliveConnection = true)
     try {
-      val m = Await.result(db.run(profileInstance
-                                 .createModel(None, ignoreInvalidDefaults)(
-                                     ExecutionContext.global)
-                                 .withPinnedSession),
-                           Duration.Inf)
+      val m = Await.result(
+          db.run(profileInstance
+            .createModel(None, ignoreInvalidDefaults)(ExecutionContext.global)
+            .withPinnedSession),
+          Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, outputDir, pkg)
     } finally db.close
   }
@@ -100,11 +101,11 @@ object SourceCodeGenerator {
     val profile =
       if (dc.profileIsObject) dc.profileName else "new " + dc.profileName
     try {
-      val m = Await.result(dc.db.run(dc.profile
-                                 .createModel(None, ignoreInvalidDefaults)(
-                                     ExecutionContext.global)
-                                 .withPinnedSession),
-                           Duration.Inf)
+      val m = Await.result(
+          dc.db.run(dc.profile
+            .createModel(None, ignoreInvalidDefaults)(ExecutionContext.global)
+            .withPinnedSession),
+          Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, out, pkg)
     } finally dc.db.close
   }
@@ -136,7 +137,8 @@ object SourceCodeGenerator {
             Some(password),
             ignoreInvalidDefaults.toBoolean)
       case _ => {
-          println("""
+        println(
+            """
             |Usage:
             |  SourceCodeGenerator configURI [outputDir]
             |  SourceCodeGenerator profile jdbcDriver url outputDir pkg [user password]
@@ -157,8 +159,8 @@ object SourceCodeGenerator {
             |slick.basic.DatabaseConfig you can set "codegen.package" and
             |"codegen.outputDir". The latter can be overridden on the command line.
           """.stripMargin.trim)
-          System.exit(1)
-        }
+        System.exit(1)
+      }
     }
   }
 }

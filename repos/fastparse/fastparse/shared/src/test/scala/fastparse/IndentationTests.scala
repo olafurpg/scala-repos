@@ -24,8 +24,8 @@ object IndentationTests extends TestSuite {
 
     val deeper: P[Int] = P(" ".rep(indent + 1).!.map(_.length))
     val blockBody: P[Seq[Int]] =
-      "\n" ~ deeper.flatMap(
-          i => new Parser(indent = i).factor.rep(1, sep = ("\n" + " " * i).~/))
+      "\n" ~ deeper.flatMap(i =>
+        new Parser(indent = i).factor.rep(1, sep = ("\n" + " " * i).~/))
     val block: P[Int] = P(CharIn("+-*/").! ~/ blockBody).map(eval)
 
     val factor: P[Int] = P(number | block)

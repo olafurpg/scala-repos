@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -72,7 +72,8 @@ import scalaz._
 import scalaz.syntax.comonad._
 
 trait TestAccountService
-    extends BlueEyesServiceSpecification with AccountService
+    extends BlueEyesServiceSpecification
+    with AccountService
     with AkkaDefaults {
 
   implicit def executionContext = defaultFutureDispatch
@@ -110,8 +111,8 @@ trait TestAccountService
 
   val clock = Clock.System
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      0, Duration(1, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(0, Duration(1, "second"))
 
   val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
@@ -163,8 +164,10 @@ class AccountServiceSpec extends TestAccountService with Tags {
   def deleteAccount(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).delete(accountId)
 
-  def changePassword(
-      accountId: String, user: String, oldPass: String, newPass: String) = {
+  def changePassword(accountId: String,
+                     user: String,
+                     oldPass: String,
+                     newPass: String) = {
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.header(auth(user, oldPass)).put(accountId + "/password")(request)
   }
@@ -174,8 +177,9 @@ class AccountServiceSpec extends TestAccountService with Tags {
     accounts.post(accountId + "/password/reset")(request)
   }
 
-  def resetPassword(
-      accountId: AccountId, tokenId: ResetTokenId, newPass: String) = {
+  def resetPassword(accountId: AccountId,
+                    tokenId: ResetTokenId,
+                    newPass: String) = {
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.post(accountId + "/password/reset/" + tokenId)(request)
   }
@@ -188,8 +192,10 @@ class AccountServiceSpec extends TestAccountService with Tags {
   def getAccountPlan(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).get(accountId + "/plan")
 
-  def putAccountPlan(
-      accountId: String, user: String, pass: String, planType: String) = {
+  def putAccountPlan(accountId: String,
+                     user: String,
+                     pass: String,
+                     planType: String) = {
     val request: JValue = JObject(JField("type", JString(planType)) :: Nil)
     accounts.header(auth(user, pass)).put(accountId + "/plan")(request)
   }
@@ -220,9 +226,11 @@ class AccountServiceSpec extends TestAccountService with Tags {
     "not create duplicate accounts" in {
       val msgFuture = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jv1), _) <- createAccount(
-            "test0002@email.com", "password1")
+                                                               "test0002@email.com",
+                                                               "password1")
         HttpResponse(HttpStatus(Conflict, _), _, Some(errorMessage), _) <- createAccount(
-            "test0002@email.com", "password2")
+                                                                              "test0002@email.com",
+                                                                              "password2")
       } yield errorMessage
 
       msgFuture.copoint must beLike {
@@ -352,18 +360,20 @@ class AccountServiceSpec extends TestAccountService with Tags {
       (for {
         genToken <- createResetToken(accountId, user)
         resetToken <- Future {
-          Mailbox.get(user).asScala.toList match {
-            case message :: Nil =>
-              // Our test email template subject is simply the token, so easy to extract
-              val output = new java.io.ByteArrayOutputStream
-              message.writeTo(output)
-              output.close
-              logger.debug("Got reset email: " + output.toString("UTF-8"))
-              message.getSubject
+                       Mailbox.get(user).asScala.toList match {
+                         case message :: Nil =>
+                           // Our test email template subject is simply the token, so easy to extract
+                           val output = new java.io.ByteArrayOutputStream
+                           message.writeTo(output)
+                           output.close
+                           logger.debug(
+                               "Got reset email: " + output.toString("UTF-8"))
+                           message.getSubject
 
-            case problem => failure("Reset email not received, got " + problem)
-          }
-        }
+                         case problem =>
+                           failure("Reset email not received, got " + problem)
+                       }
+                     }
         resetResult <- resetPassword(accountId, resetToken, newPass)
         newAuthResult <- getAccount(accountId, user, newPass)
       } yield (genToken, resetResult, newAuthResult)).copoint must beLike {

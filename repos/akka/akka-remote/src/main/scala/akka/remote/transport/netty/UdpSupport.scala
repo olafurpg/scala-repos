@@ -5,7 +5,10 @@ package akka.remote.transport.netty
 
 import akka.actor.Address
 import akka.remote.transport.AssociationHandle
-import akka.remote.transport.AssociationHandle.{HandleEventListener, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  HandleEventListener,
+  InboundPayload
+}
 import akka.remote.transport.Transport.AssociationEventListener
 import akka.util.ByteString
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}
@@ -28,7 +31,8 @@ private[remote] trait UdpHandlers extends CommonHandlers {
       listener: HandleEventListener,
       msg: ChannelBuffer,
       remoteSocketAddress: InetSocketAddress): Unit = {
-    transport.udpConnectionTable.putIfAbsent(remoteSocketAddress, listener) match {
+    transport.udpConnectionTable
+      .putIfAbsent(remoteSocketAddress, listener) match {
       case null ⇒ listener notify InboundPayload(ByteString(msg.array()))
       case oldReader ⇒
         throw new NettyTransportException(
@@ -77,9 +81,10 @@ private[remote] class UdpServerHandler(
 /**
   * INTERNAL API
   */
-private[remote] class UdpClientHandler(
-    _transport: NettyTransport, remoteAddress: Address)
-    extends ClientHandler(_transport, remoteAddress) with UdpHandlers {
+private[remote] class UdpClientHandler(_transport: NettyTransport,
+                                       remoteAddress: Address)
+    extends ClientHandler(_transport, remoteAddress)
+    with UdpHandlers {
 
   override def initUdp(channel: Channel,
                        remoteSocketAddress: SocketAddress,
@@ -112,6 +117,7 @@ private[remote] class UdpAssociationHandle(
   }
 
   override def disassociate(): Unit =
-    try channel.close() finally transport.udpConnectionTable.remove(
+    try channel.close()
+    finally transport.udpConnectionTable.remove(
         transport.addressToSocketAddress(remoteAddress))
 }

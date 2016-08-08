@@ -25,8 +25,9 @@ trait FreeSpecSingleTestTest extends FreeSpecGenerator {
             "A FreeSpecTest should be able to run single tests"),
         root =>
           checkResultTreeHasExactNamedPath(root, freeSpecTestPath: _*) &&
-          checkResultTreeDoesNotHaveNodes(
-              root, "should not run tests that are not selected"),
+            checkResultTreeDoesNotHaveNodes(
+                root,
+                "should not run tests that are not selected"),
         debug = true)
   }
 }

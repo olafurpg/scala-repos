@@ -8,14 +8,28 @@ import javax.ws.rs.core.{Context, MediaType, Response}
 
 import com.codahale.metrics.annotation.Timed
 import mesosphere.marathon.api.v2.json.Formats._
-import mesosphere.marathon.api.{EndpointsHelper, MarathonMediaType, TaskKiller, _}
+import mesosphere.marathon.api.{
+  EndpointsHelper,
+  MarathonMediaType,
+  TaskKiller,
+  _
+}
 import mesosphere.marathon.core.appinfo.EnrichedTask
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.health.HealthCheckManager
-import mesosphere.marathon.plugin.auth.{Authenticator, Authorizer, UpdateApp, ViewApp}
+import mesosphere.marathon.plugin.auth.{
+  Authenticator,
+  Authorizer,
+  UpdateApp,
+  ViewApp
+}
 import mesosphere.marathon.state.{GroupManager, PathId}
-import mesosphere.marathon.{BadRequestException, MarathonConf, MarathonSchedulerService}
+import mesosphere.marathon.{
+  BadRequestException,
+  MarathonConf,
+  MarathonSchedulerService
+}
 import org.apache.mesos.Protos.TaskState
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
@@ -70,8 +84,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
       val enrichedTasks: IterableView[EnrichedTask, Iterable[_]] = for {
         (appId, task) <- tasks
         app <- appIdsToApps(appId) if isAuthorized(ViewApp, app)
-              if statusSet.isEmpty ||
-              task.mesosStatus.exists(s => statusSet(s.getState))
+        if statusSet.isEmpty ||
+          task.mesosStatus.exists(s => statusSet(s.getState))
       } yield {
         EnrichedTask(
             appId,
@@ -81,7 +95,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         )
       }
 
-      ok(jsonObjString(
+      ok(
+          jsonObjString(
               "tasks" -> enrichedTasks
           ))
     }
@@ -133,8 +148,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         val killed = result(Future.sequence(toKill.map {
           case (appId, tasks) => taskKiller.kill(appId, _ => tasks)
         })).flatten
-        ok(jsonObjString("tasks" -> killed.map(
-                    task => EnrichedTask(task.taskId.appId, task, Seq.empty))))
+        ok(jsonObjString("tasks" -> killed.map(task =>
+          EnrichedTask(task.taskId.appId, task, Seq.empty))))
       }
 
       val tasksByAppId = tasksToAppId.flatMap {

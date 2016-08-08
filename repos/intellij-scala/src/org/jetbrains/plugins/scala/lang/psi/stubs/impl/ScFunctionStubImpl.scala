@@ -20,9 +20,10 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScFunctionStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScFunction](parent, elemType) with ScFunctionStub {
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
+    extends StubBaseWrapper[ScFunction](parent, elemType)
+    with ScFunctionStub {
   private var name: StringRef = _
   private var declaration: Boolean = false
   private var annotations: Array[StringRef] = Array[StringRef]()
@@ -36,8 +37,8 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
   private var local: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: String,
            isDeclaration: Boolean,
            annotations: Array[String],
@@ -61,8 +62,8 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
   }
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: StringRef,
            isDeclaration: Boolean,
            annotations: Array[StringRef],
@@ -98,14 +99,15 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
       val returnTypeElement = myReturnTypeElement.get
       if (returnTypeElement != null &&
           (returnTypeElement.isEmpty ||
-              (returnTypeElement.get.getContext eq getPsi))) {
+          (returnTypeElement.get.getContext eq getPsi))) {
         return returnTypeElement
       }
     }
     val res: Option[ScTypeElement] =
       if (getReturnTypeText != "") {
-        Some(ScalaPsiElementFactory.createTypeElementFromText(
-                getReturnTypeText, getPsi, null))
+        Some(
+            ScalaPsiElementFactory
+              .createTypeElementFromText(getReturnTypeText, getPsi, null))
       } else None
     myReturnTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -119,8 +121,9 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
     }
     val res: Option[ScExpression] =
       if (getBodyText != "") {
-        Some(ScalaPsiElementFactory.createExpressionWithContextFromText(
-                getBodyText, getPsi, null))
+        Some(
+            ScalaPsiElementFactory
+              .createExpressionWithContextFromText(getBodyText, getPsi, null))
       } else None
     myBodyExpression = new SofterReference[Option[ScExpression]](res)
     res

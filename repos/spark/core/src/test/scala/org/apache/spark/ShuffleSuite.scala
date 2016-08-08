@@ -17,21 +17,39 @@
 
 package org.apache.spark
 
-import java.util.concurrent.{Callable, CyclicBarrier, Executors, ExecutorService}
+import java.util.concurrent.{
+  Callable,
+  CyclicBarrier,
+  Executors,
+  ExecutorService
+}
 
 import org.scalatest.Matchers
 
 import org.apache.spark.ShuffleSuite.NonJavaSerializableClass
 import org.apache.spark.memory.TaskMemoryManager
-import org.apache.spark.rdd.{CoGroupedRDD, OrderedRDDFunctions, RDD, ShuffledRDD, SubtractedRDD}
-import org.apache.spark.scheduler.{MapStatus, MyRDD, SparkListener, SparkListenerTaskEnd}
+import org.apache.spark.rdd.{
+  CoGroupedRDD,
+  OrderedRDDFunctions,
+  RDD,
+  ShuffledRDD,
+  SubtractedRDD
+}
+import org.apache.spark.scheduler.{
+  MapStatus,
+  MyRDD,
+  SparkListener,
+  SparkListenerTaskEnd
+}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.shuffle.ShuffleWriter
 import org.apache.spark.storage.{ShuffleBlockId, ShuffleDataBlockId}
 import org.apache.spark.util.MutablePair
 
 abstract class ShuffleSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   val conf = new SparkConf(loadDefaults = false)
 
@@ -63,7 +81,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(NUM_BLOCKS))
+          b,
+          new HashPartitioner(NUM_BLOCKS))
     c.setSerializer(new KryoSerializer(conf))
     val shuffleId =
       c.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]].shuffleId
@@ -74,8 +93,8 @@ abstract class ShuffleSuite
     (0 until NUM_BLOCKS).foreach { id =>
       val statuses =
         SparkEnv.get.mapOutputTracker.getMapSizesByExecutorId(shuffleId, id)
-      assert(statuses.forall(
-              _._2.forall(blockIdSizePair => blockIdSizePair._2 > 0)))
+      assert(statuses.forall(_._2.forall(blockIdSizePair =>
+        blockIdSizePair._2 > 0)))
     }
   }
 
@@ -90,7 +109,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(3))
+          b,
+          new HashPartitioner(3))
     c.setSerializer(new KryoSerializer(conf))
     assert(c.count === 10)
   }
@@ -257,7 +277,7 @@ abstract class ShuffleSuite
 
   test("shuffle with different compression settings (SPARK-3426)") {
     for (shuffleSpillCompress <- Set(true, false);
-    shuffleCompress <- Set(true, false)) {
+         shuffleCompress <- Set(true, false)) {
       val myConf = conf
         .clone()
         .setAppName("test")
@@ -275,7 +295,7 @@ abstract class ShuffleSuite
         case e: Exception =>
           val errMsg =
             s"Failed with spark.shuffle.spill.compress=$shuffleSpillCompress," +
-            s" spark.shuffle.compress=$shuffleCompress"
+              s" spark.shuffle.compress=$shuffleCompress"
           throw new Exception(errMsg, e)
       }
     }
@@ -392,16 +412,19 @@ abstract class ShuffleSuite
       val files = writer.write(iter)
       writer.stop(true)
     }
-    val interleaver = new InterleaveIterators(
-        data1, writeAndClose(writer1), data2, writeAndClose(writer2))
+    val interleaver = new InterleaveIterators(data1,
+                                              writeAndClose(writer1),
+                                              data2,
+                                              writeAndClose(writer2))
     val (mapOutput1, mapOutput2) = interleaver.run()
 
     // check that we can read the map output and it has the right data
     assert(mapOutput1.isDefined)
     assert(mapOutput2.isDefined)
     assert(mapOutput1.get.location === mapOutput2.get.location)
-    assert(mapOutput1.get.getSizeForBlock(0) === mapOutput1.get
-          .getSizeForBlock(0))
+    assert(
+        mapOutput1.get.getSizeForBlock(0) === mapOutput1.get.getSizeForBlock(
+            0))
 
     // register one of the map outputs -- doesn't matter which one
     mapOutput1.foreach {
@@ -433,8 +456,10 @@ abstract class ShuffleSuite
   * f1 before processing data2 with f2 (or vice versa).  It adds a barrier so that the functions only
   * process one element, before pausing to wait for the other function to "catch up".
   */
-class InterleaveIterators[T, R](
-    data1: Seq[T], f1: Iterator[T] => R, data2: Seq[T], f2: Iterator[T] => R) {
+class InterleaveIterators[T, R](data1: Seq[T],
+                                f1: Iterator[T] => R,
+                                data2: Seq[T],
+                                f2: Iterator[T] => R) {
 
   require(data1.size == data2.size)
 
@@ -508,7 +533,9 @@ object ShuffleSuite {
     job
 
     sc.listenerBus.waitUntilEmpty(500)
-    AggregatedShuffleMetrics(
-        recordsWritten, recordsRead, bytesWritten, bytesRead)
+    AggregatedShuffleMetrics(recordsWritten,
+                             recordsRead,
+                             bytesWritten,
+                             bytesRead)
   }
 }

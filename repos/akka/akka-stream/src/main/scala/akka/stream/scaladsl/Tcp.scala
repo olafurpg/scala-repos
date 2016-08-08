@@ -50,8 +50,8 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents a prospective outgoing TCP connection.
     */
-  final case class OutgoingConnection(
-      remoteAddress: InetSocketAddress, localAddress: InetSocketAddress)
+  final case class OutgoingConnection(remoteAddress: InetSocketAddress,
+                                      localAddress: InetSocketAddress)
 
   def apply()(implicit system: ActorSystem): Tcp = super.apply(system)
 

@@ -12,7 +12,8 @@ import akka.actor.ExtensionIdProvider
 import akka.cluster.Cluster
 
 object DistributedData
-    extends ExtensionId[DistributedData] with ExtensionIdProvider {
+    extends ExtensionId[DistributedData]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): DistributedData = super.get(system)
 
   override def lookup = DistributedData
@@ -38,7 +39,7 @@ class DistributedData(system: ExtendedActorSystem) extends Extension {
     */
   def isTerminated: Boolean =
     Cluster(system).isTerminated ||
-    !settings.role.forall(Cluster(system).selfRoles.contains)
+      !settings.role.forall(Cluster(system).selfRoles.contains)
 
   /**
     * `ActorRef` of the [[Replicator]] .

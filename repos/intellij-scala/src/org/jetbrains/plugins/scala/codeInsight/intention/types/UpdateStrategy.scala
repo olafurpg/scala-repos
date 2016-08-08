@@ -7,12 +7,27 @@ import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.codeInsight.intention.IntentionUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, TypeAdjuster}
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScTypedPattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScTypedPattern,
+  ScWildcardPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScFunctionExpr
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -83,8 +98,8 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromPattern(pattern: ScTypedPattern) {
-    val newPattern = ScalaPsiElementFactory.createPatternFromText(
-        pattern.name, pattern.getManager)
+    val newPattern = ScalaPsiElementFactory
+      .createPatternFromText(pattern.name, pattern.getManager)
     pattern.replace(newPattern)
   }
 
@@ -102,7 +117,8 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
                   val clause: PsiElement = x.replace(
                       ScalaPsiElementFactory
                         .createClauseForFunctionExprFromText(
-                          "(" + param.getText + ")", param.getManager))
+                            "(" + param.getText + ")",
+                            param.getManager))
                   clause.asInstanceOf[ScParameterClause].parameters.head
                 case _ => param
               }
@@ -115,10 +131,10 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromParameter(param: ScParameter) {
-    val newParam = ScalaPsiElementFactory.createParameterFromText(
-        param.name, param.getManager)
-    val newClause = ScalaPsiElementFactory.createClauseForFunctionExprFromText(
-        newParam.getText, param.getManager)
+    val newParam = ScalaPsiElementFactory
+      .createParameterFromText(param.name, param.getManager)
+    val newClause = ScalaPsiElementFactory
+      .createClauseForFunctionExprFromText(newParam.getText, param.getManager)
     val expr: ScFunctionExpr =
       PsiTreeUtil.getParentOfType(param, classOf[ScFunctionExpr], false)
     if (expr != null) {
@@ -177,10 +193,11 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
               if (sc +: sc.supers).exists(isSealed) =>
             val sealedType = BaseTypes
               .get(tp)
-              .find(ScType
+              .find(
+                  ScType
                     .extractClass(_, Option(context.getProject))
                     .exists(isSealed))
-              (sealedType.toSeq :+ tp).map(typeElemFromType)
+            (sealedType.toSeq :+ tp).map(typeElemFromType)
           case Some(sc: ScTypeDefinition)
               if sc.getTruncedQualifiedName.startsWith("scala.collection") =>
             val goodTypes = Set(
@@ -198,7 +215,7 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
               .get(tp)
               .map(_.canonicalText)
               .filter(t => goodTypes.exists(t.startsWith))
-              (tp.canonicalText +: baseTypes).map(typeElemfromText)
+            (tp.canonicalText +: baseTypes).map(typeElemfromText)
           case _ => Seq(typeElemFromType(tp))
         }
     }

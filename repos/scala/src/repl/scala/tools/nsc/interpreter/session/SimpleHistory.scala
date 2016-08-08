@@ -18,8 +18,8 @@ class SimpleHistory extends History {
   private def lastIndex = size - 1
   private def fail(msg: String): String = {
     repldbg(
-        "Internal error in history(size %d, index %d): %s".format(
-            size, index, msg))
+        "Internal error in history(size %d, index %d): %s"
+          .format(size, index, msg))
     ""
   }
 

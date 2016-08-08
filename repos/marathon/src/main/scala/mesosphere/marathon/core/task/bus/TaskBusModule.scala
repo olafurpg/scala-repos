@@ -1,6 +1,10 @@
 package mesosphere.marathon.core.task.bus
 
-import mesosphere.marathon.core.task.bus.impl.{TaskStatusEmitterImpl, TaskStatusObservablesImpl, InternalTaskStatusEventStream}
+import mesosphere.marathon.core.task.bus.impl.{
+  TaskStatusEmitterImpl,
+  TaskStatusObservablesImpl,
+  InternalTaskStatusEventStream
+}
 
 /**
   * This module allows subscription to task updates via the taskStatusObservables. You can either subscribe to

@@ -20,16 +20,16 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
   override def train(sc: SparkContext, data: PreparedData): ALSModel = {
     require(!data.likeEvents.take(1).isEmpty,
             s"likeEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.users.take(1).isEmpty,
             s"users in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.items.take(1).isEmpty,
             s"items in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
@@ -47,11 +47,11 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+          " to Int index.")
 
       // key is (uindex, iindex) tuple, value is (like, t) tuple
       ((uindex, iindex), (r.like, r.t))
@@ -80,7 +80,7 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
             s"mllibRatings cannot be empty." +
-            " Please check if your events contain valid user and item ID.")
+              " Please check if your events contain valid user and item ID.")
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
 

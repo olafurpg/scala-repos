@@ -32,8 +32,9 @@ trait PlatformStatProvider {
   // Incrementor for a Counter identified by group/name for the specific jobID
   // Returns an incrementor function for the Counter wrapped in an Option
   // to ensure we catch when the incrementor cannot be obtained for the specified jobID
-  def counterIncrementor(
-      jobId: JobId, group: Group, name: Name): Option[CounterIncrementor]
+  def counterIncrementor(jobId: JobId,
+                         group: Group,
+                         name: Name): Option[CounterIncrementor]
 }
 
 object SummingbirdRuntimeStats {
@@ -68,8 +69,9 @@ object SummingbirdRuntimeStats {
   def addPlatformStatProvider(pp: PlatformStatProvider): Unit =
     platformStatProviders.add(new WeakReference(pp))
 
-  def getPlatformCounterIncrementor(
-      jobID: JobId, group: Group, name: Name): CounterIncrementor = {
+  def getPlatformCounterIncrementor(jobID: JobId,
+                                    group: Group,
+                                    name: Name): CounterIncrementor = {
     platformsInit
     // Find the PlatformMetricProvider (PMP) that matches the jobID
     // return the incrementor for the Counter specified by group/name
@@ -79,14 +81,15 @@ object SummingbirdRuntimeStats {
       prov <- provRef.get
       incr <- prov.counterIncrementor(jobID, group, name)
     } yield incr).toList.headOption.getOrElse(sys.error(
-            "Could not find the platform stat provider for jobID " + jobID))
+        "Could not find the platform stat provider for jobID " + jobID))
   }
 }
 
 object JobCounters {
   @annotation.tailrec
-  private[this] final def getOrElseUpdate[K, V](
-      map: ConcurrentHashMap[K, V], k: K, default: => V): V = {
+  private[this] final def getOrElseUpdate[K, V](map: ConcurrentHashMap[K, V],
+                                                k: K,
+                                                default: => V): V = {
     val v = map.get(k)
     if (v == null) {
       map.putIfAbsent(k, default)
@@ -96,16 +99,18 @@ object JobCounters {
     }
   }
 
-  private val registeredCountersForJob: ConcurrentHashMap[
-      JobId, ParHashSet[(Group, Name)]] =
+  private val registeredCountersForJob: ConcurrentHashMap[JobId,
+                                                          ParHashSet[(Group,
+                                                                      Name)]] =
     new ConcurrentHashMap[JobId, ParHashSet[(Group, Name)]]()
 
   def getCountersForJob(jobID: JobId): Option[Seq[(Group, Name)]] =
     Option(registeredCountersForJob.get(jobID)).map(_.toList)
 
   def registerCounter(jobID: JobId, group: Group, name: Name): Unit = {
-    val set = getOrElseUpdate(
-        registeredCountersForJob, jobID, ParHashSet[(Group, Name)]())
+    val set = getOrElseUpdate(registeredCountersForJob,
+                              jobID,
+                              ParHashSet[(Group, Name)]())
     set += ((group, name))
   }
 }

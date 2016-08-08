@@ -34,8 +34,8 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
   override def findTargetElement: PsiMember = {
     val element = new JavaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
-    assertTrue(
-        "<caret> is not on method name", element.isInstanceOf[PsiMethod])
+    assertTrue("<caret> is not on method name",
+               element.isInstanceOf[PsiMethod])
     element.asInstanceOf[PsiMethod]
   }
 
@@ -141,8 +141,9 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
 
   def testNamedAndDefaultArgs(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(
-            2, "s", getPsiTypeFromText("String", targetMethod)),
+        new ParameterInfoImpl(2,
+                              "s",
+                              getPsiTypeFromText("String", targetMethod)),
         new ParameterInfoImpl(3, "b", PsiType.BOOLEAN),
         new ParameterInfoImpl(-1, "b2", PsiType.BOOLEAN, "true")
     )

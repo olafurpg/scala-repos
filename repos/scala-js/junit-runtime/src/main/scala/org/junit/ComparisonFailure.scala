@@ -6,8 +6,8 @@ package org.junit
 object ComparisonFailure {
   private final val MAX_CONTEXT_LENGTH = 20
 
-  private class ComparisonCompactor(
-      private val expected: String, private val actual: String) {
+  private class ComparisonCompactor(private val expected: String,
+                                    private val actual: String) {
 
     private val ELLIPSIS: String = "..."
     private val DIFF_END: String = "]"
@@ -71,8 +71,8 @@ object ComparisonFailure {
       }
 
       private def extractDiff(source: String): String = {
-        val sub = source.substring(
-            _sharedPrefix.length(), source.length() - _sharedSuffix.length())
+        val sub = source.substring(_sharedPrefix.length(),
+                                   source.length() - _sharedSuffix.length())
         DIFF_START + sub + DIFF_END
       }
     }

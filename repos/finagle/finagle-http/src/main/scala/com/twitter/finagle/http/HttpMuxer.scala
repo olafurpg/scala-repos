@@ -37,12 +37,12 @@ class HttpMuxer(
     * Create a new Mux service with the specified pattern added. If the pattern already exists, overwrite existing value.
     * Pattern ending with "/" indicates prefix matching; otherwise exact matching.
     */
-  def withHandler(
-      pattern: String, service: Service[Request, Response]): HttpMuxer = {
+  def withHandler(pattern: String,
+                  service: Service[Request, Response]): HttpMuxer = {
     val norm = normalize(pattern)
     new HttpMuxer(
         handlers.filterNot { case (pat, _) => pat == norm } :+
-        ((norm, service)))
+          ((norm, service)))
   }
 
   /**
@@ -99,8 +99,8 @@ object HttpMuxer extends Service[Request, Response] {
       underlying = underlying.withHandler(pattern, service)
     }
 
-  def addRichHandler(
-      pattern: String, service: Service[Request, Response]): Unit =
+  def addRichHandler(pattern: String,
+                     service: Service[Request, Response]): Unit =
     addHandler(pattern, service)
 
   def patterns: Seq[String] = underlying.patterns
@@ -108,8 +108,9 @@ object HttpMuxer extends Service[Request, Response] {
   private[this] val log = Logger.getLogger(getClass.getName)
 
   for (handler <- LoadService[HttpMuxHandler]()) {
-    log.info("HttpMuxer[%s] = %s(%s)".format(
-            handler.pattern, handler.getClass.getName, handler))
+    log.info(
+        "HttpMuxer[%s] = %s(%s)"
+          .format(handler.pattern, handler.getClass.getName, handler))
     addHandler(handler.pattern, handler)
   }
 }

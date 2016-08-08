@@ -303,7 +303,7 @@ private[util] object DurationBox {
   * their arithmetic follows. This is useful for representing durations
   * that are truly infinite; for example the absence of a timeout.
   */
-sealed class Duration private[util](protected val nanos: Long) extends {
+sealed class Duration private[util] (protected val nanos: Long) extends {
   protected val ops = Duration
 } with TimeLike[Duration] with Serializable {
   import ops._

@@ -26,13 +26,13 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val p = TestProbe()
       val datas = List(ByteString("a"), ByteString("c"), ByteString("c"))
 
-      val completion = Source(datas).runWith(
-          StreamConverters.fromOutputStream(() ⇒
-                new OutputStream {
-          override def write(i: Int): Unit = ()
-          override def write(bytes: Array[Byte]): Unit =
-            p.ref ! ByteString(bytes).utf8String
-      }))
+      val completion =
+        Source(datas).runWith(StreamConverters.fromOutputStream(() ⇒
+          new OutputStream {
+            override def write(i: Int): Unit = ()
+            override def write(bytes: Array[Byte]): Unit =
+              p.ref ! ByteString(bytes).utf8String
+        }))
 
       p.expectMsg(datas(0).utf8String)
       p.expectMsg(datas(1).utf8String)
@@ -45,7 +45,7 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       Source
         .failed(new TE("Boom!"))
         .runWith(StreamConverters.fromOutputStream(() ⇒
-                  new OutputStream {
+          new OutputStream {
             override def write(i: Int): Unit = ()
             override def close() = p.ref ! "closed"
         }))
@@ -56,7 +56,7 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
     "close underlying stream when completion received" in assertAllStagesStopped {
       val p = TestProbe()
       Source.empty.runWith(StreamConverters.fromOutputStream(() ⇒
-                new OutputStream {
+        new OutputStream {
           override def write(i: Int): Unit = ()
           override def write(bytes: Array[Byte]): Unit =
             p.ref ! ByteString(bytes).utf8String

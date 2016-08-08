@@ -100,8 +100,8 @@ class PluginRegistry {
       repositoryPath: String): Option[GitRepositoryRouting] = {
     PluginRegistry().getRepositoryRoutings().find {
       case GitRepositoryRouting(urlPath, _, _) => {
-          repositoryPath.matches("/" + urlPath + "(/.*)?")
-        }
+        repositoryPath.matches("/" + urlPath + "(/.*)?")
+      }
     }
   }
 
@@ -121,7 +121,7 @@ class PluginRegistry {
       method: String,
       path: String,
       function: (HttpServletRequest, HttpServletResponse, Context,
-      RepositoryInfo) => Any
+                 RepositoryInfo) => Any
   )
 }
 
@@ -168,9 +168,9 @@ object PluginRegistry {
               conn.find("SELECT * FROM PLUGIN WHERE PLUGIN_ID = ?",
                         plugin.pluginId)(_.getString("VERSION")) match {
                 case Some(x) => {
-                    val dim = x.split("\\.")
-                    Version(dim(0).toInt, dim(1).toInt)
-                  }
+                  val dim = x.split("\\.")
+                  Version(dim(0).toInt, dim(1).toInt)
+                }
                 case None => Version(0, 0)
               }
 
@@ -206,8 +206,8 @@ object PluginRegistry {
                 ))
           } catch {
             case e: Throwable => {
-                logger.error(s"Error during plugin initialization", e)
-              }
+              logger.error(s"Error during plugin initialization", e)
+            }
           }
         }
     }
@@ -219,8 +219,8 @@ object PluginRegistry {
         pluginInfo.pluginClass.shutdown(instance, context, settings)
       } catch {
         case e: Exception => {
-            logger.error(s"Error during plugin shutdown", e)
-          }
+          logger.error(s"Error during plugin shutdown", e)
+        }
       }
     }
   }

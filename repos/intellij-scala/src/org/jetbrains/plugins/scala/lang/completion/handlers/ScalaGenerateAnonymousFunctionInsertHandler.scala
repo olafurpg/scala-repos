@@ -10,18 +10,25 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScTypedPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScTypedPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScFunctionExpr
-import org.jetbrains.plugins.scala.lang.psi.types.{ScAbstractType, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScAbstractType,
+  ScType,
+  ScTypePresentation
+}
 
 import scala.collection.mutable
 
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaGenerateAnonymousFunctionInsertHandler(
-    params: Seq[ScType], braceArgs: Boolean)
+class ScalaGenerateAnonymousFunctionInsertHandler(params: Seq[ScType],
+                                                  braceArgs: Boolean)
     extends InsertHandler[LookupElement] {
   def handleInsert(context: InsertionContext, item: LookupElement) {
     val abstracts = new mutable.HashSet[ScAbstractType]
@@ -42,7 +49,8 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
     val startOffset = context.getStartOffset
     val endOffset = startOffset + text.length()
     val commonParent = PsiTreeUtil.findCommonParent(
-        file.findElementAt(startOffset), file.findElementAt(endOffset - 1))
+        file.findElementAt(startOffset),
+        file.findElementAt(endOffset - 1))
     if (commonParent.getTextRange.getStartOffset != startOffset ||
         commonParent.getTextRange.getEndOffset != endOffset) {
       document.insertString(endOffset, " ")
@@ -57,8 +65,8 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
       .createTemplateBuilder(commonParent)
       .asInstanceOf[TemplateBuilderImpl]
 
-    val abstractNames = abstracts.map(
-        at => ScTypePresentation.ABSTRACT_TYPE_PREFIX + at.tpt.name)
+    val abstractNames = abstracts.map(at =>
+      ScTypePresentation.ABSTRACT_TYPE_PREFIX + at.tpt.name)
 
     def seekAbstracts(te: ScTypeElement) {
       val visitor = new ScalaRecursiveElementVisitor {
@@ -72,9 +80,12 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
                 val node = abstracts.find(
                     a =>
                       ScTypePresentation.ABSTRACT_TYPE_PREFIX +
-                      a.tpt.name == refName) match {
+                        a.tpt.name == refName) match {
                   case Some(abstr) =>
-                    import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing}
+                    import org.jetbrains.plugins.scala.lang.psi.types.{
+                      Any,
+                      Nothing
+                    }
                     abstr.simplifyType match {
                       case Any | Nothing =>
                         new ConstantNode(refName.substring(prefixLength))

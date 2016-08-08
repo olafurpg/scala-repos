@@ -109,27 +109,29 @@ private object ClassPath {
                         buf: mutable.Buffer[Info]) {
     if (ignoredPackages contains prefix) return
 
-    for (f <- dir.listFiles) if (f.isDirectory && f.canRead)
-      browseDir(f, loader, prefix + f.getName + "/", buf)
-    else
-      for (iface <- ifaceOfName(prefix + f.getName)) {
-        val source = Source.fromFile(f, "UTF-8")
-        val lines = readLines(source)
-        buf += Info(prefix + f.getName, iface, lines)
-      }
+    for (f <- dir.listFiles)
+      if (f.isDirectory && f.canRead)
+        browseDir(f, loader, prefix + f.getName + "/", buf)
+      else
+        for (iface <- ifaceOfName(prefix + f.getName)) {
+          val source = Source.fromFile(f, "UTF-8")
+          val lines = readLines(source)
+          buf += Info(prefix + f.getName, iface, lines)
+        }
   }
 
   private def browseJar(file: File,
                         loader: ClassLoader,
                         buf: mutable.Buffer[Info],
                         history: mutable.Set[String]) {
-    val jarFile = try new JarFile(file) catch {
+    val jarFile = try new JarFile(file)
+    catch {
       case _: IOException => return // not a Jar file
     }
 
     try {
-      for (uri <- jarClasspath(file, jarFile.getManifest)) browseUri0(
-          uri, loader, buf, history)
+      for (uri <- jarClasspath(file, jarFile.getManifest))
+        browseUri0(uri, loader, buf, history)
 
       for {
         e <- jarFile.entries.asScala if !e.isDirectory
@@ -141,14 +143,15 @@ private object ClassPath {
         buf += Info(n, iface, lines)
       }
     } finally {
-      try jarFile.close() catch {
+      try jarFile.close()
+      catch {
         case _: IOException =>
       }
     }
   }
 
-  private def jarClasspath(
-      jarFile: File, manifest: java.util.jar.Manifest): Seq[URI] =
+  private def jarClasspath(jarFile: File,
+                           manifest: java.util.jar.Manifest): Seq[URI] =
     for {
       m <- Option(manifest).toSeq
       attr <- Option(m.getMainAttributes.getValue("Class-Path")).toSeq
@@ -193,7 +196,7 @@ object loadServiceIgnoredPaths
   * A deny list of implementations to ignore. Keys are the fully qualified class names.
   * Any other implementations that are found via `LoadService.apply` are eligible to be used.
   *
-  * As an example, here's how to filter out `OstrichStatsReceiver`, `OstrichExporter` and 
+  * As an example, here's how to filter out `OstrichStatsReceiver`, `OstrichExporter` and
   * `CommonsStatsReceiver` using a global flag:
   *
   * {{{
@@ -208,7 +211,7 @@ object loadServiceDenied
     extends GlobalFlag[Set[String]](
         Set.empty,
         "A deny list of implementations to ignore. Keys are the fully qualified class names. " +
-        "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
+          "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
 
 /**
   * Load a singleton class in the manner of [[java.util.ServiceLoader]]. It is
@@ -219,7 +222,7 @@ object LoadService {
   private val cache: mutable.Map[ClassLoader, Seq[ClassPath.Info]] =
     mutable.Map.empty
 
-  def apply[T : ClassTag](): Seq[T] = synchronized {
+  def apply[T: ClassTag](): Seq[T] = synchronized {
     val iface = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
     val ifaceName = iface.getName
     val loader = iface.getClassLoader
@@ -228,7 +231,7 @@ object LoadService {
 
     val classNames = for {
       info <- cache.getOrElseUpdate(loader, ClassPath.browse(loader))
-                 if info.iface == ifaceName
+      if info.iface == ifaceName
       className <- info.lines
     } yield className
 
@@ -265,7 +268,7 @@ object LoadService {
           DefaultLogger.log(
               Level.FATAL,
               s"LoadService: failed to instantiate '$className' for the requested " +
-              s"service '$ifaceName'",
+                s"service '$ifaceName'",
               ex
           )
           None

@@ -16,8 +16,8 @@ private object JerkConversions extends DefaultJsonProtocol with FamilyFormats {
   //
   // Lack of definition in scalac's implicit resolution rules means
   // that we have to redefine some things here.
-  implicit override def eitherFormat[
-      A : JsonFormat, B : JsonFormat]: JsonFormat[Either[A, B]] =
+  implicit override def eitherFormat[A: JsonFormat, B: JsonFormat]
+    : JsonFormat[Either[A, B]] =
     super.eitherFormat[A, B]
   // Note that its not possible to override an object in scala, so we
   // just define a new one that wins the race.
@@ -42,7 +42,7 @@ private object JerkConversions extends DefaultJsonProtocol with FamilyFormats {
   }
 
   // some of the case classes use the keyword `type`, so we need a better default
-  override implicit def coproductHint[T : Typeable]: CoproductHint[T] =
+  override implicit def coproductHint[T: Typeable]: CoproductHint[T] =
     new FlatCoproductHint[T]("typehint")
 
   val RpcRequestFormat: RootJsonFormat[RpcRequest] = cachedImplicit

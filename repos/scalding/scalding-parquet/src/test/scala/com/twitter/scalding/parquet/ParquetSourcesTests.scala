@@ -1,8 +1,16 @@
 package com.twitter.scalding.parquet
 
 import cascading.tuple.Fields
-import com.twitter.scalding.parquet.thrift.{DailySuffixParquetThrift, FixedPathParquetThrift, HourlySuffixParquetThrift}
-import com.twitter.scalding.parquet.tuple.{DailySuffixParquetTuple, FixedPathParquetTuple, HourlySuffixParquetTuple}
+import com.twitter.scalding.parquet.thrift.{
+  DailySuffixParquetThrift,
+  FixedPathParquetThrift,
+  HourlySuffixParquetThrift
+}
+import com.twitter.scalding.parquet.tuple.{
+  DailySuffixParquetTuple,
+  FixedPathParquetTuple,
+  HourlySuffixParquetTuple
+}
 import com.twitter.scalding.{DateRange, RichDate, Source}
 import java.lang.{Integer => JInt}
 import org.apache.thrift.protocol.TProtocol
@@ -40,7 +48,8 @@ abstract class ParquetSourcesTestsBase extends WordSpec {
   }
 
   def testReturnProvidedColumns[S <: Source with HasColumnProjection](
-      src: S, expected: ColumnProjectionString) = {
+      src: S,
+      expected: ColumnProjectionString) = {
     "return the provided columns " + expected in {
       assert(src.columnProjectionString.get === expected)
     }
@@ -66,20 +75,22 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "HourlySuffixParquetThrift" should {
@@ -89,20 +100,22 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "FixedPathParquetThrift" should {
@@ -112,20 +125,22 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "DailySuffixParquetTuple" should {
@@ -135,8 +150,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new DailySuffixParquetTuple(path, dateRange, fields) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 
   "HourlySuffixParquetTuple" should {
@@ -146,8 +161,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new HourlySuffixParquetTuple(path, dateRange, fields) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 
   "FixedPathParquetTuple" should {
@@ -157,8 +172,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new FixedPathParquetTuple(fields, path, path, path) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 }
 

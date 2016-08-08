@@ -12,7 +12,9 @@ import Implicits.request2Session
   * its result into the cache which available during a request.
   */
 trait RequestCache
-    extends SystemSettingsService with AccountService with IssuesService {
+    extends SystemSettingsService
+    with AccountService
+    with IssuesService {
 
   private implicit def context2Session(implicit context: Context): Session =
     request2Session(context.request)

@@ -50,8 +50,8 @@ class ThriftServerBufferedCodecFactory(protocolFactory: TProtocolFactory)
   }
 }
 
-class ThriftServerBufferedCodec(
-    protocolFactory: TProtocolFactory, config: ServerCodecConfig)
+class ThriftServerBufferedCodec(protocolFactory: TProtocolFactory,
+                                config: ServerCodecConfig)
     extends ThriftServerFramedCodec(config) {
   override def pipelineFactory =
     ThriftServerBufferedPipelineFactory(protocolFactory)

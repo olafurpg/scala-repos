@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-final class MonadPlusOps[F[_], A] private[syntax](val self: F[A])(
+final class MonadPlusOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: MonadPlus[F])
     extends Ops[F[A]] {
   ////
@@ -22,8 +22,8 @@ final class MonadPlusOps[F[_], A] private[syntax](val self: F[A])(
     F.unite[T, B](ftb)
   }
 
-  final def separate[G[_, _], B, C](
-      implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
+  final def separate[G[_, _], B, C](implicit ev: A === G[B, C],
+                                    G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))
 
   ////
@@ -36,7 +36,9 @@ sealed trait ToMonadPlusOps0 {
 }
 
 trait ToMonadPlusOps
-    extends ToMonadPlusOps0 with ToMonadOps with ToApplicativePlusOps {
+    extends ToMonadPlusOps0
+    with ToMonadOps
+    with ToApplicativePlusOps {
   implicit def ToMonadPlusOps[F[_], A](v: F[A])(implicit F0: MonadPlus[F]) =
     new MonadPlusOps[F, A](v)
 
@@ -46,7 +48,8 @@ trait ToMonadPlusOps
 }
 
 trait MonadPlusSyntax[F[_]]
-    extends MonadSyntax[F] with ApplicativePlusSyntax[F] {
+    extends MonadSyntax[F]
+    with ApplicativePlusSyntax[F] {
   implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] =
     new MonadPlusOps[F, A](v)(MonadPlusSyntax.this.F)
 

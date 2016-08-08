@@ -63,8 +63,9 @@ final class LinkedClass(
 
   def toInfo: Infos.ClassInfo = {
     val methodInfos =
-      (staticMethods.map(_.info) ++ memberMethods.map(_.info) ++ abstractMethods
-            .map(_.info) ++ exportedMembers.map(_.info) ++ classExportInfo)
+      (staticMethods.map(_.info) ++ memberMethods
+        .map(_.info) ++ abstractMethods.map(_.info) ++ exportedMembers.map(
+          _.info) ++ classExportInfo)
 
     Infos.ClassInfo(encodedName,
                     isExported,
@@ -74,26 +75,26 @@ final class LinkedClass(
                     methodInfos)
   }
 
-  def copy(
-      name: Ident = this.name,
-      kind: ClassKind = this.kind,
-      superClass: Option[Ident] = this.superClass,
-      interfaces: List[Ident] = this.interfaces,
-      jsName: Option[String] = this.jsName,
-      fields: List[FieldDef] = this.fields,
-      staticMethods: List[LinkedMember[MethodDef]] = this.staticMethods,
-      memberMethods: List[LinkedMember[MethodDef]] = this.memberMethods,
-      abstractMethods: List[LinkedMember[MethodDef]] = this.abstractMethods,
-      exportedMembers: List[LinkedMember[Tree]] = this.exportedMembers,
-      classExports: List[Tree] = this.classExports,
-      classExportInfo: Option[Infos.MethodInfo] = this.classExportInfo,
-      optimizerHints: OptimizerHints = this.optimizerHints,
-      pos: Position = this.pos,
-      ancestors: List[String] = this.ancestors,
-      hasInstances: Boolean = this.hasInstances,
-      hasInstanceTests: Boolean = this.hasInstanceTests,
-      hasRuntimeTypeInfo: Boolean = this.hasRuntimeTypeInfo,
-      version: Option[String] = this.version) = {
+  def copy(name: Ident = this.name,
+           kind: ClassKind = this.kind,
+           superClass: Option[Ident] = this.superClass,
+           interfaces: List[Ident] = this.interfaces,
+           jsName: Option[String] = this.jsName,
+           fields: List[FieldDef] = this.fields,
+           staticMethods: List[LinkedMember[MethodDef]] = this.staticMethods,
+           memberMethods: List[LinkedMember[MethodDef]] = this.memberMethods,
+           abstractMethods: List[LinkedMember[MethodDef]] =
+             this.abstractMethods,
+           exportedMembers: List[LinkedMember[Tree]] = this.exportedMembers,
+           classExports: List[Tree] = this.classExports,
+           classExportInfo: Option[Infos.MethodInfo] = this.classExportInfo,
+           optimizerHints: OptimizerHints = this.optimizerHints,
+           pos: Position = this.pos,
+           ancestors: List[String] = this.ancestors,
+           hasInstances: Boolean = this.hasInstances,
+           hasInstanceTests: Boolean = this.hasInstanceTests,
+           hasRuntimeTypeInfo: Boolean = this.hasRuntimeTypeInfo,
+           version: Option[String] = this.version) = {
     new LinkedClass(name,
                     kind,
                     superClass,

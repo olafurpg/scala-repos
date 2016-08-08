@@ -12,13 +12,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   */
 class ScReturnStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScReturnStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScReturnStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

@@ -10,9 +10,10 @@ package scalaguide.forms.scalafieldconstructor {
   object ScalaFieldConstructorSpec extends Specification {
 
     val conf = Configuration.reference
-    implicit val messages: Messages = new DefaultMessagesApi(
-        Environment.simple(), conf, new DefaultLangs(conf))
-      .preferred(Seq.empty)
+    implicit val messages: Messages =
+      new DefaultMessagesApi(Environment.simple(),
+                             conf,
+                             new DefaultLangs(conf)).preferred(Seq.empty)
 
     "field constructors" should {
 

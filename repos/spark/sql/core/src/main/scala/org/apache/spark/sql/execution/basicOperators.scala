@@ -20,14 +20,19 @@ package org.apache.spark.sql.execution
 import org.apache.spark.rdd.{PartitionwiseSampledRDD, RDD}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, ExpressionCanonicalizer}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode,
+  ExpressionCanonicalizer
+}
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.execution.metric.{LongSQLMetricValue, SQLMetrics}
 import org.apache.spark.sql.types.LongType
 import org.apache.spark.util.random.PoissonSampler
 
 case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = projectList.map(_.toAttribute)
 
@@ -50,9 +55,11 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
     references.filter(a => usedMoreThanOnce.contains(a.exprId))
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
-    val exprs = projectList.map(x =>
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
+    val exprs = projectList.map(
+        x =>
           ExpressionCanonicalizer.execute(
               BindReferences.bindReference(x, child.output)))
     ctx.currentVars = input
@@ -61,16 +68,17 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
     val nonDeterministicAttrs =
       projectList.filterNot(_.deterministic).map(_.toAttribute)
     s"""
-       |${evaluateRequiredVariables(
-           output, resultVars, AttributeSet(nonDeterministicAttrs))}
+       |${evaluateRequiredVariables(output,
+                                    resultVars,
+                                    AttributeSet(nonDeterministicAttrs))}
        |${consume(ctx, resultVars)}
      """.stripMargin
   }
 
   protected override def doExecute(): RDD[InternalRow] = {
     child.execute().mapPartitionsInternal { iter =>
-      val project = UnsafeProjection.create(
-          projectList, child.output, subexpressionEliminationEnabled)
+      val project = UnsafeProjection
+        .create(projectList, child.output, subexpressionEliminationEnabled)
       iter.map(project)
     }
   }
@@ -79,7 +87,9 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
 }
 
 case class Filter(condition: Expression, child: SparkPlan)
-    extends UnaryNode with CodegenSupport with PredicateHelper {
+    extends UnaryNode
+    with CodegenSupport
+    with PredicateHelper {
 
   // Split out all the IsNotNulls from condition.
   private val (notNullPreds, otherPreds) =
@@ -113,8 +123,9 @@ case class Filter(condition: Expression, child: SparkPlan)
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     // filter out the nulls
@@ -196,8 +207,8 @@ case class Sample(lowerBound: Double,
       // requiring us to copy the row, which is more expensive than the random number generator.
       new PartitionwiseSampledRDD[InternalRow, InternalRow](
           child.execute(),
-          new PoissonSampler[InternalRow](
-              upperBound - lowerBound, useGapSamplingIfPossible = false),
+          new PoissonSampler[InternalRow](upperBound - lowerBound,
+                                          useGapSamplingIfPossible = false),
           preservesPartitioning = true,
           seed)
     } else {
@@ -211,15 +222,16 @@ case class Range(start: Long,
                  numSlices: Int,
                  numElements: BigInt,
                  output: Seq[Attribute])
-    extends LeafNode with CodegenSupport {
+    extends LeafNode
+    with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
                                                      "number of output rows"))
 
   // output attributes should not affect the results
-  override lazy val cleanArgs: Seq[Any] = Seq(
-      start, step, numSlices, numElements)
+  override lazy val cleanArgs: Seq[Any] =
+    Seq(start, step, numSlices, numElements)
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
     sqlContext.sparkContext
@@ -249,7 +261,8 @@ case class Range(start: Long,
         s"$number > $partitionEnd"
       }
 
-    ctx.addNewFunction("initRange", s"""
+    ctx.addNewFunction("initRange",
+                       s"""
         | private void initRange(int idx) {
         |   $BigInt index = $BigInt.valueOf(idx);
         |   $BigInt numSlice = $BigInt.valueOf(${numSlices}L);
@@ -282,8 +295,9 @@ case class Range(start: Long,
 
     val input = ctx.freshName("input")
     // Right now, Range is only used when there is one upstream.
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
     s"""
       | // initialize Range
       | if (!$initTerm) {
@@ -310,53 +324,52 @@ case class Range(start: Long,
     val numOutputRows = longMetric("numOutputRows")
     sqlContext.sparkContext
       .parallelize(0 until numSlices, numSlices)
-      .mapPartitionsWithIndex((i, _) =>
-            {
-          val partitionStart = (i * numElements) / numSlices * step + start
-          val partitionEnd =
-            (((i + 1) * numElements) / numSlices) * step + start
-          def getSafeMargin(bi: BigInt): Long =
-            if (bi.isValidLong) {
-              bi.toLong
-            } else if (bi > 0) {
-              Long.MaxValue
-            } else {
-              Long.MinValue
-            }
-          val safePartitionStart = getSafeMargin(partitionStart)
-          val safePartitionEnd = getSafeMargin(partitionEnd)
-          val rowSize =
-            UnsafeRow.calculateBitSetWidthInBytes(1) + LongType.defaultSize
-          val unsafeRow = UnsafeRow.createFromByteArray(rowSize, 1)
-
-          new Iterator[InternalRow] {
-            private[this] var number: Long = safePartitionStart
-            private[this] var overflow: Boolean = false
-
-            override def hasNext =
-              if (!overflow) {
-                if (step > 0) {
-                  number < safePartitionEnd
-                } else {
-                  number > safePartitionEnd
-                }
-              } else false
-
-            override def next() = {
-              val ret = number
-              number += step
-              if (number < ret ^ step < 0) {
-                // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
-                // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
-                // back, we are pretty sure that we have an overflow.
-                overflow = true
-              }
-
-              numOutputRows += 1
-              unsafeRow.setLong(0, ret)
-              unsafeRow
-            }
+      .mapPartitionsWithIndex((i, _) => {
+        val partitionStart = (i * numElements) / numSlices * step + start
+        val partitionEnd =
+          (((i + 1) * numElements) / numSlices) * step + start
+        def getSafeMargin(bi: BigInt): Long =
+          if (bi.isValidLong) {
+            bi.toLong
+          } else if (bi > 0) {
+            Long.MaxValue
+          } else {
+            Long.MinValue
           }
+        val safePartitionStart = getSafeMargin(partitionStart)
+        val safePartitionEnd = getSafeMargin(partitionEnd)
+        val rowSize =
+          UnsafeRow.calculateBitSetWidthInBytes(1) + LongType.defaultSize
+        val unsafeRow = UnsafeRow.createFromByteArray(rowSize, 1)
+
+        new Iterator[InternalRow] {
+          private[this] var number: Long = safePartitionStart
+          private[this] var overflow: Boolean = false
+
+          override def hasNext =
+            if (!overflow) {
+              if (step > 0) {
+                number < safePartitionEnd
+              } else {
+                number > safePartitionEnd
+              }
+            } else false
+
+          override def next() = {
+            val ret = number
+            number += step
+            if (number < ret ^ step < 0) {
+              // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
+              // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
+              // back, we are pretty sure that we have an overflow.
+              overflow = true
+            }
+
+            numOutputRows += 1
+            unsafeRow.setLong(0, ret)
+            unsafeRow
+          }
+        }
       })
   }
 }

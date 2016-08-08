@@ -10,16 +10,35 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
-import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{ClassTypeToImport, TypeAliasToImport}
+import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{
+  ClassTypeToImport,
+  TypeAliasToImport
+}
 import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern, ScInfixPattern, ScInterpolationPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScInfixTypeElement, ScParameterizedTypeElement, ScSimpleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScMacroDefinition, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScConstructorPattern,
+  ScInfixPattern,
+  ScInterpolationPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScInfixTypeElement,
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference,
+  ScThisReference
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScMacroDefinition,
+  ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.resolve._
@@ -81,8 +100,8 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
 
   override def toString: String = "CodeReferenceElement: " + getText
 
-  def getKinds(
-      incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] = {
+  def getKinds(incomplete: Boolean,
+               completion: Boolean): Set[ResolveTargets.Value] = {
     import org.jetbrains.plugins.scala.lang.resolve.StdKinds._
 
     // The qualified identifier immediately following the `macro` keyword
@@ -123,7 +142,8 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
     }
     if (completion)
       result + ResolveTargets.PACKAGE + ResolveTargets.OBJECT +
-      ResolveTargets.VAL else result
+        ResolveTargets.VAL
+    else result
   }
 
   def nameId: PsiElement =
@@ -143,17 +163,17 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
           if (!ResolveUtils.kindMatches(element, suitableKinds))
             throw new IncorrectOperationException(
                 "class does not match expected kind, problem place: " + {
-              if (getContext != null)
-                if (getContext.getContext != null)
-                  if (getContext.getContext.getContext != null)
-                    getContext.getContext.getContext.getText
-                  else getContext.getContext.getText
-                else getContext.getText
-              else getText
-            })
+                  if (getContext != null)
+                    if (getContext.getContext != null)
+                      if (getContext.getContext.getContext != null)
+                        getContext.getContext.getContext.getText
+                      else getContext.getContext.getText
+                    else getContext.getText
+                  else getText
+                })
           if (nameId.getText != c.name) {
-            val ref = ScalaPsiElementFactory.createReferenceFromText(
-                c.name, getManager)
+            val ref = ScalaPsiElementFactory
+              .createReferenceFromText(c.name, getManager)
             return this
               .replace(ref)
               .asInstanceOf[ScStableCodeReferenceElement]
@@ -164,11 +184,11 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
             .getInstance(getProject)
             .hasImportWithPrefix(qname)
           if (qualifier.isDefined && !isPredefined) {
-            val ref = ScalaPsiElementFactory.createReferenceFromText(
-                c.name, getContext, this)
+            val ref = ScalaPsiElementFactory
+              .createReferenceFromText(c.name, getContext, this)
             if (ref.isReferenceTo(element)) {
-              val ref = ScalaPsiElementFactory.createReferenceFromText(
-                  c.name, getManager)
+              val ref = ScalaPsiElementFactory
+                .createReferenceFromText(c.name, getManager)
               return this.replace(ref)
             }
           }
@@ -178,14 +198,15 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
             if (selector != null) {
               val importExpr =
                 PsiTreeUtil.getParentOfType(this, classOf[ScImportExpr])
-              selector.deleteSelector() //we can't do anything here, so just simply delete it
+              selector
+                .deleteSelector() //we can't do anything here, so just simply delete it
               return importExpr.reference.get //todo: what we should return exactly?
               //              }
             } else
               getParent match {
                 case importExpr: ScImportExpr
                     if !importExpr.singleWildcard &&
-                    !importExpr.selectorSet.isDefined =>
+                      !importExpr.selectorSet.isDefined =>
                   val holder =
                     PsiTreeUtil.getParentOfType(this, classOf[ScImportsHolder])
                   importExpr.deleteExpr()
@@ -198,11 +219,11 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                 case _ =>
                   return safeBindToElement(qname, {
                     case (qual, true) =>
-                      ScalaPsiElementFactory.createReferenceFromText(
-                          qual, getContext, this)
+                      ScalaPsiElementFactory
+                        .createReferenceFromText(qual, getContext, this)
                     case (qual, false) =>
-                      ScalaPsiElementFactory.createReferenceFromText(
-                          qual, getManager)
+                      ScalaPsiElementFactory
+                        .createReferenceFromText(qual, getManager)
                   }) {
                     c match {
                       case ClassTypeToImport(clazz) =>
@@ -217,8 +238,8 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                     if (qualifier != None) {
                       //let's make our reference unqualified
                       val ref: ScStableCodeReferenceElement =
-                        ScalaPsiElementFactory.createReferenceFromText(
-                            c.name, getManager)
+                        ScalaPsiElementFactory
+                          .createReferenceFromText(c.name, getManager)
                       this.replace(ref).asInstanceOf[ScReferenceElement]
                     }
                     this
@@ -243,12 +264,13 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                 val refToClass = bindToElement(containingClass)
                 val refToMember =
                   ScalaPsiElementFactory.createReferenceFromText(
-                      refToClass.getText + "." + binding.name, getManager)
+                      refToClass.getText + "." + binding.name,
+                      getManager)
                 this.replace(refToMember).asInstanceOf[ScReferenceElement]
             }
           case fun: ScFunction
               if Seq("unapply", "unapplySeq").contains(fun.name) &&
-              ScalaPsiUtil.hasStablePath(fun) =>
+                ScalaPsiUtil.hasStablePath(fun) =>
             bindToElement(fun.containingClass)
           case fun: ScFunction if fun.isConstructor =>
             bindToElement(fun.containingClass)
@@ -264,8 +286,10 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
 
   def getSameNameVariants: Array[ResolveResult] =
     doResolve(this,
-              new CompletionProcessor(
-                  getKinds(incomplete = true), this, false, Some(refName)))
+              new CompletionProcessor(getKinds(incomplete = true),
+                                      this,
+                                      false,
+                                      Some(refName)))
 
   override def delete() {
     getContext match {

@@ -161,8 +161,11 @@ object TreeTableView {
              oldValue: T,
              newValue: T) =
       this(
-          new jfxsc.TreeTableView.EditEvent[T](
-              source, eventType, treeTableItem, oldValue, newValue))
+          new jfxsc.TreeTableView.EditEvent[T](source,
+                                               eventType,
+                                               treeTableItem,
+                                               oldValue,
+                                               newValue))
 
     /**
       * Returns the new value input into the TreeItem by the end user.
@@ -301,7 +304,8 @@ object TreeTableView {
     *
     */
   abstract class TreeTableViewSelectionModel[S](
-      override val delegate: jfxsc.TreeTableView.TreeTableViewSelectionModel[S])
+      override val delegate: jfxsc.TreeTableView.TreeTableViewSelectionModel[
+          S])
       extends SFXDelegate[jfxsc.TreeTableView.TreeTableViewSelectionModel[S]] {
 
     type Delegate = jfxsc.TreeTableView.TreeTableViewSelectionModel[S]
@@ -338,8 +342,8 @@ object TreeTableView {
                     minColumn: TableColumnBase[jfxsc.TreeItem[S], _],
                     maxRow: Int,
                     maxColumn: TableColumnBase[jfxsc.TreeItem[S], _]) {
-      delegate.selectRange(
-          minRow, minColumn.delegate, maxRow, maxColumn.delegate)
+      delegate
+        .selectRange(minRow, minColumn.delegate, maxRow, maxColumn.delegate)
     }
 
     /**
@@ -576,8 +580,8 @@ object TreeTableView {
     *
     * @since 8.0
     */
-  def classCssMetaData: mutable.Buffer[jfxcss.CssMetaData[
-          _ <: jfxcss.Styleable, _]] =
+  def classCssMetaData: mutable.Buffer[
+      jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
     jfxsc.PopupControl.getClassCssMetaData
 }
 
@@ -600,7 +604,8 @@ object TreeTableView {
   */
 class TreeTableView[S](
     override val delegate: jfxsc.TreeTableView[S] = new jfxsc.TreeTableView[S])
-    extends Control(delegate) with SFXDelegate[jfxsc.TreeTableView[S]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TreeTableView[S]] {
 
   type Delegate = jfxsc.TreeTableView[S]
 
@@ -720,20 +725,23 @@ class TreeTableView[S](
   def columnResizePolicy: ObjectProperty[
       TreeTableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TreeTableView.ResizeFeatures[S]) =>
-          delegate.columnResizePolicyProperty.value.call(features))
+      delegate.columnResizePolicyProperty.value.call(features))
   def columnResizePolicy_=(
       p: TreeTableView.ResizeFeatures[_] => Boolean): Unit = {
     delegate
       .columnResizePolicyProperty()
-      .setValue(new jfxu.Callback[
-              jfxsc.TreeTableView.ResizeFeatures[_], java.lang.Boolean] {
-        def call(v: jfxsc.TreeTableView.ResizeFeatures[_]): java.lang.Boolean = {
-          p(v)
-        }
-      })
+      .setValue(
+          new jfxu.Callback[jfxsc.TreeTableView.ResizeFeatures[_],
+                            java.lang.Boolean] {
+            def call(v: jfxsc.TreeTableView.ResizeFeatures[_])
+              : java.lang.Boolean = {
+              p(v)
+            }
+          })
   }
-  def columnResizePolicy_=(p: jfxu.Callback[
-          jfxsc.TreeTableView.ResizeFeatures[_], java.lang.Boolean]): Unit = {
+  def columnResizePolicy_=(
+      p: jfxu.Callback[jfxsc.TreeTableView.ResizeFeatures[_],
+                       java.lang.Boolean]): Unit = {
     delegate.columnResizePolicyProperty().setValue(p)
   }
 
@@ -753,12 +761,12 @@ class TreeTableView[S](
       jfxu.Callback[jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]]] =
     delegate.rowFactoryProperty
   def rowFactory_=(v: (TreeTableView[S] => TreeTableRow[S])): Unit = {
-    rowFactory() = new jfxu.Callback[
-        jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]] {
-      def call(tv: jfxsc.TreeTableView[S]): jfxsc.TreeTableRow[S] = {
-        v(tv)
+    rowFactory() =
+      new jfxu.Callback[jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]] {
+        def call(tv: jfxsc.TreeTableView[S]): jfxsc.TreeTableRow[S] = {
+          v(tv)
+        }
       }
-    }
   }
 
   /**
@@ -883,8 +891,8 @@ class TreeTableView[S](
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TreeTableColumn[S, _]]])
     : Unit = {
-    ObjectProperty.fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[
-                jfxsc.TreeTableColumn[S, _]]]](onScrollToColumn, v)
+    ObjectProperty.fillProperty[jfxe.EventHandler[
+        jfxsc.ScrollToEvent[jfxsc.TreeTableColumn[S, _]]]](onScrollToColumn, v)
   }
 
   /**

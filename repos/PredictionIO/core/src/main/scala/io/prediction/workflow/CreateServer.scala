@@ -83,25 +83,25 @@ object KryoInstantiator extends Serializable {
   }
 }
 
-case class ServerConfig(
-    batch: String = "",
-    engineInstanceId: String = "",
-    engineId: Option[String] = None,
-    engineVersion: Option[String] = None,
-    engineVariant: String = "",
-    env: Option[String] = None,
-    ip: String = "0.0.0.0",
-    port: Int = 8000,
-    feedback: Boolean = false,
-    eventServerIp: String = "0.0.0.0",
-    eventServerPort: Int = 7070,
-    accessKey: Option[String] = None,
-    logUrl: Option[String] = None,
-    logPrefix: Option[String] = None,
-    logFile: Option[String] = None,
-    verbose: Boolean = false,
-    debug: Boolean = false,
-    jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+case class ServerConfig(batch: String = "",
+                        engineInstanceId: String = "",
+                        engineId: Option[String] = None,
+                        engineVersion: Option[String] = None,
+                        engineVariant: String = "",
+                        env: Option[String] = None,
+                        ip: String = "0.0.0.0",
+                        port: Int = 8000,
+                        feedback: Boolean = false,
+                        eventServerIp: String = "0.0.0.0",
+                        eventServerPort: Int = 7070,
+                        accessKey: Option[String] = None,
+                        logUrl: Option[String] = None,
+                        logPrefix: Option[String] = None,
+                        logFile: Option[String] = None,
+                        verbose: Boolean = false,
+                        debug: Boolean = false,
+                        jsonExtractor: JsonExtractorOption =
+                          JsonExtractorOption.Both)
 
 case class StartServer()
 case class BindServer()
@@ -135,7 +135,7 @@ object CreateServer extends Logging {
       opt[String]("env") action { (x, c) =>
         c.copy(env = Some(x))
       } text
-      ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
+        ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
           "format) to pass to the Spark execution environment.")
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
@@ -284,7 +284,9 @@ class MasterActor(sc: ServerConfig,
                   engineInstance: EngineInstance,
                   engineFactoryName: String,
                   manifest: EngineManifest)
-    extends Actor with SSLConfiguration with KeyAuthentication {
+    extends Actor
+    with SSLConfiguration
+    with KeyAuthentication {
   val log = Logging(context.system, this)
   implicit val system = context.system
   var sprayHttpListener: Option[ActorRef] = None
@@ -308,34 +310,36 @@ class MasterActor(sc: ServerConfig,
           log.error(
               s"Another process is using $serverUrl. Unable to undeploy.")
         case _ =>
-          log.error(s"Another process is using $serverUrl, or an existing " +
-              s"engine server is not responding properly (HTTP $code). " +
-              "Unable to undeploy.")
+          log.error(
+              s"Another process is using $serverUrl, or an existing " +
+                s"engine server is not responding properly (HTTP $code). " +
+                "Unable to undeploy.")
       }
     } catch {
       case e: java.net.ConnectException =>
         log.warning(s"Nothing at $serverUrl")
       case _: Throwable =>
-        log.error("Another process might be occupying " +
-            s"$ip:$port. Unable to undeploy.")
+        log.error(
+            "Another process might be occupying " +
+              s"$ip:$port. Unable to undeploy.")
     }
   }
 
   def receive: Actor.Receive = {
     case x: StartServer =>
-      val actor = createServerActor(
-          sc, engineInstance, engineFactoryName, manifest)
+      val actor =
+        createServerActor(sc, engineInstance, engineFactoryName, manifest)
       currentServerActor = Some(actor)
       undeploy(sc.ip, sc.port)
       self ! BindServer()
     case x: BindServer =>
       currentServerActor map { actor =>
         val settings = ServerSettings(system)
-        IO(Http) ! Http.Bind(
-            actor,
-            interface = sc.ip,
-            port = sc.port,
-            settings = Some(settings.copy(sslEncryption = true)))
+        IO(Http) ! Http.Bind(actor,
+                             interface = sc.ip,
+                             port = sc.port,
+                             settings =
+                               Some(settings.copy(sslEncryption = true)))
       } getOrElse {
         log.error("Cannot bind a non-existing server backend.")
       }
@@ -360,11 +364,11 @@ class MasterActor(sc: ServerConfig,
         sprayHttpListener.map { l =>
           l ! Http.Unbind(5.seconds)
           val settings = ServerSettings(system)
-          IO(Http) ! Http.Bind(
-              actor,
-              interface = sc.ip,
-              port = sc.port,
-              settings = Some(settings.copy(sslEncryption = true)))
+          IO(Http) ! Http.Bind(actor,
+                               interface = sc.ip,
+                               port = sc.port,
+                               settings =
+                                 Some(settings.copy(sslEncryption = true)))
           currentServerActor.get ! Kill
           currentServerActor = Some(actor)
         } getOrElse {
@@ -373,7 +377,7 @@ class MasterActor(sc: ServerConfig,
       } getOrElse {
         log.warning(
             s"No latest completed engine instance for ${manifest.id} " +
-            s"${manifest.version}. Abort reloading.")
+              s"${manifest.version}. Abort reloading.")
       }
     case x: Http.Bound =>
       val serverUrl = s"https://${sc.ip}:${sc.port}"
@@ -429,7 +433,9 @@ class ServerActor[Q, P](val args: ServerConfig,
                         val models: Seq[Any],
                         val serving: BaseServing[Q, P],
                         val servingParams: Params)
-    extends Actor with HttpService with KeyAuthentication {
+    extends Actor
+    with HttpService
+    with KeyAuthentication {
   val serverStartTime = DateTime.now
   val log = Logging(context.system, this)
 
@@ -441,8 +447,8 @@ class ServerActor[Q, P](val args: ServerConfig,
   def actorRefFactory: ActorContext = context
 
   implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-  val pluginsActorRef = context.actorOf(
-      Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
+  val pluginsActorRef = context
+    .actorOf(Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
   val pluginContext = EngineServerPluginContext(log, args.engineVariant)
 
   def receive: Actor.Receive = runRoute(myRoute)
@@ -464,7 +470,7 @@ class ServerActor[Q, P](val args: ServerConfig,
       scalaj.http
         .Http(logUrl)
         .postData(logPrefix + write(
-                Map("engineInstance" -> engineInstance, "message" -> message)))
+            Map("engineInstance" -> engineInstance, "message" -> message)))
         .asString
     } catch {
       case e: Throwable =>
@@ -596,7 +602,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                     scalaj.http
                       .Http(
                           s"http://${args.eventServerIp}:${args.eventServerPort}/" +
-                          s"events.json?accessKey=$accessKey")
+                            s"events.json?accessKey=$accessKey")
                       .postData(write(data))
                       .header("content-type", "application/json")
                       .asString
@@ -604,15 +610,15 @@ class ServerActor[Q, P](val args: ServerConfig,
                   }
                   f onComplete {
                     case Success(code) => {
-                        if (code != 201) {
-                          log.error(
-                              s"Feedback event failed. Status code: $code." +
+                      if (code != 201) {
+                        log.error(
+                            s"Feedback event failed. Status code: $code." +
                               s"Data: ${write(data)}.")
-                        }
                       }
+                    }
                     case Failure(t) => {
-                        log.error(s"Feedback event failed: ${t.getMessage}")
-                      }
+                      log.error(s"Feedback event failed: ${t.getMessage}")
+                    }
                   }
                   // overwrite prId in predictedResult
                   // - if it is WithPrId,
@@ -634,9 +640,9 @@ class ServerActor[Q, P](val args: ServerConfig,
               // Bookkeeping
               val servingEndTime = DateTime.now
               lastServingSec =
-              (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
+                (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
               avgServingSec = ((avgServingSec * requestCount) + lastServingSec) /
-              (requestCount + 1)
+                  (requestCount + 1)
               requestCount += 1
 
               respondWithMediaType(`application/json`) {
@@ -650,18 +656,16 @@ class ServerActor[Q, P](val args: ServerConfig,
                   remoteLog(url,
                             args.logPrefix.getOrElse(""),
                             s"Query:\n$queryString\n\nStack Trace:\n" +
-                            s"${getStackTraceString(e)}\n\n")
+                              s"${getStackTraceString(e)}\n\n")
                 }
                 complete(StatusCodes.BadRequest, e.getMessage)
               case e: Throwable =>
                 val msg =
                   s"Query:\n$queryString\n\nStack Trace:\n" +
-                  s"${getStackTraceString(e)}\n\n"
+                    s"${getStackTraceString(e)}\n\n"
                 log.error(msg)
                 args.logUrl map { url =>
-                  remoteLog(url,
-                            args.logPrefix.getOrElse(""),
-                            msg)
+                  remoteLog(url, args.logPrefix.getOrElse(""), msg)
                 }
                 complete(StatusCodes.InternalServerError, msg)
             }
@@ -696,7 +700,7 @@ class ServerActor[Q, P](val args: ServerConfig,
         respondWithMediaType(MediaTypes.`application/json`) {
           complete {
             Map("plugins" -> Map(
-                    "outputblockers" -> pluginContext.outputBlockers.map {
+                "outputblockers" -> pluginContext.outputBlockers.map {
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
@@ -704,7 +708,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
                 },
-                    "outputsniffers" -> pluginContext.outputSniffers.map {
+                "outputsniffers" -> pluginContext.outputSniffers.map {
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
@@ -712,7 +716,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
                 }
-                ))
+            ))
           }
         }
       }
@@ -726,9 +730,10 @@ class ServerActor[Q, P](val args: ServerConfig,
             val pluginName = segments(1)
             pluginType match {
               case EngineServerPlugin.outputSniffer =>
-                pluginsActorRef ? PluginsActor.HandleREST(
-                    pluginName = pluginName,
-                    pluginArgs = pluginArgs) map {
+                pluginsActorRef ? PluginsActor.HandleREST(pluginName =
+                                                            pluginName,
+                                                          pluginArgs =
+                                                            pluginArgs) map {
                   _.asInstanceOf[String]
                 }
             }

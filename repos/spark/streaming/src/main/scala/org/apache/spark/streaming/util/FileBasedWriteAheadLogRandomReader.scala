@@ -27,7 +27,8 @@ import org.apache.hadoop.conf.Configuration
   * this reads the record (ByteBuffer) from the log file.
   */
 private[streaming] class FileBasedWriteAheadLogRandomReader(
-    path: String, conf: Configuration)
+    path: String,
+    conf: Configuration)
     extends Closeable {
 
   private val instream = HdfsUtils.getInputStream(path, conf)

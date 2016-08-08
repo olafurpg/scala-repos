@@ -32,7 +32,7 @@ object SteppingInmemJournal {
   def config(instanceId: String): Config =
     ConfigFactory.parseString(s"""
         |akka.persistence.journal.stepping-inmem.class=${classOf[
-                                 SteppingInmemJournal].getName}
+                                     SteppingInmemJournal].getName}
         |akka.persistence.journal.plugin = "akka.persistence.journal.stepping-inmem"
         |akka.persistence.journal.stepping-inmem.instance-id = "$instanceId"
       """.stripMargin)
@@ -99,13 +99,10 @@ final class SteppingInmemJournal extends InmemJournal {
       val promise = Promise[Try[Unit]]()
       val future = promise.future
       doOrEnqueue { () ⇒
-        promise.completeWith(
-            super
-              .asyncWriteMessages(Seq(message))
-              .map {
-            case Nil ⇒ AsyncWriteJournal.successUnit
-            case head :: _ ⇒ head
-          })
+        promise.completeWith(super.asyncWriteMessages(Seq(message)).map {
+          case Nil ⇒ AsyncWriteJournal.successUnit
+          case head :: _ ⇒ head
+        })
         future.map(_ ⇒ ())
       }
       future
@@ -114,8 +111,8 @@ final class SteppingInmemJournal extends InmemJournal {
     Future.sequence(futures)
   }
 
-  override def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] = {
+  override def asyncDeleteMessagesTo(persistenceId: String,
+                                     toSequenceNr: Long): Future[Unit] = {
     val promise = Promise[Unit]()
     val future = promise.future
     doOrEnqueue { () ⇒
@@ -127,7 +124,8 @@ final class SteppingInmemJournal extends InmemJournal {
   }
 
   override def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] = {
+      persistenceId: String,
+      fromSequenceNr: Long): Future[Long] = {
     val promise = Promise[Long]()
     val future = promise.future
     doOrEnqueue { () ⇒
@@ -138,17 +136,19 @@ final class SteppingInmemJournal extends InmemJournal {
     future
   }
 
-  override def asyncReplayMessages(persistenceId: String,
-                                   fromSequenceNr: Long,
-                                   toSequenceNr: Long,
-                                   max: Long)(
-      recoveryCallback: (PersistentRepr) ⇒ Unit): Future[Unit] = {
+  override def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(recoveryCallback: (PersistentRepr) ⇒ Unit): Future[Unit] = {
     val promise = Promise[Unit]()
     val future = promise.future
     doOrEnqueue { () ⇒
-      promise.completeWith(super.asyncReplayMessages(
-              persistenceId, fromSequenceNr, toSequenceNr, max)(
-              recoveryCallback))
+      promise.completeWith(
+          super.asyncReplayMessages(persistenceId,
+                                    fromSequenceNr,
+                                    toSequenceNr,
+                                    max)(recoveryCallback))
       future
     }
 

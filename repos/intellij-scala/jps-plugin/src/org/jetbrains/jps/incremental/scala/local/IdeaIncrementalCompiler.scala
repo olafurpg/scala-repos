@@ -4,7 +4,12 @@ package local
 import java.io.File
 
 import org.jetbrains.jps.incremental.scala.data.CompilationData
-import sbt.compiler.{AnalyzingCompiler, CompileOutput, CompilerArguments, CompilerCache}
+import sbt.compiler.{
+  AnalyzingCompiler,
+  CompileOutput,
+  CompilerArguments,
+  CompilerCache
+}
 import xsbti.api.SourceAPI
 import xsbti.compile.DependencyChanges
 import xsbti.{DependencyContext, Position, Severity}
@@ -27,8 +32,10 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
       else CompileOutput(compilationData.outputGroups: _*)
     val cArgs = new CompilerArguments(scalac.scalaInstance, scalac.cp)
     val options =
-      "IntellijIdea.simpleAnalysis" +: cArgs(
-          Nil, compilationData.classpath, None, compilationData.scalaOptions)
+      "IntellijIdea.simpleAnalysis" +: cArgs(Nil,
+                                             compilationData.classpath,
+                                             None,
+                                             compilationData.scalaOptions)
 
     try scalac.compile(compilationData.sources,
                        emptyChanges,
@@ -38,7 +45,8 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
                        reporter,
                        CompilerCache.fresh,
                        logger,
-                       Option(progress)) catch {
+                       Option(progress))
+    catch {
       case _: xsbti.CompileFailed =>
       // the error should be already handled via the `reporter`
     }
@@ -59,10 +67,13 @@ private class ClientCallback(client: Client) extends ClientCallbackBase {
 }
 
 abstract class ClientCallbackBase extends xsbti.AnalysisCallback {
+  override def sourceDependency(dependsOn: File,
+                                source: File,
+                                publicInherited: Boolean): Unit = {}
   override def sourceDependency(
-      dependsOn: File, source: File, publicInherited: Boolean): Unit = {}
-  override def sourceDependency(
-      file: File, file1: File, dependencyContext: DependencyContext): Unit = {}
+      file: File,
+      file1: File,
+      dependencyContext: DependencyContext): Unit = {}
   override def binaryDependency(binary: File,
                                 name: String,
                                 source: File,

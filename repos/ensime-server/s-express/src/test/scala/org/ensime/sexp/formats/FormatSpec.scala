@@ -6,7 +6,7 @@ import org.ensime.sexp._
 import org.ensime.util.EnsimeSpec
 
 trait FormatSpec extends EnsimeSpec {
-  def assertFormat[T : SexpFormat](start: T, expect: Sexp): Unit = {
+  def assertFormat[T: SexpFormat](start: T, expect: Sexp): Unit = {
     start.toSexp should ===(expect)
     expect.convertTo[T] should ===(start)
   }

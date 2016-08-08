@@ -28,7 +28,8 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
         Array(0, -64, 10, 6, 0, -8, 114, 63, -59, -5, -5, 95, 40)
 
       Await.result(client.set(k, v))
-      assert(Await
+      assert(
+          Await
             .result(client.dump(k))
             .fold(fail("Expected result for DUMP"))(_.array) == expectedBytes)
       Await.result(client.del(Seq(foo)))
@@ -110,7 +111,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       Await.result(client.set(foo, bar))
       assert(Await.result(
-              client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
+          client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
 
       Await.result(client.del(Seq(foo))) // clean up
     }

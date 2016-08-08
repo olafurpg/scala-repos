@@ -103,10 +103,10 @@ class Eval(target: Option[File]) {
               new FilesystemResolver(new File(".")),
               new FilesystemResolver(new File("." + File.separator + "config"))
           ) ++
-          (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
-                path =>
-                  new FilesystemResolver(new File(path))
-              })
+            (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+              path =>
+                new FilesystemResolver(new File(path))
+            })
       )
   )
 
@@ -117,8 +117,10 @@ class Eval(target: Option[File]) {
   protected lazy val compilerSettings: Settings = new EvalSettings(target)
 
   // Primary encapsulation around native Scala compiler
-  private[this] lazy val compiler = new StringCompiler(
-      codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
+  private[this] lazy val compiler = new StringCompiler(codeWrapperLineOffset,
+                                                       target,
+                                                       compilerSettings,
+                                                       compilerMessageHandler)
 
   /**
     * run preprocessors on our string, returning a String that is the processed source
@@ -206,8 +208,9 @@ class Eval(target: Option[File]) {
   /**
     * same as apply[T], but does not run preprocessors.
     */
-  def applyProcessed[T](
-      className: String, code: String, resetState: Boolean): T = {
+  def applyProcessed[T](className: String,
+                        code: String,
+                        resetState: Boolean): T = {
     val cls = compiler(wrapCodeInClass(className, code), className, resetState)
     cls
       .getConstructor()
@@ -282,8 +285,8 @@ class Eval(target: Option[File]) {
     }
   }
 
-  private[util] def uniqueId(
-      code: String, idOpt: Option[Int] = Some(jvmId)): String = {
+  private[util] def uniqueId(code: String,
+                             idOpt: Option[Int] = Some(jvmId)): String = {
     val digest = MessageDigest.getInstance("SHA-1").digest(code.getBytes())
     val sha = new BigInteger(1, digest).toString(16)
     idOpt match {
@@ -317,7 +320,7 @@ class Eval(target: Option[File]) {
    */
   private[this] def wrapCodeInClass(className: String, code: String) = {
     "class " + className + " extends (() => Any) {\n" + "  def apply() = {\n" +
-    code + "\n" + "  }\n" + "}\n"
+      code + "\n" + "  }\n" + "}\n"
   }
 
   /*
@@ -453,14 +456,14 @@ class Eval(target: Option[File]) {
               resolver.resolvable(path)
             } match {
               case Some(r: Resolver) => {
-                  // recursively process includes
-                  if (maxDepth == 0) {
-                    throw new IllegalStateException(
-                        "Exceeded maximum recusion depth")
-                  } else {
-                    apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
-                  }
+                // recursively process includes
+                if (maxDepth == 0) {
+                  throw new IllegalStateException(
+                      "Exceeded maximum recusion depth")
+                } else {
+                  apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
                 }
+              }
               case _ =>
                 throw new IllegalStateException(
                     "No resolver could find '%s'".format(path))
@@ -483,8 +486,8 @@ class Eval(target: Option[File]) {
     outputDirs.setSingleOutput(compilerOutputDir)
     private[this] val pathList = compilerPath ::: libPath
     bootclasspath.value = pathList.mkString(File.pathSeparator)
-    classpath.value = (pathList ::: impliedClassPath).mkString(
-        File.pathSeparator)
+    classpath.value =
+      (pathList ::: impliedClassPath).mkString(File.pathSeparator)
   }
 
   /**
@@ -522,12 +525,12 @@ class Eval(target: Option[File]) {
             case _: Throwable => ""
           }
           messages += (severityName + lineMessage + ": " + message) ::
-          (if (pos.isDefined) {
-             pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-             (" " * (pos.column - 1) + "^") :: Nil
-           } else {
-             Nil
-           })
+            (if (pos.isDefined) {
+               pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+                 (" " * (pos.column - 1) + "^") :: Nil
+             } else {
+               Nil
+             })
         }
 
         def displayPrompt {
@@ -546,27 +549,27 @@ class Eval(target: Option[File]) {
      * Class loader for finding classes compiled by this StringCompiler.
      * After each reset, this class loader will not be able to find old compiled classes.
      */
-    var classLoader = new AbstractFileClassLoader(
-        target, this.getClass.getClassLoader)
+    var classLoader =
+      new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
     def reset() {
       targetDir match {
         case None => {
-            target.asInstanceOf[VirtualDirectory].clear()
-          }
+          target.asInstanceOf[VirtualDirectory].clear()
+        }
         case Some(t) => {
-            target.foreach { abstractFile =>
-              if (abstractFile.file == null ||
-                  abstractFile.file.getName.endsWith(".class")) {
-                abstractFile.delete()
-              }
+          target.foreach { abstractFile =>
+            if (abstractFile.file == null ||
+                abstractFile.file.getName.endsWith(".class")) {
+              abstractFile.delete()
             }
           }
+        }
       }
       cache.clear()
       reporter.reset()
-      classLoader = new AbstractFileClassLoader(
-          target, this.getClass.getClassLoader)
+      classLoader =
+        new AbstractFileClassLoader(target, this.getClass.getClassLoader)
     }
 
     object Debug {
@@ -639,5 +642,5 @@ class Eval(target: Option[File]) {
   class CompilerException(val messages: List[List[String]])
       extends Exception(
           "Compiler exception " +
-          messages.map(_.mkString("\n")).mkString("\n"))
+            messages.map(_.mkString("\n")).mkString("\n"))
 }

@@ -22,7 +22,12 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.stats.InMemoryStatsReceiver
 import com.twitter.util.{RandomSocket, Time}
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  RejectedExecutionHandler,
+  TimeUnit,
+  ThreadPoolExecutor
+}
 import java.util.{logging => javalog}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -64,7 +69,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
         assert(scribe.queue.size == 2)
         assert(
             scribe.makeBuffer(2).array.hexlify ==
-            ("000000b080010001000000034c6f67000000000f0001" +
+              ("000000b080010001000000034c6f67000000000f0001" +
                 "0c000000020b000100000004746573740b0002000000" +
                 "36494e46205b32303038303332392d30353a35333a31" +
                 "362e3732325d2068656c6c6f3a205468697320697320" +

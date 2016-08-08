@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -16,7 +16,10 @@
   */
 package kafka.consumer
 
-import java.nio.channels.{AsynchronousCloseException, ClosedByInterruptException}
+import java.nio.channels.{
+  AsynchronousCloseException,
+  ClosedByInterruptException
+}
 import java.util.concurrent.TimeUnit
 
 import kafka.api._
@@ -40,7 +43,11 @@ class SimpleConsumer(val host: String,
   ConsumerConfig.validateClientId(clientId)
   private val lock = new Object()
   private val blockingChannel = new BlockingChannel(
-      host, port, bufferSize, BlockingChannel.UseDefaultBufferSize, soTimeout)
+      host,
+      port,
+      bufferSize,
+      BlockingChannel.UseDefaultBufferSize,
+      soTimeout)
   private val fetchRequestAndResponseStats =
     FetchRequestAndResponseStatsRegistry.getFetchRequestAndResponseStats(
         clientId)
@@ -201,8 +208,9 @@ class SimpleConsumer(val host: String,
                              earliestOrLatest: Long,
                              consumerId: Int): Long = {
     val request = OffsetRequest(
-        requestInfo = Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                  earliestOrLatest, 1)),
+        requestInfo = Map(
+            topicAndPartition -> PartitionOffsetRequestInfo(earliestOrLatest,
+                                                            1)),
         clientId = clientId,
         replicaId = consumerId)
     val partitionErrorAndOffset =

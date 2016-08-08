@@ -32,7 +32,11 @@ import org.scalatest.time.{Seconds => ScalaTestSeconds, Span}
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.streaming.dstream.{DStream, ForEachDStream, InputDStream}
+import org.apache.spark.streaming.dstream.{
+  DStream,
+  ForEachDStream,
+  InputDStream
+}
 import org.apache.spark.streaming.scheduler._
 import org.apache.spark.util.{ManualClock, Utils}
 
@@ -63,8 +67,9 @@ private[streaming] class DummyInputDStream(ssc: StreamingContext)
   * replayable, reliable message queue like Kafka. It requires a sequence as input, and
   * returns the i_th element at the i_th batch under manual clock.
   */
-class TestInputStream[T : ClassTag](
-    _ssc: StreamingContext, input: Seq[Seq[T]], numPartitions: Int)
+class TestInputStream[T: ClassTag](_ssc: StreamingContext,
+                                   input: Seq[Seq[T]],
+                                   numPartitions: Int)
     extends InputDStream[T](_ssc) {
 
   def start() {}
@@ -97,18 +102,14 @@ class TestInputStream[T : ClassTag](
   *
   * The buffer contains a sequence of RDD's, each containing a sequence of items.
   */
-class TestOutputStream[T : ClassTag](
+class TestOutputStream[T: ClassTag](
     parent: DStream[T],
-    val output: ConcurrentLinkedQueue[Seq[T]] = new ConcurrentLinkedQueue[Seq[
-              T]]()
-)
-    extends ForEachDStream[T](parent,
-                              (rdd: RDD[T], t: Time) =>
-                                {
-                                  val collected = rdd.collect()
-                                  output.add(collected)
-                              },
-                              false) {
+    val output: ConcurrentLinkedQueue[Seq[T]] =
+      new ConcurrentLinkedQueue[Seq[T]]()
+) extends ForEachDStream[T](parent, (rdd: RDD[T], t: Time) => {
+      val collected = rdd.collect()
+      output.add(collected)
+    }, false) {
 
   // This is to clear the output buffer every it is read from a checkpoint
   @throws(classOf[IOException])
@@ -126,18 +127,15 @@ class TestOutputStream[T : ClassTag](
   * The queue contains a sequence of RDD's, each containing a sequence of partitions, each
   * containing a sequence of items.
   */
-class TestOutputStreamWithPartitions[T : ClassTag](
+class TestOutputStreamWithPartitions[T: ClassTag](
     parent: DStream[T],
-    val output: ConcurrentLinkedQueue[Seq[Seq[T]]] = new ConcurrentLinkedQueue[
-          Seq[Seq[T]]]())
-    extends ForEachDStream[T](parent,
-                              (rdd: RDD[T], t: Time) =>
-                                {
-                                  val collected =
-                                    rdd.glom().collect().map(_.toSeq)
-                                  output.add(collected)
-                              },
-                              false) {
+    val output: ConcurrentLinkedQueue[Seq[Seq[T]]] =
+      new ConcurrentLinkedQueue[Seq[Seq[T]]]())
+    extends ForEachDStream[T](parent, (rdd: RDD[T], t: Time) => {
+      val collected =
+        rdd.glom().collect().map(_.toSeq)
+      output.add(collected)
+    }, false) {
 
   // This is to clear the output buffer every it is read from a checkpoint
   @throws(classOf[IOException])
@@ -197,10 +195,11 @@ class BatchCounter(ssc: StreamingContext) {
     * @param expectedNumCompletedBatches the `expectedNumCompletedBatches` batches to wait
     * @param timeout the maximum time to wait in milliseconds.
     */
-  def waitUntilBatchesCompleted(
-      expectedNumCompletedBatches: Int, timeout: Long): Boolean =
+  def waitUntilBatchesCompleted(expectedNumCompletedBatches: Int,
+                                timeout: Long): Boolean =
     waitUntilConditionBecomeTrue(
-        numCompletedBatches >= expectedNumCompletedBatches, timeout)
+        numCompletedBatches >= expectedNumCompletedBatches,
+        timeout)
 
   /**
     * Wait until `expectedNumStartedBatches` batches are completed, or timeout. Return true if
@@ -210,13 +209,14 @@ class BatchCounter(ssc: StreamingContext) {
     * @param expectedNumStartedBatches the `expectedNumStartedBatches` batches to wait
     * @param timeout the maximum time to wait in milliseconds.
     */
-  def waitUntilBatchesStarted(
-      expectedNumStartedBatches: Int, timeout: Long): Boolean =
+  def waitUntilBatchesStarted(expectedNumStartedBatches: Int,
+                              timeout: Long): Boolean =
     waitUntilConditionBecomeTrue(
-        numStartedBatches >= expectedNumStartedBatches, timeout)
+        numStartedBatches >= expectedNumStartedBatches,
+        timeout)
 
-  private def waitUntilConditionBecomeTrue(
-      condition: => Boolean, timeout: Long): Boolean = {
+  private def waitUntilConditionBecomeTrue(condition: => Boolean,
+                                           timeout: Long): Boolean = {
     synchronized {
       var now = System.currentTimeMillis()
       val timeoutTick = now + timeout
@@ -330,7 +330,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Set up required DStreams to test the DStream operation using the two sequences
     * of input collections.
     */
-  def setupStreams[U : ClassTag, V : ClassTag](
+  def setupStreams[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       numPartitions: Int = numInputPartitions
@@ -345,7 +345,8 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     val inputStream = new TestInputStream(ssc, input, numPartitions)
     val operatedStream = operation(inputStream)
     val outputStream = new TestOutputStreamWithPartitions(
-        operatedStream, new ConcurrentLinkedQueue[Seq[Seq[V]]])
+        operatedStream,
+        new ConcurrentLinkedQueue[Seq[Seq[V]]])
     outputStream.register()
     ssc
   }
@@ -354,7 +355,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Set up required DStreams to test the binary operation using the sequence
     * of input collections.
     */
-  def setupStreams[U : ClassTag, V : ClassTag, W : ClassTag](
+  def setupStreams[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W]
@@ -370,7 +371,8 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     val inputStream2 = new TestInputStream(ssc, input2, numInputPartitions)
     val operatedStream = operation(inputStream1, inputStream2)
     val outputStream = new TestOutputStreamWithPartitions(
-        operatedStream, new ConcurrentLinkedQueue[Seq[Seq[W]]])
+        operatedStream,
+        new ConcurrentLinkedQueue[Seq[Seq[W]]])
     outputStream.register()
     ssc
   }
@@ -382,7 +384,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     *
     * Returns a sequence of items for each RDD.
     */
-  def runStreams[V : ClassTag](
+  def runStreams[V: ClassTag](
       ssc: StreamingContext,
       numBatches: Int,
       numExpectedOutput: Int
@@ -400,17 +402,18 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Returns a sequence of RDD's. Each RDD is represented as several sequences of items, each
     * representing one partition.
     */
-  def runStreamsWithPartitions[V : ClassTag](
+  def runStreamsWithPartitions[V: ClassTag](
       ssc: StreamingContext,
       numBatches: Int,
       numExpectedOutput: Int
   ): Seq[Seq[Seq[V]]] = {
-    assert(
-        numBatches > 0, "Number of batches to run stream computation is zero")
+    assert(numBatches > 0,
+           "Number of batches to run stream computation is zero")
     assert(numExpectedOutput > 0,
            "Number of expected outputs after " + numBatches + " is zero")
-    logInfo("numBatches = " + numBatches + ", numExpectedOutput = " +
-        numExpectedOutput)
+    logInfo(
+        "numBatches = " + numBatches + ", numExpectedOutput = " +
+          numExpectedOutput)
 
     // Get the output buffer
     val outputStream = ssc.graph.getOutputStreams
@@ -440,9 +443,10 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       // Wait until expected number of output items have been generated
       val startTime = System.currentTimeMillis()
       while (output.size < numExpectedOutput &&
-      System.currentTimeMillis() - startTime < maxWaitTimeMillis) {
-        logInfo("output.size = " + output.size + ", numExpectedOutput = " +
-            numExpectedOutput)
+             System.currentTimeMillis() - startTime < maxWaitTimeMillis) {
+        logInfo(
+            "output.size = " + output.size + ", numExpectedOutput = " +
+              numExpectedOutput)
         ssc.awaitTerminationOrTimeout(50)
       }
       val timeTaken = System.currentTimeMillis() - startTime
@@ -453,7 +457,8 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       assert(output.size === numExpectedOutput,
              "Unexpected number of outputs generated")
 
-      Thread.sleep(100) // Give some time for the forgetting old RDDs to complete
+      Thread
+        .sleep(100) // Give some time for the forgetting old RDDs to complete
     } finally {
       ssc.stop(stopSparkContext = true)
     }
@@ -465,7 +470,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * is same as the expected output values, by comparing the output
     * collections either as lists (order matters) or sets (order does not matter)
     */
-  def verifyOutput[V : ClassTag](
+  def verifyOutput[V: ClassTag](
       output: Seq[Seq[V]],
       expectedOutput: Seq[Seq[V]],
       useSet: Boolean
@@ -485,17 +490,17 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
         assert(
             output(i).toSet === expectedOutput(i).toSet,
             s"Set comparison failed\n" +
-            s"Expected output (${expectedOutput.size} items):\n${expectedOutput
-              .mkString("\n")}\n" +
-            s"Generated output (${output.size} items): ${output.mkString("\n")}"
+              s"Expected output (${expectedOutput.size} items):\n${expectedOutput
+                .mkString("\n")}\n" +
+              s"Generated output (${output.size} items): ${output.mkString("\n")}"
         )
       } else {
         assert(
             output(i).toList === expectedOutput(i).toList,
             s"Ordered list comparison failed\n" +
-            s"Expected output (${expectedOutput.size} items):\n${expectedOutput
-              .mkString("\n")}\n" +
-            s"Generated output (${output.size} items): ${output.mkString("\n")}"
+              s"Expected output (${expectedOutput.size} items):\n${expectedOutput
+                .mkString("\n")}\n" +
+              s"Generated output (${output.size} items): ${output.mkString("\n")}"
         )
       }
     }
@@ -506,7 +511,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Test unary DStream operation with a list of inputs, with number of
     * batches to run same as the number of expected output values
     */
-  def testOperation[U : ClassTag, V : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       expectedOutput: Seq[Seq[V]],
@@ -524,7 +529,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * @param useSet     Compare the output values with the expected output values
     *                   as sets (order matters) or as lists (order does not matter)
     */
-  def testOperation[U : ClassTag, V : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       expectedOutput: Seq[Seq[V]],
@@ -542,15 +547,19 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Test binary DStream operation with two lists of inputs, with number of
     * batches to run same as the number of expected output values
     */
-  def testOperation[U : ClassTag, V : ClassTag, W : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W],
       expectedOutput: Seq[Seq[W]],
       useSet: Boolean
   ) {
-    testOperation[U, V, W](
-        input1, input2, operation, expectedOutput, -1, useSet)
+    testOperation[U, V, W](input1,
+                           input2,
+                           operation,
+                           expectedOutput,
+                           -1,
+                           useSet)
   }
 
   /**
@@ -563,7 +572,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * @param useSet     Compare the output values with the expected output values
     *                   as sets (order matters) or as lists (order does not matter)
     */
-  def testOperation[U : ClassTag, V : ClassTag, W : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W],

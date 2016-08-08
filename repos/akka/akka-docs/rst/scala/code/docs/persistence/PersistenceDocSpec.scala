@@ -70,7 +70,8 @@ object PersistenceDocSpec {
       //#recovery-status
     }
     class MyPersistentActor1
-        extends PersistentActor with PersistentActorMethods {
+        extends PersistentActor
+        with PersistentActorMethods {
       //#persistence-id-override
       override def persistenceId = "my-stable-persistence-id"
       //#persistence-id-override
@@ -113,7 +114,8 @@ object PersistenceDocSpec {
     case class MsgConfirmed(deliveryId: Long) extends Evt
 
     class MyPersistentActor(destination: ActorSelection)
-        extends PersistentActor with AtLeastOnceDelivery {
+        extends PersistentActor
+        with AtLeastOnceDelivery {
 
       override def persistenceId: String = "persistence-id"
 
@@ -172,8 +174,8 @@ object PersistenceDocSpec {
       override def recovery =
         Recovery(
             fromSnapshot = SnapshotSelectionCriteria(
-                  maxSequenceNr = 457L,
-                  maxTimestamp = System.currentTimeMillis))
+                maxSequenceNr = 457L,
+                maxTimestamp = System.currentTimeMillis))
       //#snapshot-criteria
 
       //#snapshot-offer
@@ -204,14 +206,14 @@ object PersistenceDocSpec {
 
       override def receiveCommand: Receive = {
         case c: String => {
-            sender() ! c
-            persistAsync(s"evt-$c-1") { e =>
-              sender() ! e
-            }
-            persistAsync(s"evt-$c-2") { e =>
-              sender() ! e
-            }
+          sender() ! c
+          persistAsync(s"evt-$c-1") { e =>
+            sender() ! e
           }
+          persistAsync(s"evt-$c-2") { e =>
+            sender() ! e
+          }
+        }
       }
     }
 
@@ -243,17 +245,17 @@ object PersistenceDocSpec {
 
       override def receiveCommand: Receive = {
         case c: String => {
-            sender() ! c
-            persistAsync(s"evt-$c-1") { e =>
-              sender() ! e
-            }
-            persistAsync(s"evt-$c-2") { e =>
-              sender() ! e
-            }
-            deferAsync(s"evt-$c-3") { e =>
-              sender() ! e
-            }
+          sender() ! c
+          persistAsync(s"evt-$c-1") { e =>
+            sender() ! e
           }
+          persistAsync(s"evt-$c-2") { e =>
+            sender() ! e
+          }
+          deferAsync(s"evt-$c-3") { e =>
+            sender() ! e
+          }
+        }
       }
     }
     //#defer

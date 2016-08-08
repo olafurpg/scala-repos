@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -82,8 +82,7 @@ object Cache {
   case class OnRemoval[K, V](onRemove: (K, V, RemovalCause) => PrecogUnit)
       extends CacheOption[K, V] {
     def apply(builder: CacheBuilder[K, V]) =
-      builder.removalListener(
-          new RemovalListener[K, V] {
+      builder.removalListener(new RemovalListener[K, V] {
         def onRemoval(notification: RemovalNotification[K, V]) =
           onRemove(notification.getKey,
                    notification.getValue,
@@ -95,8 +94,8 @@ object Cache {
       options: Seq[CacheOption[K, V]]): CacheBuilder[K, V] =
     options
       .foldLeft(CacheBuilder.newBuilder.asInstanceOf[CacheBuilder[K, V]]) {
-      case (acc, opt) => opt.apply(acc)
-    }
+        case (acc, opt) => opt.apply(acc)
+      }
 
   def simple[K, V](options: CacheOption[K, V]*): SimpleCache[K, V] = {
     new SimpleCache[K, V](createBuilder(options).build())

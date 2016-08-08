@@ -10,8 +10,11 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class StatusTest
-    extends FunSuite with AssertionsForJUnit with GeneratorDrivenPropertyChecks
-    with Eventually with IntegrationPatience {
+    extends FunSuite
+    with AssertionsForJUnit
+    with GeneratorDrivenPropertyChecks
+    with Eventually
+    with IntegrationPatience {
 
   val status1 = Gen.oneOf(Status.Open, Status.Busy, Status.Closed)
   val status2 = for (left <- status1; right <- status1) yield (left, right)
@@ -88,7 +91,7 @@ class StatusTest
     forAll(idx2) {
       case (left, right) =>
         Ordering[Status].compare(ord(left), ord(right)).signum ==
-        (left - right).signum
+          (left - right).signum
     }
   }
 }

@@ -34,7 +34,9 @@ trait Spec2SingleTestTest extends ScalaTestTestCase {
         12,
         "Spec.scala",
         checkConfigAndSettings(
-            _, "SpecTest", "A SpecTest When launched should run single test"),
+            _,
+            "SpecTest",
+            "A SpecTest When launched should run single test"),
         root =>
           checkResultTreeHasExactNamedPath(root,
                                            "[root]",
@@ -42,7 +44,8 @@ trait Spec2SingleTestTest extends ScalaTestTestCase {
                                            "A SpecTest",
                                            "When launched",
                                            "should run single test") &&
-          checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
+            checkResultTreeDoesNotHaveNodes(root,
+                                            "should not run other tests"),
         debug = true)
   }
 }

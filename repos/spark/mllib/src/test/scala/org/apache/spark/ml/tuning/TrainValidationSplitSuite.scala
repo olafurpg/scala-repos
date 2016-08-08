@@ -20,7 +20,11 @@ package org.apache.spark.ml.tuning
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, Evaluator, RegressionEvaluator}
+import org.apache.spark.ml.evaluation.{
+  BinaryClassificationEvaluator,
+  Evaluator,
+  RegressionEvaluator
+}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.param.shared.HasInputCol
 import org.apache.spark.ml.regression.LinearRegression
@@ -30,7 +34,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class TrainValidationSplitSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
   test("train validation with logistic regression") {
     val dataset = sqlContext.createDataFrame(
         sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
@@ -56,15 +61,15 @@ class TrainValidationSplitSuite
 
   test("train validation with linear regression") {
     val dataset = sqlContext.createDataFrame(
-        sc.parallelize(
-            LinearDataGenerator.generateLinearInput(6.3,
-                                                    Array(4.7, 7.2),
-                                                    Array(0.9, -1.3),
-                                                    Array(0.7, 1.2),
-                                                    100,
-                                                    42,
-                                                    0.1),
-            2))
+        sc.parallelize(LinearDataGenerator.generateLinearInput(6.3,
+                                                               Array(4.7, 7.2),
+                                                               Array(0.9,
+                                                                     -1.3),
+                                                               Array(0.7, 1.2),
+                                                               100,
+                                                               42,
+                                                               0.1),
+                       2))
 
     val trainer = new LinearRegression().setSolver("l-bfgs")
     val lrParamMaps = new ParamGridBuilder()
@@ -120,7 +125,8 @@ object TrainValidationSplitSuite {
   abstract class MyModel extends Model[MyModel]
 
   class MyEstimator(override val uid: String)
-      extends Estimator[MyModel] with HasInputCol {
+      extends Estimator[MyModel]
+      with HasInputCol {
 
     override def fit(dataset: DataFrame): MyModel = {
       throw new UnsupportedOperationException

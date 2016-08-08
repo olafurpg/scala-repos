@@ -3,7 +3,10 @@ package project.template
 
 import java.io.File
 
-import com.intellij.openapi.roots.libraries.{LibraryType, NewLibraryConfiguration}
+import com.intellij.openapi.roots.libraries.{
+  LibraryType,
+  NewLibraryConfiguration
+}
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditor
 import com.intellij.openapi.roots.{JavadocOrderRootType, OrderRootType}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10
@@ -86,8 +89,11 @@ object ScalaSdkDescriptor extends SdkDescriptorCompanion {
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    ScalaSdkDescriptor(
-        version, compilerFiles, libraryFiles, sourceFiles, docFiles)
+    ScalaSdkDescriptor(version,
+                       compilerFiles,
+                       libraryFiles,
+                       sourceFiles,
+                       docFiles)
   }
 }
 
@@ -119,8 +125,8 @@ trait SdkDescriptorCompanion {
 
     val requiredBinaryArtifacts =
       Set(Artifact.ScalaLibrary, Artifact.ScalaCompiler) ++ requiredBinaries ++
-      (if (reflectRequired) Set(Artifact.ScalaReflect)
-       else Set())
+        (if (reflectRequired) Set(Artifact.ScalaReflect)
+         else Set())
 
     val existingBinaryArtifacts = binaryComponents.map(_.artifact).toSet
 
@@ -128,8 +134,8 @@ trait SdkDescriptorCompanion {
       requiredBinaryArtifacts -- existingBinaryArtifacts
 
     if (missingBinaryArtifacts.isEmpty) {
-      val compilerBinaries = binaryComponents.filter(
-          it => requiredBinaryArtifacts.contains(it.artifact))
+      val compilerBinaries = binaryComponents.filter(it =>
+        requiredBinaryArtifacts.contains(it.artifact))
 
       val libraryBinaries =
         binaryComponents.filter(it => libraryArtifacts.contains(it.artifact))

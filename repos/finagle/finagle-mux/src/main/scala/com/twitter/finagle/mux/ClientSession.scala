@@ -72,7 +72,8 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
 
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] def safeLog(msg: String, level: Level = Level.INFO): Unit =
-    try log.log(level, msg) catch {
+    try log.log(level, msg)
+    catch {
       case _: Throwable =>
     }
 
@@ -99,13 +100,14 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
 
       writeLk.lockInterruptibly()
       try {
-        state = if (outstanding.get() > 0) Draining
-        else {
-          if (log.isLoggable(Level.FINE))
-            safeLog(s"Finished draining a connection to $name", Level.FINE)
-          drainedCounter.incr()
-          Drained
-        }
+        state =
+          if (outstanding.get() > 0) Draining
+          else {
+            if (log.isLoggable(Level.FINE))
+              safeLog(s"Finished draining a connection to $name", Level.FINE)
+            drainedCounter.incr()
+            Drained
+          }
         trans.write(Message.Rdrain(tag))
       } finally writeLk.unlock()
 
@@ -200,8 +202,8 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     }
   }
 
-  private[this] val detector = FailureDetector(
-      detectorConfig, ping, sr.scope("failuredetector"))
+  private[this] val detector =
+    FailureDetector(detectorConfig, ping, sr.scope("failuredetector"))
 
   override def status: Status =
     Status.worst(detector.status, trans.status match {

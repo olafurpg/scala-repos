@@ -51,8 +51,8 @@ object DFSReadWriteTest {
   private def printUsage(): Unit = {
     val usage: String =
       "DFS Read-Write Test\n" + "\n" + "Usage: localFile dfsDir\n" + "\n" +
-      "localFile - (string) local file to use in test\n" +
-      "dfsDir - (string) DFS directory for read/write tests\n"
+        "localFile - (string) local file to use in test\n" +
+        "dfsDir - (string) DFS directory for read/write tests\n"
 
     println(usage)
   }
@@ -128,11 +128,11 @@ object DFSReadWriteTest {
     if (localWordCount == dfsWordCount) {
       println(
           s"Success! Local Word Count ($localWordCount) " +
-          s"and DFS Word Count ($dfsWordCount) agree.")
+            s"and DFS Word Count ($dfsWordCount) agree.")
     } else {
       println(
           s"Failure! Local Word Count ($localWordCount) " +
-          s"and DFS Word Count ($dfsWordCount) disagree.")
+            s"and DFS Word Count ($dfsWordCount) disagree.")
     }
   }
 }

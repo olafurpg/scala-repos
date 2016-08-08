@@ -7,7 +7,13 @@ import com.twitter.app.GlobalFlag
 import com.twitter.common.metrics.Metrics
 import com.twitter.conversions.time._
 import com.twitter.finagle.Service
-import com.twitter.finagle.http.{MediaType, RequestParamMap, Response, Request, Status}
+import com.twitter.finagle.http.{
+  MediaType,
+  RequestParamMap,
+  Response,
+  Request,
+  Status
+}
 import com.twitter.finagle.util.DefaultTimer
 import com.twitter.io.Buf
 import com.twitter.logging.Logger
@@ -46,7 +52,7 @@ object useCounterDeltas
     extends GlobalFlag[Boolean](
         false,
         "Return deltas for counters instead of absolute values. " +
-        "Provides compatibility with the behavior from 'Ostrich'"
+          "Provides compatibility with the behavior from 'Ostrich'"
     )
 
 object JsonExporter {
@@ -112,7 +118,7 @@ class JsonExporter(registry: Metrics, timer: Timer)
         else {
           log.warning(
               s"${getClass.getName} request ignored due to unsupported period: '${vals
-            .mkString(",")}'")
+                .mkString(",")}'")
           false
         }
       }
@@ -155,7 +161,8 @@ class JsonExporter(registry: Metrics, timer: Timer)
       filtered: Boolean,
       counterDeltasOn: Boolean = false
   ): String = {
-    val gauges = try registry.sampleGauges().asScala catch {
+    val gauges = try registry.sampleGauges().asScala
+    catch {
       case NonFatal(e) =>
         // because gauges run arbitrary user code, we want to protect ourselves here.
         // while the underlying registry should protect against individual misbehaving

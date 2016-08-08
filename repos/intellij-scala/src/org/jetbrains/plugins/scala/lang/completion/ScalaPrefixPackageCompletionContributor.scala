@@ -10,9 +10,16 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.{PsiElement, PsiPackage, JavaPsiFacade}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{TypeAliasToImport, ClassTypeToImport}
+import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{
+  TypeAliasToImport,
+  ClassTypeToImport
+}
 import org.jetbrains.plugins.scala.extensions
-import org.jetbrains.plugins.scala.extensions.{ResolvesTo, PsiNamedElementExt, inReadAction}
+import org.jetbrains.plugins.scala.extensions.{
+  ResolvesTo,
+  PsiNamedElementExt,
+  inReadAction
+}
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
@@ -69,7 +76,8 @@ object ScalaPrefixPackageCompletionContributor {
 
       if (parameters.getInvocationCount == 0) return
 
-      if (PsiTreeUtil.getContextOfType(position, classOf[ScImportStmt]) != null)
+      if (PsiTreeUtil
+            .getContextOfType(position, classOf[ScImportStmt]) != null)
         return
 
       if (result.getPrefixMatcher.getPrefix == "") return
@@ -79,7 +87,9 @@ object ScalaPrefixPackageCompletionContributor {
       if (pckg == null) return
 
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          pckg.name, position.getContext, position) match {
+          pckg.name,
+          position.getContext,
+          position) match {
         case ResolvesTo(pack: PsiPackage)
             if pack.getQualifiedName == pckg.getQualifiedName =>
           return
@@ -88,7 +98,9 @@ object ScalaPrefixPackageCompletionContributor {
 
       val resolveResult = new ScalaResolveResult(pckg, prefixCompletion = true)
       val lookupElems = LookupElementManager.getLookupElement(
-          resolveResult, isInImport = false, shouldImport = true)
+          resolveResult,
+          isInImport = false,
+          shouldImport = true)
       lookupElems.foreach { le =>
         le.elementToImport = pckg
       }
@@ -99,7 +111,7 @@ object ScalaPrefixPackageCompletionContributor {
     for {
       fqn <- prefixPackages(project)
       name = fqn.substring(fqn.lastIndexOf('.'))
-          if prefixMatcher.prefixMatches(name)
+      if prefixMatcher.prefixMatches(name)
     } {
       addPackageForCompletion(fqn)
     }

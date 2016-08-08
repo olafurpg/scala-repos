@@ -21,7 +21,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4ClientChannelInitializerTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   val timeout = Duration.fromSeconds(15)
 
@@ -84,13 +86,13 @@ class Netty4ClientChannelInitializerTest
           Await.result(clientsideTransport.read(), timeout) == data
             .take(frameSize)
             .mkString
-        )
+      )
       assert(
           Await.result(clientsideTransport.read(), timeout) == data
             .drop(frameSize)
             .take(frameSize)
             .mkString
-        )
+      )
 
       server.close()
     }
@@ -116,8 +118,8 @@ class Netty4ClientChannelInitializerTest
   test("Netty4ClientChannelInitializer pipelines enforce read timeouts") {
     @volatile var observedExn: Throwable = null
     val exnSnooper = new ChannelInboundHandlerAdapter {
-      override def exceptionCaught(
-          ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+      override def exceptionCaught(ctx: ChannelHandlerContext,
+                                   cause: Throwable): Unit = {
         observedExn = cause
         super.exceptionCaught(ctx, cause)
       }
@@ -125,7 +127,7 @@ class Netty4ClientChannelInitializerTest
     new Ctx {
       override def params =
         Params.empty +
-        Transport.Liveness(readTimeout = 1.millisecond, Duration.Top, None)
+          Transport.Liveness(readTimeout = 1.millisecond, Duration.Top, None)
 
       initChannel()
       client.pipeline.addLast(exnSnooper)
@@ -140,8 +142,8 @@ class Netty4ClientChannelInitializerTest
   test("Netty4ClientChannelInitializer pipelines enforce write timeouts") {
     @volatile var observedExn: Throwable = null
     val exnSnooper = new ChannelInboundHandlerAdapter {
-      override def exceptionCaught(
-          ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+      override def exceptionCaught(ctx: ChannelHandlerContext,
+                                   cause: Throwable): Unit = {
         observedExn = cause
         super.exceptionCaught(ctx, cause)
       }
@@ -157,7 +159,7 @@ class Netty4ClientChannelInitializerTest
     new Ctx {
       override def params =
         Params.empty +
-        Transport.Liveness(Duration.Top, writeTimeout = 1.millisecond, None)
+          Transport.Liveness(Duration.Top, writeTimeout = 1.millisecond, None)
 
       initChannel()
       client.pipeline.addLast(exnSnooper)
@@ -222,7 +224,9 @@ class Netty4ClientChannelInitializerTest
       }
     }
     val init = new RawNetty4ClientChannelInitializer[ByteBuf, ByteBuf](
-        p, Params.empty, _.addLast(reverser))
+        p,
+        Params.empty,
+        _.addLast(reverser))
 
     val channel: SocketChannel = new NioSocketChannel()
     val loop = new NioEventLoopGroup()
@@ -230,8 +234,7 @@ class Netty4ClientChannelInitializerTest
     init.initChannel(channel)
 
     val msgSeen = new Promise[ByteBuf]
-    channel.pipeline.addFirst(
-        new ChannelOutboundHandlerAdapter {
+    channel.pipeline.addFirst(new ChannelOutboundHandlerAdapter {
       override def write(ctx: ChannelHandlerContext,
                          msg: scala.Any,
                          promise: ChannelPromise): Unit = msg match {

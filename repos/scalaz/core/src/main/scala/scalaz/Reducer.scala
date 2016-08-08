@@ -124,7 +124,7 @@ sealed abstract class ReducerInstances {
   /** Accumulate endomorphisms. */
   implicit def EndoReducer[A]: Reducer[A => A, Endo[A]] = unitReducer(Endo(_))
 
-  implicit def DualReducer[A : Monoid]: Reducer[A, A @@ Tags.Dual] =
+  implicit def DualReducer[A: Monoid]: Reducer[A, A @@ Tags.Dual] =
     unitReducer(Tags.Dual(_: A))(Dual.dualMonoid[A])
 
   import Tags.{Multiplication, First, Last}
@@ -176,8 +176,8 @@ sealed abstract class ReducerInstances {
       def cons(c: C, m: M): M = cs(c)(m)
     }
 
-  def foldReduce[F[_], A, B](a: F[A])(
-      implicit f: Foldable[F], r: Reducer[A, B]): B =
+  def foldReduce[F[_], A, B](a: F[A])(implicit f: Foldable[F],
+                                      r: Reducer[A, B]): B =
     f.foldMap(a)(r.unit(_))(r.monoid)
 
   /** Alias for [[scalaz.UnitReducer]]`.apply`. */

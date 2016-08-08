@@ -37,8 +37,9 @@ trait NetworkFailureSpec extends DefaultTimeout { self: AkkaSpec ⇒
     Future {
       try {
         enableNetworkThrottling()
-        println("===>>> Throttling network with [" + BytesPerSecond + ", " +
-            DelayMillis + "] for [" + duration + "]")
+        println(
+            "===>>> Throttling network with [" + BytesPerSecond + ", " +
+              DelayMillis + "] for [" + duration + "]")
         Thread.sleep(duration.toMillis)
         restoreIP
       } catch {

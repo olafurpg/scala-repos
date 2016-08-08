@@ -33,7 +33,14 @@ import javafx.{scene => jfxs}
 import scala.language.implicitConversions
 import scala.math.Ordering
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty,
+  StringProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.css.Styleable
 import scalafx.delegate.SFXDelegate
@@ -63,7 +70,8 @@ object TableColumnBase {
   */
 abstract class TableColumnBase[S, T] protected (
     override val delegate: jfxsc.TableColumnBase[S, T])
-    extends EventHandlerDelegate with Styleable
+    extends EventHandlerDelegate
+    with Styleable
     with SFXDelegate[jfxsc.TableColumnBase[S, T]] {
 
   /**

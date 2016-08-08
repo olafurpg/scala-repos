@@ -50,10 +50,12 @@ trait TextareaTypedField extends StringTypedField {
   def textareaCols = 20
 }
 
-class TextareaField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
-    extends StringField(rec, maxLength) with TextareaTypedField
+class TextareaField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                    maxLength: Int)
+    extends StringField(rec, maxLength)
+    with TextareaTypedField
 
-class OptionalTextareaField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
-    extends OptionalStringField(rec, maxLength) with TextareaTypedField
+class OptionalTextareaField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                            maxLength: Int)
+    extends OptionalStringField(rec, maxLength)
+    with TextareaTypedField

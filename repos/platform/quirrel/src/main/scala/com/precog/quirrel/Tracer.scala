@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -40,9 +40,9 @@ trait Tracer extends parser.AST with typer.Binder {
 
     parentIdx match {
       case Some(idx) => {
-          copied.indices(idx) set copied.nodes.indexOf((sigma, expr))
-          copied
-        }
+        copied.indices(idx) set copied.nodes.indexOf((sigma, expr))
+        copied
+      }
       case None => copied
     }
   }
@@ -94,29 +94,29 @@ trait Tracer extends parser.AST with typer.Binder {
         addNode(trace, sigma, expr, parentIdx)
 
       case expr @ Dispatch(_, name, actuals) => {
-          expr.binding match {
-            case LetBinding(let) => {
-                val ids = let.params map { Identifier(Vector(), _) }
-                val sigma2 =
-                  sigma ++ (ids zip Stream.continually(let) zip actuals)
+        expr.binding match {
+          case LetBinding(let) => {
+            val ids = let.params map { Identifier(Vector(), _) }
+            val sigma2 =
+              sigma ++ (ids zip Stream.continually(let) zip actuals)
 
-                if (actuals.length > 0) {
-                  val updated = addNode(trace, sigma, expr, parentIdx)
-                  val idx = updated.nodes.indexOf((sigma, expr))
+            if (actuals.length > 0) {
+              val updated = addNode(trace, sigma, expr, parentIdx)
+              val idx = updated.nodes.indexOf((sigma, expr))
 
-                  loop(sigma2, updated, let.left, Some(idx))
-                } else {
-                  loop(sigma2, trace, let.left, parentIdx)
-                }
-              }
-
-            case FormalBinding(let) =>
-              loop(sigma, trace, sigma((name, let)), parentIdx)
-
-            case _ =>
-              foldThrough(trace, sigma, expr, parentIdx, actuals)
+              loop(sigma2, updated, let.left, Some(idx))
+            } else {
+              loop(sigma2, trace, let.left, parentIdx)
+            }
           }
+
+          case FormalBinding(let) =>
+            loop(sigma, trace, sigma((name, let)), parentIdx)
+
+          case _ =>
+            foldThrough(trace, sigma, expr, parentIdx, actuals)
         }
+      }
 
       case NaryOp(_, values) =>
         foldThrough(trace, sigma, expr, parentIdx, values)

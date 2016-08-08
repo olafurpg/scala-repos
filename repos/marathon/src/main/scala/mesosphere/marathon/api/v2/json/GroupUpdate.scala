@@ -19,8 +19,8 @@ case class GroupUpdate(id: Option[PathId],
 
   def apply(current: Group, timestamp: Timestamp): Group = {
     require(scaleBy.isEmpty, "To apply the update, no scale should be given.")
-    require(
-        version.isEmpty, "To apply the update, no version should be given.")
+    require(version.isEmpty,
+            "To apply the update, no version should be given.")
     val effectiveGroups = groups.fold(current.groups) { updates =>
       val currentIds = current.groups.map(_.id)
       val groupIds = updates.map(_.groupId.canonicalPath(current.id))
@@ -29,15 +29,14 @@ case class GroupUpdate(id: Option[PathId],
       val groupUpdates = changedIdList
         .flatMap(gid => current.groups.find(_.id == gid))
         .zip(changedIdList.flatMap(gid =>
-                  updates.find(_.groupId.canonicalPath(current.id) == gid)))
+          updates.find(_.groupId.canonicalPath(current.id) == gid)))
         .map { case (group, groupUpdate) => groupUpdate(group, timestamp) }
       val groupAdditions = groupIds
         .diff(changedIds)
-        .flatMap(
-            gid => updates.find(_.groupId.canonicalPath(current.id) == gid))
+        .flatMap(gid =>
+          updates.find(_.groupId.canonicalPath(current.id) == gid))
         .map(update =>
-              update.toGroup(update.groupId.canonicalPath(current.id),
-                             timestamp))
+          update.toGroup(update.groupId.canonicalPath(current.id), timestamp))
       groupUpdates.toSet ++ groupAdditions
     }
     val effectiveApps: Set[AppDefinition] =
@@ -51,8 +50,9 @@ case class GroupUpdate(id: Option[PathId],
           timestamp)
   }
 
-  def toApp(
-      gid: PathId, app: AppDefinition, version: Timestamp): AppDefinition = {
+  def toApp(gid: PathId,
+            app: AppDefinition,
+            version: Timestamp): AppDefinition = {
     val appId = app.id.canonicalPath(gid)
     app.copy(id = appId,
              dependencies = app.dependencies.map(_.canonicalPath(gid)),

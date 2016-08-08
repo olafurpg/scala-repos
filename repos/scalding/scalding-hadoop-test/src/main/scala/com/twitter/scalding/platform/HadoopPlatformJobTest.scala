@@ -46,13 +46,12 @@ case class HadoopPlatformJobTest(
   def arg(inArg: String, value: String): HadoopPlatformJobTest =
     arg(inArg, List(value))
 
-  def source[T : TypeDescriptor](
-      location: String, data: Seq[T]): HadoopPlatformJobTest =
+  def source[T: TypeDescriptor](location: String,
+                                data: Seq[T]): HadoopPlatformJobTest =
     source(TypedText.tsv[T](location), data)
 
   def source[T](out: TypedSink[T], data: Seq[T]): HadoopPlatformJobTest =
-    copy(
-        sourceWriters = sourceWriters :+ { args: Args =>
+    copy(sourceWriters = sourceWriters :+ { args: Args =>
       new Job(args) {
         TypedPipe
           .from(List(""))
@@ -63,14 +62,13 @@ case class HadoopPlatformJobTest(
       }
     })
 
-  def sink[T : TypeDescriptor](location: String)(
+  def sink[T: TypeDescriptor](location: String)(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
     sink(TypedText.tsv[T](location))(toExpect)
 
   def sink[T](in: Mappable[T])(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
-    copy(
-        sourceReaders = sourceReaders :+ { m: Mode =>
+    copy(sourceReaders = sourceReaders :+ { m: Mode =>
       toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
     })
 
@@ -103,7 +101,7 @@ case class HadoopPlatformJobTest(
 
   private def checkSinks() {
     LOG.debug("Executing sinks")
-    sourceReaders.foreach { _ (cluster.mode) }
+    sourceReaders.foreach { _(cluster.mode) }
   }
 
   def run {

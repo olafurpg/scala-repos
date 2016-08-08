@@ -77,7 +77,7 @@ object LookupJoin extends Serializable {
     * This is the "infinite history" join and always joins regardless of how
     * much time is between the left and the right
     */
-  def apply[T : Ordering, K : Ordering, V, JoinedV](
+  def apply[T: Ordering, K: Ordering, V, JoinedV](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)
@@ -88,7 +88,7 @@ object LookupJoin extends Serializable {
     * In this case, the right pipe is fed through a scanLeft doing a Semigroup.plus
     * before joined to the left
     */
-  def rightSumming[T : Ordering, K : Ordering, V, JoinedV : Semigroup](
+  def rightSumming[T: Ordering, K: Ordering, V, JoinedV: Semigroup](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)
@@ -100,7 +100,7 @@ object LookupJoin extends Serializable {
     * as the joined value.
     * Useful for bounding the time of the join to a recent window
     */
-  def withWindow[T : Ordering, K : Ordering, V, JoinedV](
+  def withWindow[T: Ordering, K: Ordering, V, JoinedV](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)(
@@ -118,8 +118,7 @@ object LookupJoin extends Serializable {
     * as the joined value, and sums are only done as long as they they come
     * within the gate interval as well
     */
-  def withWindowRightSumming[
-      T : Ordering, K : Ordering, V, JoinedV : Semigroup](
+  def withWindowRightSumming[T: Ordering, K: Ordering, V, JoinedV: Semigroup](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)(
@@ -141,41 +140,42 @@ object LookupJoin extends Serializable {
           }
       }
 
-    val joined: TypedPipe[(K, (Option[(T, JoinedV)], Option[
-            (T, V, Option[JoinedV])]))] = left.map {
-      case (t, (k, v)) => (k, (t, Left(v): Either[V, JoinedV]))
-    }.++(right.map {
-        case (t, (k, joinedV)) =>
-          (k, (t, Right(joinedV): Either[V, JoinedV]))
-      })
-      .group
-      .withReducers(reducers.getOrElse(-1)) // -1 means default in scalding
-      .sorted
-      /**
-        * Grouping by K leaves values of (T, Either[V, JoinedV]). Sort
-        * by time and scanLeft. The iterator will now represent pairs of
-        * T and either new values to join against or updates to the
-        * simulated "realtime store" described above.
-        */
-      .scanLeft(
-          /**
-            * In the simulated realtime store described above, this
-            * None is the value in the store at the current
-            * time. Because we sort by time and scan forward, this
-            * value will be updated with a new value every time a
-            * Right(delta) shows up in the iterator.
-            *
-            * The second entry in the pair will be None when the
-            * JoinedV is updated and Some(newValue) when a (K, V)
-            * shows up and a new join occurs.
-            */
-          (Option.empty[(T, JoinedV)], Option.empty[(T, V, Option[JoinedV])])) {
-        case ((None, result), (time, Left(v))) => {
+    val joined: TypedPipe[
+        (K, (Option[(T, JoinedV)], Option[(T, V, Option[JoinedV])]))] =
+      left.map {
+        case (t, (k, v)) => (k, (t, Left(v): Either[V, JoinedV]))
+      }.++(right.map {
+          case (t, (k, joinedV)) =>
+            (k, (t, Right(joinedV): Either[V, JoinedV]))
+        })
+        .group
+        .withReducers(reducers.getOrElse(-1)) // -1 means default in scalding
+        .sorted
+        /**
+          * Grouping by K leaves values of (T, Either[V, JoinedV]). Sort
+          * by time and scanLeft. The iterator will now represent pairs of
+          * T and either new values to join against or updates to the
+          * simulated "realtime store" described above.
+          */
+        .scanLeft(
+        /**
+          * In the simulated realtime store described above, this
+          * None is the value in the store at the current
+          * time. Because we sort by time and scan forward, this
+          * value will be updated with a new value every time a
+          * Right(delta) shows up in the iterator.
+          *
+          * The second entry in the pair will be None when the
+          * JoinedV is updated and Some(newValue) when a (K, V)
+          * shows up and a new join occurs.
+          */
+        (Option.empty[(T, JoinedV)], Option.empty[(T, V, Option[JoinedV])])) {
+          case ((None, result), (time, Left(v))) => {
             // The was no value previously
             (None, Some((time, v, None)))
           }
 
-        case ((prev @ Some((oldt, jv)), result), (time, Left(v))) => {
+          case ((prev @ Some((oldt, jv)), result), (time, Left(v))) => {
             // Left(v) means that we have a new value from the left
             // pipe that we need to join against the current
             // "lastJoined" value sitting in scanLeft's state. This
@@ -185,12 +185,12 @@ object LookupJoin extends Serializable {
             (prev, Some((time, v, filteredJoined)))
           }
 
-        case ((None, result), (time, Right(joined))) => {
+          case ((None, result), (time, Right(joined))) => {
             // There was no value before, so we just update to joined
             (Some((time, joined)), None)
           }
 
-        case ((Some((oldt, oldJ)), result), (time, Right(joined))) => {
+          case ((Some((oldt, oldJ)), result), (time, Right(joined))) => {
             // Right(joinedV) means that we've received a new value
             // to use in the simulated realtime service
             // described in the comments above
@@ -199,8 +199,8 @@ object LookupJoin extends Serializable {
               if (gate(time, oldt)) Semigroup.plus(oldJ, joined) else joined
             (Some((time, nextJoined)), None)
           }
-      }
-      .toTypedPipe
+        }
+        .toTypedPipe
 
     // Now, get rid of residual state from the scanLeft above:
     joined.flatMap {

@@ -44,8 +44,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
   val tp2 = new TopicPartition(topic, part2)
 
   // configure the servers and clients
-  this.serverConfig.setProperty(
-      KafkaConfig.ControlledShutdownEnableProp, "false") // speed up shutdown
+  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
+                                "false") // speed up shutdown
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
                                 "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
@@ -122,13 +122,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     consumer0.subscribe(List(topic).asJava, rebalanceListener)
 
     val assignment = Set(tp, tp2)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == assignment.asJava
-        },
-        s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == assignment.asJava
+    }, s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
 
     consumer0.seek(tp, 300)
     consumer0.seek(tp2, 500)
@@ -136,15 +133,14 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     // change subscription to trigger rebalance
     consumer0.subscribe(List(topic, topic2).asJava, rebalanceListener)
 
-    val newAssignment = Set(
-        tp, tp2, new TopicPartition(topic2, 0), new TopicPartition(topic2, 1))
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            val records = consumer0.poll(50)
-            consumer0.assignment() == newAssignment.asJava
-        },
-        s"Expected partitions ${newAssignment.asJava} but actually got ${consumer0.assignment()}")
+    val newAssignment = Set(tp,
+                            tp2,
+                            new TopicPartition(topic2, 0),
+                            new TopicPartition(topic2, 1))
+    TestUtils.waitUntilTrue(() => {
+      val records = consumer0.poll(50)
+      consumer0.assignment() == newAssignment.asJava
+    }, s"Expected partitions ${newAssignment.asJava} but actually got ${consumer0.assignment()}")
 
     // after rebalancing, we should have reset to the committed positions
     assertEquals(300, consumer0.committed(tp).offset)
@@ -165,7 +161,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     this
       .consumers(0)
       .commitSync(Map[TopicPartition, OffsetAndMetadata](
-              (tp, new OffsetAndMetadata(3L))).asJava)
+          (tp, new OffsetAndMetadata(3L))).asJava)
     assertEquals(3, this.consumers(0).committed(tp).offset)
     assertNull(this.consumers(0).committed(tp2))
 
@@ -175,7 +171,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     this
       .consumers(0)
       .commitSync(Map[TopicPartition, OffsetAndMetadata](
-              (tp2, new OffsetAndMetadata(5L))).asJava)
+          (tp2, new OffsetAndMetadata(5L))).asJava)
     assertEquals(3, this.consumers(0).committed(tp).offset)
     assertEquals(5, this.consumers(0).committed(tp2).offset)
 
@@ -227,9 +223,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     // get metadata for the topic
     var parts: Seq[PartitionInfo] = null
-    while (parts == null) parts = consumer0
-      .partitionsFor(TopicConstants.GROUP_METADATA_TOPIC_NAME)
-      .asScala
+    while (parts == null) parts =
+      consumer0.partitionsFor(TopicConstants.GROUP_METADATA_TOPIC_NAME).asScala
     assertEquals(1, parts.size)
     assertNotNull(parts(0).leader())
 
@@ -287,8 +282,9 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     sendRecords(5)
     consumer0.subscribe(List(topic).asJava)
-    consumeAndVerifyRecords(
-        consumer = consumer0, numRecords = 5, startingOffset = 0)
+    consumeAndVerifyRecords(consumer = consumer0,
+                            numRecords = 5,
+                            startingOffset = 0)
     consumer0.pause(List(tp).asJava)
 
     // subscribe to a new topic to trigger a rebalance
@@ -296,8 +292,9 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     // after rebalance, our position should be reset and our pause state lost,
     // so we should be able to consume from the beginning
-    consumeAndVerifyRecords(
-        consumer = consumer0, numRecords = 0, startingOffset = 5)
+    consumeAndVerifyRecords(consumer = consumer0,
+                            numRecords = 0,
+                            startingOffset = 5)
   }
 
   protected class TestConsumerReassignmentListener
@@ -325,11 +322,12 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     (0 until numRecords).foreach { i =>
       this
         .producers(0)
-        .send(new ProducerRecord(tp.topic(),
-                                 tp.partition(),
-                                 i.toLong,
-                                 s"key $i".getBytes,
-                                 s"value $i".getBytes))
+        .send(
+            new ProducerRecord(tp.topic(),
+                               tp.partition(),
+                               i.toLong,
+                               s"key $i".getBytes,
+                               s"value $i".getBytes))
     }
     this.producers(0).flush()
   }
@@ -343,8 +341,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       timestampType: TimestampType = TimestampType.CREATE_TIME,
       tp: TopicPartition = tp,
       maxPollRecords: Int = Int.MaxValue) {
-    val records = consumeRecords(
-        consumer, numRecords, maxPollRecords = maxPollRecords)
+    val records =
+      consumeRecords(consumer, numRecords, maxPollRecords = maxPollRecords)
     val now = System.currentTimeMillis()
     for (i <- 0 until numRecords) {
       val record = records.get(i)
@@ -365,8 +363,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       assertEquals(s"value $keyAndValueIndex", new String(record.value))
       // this is true only because K and V are byte arrays
       assertEquals(s"key $keyAndValueIndex".length, record.serializedKeySize)
-      assertEquals(
-          s"value $keyAndValueIndex".length, record.serializedValueSize)
+      assertEquals(s"value $keyAndValueIndex".length,
+                   record.serializedValueSize)
     }
   }
 
@@ -384,7 +382,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       if (iters > maxIters)
         throw new IllegalStateException(
             "Failed to consume the expected records after " + iters +
-            " iterations.")
+              " iterations.")
       iters += 1
     }
     records
@@ -396,7 +394,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     val startCount = commitCallback.count
     val started = System.currentTimeMillis()
     while (commitCallback.count == startCount &&
-    System.currentTimeMillis() - started < 10000) consumer.poll(50)
+           System.currentTimeMillis() - started < 10000) consumer.poll(50)
     assertEquals(startCount + 1, commitCallback.count)
   }
 
@@ -420,8 +418,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     val rebalanceListener = new ConsumerRebalanceListener {
       override def onPartitionsAssigned(
           partitions: util.Collection[TopicPartition]) = {
-        partitionAssignment = collection.immutable.Set(
-            consumer.assignment().asScala.toArray: _*)
+        partitionAssignment =
+          collection.immutable.Set(consumer.assignment().asScala.toArray: _*)
       }
 
       override def onPartitionsRevoked(

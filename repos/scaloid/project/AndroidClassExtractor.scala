@@ -13,7 +13,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
   private val sourceJars: List[JarFile] =
     getClass.getClassLoader.getResources("android").toList.map { binUrl =>
-      val binFile = new File(binUrl.toString
+      val binFile = new File(
+          binUrl.toString
             .split("/|!")
             .tail
             .dropRight(2)
@@ -42,8 +43,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
   }
 
   private def fixClassParamedType(tpe: ScalaType) =
-    tpe.copy(
-        params = tpe.params.map { t =>
+    tpe.copy(params = tpe.params.map { t =>
       if (t.isVar && t.bounds.head.name == "Any") {
         t.copy(bounds = List(ScalaType("AnyRef")))
       } else t
@@ -101,7 +101,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
     def hasIntentAsParam(m: Method): Boolean = {
       val params = m.getParameterTypes
       if (params.length > 0)
-        "android.content.Intent".equals(m.getParameterTypes.apply(0).getName) &&
+        "android.content.Intent"
+          .equals(m.getParameterTypes.apply(0).getName) &&
         !superMethods(methodSignature(m))
       else false
     }
@@ -136,13 +137,13 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         ((arity == 0 && isGetter(name)) || (arity == 1 && isSetter(name)))
       }.filter { m =>
         (!cls.getName.endsWith("Service") ||
-            !m.getName.equals("setForeground")) &&
+        !m.getName.equals("setForeground")) &&
         // Android 2.1.1 has a weird undocumented method. manually ignore this.
         (!cls.getName.endsWith("WebView") ||
-            !m.getName.equals("getZoomControls")) &&
+        !m.getName.equals("getZoomControls")) &&
         //https://github.com/pocorall/scaloid/issues/56
         (!cls.getName.endsWith("View") ||
-            !m.getName.equals("setBackground")) // manually specifies this method
+        !m.getName.equals("setBackground")) // manually specifies this method
       }
 
       val allMethodNames = clsMethods.map(_.getName).toSet
@@ -172,10 +173,16 @@ object AndroidClassExtractor extends JavaConversionHelpers {
               val switch =
                 if (name.endsWith("Enabled"))
                   Some(name.replace("Enabled", "").capitalize)
-                else if (name.equals("enabled")) Some("") else None
+                else if (name.equals("enabled")) Some("")
+                else None
 
-              Some(AndroidProperty(
-                      name, tpe, getter, setters, switch, nameClashes))
+              Some(
+                  AndroidProperty(name,
+                                  tpe,
+                                  getter,
+                                  setters,
+                                  switch,
+                                  nameClashes))
             }
         }
         .flatten
@@ -257,7 +264,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       listeners map { l =>
         if (listeners
               .filter(l2 =>
-                    l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
+                l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
               .length > 1) {
           val t = "(^set|^add|Listener$)".r.replaceAllIn(l.setter, "")
           l.copy(name = t.head.toLower + t.tail)
@@ -266,7 +273,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val constructorNames: Map[List[String], List[String]] = {
       val constRegex = ("public +" + clsName +
-          """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
+        """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
       val argRegex = """(.+?) +([a-z][^\[,. ]*)(?:,|$)""".r
 
       constRegex
@@ -310,7 +317,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         case Nil => Nil
         case last :: init =>
           (toTypeStr(last, isVarArgs, true) :: init.map(
-                  toTypeStr(_, isVarArgs, false))).reverse
+              toTypeStr(_, isVarArgs, false))).reverse
       }
 
       val args = typeStrs match {

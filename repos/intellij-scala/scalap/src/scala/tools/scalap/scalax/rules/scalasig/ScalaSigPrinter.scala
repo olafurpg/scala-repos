@@ -115,7 +115,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
           printAlias(level, a)
         case t: TypeSymbol
             if !t.isParam && !t.name.matches("_\\$\\d+") &&
-            !t.name.matches("\\?(\\d)+") =>
+              !t.name.matches("\\?(\\d)+") =>
           // todo: type 0? found in Suite class from scalatest package. So this is quickfix,
           // todo: we need to find why such strange type is here
           indent()
@@ -128,10 +128,11 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(prefix, classSymbol: ClassSymbol, typeArgs) = o.infoType
     o.isFinal &&
-    (classSymbol.children.find(x => x.isCase && x.isInstanceOf[MethodSymbol]) match {
-          case Some(_) => true
-          case None => false
-        })
+    (classSymbol.children
+      .find(x => x.isCase && x.isInstanceOf[MethodSymbol]) match {
+      case Some(_) => true
+      case None => false
+    })
   }
 
   private def underCaseClass(m: MethodSymbol) = m.parent match {
@@ -149,8 +150,9 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     case _ => false
   }
 
-  private def printChildren(
-      level: Int, symbol: Symbol, filterFirstCons: Boolean = false) {
+  private def printChildren(level: Int,
+                            symbol: Symbol,
+                            filterFirstCons: Boolean = false) {
     var firstConsFiltered = !filterFirstCons
     for {
       child <- symbol.children if !(child.isParam && child.isType)
@@ -277,8 +279,9 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
   def printPrimaryConstructor(m: MethodSymbol, c: ClassSymbol) {
     printModifiers(m)
-    printMethodType(
-        m.infoType, printResult = false, methodSymbolAsClassParam(_, c))(())
+    printMethodType(m.infoType,
+                    printResult = false,
+                    methodSymbolAsClassParam(_, c))(())
   }
 
   def printPackageObject(level: Int, o: ObjectSymbol) {
@@ -312,8 +315,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     nameAndType + default
   }
 
-  private def methodSymbolAsClassParam(
-      msymb: MethodSymbol, c: ClassSymbol): String = {
+  private def methodSymbolAsClassParam(msymb: MethodSymbol,
+                                       c: ClassSymbol): String = {
     val baos = new ByteArrayOutputStream
     val stream = new PrintStream(baos)
     val printer = new ScalaSigPrinter(stream, verbosity)
@@ -334,16 +337,16 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
     val nameAndType =
       processName(msymb.name) + " : " +
-      toString(msymb.infoType)(TypeFlags(true))
+        toString(msymb.infoType)(TypeFlags(true))
     val default = if (msymb.hasDefault) " = { /* compiled code */ }" else ""
     stream.print(nameAndType + default)
     baos.toString
   }
 
-  def printMethodType(t: Type,
-                      printResult: Boolean,
-                      pe: MethodSymbol => String = methodSymbolAsMethodParam)(
-      cont: => Unit) {
+  def printMethodType(
+      t: Type,
+      printResult: Boolean,
+      pe: MethodSymbol => String = methodSymbolAsMethodParam)(cont: => Unit) {
 
     def _pmt(mt: FunctionType) {
 
@@ -355,15 +358,15 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
       // Print parameter clauses
       print(
           paramEntries.mkString("(" +
-                                (mt match {
-                                  case _: ImplicitMethodType => "implicit "
-                                  //for Scala 2.9
-                                  case mt: MethodType
-                                      if mt.paramSymbols.nonEmpty &&
-                                      mt.paramSymbols.head.isImplicit =>
-                                    "implicit "
-                                  case _ => ""
-                                }),
+                                  (mt match {
+                                    case _: ImplicitMethodType => "implicit "
+                                    //for Scala 2.9
+                                    case mt: MethodType
+                                        if mt.paramSymbols.nonEmpty &&
+                                          mt.paramSymbols.head.isImplicit =>
+                                      "implicit "
+                                    case _ => ""
+                                  }),
                                 ", ",
                                 ")"))
 
@@ -413,8 +416,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     printModifiers(m)
     if (m.isAccessor) {
       val indexOfSetter = m.parent.get.children.indexWhere(x =>
-            x.isInstanceOf[MethodSymbol] &&
-            x.asInstanceOf[MethodSymbol].name == n + "_$eq")
+        x.isInstanceOf[MethodSymbol] &&
+          x.asInstanceOf[MethodSymbol].name == n + "_$eq")
       print(if (indexOfSetter > 0) "var " else "val ")
     } else {
       print("def ")
@@ -430,10 +433,10 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         print(nn)
         val printBody =
           !m.isDeferred &&
-          (m.parent match {
-                case Some(c: ClassSymbol) if refinementClass(c) => false
-                case _ => true
-              })
+            (m.parent match {
+              case Some(c: ClassSymbol) if refinementClass(c) => false
+              case _ => true
+            })
         printMethodType(m.infoType, printResult = true)({
           if (printBody)
             print(
@@ -550,130 +553,130 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         sep + typeRefString + "." + processName(symbol.name) + ".type"
       case ConstantType(constant) =>
         sep +
-        (constant match {
-              case null => "scala.Null"
-              case _: Unit => "scala.Unit"
-              case _: Boolean => "scala.Boolean"
-              case _: Byte => "scala.Byte"
-              case _: Char => "scala.Char"
-              case _: Short => "scala.Short"
-              case _: Int => "scala.Int"
-              case _: Long => "scala.Long"
-              case _: Float => "scala.Float"
-              case _: Double => "scala.Double"
-              case _: String => "java.lang.String"
-              case c: Class[_] =>
-                "java.lang.Class[" +
+          (constant match {
+            case null => "scala.Null"
+            case _: Unit => "scala.Unit"
+            case _: Boolean => "scala.Boolean"
+            case _: Byte => "scala.Byte"
+            case _: Char => "scala.Char"
+            case _: Short => "scala.Short"
+            case _: Int => "scala.Int"
+            case _: Long => "scala.Long"
+            case _: Float => "scala.Float"
+            case _: Double => "scala.Double"
+            case _: String => "java.lang.String"
+            case c: Class[_] =>
+              "java.lang.Class[" +
                 c.getComponentType.getCanonicalName.replace("$", ".") + "]"
-              case ExternalSymbol(_, Some(parent), _) =>
-                parent.path //enum value
-            })
+            case ExternalSymbol(_, Some(parent), _) =>
+              parent.path //enum value
+          })
       case TypeRefType(NoPrefixType, symbol: TypeSymbol, typeArgs)
           if currentTypeParameters.isDefinedAt(symbol) =>
         sep +
-        processName(currentTypeParameters.getOrElse(symbol, symbol.name)) +
-        typeArgString(typeArgs)
+          processName(currentTypeParameters.getOrElse(symbol, symbol.name)) +
+          typeArgString(typeArgs)
       case TypeRefType(prefix, symbol, typeArgs) =>
         sep +
-        (symbol.path match {
-              case "scala.<repeated>" =>
-                flags match {
-                  case TypeFlags(true) => toString(typeArgs.head) + "*"
-                  case _ => "scala.Seq" + typeArgString(typeArgs)
-                }
-              case "scala.<byname>" => "=> " + toString(typeArgs.head)
-              case _ =>
-                def checkContainsSelf(
-                    self: Option[Type], parent: Symbol): Boolean = {
-                  self match {
-                    case Some(tp) =>
-                      tp match {
-                        case ThisType(symbol) => symbol == parent
-                        case SingleType(_, symbol) => symbol == parent
-                        case c: ConstantType => false
-                        case TypeRefType(_, symbol, _) => symbol == parent
-                        case t: TypeBoundsType => false
-                        case RefinedType(symbol, refs) =>
-                          symbol == parent || !refs.forall(
-                              tp => !checkContainsSelf(Some(tp), parent))
-                        case ClassInfoType(symbol, refs) =>
-                          symbol == parent || !refs.forall(
-                              tp => !checkContainsSelf(Some(tp), parent))
-                        case ClassInfoTypeWithCons(symbol, refs, _) =>
-                          symbol == parent || !refs.forall(
-                              tp => !checkContainsSelf(Some(tp), parent))
-                        case ImplicitMethodType(resultType, _) => false
-                        case MethodType(resultType, _) => false
-                        case NullaryMethodType(resultType) => false
-                        case PolyType(typeRef, symbols) =>
-                          checkContainsSelf(Some(typeRef), parent) ||
+          (symbol.path match {
+            case "scala.<repeated>" =>
+              flags match {
+                case TypeFlags(true) => toString(typeArgs.head) + "*"
+                case _ => "scala.Seq" + typeArgString(typeArgs)
+              }
+            case "scala.<byname>" => "=> " + toString(typeArgs.head)
+            case _ =>
+              def checkContainsSelf(self: Option[Type],
+                                    parent: Symbol): Boolean = {
+                self match {
+                  case Some(tp) =>
+                    tp match {
+                      case ThisType(symbol) => symbol == parent
+                      case SingleType(_, symbol) => symbol == parent
+                      case c: ConstantType => false
+                      case TypeRefType(_, symbol, _) => symbol == parent
+                      case t: TypeBoundsType => false
+                      case RefinedType(symbol, refs) =>
+                        symbol == parent || !refs.forall(tp =>
+                          !checkContainsSelf(Some(tp), parent))
+                      case ClassInfoType(symbol, refs) =>
+                        symbol == parent || !refs.forall(tp =>
+                          !checkContainsSelf(Some(tp), parent))
+                      case ClassInfoTypeWithCons(symbol, refs, _) =>
+                        symbol == parent || !refs.forall(tp =>
+                          !checkContainsSelf(Some(tp), parent))
+                      case ImplicitMethodType(resultType, _) => false
+                      case MethodType(resultType, _) => false
+                      case NullaryMethodType(resultType) => false
+                      case PolyType(typeRef, symbols) =>
+                        checkContainsSelf(Some(typeRef), parent) ||
                           symbols.contains(parent)
-                        case PolyTypeWithCons(typeRef, symbols, _) =>
-                          checkContainsSelf(Some(typeRef), parent) ||
+                      case PolyTypeWithCons(typeRef, symbols, _) =>
+                        checkContainsSelf(Some(typeRef), parent) ||
                           symbols.contains(parent)
-                        case AnnotatedType(typeRef, _) =>
-                          checkContainsSelf(Some(typeRef), parent)
-                        case AnnotatedWithSelfType(typeRef, symbol, _) =>
-                          checkContainsSelf(Some(typeRef), parent) ||
+                      case AnnotatedType(typeRef, _) =>
+                        checkContainsSelf(Some(typeRef), parent)
+                      case AnnotatedWithSelfType(typeRef, symbol, _) =>
+                        checkContainsSelf(Some(typeRef), parent) ||
                           symbol == parent
-                        case ExistentialType(typeRef, symbols) =>
-                          checkContainsSelf(Some(typeRef), parent) ||
+                      case ExistentialType(typeRef, symbols) =>
+                        checkContainsSelf(Some(typeRef), parent) ||
                           symbols.contains(parent)
-                        case _ => false
-                      }
-                    case None => false
+                      case _ => false
+                    }
+                  case None => false
+                }
+              }
+              val prefixStr = (prefix, symbol, toString(prefix)) match {
+                case (NoPrefixType, _, _) => ""
+                case (ThisType(objectSymbol), _, _)
+                    if objectSymbol.isModule && !objectSymbol.isStable =>
+                  val name: String = objectSymbol.name
+                  objectSymbol match {
+                    case classSymbol: ClassSymbol if name == "package" =>
+                      processName(classSymbol.symbolInfo.owner.path) + "."
+                    case _ => processName(name) + "."
                   }
-                }
-                val prefixStr = (prefix, symbol, toString(prefix)) match {
-                  case (NoPrefixType, _, _) => ""
-                  case (ThisType(objectSymbol), _, _)
-                      if objectSymbol.isModule && !objectSymbol.isStable =>
-                    val name: String = objectSymbol.name
-                    objectSymbol match {
-                      case classSymbol: ClassSymbol if name == "package" =>
-                        processName(classSymbol.symbolInfo.owner.path) + "."
-                      case _ => processName(name) + "."
-                    }
-                  case (ThisType(packSymbol), _, _) if !packSymbol.isType =>
-                    processName(packSymbol.path.replace("<root>", "_root_")) +
+                case (ThisType(packSymbol), _, _) if !packSymbol.isType =>
+                  processName(packSymbol.path.replace("<root>", "_root_")) +
                     "."
-                  case (ThisType(classSymbol: ClassSymbol), _, _)
-                      if refinementClass(classSymbol) =>
-                    ""
-                  case (ThisType(typeSymbol: ClassSymbol),
-                        ExternalSymbol(_, Some(parent), _),
-                        _)
-                      if typeSymbol.path != parent.path &&
+                case (ThisType(classSymbol: ClassSymbol), _, _)
+                    if refinementClass(classSymbol) =>
+                  ""
+                case (ThisType(typeSymbol: ClassSymbol),
+                      ExternalSymbol(_, Some(parent), _),
+                      _)
+                    if typeSymbol.path != parent.path &&
                       checkContainsSelf(typeSymbol.selfType, parent) =>
-                    processName(typeSymbol.name) + ".this."
-                  case (ThisType(typeSymbol),
-                        ExternalSymbol(_, Some(parent), _),
-                        _) if typeSymbol.path != parent.path =>
-                    processName(typeSymbol.name) + ".super[" +
+                  processName(typeSymbol.name) + ".this."
+                case (ThisType(typeSymbol),
+                      ExternalSymbol(_, Some(parent), _),
+                      _) if typeSymbol.path != parent.path =>
+                  processName(typeSymbol.name) + ".super[" +
                     processName(parent.name) + "/*" + parent.path + "*/]."
-                  case (_, _, SingletonTypePattern(a)) => a + "."
-                  case (_, _, a) => a + "#"
-                }
-                //remove package object reference
-                val path = StringUtil.cutSubstring(prefixStr)(".`package`")
-                val name = processName(symbol.name)
-                val res = path + name
-                val typeBounds =
-                  if (name == "_") {
-                    symbol match {
-                      case ts: TypeSymbol =>
-                        ts.infoType match {
-                          case t: TypeBoundsType => toString(t)
-                          case _ => ""
-                        }
-                      case _ => ""
-                    }
-                  } else ""
-                val ress =
-                  StringUtil.trimStart(res, "<empty>.") +
+                case (_, _, SingletonTypePattern(a)) => a + "."
+                case (_, _, a) => a + "#"
+              }
+              //remove package object reference
+              val path = StringUtil.cutSubstring(prefixStr)(".`package`")
+              val name = processName(symbol.name)
+              val res = path + name
+              val typeBounds =
+                if (name == "_") {
+                  symbol match {
+                    case ts: TypeSymbol =>
+                      ts.infoType match {
+                        case t: TypeBoundsType => toString(t)
+                        case _ => ""
+                      }
+                    case _ => ""
+                  }
+                } else ""
+              val ress =
+                StringUtil.trimStart(res, "<empty>.") +
                   typeArgString(typeArgs) + typeBounds
-                ress
-            })
+              ress
+          })
       case TypeBoundsType(lower, upper) =>
         val lb = toString(lower)
         val ub = toString(upper)
@@ -683,7 +686,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
       case RefinedType(classSym: ClassSymbol, typeRefs) =>
         val classStr = getClassString(0, classSym)
         sep + typeRefs.map(toString).mkString("", " with ", "") +
-        (if (classStr == " {\n}") "" else classStr)
+          (if (classStr == " {\n}") "" else classStr)
       case RefinedType(classSym, typeRefs) =>
         sep + typeRefs.map(toString).mkString("", " with ", "")
       case ClassInfoType(symbol, typeRefs) =>
@@ -697,7 +700,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
       case PolyType(typeRef, symbols) =>
         "({ type λ" + typeParamString(symbols) + " = " +
-        toString(typeRef, sep) + " })#λ"
+          toString(typeRef, sep) + " })#λ"
       case PolyTypeWithCons(typeRef, symbols, cons) =>
         typeParamString(symbols) + cons + toString(typeRef, sep)
       case AnnotatedType(typeRef, attribTreeRefs) =>
@@ -709,7 +712,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         val refs =
           symbols.map(toString).filter(!_.startsWith("_")).map("type " + _)
         toString(typeRef, sep) +
-        (if (refs.nonEmpty) refs.mkString(" forSome {", "; ", "}") else "")
+          (if (refs.nonEmpty) refs.mkString(" forSome {", "; ", "}") else "")
       case _ => sep + t.toString
     }
   }
@@ -719,8 +722,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
   def toString(symbol: Symbol): String = symbol match {
     case symbol: TypeSymbol =>
-      val attrs = (for (a <- symbol.attributes) yield
-        toString(a)).mkString(" ")
+      val attrs =
+        (for (a <- symbol.attributes) yield toString(a)).mkString(" ")
       val atrs = if (attrs.length > 0) attrs.trim + " " else ""
       val symbolType = symbol.infoType match {
         case PolyType(typeRef, symbols) =>
@@ -832,8 +835,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
         /** Can character form part of a Scala operator name? */
         def isOperatorPart(c: Char): Boolean = (c: @switch) match {
-          case '~' | '!' | '@' | '#' | '%' | '^' | '*' | '+' |
-              '-' | '<' | '>' | '?' | ':' | '=' | '&' | '|' | '/' | '\\' =>
+          case '~' | '!' | '@' | '#' | '%' | '^' | '*' | '+' | '-' | '<' |
+              '>' | '?' | ':' | '=' | '&' | '|' | '/' | '\\' =>
             true
           case c => isSpecial(c)
         }
@@ -841,8 +844,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         if (id.isEmpty) return false
         if (isIdentifierStart(id(0))) {
           if (id.indexWhere(c =>
-                    !isIdentifierPart(c) && !isOperatorPart(c) &&
-                    c != '_') >= 0) return false
+                !isIdentifierPart(c) && !isOperatorPart(c) &&
+                  c != '_') >= 0) return false
           val index = id.indexWhere(isOperatorPart)
           if (index < 0) return true
           if (id(index - 1) != '_') return false
@@ -853,7 +856,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
       }
       val result = NameTransformer.decode(name)
       if (!isIdentifier(result) || keywordList.contains(result) ||
-          result == "=") "`" + result + "`" else result
+          result == "=") "`" + result + "`"
+      else result
     }
     val stripped = stripPrivatePrefix(name)
     val m = pattern.matcher(stripped)

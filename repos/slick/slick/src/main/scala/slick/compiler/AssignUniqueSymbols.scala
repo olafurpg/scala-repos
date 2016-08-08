@@ -69,8 +69,10 @@ class AssignUniqueSymbols extends Phase {
       }
       tr(tree)
     }
-    val features = UsedFeatures(
-        hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption)
+    val features = UsedFeatures(hasDistinct,
+                                hasTypeMapping,
+                                hasAggregate,
+                                hasNonPrimitiveOption)
     logger.debug("Detected features: " + features)
     s2 + (this -> features)
   }

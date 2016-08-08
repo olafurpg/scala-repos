@@ -30,11 +30,11 @@ import org.apache.spark.storage.{BlockManagerId, ShuffleBlockId}
 class MapOutputTrackerSuite extends SparkFunSuite {
   private val conf = new SparkConf
 
-  def createRpcEnv(name: String,
-                   host: String = "localhost",
-                   port: Int = 0,
-                   securityManager: SecurityManager = new SecurityManager(
-                         conf)): RpcEnv = {
+  def createRpcEnv(
+      name: String,
+      host: String = "localhost",
+      port: Int = 0,
+      securityManager: SecurityManager = new SecurityManager(conf)): RpcEnv = {
     RpcEnv.create(name, host, port, conf, securityManager)
   }
 
@@ -153,8 +153,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
     val slaveRpcEnv =
       createRpcEnv("spark-slave", hostname, 0, new SecurityManager(conf))
     val slaveTracker = new MapOutputTrackerWorker(conf)
-    slaveTracker.trackerEndpoint = slaveRpcEnv.setupEndpointRef(
-        rpcEnv.address, MapOutputTracker.ENDPOINT_NAME)
+    slaveTracker.trackerEndpoint = slaveRpcEnv
+      .setupEndpointRef(rpcEnv.address, MapOutputTracker.ENDPOINT_NAME)
 
     masterTracker.registerShuffle(10, 1)
     masterTracker.incrementEpoch()
@@ -165,15 +165,18 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
     val size1000 = MapStatus.decompressSize(MapStatus.compressSize(1000L))
     masterTracker.registerMapOutput(
-        10, 0, MapStatus(BlockManagerId("a", "hostA", 1000), Array(1000L)))
+        10,
+        0,
+        MapStatus(BlockManagerId("a", "hostA", 1000), Array(1000L)))
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
-    assert(slaveTracker.getMapSizesByExecutorId(10, 0) === Seq(
+    assert(
+        slaveTracker.getMapSizesByExecutorId(10, 0) === Seq(
             (BlockManagerId("a", "hostA", 1000),
              ArrayBuffer((ShuffleBlockId(10, 0, 0), size1000)))))
 
-    masterTracker.unregisterMapOutput(
-        10, 0, BlockManagerId("a", "hostA", 1000))
+    masterTracker
+      .unregisterMapOutput(10, 0, BlockManagerId("a", "hostA", 1000))
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
     intercept[FetchFailedException] {
@@ -264,11 +267,17 @@ class MapOutputTrackerSuite extends SparkFunSuite {
     // on hostB with output size 3
     tracker.registerShuffle(10, 3)
     tracker.registerMapOutput(
-        10, 0, MapStatus(BlockManagerId("a", "hostA", 1000), Array(2L)))
+        10,
+        0,
+        MapStatus(BlockManagerId("a", "hostA", 1000), Array(2L)))
     tracker.registerMapOutput(
-        10, 1, MapStatus(BlockManagerId("a", "hostA", 1000), Array(2L)))
+        10,
+        1,
+        MapStatus(BlockManagerId("a", "hostA", 1000), Array(2L)))
     tracker.registerMapOutput(
-        10, 2, MapStatus(BlockManagerId("b", "hostB", 1000), Array(3L)))
+        10,
+        2,
+        MapStatus(BlockManagerId("b", "hostB", 1000), Array(3L)))
 
     // When the threshold is 50%, only host A should be returned as a preferred location
     // as it has 4 out of 7 bytes of output.

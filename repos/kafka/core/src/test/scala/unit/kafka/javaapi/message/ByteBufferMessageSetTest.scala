@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -18,20 +18,25 @@ package kafka.javaapi.message
 
 import org.junit.Assert._
 import org.junit.Test
-import kafka.message.{DefaultCompressionCodec, CompressionCodec, NoCompressionCodec, Message}
+import kafka.message.{
+  DefaultCompressionCodec,
+  CompressionCodec,
+  NoCompressionCodec,
+  Message
+}
 
 class ByteBufferMessageSetTest
     extends kafka.javaapi.message.BaseMessageSetTestCases {
 
-  override def createMessageSet(
-      messages: Seq[Message],
-      compressed: CompressionCodec = NoCompressionCodec)
-    : ByteBufferMessageSet =
+  override def createMessageSet(messages: Seq[Message],
+                                compressed: CompressionCodec =
+                                  NoCompressionCodec): ByteBufferMessageSet =
     new ByteBufferMessageSet(new kafka.message.ByteBufferMessageSet(
-            compressed, messages: _*).buffer)
+        compressed,
+        messages: _*).buffer)
 
-  val msgSeq: Seq[Message] = Seq(
-      new Message("hello".getBytes()), new Message("there".getBytes()))
+  val msgSeq: Seq[Message] =
+    Seq(new Message("hello".getBytes()), new Message("there".getBytes()))
 
   @Test
   def testEquals() {

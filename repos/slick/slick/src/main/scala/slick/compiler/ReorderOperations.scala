@@ -20,10 +20,13 @@ class ReorderOperations extends Phase {
       logger.debug("Pushing Bind into both sides of a Union",
                    Ellipsis(n, List(0, 0), List(0, 1)))
       val s1l, s1r = new AnonSymbol
-      val n2 = Union(
-          Bind(s1l, l1, sel.replace { case Ref(s) if s == s1 => Ref(s1l) }),
-          Bind(s1r, r1, sel.replace { case Ref(s) if s == s1 => Ref(s1r) }),
-          all).infer()
+      val n2 = Union(Bind(s1l, l1, sel.replace {
+                       case Ref(s) if s == s1 => Ref(s1l)
+                     }),
+                     Bind(s1r, r1, sel.replace {
+                       case Ref(s) if s == s1 => Ref(s1r)
+                     }),
+                     all).infer()
       logger.debug("Pushed Bind into both sides of a Union",
                    Ellipsis(n2, List(0, 0), List(1, 0)))
       n2
@@ -33,10 +36,13 @@ class ReorderOperations extends Phase {
       logger.debug("Pushing Filter into both sides of a Union",
                    Ellipsis(n, List(0, 0), List(0, 1)))
       val s1l, s1r = new AnonSymbol
-      val n2 = Union(
-          Filter(s1l, l1, pred.replace { case Ref(s) if s == s1 => Ref(s1l) }),
-          Filter(s1r, r1, pred.replace { case Ref(s) if s == s1 => Ref(s1r) }),
-          all).infer()
+      val n2 = Union(Filter(s1l, l1, pred.replace {
+                       case Ref(s) if s == s1 => Ref(s1l)
+                     }),
+                     Filter(s1r, r1, pred.replace {
+                       case Ref(s) if s == s1 => Ref(s1r)
+                     }),
+                     all).infer()
       logger.debug("Pushed Filter into both sides of a Union",
                    Ellipsis(n2, List(0, 0), List(1, 0)))
       n2
@@ -60,7 +66,7 @@ class ReorderOperations extends Phase {
         Subquery(from :@ CollectionType(_, tpe), Subquery.AboveDistinct),
         Pure(StructNode(defs), ts1))
         if isAliasingOrLiteral(s, defs) &&
-        isDistinctnessPreserving(s, defs, tpe) =>
+          isDistinctnessPreserving(s, defs, tpe) =>
       Subquery(n.copy(from = from), Subquery.AboveDistinct).infer()
 
     // Push any aliasing / literal projection into other Subquery
@@ -91,8 +97,8 @@ class ReorderOperations extends Phase {
     case n => n
   }
 
-  def isAliasingOrLiteral(
-      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)]) = {
+  def isAliasingOrLiteral(base: TermSymbol,
+                          defs: ConstArray[(TermSymbol, Node)]) = {
     val r = defs.iterator.map(_._2).forall {
       case FwdPath(s :: _) if s == base => true
       case _: LiteralNode => true
@@ -103,10 +109,10 @@ class ReorderOperations extends Phase {
     r
   }
 
-  def isDistinctnessPreserving(
-      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)], tpe: Type) = {
-    val usedFields = defs.flatMap(
-        _._2.collect[TermSymbol] {
+  def isDistinctnessPreserving(base: TermSymbol,
+                               defs: ConstArray[(TermSymbol, Node)],
+                               tpe: Type) = {
+    val usedFields = defs.flatMap(_._2.collect[TermSymbol] {
       case Select(Ref(s), f) if s == base => f
     })
     val StructType(tDefs) = tpe.structural

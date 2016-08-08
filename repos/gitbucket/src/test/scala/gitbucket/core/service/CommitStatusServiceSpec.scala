@@ -6,20 +6,23 @@ import profile.simple._
 import org.scalatest.FunSuite
 
 class CommitStatusServiceSpec
-    extends FunSuite with ServiceSpecBase with CommitStatusService
-    with RepositoryService with AccountService {
+    extends FunSuite
+    with ServiceSpecBase
+    with CommitStatusService
+    with RepositoryService
+    with AccountService {
   val now = new java.util.Date()
-  val fixture1 = CommitStatus(
-      userName = "root",
-      repositoryName = "repo",
-      commitId = "0e97b8f59f7cdd709418bb59de53f741fd1c1bd7",
-      context = "jenkins/test",
-      creator = "tester",
-      state = CommitState.PENDING,
-      targetUrl = Some("http://example.com/target"),
-      description = Some("description"),
-      updatedDate = now,
-      registeredDate = now)
+  val fixture1 = CommitStatus(userName = "root",
+                              repositoryName = "repo",
+                              commitId =
+                                "0e97b8f59f7cdd709418bb59de53f741fd1c1bd7",
+                              context = "jenkins/test",
+                              creator = "tester",
+                              state = CommitState.PENDING,
+                              targetUrl = Some("http://example.com/target"),
+                              description = Some("description"),
+                              updatedDate = now,
+                              registeredDate = now)
   def findById(id: Int)(implicit s: Session) =
     CommitStatuses.filter(_.byPrimaryKey(id)).firstOption
   def generateFixture1(tester: Account)(implicit s: Session) =

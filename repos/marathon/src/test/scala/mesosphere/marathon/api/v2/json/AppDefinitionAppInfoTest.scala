@@ -3,7 +3,13 @@ package mesosphere.marathon.api.v2.json
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.JsonTestHelper
 import mesosphere.marathon.core.appinfo.{AppInfo, TaskCounts}
-import mesosphere.marathon.state.{AppDefinition, Timestamp, TaskFailure, Identifiable, PathId}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  Timestamp,
+  TaskFailure,
+  Identifiable,
+  PathId
+}
 import org.scalatest.GivenWhenThen
 import play.api.libs.json.{Writes, JsObject, Json}
 import scala.collection.immutable.Seq
@@ -54,8 +60,9 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
 
   test("app with taskCounts + deployments (show that combinations work)") {
     Given("an app with counts")
-    val extended = AppInfo(
-        app, maybeCounts = Some(counts), maybeDeployments = Some(deployments))
+    val extended = AppInfo(app,
+                           maybeCounts = Some(counts),
+                           maybeDeployments = Some(deployments))
 
     Then("the result contains all fields of the app plus the counts")
     val expectedJson =
@@ -75,9 +82,9 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
     val lastTaskFailure = new TaskFailure(
         appId = PathId("/myapp"),
         taskId = mesos.TaskID
-            .newBuilder()
-            .setValue("myapp.2da6109e-4cce-11e5-98c1-be5b2935a987")
-            .build(),
+          .newBuilder()
+          .setValue("myapp.2da6109e-4cce-11e5-98c1-be5b2935a987")
+          .build(),
         state = mesos.TaskState.TASK_FAILED,
         message = "Command exited with status 1",
         host = "srv2.dc43.mesosphere.com",

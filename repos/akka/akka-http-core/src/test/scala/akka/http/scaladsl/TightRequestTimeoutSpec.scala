@@ -3,7 +3,12 @@
   */
 package akka.http.scaladsl
 
-import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
+import java.io.{
+  BufferedReader,
+  BufferedWriter,
+  InputStreamReader,
+  OutputStreamWriter
+}
 import java.net.{BindException, Socket}
 import java.util.concurrent.TimeoutException
 
@@ -16,10 +21,19 @@ import akka.http.scaladsl.model.HttpEntity._
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.settings.{ClientConnectionSettings, ConnectionPoolSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ClientConnectionSettings,
+  ConnectionPoolSettings,
+  ServerSettings
+}
 import akka.stream.scaladsl._
 import akka.stream.testkit._
-import akka.stream.{OverflowStrategy, ActorMaterializer, BindFailedException, StreamTcpException}
+import akka.stream.{
+  OverflowStrategy,
+  ActorMaterializer,
+  BindFailedException,
+  StreamTcpException
+}
 import akka.testkit.{TestProbe, EventFilter}
 import akka.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
@@ -32,9 +46,13 @@ import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Success, Try}
 
 class TightRequestTimeoutSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures {
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+        """
     akka.loggers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.stdout-loglevel = ERROR

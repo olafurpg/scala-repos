@@ -25,21 +25,22 @@ class IpAddressTest extends MarathonSpec with Matchers {
     lazy val ipAddressWithGroupsAndLabels = IpAddress(
         groups = Vector("a", "b", "c"),
         labels = Map(
-              "foo" -> "bar",
-              "baz" -> "buzz"
-          )
+            "foo" -> "bar",
+            "baz" -> "buzz"
+        )
     )
 
     lazy val ipAddressWithDiscoveryInfo = IpAddress(
         groups = Vector("a", "b", "c"),
         labels = Map(
-              "foo" -> "bar",
-              "baz" -> "buzz"
-          ),
+            "foo" -> "bar",
+            "baz" -> "buzz"
+        ),
         discoveryInfo = DiscoveryInfo(
-              ports = Vector(DiscoveryInfo.Port(
-                        name = "http", number = 80, protocol = "tcp"))
-          )
+            ports = Vector(
+                DiscoveryInfo
+                  .Port(name = "http", number = 80, protocol = "tcp"))
+        )
     )
   }
 
@@ -70,8 +71,9 @@ class IpAddressTest extends MarathonSpec with Matchers {
     val proto = f.ipAddressWithGroupsAndLabels.toProto
     proto.getGroupsList.asScala should equal(
         f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
-        f.ipAddressWithGroupsAndLabels.labels)
+    proto.getLabelsList.asScala
+      .map(kv => kv.getKey -> kv.getValue)
+      .toMap should equal(f.ipAddressWithGroupsAndLabels.labels)
   }
 
   test("ToProto with groups and labels and discovery") {
@@ -88,8 +90,9 @@ class IpAddressTest extends MarathonSpec with Matchers {
 
     proto.getGroupsList.asScala should equal(
         f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
-        f.ipAddressWithGroupsAndLabels.labels)
+    proto.getLabelsList.asScala
+      .map(kv => kv.getKey -> kv.getValue)
+      .toMap should equal(f.ipAddressWithGroupsAndLabels.labels)
     proto.getDiscoveryInfo should equal(discoveryInfoProto)
   }
 

@@ -90,7 +90,8 @@ object TouchEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/TouchEvent.html]]
   */
 class TouchEvent(override val delegate: jfxsi.TouchEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.TouchEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.TouchEvent] {
 
   /**
     * Returns number of touch points represented by this touch event set.

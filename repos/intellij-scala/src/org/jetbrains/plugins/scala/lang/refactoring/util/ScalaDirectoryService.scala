@@ -5,7 +5,11 @@ import java.util.Properties
 
 import com.intellij.ide.fileTemplates.impl.FileTemplateBase
 import com.intellij.ide.fileTemplates.ui.CreateFromTemplateDialog
-import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager, FileTemplateUtil}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate,
+  FileTemplateManager,
+  FileTemplateUtil
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.{PsiBundle, PsiClass, PsiDirectory, PsiElement}
@@ -36,11 +40,14 @@ object ScalaDirectoryService {
     val fileName: String = name
     val element: PsiElement = try {
       if (askToDefineVariables)
-        new CreateFromTemplateDialog(
-            dir.getProject, dir, template, null, properties).create
+        new CreateFromTemplateDialog(dir.getProject,
+                                     dir,
+                                     template,
+                                     null,
+                                     properties).create
       else
-        FileTemplateUtil.createFromTemplate(
-            template, fileName, properties, dir)
+        FileTemplateUtil
+          .createFromTemplate(template, fileName, properties, dir)
     } catch {
       case e: IncorrectOperationException => throw e
       case e: Exception =>
@@ -62,8 +69,8 @@ object ScalaDirectoryService {
                       templateName)
   }
 
-  private def templateForUnitTest(
-      templateName: String, name: String): FileTemplate = {
+  private def templateForUnitTest(templateName: String,
+                                  name: String): FileTemplate = {
     val kind = templateName match {
       case ScalaFileTemplateUtil.SCALA_CLASS => "class "
       case ScalaFileTemplateUtil.SCALA_TRAIT => "trait "

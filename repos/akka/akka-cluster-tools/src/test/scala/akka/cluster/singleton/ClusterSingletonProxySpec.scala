@@ -11,7 +11,9 @@ import akka.cluster.Cluster
 import scala.concurrent.duration._
 
 class ClusterSingletonProxySpec
-    extends WordSpecLike with Matchers with BeforeAndAfterAll {
+    extends WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   import ClusterSingletonProxySpec._
 
@@ -19,7 +21,8 @@ class ClusterSingletonProxySpec
   seed.cluster.join(seed.cluster.selfAddress)
 
   val testSystems =
-    (0 until 4).map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
+    (0 until 4)
+      .map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
 
   "The cluster singleton proxy" must {
     "correctly identify the singleton" in {
@@ -45,14 +48,14 @@ object ClusterSingletonProxySpec {
                          singletonProps = Props[Singleton],
                          terminationMessage = PoisonPill,
                          settings = ClusterSingletonManagerSettings(system)
-                             .withRemovalMargin(5.seconds)),
+                           .withRemovalMargin(5.seconds)),
                      name = "singletonManager")
     }
 
     val proxy = system.actorOf(
-        ClusterSingletonProxy.props(
-            "user/singletonManager",
-            settings = ClusterSingletonProxySettings(system)),
+        ClusterSingletonProxy.props("user/singletonManager",
+                                    settings =
+                                      ClusterSingletonProxySettings(system)),
         s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
 
     def testProxy(msg: String) {

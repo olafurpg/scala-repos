@@ -38,12 +38,13 @@ class NotImplementedCodeInspection extends AbstractInspection {
     }
   }
 
-  private def positionCursor(
-      project: Project, targetFile: PsiFile, element: PsiElement): Editor = {
+  private def positionCursor(project: Project,
+                             targetFile: PsiFile,
+                             element: PsiElement): Editor = {
     val range = element.getTextRange
     val textOffset = range.getStartOffset
-    val descriptor = new OpenFileDescriptor(
-        project, targetFile.getVirtualFile, textOffset)
+    val descriptor =
+      new OpenFileDescriptor(project, targetFile.getVirtualFile, textOffset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 }

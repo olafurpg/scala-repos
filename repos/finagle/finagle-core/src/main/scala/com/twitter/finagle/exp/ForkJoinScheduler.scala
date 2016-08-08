@@ -13,8 +13,9 @@ import java.util.concurrent.atomic.AtomicLong
   * to balancing load by work-stealing, it implements managed
   * blocking to ensure desired parallelism is retained.
   */
-private class ForkJoinScheduler(
-    nthreads: Int, statsReceiver: StatsReceiver = NullStatsReceiver)
+private class ForkJoinScheduler(nthreads: Int,
+                                statsReceiver: StatsReceiver =
+                                  NullStatsReceiver)
     extends Scheduler {
   private trait IsManagedThread
 
@@ -89,7 +90,8 @@ private class ForkJoinScheduler(
         local.submit(r)
 
       case _ =>
-        try pool.execute(ForkJoinTask.adapt(r)) catch {
+        try pool.execute(ForkJoinTask.adapt(r))
+        catch {
           // ForkJoin pools reject execution only when its internal
           // resources are exhausted. It is a serious, nonrecoverable
           // error.
@@ -116,7 +118,8 @@ private class ForkJoinScheduler(
           override def block() = {
             numBlocks.incr()
             activeBlocks.incrementAndGet()
-            res = try f finally {
+            res = try f
+            finally {
               ok = true
               activeBlocks.decrementAndGet()
             }

@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.finders.FindersApiTe
   * @since 10.02.2015.
   */
 class Scalatest2_11_2_2_1_FindersApiTest
-    extends Scalatest2_11_2_2_1_Base with FindersApiTest {}
+    extends Scalatest2_11_2_2_1_Base
+    with FindersApiTest {}

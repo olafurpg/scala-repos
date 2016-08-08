@@ -8,7 +8,8 @@ import org.ensime.util.EnsimeSpec
 import scala.reflect.internal.util.{OffsetPosition, RangePosition}
 
 class ImplicitAnalyzerSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -52,7 +53,8 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
+      dets should ===(
+          List(
               ("conversion", "\"sample\"", "StringToTest")
           ))
     }
@@ -73,7 +75,8 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
+      dets should ===(
+          List(
               ("param", "\"sample\"", "StringToTest", List("myThing"), true),
               ("conversion", "\"sample\"", "StringToTest")
           ))
@@ -98,15 +101,10 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(
-          List(
-              ("param",
-               "zz(1)(\"abc\")",
-               "zz",
-               List("myThing", "myThong"),
-               false),
-              ("param", "yy", "yy", List("myThing"), false)
-          ))
+      dets should ===(List(
+          ("param", "zz(1)(\"abc\")", "zz", List("myThing", "myThong"), false),
+          ("param", "yy", "yy", List("myThing"), false)
+      ))
     }
   }
 

@@ -11,7 +11,11 @@ import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
 import scalafx.css.Styleable
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.event.Event
 
 /**
@@ -63,8 +67,11 @@ object TreeTableColumn {
     def this(treeTableView: TreeTableView[S],
              treeTableColumn: TreeTableColumn[S, T],
              value: S) =
-      this(new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
-              treeTableView, treeTableColumn, new TreeItem[S](value)))
+      this(
+          new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
+              treeTableView,
+              treeTableColumn,
+              new TreeItem[S](value)))
 
     /**
       * Returns the TreeTableColumn passed in to the constructor.
@@ -123,8 +130,11 @@ object TreeTableColumn {
         pos: TreeTablePosition[S, T],
         eventType: jfxe.EventType[jfxsc.TreeTableColumn.CellEditEvent[S, T]],
         newValue: T) =
-      this(new jfxsc.TreeTableColumn.CellEditEvent(
-              table, pos, eventType, newValue))
+      this(
+          new jfxsc.TreeTableColumn.CellEditEvent(table,
+                                                  pos,
+                                                  eventType,
+                                                  newValue))
 
     /**
       * Returns the TreeTableView upon which this event occurred.
@@ -160,8 +170,8 @@ object TreeTableColumn {
   }
 
   object SortType
-      extends SFXEnumDelegateCompanion[
-          jfxsc.TreeTableColumn.SortType, SortType] {
+      extends SFXEnumDelegateCompanion[jfxsc.TreeTableColumn.SortType,
+                                       SortType] {
 
     /** Column will be sorted in an ascending order. */
     val Ascending = new SortType(jfxsc.TreeTableColumn.SortType.ASCENDING)
@@ -225,8 +235,8 @@ object TreeTableColumn {
   *
   */
 class TreeTableColumn[S, T](
-    override val delegate: jfxsc.TreeTableColumn[S, T] = new jfxsc.TreeTableColumn[
-          S, T]())
+    override val delegate: jfxsc.TreeTableColumn[S, T] =
+      new jfxsc.TreeTableColumn[S, T]())
     extends TableColumnBase[jfxsc.TreeItem[S], T](delegate)
     with SFXDelegate[jfxsc.TreeTableColumn[S, T]] {
 
@@ -249,19 +259,17 @@ class TreeTableColumn[S, T](
     * Finally, there are a number of pre-built cell factories available in the javafx.scene.control.cell package.
     */
   def cellFactory: ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
-    ObjectProperty(
-        (column: TreeTableColumn[S, T]) =>
-          new TreeTableCell(
-              delegate.cellFactoryProperty.getValue.call(column)))
+    ObjectProperty((column: TreeTableColumn[S, T]) =>
+      new TreeTableCell(delegate.cellFactoryProperty.getValue.call(column)))
 
   def cellFactory_=(f: TreeTableColumn[S, T] => TreeTableCell[S, T]) {
-    delegate.cellFactoryProperty.setValue(
-        new jfxu.Callback[
-            jfxsc.TreeTableColumn[S, T], jfxsc.TreeTableCell[S, T]] {
-      def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
-        f(v)
-      }
-    })
+    delegate.cellFactoryProperty
+      .setValue(new jfxu.Callback[jfxsc.TreeTableColumn[S, T],
+                                  jfxsc.TreeTableCell[S, T]] {
+        def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
+          f(v)
+        }
+      })
   }
 
   /**
@@ -302,11 +310,11 @@ class TreeTableColumn[S, T](
     delegate.cellValueFactoryProperty.setValue(
         new jfxu.Callback[jfxsc.TreeTableColumn.CellDataFeatures[S, T],
                           jfxbv.ObservableValue[T]] {
-      def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
-        : jfxbv.ObservableValue[T] = {
-        f(v).delegate
-      }
-    })
+          def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
+            : jfxbv.ObservableValue[T] = {
+            f(v).delegate
+          }
+        })
   }
 
   /**

@@ -22,7 +22,8 @@ object Sender {
     val payloadSize = if (args.length >= 4) args(3).toInt else 100
 
     system.actorOf(
-        Sender.props(remotePath, totalMessages, burstSize, payloadSize), "snd")
+        Sender.props(remotePath, totalMessages, burstSize, payloadSize),
+        "snd")
   }
 
   def props(path: String,
@@ -36,13 +37,17 @@ object Sender {
   sealed trait Echo
   case object Start extends Echo
   case object Done extends Echo
-  case class Continue(
-      remaining: Int, startTime: Long, burstStartTime: Long, n: Int)
+  case class Continue(remaining: Int,
+                      startTime: Long,
+                      burstStartTime: Long,
+                      n: Int)
       extends Echo
 }
 
-class Sender(
-    path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
+class Sender(path: String,
+             totalMessages: Int,
+             burstSize: Int,
+             payloadSize: Int)
     extends Actor {
   import Sender._
 
@@ -89,9 +94,8 @@ class Sender(
       maxRoundTripMillis = math.max(maxRoundTripMillis, roundTripMillis)
       if (duration >= 500) {
         val throughtput = (n * 1000.0 / duration).toInt
-        println(
-            s"It took $duration ms to deliver $n messages, throughtput $throughtput msg/s, " +
-            s"latest round-trip $roundTripMillis ms, remaining $remaining of $totalMessages")
+        println(s"It took $duration ms to deliver $n messages, throughtput $throughtput msg/s, " +
+          s"latest round-trip $roundTripMillis ms, remaining $remaining of $totalMessages")
       }
 
       val nextRemaining = sendBatch(actor, remaining)
@@ -99,16 +103,17 @@ class Sender(
       else if (duration >= 500)
         actor ! Continue(nextRemaining, now, now, burstSize)
       else
-        actor ! c.copy(
-            remaining = nextRemaining, burstStartTime = now, n = n + burstSize)
+        actor ! c.copy(remaining = nextRemaining,
+                       burstStartTime = now,
+                       n = n + burstSize)
 
     case Done =>
       val took = (System.nanoTime - startTime).nanos.toMillis
       val throughtput = (totalMessages * 1000.0 / took).toInt
       println(
           s"== It took $took ms to deliver $totalMessages messages, throughtput $throughtput msg/s, " +
-          s"max round-trip $maxRoundTripMillis ms, burst size $burstSize, " +
-          s"payload size $payloadSize")
+            s"max round-trip $maxRoundTripMillis ms, burst size $burstSize, " +
+            s"payload size $payloadSize")
       actor ! Shutdown
 
     case Terminated(`actor`) =>

@@ -147,8 +147,9 @@ abstract class DriverType(val name: String) {
     * The List of commands will be executed in order.
     */
   def primaryKeySetup(tableName: String, columnName: String): List[String] = {
-    List("ALTER TABLE " + tableName + " ADD CONSTRAINT " + tableName +
-        "_PK PRIMARY KEY(" + columnName + ")")
+    List(
+        "ALTER TABLE " + tableName + " ADD CONSTRAINT " + tableName +
+          "_PK PRIMARY KEY(" + columnName + ")")
   }
 
   /** This defines the syntax for adding a column in an alter. This is
@@ -157,32 +158,31 @@ abstract class DriverType(val name: String) {
 }
 
 object DriverType {
-  var calcDriver: Connection => DriverType = conn =>
-    {
-      val meta = conn.getMetaData
+  var calcDriver: Connection => DriverType = conn => {
+    val meta = conn.getMetaData
 
-      (meta.getDatabaseProductName,
-       meta.getDatabaseMajorVersion,
-       meta.getDatabaseMinorVersion) match {
-        case (DerbyDriver.name, _, _) => DerbyDriver
-        case (MySqlDriver.name, _, _) => MySqlDriver
-        case (PostgreSqlDriver.name, major, minor)
-            if ((major == 8 && minor >= 2) || major > 8) =>
-          PostgreSqlDriver
-        case (PostgreSqlDriver.name, _, _) => PostgreSqlOldDriver
-        case (H2Driver.name, _, _) => H2Driver
-        case (SqlServerDriver.name, major, _) if major >= 9 => SqlServerDriver
-        case (SqlServerDriver.name, _, _) => SqlServerPre2005Driver
-        case (SybaseSQLAnywhereDriver.name, _, _) => SybaseSQLAnywhereDriver
-        case (SybaseASEDriver.name, _, _) => SybaseASEDriver
-        case (OracleDriver.name, _, _) => OracleDriver
-        case (MaxDbDriver.name, _, _) => MaxDbDriver
-        case (other, _, _) if other.startsWith(DB2Driver.name) => DB2Driver
-        case x =>
-          throw new Exception(
-              "Lift mapper does not support JDBC driver %s.\n".format(x) +
+    (meta.getDatabaseProductName,
+     meta.getDatabaseMajorVersion,
+     meta.getDatabaseMinorVersion) match {
+      case (DerbyDriver.name, _, _) => DerbyDriver
+      case (MySqlDriver.name, _, _) => MySqlDriver
+      case (PostgreSqlDriver.name, major, minor)
+          if ((major == 8 && minor >= 2) || major > 8) =>
+        PostgreSqlDriver
+      case (PostgreSqlDriver.name, _, _) => PostgreSqlOldDriver
+      case (H2Driver.name, _, _) => H2Driver
+      case (SqlServerDriver.name, major, _) if major >= 9 => SqlServerDriver
+      case (SqlServerDriver.name, _, _) => SqlServerPre2005Driver
+      case (SybaseSQLAnywhereDriver.name, _, _) => SybaseSQLAnywhereDriver
+      case (SybaseASEDriver.name, _, _) => SybaseASEDriver
+      case (OracleDriver.name, _, _) => OracleDriver
+      case (MaxDbDriver.name, _, _) => MaxDbDriver
+      case (other, _, _) if other.startsWith(DB2Driver.name) => DB2Driver
+      case x =>
+        throw new Exception(
+            "Lift mapper does not support JDBC driver %s.\n".format(x) +
               "See http://wiki.liftweb.net/index.php/Category:Database for a list of supported databases.")
-      }
+    }
   }
 }
 
@@ -328,8 +328,8 @@ object PostgreSqlDriver extends BasePostgreSQLDriver {
       tableName: String,
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
-    DB.prepareStatement(
-        query + " RETURNING " + genKeyNames.mkString(","), conn) { stmt =>
+    DB.prepareStatement(query + " RETURNING " + genKeyNames.mkString(","),
+                        conn) { stmt =>
       setter(stmt)
       handler(Left(stmt.executeQuery))
     }
@@ -473,19 +473,19 @@ object OracleDriver extends DriverType("Oracle") {
     case Types.BOOLEAN => Types.INTEGER
   }
 
-  override def primaryKeySetup(
-      tableName: String, columnName: String): List[String] = {
+  override def primaryKeySetup(tableName: String,
+                               columnName: String): List[String] = {
     /*
      * This trigger and sequence setup is taken from http://www.databaseanswers.org/sql_scripts/ora_sequence.htm
      */
     super.primaryKeySetup(tableName, columnName) ::: List(
         "CREATE SEQUENCE " + tableName +
-        "_sequence START WITH 1 INCREMENT BY 1",
+          "_sequence START WITH 1 INCREMENT BY 1",
         "CREATE OR REPLACE TRIGGER " + tableName +
-        "_trigger BEFORE INSERT ON " + tableName + " " + "FOR EACH ROW " +
-        "WHEN (new." + columnName + " is null) " + "BEGIN " +
-        "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
-        " FROM DUAL; " + "END;")
+          "_trigger BEFORE INSERT ON " + tableName + " " + "FOR EACH ROW " +
+          "WHEN (new." + columnName + " is null) " + "BEGIN " +
+          "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
+          " FROM DUAL; " + "END;")
   }
 
   // Oracle supports returning generated keys only if we specify the names of the column(s) to return.

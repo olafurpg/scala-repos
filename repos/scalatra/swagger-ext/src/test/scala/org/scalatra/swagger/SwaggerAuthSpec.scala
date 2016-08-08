@@ -18,7 +18,8 @@ object SwaggerAuthSpec {
 
   val apiInfo = ApiInfo(
       title = "Swagger Sample App",
-      description = "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
+      description =
+        "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
       termsOfServiceUrl = "http://helloreverb.com/terms/",
       contact = "apiteam@wordnik.com",
       license = "Apache 2.0",
@@ -46,7 +47,8 @@ object SwaggerAuthSpec {
   }
 
   trait AuthenticatedBase
-      extends ScalatraServlet with NativeJsonSupport
+      extends ScalatraServlet
+      with NativeJsonSupport
       with ScentrySupport[User] {
     type ScentryConfiguration = ScentryConfig
     protected val scentryConfig: ScentryConfiguration = new ScentryConfig {}
@@ -71,7 +73,9 @@ object SwaggerAuthSpec {
   }
 
   class ResourcesApp(implicit protected val swagger: SwaggerWithAuth)
-      extends AuthenticatedBase with NativeJsonSupport with CorsSupport
+      extends AuthenticatedBase
+      with NativeJsonSupport
+      with CorsSupport
       with SwaggerAuthBase[User] {
 
     error {
@@ -82,7 +86,8 @@ object SwaggerAuthSpec {
   }
 
   class PetsApi(implicit protected val swagger: SwaggerWithAuth)
-      extends AuthenticatedBase with NativeJsonSupport
+      extends AuthenticatedBase
+      with NativeJsonSupport
       with SwaggerAuthSupport[User] {
 
     implicit protected def jsonFormats: Formats = DefaultFormats
@@ -90,20 +95,17 @@ object SwaggerAuthSpec {
     protected val applicationDescription = "The pets api"
     override protected val applicationName = Some("pets")
 
-    private val allowsTom = (u: Option[User]) =>
-      {
-        u.map(_.login) == Some("tom")
+    private val allowsTom = (u: Option[User]) => {
+      u.map(_.login) == Some("tom")
     }
 
-    private val allowsAuthenticated = (u: Option[User]) =>
-      {
-        u.isDefined
+    private val allowsAuthenticated = (u: Option[User]) => {
+      u.isDefined
     }
 
-    private val noJohn = (u: Option[User]) =>
-      {
-        val uu = u.map(_.login)
-        uu.isDefined && uu != Some("john")
+    private val noJohn = (u: Option[User]) => {
+      val uu = u.map(_.login)
+      uu.isDefined && uu != Some("john")
     }
 
     get("/", operation(apiOperation[Unit]("getPets"))) {
@@ -127,7 +129,8 @@ object SwaggerAuthSpec {
   }
 
   class AdminApi(implicit protected val swagger: SwaggerWithAuth)
-      extends AuthenticatedBase with NativeJsonSupport
+      extends AuthenticatedBase
+      with NativeJsonSupport
       with SwaggerAuthSupport[User] {
     protected val applicationDescription = "The admin api"
     override protected val applicationName = Some("admin")

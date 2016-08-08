@@ -33,7 +33,7 @@ class ScalaPropertiesReferenceContributor extends PsiReferenceContributor {
         ScalaPatterns
           .scalaLiteral()
           .withParent(psiNameValuePair.withName(
-                  AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)),
+              AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)),
         new ResourceBundleReferenceProvider)
     registrar.registerReferenceProvider(
         PsiJavaPatterns.psiElement(classOf[PropertyValueImpl]),
@@ -45,8 +45,8 @@ class ScalaPropertiesReferenceContributor extends PsiReferenceContributor {
             val text: String = element.getText
             val words: Array[String] = text.split("\\s")
             if (words.length != 1) return PsiReference.EMPTY_ARRAY
-            CLASS_REFERENCE_PROVIDER.getReferencesByString(
-                words(0), element, 0)
+            CLASS_REFERENCE_PROVIDER
+              .getReferencesByString(words(0), element, 0)
           }
         })
   }

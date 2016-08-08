@@ -40,7 +40,8 @@ object Button {
 }
 
 class Button(override val delegate: jfxsc.Button = new jfxsc.Button)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.Button] {
+    extends ButtonBase(delegate)
+    with SFXDelegate[jfxsc.Button] {
 
   /**
     * Creates a button with the specified text as its label.

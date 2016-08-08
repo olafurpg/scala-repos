@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -33,9 +33,9 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeTruncationSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import Function._
 
@@ -67,8 +67,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04-29", "2011-02-21", "2011-09-06", "2012-02-11", "2012-12-28")
+      result2 must contain("2010-04-29",
+                           "2011-02-21",
+                           "2011-09-06",
+                           "2012-02-11",
+                           "2012-12-28")
     }
     "determine year and month" in {
       val input = dag.Operate(
@@ -84,8 +87,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04", "2011-02", "2011-09", "2012-02", "2012-12")
+      result2 must contain("2010-04",
+                           "2011-02",
+                           "2011-09",
+                           "2012-02",
+                           "2012-12")
     }
     "determine year and day of year" in {
       val input = dag.Operate(
@@ -101,8 +107,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2012-363", "2011-249", "2012-042", "2010-119", "2011-052")
+      result2 must contain("2012-363",
+                           "2011-249",
+                           "2012-042",
+                           "2010-119",
+                           "2011-052")
     }
     "determine month and day" in {
       val input = dag.Operate(
@@ -270,8 +279,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "09:37:52", "20:09:59", "06:44:52", "09:11:33", "22:38:19")
+      result2 must contain("09:37:52",
+                           "20:09:59",
+                           "06:44:52",
+                           "09:11:33",
+                           "22:38:19")
     }
   }
 
@@ -290,8 +302,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04-29", "2011-02-21", "2011-09-06", "2012-02-11", "2012-12-28")
+      result2 must contain("2010-04-29",
+                           "2011-02-21",
+                           "2011-09-06",
+                           "2012-02-11",
+                           "2012-12-28")
     }
     "determine year and month" in {
       val input = dag.Operate(
@@ -307,8 +322,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04", "2011-02", "2011-09", "2012-02", "2012-12")
+      result2 must contain("2010-04",
+                           "2011-02",
+                           "2011-09",
+                           "2012-02",
+                           "2012-12")
     }
     "determine year and day of year" in {
       val input = dag.Operate(
@@ -324,8 +342,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2012-363", "2011-249", "2012-042", "2010-119", "2011-052")
+      result2 must contain("2012-363",
+                           "2011-249",
+                           "2012-042",
+                           "2010-119",
+                           "2011-052")
     }
     "determine month and day" in {
       val input = dag.Operate(
@@ -493,8 +514,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "09:37:52", "20:09:59", "06:44:52", "09:11:33", "22:38:19")
+      result2 must contain("09:37:52",
+                           "20:09:59",
+                           "06:44:52",
+                           "09:11:33",
+                           "22:38:19")
     }
   }
 
@@ -1270,4 +1294,5 @@ trait TimeTruncationSpecs[M[+ _]]
 }
 
 object TimeTruncationSpecs
-    extends TimeTruncationSpecs[test.YId] with test.YIdInstances
+    extends TimeTruncationSpecs[test.YId]
+    with test.YIdInstances

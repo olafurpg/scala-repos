@@ -24,8 +24,8 @@ private[prediction] object Common {
   @transient lazy private val channelsDb = Storage.getMetaDataChannels()
 
   /* throw exception if invalid app name or channel name */
-  def appNameToId(
-      appName: String, channelName: Option[String]): (Int, Option[Int]) = {
+  def appNameToId(appName: String,
+                  channelName: Option[String]): (Int, Option[Int]) = {
     val appOpt = appsDb.getByName(appName)
 
     appOpt.map { app =>

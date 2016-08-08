@@ -22,8 +22,7 @@ private object BSONHandlers {
         case _ => ColorChoice.Random
       }
       def write(c: ColorChoice) =
-        BSONInteger(
-            c match {
+        BSONInteger(c match {
           case ColorChoice.White => 1
           case ColorChoice.Black => 2
           case ColorChoice.Random => 0

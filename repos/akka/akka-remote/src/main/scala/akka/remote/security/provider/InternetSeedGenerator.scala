@@ -15,7 +15,12 @@
 // ============================================================================
 package akka.remote.security.provider
 
-import org.uncommons.maths.random.{SeedGenerator, SeedException, SecureRandomSeedGenerator, RandomDotOrgSeedGenerator}
+import org.uncommons.maths.random.{
+  SeedGenerator,
+  SeedException,
+  SecureRandomSeedGenerator,
+  RandomDotOrgSeedGenerator
+}
 import scala.collection.immutable
 
 /**
@@ -55,10 +60,11 @@ final class InternetSeedGenerator extends SeedGenerator {
   def generateSeed(length: Int): Array[Byte] =
     InternetSeedGenerator.Generators.view
       .flatMap(g ⇒
-            try Option(g.generateSeed(length)) catch {
+        try Option(g.generateSeed(length))
+        catch {
           case _: SeedException ⇒ None
       })
       .headOption
       .getOrElse(throw new IllegalStateException(
-              "All available seed generation strategies failed."))
+          "All available seed generation strategies failed."))
 }

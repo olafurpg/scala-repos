@@ -9,11 +9,24 @@ import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTupleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement,
+  ScTupleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{Any => scTypeAny, ScType}
@@ -39,25 +52,19 @@ object CreateFromUsageUtil {
   def nameAndTypeForArg(arg: PsiElement): (String, ScType) = arg match {
     case ref: ScReferenceExpression => (ref.refName, ref.getType().getOrAny)
     case expr: ScExpression =>
-      val tp = expr
-        .getType()
-        .getOrAny
-        (nameByType(tp), tp)
+      val tp = expr.getType().getOrAny
+      (nameByType(tp), tp)
     case bp: ScBindingPattern if !bp.isWildcard =>
       (bp.name, bp.getType(TypingContext.empty).getOrAny)
     case p: ScPattern =>
-      val tp: ScType = p
-        .getType(TypingContext.empty)
-        .getOrAny
-        (nameByType(tp), tp)
+      val tp: ScType = p.getType(TypingContext.empty).getOrAny
+      (nameByType(tp), tp)
     case _ => ("value", scTypeAny)
   }
 
   def paramsText(args: Seq[PsiElement]) = {
-    val (names, types) = args
-      .map(nameAndTypeForArg)
-      .unzip
-      (uniqueNames(names), types).zipped
+    val (names, types) = args.map(nameAndTypeForArg).unzip
+    (uniqueNames(names), types).zipped
       .map((name, tpe) => s"$name: ${tpe.canonicalText}")
       .mkString("(", ", ", ")")
   }
@@ -90,8 +97,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addParametersToTemplate(
-      elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addParametersToTemplate(elem: PsiElement,
+                              builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScParameter]).foreach { parameter =>
       val id = parameter.getNameIdentifier
       builder.replaceElement(id, id.getText)
@@ -102,8 +109,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addTypeParametersToTemplate(
-      elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addTypeParametersToTemplate(elem: PsiElement,
+                                  builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScTypeParam]).foreach { tp =>
       builder.replaceElement(tp.nameId, tp.name)
     }
@@ -119,8 +126,8 @@ object CreateFromUsageUtil {
       }
   }
 
-  def addUnapplyResultTypesToTemplate(
-      fun: ScFunction, builder: TemplateBuilder): Unit = {
+  def addUnapplyResultTypesToTemplate(fun: ScFunction,
+                                      builder: TemplateBuilder): Unit = {
     fun.returnTypeElement match {
       case Some(
           ScParameterizedTypeElement(_, Seq(tuple: ScTupleTypeElement))) =>
@@ -136,7 +143,9 @@ object CreateFromUsageUtil {
     val offset = element.getTextRange.getEndOffset
     val project = element.getProject
     val descriptor = new OpenFileDescriptor(
-        project, element.getContainingFile.getVirtualFile, offset)
+        project,
+        element.getContainingFile.getVirtualFile,
+        offset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 

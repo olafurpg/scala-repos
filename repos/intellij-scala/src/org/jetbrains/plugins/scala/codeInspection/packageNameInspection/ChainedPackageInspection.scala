@@ -17,8 +17,9 @@ class ChainedPackageInspection extends LocalInspectionTool {
   override def getID = "ScalaChainedPackageClause"
 
   // TODO support multiple base packages simultaneously
-  override def checkFile(
-      file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean) = {
+  override def checkFile(file: PsiFile,
+                         manager: InspectionManager,
+                         isOnTheFly: Boolean) = {
     val problems =
       file.asOptionOf[ScalaFile].filter(!_.isScriptFile()).flatMap {
         scalaFile =>
@@ -30,8 +31,8 @@ class ChainedPackageInspection extends LocalInspectionTool {
 
             basePackages
               .find(basePackage =>
-                    firstPackaging.getPackageName != basePackage &&
-                    firstPackaging.getPackageName.startsWith(basePackage))
+                firstPackaging.getPackageName != basePackage &&
+                  firstPackaging.getPackageName.startsWith(basePackage))
               .flatMap { basePackage =>
                 firstPackaging.reference.map(_.getTextRange).map { range =>
                   manager.createProblemDescriptor(

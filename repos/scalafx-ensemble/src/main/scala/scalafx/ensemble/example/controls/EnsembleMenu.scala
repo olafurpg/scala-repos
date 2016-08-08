@@ -56,7 +56,8 @@ class EnsembleMenu extends EnsembleExample {
         items = List(
             new Menu("Author Info") {
               graphic = new ImageView {
-                image = new Image(this.getClass.getResourceAsStream(
+                image = new Image(
+                    this.getClass.getResourceAsStream(
                         "/scalafx/ensemble/images/crumb-selected-focused.png"))
                 margin = Insets(0, 0, 0, 5)
               }
@@ -74,9 +75,11 @@ class EnsembleMenu extends EnsembleExample {
                     selected = true
                     selected.onInvalidate {
                       fooMenuItem.setVisible(selected())
-                      println("""Menu item "foo" is now """ +
-                          (if (fooMenuItem.visible())
-                             "" else "not") + " visible")
+                      println(
+                          """Menu item "foo" is now """ +
+                            (if (fooMenuItem.visible())
+                               ""
+                             else "not") + " visible")
                     }
                   }
               )

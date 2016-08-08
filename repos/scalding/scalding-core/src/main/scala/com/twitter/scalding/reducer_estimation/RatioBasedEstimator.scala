@@ -32,12 +32,14 @@ abstract class RatioBasedEstimator extends ReducerEstimator {
     *
     * @param threshold  Specify lower bound on ratio (e.g. 0.10 for 10%)
     */
-  private def acceptableInputRatio(
-      current: Long, past: Long, threshold: Double): Boolean = {
+  private def acceptableInputRatio(current: Long,
+                                   past: Long,
+                                   threshold: Double): Boolean = {
     val ratio = current / past.toDouble
     if (threshold > 0 && (ratio < threshold || ratio > 1 / threshold)) {
-      LOG.warn("Input sizes differ too much to use for estimation: " +
-          "current: " + current + ", past: " + past)
+      LOG.warn(
+          "Input sizes differ too much to use for estimation: " +
+            "current: " + current + ", past: " + past)
       false
     } else true
   }
@@ -63,8 +65,8 @@ abstract class RatioBasedEstimator extends ReducerEstimator {
           None
         } else {
           val ratios = for {
-            h <- history if acceptableInputRatio(
-                    inputBytes, h.hdfsBytesRead, threshold)
+            h <- history
+            if acceptableInputRatio(inputBytes, h.hdfsBytesRead, threshold)
           } yield h.reduceFileBytesRead / h.hdfsBytesRead.toDouble
 
           if (ratios.isEmpty) {
@@ -80,8 +82,9 @@ abstract class RatioBasedEstimator extends ReducerEstimator {
               // scale reducer estimate based on the historical input ratio
               val e = (baseEstimate * reducerRatio).ceil.toInt max 1
 
-              LOG.info("\nRatioBasedEstimator" + "\n - past reducer ratio: " +
-                  reducerRatio + "\n - reducer estimate:   " + e)
+              LOG.info(
+                  "\nRatioBasedEstimator" + "\n - past reducer ratio: " +
+                    reducerRatio + "\n - reducer estimate:   " + e)
 
               e
             }

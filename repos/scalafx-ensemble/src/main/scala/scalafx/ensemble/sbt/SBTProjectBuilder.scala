@@ -82,14 +82,14 @@ object SBTProjectBuilder {
 
     // Copy resources, if used by the sample.
     sampleInfo.resources.foreach(resource =>
-          copyResource(new File(projectDir, resourceSubDir), resource))
+      copyResource(new File(projectDir, resourceSubDir), resource))
 
     // Copy project files
     copyText(projectDir,
              "build.sbt",
              filters = List("@name@" -> projectName,
                             "@mainClass@" ->
-                            (sampleInfo.packageName + "." +
+                              (sampleInfo.packageName + "." +
                                 sampleInfo.classSimpleName)))
     copyText(projectDir, "project/build.properties")
     copyText(projectDir, "project/plugins.sbt")
@@ -122,7 +122,7 @@ object SBTProjectBuilder {
       case t: Throwable =>
         throw new IOException(
             "Error while creating SBT project. Failed to copy text file: " +
-            fileName,
+              fileName,
             t)
     }
   }
@@ -139,7 +139,7 @@ object SBTProjectBuilder {
       case t: Throwable =>
         throw new IOException(
             "Error while creating SBT project. Failed to copy resource: " +
-            fileName,
+              fileName,
             t)
     }
   }

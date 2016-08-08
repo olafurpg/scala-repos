@@ -65,7 +65,8 @@ abstract class SymbolPairs {
   case class SymbolPair(base: Symbol, low: Symbol, high: Symbol) {
     def pos =
       if (low.owner == base) low.pos
-      else if (high.owner == base) high.pos else base.pos
+      else if (high.owner == base) high.pos
+      else base.pos
     def self: Type = base.thisType
     def rootType: Type = base.thisType
 
@@ -227,8 +228,9 @@ abstract class SymbolPairs {
 
     /** Implements `bs1 * bs2 * {0..n} != 0`.
       *  Used in hasCommonParentAsSubclass */
-    private def intersectionContainsElementLeq(
-        bs1: BitSet, bs2: BitSet, n: Int): Boolean = {
+    private def intersectionContainsElementLeq(bs1: BitSet,
+                                               bs2: BitSet,
+                                               n: Int): Boolean = {
       val nshifted = n >> 5
       val nmask = 1 << (n & 31)
       var i = 0
@@ -247,8 +249,9 @@ abstract class SymbolPairs {
       (index1 >= 0) && {
         val index2 = index(sym2.owner)
         (index2 >= 0) && {
-          intersectionContainsElementLeq(
-              subParents(index1), subParents(index2), index1 min index2)
+          intersectionContainsElementLeq(subParents(index1),
+                                         subParents(index2),
+                                         index1 min index2)
         }
       }
     }
@@ -289,7 +292,9 @@ abstract class SymbolPairs {
     def currentPair = new SymbolPair(base, low, high)
     def iterator = new Iterator[SymbolPair] {
       def hasNext = cursor.hasNext
-      def next() = try cursor.currentPair finally cursor.next()
+      def next() =
+        try cursor.currentPair
+        finally cursor.next()
     }
 
     // Note that next is called once during object initialization to

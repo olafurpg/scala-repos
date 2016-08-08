@@ -28,8 +28,10 @@ trait SnapshotStore extends Actor with ActorLogging {
       cfg.getDuration("circuit-breaker.call-timeout", MILLISECONDS).millis
     val resetTimeout =
       cfg.getDuration("circuit-breaker.reset-timeout", MILLISECONDS).millis
-    CircuitBreaker(
-        context.system.scheduler, maxFailures, callTimeout, resetTimeout)
+    CircuitBreaker(context.system.scheduler,
+                   maxFailures,
+                   callTimeout,
+                   resetTimeout)
   }
 
   final def receive =
@@ -53,7 +55,8 @@ trait SnapshotStore extends Actor with ActorLogging {
       } to (self, senderPersistentActor())
 
     case evt: SaveSnapshotSuccess ⇒
-      try tryReceivePluginInternal(evt) finally senderPersistentActor ! evt // sender is persistentActor
+      try tryReceivePluginInternal(evt)
+      finally senderPersistentActor ! evt // sender is persistentActor
     case evt @ SaveSnapshotFailure(metadata, _) ⇒
       try {
         tryReceivePluginInternal(evt)
@@ -75,9 +78,11 @@ trait SnapshotStore extends Actor with ActorLogging {
         }
 
     case evt: DeleteSnapshotSuccess ⇒
-      try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt
+      try tryReceivePluginInternal(evt)
+      finally senderPersistentActor() ! evt
     case evt: DeleteSnapshotFailure ⇒
-      try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt
+      try tryReceivePluginInternal(evt)
+      finally senderPersistentActor() ! evt
 
     case d @ DeleteSnapshots(persistenceId, criteria) ⇒
       breaker
@@ -94,9 +99,11 @@ trait SnapshotStore extends Actor with ActorLogging {
         }
 
     case evt: DeleteSnapshotsFailure ⇒
-      try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt // sender is persistentActor
+      try tryReceivePluginInternal(evt)
+      finally senderPersistentActor() ! evt // sender is persistentActor
     case evt: DeleteSnapshotsSuccess ⇒
-      try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt
+      try tryReceivePluginInternal(evt)
+      finally senderPersistentActor() ! evt
   }
 
   /** Documents intent that the sender() is expected to be the PersistentActor */
@@ -146,8 +153,8 @@ trait SnapshotStore extends Actor with ActorLogging {
     * @param persistenceId id of the persistent actor.
     * @param criteria selection criteria for deleting.
     */
-  def deleteAsync(
-      persistenceId: String, criteria: SnapshotSelectionCriteria): Future[Unit]
+  def deleteAsync(persistenceId: String,
+                  criteria: SnapshotSelectionCriteria): Future[Unit]
 
   /**
     * Plugin API

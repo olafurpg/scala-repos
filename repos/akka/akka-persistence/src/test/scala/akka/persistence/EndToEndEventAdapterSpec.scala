@@ -78,7 +78,8 @@ object EndToEndEventAdapterSpec {
   class EndToEndAdapterActor(name: String,
                              override val journalPluginId: String,
                              probe: Option[ActorRef])
-      extends NamedPersistentActor(name) with PersistentActor {
+      extends NamedPersistentActor(name)
+      with PersistentActor {
 
     var state: List[Any] = Nil
 
@@ -100,13 +101,15 @@ object EndToEndEventAdapterSpec {
   }
 }
 
-abstract class EndToEndEventAdapterSpec(
-    journalName: String, journalConfig: Config)
-    extends WordSpecLike with Matchers with BeforeAndAfterAll {
+abstract class EndToEndEventAdapterSpec(journalName: String,
+                                        journalConfig: Config)
+    extends WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
   import EndToEndEventAdapterSpec._
 
-  val storageLocations = List("akka.persistence.journal.leveldb.dir").map(
-      s ⇒ new File(journalConfig.getString(s)))
+  val storageLocations = List("akka.persistence.journal.leveldb.dir").map(s ⇒
+    new File(journalConfig.getString(s)))
 
   override protected def beforeAll() {
     storageLocations.foreach(FileUtils.deleteDirectory)
@@ -168,13 +171,15 @@ abstract class EndToEndEventAdapterSpec(
   def withActorSystem[T](name: String, config: Config)(
       block: ActorSystem ⇒ T): T = {
     val system = ActorSystem(name, journalConfig withFallback config)
-    try block(system) finally Await.ready(system.terminate(), 3.seconds)
+    try block(system)
+    finally Await.ready(system.terminate(), 3.seconds)
   }
 
   "EventAdapters in end-to-end scenarios" must {
 
     "use the same adapter when reading as was used when writing to the journal" in withActorSystem(
-        "SimpleSystem", adaptersConfig) { implicit system ⇒
+        "SimpleSystem",
+        adaptersConfig) { implicit system ⇒
       val p = TestProbe()
       implicit val ref = p.ref
 

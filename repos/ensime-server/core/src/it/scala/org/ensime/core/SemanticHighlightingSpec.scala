@@ -9,7 +9,8 @@ import org.ensime.util.EnsimeSpec
 import scala.reflect.internal.util.RangePosition
 
 class SemanticHighlightingSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -194,7 +195,8 @@ class SemanticHighlightingSpec
           List(DeprecatedSymbol)
       )
 
-      sds should ===(List(
+      sds should ===(
+          List(
               (DeprecatedSymbol, "BadTrait")
           ))
   }
@@ -262,7 +264,8 @@ class SemanticHighlightingSpec
         List(OperatorFieldSymbol)
     )
     // TODO We should highlight the "+="
-    sds should ===(List(
+    sds should ===(
+        List(
             (OperatorFieldSymbol, "+"),
             (OperatorFieldSymbol, "*")
         ))
@@ -484,7 +487,8 @@ class SemanticHighlightingSpec
           """,
           List(ValFieldSymbol)
       )
-      sds should ===(List(
+      sds should ===(
+          List(
               (ValFieldSymbol, "u"),
               (ValFieldSymbol, "v")
           ))
@@ -507,7 +511,8 @@ class SemanticHighlightingSpec
           """,
         List(OperatorFieldSymbol)
     )
-    sds should ===(List(
+    sds should ===(
+        List(
             (OperatorFieldSymbol, "value")
         ))
   }
@@ -523,7 +528,8 @@ class SemanticHighlightingSpec
           List(PackageSymbol)
       )
       // only part of "example" is highlighted
-      sds should ===(List(
+      sds should ===(
+          List(
               (PackageSymbol, "com"),
               (PackageSymbol, "example")
           ))
@@ -543,7 +549,8 @@ class SemanticHighlightingSpec
           List(OperatorFieldSymbol)
       )
       // Call to foo is missing
-      sds should ===(List(
+      sds should ===(
+          List(
               (OperatorFieldSymbol, "!"),
               (OperatorFieldSymbol, "==")
           ))
@@ -565,7 +572,8 @@ class SemanticHighlightingSpec
           """,
           List(ImplicitConversionSymbol)
       )
-      sds should ===(List(
+      sds should ===(
+          List(
               (ImplicitConversionSymbol, "\"sample\"")
           ))
   }
@@ -588,7 +596,8 @@ class SemanticHighlightingSpec
           """,
           List(ImplicitParamsSymbol)
       )
-      sds should ===(List(
+      sds should ===(
+          List(
               (ImplicitParamsSymbol, "zz(1)")
           ))
   }
@@ -608,7 +617,8 @@ class SemanticHighlightingSpec
           """,
           List(FunctionCallSymbol)
       )
-      sds should ===(List(
+      sds should ===(
+          List(
               (FunctionCallSymbol, "fun"),
               (FunctionCallSymbol, "foo")
           ))

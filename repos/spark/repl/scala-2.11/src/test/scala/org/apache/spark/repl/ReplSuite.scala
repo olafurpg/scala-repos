@@ -193,15 +193,15 @@ class ReplSuite extends SparkFunSuite {
     out.write("What's up?\n")
     out.write("Goodbye\n")
     out.close()
-    val output = runInterpreter(
-        "local",
-        """
+    val output =
+      runInterpreter("local",
+                     """
         |var file = sc.textFile("%s").cache()
         |file.count()
         |file.count()
         |file.count()
       """.stripMargin.format(StringEscapeUtils.escapeJava(
-                tempDir.getAbsolutePath + File.separator + "input")))
+                         tempDir.getAbsolutePath + File.separator + "input")))
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Long = 3", output)

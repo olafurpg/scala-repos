@@ -13,11 +13,18 @@ import com.intellij.refactoring.rename.RenameUtil
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor,
+  ScReferenceElement,
+  ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -132,7 +139,8 @@ object ScalaRenameUtil {
           else {
             val needEncodedName: UsageInfo => Boolean = { u =>
               val ref = u.getReference.getElement
-              !ref.getLanguage.isInstanceOf[ScalaLanguage] //todo more concise condition?
+              !ref.getLanguage
+                .isInstanceOf[ScalaLanguage] //todo more concise condition?
             }
             val (usagesEncoded, usagesPlain) =
               usagez.partition(needEncodedName)
@@ -163,7 +171,7 @@ object ScalaRenameUtil {
           val grouped = usagez.groupBy(u => setterSuffix(u.getElement.getText))
           grouped
             .map(entry =>
-                  UsagesWithName(newNameWithoutSuffix + entry._1, entry._2))
+              UsagesWithName(newNameWithoutSuffix + entry._1, entry._2))
             .toSeq
         }
     }
@@ -180,13 +188,15 @@ object ScalaRenameUtil {
     }
     modified.foreach {
       case UsagesWithName(name, usagez) if usagez.nonEmpty =>
-        RenameUtil.doRenameGenericNamedElement(
-            namedElement, name, usagez, listener)
+        RenameUtil
+          .doRenameGenericNamedElement(namedElement, name, usagez, listener)
       case _ =>
     }
     //to guarantee correct name of namedElement itself
-    RenameUtil.doRenameGenericNamedElement(
-        namedElement, newName, Array.empty[UsageInfo], listener)
+    RenameUtil.doRenameGenericNamedElement(namedElement,
+                                           newName,
+                                           Array.empty[UsageInfo],
+                                           listener)
   }
 
   def setterSuffix(name: String) = {
@@ -198,8 +208,9 @@ object ScalaRenameUtil {
   def sameElement(range: RangeMarker, element: PsiElement): Boolean = {
     val newElemRange = Option(ScalaRenameUtil.findSubstituteElement(element))
       .map(_.getTextRange)
-    newElemRange.exists(nr =>
+    newElemRange.exists(
+        nr =>
           nr.getStartOffset == range.getStartOffset &&
-          nr.getEndOffset == range.getEndOffset)
+            nr.getEndOffset == range.getEndOffset)
   }
 }

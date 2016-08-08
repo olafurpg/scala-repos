@@ -26,8 +26,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
   private[this] val logger = Logger("REQUEST")
   import org.scalatra.slf4j.ScalatraSlf4jRequestLogging._
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse) {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse) {
     val realMultiParams =
       req.getParameterMap.asScala.toMap transform { (k, v) ⇒
         v: Seq[String]
@@ -42,7 +42,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
   }
 
   protected def logRequest() {
-    logger.info(MDC.getCopyOfContextMap.asScala
+    logger.info(
+        MDC.getCopyOfContextMap.asScala
           .map(kv => kv._1.toString + ": " + kv._2.toString)
           .mkString("{", ", ", " }"))
   }
@@ -52,8 +53,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       implicit request: HttpServletRequest): S = {
     val originalParams = multiParams
     request(MultiParamsKey) = originalParams ++ matchedRoute
-      .map(_.multiParams)
-      .getOrElse(Map.empty)
+        .map(_.multiParams)
+        .getOrElse(Map.empty)
     fillMdc()
     try { thunk } finally { request(MultiParamsKey) = originalParams }
   }
@@ -120,10 +121,9 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       method: HttpMethod,
       transformers: Seq[_root_.org.scalatra.RouteTransformer],
       action: => Any): Route = {
-    val newAction = () =>
-      {
-        try { logRequest() } catch { case _: Throwable => }
-        action
+    val newAction = () => {
+      try { logRequest() } catch { case _: Throwable => }
+      action
     }
     val route = Route(transformers,
                       newAction,

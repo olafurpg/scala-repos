@@ -46,10 +46,10 @@ object JavaArrayOps {
 
   // <editor-fold defaultstate="collapsed" desc=" implementations ">
 
-  def dvToArray[@specialized(Int, Double, Long, Float) V : ClassTag](
+  def dvToArray[@specialized(Int, Double, Long, Float) V: ClassTag](
       dv: DenseVector[V]): Array[V] = dv.toArray
 
-  def dmToArray2[@specialized(Int, Double, Long, Float) V : ClassTag](
+  def dmToArray2[@specialized(Int, Double, Long, Float) V: ClassTag](
       dm: DenseMatrix[V]): Array[Array[V]] = {
     val ret = new Array[Array[V]](dm.rows)
     var rowI = 0
@@ -66,7 +66,7 @@ object JavaArrayOps {
     ret
   }
 
-  def arrayToDv[@specialized(Int, Double, Long, Float) V : ClassTag](
+  def arrayToDv[@specialized(Int, Double, Long, Float) V: ClassTag](
       array: Array[V]): DenseVector[V] = new DenseVector(array)
 
   /** Constructs DenseMatrix from Array[Array[V]] input. Input is in row-major like
@@ -75,7 +75,7 @@ object JavaArrayOps {
     * @param values
     * @return
     */
-  def array2ToDm[@specialized(Int, Double, Long, Float) V : ClassTag](
+  def array2ToDm[@specialized(Int, Double, Long, Float) V: ClassTag](
       values: Array[Array[V]]): DenseMatrix[V] = {
 
     val tempRows = values.length

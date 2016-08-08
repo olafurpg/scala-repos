@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package worksheet.actions
 
 import com.intellij.ide.scratch.{ScratchFileService, ScratchRootType}
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction,
+  AnActionEvent,
+  CommonDataKeys
+}
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile

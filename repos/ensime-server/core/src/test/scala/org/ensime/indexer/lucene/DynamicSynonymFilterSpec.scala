@@ -36,8 +36,8 @@ class DynamicSynonymFilterSpec extends EnsimeSpec {
       else cleese
   }
 
-  private def applyEngineToTerm(
-      term: String, engine: SynonymEngine): List[String] = {
+  private def applyEngineToTerm(term: String,
+                                engine: SynonymEngine): List[String] = {
     val reader = new StringReader(term)
     val source = new KeywordTokenizer(reader)
     val filter = new DynamicSynonymFilter(source, engine)

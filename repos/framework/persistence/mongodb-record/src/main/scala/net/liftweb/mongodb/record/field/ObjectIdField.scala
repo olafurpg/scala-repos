@@ -37,7 +37,8 @@ import org.bson.types.ObjectId
  * Field for storing an ObjectId
  */
 class ObjectIdField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[ObjectId, OwnerType] with MandatoryTypedField[ObjectId] {
+    extends Field[ObjectId, OwnerType]
+    with MandatoryTypedField[ObjectId] {
 
   def owner = rec
 
@@ -88,7 +89,7 @@ class ObjectIdField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 
   def asJValue: JValue =
     valueBox.map(v => JsonObjectId.asJValue(v, owner.meta.formats)) openOr
-    (JNothing: JValue)
+      (JNothing: JValue)
 
   def createdAt: Date = this.get.getDate
 }

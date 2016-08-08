@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableBufferSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableList[T], ObservableBuffer[T]](
-        classOf[jfxc.ObservableList[T]], classOf[ObservableBuffer[T]]) {
+        classOf[jfxc.ObservableList[T]],
+        classOf[ObservableBuffer[T]]) {
 
   /**
     * Verifies if a generated Buffer is the same instance than a original Buffer. If it should not be,
@@ -519,9 +520,10 @@ class ObservableBufferSpec[T]
     buffer onChange { (list, changes) =>
       {
         list.toList should equal(List("b", "d"))
-        changes.toList should equal(List(Remove(0, Buffer("a")),
-                                         Remove(1, Buffer("c")),
-                                         Remove(2, Buffer("e"))))
+        changes.toList should equal(
+            List(Remove(0, Buffer("a")),
+                 Remove(1, Buffer("c")),
+                 Remove(2, Buffer("e"))))
       }
     }
 
@@ -650,15 +652,14 @@ class ObservableBufferSpec[T]
     var actualFrom = -1
     var actualTo = -1
     var changed = false
-    items.onChange((obs, changes) =>
-          {
-        changed = true
-        for (change <- changes) change match {
-          case ObservableBuffer.Update(from, to) =>
-            actualFrom = from
-            actualTo = to
-          case _ @otherChange => fail("Wrong change: " + otherChange.toString)
-        }
+    items.onChange((obs, changes) => {
+      changed = true
+      for (change <- changes) change match {
+        case ObservableBuffer.Update(from, to) =>
+          actualFrom = from
+          actualTo = to
+        case _ @otherChange => fail("Wrong change: " + otherChange.toString)
+      }
     })
 
     items(0) += "update"

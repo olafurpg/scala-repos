@@ -6,7 +6,10 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.{Ref, TextRange}
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile}
-import com.intellij.refactoring.changeSignature.{ChangeInfo, ChangeSignatureUsageProcessor}
+import com.intellij.refactoring.changeSignature.{
+  ChangeInfo,
+  ChangeSignatureUsageProcessor
+}
 import com.intellij.refactoring.rename.ResolveSnapshotProvider
 import com.intellij.refactoring.rename.ResolveSnapshotProvider.ResolveSnapshot
 import com.intellij.usageView.UsageInfo
@@ -71,8 +74,8 @@ class ScalaIntroduceParameterUsageProcessor
 
   override def processPrimaryMethod(changeInfo: ChangeInfo): Boolean = false
 
-  override def shouldPreviewUsages(
-      changeInfo: ChangeInfo, usages: Array[UsageInfo]): Boolean = false
+  override def shouldPreviewUsages(changeInfo: ChangeInfo,
+                                   usages: Array[UsageInfo]): Boolean = false
 
   override def findConflicts(
       info: ChangeInfo,

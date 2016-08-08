@@ -21,21 +21,44 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockStatement, ScModifiableTypedDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockStatement,
+  ScModifiableTypedDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.fake.{FakePsiReferenceList, FakePsiTypeParameterList}
+import org.jetbrains.plugins.scala.lang.psi.fake.{
+  FakePsiReferenceList,
+  FakePsiTypeParameterList
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{JavaIdentifier, ScSyntheticFunction, ScSyntheticTypeParameter, SyntheticClasses}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  JavaIdentifier,
+  ScSyntheticFunction,
+  ScSyntheticTypeParameter,
+  SyntheticClasses
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
-import org.jetbrains.plugins.scala.lang.psi.light.scala.{ScLightFunctionDeclaration, ScLightFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.light.scala.{
+  ScLightFunctionDeclaration,
+  ScLightFunctionDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{Unit => UnitType, _}
-import org.jetbrains.plugins.scala.macroAnnotations.{Cached, CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  Cached,
+  CachedInsidePsiElement,
+  ModCount
+}
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -62,8 +85,8 @@ trait ScFun extends ScTypeParametersOwner {
   def polymorphicType: ScType = {
     if (typeParameters.isEmpty) methodType
     else
-      ScTypePolymorphicType(
-          methodType, typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(methodType,
+                            typeParameters.map(new TypeParameter(_)))
   }
 }
 
@@ -71,10 +94,18 @@ trait ScFun extends ScTypeParametersOwner {
   * Represents Scala's internal function definitions and declarations
   */
 trait ScFunction
-    extends ScalaPsiElement with ScMember with ScTypeParametersOwner
-    with ScParameterOwner with ScDocCommentOwner with ScTypedDefinition
-    with ScCommentOwner with ScDeclaredElementsHolder with ScAnnotationsHolder
-    with ScMethodLike with ScBlockStatement with ScModifiableTypedDeclaration {
+    extends ScalaPsiElement
+    with ScMember
+    with ScTypeParametersOwner
+    with ScParameterOwner
+    with ScDocCommentOwner
+    with ScTypedDefinition
+    with ScCommentOwner
+    with ScDeclaredElementsHolder
+    with ScAnnotationsHolder
+    with ScMethodLike
+    with ScBlockStatement
+    with ScModifiableTypedDeclaration {
 
   private var synthNavElement: Option[PsiElement] = None
   var syntheticCaseClass: Option[ScClass] = None
@@ -165,8 +196,8 @@ trait ScFunction
           case Some((fun: ScSyntheticFunction, subst)) =>
             var typeParamSubst = ScSubstitutor.empty
             fun.typeParameters.zip(typeParameters).foreach {
-              case (
-                  oldParam: ScSyntheticTypeParameter, newParam: ScTypeParam) =>
+              case (oldParam: ScSyntheticTypeParameter,
+                    newParam: ScTypeParam) =>
                 typeParamSubst = typeParamSubst.bindT(
                     (oldParam.name, ScalaPsiUtil.getPsiElementId(oldParam)),
                     new ScTypeParameterType(newParam, subst))
@@ -183,8 +214,8 @@ trait ScFunction
             Some(
                 typeParamSubst
                   .followed(subst)
-                  .subst(ScType.create(
-                          fun.getReturnType, getProject, getResolveScope)))
+                  .subst(ScType
+                    .create(fun.getReturnType, getProject, getResolveScope)))
           case _ => None
         }
         superReturnType
@@ -248,10 +279,11 @@ trait ScFunction
         clauses.foldRight[ScType](resultType) {
           (clause: ScParameterClause, tp: ScType) =>
             new ScMethodType(tp, clause.getSmartParameters, clause.isImplicit)(
-                getProject, getResolveScope)
+                getProject,
+                getResolveScope)
         } else
-        new ScMethodType(resultType, Seq.empty, false)(
-            getProject, getResolveScope)
+        new ScMethodType(resultType, Seq.empty, false)(getProject,
+                                                       getResolveScope)
     res.asInstanceOf[ScMethodType]
   }
 
@@ -261,8 +293,8 @@ trait ScFunction
   def polymorphicType(result: Option[ScType] = None): ScType = {
     if (typeParameters.isEmpty) methodType(result)
     else
-      ScTypePolymorphicType(
-          methodType(result), typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(methodType(result),
+                            typeParameters.map(new TypeParameter(_)))
   }
 
   /**
@@ -320,8 +352,8 @@ trait ScFunction
             fun.returnTypeInner
           case _ =>
         }
-        parent.putUserData(
-            ScFunction.calculatedBlockKey, java.lang.Boolean.TRUE)
+        parent
+          .putUserData(ScFunction.calculatedBlockKey, java.lang.Boolean.TRUE)
         returnTypeInner
       }
     } else returnTypeInner
@@ -349,15 +381,15 @@ trait ScFunction
         case owner: ScTypeParametersOwner =>
           if (hasImplicit) None
           else
-            ScalaPsiUtil.syntheticParamClause(
-                owner, paramClauses, classParam = false)
+            ScalaPsiUtil
+              .syntheticParamClause(owner, paramClauses, classParam = false)
         case _ => None
       }
     } else {
       if (hasImplicit) None
       else
-        ScalaPsiUtil.syntheticParamClause(
-            this, paramClauses, classParam = false)
+        ScalaPsiUtil
+          .syntheticParamClause(this, paramClauses, classParam = false)
     }
   }
 
@@ -368,15 +400,15 @@ trait ScFunction
     * @param name parameter name
     * @param clausePosition = -1, effective clause number, if -1 then parameter in any explicit? clause
     */
-  def getParamByName(
-      name: String, clausePosition: Int = -1): Option[ScParameter] = {
+  def getParamByName(name: String,
+                     clausePosition: Int = -1): Option[ScParameter] = {
     clausePosition match {
       case -1 =>
         parameters.find {
           case param =>
             ScalaPsiUtil.memberNamesEquals(param.name, name) ||
-            param.deprecatedName.exists(
-                ScalaPsiUtil.memberNamesEquals(_, name))
+              param.deprecatedName.exists(
+                  ScalaPsiUtil.memberNamesEquals(_, name))
         }
       case i if i < 0 || i >= effectiveParameterClauses.length => None
       case _ =>
@@ -386,8 +418,8 @@ trait ScFunction
           .find {
             case param =>
               ScalaPsiUtil.memberNamesEquals(param.name, name) ||
-              param.deprecatedName.exists(
-                  ScalaPsiUtil.memberNamesEquals(_, name))
+                param.deprecatedName.exists(
+                    ScalaPsiUtil.memberNamesEquals(_, name))
           }
     }
   }
@@ -411,17 +443,15 @@ trait ScFunction
   def isBridge: Boolean = {
     //todo: fix algorithm for annotation resolve to not resolve objects (if it's possible)
     //heuristic algorithm to avoid SOE in MixinNodes.build
-    annotations.exists(
-        annot =>
-          {
-        annot.typeElement match {
-          case s: ScSimpleTypeElement =>
-            s.reference match {
-              case Some(ref) => ref.refName == "bridge"
-              case _ => false
-            }
-          case _ => false
-        }
+    annotations.exists(annot => {
+      annot.typeElement match {
+        case s: ScSimpleTypeElement =>
+          s.reference match {
+            case Some(ref) => ref.refName == "bridge"
+            case _ => false
+          }
+        case _ => false
+      }
     })
   }
 
@@ -438,8 +468,10 @@ trait ScFunction
   }
 
   def getTypeParameterList =
-    new FakePsiTypeParameterList(
-        getManager, getLanguage, typeParameters.toArray, this)
+    new FakePsiTypeParameterList(getManager,
+                                 getLanguage,
+                                 typeParameters.toArray,
+                                 this)
 
   def hasTypeParameters = typeParameters.nonEmpty
 
@@ -471,10 +503,13 @@ trait ScFunction
       for {
         clause <- clauses
         first <- clause.clauses.headOption if first.hasRepeatedParam
-                if isJavaVarargs
+        if isJavaVarargs
       } {
-        buffer += new ScFunctionWrapper(
-            this, isStatic, isInterface, cClass, isJavaVarargs = true)
+        buffer += new ScFunctionWrapper(this,
+                                        isStatic,
+                                        isInterface,
+                                        cClass,
+                                        isJavaVarargs = true)
       }
 
       val params = parameters
@@ -540,8 +575,8 @@ trait ScFunction
       option.get.primarySuper
         .filter(_.info.isInstanceOf[PhysicalSignature])
         .map(node =>
-              (node.info.asInstanceOf[PhysicalSignature].method,
-               node.info.substitutor))
+          (node.info.asInstanceOf[PhysicalSignature].method,
+           node.info.substitutor))
     } else None
   }
 
@@ -689,17 +724,18 @@ trait ScFunction
     }
   }
 
-  override protected def isSimilarMemberForNavigation(
-      m: ScMember, strictCheck: Boolean) = m match {
-    case f: ScFunction =>
-      f.name == name && {
-        if (strictCheck)
-          new PhysicalSignature(this, ScSubstitutor.empty)
-            .paramTypesEquiv(new PhysicalSignature(f, ScSubstitutor.empty))
-        else true
-      }
-    case _ => false
-  }
+  override protected def isSimilarMemberForNavigation(m: ScMember,
+                                                      strictCheck: Boolean) =
+    m match {
+      case f: ScFunction =>
+        f.name == name && {
+          if (strictCheck)
+            new PhysicalSignature(this, ScSubstitutor.empty)
+              .paramTypesEquiv(new PhysicalSignature(f, ScSubstitutor.empty))
+          else true
+        }
+      case _ => false
+    }
 
   def hasAssign =
     getNode.getChildren(TokenSet.create(ScalaTokenTypes.tASSIGN)).nonEmpty
@@ -716,7 +752,8 @@ trait ScFunction
   override def getName = {
     val res =
       if (isConstructor && getContainingClass != null)
-        getContainingClass.getName else super.getName
+        getContainingClass.getName
+      else super.getName
     if (JavaLexer.isKeyword(res, LanguageLevel.HIGHEST)) "_mth" + res
     else res
   }
@@ -755,14 +792,14 @@ trait ScFunction
   def getTypeNoImplicits(ctx: TypingContext): TypeResult[ScType] =
     getTypeNoImplicits(ctx, returnType)
 
-  def getTypeNoImplicits(
-      ctx: TypingContext, rt: TypeResult[ScType]): TypeResult[ScType] = {
+  def getTypeNoImplicits(ctx: TypingContext,
+                         rt: TypeResult[ScType]): TypeResult[ScType] = {
     collectReverseParamTypesNoImplicits match {
       case Some(params) =>
         val project = getProject
         val resolveScope = getResolveScope
-        rt.map(params.foldLeft(_)((res,
-                params) => ScFunctionType(res, params)(project, resolveScope)))
+        rt.map(params.foldLeft(_)((res, params) =>
+          ScFunctionType(res, params)(project, resolveScope)))
       case None => Failure("no params", Some(this))
     }
   }
@@ -802,8 +839,8 @@ object ScFunction {
     val WithFilter = "withFilter"
 
     val Unapplies: Set[String] = Set(Unapply, UnapplySeq)
-    val ForComprehensions: Set[String] = Set(
-        Foreach, Map, FlatMap, Filter, WithFilter)
+    val ForComprehensions: Set[String] =
+      Set(Foreach, Map, FlatMap, Filter, WithFilter)
     val Special: Set[String] =
       Set(Apply, Update) ++ Unapplies ++ ForComprehensions
   }

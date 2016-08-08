@@ -41,8 +41,8 @@ object ToHeadUsages extends Specification {
     }
   }
 
-  private val host_ = System.getProperty(
-      "net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
+  private val host_ = System
+    .getProperty("net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
   private val port_ = System
     .getProperty("net.liftweb.webapptest.toheadusages.port", "8282")
     .toInt
@@ -59,7 +59,8 @@ object ToHeadUsages extends Specification {
       jetty.browse(
           "/htmlFragmentWithHead",
           html =>
-            html.getElementByXPath("/html/head/script[@id='fromFrag']") must not(
+            html
+              .getElementByXPath("/html/head/script[@id='fromFrag']") must not(
                 beNull when jetty.running)
       )
     }
@@ -68,8 +69,10 @@ object ToHeadUsages extends Specification {
       jetty.browse(
           "/htmlFragmentWithHead",
           html =>
-            html.getElementsByXPath("/html/body/script[@id='fromFrag']").size must
-            (be_==(0) when jetty.running)
+            html
+              .getElementsByXPath("/html/body/script[@id='fromFrag']")
+              .size must
+              (be_==(0) when jetty.running)
       )
     }
 
@@ -85,10 +88,9 @@ object ToHeadUsages extends Specification {
     "not merge for bodyless html" in {
       jetty.browse(
           "/basicDiv",
-          html =>
-            {
-              html.getElementById("fruit") must not(beNull when jetty.running)
-              html.getElementById("bat") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("fruit") must not(beNull when jetty.running)
+            html.getElementById("bat") must not(beNull when jetty.running)
           }
       )
     }
@@ -96,9 +98,8 @@ object ToHeadUsages extends Specification {
     "not merge for headless bodyless html" in {
       jetty.browse(
           "/h1",
-          html =>
-            {
-              html.getElementById("h1") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("h1") must not(beNull when jetty.running)
           }
       )
     }
@@ -118,9 +119,8 @@ object ToHeadUsages extends Specification {
     "not merge non-html" in {
       jetty.browse(
           "/non_html",
-          html =>
-            {
-              html.getElementById("frog") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("frog") must not(beNull when jetty.running)
           }
       )
     }
@@ -158,9 +158,8 @@ object ToHeadUsages extends Specification {
     "render" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementById("second") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("second") must not(beNull when jetty.running)
           }
       )
     }
@@ -168,11 +167,10 @@ object ToHeadUsages extends Specification {
     "not deferred not in actor" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementByXPath(
-                  "/html/body/span[@id='whack1']/span[@id='actor_false']") must not(
-                  beNull when jetty.running)
+          html => {
+            html.getElementByXPath(
+                "/html/body/span[@id='whack1']/span[@id='actor_false']") must not(
+                beNull when jetty.running)
           }
       )
     }
@@ -180,11 +178,10 @@ object ToHeadUsages extends Specification {
     "deferred in actor" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementByXPath(
-                  "/html/body/span[@id='whack2']/span[@id='actor_true']") must not(
-                  beNull when jetty.running)
+          html => {
+            html.getElementByXPath(
+                "/html/body/span[@id='whack2']/span[@id='actor_true']") must not(
+                beNull when jetty.running)
           }
       )
     }
@@ -207,13 +204,17 @@ object ToHeadUsages extends Specification {
           </span>)
         }
 
-      ((first \\ "a").filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+      ((first \\ "a")
+        .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
-      ((first \\ "a").filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+      ((first \\ "a")
+        .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/wombat/bar").when(jetty.running)
-      ((second \\ "a").filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+      ((second \\ "a")
+        .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
-      ((second \\ "a").filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+      ((second \\ "a")
+        .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/bar").when(jetty.running)
     }
   }

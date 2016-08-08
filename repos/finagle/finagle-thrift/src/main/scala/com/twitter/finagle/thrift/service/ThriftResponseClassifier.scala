@@ -103,7 +103,8 @@ object ThriftResponseClassifier {
 
       reqRep.response match {
         case Return(bytes: Array[Byte]) =>
-          try classifier.isDefinedAt(deserialized(deserCtx, bytes)) catch {
+          try classifier.isDefinedAt(deserialized(deserCtx, bytes))
+          catch {
             case _: Throwable => false
           }
         case _ => false

@@ -48,7 +48,7 @@ object CsvImplicits {
   /**
     * Provides enrichment on Series object for writing to a Csv file.
     */
-  implicit def series2CsvWriter[X : ST : ORD, T : ST](series: Series[X, T]) =
+  implicit def series2CsvWriter[X: ST: ORD, T: ST](series: Series[X, T]) =
     new {
       def writeCsvFile(path: String,
                        withColIx: Boolean = false,
@@ -70,7 +70,7 @@ object CsvImplicits {
   /**
     * Provides enrichment on Frame object for writing to a Csv file.
     */
-  implicit def frame2CsvWriter[RX : ST : ORD, CX : ST : ORD, T : ST](
+  implicit def frame2CsvWriter[RX: ST: ORD, CX: ST: ORD, T: ST](
       frame: Frame[RX, CX, T]) = new {
 
     /**

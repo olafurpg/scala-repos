@@ -20,7 +20,9 @@ object Sxr {
       scalacOptions +=
         "-P:sxr:base-directory:" + sourceDirectories.value.absString,
       scalacOptions += "-Xplugin:" +
-      managedClasspath.value.files.filter(_.getName.contains("sxr")).absString,
+        managedClasspath.value.files
+          .filter(_.getName.contains("sxr"))
+          .absString,
       scalacOptions += "-Ystop-after:sxr",
       target := target.in(taskGlobal).value / "browse",
       sxr in taskGlobal <<= sxrTask

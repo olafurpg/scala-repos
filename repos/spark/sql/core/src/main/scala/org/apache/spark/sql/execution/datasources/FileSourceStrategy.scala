@@ -56,8 +56,9 @@ import org.apache.spark.sql.types._
   */
 private[sql] object FileSourceStrategy extends Strategy with Logging {
   def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(files: HadoopFsRelation, _, _))
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(files: HadoopFsRelation, _, _))
         if files.fileFormat.toString == "TestFileFormat" =>
       // Filters on this relation fall into four categories based on where we can use them to avoid
       // reading unneeded data:
@@ -79,8 +80,9 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
           files.bucketSpec
             .map(_.bucketColumnNames)
             .getOrElse(Nil)
-            .map(l.resolveQuoted(_, files.sqlContext.conf.resolver)
-                  .getOrElse(sys.error(""))))
+            .map(l
+              .resolveQuoted(_, files.sqlContext.conf.resolver)
+              .getOrElse(sys.error(""))))
 
       // Partition keys are not available in the statistics of the files.
       val dataFilters =
@@ -119,8 +121,7 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
           logInfo(s"Planning with ${bucketing.numBuckets} buckets")
           val bucketed = selectedPartitions.flatMap { p =>
             p.files.map(f =>
-                  PartitionedFile(
-                      p.values, f.getPath.toUri.toString, 0, f.getLen))
+              PartitionedFile(p.values, f.getPath.toUri.toString, 0, f.getLen))
           }.groupBy { f =>
             BucketingUtils
               .getBucketId(new Path(f.filePath).getName)

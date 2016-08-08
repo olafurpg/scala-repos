@@ -32,8 +32,8 @@ object ScaldingILoop {
       filename: String): List[File] = {
     val matchingFiles = for {
       ancestor <- Iterator
-        .iterate(currentDir)(new File(_).getParent)
-        .takeWhile(_ != "/")
+                   .iterate(currentDir)(new File(_).getParent)
+                   .takeWhile(_ != "/")
 
       children: Array[File] = Option(new File(ancestor).listFiles).getOrElse {
         println(
@@ -65,15 +65,15 @@ class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
     def wrapFlames(s: String) = s.replaceAll("[()]+", fc + "$0" + wc)
     echo(
         fc + " (                                           \n" +
-        " )\\ )            (   (                       \n" +
-        "(()/(         )  )\\  )\\ )  (          (  (   \n" +
-        " /(_)) (   ( /( ((_)(()/( )\\   (     )\\))(  \n" +
-        "(_))   )\\  )( )) _   ((_)(( )  )\\ ) (( ))\\  \n".replaceAll(
-            "_", wc + "_" + fc) + wc +
-        wrapFlames("/ __|((_) ((_)_ | |  _| | (_) _(_(( (_()_) \n") +
-        wrapFlames("\\__ \\/ _| / _` || |/ _` | | || ' \\))/ _` \\  \n") +
-        "|___/\\__| \\__,_||_|\\__,_| |_||_||_| \\__, |  \n" +
-        "                                    |___/   ")
+          " )\\ )            (   (                       \n" +
+          "(()/(         )  )\\  )\\ )  (          (  (   \n" +
+          " /(_)) (   ( /( ((_)(()/( )\\   (     )\\))(  \n" +
+          "(_))   )\\  )( )) _   ((_)(( )  )\\ ) (( ))\\  \n"
+            .replaceAll("_", wc + "_" + fc) + wc +
+          wrapFlames("/ __|((_) ((_)_ | |  _| | (_) _(_(( (_()_) \n") +
+          wrapFlames("\\__ \\/ _| / _` || |/ _` | | || ' \\))/ _` \\  \n") +
+          "|___/\\__| \\__,_||_|\\__,_| |_||_||_| \\__, |  \n" +
+          "                                    |___/   ")
   }
 
   /**

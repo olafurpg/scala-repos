@@ -15,15 +15,20 @@ import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.refactoring.{HelpID, RefactoringActionHandler}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporter, ScalaRefactoringUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  DialogConflictsReporter,
+  ScalaRefactoringUtil
+}
 
 /**
   * User: Alexander Podkhalyuzin
   * Date: 23.06.2008
   */
 class ScalaIntroduceVariableHandler
-    extends RefactoringActionHandler with DialogConflictsReporter
-    with IntroduceExpressions with IntroduceTypeAlias {
+    extends RefactoringActionHandler
+    with DialogConflictsReporter
+    with IntroduceExpressions
+    with IntroduceTypeAlias {
   var occurrenceHighlighters = Seq.empty[RangeHighlighter]
 
   def invoke(project: Project,
@@ -36,8 +41,8 @@ class ScalaIntroduceVariableHandler
     def selectionEnd = editor.getSelectionModel.getSelectionEnd
 
     val selectedElement: Option[PsiElement] = {
-      val typeElem = ScalaRefactoringUtil.getTypeElement(
-          project, editor, file, selectionStart, selectionEnd)
+      val typeElem = ScalaRefactoringUtil
+        .getTypeElement(project, editor, file, selectionStart, selectionEnd)
       val expr = ScalaRefactoringUtil
         .getExpression(project, editor, file, selectionStart, selectionEnd)
         .map(_._1)
@@ -49,7 +54,7 @@ class ScalaIntroduceVariableHandler
         val element: PsiElement = file.findElementAt(offset) match {
           case w: PsiWhiteSpace
               if w.getTextRange.getStartOffset == offset &&
-              w.getText.contains("\n") =>
+                w.getText.contains("\n") =>
             file.findElementAt(offset - 1)
           case p => p
         }
@@ -59,8 +64,10 @@ class ScalaIntroduceVariableHandler
       def findTypeElement(offset: Int) =
         if (!hasSelection && !isExpression)
           Option(
-              PsiTreeUtil.findElementOfClassAtOffset(
-                  file, offset, classOf[ScTypeElement], false))
+              PsiTreeUtil.findElementOfClassAtOffset(file,
+                                                     offset,
+                                                     classOf[ScTypeElement],
+                                                     false))
         else None
 
       file.findElementAt(offset) match {
@@ -94,7 +101,9 @@ class ScalaIntroduceVariableHandler
     }
 
     if (typeElement.isDefined) {
-      if (editor.getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO).isData) {
+      if (editor
+            .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
+            .isData) {
         invokeTypeElement(project, editor, file, typeElement.get)
       } else {
         ScalaRefactoringUtil.afterTypeElementChoosing(

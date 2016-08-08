@@ -21,7 +21,10 @@ import com.twitter.summingbird.scalding.{Scalding, ScaldingEnv}
 import com.twitter.summingbird.scalding.store.InitialBatchedStore
 import com.twitter.summingbird._
 import com.twitter.summingbird.batch.{Batcher, BatchID}
-import com.twitter.summingbird.option.{MonoidIsCommutative => BMonoidIsCommutative, _}
+import com.twitter.summingbird.option.{
+  MonoidIsCommutative => BMonoidIsCommutative,
+  _
+}
 import com.twitter.summingbird.source.EventSource
 import com.twitter.summingbird.store.CompoundStore
 import org.scalatest.WordSpec
@@ -42,7 +45,7 @@ class TestJob1(env: Env) extends AbstractJob(env) {
         (e % 2, e)
       }
       .groupAndSumTo(CompoundStore.fromOffline[Long, Long](
-              new InitialBatchedStore(BatchID(12L), null)))
+          new InitialBatchedStore(BatchID(12L), null)))
       .set(BMonoidIsCommutative(true))
   } catch {
     case t: Throwable => t.printStackTrace
@@ -61,7 +64,8 @@ class OptionsTest extends WordSpec {
     val conf = new Configuration
     val cfg = scalding.build.platform.buildConfig(conf)
     assert(cfg.get("com.twitter.chill.config.configuredinstantiator") != None)
-    assert(cfg.get("summingbird.options") == Some(
+    assert(
+        cfg.get("summingbird.options") == Some(
             scalding.build.platform.options.toString))
     assert(cfg.get("cascading.aggregateby.threshold") == Some("100000"))
 

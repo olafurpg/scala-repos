@@ -17,7 +17,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment,
+  ScDocTag
+}
 
 import scala.collection.mutable
 
@@ -26,8 +29,9 @@ import scala.collection.mutable
   * Date: 22.07.2008
   */
 class ScDocCommentImpl(text: CharSequence)
-    extends LazyParseablePsiElement(
-        ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment {
+    extends LazyParseablePsiElement(ScalaDocElementTypes.SCALA_DOC_COMMENT,
+                                    text)
+    with ScDocComment {
   def version: Int = {
     val firstLineIsEmpty = getNode
       .getChildren(null)
@@ -78,11 +82,11 @@ class ScDocCommentImpl(text: CharSequence)
     val answer = mutable.ArrayBuilder.make[PsiDocTag]()
 
     while (currentChild != null &&
-    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
+           currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
       currentChild match {
         case docTag: ScDocTag
             if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG &&
-            filter(docTag.name) =>
+              filter(docTag.name) =>
           answer += currentChild.asInstanceOf[PsiDocTag]
         case _ =>
       }
@@ -100,7 +104,8 @@ class ScDocCommentImpl(text: CharSequence)
       if (aClass.isInstance(cur)) result.add(cur.asInstanceOf[T])
       cur = cur.getNextSibling
     }
-    result.toArray[T](java.lang.reflect.Array
+    result.toArray[T](
+        java.lang.reflect.Array
           .newInstance(aClass, result.size)
           .asInstanceOf[Array[T]])
   }

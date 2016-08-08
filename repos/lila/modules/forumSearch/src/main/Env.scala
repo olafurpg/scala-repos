@@ -31,19 +31,17 @@ final class Env(config: Config,
   import Query.jsonWriter
 
   private lazy val paginatorBuilder = new lila.search.PaginatorBuilder(
-      searchApi = api, maxPerPage = PaginatorMaxPerPage)
+      searchApi = api,
+      maxPerPage = PaginatorMaxPerPage)
 
-  system.actorOf(
-      Props(
-          new Actor {
-        import lila.forum.actorApi._
-        def receive = {
-          case InsertPost(post) => api store post
-          case RemovePost(id) => client deleteById Id(id)
-          case RemovePosts(ids) => client deleteByIds ids.map(Id.apply)
-        }
-      }),
-      name = ActorName)
+  system.actorOf(Props(new Actor {
+    import lila.forum.actorApi._
+    def receive = {
+      case InsertPost(post) => api store post
+      case RemovePost(id) => client deleteById Id(id)
+      case RemovePosts(ids) => client deleteByIds ids.map(Id.apply)
+    }
+  }), name = ActorName)
 }
 
 object Env {

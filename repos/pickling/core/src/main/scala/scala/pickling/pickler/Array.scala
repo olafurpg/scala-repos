@@ -4,7 +4,7 @@ package pickler
 import scala.collection.generic.CanBuildFrom
 
 trait ArrayPicklers {
-  implicit def arrayPickler[T >: Null : FastTypeTag](
+  implicit def arrayPickler[T >: Null: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[Array[T]],

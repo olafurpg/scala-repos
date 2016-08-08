@@ -305,8 +305,8 @@ router-dispatcher {}
   class Parent extends Actor {
 
     //#paths
-    val paths = List(
-        "/user/workers/w1", "/user/workers/w2", "/user/workers/w3")
+    val paths =
+      List("/user/workers/w1", "/user/workers/w2", "/user/workers/w3")
     //#paths
 
     //#round-robin-pool-1
@@ -326,7 +326,7 @@ router-dispatcher {}
     //#round-robin-group-2
     val router4: ActorRef =
       context.actorOf(RoundRobinGroup(paths).props(), "router4")
-    //#round-robin-group-2  
+    //#round-robin-group-2
 
     //#random-pool-1
     val router5: ActorRef =
@@ -452,8 +452,8 @@ router-dispatcher {}
     //#consistent-hashing-pool-1
 
     //#consistent-hashing-pool-2
-    val router26: ActorRef = context.actorOf(
-        ConsistentHashingPool(5).props(Props[Worker]), "router26")
+    val router26: ActorRef = context
+      .actorOf(ConsistentHashingPool(5).props(Props[Worker]), "router26")
     //#consistent-hashing-pool-2
 
     //#consistent-hashing-group-1
@@ -463,7 +463,7 @@ router-dispatcher {}
     //#consistent-hashing-group-2
     val router28: ActorRef =
       context.actorOf(ConsistentHashingGroup(paths).props(), "router28")
-    //#consistent-hashing-group-2  
+    //#consistent-hashing-group-2
 
     //#resize-pool-1
     val router29: ActorRef =
@@ -473,8 +473,9 @@ router-dispatcher {}
     //#resize-pool-2
     val resizer = DefaultResizer(lowerBound = 2, upperBound = 15)
     val router30: ActorRef = context.actorOf(
-        RoundRobinPool(5, Some(resizer)).props(Props[Worker]), "router30")
-    //#resize-pool-2  
+        RoundRobinPool(5, Some(resizer)).props(Props[Worker]),
+        "router30")
+    //#resize-pool-2
 
     //#optimal-size-exploring-resize-pool
     val router31: ActorRef =
@@ -494,7 +495,8 @@ router-dispatcher {}
 }
 
 class RouterDocSpec
-    extends AkkaSpec(RouterDocSpec.config) with ImplicitSender {
+    extends AkkaSpec(RouterDocSpec.config)
+    with ImplicitSender {
 
   import RouterDocSpec._
 
@@ -511,7 +513,7 @@ class RouterDocSpec
     val router: ActorRef =
       system.actorOf(
                      // “head” router actor will run on "router-dispatcher" dispatcher
-                     // Worker routees will run on "pool-dispatcher" dispatcher  
+                     // Worker routees will run on "pool-dispatcher" dispatcher
                      RandomPool(5, routerDispatcher = "router-dispatcher")
                        .props(Props[Worker]),
                      name = "poolWithDispatcher")

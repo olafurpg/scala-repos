@@ -10,7 +10,12 @@ import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream._
 import akka.stream.actor._
-import akka.stream.impl.{ActorProcessor, ExposedPublisher, SeqActorName, SubscribePending}
+import akka.stream.impl.{
+  ActorProcessor,
+  ExposedPublisher,
+  SeqActorName,
+  SubscribePending
+}
 import akka.stream.scaladsl._
 
 import scala.collection.immutable
@@ -98,7 +103,8 @@ private object PoolSlot {
       slotIx: Int,
       connectionFlow: Flow[HttpRequest, HttpResponse, Any],
       settings: ConnectionPoolSettings)(implicit fm: Materializer)
-      extends ActorSubscriber with ActorPublisher[List[ProcessorOut]]
+      extends ActorSubscriber
+      with ActorPublisher[List[ProcessorOut]]
       with ActorLogging {
     var exposedPublisher: akka.stream.impl.ActorPublisher[Any] = _
     var inflightRequests = immutable.Queue.empty[RequestContext]
@@ -106,8 +112,8 @@ private object PoolSlot {
       .actorPublisher[HttpRequest](
           Props(new FlowInportActor(self)).withDeploy(Deploy.local))
       .via(connectionFlow)
-      .toMat(Sink.actorSubscriber[HttpResponse](Props(new FlowOutportActor(
-                      self)).withDeploy(Deploy.local)))(Keep.both)
+      .toMat(Sink.actorSubscriber[HttpResponse](Props(
+          new FlowOutportActor(self)).withDeploy(Deploy.local)))(Keep.both)
       .named("SlotProcessorInternalConnectionFlow")
 
     override def requestStrategy = ZeroRequestStrategy
@@ -125,7 +131,7 @@ private object PoolSlot {
     def waitingForSubscribePending: Receive = {
       case SubscribePending ⇒
         exposedPublisher.takePendingSubscribers() foreach
-        (s ⇒ self ! ActorPublisher.Internal.Subscribe(s))
+          (s ⇒ self ! ActorPublisher.Internal.Subscribe(s))
         log.debug("become unconnected, from subscriber pending")
         context.become(unconnected)
     }
@@ -192,8 +198,8 @@ private object PoolSlot {
         val (entity, whenCompleted) =
           HttpEntity.captureTermination(response.entity)
         val delivery = ResponseDelivery(
-            ResponseContext(
-                requestContext, Success(response withEntity entity)))
+            ResponseContext(requestContext,
+                            Success(response withEntity entity)))
         import fm.executionContext
         val requestCompleted = SlotEvent.RequestCompletedFuture(
             whenCompleted.map(_ ⇒ SlotEvent.RequestCompleted(slotIx)))
@@ -215,22 +221,22 @@ private object PoolSlot {
           (error match {
             case Some(err) ⇒
               ResponseDelivery(
-                  ResponseContext(
-                      firstContext.get,
-                      Failure(new UnexpectedDisconnectException(
-                              "Unexpected (early) disconnect", err))))
+                  ResponseContext(firstContext.get,
+                                  Failure(new UnexpectedDisconnectException(
+                                      "Unexpected (early) disconnect",
+                                      err))))
             case _ ⇒
               ResponseDelivery(
                   ResponseContext(firstContext.get,
                                   Failure(new UnexpectedDisconnectException(
-                                          "Unexpected (early) disconnect"))))
+                                      "Unexpected (early) disconnect"))))
           }) :: Nil
         } else {
           inflightRequests.map { rc ⇒
             if (rc.retriesLeft == 0) {
               val reason =
                 error.fold[Throwable](new UnexpectedDisconnectException(
-                        "Unexpected disconnect"))(conforms)
+                    "Unexpected disconnect"))(conforms)
               connInport ! ActorPublisherMessage.Cancel
               ResponseDelivery(ResponseContext(rc, Failure(reason)))
             } else
@@ -264,7 +270,8 @@ private object PoolSlot {
       extends NoSerializationVerificationNeeded
 
   private class FlowInportActor(slotProcessor: ActorRef)
-      extends ActorPublisher[HttpRequest] with ActorLogging {
+      extends ActorPublisher[HttpRequest]
+      with ActorLogging {
     def receive: Receive = {
       case ev: Request ⇒ slotProcessor ! FromConnection(ev)
       case OnNext(r: HttpRequest) ⇒ onNext(r)
@@ -277,7 +284,8 @@ private object PoolSlot {
   }
 
   private class FlowOutportActor(slotProcessor: ActorRef)
-      extends ActorSubscriber with ActorLogging {
+      extends ActorSubscriber
+      with ActorLogging {
     def requestStrategy = ZeroRequestStrategy
     def receive: Receive = {
       case Request(n) ⇒ request(n)

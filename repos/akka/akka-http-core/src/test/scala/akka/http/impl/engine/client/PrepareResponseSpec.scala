@@ -5,7 +5,12 @@ package akka.http.impl.engine.client
 
 import akka.http.impl.engine.client.OutgoingConnectionBlueprint.PrepareResponse
 import akka.http.impl.engine.parsing.ParserOutput
-import akka.http.impl.engine.parsing.ParserOutput.{StrictEntityCreator, EntityStreamError, EntityChunk, StreamedEntityCreator}
+import akka.http.impl.engine.parsing.ParserOutput.{
+  StrictEntityCreator,
+  EntityStreamError,
+  EntityChunk,
+  StreamedEntityCreator
+}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ParserSettings
 import akka.stream.{ActorMaterializer, Attributes}

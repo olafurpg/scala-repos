@@ -16,19 +16,21 @@ private[blog] final class Notifier(blogApi: BlogApi,
       } foreach {
         _ ?? { post =>
           ThreadRepo.visibleByUserContainingExists(
-              user = lichessUserId, containing = post.id) foreach {
+              user = lichessUserId,
+              containing = post.id) foreach {
             case true => funit
             case false =>
-              UserRepo recentlySeenNotKidIds DateTime.now.minusWeeks(2) foreach {
-                userIds =>
-                  (ThreadRepo reallyDeleteByCreatorId lichessUserId) >> {
-                    val thread = makeThread(post)
-                    val futures =
-                      userIds.toStream map { userId =>
-                        messageApi.lichessThread(thread.copy(to = userId))
-                      }
-                    lila.common.Future.lazyFold(futures)(())((_, _) => ()) >>- lastPostCache.clear
-                  }
+              UserRepo recentlySeenNotKidIds DateTime.now
+                .minusWeeks(2) foreach { userIds =>
+                (ThreadRepo reallyDeleteByCreatorId lichessUserId) >> {
+                  val thread = makeThread(post)
+                  val futures =
+                    userIds.toStream map { userId =>
+                      messageApi.lichessThread(thread.copy(to = userId))
+                    }
+                  lila.common.Future
+                    .lazyFold(futures)(())((_, _) => ()) >>- lastPostCache.clear
+                }
               }
           }
         }

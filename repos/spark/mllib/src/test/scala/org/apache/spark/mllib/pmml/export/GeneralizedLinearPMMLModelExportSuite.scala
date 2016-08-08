@@ -20,7 +20,11 @@ package org.apache.spark.mllib.pmml.export
 import org.dmg.pmml.RegressionModel
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.regression.{LassoModel, LinearRegressionModel, RidgeRegressionModel}
+import org.apache.spark.mllib.regression.{
+  LassoModel,
+  LinearRegressionModel,
+  RidgeRegressionModel
+}
 import org.apache.spark.mllib.util.LinearDataGenerator
 
 class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
@@ -39,7 +43,7 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
     // check that the number of fields match the weights size
     assert(
         pmml.getDataDictionary.getNumberOfFields === linearRegressionModel.weights.size +
-        1)
+          1)
     // This verifies that there is a model attached to the pmml object and the model is a regression
     // one.  It also verifies that the pmml model has a regression table with the same number of
     // predictors of the model weights.
@@ -66,7 +70,7 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
     // check that the number of fields match the weights size
     assert(
         pmml.getDataDictionary.getNumberOfFields === ridgeRegressionModel.weights.size +
-        1)
+          1)
     // This verify that there is a model attached to the pmml object and the model is a regression
     // one.  It also verifies that the pmml model has a regression table with the same number of
     // predictors of the model weights.
@@ -93,7 +97,7 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
     // check that the number of fields match the weights size
     assert(
         pmml.getDataDictionary.getNumberOfFields === lassoModel.weights.size +
-        1)
+          1)
     // This verify that there is a model attached to the pmml object and the model is a regression
     // one. It also verifies that the pmml model has a regression table with the same number of
     // predictors of the model weights.

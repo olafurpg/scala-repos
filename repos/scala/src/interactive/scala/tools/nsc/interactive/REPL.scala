@@ -16,7 +16,7 @@ object REPL {
 
   val versionMsg =
     "Scala compiler " + Properties.versionString + " -- " +
-    Properties.copyrightString
+      Properties.copyrightString
 
   val prompt = "> "
 
@@ -102,8 +102,9 @@ object REPL {
     }
 
     def doStructure(file: String) {
-      comp.askParsedEntered(
-          toSourceFile(file), keepLoaded = false, structureResult)
+      comp.askParsedEntered(toSourceFile(file),
+                            keepLoaded = false,
+                            structureResult)
       show(structureResult)
     }
 
@@ -116,8 +117,8 @@ object REPL {
           comp.askReload(List(toSourceFile(file)), reloadResult)
           Thread.sleep(millis.toLong)
           println("ask type now")
-          comp.askLoadedTyped(
-              toSourceFile(file), keepLoaded = true, typedResult)
+          comp
+            .askLoadedTyped(toSourceFile(file), keepLoaded = true, typedResult)
           typedResult.get
         case List("typeat", file, off1, off2) =>
           doTypeAt(makePos(file, off1, off2))

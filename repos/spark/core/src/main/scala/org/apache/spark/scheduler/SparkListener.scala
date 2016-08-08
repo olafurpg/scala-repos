@@ -44,8 +44,8 @@ trait SparkListenerEvent {
 }
 
 @DeveloperApi
-case class SparkListenerStageSubmitted(
-    stageInfo: StageInfo, properties: Properties = null)
+case class SparkListenerStageSubmitted(stageInfo: StageInfo,
+                                       properties: Properties = null)
     extends SparkListenerEvent
 
 @DeveloperApi
@@ -53,8 +53,9 @@ case class SparkListenerStageCompleted(stageInfo: StageInfo)
     extends SparkListenerEvent
 
 @DeveloperApi
-case class SparkListenerTaskStart(
-    stageId: Int, stageAttemptId: Int, taskInfo: TaskInfo)
+case class SparkListenerTaskStart(stageId: Int,
+                                  stageAttemptId: Int,
+                                  taskInfo: TaskInfo)
     extends SparkListenerEvent
 
 @DeveloperApi
@@ -92,26 +93,29 @@ case class SparkListenerEnvironmentUpdate(
     extends SparkListenerEvent
 
 @DeveloperApi
-case class SparkListenerBlockManagerAdded(
-    time: Long, blockManagerId: BlockManagerId, maxMem: Long)
+case class SparkListenerBlockManagerAdded(time: Long,
+                                          blockManagerId: BlockManagerId,
+                                          maxMem: Long)
     extends SparkListenerEvent
 
 @DeveloperApi
-case class SparkListenerBlockManagerRemoved(
-    time: Long, blockManagerId: BlockManagerId)
+case class SparkListenerBlockManagerRemoved(time: Long,
+                                            blockManagerId: BlockManagerId)
     extends SparkListenerEvent
 
 @DeveloperApi
 case class SparkListenerUnpersistRDD(rddId: Int) extends SparkListenerEvent
 
 @DeveloperApi
-case class SparkListenerExecutorAdded(
-    time: Long, executorId: String, executorInfo: ExecutorInfo)
+case class SparkListenerExecutorAdded(time: Long,
+                                      executorId: String,
+                                      executorInfo: ExecutorInfo)
     extends SparkListenerEvent
 
 @DeveloperApi
-case class SparkListenerExecutorRemoved(
-    time: Long, executorId: String, reason: String)
+case class SparkListenerExecutorRemoved(time: Long,
+                                        executorId: String,
+                                        reason: String)
     extends SparkListenerEvent
 
 @DeveloperApi
@@ -125,7 +129,8 @@ case class SparkListenerBlockUpdated(blockUpdatedInfo: BlockUpdatedInfo)
   */
 @DeveloperApi
 case class SparkListenerExecutorMetricsUpdate(
-    execId: String, accumUpdates: Seq[(Long, Int, Int, Seq[AccumulableInfo])])
+    execId: String,
+    accumUpdates: Seq[(Long, Int, Int, Seq[AccumulableInfo])])
     extends SparkListenerEvent
 
 @DeveloperApi
@@ -286,8 +291,9 @@ class StatsReportListener extends SparkListener with Logging {
     implicit val sc = stageCompleted
     this.logInfo(
         s"Finished stage: ${getStatusDetail(stageCompleted.stageInfo)}")
-    showMillisDistribution(
-        "task runtime:", (info, _) => Some(info.duration), taskInfoMetrics)
+    showMillisDistribution("task runtime:",
+                           (info, _) => Some(info.duration),
+                           taskInfoMetrics)
 
     // Shuffle write
     showBytesDistribution(
@@ -335,8 +341,8 @@ class StatsReportListener extends SparkListener with Logging {
       .getOrElse("-")
 
     s"Stage(${info.stageId}, ${info.attemptId}); Name: '${info.name}'; " +
-    s"Status: ${info.getStatusString}$failureReason; numTasks: ${info.numTasks}; " +
-    s"Took: $timeTaken msec"
+      s"Status: ${info.getStatusString}$failureReason; numTasks: ${info.numTasks}; " +
+      s"Took: $timeTaken msec"
   }
 }
 
@@ -350,9 +356,8 @@ private[spark] object StatsReportListener extends Logging {
   def extractDoubleDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
       getMetric: (TaskInfo,
-      TaskMetrics) => Option[Double]): Option[Distribution] = {
-    Distribution(
-        taskInfoMetrics.flatMap {
+                  TaskMetrics) => Option[Double]): Option[Distribution] = {
+    Distribution(taskInfoMetrics.flatMap {
       case (info, metric) => getMetric(info, metric)
     })
   }
@@ -361,14 +366,15 @@ private[spark] object StatsReportListener extends Logging {
   def extractLongDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
       getMetric: (TaskInfo,
-      TaskMetrics) => Option[Long]): Option[Distribution] = {
-    extractDoubleDistribution(
-        taskInfoMetrics,
-        (info, metric) => { getMetric(info, metric).map(_.toDouble) })
+                  TaskMetrics) => Option[Long]): Option[Distribution] = {
+    extractDoubleDistribution(taskInfoMetrics, (info, metric) => {
+      getMetric(info, metric).map(_.toDouble)
+    })
   }
 
-  def showDistribution(
-      heading: String, d: Distribution, formatNumber: Double => String) {
+  def showDistribution(heading: String,
+                       d: Distribution,
+                       formatNumber: Double => String) {
     val stats = d.statCounter
     val quantiles = d.getQuantiles(probabilities).map(formatNumber)
     logInfo(heading + stats)
@@ -384,8 +390,9 @@ private[spark] object StatsReportListener extends Logging {
     }
   }
 
-  def showDistribution(
-      heading: String, dOpt: Option[Distribution], format: String) {
+  def showDistribution(heading: String,
+                       dOpt: Option[Distribution],
+                       format: String) {
     def f(d: Double): String = format.format(d)
     showDistribution(heading, dOpt, f _)
   }
@@ -394,15 +401,16 @@ private[spark] object StatsReportListener extends Logging {
                        format: String,
                        getMetric: (TaskInfo, TaskMetrics) => Option[Double],
                        taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showDistribution(
-        heading, extractDoubleDistribution(taskInfoMetrics, getMetric), format)
+    showDistribution(heading,
+                     extractDoubleDistribution(taskInfoMetrics, getMetric),
+                     format)
   }
 
   def showBytesDistribution(heading: String,
                             getMetric: (TaskInfo, TaskMetrics) => Option[Long],
                             taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showBytesDistribution(
-        heading, extractLongDistribution(taskInfoMetrics, getMetric))
+    showBytesDistribution(heading,
+                          extractLongDistribution(taskInfoMetrics, getMetric))
   }
 
   def showBytesDistribution(heading: String, dOpt: Option[Distribution]) {
@@ -412,8 +420,9 @@ private[spark] object StatsReportListener extends Logging {
   }
 
   def showBytesDistribution(heading: String, dist: Distribution) {
-    showDistribution(
-        heading, dist, (d => Utils.bytesToString(d.toLong)): Double => String)
+    showDistribution(heading,
+                     dist,
+                     (d => Utils.bytesToString(d.toLong)): Double => String)
   }
 
   def showMillisDistribution(heading: String, dOpt: Option[Distribution]) {
@@ -425,10 +434,10 @@ private[spark] object StatsReportListener extends Logging {
 
   def showMillisDistribution(heading: String,
                              getMetric: (TaskInfo,
-                             TaskMetrics) => Option[Long],
+                                         TaskMetrics) => Option[Long],
                              taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showMillisDistribution(
-        heading, extractLongDistribution(taskInfoMetrics, getMetric))
+    showMillisDistribution(heading,
+                           extractLongDistribution(taskInfoMetrics, getMetric))
   }
 
   val seconds = 1000L
@@ -453,8 +462,9 @@ private[spark] object StatsReportListener extends Logging {
   }
 }
 
-private case class RuntimePercentage(
-    executorPct: Double, fetchPct: Option[Double], other: Double)
+private case class RuntimePercentage(executorPct: Double,
+                                     fetchPct: Option[Double],
+                                     other: Double)
 
 private object RuntimePercentage {
   def apply(totalTime: Long, metrics: TaskMetrics): RuntimePercentage = {

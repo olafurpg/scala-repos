@@ -1,9 +1,16 @@
 package com.twitter.finagle.zipkin.thrift
 
 import com.twitter.finagle.NoStacktrace
-import com.twitter.finagle.stats.{DefaultStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  DefaultStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.tracing.{TraceId, Record, Tracer, Annotation, Trace}
-import com.twitter.finagle.zipkin.{host => Host, initialSampleRate => sampleRateFlag}
+import com.twitter.finagle.zipkin.{
+  host => Host,
+  initialSampleRate => sampleRateFlag
+}
 import com.twitter.io.Buf
 import com.twitter.util.events.{Event, Sink}
 import com.twitter.util.{Time, Throw, Try}
@@ -47,19 +54,20 @@ private object Json {
       typ.getRawClass == classOf[Annotation]
   }
 
-  mapper.setDefaultTyping(TypeResolverBuilder
+  mapper.setDefaultTyping(
+      TypeResolverBuilder
         .init(JsonTypeInfo.Id.CLASS, null)
         .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
 
   def serialize(o: AnyRef): String = mapper.writeValueAsString(o)
 
-  def deserialize[T : Manifest](value: String): T =
+  def deserialize[T: Manifest](value: String): T =
     mapper.readValue(value, typeReference[T])
 
-  def deserialize[T : Manifest](node: JsonNode): T =
+  def deserialize[T: Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 
@@ -179,8 +187,9 @@ object ZipkinTracer {
   * @param initialSampleRate Start off with this sample rate. Can be changed later.
   * @param sink where to send sampled trace events to.
   */
-class SamplingTracer(
-    underlyingTracer: Tracer, initialSampleRate: Float, sink: Sink)
+class SamplingTracer(underlyingTracer: Tracer,
+                     initialSampleRate: Float,
+                     sink: Sink)
     extends Tracer {
 
   /**

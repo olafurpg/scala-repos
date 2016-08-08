@@ -8,7 +8,7 @@ class JdbcScalarFunctionTest extends AsyncTest[JdbcTestDB] {
 
   def test = {
     def check[T](q: Rep[T], exp: T) = q.result.map(_ shouldBe exp)
-    def checkLit[T : ColumnType](v: T) = check(LiteralColumn(v), v)
+    def checkLit[T: ColumnType](v: T) = check(LiteralColumn(v), v)
 
     seq(
         checkLit(Date.valueOf("2011-07-15")),

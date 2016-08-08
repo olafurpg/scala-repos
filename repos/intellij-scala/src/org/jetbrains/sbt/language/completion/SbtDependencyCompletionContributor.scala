@@ -9,7 +9,10 @@ import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionContributor
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScInfixExpr
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
-import org.jetbrains.sbt.resolvers.{SbtResolverIndexesManager, SbtResolverUtils}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolverIndexesManager,
+  SbtResolverUtils
+}
 
 /**
   * @author Nikolay Obedin
@@ -76,7 +79,7 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
               completeArtifact(group)
             case (ScInfixExpr(llop, loper, lrop), oper, rop)
                 if rop == place.getContext &&
-                oper.getText == "%" && isValidOperation(loper.getText) =>
+                  oper.getText == "%" && isValidOperation(loper.getText) =>
               for {
                 ScLiteralImpl.string(group) <- Option(llop)
                 ScLiteralImpl.string(artifact) <- Option(lrop)

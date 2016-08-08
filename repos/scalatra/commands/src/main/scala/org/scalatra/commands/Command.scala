@@ -41,7 +41,7 @@ import org.scalatra.util.conversion._
   */
 trait Command extends BindingSyntax with ParamsValueReaderProperties {
 
-  type CommandTypeConverterFactory [T] <: TypeConverterFactory[T]
+  type CommandTypeConverterFactory[T] <: TypeConverterFactory[T]
   private[this] var preBindingActions: Seq[BindingAction] = Nil
 
   private[this] var postBindingActions: Seq[BindingAction] = Nil
@@ -73,12 +73,12 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     _errors = bindings.values.filter(_.isInvalid).toSeq
   }
 
-  implicit def binding2field[T : Manifest : TypeConverterFactory](
+  implicit def binding2field[T: Manifest: TypeConverterFactory](
       field: FieldDescriptor[T]): Field[T] = {
     new Field(bind(field), this)
   }
 
-  implicit def autoBind[T : Manifest : TypeConverterFactory](
+  implicit def autoBind[T: Manifest: TypeConverterFactory](
       fieldName: String): Field[T] =
     bind[T](FieldDescriptor[T](fieldName))
 
@@ -163,7 +163,8 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
                 tcf.asInstanceOf[CommandTypeConverterFactory[_]])(params)
               .asInstanceOf[TypeConverter[Seq[String], b.T]]
             val paramsBinding = Binding(b.field, pv, b.typeConverterFactory)(
-                manifest[Seq[String]], b.valueManifest)
+                manifest[Seq[String]],
+                b.valueManifest)
             paramsBinding(
                 params
                   .read(name)
@@ -188,8 +189,8 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
   override def toString: String =
     "%s(bindings: [%s])".format(getClass.getName, bindings.mkString(", "))
 
-  private type ExecutorView[S] = (this.type => S) => CommandExecutor[
-      this.type, S]
+  private type ExecutorView[S] =
+    (this.type => S) => CommandExecutor[this.type, S]
   def apply[S](handler: this.type => S)(implicit executor: ExecutorView[S]) =
     handler.execute(this)
   def execute[S](handler: this.type => S)(implicit executor: ExecutorView[S]) =

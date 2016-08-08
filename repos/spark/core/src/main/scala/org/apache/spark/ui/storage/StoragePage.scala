@@ -148,11 +148,8 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     }
   }
 
-  private val streamBlockTableHeader = Seq("Block ID",
-                                           "Replication Level",
-                                           "Location",
-                                           "Storage Level",
-                                           "Size")
+  private val streamBlockTableHeader =
+    Seq("Block ID", "Replication Level", "Location", "Storage Level", "Size")
 
   /** Render a stream block */
   private def streamBlockTableRow(
@@ -160,8 +157,10 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     val replications = block._2
     assert(replications.size > 0) // This must be true because it's the result of "groupBy"
     if (replications.size == 1) {
-      streamBlockTableSubrow(
-          block._1, replications.head, replications.size, true)
+      streamBlockTableSubrow(block._1,
+                             replications.head,
+                             replications.size,
+                             true)
     } else {
       streamBlockTableSubrow(block._1,
                              replications.head,

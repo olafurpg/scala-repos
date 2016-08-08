@@ -80,8 +80,8 @@ object Chameneos {
     var numFaded = 0
 
     override def preStart() = {
-      for (i ← 0 until numChameneos) context.actorOf(
-          Props(new Chameneo(self, colours(i % 3), i)))
+      for (i ← 0 until numChameneos)
+        context.actorOf(Props(new Chameneo(self, colours(i % 3), i)))
     }
 
     def receive = {

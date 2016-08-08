@@ -100,7 +100,7 @@ object EventHandler extends ListenerManagement {
     case unknown =>
       throw new ConfigurationException(
           "Configuration option 'akka.event-handler-level' is invalid [" +
-          unknown + "]")
+            unknown + "]")
   }
 
   /**
@@ -117,7 +117,7 @@ object EventHandler extends ListenerManagement {
     } else notifyListeners(event)
   }
 
-  def notify[T <: Event : ClassTag](event: => T) {
+  def notify[T <: Event: ClassTag](event: => T) {
     if (level >= levelFor(classTag[T].erasure.asInstanceOf[Class[_ <: Event]]))
       notifyListeners(event)
   }
@@ -235,7 +235,7 @@ object EventHandler extends ListenerManagement {
       case e: Exception =>
         throw new ConfigurationException(
             "Event Handler specified in config can't be loaded [" +
-            listenerName + "] due to [" + e.toString + "]",
+              listenerName + "] due to [" + e.toString + "]",
             e)
     }
   }

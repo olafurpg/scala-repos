@@ -1,6 +1,12 @@
 package org.scalatra.swagger.reflect
 
-import java.lang.reflect.{GenericArrayType, ParameterizedType, Type, TypeVariable, WildcardType}
+import java.lang.reflect.{
+  GenericArrayType,
+  ParameterizedType,
+  Type,
+  TypeVariable,
+  WildcardType
+}
 
 import scala.reflect.Manifest
 

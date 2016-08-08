@@ -8,19 +8,39 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.psi.codeStyle.{CodeStyleSettingsManager, CodeStyleManager}
-import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiWhiteSpace}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScVariable, ScFunction, ScValue}
+import com.intellij.psi.{
+  PsiDocumentManager,
+  PsiElement,
+  PsiFile,
+  PsiWhiteSpace
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScVariable,
+  ScFunction,
+  ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 import org.jetbrains.plugins.scala.{ScalaLanguage, extensions}
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaTokenTypes, ScalaXmlTokenTypes}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaTokenTypes,
+  ScalaXmlTokenTypes
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes.PatchedXmlLexer
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScIfStmt, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList,
+  ScIfStmt,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -34,8 +54,10 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * @author Dmitry Naydanov
   */
 class ScalaTypedHandler extends TypedHandlerDelegate {
-  override def charTyped(
-      c: Char, project: Project, editor: Editor, file: PsiFile): Result = {
+  override def charTyped(c: Char,
+                         project: Project,
+                         editor: Editor,
+                         file: PsiFile): Result = {
     if (!file.isInstanceOf[ScalaFile]) return Result.CONTINUE
 
     val offset = editor.getCaretModel.getOffset
@@ -74,7 +96,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     } else if (file.findElementAt(offset - 2) match {
                  case i: PsiElement
                      if !ScalaNamesUtil.isOperatorName(i.getText) &&
-                     i.getText != "=" =>
+                       i.getText != "=" =>
                    c == '>' || c == '/'; case _ => false
                }) {
       chooseXmlTask(withAttr = false)
@@ -88,9 +110,9 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
       }
     } else if (c == '{' &&
                (element.getParent match {
-                     case l: ScInterpolatedStringLiteral =>
-                       !l.isMultiLineString; case _ => false
-                   })) {
+                 case l: ScInterpolatedStringLiteral =>
+                   !l.isMultiLineString; case _ => false
+               })) {
       myTask = completeInterpolatedStringBraces
     } else if (c == '>' || c == '-') {
       myTask = replaceArrowTask(file, editor)
@@ -147,15 +169,15 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     // TODO split "if" condition
     if ((c == '"' && Set(ScalaTokenTypes.tMULTILINE_STRING,
                          ScalaTokenTypes.tINTERPOLATED_STRING_END).contains(
-                elementType) && element.getTextOffset + element.getTextLength -
-            offset < 4) || isInDocComment(element) &&
+            elementType) && element.getTextOffset + element.getTextLength -
+          offset < 4) || isInDocComment(element) &&
         (elementType.isInstanceOf[ScaladocSyntaxElementType] ||
-            elementType == ScalaDocTokenType.DOC_INNER_CLOSE_CODE_TAG) &&
+        elementType == ScalaDocTokenType.DOC_INNER_CLOSE_CODE_TAG) &&
         element.getParent.getLastChild == element &&
         element.getText.startsWith("" + c) &&
         !(elementType == ScalaDocTokenType.DOC_ITALIC_TAG &&
-            element.getPrevSibling != null &&
-            element.getPrevSibling.getNode.getElementType == ScalaDocTokenType.DOC_ITALIC_TAG)) {
+          element.getPrevSibling != null &&
+          element.getPrevSibling.getNode.getElementType == ScalaDocTokenType.DOC_ITALIC_TAG)) {
       moveCaret()
       return Result.STOP
     } else if (c == '"' &&
@@ -187,7 +209,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         completeMultilineString(editor, project, element, offset)
       } else if (prevType == ScalaTokenTypes.tINTERPOLATED_STRING_END &&
                  elementType != ScalaTokenTypes.tINTERPOLATED_STRING_END &&
-                 Set("f\"\"", "s\"\"").contains(prevElement.getParent.getText)) {
+                 Set("f\"\"", "s\"\"")
+                   .contains(prevElement.getParent.getText)) {
         completeMultilineString(editor, project, element, offset)
       }
     } else if (c == '.' && ScalaPsiUtil.isLineTerminator(prevElement)) {
@@ -211,8 +234,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
   private def isInDocComment(element: PsiElement): Boolean =
     isInPlace(element, classOf[ScDocComment])
 
-  private def isInPlace(
-      element: PsiElement, place: Class[_ <: PsiElement]*): Boolean = {
+  private def isInPlace(element: PsiElement,
+                        place: Class[_ <: PsiElement]*): Boolean = {
     if (element == null || place == null) return false
 
     var nextParent = element.getParent
@@ -224,22 +247,32 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
   }
 
   private def completeScalaDocWikiSyntax(tagToInsert: String)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
-    if (element.getNode.getElementType.isInstanceOf[ScaladocSyntaxElementType] ||
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
+    if (element.getNode.getElementType
+          .isInstanceOf[ScaladocSyntaxElementType] ||
         tagToInsert == "}}}") {
       insertAndCommit(offset, tagToInsert, document, project)
     }
   }
 
-  private def completeScalaDocBoldSyntaxElement(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
-    if (element.getNode.getElementType.isInstanceOf[ScaladocSyntaxElementType]) {
+  private def completeScalaDocBoldSyntaxElement(document: Document,
+                                                project: Project,
+                                                element: PsiElement,
+                                                offset: Int) {
+    if (element.getNode.getElementType
+          .isInstanceOf[ScaladocSyntaxElementType]) {
       insertAndCommit(offset, "'", document, project)
     }
   }
 
   private def completeXmlTag(insert: ScXmlStartTag => String)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
     if (element == null) return
 
     def doInsert(tag: ScXmlStartTag) {
@@ -267,8 +300,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def completeInterpolatedStringBraces(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def completeInterpolatedStringBraces(document: Document,
+                                               project: Project,
+                                               element: PsiElement,
+                                               offset: Int) {
     if (element == null) return
     import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes._
 
@@ -276,13 +311,15 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         Option(element.getParent.getPrevSibling).exists(
             _.getNode.getElementType == tINTERPOLATED_STRING_INJECTION) &&
         (element.getNextSibling == null ||
-            element.getNextSibling.getNode.getElementType != tRBRACE)) {
+        element.getNextSibling.getNode.getElementType != tRBRACE)) {
       insertAndCommit(offset, "}", document, project)
     }
   }
 
-  private def completeXmlAttributeQuote(editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def completeXmlAttributeQuote(editor: Editor)(document: Document,
+                                                        project: Project,
+                                                        element: PsiElement,
+                                                        offset: Int) {
     if (element != null &&
         element.getNode.getElementType == ScalaXmlTokenTypes.XML_EQ &&
         element.getParent != null &&
@@ -292,8 +329,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def completeMultilineString(
-      editor: Editor, project: Project, element: PsiElement, offset: Int) {
+  private def completeMultilineString(editor: Editor,
+                                      project: Project,
+                                      element: PsiElement,
+                                      offset: Int) {
     extensions.inWriteAction {
       val document = editor.getDocument
       document.insertString(offset, "\"\"\"")
@@ -301,8 +340,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def insertAndCommit(
-      offset: Int, text: String, document: Document, project: Project) {
+  private def insertAndCommit(offset: Int,
+                              text: String,
+                              document: Document,
+                              project: Project) {
     extensions.inWriteAction {
       document.insertString(offset, text)
       PsiDocumentManager.getInstance(project).commitDocument(document)
@@ -334,8 +375,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def indentCase(file: PsiFile)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def indentCase(file: PsiFile)(document: Document,
+                                        project: Project,
+                                        element: PsiElement,
+                                        offset: Int) {
     indentElement(file)(
         document,
         project,
@@ -343,11 +386,13 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         offset,
         elem =>
           elem.getNode.getElementType == ScalaTokenTypes.kCASE &&
-          elem.getParent.isInstanceOf[ScCaseClause])
+            elem.getParent.isInstanceOf[ScCaseClause])
   }
 
-  private def indentElse(file: PsiFile)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def indentElse(file: PsiFile)(document: Document,
+                                        project: Project,
+                                        element: PsiElement,
+                                        offset: Int) {
     indentElement(file)(
         document,
         project,
@@ -355,7 +400,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         offset,
         elem =>
           elem.getNode.getElementType == ScalaTokenTypes.kELSE &&
-          elem.getParent.isInstanceOf[ScIfStmt])
+            elem.getParent.isInstanceOf[ScIfStmt])
   }
 
   private def indentRefExprDot(file: PsiFile)(document: Document,
@@ -382,32 +427,28 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         offset,
         _ => true,
         elem =>
-          Option(elem.getParent)
-            .map(_.getParent)
-            .exists {
-              case _: ScParameterClause | _: ScArgumentExprList => true
-              case _ => false
-          })
+          Option(elem.getParent).map(_.getParent).exists {
+            case _: ScParameterClause | _: ScArgumentExprList => true
+            case _ => false
+        })
   }
 
   private def indentDefinitionAssign(file: PsiFile)(document: Document,
                                                     project: Project,
                                                     element: PsiElement,
                                                     offset: Int) = {
-    indentElement(file)(document,
-                        project,
-                        element,
-                        offset,
-                        _ => true,
-                        elem =>
-                          Option(elem.getParent)
-                            .map(_.getParent)
-                            .exists {
-                              case _: ScFunction | _: ScVariable | _: ScValue |
-                                  _: ScTypeAlias =>
-                                true
-                              case _ => false
-                          })
+    indentElement(file)(
+        document,
+        project,
+        element,
+        offset,
+        _ => true,
+        elem =>
+          Option(elem.getParent).map(_.getParent).exists {
+            case _: ScFunction | _: ScVariable | _: ScValue | _: ScTypeAlias =>
+              true
+            case _ => false
+        })
   }
 
   private def indentValBraceStyle(file: PsiFile)(document: Document,
@@ -423,15 +464,15 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         _.parent.flatMap(_.parent).exists(_.isInstanceOf[ScValue]))
   }
 
-  private def indentElement(
-      file: PsiFile)(document: Document,
-                     project: Project,
-                     element: PsiElement,
-                     offset: Int,
-                     prevCondition: PsiElement => Boolean,
-                     condition: PsiElement => Boolean = element =>
-                         element.isInstanceOf[PsiWhiteSpace] ||
-                         ScalaPsiUtil.isLineTerminator(element)) {
+  private def indentElement(file: PsiFile)(
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int,
+      prevCondition: PsiElement => Boolean,
+      condition: PsiElement => Boolean = element =>
+        element.isInstanceOf[PsiWhiteSpace] ||
+          ScalaPsiUtil.isLineTerminator(element)) {
     if (condition(element)) {
       val anotherElement = file.findElementAt(offset - 2)
       if (prevCondition(anotherElement)) {
@@ -446,7 +487,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
   }
 
   private def replaceArrowTask(file: PsiFile, editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
     @inline
     def replaceElement(replaceWith: String) {
       extensions.inWriteAction {
@@ -465,7 +509,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         replaceElement(ScalaTypedHandler.unicodeCaseArrow)
       case ScalaTokenTypes.tIDENTIFIER
           if settings.REPLACE_MAP_ARROW_WITH_UNICODE_CHAR &&
-          element.getText == "->" =>
+            element.getText == "->" =>
         replaceElement(ScalaTypedHandler.unicodeMapArrow)
       case ScalaTokenTypes.tCHOOSE
           if settings.REPLACE_FOR_GENERATOR_ARROW_WITH_UNICODE_CHAR =>
@@ -475,7 +519,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
   }
 
   private def startAutopopupCompletion(file: PsiFile, editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
     if (CodeInsightSettings.getInstance().AUTO_POPUP_COMPLETION_LOOKUP) {
       element.getParent match {
         case l: ScLiteral =>
@@ -490,8 +537,9 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def scheduleAutopopup(
-      file: PsiFile, editor: Editor, project: Project): Unit = {
+  private def scheduleAutopopup(file: PsiFile,
+                                editor: Editor,
+                                project: Project): Unit = {
     AutoPopupController
       .getInstance(project)
       .scheduleAutoPopup(
@@ -502,9 +550,12 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
       )
   }
 
-  private def startAutopopupCompletionInInterpolatedString(
-      file: PsiFile, editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def startAutopopupCompletionInInterpolatedString(file: PsiFile,
+                                                           editor: Editor)(
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
     if (CodeInsightSettings.getInstance().AUTO_POPUP_COMPLETION_LOOKUP) {
       element.getParent match {
         case l: ScLiteral =>
@@ -524,7 +575,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
   }
 
   private def convertToInterpolated(file: PsiFile, editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int) {
     if (ScalaApplicationSettings.getInstance().UPGRADE_TO_INTERPOLATED) {
       element.getParent match {
         case l: ScLiteral =>
@@ -551,8 +605,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
   }
 
-  private def completeEmptyXmlTag(editor: Editor)(
-      document: Document, project: Project, element: PsiElement, offset: Int) {
+  private def completeEmptyXmlTag(editor: Editor)(document: Document,
+                                                  project: Project,
+                                                  element: PsiElement,
+                                                  offset: Int) {
     if (element != null &&
         element.getNode.getElementType == ScalaXmlTokenTypes.XML_DATA_CHARACTERS &&
         element.getText == "/" && element.getPrevSibling != null &&
@@ -582,8 +638,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
 
 object ScalaTypedHandler {
   val wiki1LTagMatch = Set("^", "`")
-  val wiki2LTagMatch = Map(
-      "__" -> "__", "''" -> "''", ",," -> ",,", "[[" -> "]]")
+  val wiki2LTagMatch =
+    Map("__" -> "__", "''" -> "''", ",," -> ",,", "[[" -> "]]")
 
   val unicodeCaseArrow = "⇒"
   val unicodeMapArrow = "→"

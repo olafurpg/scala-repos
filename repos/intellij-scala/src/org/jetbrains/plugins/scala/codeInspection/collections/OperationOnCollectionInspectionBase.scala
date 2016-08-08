@@ -13,9 +13,15 @@ import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.psi.PsiElement
 import com.intellij.ui._
 import org.jetbrains.plugins.scala.codeInspection.collections.OperationOnCollectionInspectionBase._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.settings.{ScalaApplicationSettings, ScalaProjectSettingsUtil}
+import org.jetbrains.plugins.scala.settings.{
+  ScalaApplicationSettings,
+  ScalaProjectSettingsUtil
+}
 import org.jetbrains.plugins.scala.util.JListCompatibility
 
 /**
@@ -26,8 +32,8 @@ object OperationOnCollectionInspectionBase {
   val inspectionId = InspectionBundle.message("operation.on.collection.id")
   val inspectionName = InspectionBundle.message("operation.on.collection.name")
 
-  val likeOptionClassesDefault = Array(
-      "scala.Option", "scala.Some", "scala.None")
+  val likeOptionClassesDefault =
+    Array("scala.Option", "scala.Some", "scala.None")
   val likeCollectionClassesDefault = Array("scala.collection._",
                                            "scala.Array",
                                            "scala.Option",
@@ -81,11 +87,11 @@ abstract class OperationOnCollectionInspectionBase
     def simplificationTypes =
       for {
         (st, idx) <- possibleSimplificationTypes.zipWithIndex
-                        if getSimplificationTypesEnabled(idx)
+        if getSimplificationTypesEnabled(idx)
       } yield st
 
-    simplificationTypes.flatMap(
-        st => st.getSimplifications(expr) ++ st.getSimplification(expr))
+    simplificationTypes.flatMap(st =>
+      st.getSimplifications(expr) ++ st.getSimplification(expr))
   }
 
   def getLikeCollectionClasses: Array[String] =
@@ -118,10 +124,9 @@ abstract class OperationOnCollectionInspectionBase
       innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS))
       for (i <- possibleSimplificationTypes.indices) {
         val enabled: Array[java.lang.Boolean] = getSimplificationTypesEnabled
-        val checkBox = new JCheckBox(
-            possibleSimplificationTypes(i).description, enabled(i))
-        checkBox.getModel.addChangeListener(
-            new ChangeListener {
+        val checkBox =
+          new JCheckBox(possibleSimplificationTypes(i).description, enabled(i))
+        checkBox.getModel.addChangeListener(new ChangeListener {
           def stateChanged(e: ChangeEvent) {
             enabled(i) = checkBox.isSelected
             setSimplificationTypesEnabled(enabled)
@@ -136,8 +141,8 @@ abstract class OperationOnCollectionInspectionBase
       extPanel
     }
 
-    def createPatternListPanel(
-        parent: JComponent, patternListKey: String): JComponent = {
+    def createPatternListPanel(parent: JComponent,
+                               patternListKey: String): JComponent = {
       val patternList: Array[String] = patternLists(patternListKey)()
       val listModel = JListCompatibility.createDefaultListModel()
       patternList.foreach(JListCompatibility.add(listModel, listModel.size, _))
@@ -158,8 +163,8 @@ abstract class OperationOnCollectionInspectionBase
             resetValues()
             patternJBList.setSelectedValue(pattern, true)
             ScrollingUtil.ensureIndexIsVisible(patternJBList, index, 0)
-            IdeFocusManager.getGlobalInstance.requestFocus(
-                patternJBList, false)
+            IdeFocusManager.getGlobalInstance.requestFocus(patternJBList,
+                                                           false)
           }
 
           def run(button: AnActionButton) {
@@ -195,8 +200,8 @@ abstract class OperationOnCollectionInspectionBase
     def patternsPanel(): JComponent = {
 
       val panel = new JPanel(new GridLayout(1, 2))
-      val likeCollectionPanel = createPatternListPanel(
-          panel, likeCollectionKey)
+      val likeCollectionPanel =
+        createPatternListPanel(panel, likeCollectionKey)
       val likeOptionPanel = createPatternListPanel(panel, likeOptionKey)
       panel.add(likeCollectionPanel)
       panel.add(likeOptionPanel)

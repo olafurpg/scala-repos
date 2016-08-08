@@ -17,7 +17,8 @@ object TestOptions {
   def karafOptions(useDeployFolder: Boolean = false,
                    extractInTargetFolder: Boolean = true): PaxOption = {
     val kdc = karafDistributionConfiguration
-      .frameworkUrl(maven
+      .frameworkUrl(
+          maven
             .groupId("org.apache.karaf")
             .artifactId("apache-karaf")
             .`type`("zip")
@@ -28,9 +29,11 @@ object TestOptions {
 
     new DefaultCompositeOption(
         if (extractInTargetFolder)
-          kdc.unpackDirectory(new File("target/paxexam/unpack/")) else kdc,
-        editConfigurationFilePut(
-            "etc/config.properties", "karaf.framework", "equinox"))
+          kdc.unpackDirectory(new File("target/paxexam/unpack/"))
+        else kdc,
+        editConfigurationFilePut("etc/config.properties",
+                                 "karaf.framework",
+                                 "equinox"))
   }
 
   def testBundles(): PaxOption = {
@@ -42,14 +45,14 @@ object TestOptions {
         junitBundles)
   }
 
-  def debugOptions(
-      level: LogLevelOption.LogLevel = LogLevelOption.LogLevel.INFO,
-      debugPort: Option[Int] = None): PaxOption = {
+  def debugOptions(level: LogLevelOption.LogLevel =
+                     LogLevelOption.LogLevel.INFO,
+                   debugPort: Option[Int] = None): PaxOption = {
     val options: List[PaxOption] =
       List(logLevel(level),
            configureConsole().startLocalConsole(),
-           configureConsole().startRemoteShell()) ++ debugPort.toList.map(
-          p => debugConfiguration(String.valueOf(p), true))
+           configureConsole().startRemoteShell()) ++ debugPort.toList.map(p =>
+        debugConfiguration(String.valueOf(p), true))
     new DefaultCompositeOption(options: _*)
   }
 
@@ -57,7 +60,8 @@ object TestOptions {
       useDeployFolder: Boolean = false,
       extractInTargetFolder: Boolean = true): PaxOption = {
     new DefaultCompositeOption(
-        karafOptions(useDeployFolder, extractInTargetFolder), testBundles())
+        karafOptions(useDeployFolder, extractInTargetFolder),
+        testBundles())
   }
 
   def featureDiningHakkers(): PaxOption = {

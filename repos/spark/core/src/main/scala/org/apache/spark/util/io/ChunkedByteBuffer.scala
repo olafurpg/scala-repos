@@ -147,7 +147,8 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   *                in order to close any memory-mapped files which back the buffer.
   */
 private class ChunkedByteBufferInputStream(
-    var chunkedByteBuffer: ChunkedByteBuffer, dispose: Boolean)
+    var chunkedByteBuffer: ChunkedByteBuffer,
+    dispose: Boolean)
     extends InputStream {
 
   private[this] var chunks = chunkedByteBuffer.getChunks().iterator

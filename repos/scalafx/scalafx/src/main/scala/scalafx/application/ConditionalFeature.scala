@@ -33,20 +33,20 @@ import scalafx.delegate._
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/ConditionalFeature.html javafx.application.ConditionalFeature]] */
 object ConditionalFeature
-    extends SFXEnumDelegateCompanion[
-        jfxa.ConditionalFeature, ConditionalFeature] {
+    extends SFXEnumDelegateCompanion[jfxa.ConditionalFeature,
+                                     ConditionalFeature] {
 
   val Controls = new ConditionalFeature(jfxa.ConditionalFeature.CONTROLS)
-  @deprecated(
-      "Use Controls; CONTROLS will be removed in a future release", "8.0.5")
+  @deprecated("Use Controls; CONTROLS will be removed in a future release",
+              "8.0.5")
   val CONTROLS = Controls
   val Graphics = new ConditionalFeature(jfxa.ConditionalFeature.GRAPHICS)
-  @deprecated(
-      "Use Graphics; GRAPHICS will be removed in a future releas", "8.0.5")
+  @deprecated("Use Graphics; GRAPHICS will be removed in a future releas",
+              "8.0.5")
   val GRAPHICS = Graphics
   val Effect = new ConditionalFeature(jfxa.ConditionalFeature.EFFECT)
-  @deprecated(
-      "Use Effect; EFFECT will be removed in a future release", "2.2.60")
+  @deprecated("Use Effect; EFFECT will be removed in a future release",
+              "2.2.60")
   val EFFECT = Effect
   val FXML = new ConditionalFeature(jfxa.ConditionalFeature.FXML)
   val InputMethod = new ConditionalFeature(
@@ -75,8 +75,8 @@ object ConditionalFeature
   @deprecated("Use Media; MEDIA will be removed in a future releas", "8.0.5")
   val MEDIA = Media
   val Scene3D = new ConditionalFeature(jfxa.ConditionalFeature.SCENE3D)
-  @deprecated(
-      "Use Scene3D; SCENE3D will be removed in a future release", "2.2.60")
+  @deprecated("Use Scene3D; SCENE3D will be removed in a future release",
+              "2.2.60")
   val SCENE3D = Scene3D
   val ShapeClip = new ConditionalFeature(jfxa.ConditionalFeature.SHAPE_CLIP)
   @deprecated("Use ShapeClip; SHAPE_CLIP will be removed in a future release",

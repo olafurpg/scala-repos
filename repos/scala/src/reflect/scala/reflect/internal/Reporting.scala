@@ -87,8 +87,10 @@ import util.Position
   *  Currently, scala.tools.nsc.Reporter is used by sbt/ide/partest.
   */
 abstract class Reporter {
-  protected def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean): Unit
+  protected def info0(pos: Position,
+                      msg: String,
+                      severity: Severity,
+                      force: Boolean): Unit
 
   def echo(pos: Position, msg: String): Unit =
     info0(pos, msg, INFO, force = true)

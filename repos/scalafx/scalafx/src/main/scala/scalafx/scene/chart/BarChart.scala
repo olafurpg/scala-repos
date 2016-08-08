@@ -55,7 +55,8 @@ object BarChart {
 }
 
 class BarChart[X, Y](override val delegate: jfxsc.BarChart[X, Y])
-    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.BarChart[X, Y]] {
+    extends XYChart[X, Y](delegate)
+    with SFXDelegate[jfxsc.BarChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis))

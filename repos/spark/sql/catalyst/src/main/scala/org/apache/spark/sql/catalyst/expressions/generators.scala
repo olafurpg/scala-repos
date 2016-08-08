@@ -71,7 +71,8 @@ trait Generator extends Expression {
 case class UserDefinedGenerator(elementTypes: Seq[(DataType, Boolean, String)],
                                 function: Row => TraversableOnce[InternalRow],
                                 children: Seq[Expression])
-    extends Generator with CodegenFallback {
+    extends Generator
+    with CodegenFallback {
 
   @transient private[this] var inputRow: InterpretedProjection = _
   @transient private[this] var convertToScala: (InternalRow) => Row = _
@@ -101,7 +102,9 @@ case class UserDefinedGenerator(elementTypes: Seq[(DataType, Boolean, String)],
   * Given an input array produces a sequence of rows for each value in the array.
   */
 case class Explode(child: Expression)
-    extends UnaryExpression with Generator with CodegenFallback {
+    extends UnaryExpression
+    with Generator
+    with CodegenFallback {
 
   override def children: Seq[Expression] = child :: Nil
 
@@ -131,11 +134,9 @@ case class Explode(child: Expression)
           Nil
         } else {
           val rows = new Array[InternalRow](inputArray.numElements())
-          inputArray.foreach(et,
-                             (i, e) =>
-                               {
-                                 rows(i) = InternalRow(e)
-                             })
+          inputArray.foreach(et, (i, e) => {
+            rows(i) = InternalRow(e)
+          })
           rows
         }
       case MapType(kt, vt, _) =>
@@ -145,13 +146,10 @@ case class Explode(child: Expression)
         } else {
           val rows = new Array[InternalRow](inputMap.numElements())
           var i = 0
-          inputMap.foreach(kt,
-                           vt,
-                           (k, v) =>
-                             {
-                               rows(i) = InternalRow(k, v)
-                               i += 1
-                           })
+          inputMap.foreach(kt, vt, (k, v) => {
+            rows(i) = InternalRow(k, v)
+            i += 1
+          })
           rows
         }
     }

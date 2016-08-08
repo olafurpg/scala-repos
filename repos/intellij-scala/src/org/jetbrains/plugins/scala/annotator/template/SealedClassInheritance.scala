@@ -3,7 +3,10 @@ package org.jetbrains.plugins.scala.annotator.template
 import com.intellij.lang.annotation.AnnotationHolder
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 
 /**
   * Pavel Fatin
@@ -26,11 +29,11 @@ object SealedClassInheritance extends AnnotatorPart[ScTemplateDefinition] {
     definition.refs.foreach {
       case (refElement, Some((psiClass: ScTypeDefinition, _)))
           if psiClass.hasModifierProperty("sealed") &&
-          psiClass.getContainingFile.getNavigationElement != refElement.getContainingFile.getNavigationElement =>
+            psiClass.getContainingFile.getNavigationElement != refElement.getContainingFile.getNavigationElement =>
         holder.createErrorAnnotation(
             refElement,
-            "Illegal inheritance from sealed %s %s".format(
-                kindOf(psiClass).toLowerCase, psiClass.name))
+            "Illegal inheritance from sealed %s %s"
+              .format(kindOf(psiClass).toLowerCase, psiClass.name))
       case _ =>
     }
   }

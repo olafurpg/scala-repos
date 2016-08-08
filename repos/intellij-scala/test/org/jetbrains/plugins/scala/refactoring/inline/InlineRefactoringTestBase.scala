@@ -34,8 +34,9 @@ abstract class InlineRefactoringTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
 
     val offset = fileText.indexOf(caretMarker) + caretMarker.length
@@ -75,8 +76,8 @@ abstract class InlineRefactoringTestBase
                s"Warning should be: $warning, but is: ${e.getMessage}")
         return
       case e: Exception =>
-        assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(assertion = false,
+               message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

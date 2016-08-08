@@ -141,7 +141,8 @@ object SqlToSlick extends App {
       //#dbFunction
 
       val (sRes, pRes) = Await.result(
-          db.run(squared.to[Set].result.zip(pow.to[Set].result)), Duration.Inf)
+          db.run(squared.to[Set].result.zip(pow.to[Set].result)),
+          Duration.Inf)
       assert(sRes == pRes)
       assert(Set(998001, 1002001) subsetOf pRes)
     };
@@ -272,7 +273,8 @@ object SqlToSlick extends App {
         //#sqlQueryImplicitJoin
         val slick = //#slickQueryImplicitJoin
         people
-          .flatMap(p =>
+          .flatMap(
+              p =>
                 addresses
                   .filter(a => p.addressId === a.id)
                   .map(a => (p.name, a.city)))
@@ -282,7 +284,8 @@ object SqlToSlick extends App {
         val slick2 = //#slickQueryImplicitJoin
         // or equivalent for-expression:
         (for (p <- people;
-        a <- addresses if p.addressId === a.id) yield (p.name, a.city)).result
+              a <- addresses if p.addressId === a.id)
+          yield (p.name, a.city)).result
         //#slickQueryImplicitJoin
         val ((sqlRes, slickRes), slick2Res) =
           Await.result(db.run(sql zip slick zip slick2), Duration.Inf)
@@ -410,7 +413,7 @@ object SqlToSlick extends App {
         val slickInsert = {
           //#slickQueryInsert
           people.map(p => (p.name, p.age, p.addressId)) +=
-          ("M Odersky", 12345, 1)
+            ("M Odersky", 12345, 1)
           //#slickQueryInsert
         }
         val slickUpdate = {
@@ -452,7 +455,7 @@ object SqlToSlick extends App {
         val slick = //#slickCase
         people
           .map(p =>
-                Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
+            Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
           .result
         //#slickCase
         val (sqlRes, slickRes) =

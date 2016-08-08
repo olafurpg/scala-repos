@@ -33,7 +33,8 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
         .verifying(captchaFailMessage, validateCaptcha _))
 
   def edit(team: Team) =
-    Form(mapping(Fields.location, Fields.description, Fields.open)(
+    Form(
+        mapping(Fields.location, Fields.description, Fields.open)(
             TeamEdit.apply)(TeamEdit.unapply)) fill TeamEdit(
         location = team.location,
         description = team.description,
@@ -83,8 +84,9 @@ private[team] case class TeamSetup(name: String,
          description = description.trim)
 }
 
-private[team] case class TeamEdit(
-    location: Option[String], description: String, open: Int) {
+private[team] case class TeamEdit(location: Option[String],
+                                  description: String,
+                                  open: Int) {
 
   def isOpen = open == 1
 
@@ -93,5 +95,6 @@ private[team] case class TeamEdit(
          description = description.trim)
 }
 
-private[team] case class RequestSetup(
-    message: String, gameId: String, move: String)
+private[team] case class RequestSetup(message: String,
+                                      gameId: String,
+                                      move: String)

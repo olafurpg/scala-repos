@@ -13,7 +13,9 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.immutable.Seq
 
 class AppDefinitionValidatorTest
-    extends MarathonSpec with Matchers with GivenWhenThen {
+    extends MarathonSpec
+    with Matchers
+    with GivenWhenThen {
 
   test("only cmd") {
     val app = AppDefinition(id = PathId("/test"), cmd = Some("true"))
@@ -143,11 +145,11 @@ class AppDefinitionValidatorTest
         id = PathId("/test"),
         cmd = Some("true"),
         healthChecks = Set(
-              HealthCheck(
-                  protocol = HealthCheckDefinition.Protocol.COMMAND,
-                  command = Some(Command("curl http://localhost:$PORT"))
-              )
-          )
+            HealthCheck(
+                protocol = HealthCheckDefinition.Protocol.COMMAND,
+                command = Some(Command("curl http://localhost:$PORT"))
+            )
+        )
     )
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
@@ -178,8 +180,8 @@ class AppDefinitionValidatorTest
 
   test("only container") {
     val f = new Fixture
-    val app = AppDefinition(
-        id = PathId("/test"), container = Some(f.validDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
@@ -293,8 +295,8 @@ class AppDefinitionValidatorTest
   test("persistent volume with mode RO is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(
-              f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO))
+        volumes =
+          Seq(f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO))
     )
     assert(validate(container).isFailure)
   }
@@ -302,8 +304,8 @@ class AppDefinitionValidatorTest
   test("persistent volume with size 0 is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validPersistentVolume.copy(
-                  persistent = PersistentVolumeInfo(0)))
+        volumes = Seq(
+            f.validPersistentVolume.copy(persistent = PersistentVolumeInfo(0)))
     )
     assert(validate(container).isFailure)
   }
@@ -311,8 +313,9 @@ class AppDefinitionValidatorTest
   test("persistent volume with size < 0 is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validPersistentVolume.copy(
-                  persistent = PersistentVolumeInfo(-1)))
+        volumes = Seq(
+            f.validPersistentVolume.copy(
+                persistent = PersistentVolumeInfo(-1)))
     )
     assert(validate(container).isFailure)
   }
@@ -437,16 +440,15 @@ class AppDefinitionValidatorTest
       PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
     val zero = UpgradeStrategy(0, 0)
 
-    def residentApp(
-        id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
+    def residentApp(id: String,
+                    volumes: Seq[PersistentVolume]): AppDefinition = {
       AppDefinition(
           id = PathId(id),
           cmd = Some("test"),
           container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
-          residency = Some(
-                Residency(
-                    123,
-                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+          residency = Some(Residency(
+              123,
+              Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
       )
     }
     val vol1 = persistentVolume("foo")

@@ -279,28 +279,28 @@ case class RRule private (
     * provided DateTime instance.
     */
   def from(dt: DateTime): Iterator[DateTime] = {
-    val riter = RecurrenceIteratorFactory.createRecurrenceIterator(
-        toICal, dt2dtv(dt), inzone.toTimeZone)
+    val riter = RecurrenceIteratorFactory
+      .createRecurrenceIterator(toICal, dt2dtv(dt), inzone.toTimeZone)
 
     val iterWithJoins = joins.foldLeft(riter) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.join(i1, tmpiter)
     }
 
     val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.except(i1, tmpiter)
     }
 
-    DateTimeIteratorFactory.createDateTimeIterator(iterWithJoinsWithExcepts) map {
-      dt =>
-        dt.withZone(inzone)
+    DateTimeIteratorFactory
+      .createDateTimeIterator(iterWithJoinsWithExcepts) map { dt =>
+      dt.withZone(inzone)
     }
   }
 

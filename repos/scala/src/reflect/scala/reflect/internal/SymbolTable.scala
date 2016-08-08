@@ -14,15 +14,40 @@ import java.util.concurrent.TimeUnit
 import scala.reflect.internal.{TreeGen => InternalTreeGen}
 
 abstract class SymbolTable
-    extends macros.Universe with Collections with Names with Symbols with Types
-    with Variances with Kinds with ExistentialsAndSkolems with FlagSets
-    with Scopes with Mirrors with Definitions with Constants with BaseTypeSeqs
-    with InfoTransformers with transform.Transforms with StdNames
-    with AnnotationInfos with AnnotationCheckers with Trees with Printers
-    with Positions with TypeDebugging with Importers with Required
-    with CapturedVariables with StdAttachments with StdCreators
-    with ReificationSupport with PrivateWithin with pickling.Translations
-    with FreshNames with Internals with Reporting {
+    extends macros.Universe
+    with Collections
+    with Names
+    with Symbols
+    with Types
+    with Variances
+    with Kinds
+    with ExistentialsAndSkolems
+    with FlagSets
+    with Scopes
+    with Mirrors
+    with Definitions
+    with Constants
+    with BaseTypeSeqs
+    with InfoTransformers
+    with transform.Transforms
+    with StdNames
+    with AnnotationInfos
+    with AnnotationCheckers
+    with Trees
+    with Printers
+    with Positions
+    with TypeDebugging
+    with Importers
+    with Required
+    with CapturedVariables
+    with StdAttachments
+    with StdCreators
+    with ReificationSupport
+    with PrivateWithin
+    with pickling.Translations
+    with FreshNames
+    with Internals
+    with Reporting {
 
   val gen = new InternalTreeGen {
     val global: SymbolTable.this.type = SymbolTable.this
@@ -32,7 +57,7 @@ abstract class SymbolTable
 
   protected def elapsedMessage(msg: String, start: Long) =
     msg + " in " + (TimeUnit.NANOSECONDS.toMillis(System.nanoTime()) - start) +
-    "ms"
+      "ms"
 
   def informProgress(msg: String) =
     if (settings.verbose) inform("[" + msg + "]")
@@ -99,7 +124,8 @@ abstract class SymbolTable
   }
   @inline
   final private[scala] def debuglogResultIf[T](
-      msg: => String, cond: T => Boolean)(result: T): T = {
+      msg: => String,
+      cond: T => Boolean)(result: T): T = {
     if (cond(result)) debuglog(msg + ": " + result)
 
     result
@@ -117,9 +143,10 @@ abstract class SymbolTable
     SimpleNameOrdering.asInstanceOf[Ordering[T]]
 
   private object SimpleNameOrdering extends Ordering[Names#Name] {
-    def compare(n1: Names#Name, n2: Names#Name) = (if (n1 eq n2) 0
-                                                   else
-                                                     n1.toString compareTo n2.toString)
+    def compare(n1: Names#Name, n2: Names#Name) =
+      (if (n1 eq n2) 0
+       else
+         n1.toString compareTo n2.toString)
   }
 
   /** Dump each symbol to stdout after shutdown.
@@ -218,7 +245,8 @@ abstract class SymbolTable
   /** Perform given operation at given phase. */
   @inline final def enteringPhase[T](ph: Phase)(op: => T): T = {
     val saved = pushPhase(ph)
-    try op finally popPhase(saved)
+    try op
+    finally popPhase(saved)
   }
 
   final def findPhaseWithName(phaseName: String): Phase = {
@@ -259,7 +287,7 @@ abstract class SymbolTable
   final def isValidForBaseClasses(period: Period): Boolean = {
     def noChangeInBaseClasses(it: InfoTransformer, limit: Phase#Id): Boolean =
       (it.pid >= limit || !it.changesBaseClasses &&
-          noChangeInBaseClasses(it.next, limit))
+        noChangeInBaseClasses(it.next, limit))
     period != 0 && runId(period) == currentRunId && {
       val pid = phaseId(period)
       if (phase.id > pid)
@@ -274,8 +302,8 @@ abstract class SymbolTable
       if (!member.isPrivate && !member.isConstructor) {
         // todo: handle overlapping definitions in some way: mark as errors
         // or treat as abstractions. For now the symbol in the package module takes precedence.
-        for (existing <- dest.info.decl(member.name).alternatives) dest.info.decls
-          .unlink(existing)
+        for (existing <- dest.info.decl(member.name).alternatives)
+          dest.info.decls.unlink(existing)
       }
     }
     // enter non-private decls the class
@@ -302,9 +330,8 @@ abstract class SymbolTable
       val method = params.last.owner
       val elemtp = formals.last.typeArgs.head match {
         case RefinedType(List(t1, t2), _)
-            if
-            (t1.typeSymbol.isAbstractType &&
-                t2.typeSymbol == definitions.ObjectClass) =>
+            if (t1.typeSymbol.isAbstractType &&
+              t2.typeSymbol == definitions.ObjectClass) =>
           t1 // drop intersection with Object for abstract types in varargs. UnCurry can handle them.
         case t =>
           t
@@ -370,8 +397,7 @@ abstract class SymbolTable
       val NoCached: T = null.asInstanceOf[T]
       var cached: T = NoCached
       var cachedRunId = NoRunId
-      recordCache(
-          new Clearable {
+      recordCache(new Clearable {
         def clear(): Unit = cached = NoCached
       })
       () =>

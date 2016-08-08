@@ -17,7 +17,12 @@
 
 package org.apache.spark.sql.api.r
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 
 import scala.util.matching.Regex
 
@@ -92,8 +97,9 @@ private[r] object SQLUtils {
     }
   }
 
-  def createStructField(
-      name: String, dataType: String, nullable: Boolean): StructField = {
+  def createStructField(name: String,
+                        dataType: String,
+                        nullable: Boolean): StructField = {
     val dtObj = getSQLDataType(dataType)
     StructField(name, dtObj, nullable)
   }
@@ -122,8 +128,7 @@ private[r] object SQLUtils {
     val bis = new ByteArrayInputStream(bytes)
     val dis = new DataInputStream(bis)
     val num = SerDe.readInt(dis)
-    Row.fromSeq(
-        (0 until num).map { i =>
+    Row.fromSeq((0 until num).map { i =>
       doConversion(SerDe.readObject(dis), schema.fields(i).dataType)
     }.toSeq)
   }

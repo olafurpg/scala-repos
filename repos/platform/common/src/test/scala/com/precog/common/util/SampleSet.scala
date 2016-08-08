@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -49,12 +49,12 @@ object AdSamples {
                        "1000-5000",
                        "5000-10000",
                        "10000+")
-  val revenue = List(
-      "<500K", "500K-5M", "5-50M", "50-250M", "250-500M", "500M+")
-  val category = List(
-      "electronics", "fashion", "travel", "media", "sundries", "magical")
-  val ageTuples = List(
-      (0, 17), (18, 24), (25, 36), (37, 48), (49, 60), (61, 75), (76, 130))
+  val revenue =
+    List("<500K", "500K-5M", "5-50M", "50-250M", "250-500M", "500M+")
+  val category =
+    List("electronics", "fashion", "travel", "media", "sundries", "magical")
+  val ageTuples =
+    List((0, 17), (18, 24), (25, 36), (37, 48), (49, 60), (61, 75), (76, 130))
   val ageRangeStrings = ageTuples map { case (l, h) => "%d-%d".format(l, h) }
   val ageRangeArrays =
     ageTuples map { case (l, h) => JArray(List(JNum(l), JNum(h))) }
@@ -159,27 +159,21 @@ object AdSamples {
                          "research")
 
   def gaussianIndex(size: Int): Gen[Int] = {
-    Gen(
-        p =>
-          {
-        def sample: Double = {
-          val testIndex = (p.rng.nextGaussian * (size / 5)) + (size / 2)
-          if (testIndex < 0 || testIndex >= size) sample
-          else testIndex
-        }
+    Gen(p => {
+      def sample: Double = {
+        val testIndex = (p.rng.nextGaussian * (size / 5)) + (size / 2)
+        if (testIndex < 0 || testIndex >= size) sample
+        else testIndex
+      }
 
-        Some(sample.toInt)
+      Some(sample.toInt)
     })
   }
 
   def exponentialIndex(size: Int): Gen[Int] = {
-    Gen(
-        p =>
-          {
-        import scala.math._
-        Some(round(exp(-p.rng.nextDouble * 8) * size).toInt
-              .min(size - 1)
-              .max(0))
+    Gen(p => {
+      import scala.math._
+      Some(round(exp(-p.rng.nextDouble * 8) * size).toInt.min(size - 1).max(0))
     })
   }
 
@@ -374,10 +368,10 @@ object AdSamples {
   }
 }
 
-case class DistributedSampleSet[T](
-    val queriableSampleSize: Int,
-    sampler: Gen[T],
-    private val recordedSamples: Vector[T] = Vector())
+case class DistributedSampleSet[T](val queriableSampleSize: Int,
+                                   sampler: Gen[T],
+                                   private val recordedSamples: Vector[T] =
+                                     Vector())
     extends SampleSet[T] { self =>
   def queriableSamples =
     (recordedSamples.size >= queriableSampleSize).option(recordedSamples)
@@ -409,8 +403,8 @@ object DistributedSampleSet {
       }
     }
 
-    val (sampleSet, data) = pull(
-        DistributedSampleSet(queriableSamples, sampler), Vector(), 0)
+    val (sampleSet, data) =
+      pull(DistributedSampleSet(queriableSamples, sampler), Vector(), 0)
     (data, sampleSet.queriableSamples)
   }
 }

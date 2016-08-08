@@ -92,7 +92,8 @@ object GraphLoader extends Logging {
       .setName("GraphLoader.edgeListFile - edges (%s)".format(path))
     edges.count()
 
-    logInfo("It took %d ms to load the edges".format(
+    logInfo(
+        "It took %d ms to load the edges".format(
             System.currentTimeMillis - startTime))
 
     GraphImpl.fromEdgePartitions(edges,

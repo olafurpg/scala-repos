@@ -45,7 +45,8 @@ class JsonThriftSerializer extends ThriftSerializer {
     val newObj =
       new MappingJsonFactory().createParser(bytes).readValueAs(obj.getClass)
     binarySerializer.fromBytes(
-        obj, binarySerializer.toBytes(newObj.asInstanceOf[TBase[_, _]]))
+        obj,
+        binarySerializer.toBytes(newObj.asInstanceOf[TBase[_, _]]))
   }
 }
 
@@ -56,7 +57,8 @@ class JsonThriftSerializer extends ThriftSerializer {
   *       instead of this is recommended.
   */
 class BinaryThriftSerializer
-    extends ThriftSerializer with Base64StringEncoder {
+    extends ThriftSerializer
+    with Base64StringEncoder {
   override def protocolFactory = new TBinaryProtocol.Factory
 }
 
@@ -64,6 +66,7 @@ class BinaryThriftSerializer
   * A thread-safe [[ThriftSerializer]] that uses [[TCompactProtocol]].
   */
 class CompactThriftSerializer
-    extends ThriftSerializer with Base64StringEncoder {
+    extends ThriftSerializer
+    with Base64StringEncoder {
   override def protocolFactory = new TCompactProtocol.Factory
 }

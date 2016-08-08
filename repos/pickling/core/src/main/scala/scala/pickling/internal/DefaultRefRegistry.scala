@@ -3,7 +3,11 @@ package scala.pickling.internal
 import java.util.IdentityHashMap
 
 import scala.pickling.PicklingException
-import scala.pickling.spi.{RefUnpicklingRegistry, RefPicklingRegistry, RefRegistry}
+import scala.pickling.spi.{
+  RefUnpicklingRegistry,
+  RefPicklingRegistry,
+  RefRegistry
+}
 
 /** Default implementation of the Ref registry that allows circular dependencies to be handled.
   * Uses thread-local caches (per pickler/unpickler thread).

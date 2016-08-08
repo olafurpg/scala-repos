@@ -78,7 +78,8 @@ object PathExtractor {
       }.unzip
 
       new PathExtractor(
-          regexParts.mkString(Pattern.quote(parts.head), "", "/?").r, descs)
+          regexParts.mkString(Pattern.quote(parts.head), "", "/?").r,
+          descs)
     })
   }
 }

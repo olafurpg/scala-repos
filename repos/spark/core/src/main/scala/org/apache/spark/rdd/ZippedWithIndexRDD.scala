@@ -22,9 +22,10 @@ import scala.reflect.ClassTag
 import org.apache.spark.{Partition, TaskContext}
 import org.apache.spark.util.Utils
 
-private[spark] class ZippedWithIndexRDDPartition(
-    val prev: Partition, val startIndex: Long)
-    extends Partition with Serializable {
+private[spark] class ZippedWithIndexRDDPartition(val prev: Partition,
+                                                 val startIndex: Long)
+    extends Partition
+    with Serializable {
   override val index: Int = prev.index
 }
 
@@ -36,7 +37,7 @@ private[spark] class ZippedWithIndexRDDPartition(
   * @param prev parent RDD
   * @tparam T parent RDD item type
   */
-private[spark] class ZippedWithIndexRDD[T : ClassTag](prev: RDD[T])
+private[spark] class ZippedWithIndexRDD[T: ClassTag](prev: RDD[T])
     extends RDD[(T, Long)](prev) {
 
   /** The start index of each partition. */
@@ -58,16 +59,16 @@ private[spark] class ZippedWithIndexRDD[T : ClassTag](prev: RDD[T])
   }
 
   override def getPartitions: Array[Partition] = {
-    firstParent[T].partitions
-      .map(x => new ZippedWithIndexRDDPartition(x, startIndices(x.index)))
+    firstParent[T].partitions.map(x =>
+      new ZippedWithIndexRDDPartition(x, startIndices(x.index)))
   }
 
   override def getPreferredLocations(split: Partition): Seq[String] =
     firstParent[T].preferredLocations(
         split.asInstanceOf[ZippedWithIndexRDDPartition].prev)
 
-  override def compute(
-      splitIn: Partition, context: TaskContext): Iterator[(T, Long)] = {
+  override def compute(splitIn: Partition,
+                       context: TaskContext): Iterator[(T, Long)] = {
     val split = splitIn.asInstanceOf[ZippedWithIndexRDDPartition]
     firstParent[T].iterator(split.prev, context).zipWithIndex.map { x =>
       (x._1, split.startIndex + x._2)

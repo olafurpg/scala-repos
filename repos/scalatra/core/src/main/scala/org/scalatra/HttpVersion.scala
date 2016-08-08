@@ -16,7 +16,7 @@ abstract class HttpVersion(val protocolName: String,
   override def equals(obj: Any): Boolean = obj match {
     case m: HttpVersion =>
       protocolName == m.protocolName && majorVersion == m.majorVersion &&
-      minorVersion == m.minorVersion
+        minorVersion == m.minorVersion
     case _ => false
   }
 

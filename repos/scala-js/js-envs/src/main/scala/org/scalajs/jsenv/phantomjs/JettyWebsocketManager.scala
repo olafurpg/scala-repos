@@ -27,18 +27,16 @@ private[phantomjs] final class JettyWebsocketManager(
   private[this] val server = new Server()
 
   server.addConnector(connector)
-  server.setHandler(
-      new WebSocketHandler {
+  server.setHandler(new WebSocketHandler {
     // Support Hixie 76 for Phantom.js
     getWebSocketFactory().setMinVersion(-1)
 
-    override def doWebSocketConnect(
-        request: HttpServletRequest, protocol: String): WebSocket =
+    override def doWebSocketConnect(request: HttpServletRequest,
+                                    protocol: String): WebSocket =
       new ComWebSocketListener
   })
 
-  server.addLifeCycleListener(
-      new AbstractLifeCycle.AbstractLifeCycleListener {
+  server.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener {
     override def lifeCycleStarted(event: LifeCycle): Unit = {
       if (event.isRunning()) wsListener.onRunning()
     }
@@ -66,7 +64,7 @@ private[phantomjs] final class JettyWebsocketManager(
       if (statusCode != 1000) {
         throw new Exception(
             "Abnormal closing of connection. " +
-            s"Code: $statusCode, Reason: $reason")
+              s"Code: $statusCode, Reason: $reason")
       }
     }
 

@@ -107,7 +107,7 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
     do {
       b = readByte().toLong
       x = (x << 7) + (b & 0x7f)
-    } while ( (b & 0x80) != 0L)
+    } while ((b & 0x80) != 0L)
     x
   }
 

@@ -45,7 +45,8 @@ import org.apache.spark.tags.DockerTest
   */
 @DockerTest
 class OracleIntegrationSuite
-    extends DockerJDBCIntegrationSuite with SharedSQLContext {
+    extends DockerJDBCIntegrationSuite
+    with SharedSQLContext {
   import testImplicits._
 
   override val db = new DatabaseOnDocker {

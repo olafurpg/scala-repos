@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class TreeCellSpec[T <: AnyRef]
     extends SimpleSFXDelegateSpec[jfxsc.TreeCell[T], TreeCell[T]](
-        classOf[jfxsc.TreeCell[T]], classOf[TreeCell[T]])
+        classOf[jfxsc.TreeCell[T]],
+        classOf[TreeCell[T]])
     with RunOnApplicationThread

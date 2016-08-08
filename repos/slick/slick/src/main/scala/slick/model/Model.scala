@@ -15,7 +15,7 @@ case class QualifiedName(table: String,
   /** human readable String representation */
   def asString =
     catalog.map(_ + ".").getOrElse("") + schema.map(_ + ".").getOrElse("") +
-    table
+      table
 }
 
 case class Table(

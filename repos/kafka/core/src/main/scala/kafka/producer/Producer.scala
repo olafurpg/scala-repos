@@ -21,13 +21,17 @@ import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 
 import kafka.common.{AppInfo, QueueFullException}
 import kafka.metrics._
-import kafka.producer.async.{DefaultEventHandler, EventHandler, ProducerSendThread}
+import kafka.producer.async.{
+  DefaultEventHandler,
+  EventHandler,
+  ProducerSendThread
+}
 import kafka.serializer.Encoder
 import kafka.utils._
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
-    "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
+      "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 class Producer[K, V](
     val config: ProducerConfig,
@@ -66,12 +70,12 @@ class Producer[K, V](
     this(config,
          new DefaultEventHandler[K, V](
              config,
-             CoreUtils.createObject[Partitioner](
-                 config.partitionerClass, config.props),
+             CoreUtils.createObject[Partitioner](config.partitionerClass,
+                                                 config.props),
              CoreUtils.createObject[Encoder[V]](config.serializerClass,
                                                 config.props),
-             CoreUtils.createObject[Encoder[K]](
-                 config.keySerializerClass, config.props),
+             CoreUtils.createObject[Encoder[K]](config.keySerializerClass,
+                                                config.props),
              new ProducerPool(config)))
 
   /**
@@ -92,7 +96,10 @@ class Producer[K, V](
 
   private def recordStats(messages: Seq[KeyedMessage[K, V]]) {
     for (message <- messages) {
-      producerTopicStats.getProducerTopicStats(message.topic).messageRate.mark()
+      producerTopicStats
+        .getProducerTopicStats(message.topic)
+        .messageRate
+        .mark()
       producerTopicStats.getProducerAllTopicsStats.messageRate.mark()
     }
   }
@@ -126,7 +133,7 @@ class Producer[K, V](
         producerTopicStats.getProducerAllTopicsStats.droppedMessageRate.mark()
         throw new QueueFullException(
             "Event queue is full of unsent messages, could not send event: " +
-            message.toString)
+              message.toString)
       } else {
         trace("Added to send queue an event: " + message.toString)
         trace("Remaining queue size: " + queue.remainingCapacity)
@@ -147,8 +154,9 @@ class Producer[K, V](
         KafkaMetricsGroup.removeAllProducerMetrics(config.clientId)
         if (producerSendThread != null) producerSendThread.shutdown
         eventHandler.close
-        info("Producer shutdown completed in " +
-            (System.nanoTime() - startTime) / 1000000 + " ms")
+        info(
+            "Producer shutdown completed in " +
+              (System.nanoTime() - startTime) / 1000000 + " ms")
       }
     }
   }

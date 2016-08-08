@@ -18,7 +18,11 @@
 package org.apache.spark.ml.feature
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.ml.attribute.{Attribute, AttributeGroup, NumericAttribute}
+import org.apache.spark.ml.attribute.{
+  Attribute,
+  AttributeGroup,
+  NumericAttribute
+}
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
 import org.apache.spark.mllib.linalg.{Vector, Vectors, VectorUDT}
@@ -27,7 +31,8 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{StructField, StructType}
 
 class VectorSlicerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -80,8 +85,9 @@ class VectorSlicerSuite
       new AttributeGroup("features", attrs.asInstanceOf[Array[Attribute]])
 
     val resultAttrs = Array("f1", "f4").map(defaultAttr.withName)
-    val resultAttrGroup = new AttributeGroup(
-        "expected", resultAttrs.asInstanceOf[Array[Attribute]])
+    val resultAttrGroup =
+      new AttributeGroup("expected",
+                         resultAttrs.asInstanceOf[Array[Attribute]])
 
     val rdd =
       sc.parallelize(data.zip(expected)).map { case (a, b) => Row(a, b) }

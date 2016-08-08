@@ -99,8 +99,9 @@ class UnnecessaryParenthesesInspectionTest
   def test_7(): Unit = {
     val text = """def a(x: Any): Boolean = true
                       |List() count (a(_))"""
-    checkTextHasNoErrors(
-        text, annotation, classOf[ScalaUnnecessaryParenthesesInspection])
+    checkTextHasNoErrors(text,
+                         annotation,
+                         classOf[ScalaUnnecessaryParenthesesInspection])
   }
 
   def test_8(): Unit = {

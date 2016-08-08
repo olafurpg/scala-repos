@@ -27,7 +27,12 @@
 
 package scalafx.scene
 
-import javafx.scene.{effect => jfxse, input => jfxsi, layout => jfxsl, transform => jfxst}
+import javafx.scene.{
+  effect => jfxse,
+  input => jfxsi,
+  layout => jfxsl,
+  transform => jfxst
+}
 import javafx.util.Callback
 import javafx.{event => jfxe, geometry => jfxg, scene => jfxs, util => jfxu}
 
@@ -70,7 +75,9 @@ object Node {
   * @param delegate JavaFX Node
   */
 abstract class Node protected (override val delegate: jfxs.Node)
-    extends EventHandlerDelegate with Styleable with SFXDelegate[jfxs.Node] {
+    extends EventHandlerDelegate
+    with Styleable
+    with SFXDelegate[jfxs.Node] {
 
   /**
     * The accessible text for this `Node`.
@@ -490,7 +497,7 @@ abstract class Node protected (override val delegate: jfxs.Node)
   }
 
   /**
-    * Defines a function to be called when a full press-drag-release gesture ends (by releasing mouse button) within 
+    * Defines a function to be called when a full press-drag-release gesture ends (by releasing mouse button) within
     * this Node.
     */
   def onMouseDragReleased = delegate.onMouseDragReleasedProperty
@@ -1019,8 +1026,8 @@ abstract class Node protected (override val delegate: jfxs.Node)
   /**
     * Takes a snapshot of this node and returns the rendered image when it is ready.
     */
-  def snapshot(
-      params: SnapshotParameters, image: WritableImage): WritableImage =
+  def snapshot(params: SnapshotParameters,
+               image: WritableImage): WritableImage =
     delegate.snapshot(delegateOrNull(params), delegateOrNull(image))
 
   /**

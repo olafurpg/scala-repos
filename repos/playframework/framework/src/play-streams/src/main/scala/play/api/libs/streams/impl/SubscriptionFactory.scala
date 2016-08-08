@@ -25,7 +25,8 @@ private[streams] trait SubscriptionFactory[T] {
     * one of the `SubscriptionHandle`s.
     */
   def createSubscription[U >: T](
-      subr: Subscriber[U], onSubscriptionEnded: SubscriptionHandle[U] => Unit)
+      subr: Subscriber[U],
+      onSubscriptionEnded: SubscriptionHandle[U] => Unit)
     : SubscriptionHandle[U]
 }
 

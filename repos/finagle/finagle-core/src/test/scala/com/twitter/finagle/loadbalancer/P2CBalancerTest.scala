@@ -3,7 +3,11 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.app.App
 import com.twitter.conversions.time._
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  StatsReceiver,
+  NullStatsReceiver,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Function => _, _}
 import org.junit.runner.RunWith
@@ -75,8 +79,7 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
       sum += load
       count += 1
 
-      Future.value(
-          new Service[Unit, Int] {
+      Future.value(new Service[Unit, Int] {
         def apply(req: Unit) = Future.value(which)
         override def close(deadline: Time) = {
           load -= 1
@@ -327,7 +330,7 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
           val latency = Await.result(svc((): Unit)).toLong
           val work =
             (clock() + latency ->
-                (schedule.getOrElse(clock() + latency, Nil) :+ svc))
+              (schedule.getOrElse(clock() + latency, Nil) :+ svc))
           schedule + work
         }
       for (seq <- next.get(step); c <- seq) c.close()

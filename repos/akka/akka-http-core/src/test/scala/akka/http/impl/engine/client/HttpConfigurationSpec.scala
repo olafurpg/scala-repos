@@ -5,7 +5,11 @@
 package akka.http.impl.engine.client
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.settings.{ClientConnectionSettings, ConnectionPoolSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ClientConnectionSettings,
+  ConnectionPoolSettings,
+  ServerSettings
+}
 import akka.testkit.AkkaSpec
 import com.typesafe.config.ConfigFactory
 
@@ -106,7 +110,8 @@ class HttpConfigurationSpec extends AkkaSpec {
     }
 
     "change parser settings for all by setting `akka.http.parsing`, unless client/server override it" in {
-      configuredSystem("""
+      configuredSystem(
+          """
         akka.http {
           parsing.illegal-header-warnings = off
           server.parsing.illegal-header-warnings = on
@@ -125,7 +130,8 @@ class HttpConfigurationSpec extends AkkaSpec {
     }
 
     "change parser settings for all by setting `akka.http.parsing`, unless all override it" in {
-      configuredSystem("""
+      configuredSystem(
+          """
         akka.http {
           parsing.illegal-header-warnings = off
           server.parsing.illegal-header-warnings = on
@@ -150,6 +156,7 @@ class HttpConfigurationSpec extends AkkaSpec {
       ConfigFactory.parseString(overrides).withFallback(ConfigFactory.load())
     // we go via ActorSystem in order to hit the settings caching infrastructure
     val sys = ActorSystem("config-testing", config)
-    try block(sys) finally sys.terminate()
+    try block(sys)
+    finally sys.terminate()
   }
 }

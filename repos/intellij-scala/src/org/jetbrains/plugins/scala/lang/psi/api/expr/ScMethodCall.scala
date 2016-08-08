@@ -6,7 +6,7 @@ package expr
 
 import com.intellij.psi.PsiElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
@@ -28,7 +28,7 @@ trait ScMethodCall extends ScExpression with MethodInvocation {
 
   override def isUpdateCall: Boolean =
     getContext.isInstanceOf[ScAssignStmt] &&
-    getContext.asInstanceOf[ScAssignStmt].getLExpression == this
+      getContext.asInstanceOf[ScAssignStmt].getLExpression == this
 
   def updateExpression(): Option[ScExpression] = {
     getContext match {
@@ -40,7 +40,7 @@ trait ScMethodCall extends ScExpression with MethodInvocation {
   def argsElement: PsiElement = args
 
   /**
-    * If named parameters enabled for this method even if it is from java; needed for Play 2 support  
+    * If named parameters enabled for this method even if it is from java; needed for Play 2 support
     */
   def isNamedParametersEnabledEverywhere: Boolean = false
 }

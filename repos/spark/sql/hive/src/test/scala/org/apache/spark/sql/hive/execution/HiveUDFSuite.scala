@@ -25,7 +25,10 @@ import org.apache.hadoop.hive.ql.udf.UDAFPercentile
 import org.apache.hadoop.hive.ql.udf.generic._
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject
 import org.apache.hadoop.hive.serde2.{AbstractSerDe, SerDeStats}
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspector, ObjectInspectorFactory}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspector,
+  ObjectInspectorFactory
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory
 import org.apache.hadoop.io.Writable
 
@@ -175,9 +178,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToListString(s) FROM inputTable")
     }
-    assert(
-        errMsg.getMessage contains "List type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch a component type in List<>;")
+    assert(errMsg.getMessage contains "List type in java is unsupported because " +
+      "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListString")
     hiveContext.reset()
@@ -192,9 +194,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToListInt(s) FROM inputTable")
     }
-    assert(
-        errMsg.getMessage contains "List type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch a component type in List<>;")
+    assert(errMsg.getMessage contains "List type in java is unsupported because " +
+      "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListInt")
     hiveContext.reset()
@@ -205,14 +206,15 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       hiveContext.sparkContext.parallelize(StringCaseClass("") :: Nil).toDF()
     testData.registerTempTable("inputTable")
 
-    sql(s"CREATE TEMPORARY FUNCTION testUDFToStringIntMap " +
-        s"AS '${classOf[UDFToStringIntMap].getName}'")
+    sql(
+        s"CREATE TEMPORARY FUNCTION testUDFToStringIntMap " +
+          s"AS '${classOf[UDFToStringIntMap].getName}'")
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToStringIntMap(s) FROM inputTable")
     }
     assert(
         errMsg.getMessage contains "Map type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch key and value types in Map<>;")
+          "JVM type erasure makes spark fail to catch key and value types in Map<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToStringIntMap")
     hiveContext.reset()
@@ -223,14 +225,15 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       hiveContext.sparkContext.parallelize(StringCaseClass("") :: Nil).toDF()
     testData.registerTempTable("inputTable")
 
-    sql(s"CREATE TEMPORARY FUNCTION testUDFToIntIntMap " +
-        s"AS '${classOf[UDFToIntIntMap].getName}'")
+    sql(
+        s"CREATE TEMPORARY FUNCTION testUDFToIntIntMap " +
+          s"AS '${classOf[UDFToIntIntMap].getName}'")
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToIntIntMap(s) FROM inputTable")
     }
     assert(
         errMsg.getMessage contains "Map type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch key and value types in Map<>;")
+          "JVM type erasure makes spark fail to catch key and value types in Map<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToIntIntMap")
     hiveContext.reset()
@@ -238,9 +241,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
   test("UDFListListInt") {
     val testData = hiveContext.sparkContext
-      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(
-              Seq((1, 2, 3))) :: ListListIntCaseClass(
-              Seq((4, 5, 6), (7, 8, 9))) :: Nil)
+      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(Seq(
+          (1, 2, 3))) :: ListListIntCaseClass(Seq((4, 5, 6), (7, 8, 9))) :: Nil)
       .toDF()
     testData.registerTempTable("listListIntTable")
 
@@ -291,9 +293,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
   test("UDFTwoListList") {
     val testData = hiveContext.sparkContext
-      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(
-              Seq((1, 2, 3))) :: ListListIntCaseClass(
-              Seq((4, 5, 6), (7, 8, 9))) :: Nil)
+      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(Seq(
+          (1, 2, 3))) :: ListListIntCaseClass(Seq((4, 5, 6), (7, 8, 9))) :: Nil)
       .toDF()
     testData.registerTempTable("TwoListTable")
 
@@ -307,59 +308,57 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
   test(
       "Hive UDFs with insufficient number of input arguments should trigger an analysis error") {
-    Seq((1, 2))
-      .toDF("a", "b")
-      .registerTempTable("testUDF")
+    Seq((1, 2)).toDF("a", "b").registerTempTable("testUDF")
 
-      {
-        // HiveSimpleUDF
-        sql(s"CREATE TEMPORARY FUNCTION testUDFTwoListList AS '${classOf[UDFTwoListList].getName}'")
-        val message = intercept[AnalysisException] {
-          sql("SELECT testUDFTwoListList() FROM testUDF")
-        }.getMessage
-        assert(message.contains("No handler for Hive udf"))
-        sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFTwoListList")
-      }
+    {
+      // HiveSimpleUDF
+      sql(s"CREATE TEMPORARY FUNCTION testUDFTwoListList AS '${classOf[UDFTwoListList].getName}'")
+      val message = intercept[AnalysisException] {
+        sql("SELECT testUDFTwoListList() FROM testUDF")
+      }.getMessage
+      assert(message.contains("No handler for Hive udf"))
+      sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFTwoListList")
+    }
 
-      {
-        // HiveGenericUDF
-        sql(s"CREATE TEMPORARY FUNCTION testUDFAnd AS '${classOf[GenericUDFOPAnd].getName}'")
-        val message = intercept[AnalysisException] {
-          sql("SELECT testUDFAnd() FROM testUDF")
-        }.getMessage
-        assert(message.contains("No handler for Hive udf"))
-        sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFAnd")
-      }
+    {
+      // HiveGenericUDF
+      sql(s"CREATE TEMPORARY FUNCTION testUDFAnd AS '${classOf[GenericUDFOPAnd].getName}'")
+      val message = intercept[AnalysisException] {
+        sql("SELECT testUDFAnd() FROM testUDF")
+      }.getMessage
+      assert(message.contains("No handler for Hive udf"))
+      sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFAnd")
+    }
 
-      {
-        // Hive UDAF
-        sql(s"CREATE TEMPORARY FUNCTION testUDAFPercentile AS '${classOf[UDAFPercentile].getName}'")
-        val message = intercept[AnalysisException] {
-          sql("SELECT testUDAFPercentile(a) FROM testUDF GROUP BY b")
-        }.getMessage
-        assert(message.contains("No handler for Hive udf"))
-        sql("DROP TEMPORARY FUNCTION IF EXISTS testUDAFPercentile")
-      }
+    {
+      // Hive UDAF
+      sql(s"CREATE TEMPORARY FUNCTION testUDAFPercentile AS '${classOf[UDAFPercentile].getName}'")
+      val message = intercept[AnalysisException] {
+        sql("SELECT testUDAFPercentile(a) FROM testUDF GROUP BY b")
+      }.getMessage
+      assert(message.contains("No handler for Hive udf"))
+      sql("DROP TEMPORARY FUNCTION IF EXISTS testUDAFPercentile")
+    }
 
-      {
-        // AbstractGenericUDAFResolver
-        sql(s"CREATE TEMPORARY FUNCTION testUDAFAverage AS '${classOf[GenericUDAFAverage].getName}'")
-        val message = intercept[AnalysisException] {
-          sql("SELECT testUDAFAverage() FROM testUDF GROUP BY b")
-        }.getMessage
-        assert(message.contains("No handler for Hive udf"))
-        sql("DROP TEMPORARY FUNCTION IF EXISTS testUDAFAverage")
-      }
+    {
+      // AbstractGenericUDAFResolver
+      sql(s"CREATE TEMPORARY FUNCTION testUDAFAverage AS '${classOf[GenericUDAFAverage].getName}'")
+      val message = intercept[AnalysisException] {
+        sql("SELECT testUDAFAverage() FROM testUDF GROUP BY b")
+      }.getMessage
+      assert(message.contains("No handler for Hive udf"))
+      sql("DROP TEMPORARY FUNCTION IF EXISTS testUDAFAverage")
+    }
 
-      {
-        // Hive UDTF
-        sql(s"CREATE TEMPORARY FUNCTION testUDTFExplode AS '${classOf[GenericUDTFExplode].getName}'")
-        val message = intercept[AnalysisException] {
-          sql("SELECT testUDTFExplode() FROM testUDF")
-        }.getMessage
-        assert(message.contains("No handler for Hive udf"))
-        sql("DROP TEMPORARY FUNCTION IF EXISTS testUDTFExplode")
-      }
+    {
+      // Hive UDTF
+      sql(s"CREATE TEMPORARY FUNCTION testUDTFExplode AS '${classOf[GenericUDTFExplode].getName}'")
+      val message = intercept[AnalysisException] {
+        sql("SELECT testUDTFExplode() FROM testUDF")
+      }.getMessage
+      assert(message.contains("No handler for Hive udf"))
+      sql("DROP TEMPORARY FUNCTION IF EXISTS testUDTFExplode")
+    }
 
     sqlContext.dropTempTable("testUDF")
   }
@@ -369,7 +368,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       Seq(Tuple1(1451400761)).toDF("test_date").registerTempTable("tab1")
       sql(s"CREATE TEMPORARY FUNCTION testUDFToDate AS '${classOf[GenericUDFToDate].getName}'")
       val count = sql("select testUDFToDate(cast(test_date as timestamp))" +
-          " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
+        " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
         .count()
       sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToDate")
       assert(count == 1)
@@ -455,8 +454,9 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
     // Non-External parquet pointing to /tmp/...
 
-    sql("CREATE TABLE parquet_tmp(c1 int, c2 int) " + " STORED AS parquet " +
-        " AS SELECT 1, 2")
+    sql(
+        "CREATE TABLE parquet_tmp(c1 int, c2 int) " + " STORED AS parquet " +
+          " AS SELECT 1, 2")
 
     val answer4 = sql("SELECT input_file_name() as file FROM parquet_tmp")
       .head()

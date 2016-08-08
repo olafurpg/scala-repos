@@ -68,7 +68,8 @@ case class ComplexReflectData(arrayField: Seq[Int],
                               dataField: Data)
 
 class ScalaReflectionRelationSuite
-    extends SparkFunSuite with SharedSQLContext {
+    extends SparkFunSuite
+    with SharedSQLContext {
   import testImplicits._
 
   test("query case class RDD") {
@@ -106,7 +107,8 @@ class ScalaReflectionRelationSuite
     val data = NullReflectData(null, null, null, null, null, null, null)
     Seq(data).toDF().registerTempTable("reflectNullData")
 
-    assert(sql("SELECT * FROM reflectNullData").collect().head === Row.fromSeq(
+    assert(
+        sql("SELECT * FROM reflectNullData").collect().head === Row.fromSeq(
             Seq.fill(7)(null)))
   }
 
@@ -114,7 +116,8 @@ class ScalaReflectionRelationSuite
     val data = OptionalReflectData(None, None, None, None, None, None, None)
     Seq(data).toDF().registerTempTable("reflectOptionalData")
 
-    assert(sql("SELECT * FROM reflectOptionalData").collect().head === Row
+    assert(
+        sql("SELECT * FROM reflectOptionalData").collect().head === Row
           .fromSeq(Seq.fill(7)(null)))
   }
 

@@ -10,7 +10,7 @@ import Prop._
 trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F] {
   def laws: BimonadLaws[F]
 
-  def bimonad[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def bimonad[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFFA: Arbitrary[F[F[A]]],
       ArbFB: Arbitrary[F[B]],

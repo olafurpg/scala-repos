@@ -33,32 +33,34 @@ sealed trait ScopedTaskable[T] extends Scoped {
   * Instances are constructed using the companion object.
   */
 sealed abstract class SettingKey[T]
-    extends ScopedTaskable[T] with KeyedInitialize[T]
-    with Scoped.ScopingSetting[SettingKey[T]] with Scoped.DefinableSetting[T] {
+    extends ScopedTaskable[T]
+    with KeyedInitialize[T]
+    with Scoped.ScopingSetting[SettingKey[T]]
+    with Scoped.DefinableSetting[T] {
   val key: AttributeKey[T]
   final def toTask: Initialize[Task[T]] = this apply inlineTask
   final def scopedKey: ScopedKey[T] = ScopedKey(scope, key)
   final def in(scope: Scope): SettingKey[T] =
     Scoped.scopedSetting(Scope.replaceThis(this.scope)(scope), this.key)
 
-  final def :=(v: T): Setting[T] = macro std.TaskMacro
-    .settingAssignMacroImpl[T]
-  final def +=[U](v: U)(implicit a: Append.Value[T, U]): Setting[T] = macro std.TaskMacro
-    .settingAppend1Impl[T, U]
-  final def ++=[U](vs: U)(implicit a: Append.Values[T, U]): Setting[T] = macro std.TaskMacro
-    .settingAppendNImpl[T, U]
+  final def :=(v: T): Setting[T] =
+    macro std.TaskMacro.settingAssignMacroImpl[T]
+  final def +=[U](v: U)(implicit a: Append.Value[T, U]): Setting[T] =
+    macro std.TaskMacro.settingAppend1Impl[T, U]
+  final def ++=[U](vs: U)(implicit a: Append.Values[T, U]): Setting[T] =
+    macro std.TaskMacro.settingAppendNImpl[T, U]
   final def <+=[V](v: Initialize[V])(
-      implicit a: Append.Value[T, V]): Setting[T] = macro std.TaskMacro
-    .settingAppend1Position[T, V]
+      implicit a: Append.Value[T, V]): Setting[T] =
+    macro std.TaskMacro.settingAppend1Position[T, V]
   final def <++=[V](vs: Initialize[V])(
-      implicit a: Append.Values[T, V]): Setting[T] = macro std.TaskMacro
-    .settingAppendNPosition[T, V]
-  final def -=[U](v: U)(implicit r: Remove.Value[T, U]): Setting[T] = macro std.TaskMacro
-    .settingRemove1Impl[T, U]
-  final def --=[U](vs: U)(implicit r: Remove.Values[T, U]): Setting[T] = macro std.TaskMacro
-    .settingRemoveNImpl[T, U]
-  final def ~=(f: T => T): Setting[T] = macro std.TaskMacro
-    .settingTransformPosition[T]
+      implicit a: Append.Values[T, V]): Setting[T] =
+    macro std.TaskMacro.settingAppendNPosition[T, V]
+  final def -=[U](v: U)(implicit r: Remove.Value[T, U]): Setting[T] =
+    macro std.TaskMacro.settingRemove1Impl[T, U]
+  final def --=[U](vs: U)(implicit r: Remove.Values[T, U]): Setting[T] =
+    macro std.TaskMacro.settingRemoveNImpl[T, U]
+  final def ~=(f: T => T): Setting[T] =
+    macro std.TaskMacro.settingTransformPosition[T]
 
   final def append1[V](v: Initialize[V], source: SourcePosition)(
       implicit a: Append.Value[T, V]): Setting[T] =
@@ -88,28 +90,30 @@ sealed abstract class SettingKey[T]
   * Instances are constructed using the companion object.
   */
 sealed abstract class TaskKey[T]
-    extends ScopedTaskable[T] with KeyedInitialize[Task[T]]
-    with Scoped.ScopingSetting[TaskKey[T]] with Scoped.DefinableTask[T] {
+    extends ScopedTaskable[T]
+    with KeyedInitialize[Task[T]]
+    with Scoped.ScopingSetting[TaskKey[T]]
+    with Scoped.DefinableTask[T] {
   val key: AttributeKey[Task[T]]
   def toTask: Initialize[Task[T]] = this
   def scopedKey: ScopedKey[Task[T]] = ScopedKey(scope, key)
   def in(scope: Scope): TaskKey[T] =
     Scoped.scopedTask(Scope.replaceThis(this.scope)(scope), this.key)
 
-  def +=[U](v: U)(implicit a: Append.Value[T, U]): Setting[Task[T]] = macro std.TaskMacro
-    .taskAppend1Impl[T, U]
-  def ++=[U](vs: U)(implicit a: Append.Values[T, U]): Setting[Task[T]] = macro std.TaskMacro
-    .taskAppendNImpl[T, U]
+  def +=[U](v: U)(implicit a: Append.Value[T, U]): Setting[Task[T]] =
+    macro std.TaskMacro.taskAppend1Impl[T, U]
+  def ++=[U](vs: U)(implicit a: Append.Values[T, U]): Setting[Task[T]] =
+    macro std.TaskMacro.taskAppendNImpl[T, U]
   def <+=[V](v: Initialize[Task[V]])(
-      implicit a: Append.Value[T, V]): Setting[Task[T]] = macro std.TaskMacro
-    .taskAppend1Position[T, V]
+      implicit a: Append.Value[T, V]): Setting[Task[T]] =
+    macro std.TaskMacro.taskAppend1Position[T, V]
   def <++=[V](vs: Initialize[Task[V]])(
-      implicit a: Append.Values[T, V]): Setting[Task[T]] = macro std.TaskMacro
-    .taskAppendNPosition[T, V]
-  final def -=[U](v: U)(implicit r: Remove.Value[T, U]): Setting[Task[T]] = macro std.TaskMacro
-    .taskRemove1Impl[T, U]
-  final def --=[U](vs: U)(implicit r: Remove.Values[T, U]): Setting[Task[T]] = macro std.TaskMacro
-    .taskRemoveNImpl[T, U]
+      implicit a: Append.Values[T, V]): Setting[Task[T]] =
+    macro std.TaskMacro.taskAppendNPosition[T, V]
+  final def -=[U](v: U)(implicit r: Remove.Value[T, U]): Setting[Task[T]] =
+    macro std.TaskMacro.taskRemove1Impl[T, U]
+  final def --=[U](vs: U)(implicit r: Remove.Values[T, U]): Setting[Task[T]] =
+    macro std.TaskMacro.taskRemoveNImpl[T, U]
 
   def append1[V](v: Initialize[Task[V]], source: SourcePosition)(
       implicit a: Append.Value[T, V]): Setting[Task[T]] =
@@ -126,8 +130,8 @@ sealed abstract class TaskKey[T]
     make(vs, source)(r.removeValues)
 
   private[this] def make[S](
-      other: Initialize[Task[S]], source: SourcePosition)(
-      f: (T, S) => T): Setting[Task[T]] =
+      other: Initialize[Task[S]],
+      source: SourcePosition)(f: (T, S) => T): Setting[Task[T]] =
     set((this, other) { (a, b) =>
       (a, b) map f.tupled
     }, source)
@@ -141,7 +145,8 @@ sealed abstract class TaskKey[T]
   * Instances are constructed using the companion object.
   */
 sealed trait InputKey[T]
-    extends Scoped with KeyedInitialize[InputTask[T]]
+    extends Scoped
+    with KeyedInitialize[InputTask[T]]
     with Scoped.ScopingSetting[InputKey[T]]
     with Scoped.DefinableSetting[InputTask[T]] {
   val key: AttributeKey[InputTask[T]]
@@ -149,12 +154,12 @@ sealed trait InputKey[T]
   def in(scope: Scope): InputKey[T] =
     Scoped.scopedInput(Scope.replaceThis(this.scope)(scope), this.key)
 
-  final def :=(v: T): Setting[InputTask[T]] = macro std.TaskMacro
-    .inputTaskAssignMacroImpl[T]
-  final def ~=(f: T => T): Setting[InputTask[T]] = macro std.TaskMacro
-    .itaskTransformPosition[T]
-  final def transform(
-      f: T => T, source: SourcePosition): Setting[InputTask[T]] =
+  final def :=(v: T): Setting[InputTask[T]] =
+    macro std.TaskMacro.inputTaskAssignMacroImpl[T]
+  final def ~=(f: T => T): Setting[InputTask[T]] =
+    macro std.TaskMacro.itaskTransformPosition[T]
+  final def transform(f: T => T,
+                      source: SourcePosition): Setting[InputTask[T]] =
     set(scopedKey(_ mapTask { _ map f }), source)
 }
 
@@ -211,16 +216,16 @@ object Scoped {
   sealed trait DefinableSetting[S] {
     def scopedKey: ScopedKey[S]
 
-    private[sbt] final def :==(app: S): Setting[S] = macro std.TaskMacro
-      .settingAssignPure[S]
+    private[sbt] final def :==(app: S): Setting[S] =
+      macro std.TaskMacro.settingAssignPure[S]
 
     /**
       * Binds a single value to this. A new [Def.Setting] is defined using the value(s) of `app`.
       * @param app value to bind to this key
       * @return setting binding this key to the given value.
       */
-    final def <<=(app: Initialize[S]): Setting[S] = macro std.TaskMacro
-      .settingAssignPosition[S]
+    final def <<=(app: Initialize[S]): Setting[S] =
+      macro std.TaskMacro.settingAssignPosition[S]
 
     /** Internally used function for setting a value along with the `.sbt` file location where it is defined. */
     final def set(app: Initialize[S], source: SourcePosition): Setting[S] =
@@ -265,18 +270,18 @@ object Scoped {
   }
   sealed trait DefinableTask[S] { self: TaskKey[S] =>
 
-    private[sbt] def :==(app: S): Setting[Task[S]] = macro std.TaskMacro
-      .taskAssignPositionPure[S]
-    private[sbt] def ::=(app: Task[S]): Setting[Task[S]] = macro std.TaskMacro
-      .taskAssignPositionT[S]
+    private[sbt] def :==(app: S): Setting[Task[S]] =
+      macro std.TaskMacro.taskAssignPositionPure[S]
+    private[sbt] def ::=(app: Task[S]): Setting[Task[S]] =
+      macro std.TaskMacro.taskAssignPositionT[S]
     def :=(v: S): Setting[Task[S]] = macro std.TaskMacro.taskAssignMacroImpl[S]
-    def ~=(f: S => S): Setting[Task[S]] = macro std.TaskMacro
-      .taskTransformPosition[S]
+    def ~=(f: S => S): Setting[Task[S]] =
+      macro std.TaskMacro.taskTransformPosition[S]
 
-    def <<=(app: Initialize[Task[S]]): Setting[Task[S]] = macro std.TaskMacro
-      .itaskAssignPosition[S]
-    def set(
-        app: Initialize[Task[S]], source: SourcePosition): Setting[Task[S]] =
+    def <<=(app: Initialize[Task[S]]): Setting[Task[S]] =
+      macro std.TaskMacro.itaskAssignPosition[S]
+    def set(app: Initialize[Task[S]],
+            source: SourcePosition): Setting[Task[S]] =
       Def.setting(scopedKey, app, source)
     def transform(f: S => S, source: SourcePosition): Setting[Task[S]] =
       set(scopedKey(_ map f), source)
@@ -419,49 +424,84 @@ object Scoped {
       t2: (ScopedTaskable[A], ScopedTaskable[B])): RichTaskable2[A, B] =
     new RichTaskable2(t2)
   implicit def t3ToTable3[A, B, C](
-      t3: (ScopedTaskable[A], ScopedTaskable[B],
-      ScopedTaskable[C])): RichTaskable3[A, B, C] = new RichTaskable3(t3)
+      t3: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C]))
+    : RichTaskable3[A, B, C] = new RichTaskable3(t3)
   implicit def t4ToTable4[A, B, C, D](
-      t4: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D])): RichTaskable4[A, B, C, D] = new RichTaskable4(t4)
+      t4: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D])): RichTaskable4[A, B, C, D] =
+    new RichTaskable4(t4)
   implicit def t5ToTable5[A, B, C, D, E](
-      t5: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E])): RichTaskable5[A, B, C, D, E] =
+      t5: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D],
+           ScopedTaskable[E])): RichTaskable5[A, B, C, D, E] =
     new RichTaskable5(t5)
   implicit def t6ToTable6[A, B, C, D, E, F](
-      t6: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E],
-      ScopedTaskable[F])): RichTaskable6[A, B, C, D, E, F] =
+      t6: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D],
+           ScopedTaskable[E],
+           ScopedTaskable[F])): RichTaskable6[A, B, C, D, E, F] =
     new RichTaskable6(t6)
   implicit def t7ToTable7[A, B, C, D, E, F, G](
-      t7: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F],
-      ScopedTaskable[G])): RichTaskable7[A, B, C, D, E, F, G] =
+      t7: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D],
+           ScopedTaskable[E],
+           ScopedTaskable[F],
+           ScopedTaskable[G])): RichTaskable7[A, B, C, D, E, F, G] =
     new RichTaskable7(t7)
   implicit def t8ToTable8[A, B, C, D, E, F, G, H](
-      t8: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F],
-      ScopedTaskable[G],
-      ScopedTaskable[H])): RichTaskable8[A, B, C, D, E, F, G, H] =
+      t8: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D],
+           ScopedTaskable[E],
+           ScopedTaskable[F],
+           ScopedTaskable[G],
+           ScopedTaskable[H])): RichTaskable8[A, B, C, D, E, F, G, H] =
     new RichTaskable8(t8)
   implicit def t9ToTable9[A, B, C, D, E, F, G, H, I](
-      t9: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F],
-      ScopedTaskable[G], ScopedTaskable[H],
-      ScopedTaskable[I])): RichTaskable9[A, B, C, D, E, F, G, H, I] =
+      t9: (ScopedTaskable[A],
+           ScopedTaskable[B],
+           ScopedTaskable[C],
+           ScopedTaskable[D],
+           ScopedTaskable[E],
+           ScopedTaskable[F],
+           ScopedTaskable[G],
+           ScopedTaskable[H],
+           ScopedTaskable[I])): RichTaskable9[A, B, C, D, E, F, G, H, I] =
     new RichTaskable9(t9)
   implicit def t10ToTable10[A, B, C, D, E, F, G, H, I, J](
-      t10: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F],
-      ScopedTaskable[G], ScopedTaskable[H], ScopedTaskable[I],
-      ScopedTaskable[J])): RichTaskable10[A, B, C, D, E, F, G, H, I, J] =
+      t10: (ScopedTaskable[A],
+            ScopedTaskable[B],
+            ScopedTaskable[C],
+            ScopedTaskable[D],
+            ScopedTaskable[E],
+            ScopedTaskable[F],
+            ScopedTaskable[G],
+            ScopedTaskable[H],
+            ScopedTaskable[I],
+            ScopedTaskable[J])): RichTaskable10[A, B, C, D, E, F, G, H, I, J] =
     new RichTaskable10(t10)
   implicit def t11ToTable11[A, B, C, D, E, F, G, H, I, J, K](
-      t11: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C],
-      ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F],
-      ScopedTaskable[G], ScopedTaskable[H], ScopedTaskable[I],
-      ScopedTaskable[J],
-      ScopedTaskable[K])): RichTaskable11[A, B, C, D, E, F, G, H, I, J, K] =
+      t11: (ScopedTaskable[A],
+            ScopedTaskable[B],
+            ScopedTaskable[C],
+            ScopedTaskable[D],
+            ScopedTaskable[E],
+            ScopedTaskable[F],
+            ScopedTaskable[G],
+            ScopedTaskable[H],
+            ScopedTaskable[I],
+            ScopedTaskable[J],
+            ScopedTaskable[K]))
+    : RichTaskable11[A, B, C, D, E, F, G, H, I, J, K] =
     new RichTaskable11(t11)
   /*	implicit def t12ToTable12[A,B,C,D,E,F,G,H,I,J,K,L](t12: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C], ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F], ScopedTaskable[G], ScopedTaskable[H], ScopedTaskable[I], ScopedTaskable[J], ScopedTaskable[K], ScopedTaskable[L]) ): RichTaskable12[A,B,C,D,E,F,G,H,I,J,K,L] = new RichTaskable12(t12)
 	implicit def t13ToTable13[A,B,C,D,E,F,G,H,I,J,K,L,N](t13: (ScopedTaskable[A], ScopedTaskable[B], ScopedTaskable[C], ScopedTaskable[D], ScopedTaskable[E], ScopedTaskable[F], ScopedTaskable[G], ScopedTaskable[H], ScopedTaskable[I], ScopedTaskable[J], ScopedTaskable[K], ScopedTaskable[L], ScopedTaskable[N]) ): RichTaskable13[A,B,C,D,E,F,G,H,I,J,K,L,N] = new RichTaskable13(t13)
@@ -471,15 +511,15 @@ object Scoped {
   sealed abstract class RichTaskables[K[L[x]]](
       final val keys: K[ScopedTaskable])(implicit a: AList[K]) {
     type App[T] = Initialize[Task[T]]
-    type Fun [M[_], Ret]
+    type Fun[M[_], Ret]
     protected def convert[M[_], Ret](f: Fun[M, Ret]): K[M] => Ret
     private[this] val inputs: K[App] =
       a.transform(keys, new (ScopedTaskable ~> App) {
         def apply[T](in: ScopedTaskable[T]): App[T] = in.toTask
       })
     private[this] def onTasks[T](f: K[Task] => Task[T]): App[T] =
-      Def.app[({ type l[L[x]] = K[(L ∙ Task)#l] })#l, Task[T]](inputs)(f)(AList
-            .asplit[K, Task](a))
+      Def.app[({ type l[L[x]] = K[(L ∙ Task)#l] })#l, Task[T]](inputs)(f)(
+          AList.asplit[K, Task](a))
 
     def flatMap[T](f: Fun[Id, Task[T]]): App[T] =
       onTasks(_.flatMap(convert(f)))
@@ -542,7 +582,7 @@ object Scoped {
       extends RichTaskables[AList.T8K[A, B, C, D, E, F, G, H]#l](t8)(
           AList.tuple8[A, B, C, D, E, F, G, H]) {
     type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G],
-    M[H]) => Ret
+                           M[H]) => Ret
     def identityMap = map(mkTuple8)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
@@ -551,28 +591,45 @@ object Scoped {
       extends RichTaskables[AList.T9K[A, B, C, D, E, F, G, H, I]#l](t9)(
           AList.tuple9[A, B, C, D, E, F, G, H, I]) {
     type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-    M[I]) => Ret
+                           M[I]) => Ret
     def identityMap = map(mkTuple9)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
   final class RichTaskable10[A, B, C, D, E, F, G, H, I, J](
-      t10: ((ST[A], ST[B], ST[C], ST[D], ST[E], ST[F], ST[G], ST[H], ST[I],
-      ST[J])))
+      t10: ((ST[A],
+             ST[B],
+             ST[C],
+             ST[D],
+             ST[E],
+             ST[F],
+             ST[G],
+             ST[H],
+             ST[I],
+             ST[J])))
       extends RichTaskables[AList.T10K[A, B, C, D, E, F, G, H, I, J]#l](t10)(
           AList.tuple10[A, B, C, D, E, F, G, H, I, J]) {
     type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-    M[I], M[J]) => Ret
+                           M[I], M[J]) => Ret
     def identityMap = map(mkTuple10)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
 
   final class RichTaskable11[A, B, C, D, E, F, G, H, I, J, K](
-      t11: ((ST[A], ST[B], ST[C], ST[D], ST[E], ST[F], ST[G], ST[H], ST[I],
-      ST[J], ST[K])))
+      t11: ((ST[A],
+             ST[B],
+             ST[C],
+             ST[D],
+             ST[E],
+             ST[F],
+             ST[G],
+             ST[H],
+             ST[I],
+             ST[J],
+             ST[K])))
       extends RichTaskables[AList.T11K[A, B, C, D, E, F, G, H, I, J, K]#l](
           t11)(AList.tuple11[A, B, C, D, E, F, G, H, I, J, K]) {
     type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-    M[I], M[J], M[K]) => Ret
+                           M[I], M[J], M[K]) => Ret
     def identityMap = map(mkTuple11)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
@@ -611,36 +668,72 @@ object Scoped {
       t3: (Initialize[A], Initialize[B], Initialize[C])): Apply3[A, B, C] =
     new Apply3(t3)
   implicit def t4ToApp4[A, B, C, D](
-      t4: (Initialize[A], Initialize[B], Initialize[C],
-      Initialize[D])): Apply4[A, B, C, D] = new Apply4(t4)
+      t4: (Initialize[A], Initialize[B], Initialize[C], Initialize[D]))
+    : Apply4[A, B, C, D] = new Apply4(t4)
   implicit def t5ToApp5[A, B, C, D, E](
-      t5: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E])): Apply5[A, B, C, D, E] = new Apply5(t5)
+      t5: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E])): Apply5[A, B, C, D, E] = new Apply5(t5)
   implicit def t6ToApp6[A, B, C, D, E, F](
-      t6: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F])): Apply6[A, B, C, D, E, F] = new Apply6(t6)
+      t6: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F])): Apply6[A, B, C, D, E, F] = new Apply6(t6)
   implicit def t7ToApp7[A, B, C, D, E, F, G](
-      t7: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F],
-      Initialize[G])): Apply7[A, B, C, D, E, F, G] = new Apply7(t7)
+      t7: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G])): Apply7[A, B, C, D, E, F, G] = new Apply7(t7)
   implicit def t8ToApp8[A, B, C, D, E, F, G, H](
-      t8: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G],
-      Initialize[H])): Apply8[A, B, C, D, E, F, G, H] = new Apply8(t8)
+      t8: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G],
+           Initialize[H])): Apply8[A, B, C, D, E, F, G, H] = new Apply8(t8)
   implicit def t9ToApp9[A, B, C, D, E, F, G, H, I](
-      t9: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I])): Apply9[A, B, C, D, E, F, G, H, I] = new Apply9(t9)
+      t9: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G],
+           Initialize[H],
+           Initialize[I])): Apply9[A, B, C, D, E, F, G, H, I] = new Apply9(t9)
   implicit def t10ToApp10[A, B, C, D, E, F, G, H, I, J](
-      t10: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I], Initialize[J])): Apply10[A, B, C, D, E, F, G, H, I, J] =
+      t10: (Initialize[A],
+            Initialize[B],
+            Initialize[C],
+            Initialize[D],
+            Initialize[E],
+            Initialize[F],
+            Initialize[G],
+            Initialize[H],
+            Initialize[I],
+            Initialize[J])): Apply10[A, B, C, D, E, F, G, H, I, J] =
     new Apply10(t10)
   implicit def t11ToApp11[A, B, C, D, E, F, G, H, I, J, K](
-      t11: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I], Initialize[J],
-      Initialize[K])): Apply11[A, B, C, D, E, F, G, H, I, J, K] =
+      t11: (Initialize[A],
+            Initialize[B],
+            Initialize[C],
+            Initialize[D],
+            Initialize[E],
+            Initialize[F],
+            Initialize[G],
+            Initialize[H],
+            Initialize[I],
+            Initialize[J],
+            Initialize[K])): Apply11[A, B, C, D, E, F, G, H, I, J, K] =
     new Apply11(t11)
   /*    implicit def t12ToApp12[A,B,C,D,E,F,G,H,I,J,K,L](t12: (Initialize[A], Initialize[B], Initialize[C], Initialize[D], Initialize[E], Initialize[F], Initialize[G], Initialize[H], Initialize[I], Initialize[J], Initialize[K], Initialize[L]) ): Apply12[A,B,C,D,E,F,G,H,I,J,K,L] = new Apply12(t12)
     implicit def t13ToApp13[A,B,C,D,E,F,G,H,I,J,K,L,N](t13: (Initialize[A], Initialize[B], Initialize[C], Initialize[D], Initialize[E], Initialize[F], Initialize[G], Initialize[H], Initialize[I], Initialize[J], Initialize[K], Initialize[L], Initialize[N]) ): Apply13[A,B,C,D,E,F,G,H,I,J,K,L,N] = new Apply13(t13)
@@ -673,13 +766,13 @@ object Scoped {
       (a, b, c, d, e, f, g, h, i, j, k, l)
   def mkTuple13[A, B, C, D, E, F, G, H, I, J, K, L, N] =
     (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
-    n: N) => (a, b, c, d, e, f, g, h, i, j, k, l, n)
+     n: N) => (a, b, c, d, e, f, g, h, i, j, k, l, n)
   def mkTuple14[A, B, C, D, E, F, G, H, I, J, K, L, N, O] =
     (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
-    n: N, o: O) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o)
+     n: N, o: O) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o)
   def mkTuple15[A, B, C, D, E, F, G, H, I, J, K, L, N, O, P] =
     (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
-    n: N, o: O, p: P) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o, p)
+     n: N, o: O, p: P) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o, p)
 
   final class Apply2[A, B](t2: (Initialize[A], Initialize[B])) {
     def apply[T](z: (A, B) => T) =
@@ -700,59 +793,98 @@ object Scoped {
     def identity = apply(mkTuple4)
   }
   final class Apply5[A, B, C, D, E](
-      t5: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E])) {
+      t5: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E])) {
     def apply[T](z: (A, B, C, D, E) => T) =
       Def.app[AList.T5K[A, B, C, D, E]#l, T](t5)(z.tupled)(
           AList.tuple5[A, B, C, D, E])
     def identity = apply(mkTuple5)
   }
   final class Apply6[A, B, C, D, E, F](
-      t6: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F])) {
+      t6: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F])) {
     def apply[T](z: (A, B, C, D, E, F) => T) =
       Def.app[AList.T6K[A, B, C, D, E, F]#l, T](t6)(z.tupled)(
           AList.tuple6[A, B, C, D, E, F])
     def identity = apply(mkTuple6)
   }
   final class Apply7[A, B, C, D, E, F, G](
-      t7: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G])) {
+      t7: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G])) {
     def apply[T](z: (A, B, C, D, E, F, G) => T) =
       Def.app[AList.T7K[A, B, C, D, E, F, G]#l, T](t7)(z.tupled)(
           AList.tuple7[A, B, C, D, E, F, G])
     def identity = apply(mkTuple7)
   }
   final class Apply8[A, B, C, D, E, F, G, H](
-      t8: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H])) {
+      t8: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G],
+           Initialize[H])) {
     def apply[T](z: (A, B, C, D, E, F, G, H) => T) =
       Def.app[AList.T8K[A, B, C, D, E, F, G, H]#l, T](t8)(z.tupled)(
           AList.tuple8[A, B, C, D, E, F, G, H])
     def identity = apply(mkTuple8)
   }
   final class Apply9[A, B, C, D, E, F, G, H, I](
-      t9: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I])) {
+      t9: (Initialize[A],
+           Initialize[B],
+           Initialize[C],
+           Initialize[D],
+           Initialize[E],
+           Initialize[F],
+           Initialize[G],
+           Initialize[H],
+           Initialize[I])) {
     def apply[T](z: (A, B, C, D, E, F, G, H, I) => T) =
       Def.app[AList.T9K[A, B, C, D, E, F, G, H, I]#l, T](t9)(z.tupled)(
           AList.tuple9[A, B, C, D, E, F, G, H, I])
     def identity = apply(mkTuple9)
   }
   final class Apply10[A, B, C, D, E, F, G, H, I, J](
-      t10: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I], Initialize[J])) {
+      t10: (Initialize[A],
+            Initialize[B],
+            Initialize[C],
+            Initialize[D],
+            Initialize[E],
+            Initialize[F],
+            Initialize[G],
+            Initialize[H],
+            Initialize[I],
+            Initialize[J])) {
     def apply[T](z: (A, B, C, D, E, F, G, H, I, J) => T) =
       Def.app[AList.T10K[A, B, C, D, E, F, G, H, I, J]#l, T](t10)(z.tupled)(
           AList.tuple10[A, B, C, D, E, F, G, H, I, J])
     def identity = apply(mkTuple10)
   }
   final class Apply11[A, B, C, D, E, F, G, H, I, J, K](
-      t11: (Initialize[A], Initialize[B], Initialize[C], Initialize[D],
-      Initialize[E], Initialize[F], Initialize[G], Initialize[H],
-      Initialize[I], Initialize[J], Initialize[K])) {
+      t11: (Initialize[A],
+            Initialize[B],
+            Initialize[C],
+            Initialize[D],
+            Initialize[E],
+            Initialize[F],
+            Initialize[G],
+            Initialize[H],
+            Initialize[I],
+            Initialize[J],
+            Initialize[K])) {
     def apply[T](z: (A, B, C, D, E, F, G, H, I, J, K) => T) =
       Def.app[AList.T11K[A, B, C, D, E, F, G, H, I, J, K]#l, T](t11)(z.tupled)(
           AList.tuple11[A, B, C, D, E, F, G, H, I, J, K])
@@ -775,8 +907,8 @@ object Scoped {
         def identity = apply(mkTuple15)
     }
    */
-  private[sbt] def extendScoped(
-      s1: Scoped, ss: Seq[Scoped]): Seq[AttributeKey[_]] =
+  private[sbt] def extendScoped(s1: Scoped,
+                                ss: Seq[Scoped]): Seq[AttributeKey[_]] =
     s1.key +: ss.map(_.key)
 }
 
@@ -784,25 +916,27 @@ import Scoped.extendScoped
 
 /** Constructs InputKeys, which are associated with input tasks to define a setting.*/
 object InputKey {
-  def apply[T : Manifest](label: String,
-                          description: String = "",
-                          rank: Int = KeyRanks.DefaultInputRank): InputKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String = "",
+                         rank: Int = KeyRanks.DefaultInputRank): InputKey[T] =
     apply(AttributeKey[InputTask[T]](label, description, rank))
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          extend1: Scoped,
-                          extendN: Scoped*): InputKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         extend1: Scoped,
+                         extendN: Scoped*): InputKey[T] =
     apply(label, description, KeyRanks.DefaultInputRank, extend1, extendN: _*)
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          rank: Int,
-                          extend1: Scoped,
-                          extendN: Scoped*): InputKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         rank: Int,
+                         extend1: Scoped,
+                         extendN: Scoped*): InputKey[T] =
     apply(
-        AttributeKey[InputTask[T]](
-            label, description, extendScoped(extend1, extendN), rank))
+        AttributeKey[InputTask[T]](label,
+                                   description,
+                                   extendScoped(extend1, extendN),
+                                   rank))
 
   def apply[T](akey: AttributeKey[InputTask[T]]): InputKey[T] =
     new InputKey[T] { val key = akey; def scope = Scope.ThisScope }
@@ -810,58 +944,64 @@ object InputKey {
 
 /** Constructs TaskKeys, which are associated with tasks to define a setting.*/
 object TaskKey {
-  def apply[T : Manifest](label: String,
-                          description: String = "",
-                          rank: Int = KeyRanks.DefaultTaskRank): TaskKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String = "",
+                         rank: Int = KeyRanks.DefaultTaskRank): TaskKey[T] =
     apply(AttributeKey[Task[T]](label, description, rank))
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          extend1: Scoped,
-                          extendN: Scoped*): TaskKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         extend1: Scoped,
+                         extendN: Scoped*): TaskKey[T] =
     apply(
-        AttributeKey[Task[T]](
-            label, description, extendScoped(extend1, extendN)))
+        AttributeKey[Task[T]](label,
+                              description,
+                              extendScoped(extend1, extendN)))
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          rank: Int,
-                          extend1: Scoped,
-                          extendN: Scoped*): TaskKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         rank: Int,
+                         extend1: Scoped,
+                         extendN: Scoped*): TaskKey[T] =
     apply(
-        AttributeKey[Task[T]](
-            label, description, extendScoped(extend1, extendN), rank))
+        AttributeKey[Task[T]](label,
+                              description,
+                              extendScoped(extend1, extendN),
+                              rank))
 
   def apply[T](akey: AttributeKey[Task[T]]): TaskKey[T] =
     new TaskKey[T] { val key = akey; def scope = Scope.ThisScope }
 
-  def local[T : Manifest]: TaskKey[T] = apply[T](AttributeKey.local[Task[T]])
+  def local[T: Manifest]: TaskKey[T] = apply[T](AttributeKey.local[Task[T]])
 }
 
 /** Constructs SettingKeys, which are associated with a value to define a basic setting.*/
 object SettingKey {
-  def apply[T : Manifest](
+  def apply[T: Manifest](
       label: String,
       description: String = "",
       rank: Int = KeyRanks.DefaultSettingRank): SettingKey[T] =
     apply(AttributeKey[T](label, description, rank))
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          extend1: Scoped,
-                          extendN: Scoped*): SettingKey[T] =
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         extend1: Scoped,
+                         extendN: Scoped*): SettingKey[T] =
     apply(AttributeKey[T](label, description, extendScoped(extend1, extendN)))
 
-  def apply[T : Manifest](label: String,
-                          description: String,
-                          rank: Int,
-                          extend1: Scoped,
-                          extendN: Scoped*): SettingKey[T] =
-    apply(AttributeKey[T](
-            label, description, extendScoped(extend1, extendN), rank))
+  def apply[T: Manifest](label: String,
+                         description: String,
+                         rank: Int,
+                         extend1: Scoped,
+                         extendN: Scoped*): SettingKey[T] =
+    apply(
+        AttributeKey[T](label,
+                        description,
+                        extendScoped(extend1, extendN),
+                        rank))
 
   def apply[T](akey: AttributeKey[T]): SettingKey[T] =
     new SettingKey[T] { val key = akey; def scope = Scope.ThisScope }
 
-  def local[T : Manifest]: SettingKey[T] = apply[T](AttributeKey.local[T])
+  def local[T: Manifest]: SettingKey[T] = apply[T](AttributeKey.local[T])
 }

@@ -5,7 +5,12 @@ import java.awt.{Desktop, Toolkit}
 import java.net.{URI, URL}
 import javax.swing.event.HyperlinkEvent
 
-import com.intellij.notification.{Notification, NotificationListener, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification,
+  NotificationListener,
+  NotificationType,
+  Notifications
+}
 import org.intellij.lang.annotations.Language
 
 /**
@@ -30,7 +35,7 @@ object DesktopUtils {
   def browse(url: String) {
     val supported =
       Desktop.isDesktopSupported &&
-      Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
+        Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
 
     if (supported) Desktop.getDesktop.browse(new URI(url))
     else

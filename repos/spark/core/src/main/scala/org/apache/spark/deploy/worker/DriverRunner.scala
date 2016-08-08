@@ -170,8 +170,9 @@ private[deploy] class DriverRunner(conf: SparkConf,
     localJarFilename
   }
 
-  private def launchDriver(
-      builder: ProcessBuilder, baseDir: File, supervise: Boolean) {
+  private def launchDriver(builder: ProcessBuilder,
+                           baseDir: File,
+                           supervise: Boolean) {
     builder.directory(baseDir)
     def initialize(process: Process): Unit = {
       // Redirect stdout and stderr to files
@@ -212,7 +213,7 @@ private[deploy] class DriverRunner(conf: SparkConf,
       val processStart = clock.getTimeMillis()
       val exitCode = process.get.waitFor()
       if (clock.getTimeMillis() -
-          processStart > successfulRunDuration * 1000) {
+            processStart > successfulRunDuration * 1000) {
         waitSeconds = 1
       }
 

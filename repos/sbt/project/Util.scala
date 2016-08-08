@@ -13,10 +13,10 @@ object Util {
   def crossBuild: Seq[Setting[_]] =
     Seq(
         crossPaths :=
-        (scalaBinaryVersion.value match {
-              case "2.11" => true
-              case _ => false
-            })
+          (scalaBinaryVersion.value match {
+            case "2.11" => true
+            case _ => false
+          })
     )
 
   lazy val javaOnlySettings =
@@ -139,7 +139,7 @@ object Util {
 
   def excludePomArtifact(artifactId: String) =
     (artifactId == "compiler-interface") ||
-    (artifactId startsWith "precompiled")
+      (artifactId startsWith "precompiled")
 
   val testExclusive = tags in test += ((ExclusiveTest, 1))
 

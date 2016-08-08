@@ -54,7 +54,8 @@ class ScalaMalformedFormatStringInspection extends AbstractInspection {
   private def inspect(part: StringPart, holder: ProblemsHolder) {
     part match {
       case injection @ Injection(
-          exp, Some(Specifier(Span(element, start, end), format))) =>
+          exp,
+          Some(Specifier(Span(element, start, end), format))) =>
         injection.problem match {
           case Some(Inapplicable) =>
             for (argumentType <- injection.expressionType) {
@@ -82,7 +83,8 @@ class ScalaMalformedFormatStringInspection extends AbstractInspection {
             "No argument for a format specifier %s".format(format))
 
       case UnboundPositionalSpecifier(
-          Specifier(Span(element, start, end), format), position) =>
+          Specifier(Span(element, start, end), format),
+          position) =>
         holder.registerProblem(element,
                                new TextRange(start, end),
                                "No argument at position %d".format(position))

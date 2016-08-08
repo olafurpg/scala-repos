@@ -162,9 +162,10 @@ object PartialFunction {
 
   /** Composite function produced by `PartialFunction#orElse` method
     */
-  private class OrElse[-A, +B](
-      f1: PartialFunction[A, B], f2: PartialFunction[A, B])
-      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
+  private class OrElse[-A, +B](f1: PartialFunction[A, B],
+                               f2: PartialFunction[A, B])
+      extends scala.runtime.AbstractPartialFunction[A, B]
+      with Serializable {
     def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)
 
     override def apply(x: A): B = f1.applyOrElse(x, f2)
@@ -184,7 +185,8 @@ object PartialFunction {
   /** Composite function produced by `PartialFunction#andThen` method
     */
   private class AndThen[-A, B, +C](pf: PartialFunction[A, B], k: B => C)
-      extends PartialFunction[A, C] with Serializable {
+      extends PartialFunction[A, C]
+      with Serializable {
     def isDefinedAt(x: A) = pf.isDefinedAt(x)
 
     def apply(x: A): C = k(pf(x))
@@ -225,7 +227,8 @@ object PartialFunction {
     (fallback_pf eq x.asInstanceOf[AnyRef])
 
   private class Lifted[-A, +B](val pf: PartialFunction[A, B])
-      extends scala.runtime.AbstractFunction1[A, Option[B]] with Serializable {
+      extends scala.runtime.AbstractFunction1[A, Option[B]]
+      with Serializable {
 
     def apply(x: A): Option[B] = {
       val z = pf.applyOrElse(x, checkFallback[B])
@@ -234,7 +237,8 @@ object PartialFunction {
   }
 
   private class Unlifted[A, B](f: A => Option[B])
-      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
+      extends scala.runtime.AbstractPartialFunction[A, B]
+      with Serializable {
     def isDefinedAt(x: A): Boolean = f(x).isDefined
 
     override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {

@@ -80,7 +80,7 @@ object GenerateUnsafeRowJoiner
             } else if (i - bitset1Words < bitset2Words - 1) {
               // combine next two words of bitset2
               s"($getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder))" +
-              s" | ($getLong(obj2, offset2 + ${(i - bitset1Words + 1) * 8}) << $bitset1Remainder)"
+                s" | ($getLong(obj2, offset2 + ${(i - bitset1Words + 1) * 8}) << $bitset1Remainder)"
             } else {
               // last word of bitset2
               s"$getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder)"
@@ -172,13 +172,13 @@ object GenerateUnsafeRowJoiner
        |class SpecificUnsafeRowJoiner extends ${classOf[UnsafeRowJoiner].getName} {
        |  private byte[] buf = new byte[64];
        |  private UnsafeRow out = new UnsafeRow(${schema1.size +
-                  schema2.size});
+                    schema2.size});
        |
        |  public UnsafeRow join(UnsafeRow row1, UnsafeRow row2) {
        |    // row1: ${schema1.size} fields, $bitset1Words words in bitset
        |    // row2: ${schema2.size}, $bitset2Words words in bitset
        |    // output: ${schema1.size +
-                  schema2.size} fields, $outputBitsetWords words in bitset
+                    schema2.size} fields, $outputBitsetWords words in bitset
        |    final int sizeInBytes = row1.getSizeInBytes() + row2.getSizeInBytes() - $sizeReduction;
        |    if (sizeInBytes > buf.length) {
        |      buf = new byte[sizeInBytes];

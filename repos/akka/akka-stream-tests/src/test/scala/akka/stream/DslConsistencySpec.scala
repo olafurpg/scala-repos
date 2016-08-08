@@ -68,8 +68,10 @@ class DslConsistencySpec extends WordSpec with Matchers {
         "andThenMat",
         "isIdentity",
         "withAttributes",
-        "transformMaterializing") ++ Set(
-        "asScala", "asJava", "deprecatedAndThen", "deprecatedAndThenMat")
+        "transformMaterializing") ++ Set("asScala",
+                                         "asJava",
+                                         "deprecatedAndThen",
+                                         "deprecatedAndThenMat")
 
   val graphHelpers = Set("zipGraph",
                          "zipWithGraph",
@@ -84,9 +86,9 @@ class DslConsistencySpec extends WordSpec with Matchers {
       jSourceClass -> graphHelpers,
       // Java subflows can only be nested using .via and .to (due to type system restrictions)
       jSubFlowClass ->
-      (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
+        (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
       jSubSourceClass ->
-      (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
+        (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
       sFlowClass -> Set("of"),
       sSourceClass -> Set("adapt", "from"),
       sSinkClass -> Set("adapt"),
@@ -106,20 +108,21 @@ class DslConsistencySpec extends WordSpec with Matchers {
   "Java and Scala DSLs" must {
 
     ("Source" -> List[Class[_]](sSourceClass, jSourceClass)) ::
-    ("SubSource" -> List[Class[_]](sSubSourceClass, jSubSourceClass)) ::
-    ("Flow" -> List[Class[_]](sFlowClass, jFlowClass)) ::
-    ("SubFlow" -> List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
-    ("Sink" -> List[Class[_]](sSinkClass, jSinkClass)) ::
-    ("RunanbleFlow" -> List[Class[_]](sRunnableGraphClass,
-                                      jRunnableGraphClass)) :: Nil foreach {
+      ("SubSource" -> List[Class[_]](sSubSourceClass, jSubSourceClass)) ::
+        ("Flow" -> List[Class[_]](sFlowClass, jFlowClass)) ::
+          ("SubFlow" -> List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
+            ("Sink" -> List[Class[_]](sSinkClass, jSinkClass)) ::
+              ("RunanbleFlow" -> List[Class[_]](
+                  sRunnableGraphClass,
+                  jRunnableGraphClass)) :: Nil foreach {
       case (element, classes) ⇒
         s"provide same $element transforming operators" in {
           val allOps = (for {
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
-               if !ignore(m.getName)
-               if !m.getName.contains("$")
-               if !materializing(m)
+            if !ignore(m.getName)
+            if !m.getName.contains("$")
+            if !materializing(m)
           } yield m.getName).toSet
 
           for (c ← classes; op ← allOps) assertHasMethod(c, op)
@@ -129,9 +132,9 @@ class DslConsistencySpec extends WordSpec with Matchers {
           val materializingOps = (for {
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
-               if !ignore(m.getName)
-               if !m.getName.contains("$")
-               if materializing(m)
+            if !ignore(m.getName)
+            if !m.getName.contains("$")
+            if materializing(m)
           } yield m.getName).toSet
 
           for (c ← classes; op ← materializingOps) assertHasMethod(c, op)

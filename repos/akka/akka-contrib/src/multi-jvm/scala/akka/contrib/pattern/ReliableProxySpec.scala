@@ -29,8 +29,10 @@ class ReliableProxyMultiJvmNode1 extends ReliableProxySpec
 class ReliableProxyMultiJvmNode2 extends ReliableProxySpec
 
 class ReliableProxySpec
-    extends MultiNodeSpec(ReliableProxySpec) with STMultiNodeSpec
-    with BeforeAndAfterEach with ImplicitSender {
+    extends MultiNodeSpec(ReliableProxySpec)
+    with STMultiNodeSpec
+    with BeforeAndAfterEach
+    with ImplicitSender {
   import ReliableProxySpec._
   import ReliableProxy._
 
@@ -98,7 +100,8 @@ class ReliableProxySpec
 
         idTarget()
         proxy = system.actorOf(
-            ReliableProxy.props(target.path, 100.millis, 5.seconds), "proxy1")
+            ReliableProxy.props(target.path, 100.millis, 5.seconds),
+            "proxy1")
         watch(proxy)
         proxy ! FSM.SubscribeTransitionCallBack(testActor)
         expectState(Connecting)

@@ -217,8 +217,7 @@ object SwapperApp extends App {
 
 //#receive-orElse
 
-trait ProducerBehavior {
-  this: Actor =>
+trait ProducerBehavior { this: Actor =>
 
   val producerBehavior: Receive = {
     case GiveMeThings =>
@@ -226,8 +225,7 @@ trait ProducerBehavior {
   }
 }
 
-trait ConsumerBehavior {
-  this: Actor with ActorLogging =>
+trait ConsumerBehavior { this: Actor with ActorLogging =>
 
   val consumerBehavior: Receive = {
     case ref: ActorRef =>
@@ -247,7 +245,9 @@ class Consumer extends Actor with ActorLogging with ConsumerBehavior {
 }
 
 class ProducerConsumer
-    extends Actor with ActorLogging with ProducerBehavior
+    extends Actor
+    with ActorLogging
+    with ProducerBehavior
     with ConsumerBehavior {
 
   def receive = producerBehavior.orElse[Any, Unit](consumerBehavior)
@@ -480,7 +480,8 @@ class ActorDocSpec extends AkkaSpec("""
 
       class WatchActor extends Actor {
         val child = context.actorOf(Props.empty, "child")
-        context.watch(child) // <-- this is the only call needed for registration
+        context
+          .watch(child) // <-- this is the only call needed for registration
         var lastSender = system.deadLetters
 
         def receive = {
@@ -589,8 +590,10 @@ class ActorDocSpec extends AkkaSpec("""
     def receive = {
       case ref: ActorRef =>
         //#reply-with-sender
-        sender().tell("reply", context.parent) // replies will go back to parent
-        sender().!("reply")(context.parent) // alternative syntax (beware of the parens!)
+        sender()
+          .tell("reply", context.parent) // replies will go back to parent
+        sender()
+          .!("reply")(context.parent) // alternative syntax (beware of the parens!)
       //#reply-with-sender
       case x =>
         //#reply-without-sender
@@ -614,12 +617,13 @@ class ActorDocSpec extends AkkaSpec("""
 
   "using ActorDSL outside of akka.actor package" in {
     import akka.actor.ActorDSL._
-    actor(
-        new Act {
-      superviseWith(
-          OneForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
-      superviseWith(
-          AllForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
+    actor(new Act {
+      superviseWith(OneForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
+      superviseWith(AllForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
     })
   }
 }

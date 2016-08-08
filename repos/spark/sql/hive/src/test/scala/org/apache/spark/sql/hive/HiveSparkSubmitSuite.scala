@@ -42,8 +42,11 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * This suite tests spark-submit with applications using HiveContext.
   */
 class HiveSparkSubmitSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with ResetSystemProperties
+    with Timeouts {
 
   // TODO: rewrite these or mark them as slow tests to be run sparingly
 
@@ -168,8 +171,8 @@ class HiveSparkSubmitSuite
   // NOTE: This is an expensive operation in terms of time (10 seconds+). Use sparingly.
   // This is copied from org.apache.spark.deploy.SparkSubmitSuite
   private def runSparkSubmit(args: Seq[String]): Unit = {
-    val sparkHome = sys.props.getOrElse(
-        "spark.test.home", fail("spark.test.home is not set!"))
+    val sparkHome = sys.props
+      .getOrElse("spark.test.home", fail("spark.test.home is not set!"))
     val history = ArrayBuffer.empty[String]
     val commands = Seq("./bin/spark-submit") ++ args
     val commandLine = commands.mkString("'", "' '", "'")
@@ -219,7 +222,7 @@ class HiveSparkSubmitSuite
       case to: TestFailedDueToTimeoutException =>
         val historyLog = history.mkString("\n")
         fail(s"Timeout of $commandLine" +
-             s" See the log4j logs for more detail." + s"\n$historyLog",
+               s" See the log4j logs for more detail." + s"\n$historyLog",
              to)
       case t: Throwable => throw t
     } finally {
@@ -269,7 +272,8 @@ object SparkSubmitClassLoaderTest extends Logging {
 
     // Load a Hive UDF from the jar.
     logInfo("Registering temporary Hive UDF provided in a jar.")
-    hiveContext.sql("""
+    hiveContext.sql(
+        """
         |CREATE TEMPORARY FUNCTION example_max
         |AS 'org.apache.hadoop.hive.contrib.udaf.example.UDAFExampleMax'
       """.stripMargin)
@@ -323,7 +327,7 @@ object SparkSQLConfTest extends Logging {
 
         // Always add these two metastore settings at the beginning.
         ("spark.sql.hive.metastore.version" -> "0.12") +:
-        ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
+          ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
       }
 
       // For this simple test, we do not really clone this object.

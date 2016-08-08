@@ -10,7 +10,12 @@ import java.util.concurrent.ThreadLocalRandom
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
-import akka.stream.stage.{Context, PushPullStage, SyncDirective, TerminationDirective}
+import akka.stream.stage.{
+  Context,
+  PushPullStage,
+  SyncDirective,
+  TerminationDirective
+}
 import akka.util.{ByteString, ByteStringBuilder}
 import play.api.mvc.MultipartFormData
 import play.api.mvc.MultipartFormData.Part
@@ -35,8 +40,12 @@ object Multipart {
   /**
     * Provides a Formatting Flow which could be used to format a MultipartFormData.Part source to a multipart/form data body
     */
-  def format(boundary: String, nioCharset: Charset, chunkSize: Int): Flow[
-      MultipartFormData.Part[Source[ByteString, _]], ByteString, NotUsed] = {
+  def format(
+      boundary: String,
+      nioCharset: Charset,
+      chunkSize: Int): Flow[MultipartFormData.Part[Source[ByteString, _]],
+                            ByteString,
+                            NotUsed] = {
     Flow[MultipartFormData.Part[Source[ByteString, _]]]
       .transform(() => streamed(boundary, nioCharset, chunkSize))
       .flatMapConcat(identity)
@@ -73,8 +82,8 @@ object Multipart {
     }
   }
 
-  private class CustomCharsetByteStringFormatter(
-      nioCharset: Charset, sizeHint: Int)
+  private class CustomCharsetByteStringFormatter(nioCharset: Charset,
+                                                 sizeHint: Int)
       extends Formatter {
     private[this] val charBuffer = CharBuffer.allocate(64)
     private[this] val builder = new ByteStringBuilder
@@ -123,9 +132,9 @@ object Multipart {
     }
   }
 
-  private def streamed(
-      boundary: String, nioCharset: Charset, chunkSize: Int): PushPullStage[
-      MultipartFormData.Part[Source[ByteString, _]], Source[ByteString, Any]] =
+  private def streamed(boundary: String, nioCharset: Charset, chunkSize: Int)
+    : PushPullStage[MultipartFormData.Part[Source[ByteString, _]],
+                    Source[ByteString, Any]] =
     new PushPullStage[MultipartFormData.Part[Source[ByteString, _]],
                       Source[ByteString, Any]] {
       var firstBoundaryRendered = false
@@ -149,15 +158,16 @@ object Multipart {
             case _ => throw new UnsupportedOperationException()
           }
 
-        renderBoundary(
-            f, boundary, suppressInitialCrLf = !firstBoundaryRendered)
+        renderBoundary(f,
+                       boundary,
+                       suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
 
         val (key, filename, contentType) = bodyPart match {
           case MultipartFormData.DataPart(innerKey, _) =>
             (innerKey, None, Option("text/plain"))
-          case MultipartFormData.FilePart(
-              innerKey, innerFilename, innerContentType, _) =>
+          case MultipartFormData
+                .FilePart(innerKey, innerFilename, innerContentType, _) =>
             (innerKey, Option(innerFilename), innerContentType)
           case _ => throw new UnsupportedOperationException()
         }

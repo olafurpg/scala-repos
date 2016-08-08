@@ -19,13 +19,27 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScTypeParametersOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScTypeParametersOwner,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateDefinitionStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{PhysicalSignature, ScSubstitutor, ScType, ScTypeParameterType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  PhysicalSignature,
+  ScSubstitutor,
+  ScType,
+  ScTypeParameterType
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
@@ -38,8 +52,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
                            nodeType: IElementType,
                            node: ASTNode)
-    extends ScTypeDefinitionImpl(stub, nodeType, node) with ScClass
-    with ScTypeParametersOwner with ScTemplateDefinition {
+    extends ScTypeDefinitionImpl(stub, nodeType, node)
+    with ScClass
+    with ScTypeParametersOwner
+    with ScTemplateDefinition {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => visitor.visitClass(this)
@@ -92,13 +108,16 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
       lastParent: PsiElement,
       place: PsiElement): Boolean = {
     if (DumbService.getInstance(getProject).isDumb) return true
-    if (!super [ScTemplateDefinition].processDeclarationsForTemplateBody(
-            processor, state, lastParent, place)) return false
+    if (!super[ScTemplateDefinition].processDeclarationsForTemplateBody(
+            processor,
+            state,
+            lastParent,
+            place)) return false
 
     constructor match {
       case Some(constr)
           if place != null &&
-          PsiTreeUtil.isContextAncestor(constr, place, false) =>
+            PsiTreeUtil.isContextAncestor(constr, place, false) =>
       //ignore, should be processed in ScParameters
       case _ =>
         for (p <- parameters) {
@@ -110,16 +129,16 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         }
     }
 
-    super [ScTypeParametersOwner].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTypeParametersOwner]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super [ScTemplateDefinition].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTemplateDefinition]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def isCase: Boolean = hasModifierProperty("case")
@@ -178,8 +197,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
           }
         }
         TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(o) { node =>
-          this.processPsiMethodsForNode(
-              node, isStatic = true, isInterface = false)(add)
+          this.processPsiMethodsForNode(node,
+                                        isStatic = true,
+                                        isInterface = false)(add)
         }
 
         for (synthetic <- o.syntheticMethodsNoOverride) {
@@ -199,8 +219,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     val buffer = new ArrayBuffer[PsiMethod]
     buffer ++= functions
       .filter(_.isConstructor)
-      .flatMap(_.getFunctionWrappers(
-              isStatic = false, isInterface = false, Some(this)))
+      .flatMap(_.getFunctionWrappers(isStatic = false,
+                                     isInterface = false,
+                                     Some(this)))
     constructor match {
       case Some(x) => buffer ++= x.getFunctionWrappers
       case _ =>
@@ -222,8 +243,8 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
             !hasCopy && !x.parameterList.clauses.exists(_.hasRepeatedParam)
           if (addCopy) {
             try {
-              val method = ScalaPsiElementFactory.createMethodWithContext(
-                  copyMethodText, this, this)
+              val method = ScalaPsiElementFactory
+                .createMethodWithContext(copyMethodText, this, this)
               method.setSynthetic(this)
               buf += method
             } catch {
@@ -241,21 +262,22 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     val x = constructor.getOrElse(return "")
     val paramString =
       (if (x.parameterList.clauses.length == 1 &&
-           x.parameterList.clauses.head.isImplicit) "()" else "") +
-      x.parameterList.clauses.map { c =>
-        val start = if (c.isImplicit) "(implicit " else "("
-        c.parameters.map { p =>
-          val paramType = p.typeElement match {
-            case Some(te) => te.getText
-            case None => "Any"
-          }
-          p.name + " : " + paramType + " = this." + p.name
-        }.mkString(start, ", ", ")")
-      }.mkString("")
+           x.parameterList.clauses.head.isImplicit) "()"
+       else "") +
+        x.parameterList.clauses.map { c =>
+          val start = if (c.isImplicit) "(implicit " else "("
+          c.parameters.map { p =>
+            val paramType = p.typeElement match {
+              case Some(te) => te.getText
+              case None => "Any"
+            }
+            p.name + " : " + paramType + " = this." + p.name
+          }.mkString(start, ", ", ")")
+        }.mkString("")
 
     val returnType = name + typeParameters.map(_.name).mkString("[", ",", "]")
     "def copy" + typeParamString + paramString + " : " + returnType +
-    " = throw new Error(\"\")"
+      " = throw new Error(\"\")"
   }
 
   private def implicitMethodText: String = {
@@ -265,21 +287,19 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         .map(clause => typeParameters.map(_.name).mkString("[", ",", "]"))
         .getOrElse("")
     val typeParametersText = typeParametersClause
-      .map(tp =>
-            {
-          tp.typeParameters
-            .map(tp =>
-                  {
-                val baseText = tp.typeParameterText
-                if (tp.isContravariant) {
-                  val i = baseText.indexOf('-')
-                  baseText.substring(i + 1)
-                } else if (tp.isCovariant) {
-                  val i = baseText.indexOf('+')
-                  baseText.substring(i + 1)
-                } else baseText
-            })
-            .mkString("[", ", ", "]")
+      .map(tp => {
+        tp.typeParameters
+          .map(tp => {
+            val baseText = tp.typeParameterText
+            if (tp.isContravariant) {
+              val i = baseText.indexOf('-')
+              baseText.substring(i + 1)
+            } else if (tp.isCovariant) {
+              val i = baseText.indexOf('+')
+              baseText.substring(i + 1)
+            } else baseText
+          })
+          .mkString("[", ", ", "]")
       })
       .getOrElse("")
     val parametersText = constr.parameterList.clauses.map {
@@ -295,8 +315,8 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         }.mkString(if (clause.isImplicit) "(implicit " else "(", ", ", ")")
     }.mkString
     getModifierList.accessModifier.map(am => am.getText + " ").getOrElse("") +
-    "implicit def " + name + typeParametersText + parametersText + " : " +
-    returnType + " = throw new Error(\"\")"
+      "implicit def " + name + typeParametersText + parametersText + " : " +
+      returnType + " = throw new Error(\"\")"
   }
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
@@ -306,7 +326,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         case Some(x: ScPrimaryConstructor) =>
           try {
             val method = ScalaPsiElementFactory.createMethodWithContext(
-                implicitMethodText, this.getContext, this)
+                implicitMethodText,
+                this.getContext,
+                this)
             method.setSynthetic(this)
             Some(method)
           } catch {
@@ -329,8 +351,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
               val psiTypeText: String =
                 ScType.toPsi(tp, getProject, getResolveScope).getCanonicalText
               val text = s"public final $psiTypeText ${param.name};"
-              val elem = new LightField(
-                  getManager, factory.createFieldFromText(text, this), this)
+              val elem =
+                new LightField(getManager,
+                               factory.createFieldFromText(text, this),
+                               this)
               elem.setNavigationElement(param)
               Option(elem)
             case _ => None

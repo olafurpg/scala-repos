@@ -9,9 +9,10 @@ object AnyPickler extends Pickler[Any] {
     val classLoader = this.getClass.getClassLoader
     internal.GRL.lock()
     val tag =
-      try FastTypeTag.mkRaw(clazz,
-                            scala.reflect.runtime.universe.runtimeMirror(
-                                classLoader)) finally internal.GRL.unlock()
+      try FastTypeTag.mkRaw(
+          clazz,
+          scala.reflect.runtime.universe.runtimeMirror(classLoader))
+      finally internal.GRL.unlock()
     val p =
       internal.currentRuntime.picklers.genPickler(classLoader, clazz, tag)
     p.asInstanceOf[Pickler[Any]].pickle(picklee, builder)

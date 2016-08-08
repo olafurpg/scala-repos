@@ -34,7 +34,10 @@ import org.apache.spark.util.random.XORShiftRandom
   * Params for [[QuantileDiscretizer]].
   */
 private[feature] trait QuantileDiscretizerBase
-    extends Params with HasInputCol with HasOutputCol with HasSeed {
+    extends Params
+    with HasInputCol
+    with HasOutputCol
+    with HasSeed {
 
   /**
     * Maximum number of buckets (quantiles, or categories) into which data points are grouped. Must
@@ -46,7 +49,7 @@ private[feature] trait QuantileDiscretizerBase
       this,
       "numBuckets",
       "Maximum number of buckets (quantiles, or " +
-      "categories) into which data points are grouped. Must be >= 2.",
+        "categories) into which data points are grouped. Must be >= 2.",
       ParamValidators.gtEq(2))
   setDefault(numBuckets -> 2)
 
@@ -64,7 +67,8 @@ private[feature] trait QuantileDiscretizerBase
   */
 @Experimental
 final class QuantileDiscretizer(override val uid: String)
-    extends Estimator[Bucketizer] with QuantileDiscretizerBase
+    extends Estimator[Bucketizer]
+    with QuantileDiscretizerBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("quantileDiscretizer"))
@@ -107,7 +111,8 @@ final class QuantileDiscretizer(override val uid: String)
 
 @Since("1.6.0")
 object QuantileDiscretizer
-    extends DefaultParamsReadable[QuantileDiscretizer] with Logging {
+    extends DefaultParamsReadable[QuantileDiscretizer]
+    with Logging {
 
   /**
     * Minimum number of samples required for finding splits, regardless of number of bins.  If
@@ -118,8 +123,9 @@ object QuantileDiscretizer
   /**
     * Sampling from the given dataset to collect quantile statistics.
     */
-  private[feature] def getSampledInput(
-      dataset: DataFrame, numBins: Int, seed: Long): Array[Row] = {
+  private[feature] def getSampledInput(dataset: DataFrame,
+                                       numBins: Int,
+                                       seed: Long): Array[Row] = {
     val totalSamples = dataset.count()
     require(
         totalSamples > 0,
@@ -136,8 +142,8 @@ object QuantileDiscretizer
   /**
     * Compute split points with respect to the sample distribution.
     */
-  private[feature] def findSplitCandidates(
-      samples: Array[Double], numSplits: Int): Array[Double] = {
+  private[feature] def findSplitCandidates(samples: Array[Double],
+                                           numSplits: Int): Array[Double] = {
     val valueCountMap = samples.foldLeft(Map.empty[Double, Int]) { (m, x) =>
       m + ((x, m.getOrElse(x, 0) + 1))
     }

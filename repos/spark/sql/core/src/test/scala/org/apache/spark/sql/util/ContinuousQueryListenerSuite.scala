@@ -31,10 +31,16 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark.sql._
 import org.apache.spark.sql.execution.streaming._
 import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.util.ContinuousQueryListener.{QueryProgress, QueryStarted, QueryTerminated}
+import org.apache.spark.sql.util.ContinuousQueryListener.{
+  QueryProgress,
+  QueryStarted,
+  QueryTerminated
+}
 
 class ContinuousQueryListenerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
 
   import testImplicits._
 
@@ -80,7 +86,7 @@ class ContinuousQueryListenerSuite
               assert(status.active == true)
               assert(status.sourceStatuses(0).offset === Some(LongOffset(0)))
               assert(status.sinkStatus.offset === Some(
-                      CompositeOffset.fill(LongOffset(0))))
+                  CompositeOffset.fill(LongOffset(0))))
 
               // No termination events
               assert(listener.terminationStatus === null)
@@ -95,7 +101,7 @@ class ContinuousQueryListenerSuite
               assert(status.active === false) // must be inactive by the time onQueryTerm is called
               assert(status.sourceStatuses(0).offset === Some(LongOffset(0)))
               assert(status.sinkStatus.offset === Some(
-                      CompositeOffset.fill(LongOffset(0))))
+                  CompositeOffset.fill(LongOffset(0))))
             }
             listener.checkAsyncErrors()
           }
@@ -183,7 +189,8 @@ class ContinuousQueryListenerSuite
       progressStatuses.clear()
 
       // To reset the waiter
-      try asyncTestWaiter.await(timeout(1 milliseconds)) catch {
+      try asyncTestWaiter.await(timeout(1 milliseconds))
+      catch {
         case NonFatal(e) =>
       }
     }

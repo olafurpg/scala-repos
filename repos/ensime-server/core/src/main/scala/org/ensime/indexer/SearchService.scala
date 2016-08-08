@@ -29,8 +29,9 @@ class SearchService(
 )(
     implicit actorSystem: ActorSystem,
     vfs: EnsimeVFS
-)
-    extends ClassfileIndexer with FileChangeListener with SLF4JLogging {
+) extends ClassfileIndexer
+    with FileChangeListener
+    with SLF4JLogging {
 
   private val QUERY_TIMEOUT = 30 seconds
 
@@ -115,8 +116,8 @@ class SearchService(
     }
 
     // index all the given bases and return number of rows written
-    def indexBases(
-        bases: Set[FileObject], checks: Seq[FileCheck]): Future[Int] = {
+    def indexBases(bases: Set[FileObject],
+                   checks: Seq[FileCheck]): Future[Int] = {
       log.info("Indexing bases...")
       val checksLookup: Map[String, FileCheck] =
         checks.map(check => (check.filename -> check)).toMap
@@ -171,7 +172,8 @@ class SearchService(
         val check = FileCheck(classfile)
         Future {
           blocking {
-            try extractSymbols(classfile, classfile) finally classfile.close()
+            try extractSymbols(classfile, classfile)
+            finally classfile.close()
           }
         }
       case jar =>
@@ -180,8 +182,8 @@ class SearchService(
         Future {
           blocking {
             val vJar = vfs.vjar(jar)
-            try scan(vJar) flatMap (extractSymbols(jar, _)) finally vfs.nuke(
-                vJar)
+            try scan(vJar) flatMap (extractSymbols(jar, _))
+            finally vfs.nuke(vJar)
           }
         }
     }
@@ -189,8 +191,8 @@ class SearchService(
   private val blacklist = Set("sun/", "sunw/", "com/sun/")
   private val ignore = Set("$$", "$worker$")
   import org.ensime.util.RichFileObject._
-  private def extractSymbols(
-      container: FileObject, f: FileObject): List[FqnSymbol] = {
+  private def extractSymbols(container: FileObject,
+                             f: FileObject): List[FqnSymbol] = {
     f.pathWithinArchive match {
       case Some(relative) if blacklist.exists(relative.startsWith) => Nil
       case _ =>
@@ -276,8 +278,8 @@ class SearchService(
    * the list of symbols is non-empty.
    */
 
-  val backlogActor = actorSystem.actorOf(
-      Props(new IndexingQueueActor(this)), "ClassfileIndexer")
+  val backlogActor = actorSystem
+    .actorOf(Props(new IndexingQueueActor(this)), "ClassfileIndexer")
 
   // deletion in both Lucene and H2 is really slow, batching helps
   def deleteInBatches(
@@ -309,7 +311,8 @@ class SearchService(
 case class IndexFile(f: FileObject)
 
 class IndexingQueueActor(searchService: SearchService)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.system
 
   import scala.concurrent.duration._

@@ -192,7 +192,8 @@ trait Future[+T] extends Awaitable[T] {
     transform({
       case Failure(t) => Success(t)
       case Success(v) =>
-        Failure(new NoSuchElementException(
+        Failure(
+            new NoSuchElementException(
                 "Future.failed not completed with a throwable."))
     })(internalExecutor)
 
@@ -261,8 +262,8 @@ trait Future[+T] extends Awaitable[T] {
     *  val g = f map { x: String => x + " is now!" }
     *  }}}
     *
-    *  Note that a for comprehension involving a `Future` 
-    *  may expand to include a call to `map` and or `flatMap` 
+    *  Note that a for comprehension involving a `Future`
+    *  may expand to include a call to `map` and or `flatMap`
     *  and `withFilter`.  See [[scala.concurrent.Future#flatMap]] for an example of such a comprehension.
     *
     *
@@ -520,7 +521,8 @@ trait Future[+T] extends Awaitable[T] {
   def andThen[U](pf: PartialFunction[Try[T], U])(
       implicit executor: ExecutionContext): Future[T] =
     transform { result =>
-      try pf.applyOrElse[Try[T], Any](result, Predef.conforms[Try[T]]) catch {
+      try pf.applyOrElse[Try[T], Any](result, Predef.conforms[Try[T]])
+      catch {
         case NonFatal(t) => executor reportFailure t
       }
 
@@ -770,14 +772,15 @@ object Future {
     * @param op       the fold operation to be applied to the zero and futures
     * @return         the `Future` holding the result of the fold
     */
-  def foldLeft[T, R](
-      futures: scala.collection.immutable.Iterable[Future[T]])(zero: R)(
-      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] =
+  def foldLeft[T, R](futures: scala.collection.immutable.Iterable[Future[T]])(
+      zero: R)(op: (R, T) => R)(
+      implicit executor: ExecutionContext): Future[R] =
     foldNext(futures.iterator, zero, op)
 
   private[this] def foldNext[T, R](
-      i: Iterator[Future[T]], prevValue: R, op: (R, T) => R)(
-      implicit executor: ExecutionContext): Future[R] =
+      i: Iterator[Future[T]],
+      prevValue: R,
+      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] =
     if (!i.hasNext) successful(prevValue)
     else
       i.next().flatMap { value =>
@@ -802,8 +805,8 @@ object Future {
     * @return         the `Future` holding the result of the fold
     */
   @deprecated("Use Future.foldLeft instead", "2.12")
-  def fold[T, R](futures: TraversableOnce[Future[T]])(
-      zero: R)(@deprecatedName('foldFun) op: (R, T) => R)(
+  def fold[T, R](futures: TraversableOnce[Future[T]])(zero: R)(
+      @deprecatedName('foldFun) op: (R, T) => R)(
       implicit executor: ExecutionContext): Future[R] = {
     if (futures.isEmpty) successful(zero)
     else sequence(futures).map(_.foldLeft(zero)(op))
@@ -902,12 +905,14 @@ object Future {
   // doesn't need to create defaultExecutionContext as
   // a side effect.
   private[concurrent] object InternalCallbackExecutor
-      extends ExecutionContext with BatchingExecutor {
+      extends ExecutionContext
+      with BatchingExecutor {
     override protected def unbatchedExecute(r: Runnable): Unit =
       r.run()
     override def reportFailure(t: Throwable): Unit =
       throw new IllegalStateException(
-          "problem in scala.concurrent internal callback", t)
+          "problem in scala.concurrent internal callback",
+          t)
   }
 }
 

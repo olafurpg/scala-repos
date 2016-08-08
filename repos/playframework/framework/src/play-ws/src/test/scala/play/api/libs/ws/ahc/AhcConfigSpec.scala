@@ -30,11 +30,14 @@ object AhcConfigSpec extends Specification with Mockito {
   "AhcConfigSpec" should {
 
     def parseThis(input: String)(implicit app: play.api.Application) = {
-      val config = play.api.Configuration(ConfigFactory
+      val config = play.api.Configuration(
+          ConfigFactory
             .parseString(input)
             .withFallback(ConfigFactory.defaultReference()))
-      val parser = new AhcWSClientConfigParser(
-          defaultWsConfig, config, app.injector.instanceOf[Environment])
+      val parser =
+        new AhcWSClientConfigParser(defaultWsConfig,
+                                    config,
+                                    app.injector.instanceOf[Environment])
       parser.parse()
     }
 

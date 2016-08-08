@@ -32,7 +32,9 @@ import org.apache.spark.scheduler._
 import org.apache.spark.serializer.JavaSerializer
 
 class AccumulatorSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
   import AccumulatorParam._
 
   override def afterEach(): Unit = {
@@ -221,10 +223,14 @@ class AccumulatorSuite
   }
 
   test("only external accums are automatically registered") {
-    val accEx = new Accumulator(
-        0, IntAccumulatorParam, Some("external"), internal = false)
-    val accIn = new Accumulator(
-        0, IntAccumulatorParam, Some("internal"), internal = true)
+    val accEx = new Accumulator(0,
+                                IntAccumulatorParam,
+                                Some("external"),
+                                internal = false)
+    val accIn = new Accumulator(0,
+                                IntAccumulatorParam,
+                                Some("internal"),
+                                internal = true)
     assert(!accEx.isInternal)
     assert(accIn.isInternal)
     assert(Accumulators.get(accEx.id).isDefined)
@@ -232,8 +238,11 @@ class AccumulatorSuite
   }
 
   test("copy") {
-    val acc1 = new Accumulable[Long, Long](
-        456L, LongAccumulatorParam, Some("x"), true, false)
+    val acc1 = new Accumulable[Long, Long](456L,
+                                           LongAccumulatorParam,
+                                           Some("x"),
+                                           true,
+                                           false)
     val acc2 = acc1.copy()
     assert(acc1.id === acc2.id)
     assert(acc1.value === acc2.value)
@@ -282,8 +291,9 @@ class AccumulatorSuite
   }
 
   test("list accumulator param") {
-    val acc = new Accumulator(
-        Seq.empty[Int], new ListAccumulatorParam[Int], Some("numbers"))
+    val acc = new Accumulator(Seq.empty[Int],
+                              new ListAccumulatorParam[Int],
+                              Some("numbers"))
     assert(acc.value === Seq.empty[Int])
     acc.add(Seq(1, 2))
     assert(acc.value === Seq(1, 2))
@@ -300,8 +310,10 @@ class AccumulatorSuite
   test("value is reset on the executors") {
     val acc1 =
       new Accumulator(0, IntAccumulatorParam, Some("thing"), internal = false)
-    val acc2 = new Accumulator(
-        0L, LongAccumulatorParam, Some("thing2"), internal = false)
+    val acc2 = new Accumulator(0L,
+                               LongAccumulatorParam,
+                               Some("thing2"),
+                               internal = false)
     val externalAccums = Seq(acc1, acc2)
     val internalAccums = InternalAccumulator.createAll()
     // Set some values; these should not be observed later on the "executors"
@@ -315,13 +327,16 @@ class AccumulatorSuite
     // Simulate the task being serialized and sent to the executors.
     val dummyTask = new DummyTask(internalAccums, externalAccums)
     val serInstance = new JavaSerializer(new SparkConf).newInstance()
-    val taskSer = Task.serializeWithDependencies(
-        dummyTask, mutable.HashMap(), mutable.HashMap(), serInstance)
+    val taskSer = Task.serializeWithDependencies(dummyTask,
+                                                 mutable.HashMap(),
+                                                 mutable.HashMap(),
+                                                 serInstance)
     // Now we're on the executors.
     // Deserialize the task and assert that its accumulators are zero'ed out.
     val (_, _, taskBytes) = Task.deserializeWithDependencies(taskSer)
     val taskDeser = serInstance.deserialize[DummyTask](
-        taskBytes, Thread.currentThread.getContextClassLoader)
+        taskBytes,
+        Thread.currentThread.getContextClassLoader)
     // Assert that executors see only zeros
     taskDeser.externalAccums.foreach { a =>
       assert(a.localValue == a.zero)
@@ -354,7 +369,8 @@ private[spark] object AccumulatorSuite {
     }
     if (!isSet) {
       throw new TestFailedException(
-          s"peak execution memory accumulator not set in '$testName'", 0)
+          s"peak execution memory accumulator not set in '$testName'",
+          0)
     }
   }
 }
@@ -380,10 +396,10 @@ private class SaveInfoListener extends SparkListener {
     completedStageInfos.toArray.toSeq
   def getCompletedTaskInfos: Seq[TaskInfo] =
     completedTaskInfos.values.flatten.toSeq
-  def getCompletedTaskInfos(
-      stageId: StageId, stageAttemptId: StageAttemptId): Seq[TaskInfo] =
-    completedTaskInfos.getOrElse(
-        (stageId, stageAttemptId), Seq.empty[TaskInfo])
+  def getCompletedTaskInfos(stageId: StageId,
+                            stageAttemptId: StageAttemptId): Seq[TaskInfo] =
+    completedTaskInfos
+      .getOrElse((stageId, stageAttemptId), Seq.empty[TaskInfo])
 
   /**
     * If `jobCompletionCallback` is set, block until the next call has finished.

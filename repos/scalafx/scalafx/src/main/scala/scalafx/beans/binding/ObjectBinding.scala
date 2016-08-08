@@ -38,6 +38,7 @@ object ObjectBinding {
 }
 
 class ObjectBinding[T](override val delegate: jfxbb.ObjectBinding[T])
-    extends ObjectExpression[T](delegate) with ObservableValue[T, T] {
+    extends ObjectExpression[T](delegate)
+    with ObservableValue[T, T] {
   def value = delegate.get
 }

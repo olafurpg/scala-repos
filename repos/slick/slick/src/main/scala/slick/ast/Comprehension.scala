@@ -5,27 +5,27 @@ import Util._
 import slick.util.ConstArray
 
 /** A SQL comprehension */
-final case class Comprehension(
-    sym: TermSymbol,
-    from: Node,
-    select: Node,
-    where: Option[Node] = None,
-    groupBy: Option[Node] = None,
-    orderBy: ConstArray[(Node, Ordering)] = ConstArray.empty,
-    having: Option[Node] = None,
-    distinct: Option[Node] = None,
-    fetch: Option[Node] = None,
-    offset: Option[Node] = None)
+final case class Comprehension(sym: TermSymbol,
+                               from: Node,
+                               select: Node,
+                               where: Option[Node] = None,
+                               groupBy: Option[Node] = None,
+                               orderBy: ConstArray[(Node, Ordering)] =
+                                 ConstArray.empty,
+                               having: Option[Node] = None,
+                               distinct: Option[Node] = None,
+                               fetch: Option[Node] = None,
+                               offset: Option[Node] = None)
     extends DefNode {
   type Self = Comprehension
   lazy val children =
     (ConstArray.newBuilder() + from + select ++ where ++ groupBy ++ orderBy
-          .map(_._1) ++ having ++ distinct ++ fetch ++ offset).result
+      .map(_._1) ++ having ++ distinct ++ fetch ++ offset).result
   override def childNames =
-    Seq("from " + sym, "select") ++ where.map(_ => "where") ++ groupBy.map(
-        _ => "groupBy") ++ orderBy.map("orderBy " + _._2).toSeq ++ having.map(
-        _ => "having") ++ distinct.map(_ => "distinct") ++ fetch.map(
-        _ => "fetch") ++ offset.map(_ => "offset")
+    Seq("from " + sym, "select") ++ where.map(_ => "where") ++ groupBy.map(_ =>
+      "groupBy") ++ orderBy.map("orderBy " + _._2).toSeq ++ having.map(
+        _ => "having") ++ distinct.map(_ => "distinct") ++ fetch.map(_ =>
+      "fetch") ++ offset.map(_ => "offset")
   protected[this] def rebuild(ch: ConstArray[Node]) = {
     val newFrom = ch(0)
     val newSelect = ch(1)
@@ -77,7 +77,7 @@ final case class Comprehension(
     // Check if the nodes changed
     val same =
       (f2 eq from) && (s2 eq select) && w2.isEmpty && g2.isEmpty && (o2 eq o) &&
-      h2.isEmpty && distinct2.isEmpty && fetch2.isEmpty && offset2.isEmpty
+        h2.isEmpty && distinct2.isEmpty && fetch2.isEmpty && offset2.isEmpty
     val newType =
       if (!hasType)
         CollectionType(f2.nodeType.asCollectionType.cons,
@@ -90,7 +90,8 @@ final case class Comprehension(
           select = s2,
           where = w2.orElse(where),
           groupBy = g2.orElse(groupBy),
-          orderBy = if (o2 eq o) orderBy
+          orderBy =
+            if (o2 eq o) orderBy
             else orderBy.zip(o2).map { case ((_, o), n) => (n, o) },
           having = h2.orElse(having),
           distinct = distinct2.orElse(distinct),

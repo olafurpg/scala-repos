@@ -26,8 +26,7 @@ import Helpers._
 import JE._
 import JsCmds._
 
-trait JxYieldFunc {
-  this: JxBase =>
+trait JxYieldFunc { this: JxBase =>
   def yieldFunction: JsExp
 }
 
@@ -61,10 +60,10 @@ trait JxBase { self: Node =>
 
             JsRaw(varName + ".className = " + x.text.encJs).cmd & JsRaw(
                 varName + ".setAttribute(" + m.key.encJs + "," + x.text.encJs +
-                ");").cmd
+                  ");").cmd
           } else {
             JsRaw(varName + ".setAttribute(" + m.key.encJs + "," +
-                x.text.encJs + ");").cmd
+              x.text.encJs + ");").cmd
           }
       }.foldLeft(Noop)(_ & _)
     }.foldLeft(Noop)(_ & _)
@@ -84,22 +83,23 @@ trait JxBase { self: Node =>
       case Group(nodes) => addToDocFrag(parent, nodes.toList)
       case Text(txt) =>
         JsRaw(parent + ".appendChild(document.createTextNode(" +
-            fixText(txt).encJs + "));").cmd
+          fixText(txt).encJs + "));").cmd
       case a: Atom[_] =>
         JsRaw(parent + ".appendChild(document.createTextNode(" + a.text.encJs +
-            "));").cmd
+          "));").cmd
       case e: scala.xml.Elem =>
         val varName = "v" + Helpers.nextFuncName
         JsCrVar(
             varName,
             JsRaw("document.createElement(" + e.label.encJs + ")")) & addAttrs(
-            varName, e.attributes.toList) & JsRaw(parent + ".appendChild(" +
-            varName + ")") & addToDocFrag(varName, e.child.toList)
+            varName,
+            e.attributes.toList) & JsRaw(parent + ".appendChild(" +
+          varName + ")") & addToDocFrag(varName, e.child.toList)
       case ns: NodeSeq =>
         if (ns.length == 0) Noop
         else if (ns.length == 1) {
           logger.error("In addToDocFrag, got a " + ns + " of type " +
-              ns.getClass.getName)
+            ns.getClass.getName)
           Noop
         } else addToDocFrag(parent, ns.toList)
     }.foldLeft(Noop)(_ & _)
@@ -132,8 +132,8 @@ case class JxMap(in: JsExp, what: JxYieldFunc) extends Node with JxBase {
     val cr = "c" + Helpers.nextFuncName
     JsCrVar(ran, in) & JsCrVar(fr, what.yieldFunction) & JsRaw(
         "for (" + cr + " = 0; " + cr + " < " + ran + ".length; " + cr +
-        "++) {" + parentName + ".appendChild(" + fr + "(" + ran + "[" + cr +
-        "]));" + "}")
+          "++) {" + parentName + ".appendChild(" + fr + "(" + ran + "[" + cr +
+          "]));" + "}")
   }
 }
 
@@ -148,10 +148,9 @@ case class JxMatch(exp: JsExp, cases: JxCase*) extends Node with JxBase {
 
   def appendToParent(parentName: String): JsCmd = {
     val vn = "v" + Helpers.nextFuncName
-    JsCrVar(vn, exp) & JsRaw(
-        "if (false) {\n} " + cases.map { c =>
+    JsCrVar(vn, exp) & JsRaw("if (false) {\n} " + cases.map { c =>
       " else if (" + vn + " == " + c.toMatch.toJsCmd + ") {" +
-      addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
+        addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
     }.mkString("") + " else {throw new Exception('Unmatched: '+" + vn + ");}")
   }
 }
@@ -164,19 +163,20 @@ case class JxIf(toTest: JsExp, ifTrue: NodeSeq) extends Node with JxBase {
   def appendToParent(parentName: String): JsCmd = {
     JsRaw(
         "if (" + toTest.toJsCmd + ") {\n" +
-        addToDocFrag(parentName, ifTrue.toList).toJsCmd + "}\n")
+          addToDocFrag(parentName, ifTrue.toList).toJsCmd + "}\n")
   }
 }
 
 case class JxIfElse(toTest: JsExp, ifTrue: NodeSeq, ifFalse: NodeSeq)
-    extends Node with JxBase {
+    extends Node
+    with JxBase {
   def child = Nil
 
   def appendToParent(parentName: String): JsCmd = {
     JsRaw(
         "if (" + toTest.toJsCmd + ") {\n" +
-        addToDocFrag(parentName, ifTrue.toList).toJsCmd + "} else {\n" +
-        addToDocFrag(parentName, ifFalse.toList).toJsCmd + "}\n")
+          addToDocFrag(parentName, ifTrue.toList).toJsCmd + "} else {\n" +
+          addToDocFrag(parentName, ifFalse.toList).toJsCmd + "}\n")
   }
 }
 
@@ -190,5 +190,6 @@ case class Jx(child: NodeSeq) extends Node with JxBase with JxYieldFunc {
     AnonFunc(
         "it",
         JsCrVar("df", JsRaw("document.createDocumentFragment()")) & addToDocFrag(
-            "df", child.toList) & JsRaw("return df"))
+            "df",
+            child.toList) & JsRaw("return df"))
 }

@@ -19,7 +19,8 @@ class HttpEventModuleTest extends MarathonSpec {
         "http://127.0.0.1:8000,http://127.0.0.1:8001"
     )
 
-    assert(conf.httpEventEndpoints.get == Some(
+    assert(
+        conf.httpEventEndpoints.get == Some(
             List("http://127.0.0.1:8000", "http://127.0.0.1:8001")))
   }
 
@@ -29,7 +30,8 @@ class HttpEventModuleTest extends MarathonSpec {
         "http://127.0.0.1:8000 , http://127.0.0.1:8001   "
     )
 
-    assert(conf.httpEventEndpoints.get == Some(
+    assert(
+        conf.httpEventEndpoints.get == Some(
             List("http://127.0.0.1:8000", "http://127.0.0.1:8001")))
   }
 

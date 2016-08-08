@@ -30,7 +30,7 @@ class BinaryVectorizer(propertyMap: HashMap[(String, String), Int])
 
   override def toString: String = {
     s"BinaryVectorizer($numFeatures): " +
-    properties.map(e => s"(${e._1}, ${e._2})").mkString(",")
+      properties.map(e => s"(${e._1}, ${e._2})").mkString(",")
   }
 
   def toBinary(map: Array[(String, String)]): Vector = {

@@ -16,7 +16,8 @@ object Utils {
       """akka.actor.default-mailbox.mailbox-type = "akka.dispatch.UnboundedMailbox"""")
 
   case class TE(message: String)
-      extends RuntimeException(message) with NoStackTrace
+      extends RuntimeException(message)
+      with NoStackTrace
 
   def assertAllStagesStopped[T](block: ⇒ T)(
       implicit materializer: Materializer): T =

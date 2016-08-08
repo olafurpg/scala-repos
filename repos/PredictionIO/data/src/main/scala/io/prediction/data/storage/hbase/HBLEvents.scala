@@ -30,9 +30,11 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class HBLEvents(
-    val client: HBClient, config: StorageClientConfig, val namespace: String)
-    extends LEvents with Logging {
+class HBLEvents(val client: HBClient,
+                config: StorageClientConfig,
+                val namespace: String)
+    extends LEvents
+    with Logging {
 
   // implicit val formats = DefaultFormats + new EventJson4sSupport.DBSerializer
 
@@ -56,8 +58,9 @@ class HBLEvents(
     val tableName =
       TableName.valueOf(HBEventsUtil.tableName(namespace, appId, channelId))
     if (!client.admin.tableExists(tableName)) {
-      info(s"The table ${tableName.getNameAsString()} doesn't exist yet." +
-          " Creating now...")
+      info(
+          s"The table ${tableName.getNameAsString()} doesn't exist yet." +
+            " Creating now...")
       val tableDesc = new HTableDescriptor(tableName)
       tableDesc.addFamily(new HColumnDescriptor("e"))
       tableDesc.addFamily(new HColumnDescriptor("r")) // reserved
@@ -77,14 +80,14 @@ class HBLEvents(
       } else {
         info(
             s"Table ${tableName.getNameAsString()} doesn't exist." +
-            s" Nothing is deleted.")
+              s" Nothing is deleted.")
       }
       true
     } catch {
       case e: Exception => {
-          error(s"Fail to remove table for appId ${appId}. Exception: ${e}")
-          false
-        }
+        error(s"Fail to remove table for appId ${appId}. Exception: ${e}")
+        false
+      }
     }
   }
 
@@ -124,8 +127,9 @@ class HBLEvents(
     }
   }
 
-  override def futureDelete(
-      eventId: String, appId: Int, channelId: Option[Int])(
+  override def futureDelete(eventId: String,
+                            appId: Int,
+                            channelId: Option[Int])(
       implicit ec: ExecutionContext): Future[Boolean] = {
     Future {
       val table = getTable(appId, channelId)
@@ -153,7 +157,7 @@ class HBLEvents(
 
       require(
           !((reversed == Some(true)) &&
-              (entityType.isEmpty || entityId.isEmpty)),
+            (entityType.isEmpty || entityId.isEmpty)),
           "the parameter reversed can only be used with both entityType and entityId specified.")
 
       val table = getTable(appId, channelId)

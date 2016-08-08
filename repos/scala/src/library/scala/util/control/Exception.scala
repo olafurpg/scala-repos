@@ -33,8 +33,8 @@ import scala.language.implicitConversions
 object Exception {
   type Catcher[+T] = PartialFunction[Throwable, T]
 
-  def mkCatcher[Ex <: Throwable : ClassTag, T](
-      isDef: Ex => Boolean, f: Ex => T) = new Catcher[T] {
+  def mkCatcher[Ex <: Throwable: ClassTag, T](isDef: Ex => Boolean,
+                                              f: Ex => T) = new Catcher[T] {
     private def downcast(x: Throwable): Option[Ex] =
       if (classTag[Ex].runtimeClass.isAssignableFrom(x.getClass))
         Some(x.asInstanceOf[Ex])
@@ -47,7 +47,7 @@ object Exception {
   def mkThrowableCatcher[T](isDef: Throwable => Boolean, f: Throwable => T) =
     mkCatcher(isDef, f)
 
-  implicit def throwableSubtypeToCatcher[Ex <: Throwable : ClassTag, T](
+  implicit def throwableSubtypeToCatcher[Ex <: Throwable: ClassTag, T](
       pf: PartialFunction[Ex, T]) =
     mkCatcher(pf.isDefinedAt _, pf.apply _)
 
@@ -73,7 +73,7 @@ object Exception {
   }
 
   /** A container class for finally code. */
-  class Finally private[Exception](body: => Unit) extends Described {
+  class Finally private[Exception] (body: => Unit) extends Described {
     protected val name = "Finally"
 
     def and(other: => Unit): Finally = new Finally({ body; other })
@@ -100,7 +100,8 @@ object Exception {
 
     /** Apply this catch logic to the supplied body. */
     def apply[U >: T](body: => U): U =
-      try body catch {
+      try body
+      catch {
         case x if rethrow(x) => throw x
         case x if pf isDefinedAt x => pf(x)
       } finally fin foreach (_.invoke())
@@ -144,8 +145,8 @@ object Exception {
     def toTry: Catch[scala.util.Try[T]] = withApply(x => Failure(x))
   }
 
-  final val nothingCatcher: Catcher[Nothing] = mkThrowableCatcher(
-      _ => false, throw _)
+  final val nothingCatcher: Catcher[Nothing] =
+    mkThrowableCatcher(_ => false, throw _)
   final def nonFatalCatcher[T]: Catcher[T] =
     mkThrowableCatcher({ case NonFatal(_) => true; case _ => false }, throw _)
   final def allCatcher[T]: Catcher[T] = mkThrowableCatcher(_ => true, throw _)
@@ -173,7 +174,7 @@ object Exception {
     */
   def catching[T](exceptions: Class[_]*): Catch[T] =
     new Catch(pfFromExceptions(exceptions: _*)) withDesc
-    (exceptions map (_.getName) mkString ", ")
+      (exceptions map (_.getName) mkString ", ")
 
   def catching[T](c: Catcher[T]): Catch[T] = new Catch(c)
 
@@ -226,8 +227,8 @@ object Exception {
   }
 
   /** Private **/
-  private def wouldMatch(
-      x: Throwable, classes: scala.collection.Seq[Class[_]]): Boolean =
+  private def wouldMatch(x: Throwable,
+                         classes: scala.collection.Seq[Class[_]]): Boolean =
     classes exists (_ isAssignableFrom x.getClass)
 
   private def pfFromExceptions(

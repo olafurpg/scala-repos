@@ -37,10 +37,8 @@ class DefaultOSGiLogger extends DefaultLogger {
       * @param logService OSGi LogService that has been registered,
       */
     def setLogService(logService: LogService) {
-      messagesToLog.foreach(
-          x ⇒
-            {
-          logMessage(logService, x)
+      messagesToLog.foreach(x ⇒ {
+        logMessage(logService, x)
       })
       context.become(initialisedReceive(logService))
     }

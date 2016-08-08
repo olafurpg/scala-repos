@@ -52,8 +52,8 @@ class BTypesFromClassfileTest {
   def sameBTypes(fromSyms: Iterable[ClassBType],
                  fromClassfiles: Iterable[ClassBType],
                  checked: Set[InternalName]): Set[InternalName] = {
-    assert(
-        fromSyms.size == fromClassfiles.size, s"\n$fromSyms\n$fromClassfiles")
+    assert(fromSyms.size == fromClassfiles.size,
+           s"\n$fromSyms\n$fromClassfiles")
     (fromSyms, fromClassfiles).zipped.foldLeft(checked) {
       case (chk, (fromSym, fromClassfile)) =>
         sameBType(fromSym, fromClassfile, chk)
@@ -70,7 +70,7 @@ class BTypesFromClassfileTest {
       if (fromSym.nestedInfo.isEmpty) fromSym.flags == fromClassfile.flags
       else
         (fromSym.flags | ACC_PRIVATE | ACC_PUBLIC) ==
-        (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
+          (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
     }, s"class flags differ\n$fromSym\n$fromClassfile")
 
     // we don't compare InlineInfos in this test: in both cases (from symbol and from classfile) they
@@ -78,13 +78,13 @@ class BTypesFromClassfileTest {
     // built from symbols for classes that are being compiled, which is not the case here. Instead
     // there's a separate InlineInfoTest.
 
-    val chk1 = sameBTypes(
-        fromSym.superClass, fromClassfile.superClass, checked)
+    val chk1 =
+      sameBTypes(fromSym.superClass, fromClassfile.superClass, checked)
 
     val fromSymInterfaces = fromSym.interfaces
     val fromClassFileInterfaces = fromClassfile.interfaces
-    val (matching, other) = fromClassFileInterfaces.partition(
-        x => fromSymInterfaces.exists(_.internalName == x.internalName))
+    val (matching, other) = fromClassFileInterfaces.partition(x =>
+      fromSymInterfaces.exists(_.internalName == x.internalName))
     val chk2 = sameBTypes(fromSym.interfaces, matching, chk1)
     for (redundant <- other) {
       // TODO SD-86 The new trait encoding emits redundant parents in the backend to avoid linkage errors in invokespecial

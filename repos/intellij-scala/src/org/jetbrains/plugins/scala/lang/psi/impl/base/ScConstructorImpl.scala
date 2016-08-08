@@ -9,20 +9,54 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.InferUtil.SafeCheckException
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression, ScNewTemplateDefinition, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement,
+  ScTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScExpression,
+  ScNewTemplateDefinition,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScExtendsBlock}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents,
+  ScExtendsBlock
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, ScalaElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  InferUtil,
+  ScalaElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScSimpleTypeElementImpl
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter,
+  ScMethodType,
+  ScTypePolymorphicType,
+  TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.collection.Seq
@@ -34,7 +68,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2008
   */
 class ScConstructorImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstructor {
+    extends ScalaPsiElementImpl(node)
+    with ScConstructor {
 
   def typeElement: ScTypeElement =
     findNotNullChildByClass(classOf[ScTypeElement])
@@ -99,8 +134,8 @@ class ScConstructorImpl(node: ASTNode)
   def multiType(i: Int): Seq[TypeResult[ScType]] =
     innerMultiType(i, isShape = false)
 
-  private def innerMultiType(
-      i: Int, isShape: Boolean): Seq[TypeResult[ScType]] = {
+  private def innerMultiType(i: Int,
+                             isShape: Boolean): Seq[TypeResult[ScType]] = {
     def FAILURE = Failure("Can't resolve type", Some(this))
     def workWithResolveResult(
         constr: PsiMethod,
@@ -129,8 +164,10 @@ class ScConstructorImpl(node: ASTNode)
           if (i > 0)
             return Failure("Java constructors only have one parameter section",
                            Some(this))
-          ResolveUtils.javaMethodType(
-              method, subst, getResolveScope, Some(subst.subst(tp)))
+          ResolveUtils.javaMethodType(method,
+                                      subst,
+                                      getResolveScope,
+                                      Some(subst.subst(tp)))
       }
       val typeParameters: Seq[TypeParameter] = r.getActualElement match {
         case tp: ScTypeParametersOwner if tp.typeParameters.nonEmpty =>
@@ -145,10 +182,13 @@ class ScConstructorImpl(node: ASTNode)
           val zipped = p.typeArgList.typeArgs.zip(typeParameters)
           val appSubst = new ScSubstitutor(
               new HashMap[(String, PsiElement), ScType] ++ zipped.map {
-            case (arg, typeParam) =>
-              ((typeParam.name, ScalaPsiUtil.getPsiElementId(typeParam.ptp)),
-               arg.getType(TypingContext.empty).getOrAny)
-          }, Map.empty, None)
+                case (arg, typeParam) =>
+                  ((typeParam.name,
+                    ScalaPsiUtil.getPsiElementId(typeParam.ptp)),
+                   arg.getType(TypingContext.empty).getOrAny)
+              },
+              Map.empty,
+              None)
           Success(appSubst.subst(res), Some(this))
         case _ =>
           var nonValueType = ScTypePolymorphicType(res, typeParameters)
@@ -157,12 +197,18 @@ class ScConstructorImpl(node: ASTNode)
               try {
                 nonValueType = InferUtil.localTypeInference(
                     nonValueType.internalType,
-                    Seq(new Parameter(
-                            "", None, expected, false, false, false, 0)),
+                    Seq(
+                        new Parameter("",
+                                      None,
+                                      expected,
+                                      false,
+                                      false,
+                                      false,
+                                      0)),
                     Seq(
                         new Expression(InferUtil
-                              .undefineSubstitutor(nonValueType.typeParameters)
-                              .subst(subst.subst(tp).inferValueType))),
+                          .undefineSubstitutor(nonValueType.typeParameters)
+                          .subst(subst.subst(tp).inferValueType))),
                     nonValueType.typeParameters,
                     shouldUndefineParameters = false,
                     filterTypeParams = false)
@@ -186,11 +232,11 @@ class ScConstructorImpl(node: ASTNode)
               buffer += workWithResolveResult(constr, r, subst, s, ref)
             case ScalaResolveResult(clazz: PsiClass, subst)
                 if !clazz.isInstanceOf[ScTemplateDefinition] &&
-                clazz.isAnnotationType =>
+                  clazz.isAnnotationType =>
               val params = clazz.getMethods.flatMap {
                 case p: PsiAnnotationMethod =>
-                  val paramType = subst.subst(ScType.create(
-                          p.getReturnType, getProject, getResolveScope))
+                  val paramType = subst.subst(ScType
+                    .create(p.getReturnType, getProject, getResolveScope))
                   Seq(
                       Parameter(p.getName,
                                 None,

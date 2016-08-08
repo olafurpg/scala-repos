@@ -4,14 +4,24 @@ import com.intellij.codeInsight.PsiEquivalenceUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicatesUtil._
-import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{ExtractMethodOutput, ExtractMethodParameter}
+import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{
+  ExtractMethodOutput,
+  ExtractMethodParameter
+}
 
 import scala.collection.mutable
 
@@ -19,8 +29,8 @@ import scala.collection.mutable
   * Nikolay.Tropin
   * 2014-05-15
   */
-class DuplicateMatch(
-    pattern: DuplicatePattern, val candidates: Seq[PsiElement]) {
+class DuplicateMatch(pattern: DuplicatePattern,
+                     val candidates: Seq[PsiElement]) {
   private val parameterValues =
     mutable.Map[ExtractMethodParameter, ScExpression]()
   private val definitionCorrespondence =
@@ -57,13 +67,13 @@ class DuplicateMatch(
     }
   }
 
-  private def checkChildren(
-      subPattern: PsiElement, subCandidate: PsiElement): Boolean = {
+  private def checkChildren(subPattern: PsiElement,
+                            subCandidate: PsiElement): Boolean = {
     checkElementSeq(subPattern.children.toSeq, subCandidate.children.toSeq)
   }
 
-  private def checkElement(
-      subPattern: PsiElement, candidate: PsiElement): Boolean = {
+  private def checkElement(subPattern: PsiElement,
+                           candidate: PsiElement): Boolean = {
     if (!canBeEquivalent(subPattern, candidate)) return false
 
     (subPattern, candidate) match {
@@ -83,7 +93,7 @@ class DuplicateMatch(
                  ResolvesTo(td2: ScTypedDefinition)))
           if pattern.definitions.contains(td1) =>
         definitionCorrespondence.get(td1) == Some(td2) &&
-        typesEquiv(ref1, ref2)
+          typesEquiv(ref1, ref2)
       case Both((ref1: ScReferenceElement, ref2: ScReferenceElement),
                 (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
         (res1, res2) match {

@@ -3,8 +3,8 @@ package org.scalajs.core.tools.jsdep
 import org.scalajs.core.tools.sem.Semantics
 
 /** Expresses a requirement for a given semantic to be compliant */
-final class ComplianceRequirement(
-    val semantics: String, val origins: List[Origin])
+final class ComplianceRequirement(val semantics: String,
+                                  val origins: List[Origin])
 
 object ComplianceRequirement {
 
@@ -14,8 +14,8 @@ object ComplianceRequirement {
     */
   final def checkCompliance(requirements: Traversable[ComplianceRequirement],
                             semantics: Semantics): Unit = {
-    val unmet = requirements.filterNot(
-        compliance => semantics.isCompliant(compliance.semantics))
+    val unmet = requirements.filterNot(compliance =>
+      semantics.isCompliant(compliance.semantics))
 
     if (unmet.nonEmpty) throw new BadComplianceException(unmet.toList)
   }

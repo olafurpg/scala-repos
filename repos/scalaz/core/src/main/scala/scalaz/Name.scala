@@ -24,7 +24,7 @@ object Name {
       Name] with Cozip[Name] = new Monad[Name] with BindRec[Name]
   with Comonad[Name] with Distributive[Name] with Traverse1[Name]
   with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] {
-    override def foldMap1[A, B : Semigroup](fa: Name[A])(f: A => B) =
+    override def foldMap1[A, B: Semigroup](fa: Name[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Name[A], z: B)(f: (B, A) => B) =
       f(z, fa.value)
@@ -58,7 +58,7 @@ object Name {
         case \/-(b) => Name(b)
       }
   }
-  implicit def nameEqual[A : Equal]: Equal[Name[A]] = new Equal[Name[A]] {
+  implicit def nameEqual[A: Equal]: Equal[Name[A]] = new Equal[Name[A]] {
     def equal(a1: Name[A], a2: Name[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
   }
@@ -78,7 +78,7 @@ object Need {
       Need] with Cozip[Need] = new Monad[Need] with BindRec[Need]
   with Comonad[Need] with Distributive[Need] with Traverse1[Need]
   with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] {
-    override def foldMap1[A, B : Semigroup](fa: Need[A])(f: A => B) =
+    override def foldMap1[A, B: Semigroup](fa: Need[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Need[A], z: B)(f: (B, A) => B) =
       f(z, fa.value)
@@ -112,7 +112,7 @@ object Need {
         case \/-(b) => Need(b)
       }
   }
-  implicit def needEqual[A : Equal]: Equal[Need[A]] = new Equal[Need[A]] {
+  implicit def needEqual[A: Equal]: Equal[Need[A]] = new Equal[Need[A]] {
     def equal(a1: Need[A], a2: Need[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
   }
@@ -124,7 +124,7 @@ object Value {
       Value] with Cozip[Value] = new Monad[Value] with BindRec[Value]
   with Comonad[Value] with Distributive[Value] with Traverse1[Value]
   with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] {
-    override def foldMap1[A, B : Semigroup](fa: Value[A])(f: A => B) =
+    override def foldMap1[A, B: Semigroup](fa: Value[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Value[A], z: B)(f: (B, A) => B) =
       f(z, fa.value)
@@ -154,7 +154,7 @@ object Value {
         case \/-(b) => Value(b)
       }
   }
-  implicit def valueEqual[A : Equal]: Equal[Value[A]] = new Equal[Value[A]] {
+  implicit def valueEqual[A: Equal]: Equal[Value[A]] = new Equal[Value[A]] {
     def equal(a1: Value[A], a2: Value[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
   }

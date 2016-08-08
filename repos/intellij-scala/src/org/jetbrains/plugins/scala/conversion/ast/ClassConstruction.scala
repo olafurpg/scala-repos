@@ -29,11 +29,13 @@ case class AnonymousClass(mType: IntermediateNode,
                           args: IntermediateNode,
                           body: Seq[IntermediateNode],
                           extendsList: Seq[IntermediateNode])
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode
+    with TypedElement {
   override def getType: TypeConstruction =
     mType.asInstanceOf[TypedElement].getType
 }
 
-case class Enum(
-    name: String, modifiers: IntermediateNode, enumConstants: Seq[String])
+case class Enum(name: String,
+                modifiers: IntermediateNode,
+                enumConstants: Seq[String])
     extends IntermediateNode

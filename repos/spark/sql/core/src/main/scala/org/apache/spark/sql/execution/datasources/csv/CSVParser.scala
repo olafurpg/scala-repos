@@ -20,7 +20,12 @@ package org.apache.spark.sql.execution.datasources.csv
 import java.io.{ByteArrayOutputStream, OutputStreamWriter, StringReader}
 import java.nio.charset.StandardCharsets
 
-import com.univocity.parsers.csv.{CsvParser, CsvParserSettings, CsvWriter, CsvWriterSettings}
+import com.univocity.parsers.csv.{
+  CsvParser,
+  CsvParserSettings,
+  CsvWriter,
+  CsvWriterSettings
+}
 
 import org.apache.spark.internal.Logging
 
@@ -119,9 +124,11 @@ private[sql] class LineCsvReader(params: CSVOptions)
   * @param params Parameters object
   * @param headers headers for the columns
   */
-private[sql] class BulkCsvReader(
-    iter: Iterator[String], params: CSVOptions, headers: Seq[String])
-    extends CsvReader(params, headers) with Iterator[Array[String]] {
+private[sql] class BulkCsvReader(iter: Iterator[String],
+                                 params: CSVOptions,
+                                 headers: Seq[String])
+    extends CsvReader(params, headers)
+    with Iterator[Array[String]] {
 
   private val reader = new StringIteratorReader(iter)
   parser.beginParsing(reader)
@@ -206,12 +213,16 @@ private class StringIteratorReader(val iter: Iterator[String])
       } else {
         n = Math.min(length - next, len).toInt // lesser of amount of input available or buf size
         if (n == length - next) {
-          str.getChars(
-              (next - start).toInt, (next - start + n - 1).toInt, cbuf, off)
+          str.getChars((next - start).toInt,
+                       (next - start + n - 1).toInt,
+                       cbuf,
+                       off)
           cbuf(off + n - 1) = '\n'
         } else {
-          str.getChars(
-              (next - start).toInt, (next - start + n).toInt, cbuf, off)
+          str.getChars((next - start).toInt,
+                       (next - start + n).toInt,
+                       cbuf,
+                       off)
         }
         next += n
         if (n < len) {

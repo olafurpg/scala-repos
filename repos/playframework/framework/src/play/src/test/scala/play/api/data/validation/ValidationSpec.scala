@@ -25,10 +25,9 @@ object ValidationSpec extends Specification {
       Form("value" -> Forms.text(maxLength = 0))
         .bind(Map("value" -> null))
         .fold(
-            formWithErrors =>
-              {
-                formWithErrors.errors.head.message must equalTo(
-                    "error.maxLength")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo(
+                  "error.maxLength")
             }, { textData =>
               "The mapping should fail." must equalTo("Error")
             }
@@ -47,10 +46,9 @@ object ValidationSpec extends Specification {
       Form("value" -> Forms.text(minLength = 0))
         .bind(Map("value" -> null))
         .fold(
-            formWithErrors =>
-              {
-                formWithErrors.errors.head.message must equalTo(
-                    "error.minLength")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo(
+                  "error.minLength")
             }, { textData =>
               "The mapping should fail." must equalTo("Error")
             }
@@ -63,10 +61,8 @@ object ValidationSpec extends Specification {
       Form("value" -> nonEmptyText)
         .bind(Map("value" -> null))
         .fold(
-            formWithErrors =>
-              {
-                formWithErrors.errors.head.message must equalTo(
-                    "error.required")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.required")
             }, { textData =>
               "The mapping should fail." must equalTo("Error")
             }
@@ -149,10 +145,10 @@ object ValidationSpec extends Specification {
       Form("value" -> number(1, 10))
         .bind(Map("value" -> "5"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              number =>
-                number must equalTo(5)
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { number =>
+              number must equalTo(5)
             }
         )
     }
@@ -161,10 +157,10 @@ object ValidationSpec extends Specification {
       Form("value" -> number(1, 10))
         .bind(Map("value" -> "15"))
         .fold(
-            formWithErrors =>
-              { formWithErrors.errors.head.message must equalTo("error.max") }, {
-              number =>
-                "The mapping should fail." must equalTo("Error")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.max")
+            }, { number =>
+              "The mapping should fail." must equalTo("Error")
             }
         )
     }
@@ -175,10 +171,10 @@ object ValidationSpec extends Specification {
       Form("value" -> longNumber(1, 123456789023L))
         .bind(Map("value" -> "12345678902"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              number =>
-                number must equalTo(12345678902L)
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { number =>
+              number must equalTo(12345678902L)
             }
         )
     }
@@ -187,10 +183,10 @@ object ValidationSpec extends Specification {
       Form("value" -> longNumber(1, 10))
         .bind(Map("value" -> "-12345678902"))
         .fold(
-            formWithErrors =>
-              { formWithErrors.errors.head.message must equalTo("error.min") }, {
-              number =>
-                "The mapping should fail." must equalTo("Error")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.min")
+            }, { number =>
+              "The mapping should fail." must equalTo("Error")
             }
         )
     }
@@ -201,10 +197,10 @@ object ValidationSpec extends Specification {
       Form("value" -> (nonEmptyText verifying min("CC")))
         .bind(Map("value" -> "Toto"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              str =>
-                str must equalTo("Toto")
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { str =>
+              str must equalTo("Toto")
             }
         )
     }
@@ -213,10 +209,10 @@ object ValidationSpec extends Specification {
       Form("value" -> (nonEmptyText verifying min("CC")))
         .bind(Map("value" -> "AA"))
         .fold(
-            formWithErrors =>
-              { formWithErrors.errors.head.message must equalTo("error.min") }, {
-              str =>
-                "The mapping should fail." must equalTo("Error")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.min")
+            }, { str =>
+              "The mapping should fail." must equalTo("Error")
             }
         )
     }
@@ -227,10 +223,10 @@ object ValidationSpec extends Specification {
       Form("value" -> (of[Double] verifying max(100.1)))
         .bind(Map("value" -> "10.2"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              number =>
-                number must equalTo(10.2)
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { number =>
+              number must equalTo(10.2)
             }
         )
     }
@@ -239,10 +235,10 @@ object ValidationSpec extends Specification {
       Form("value" -> (of[Double] verifying max(100.1)))
         .bind(Map("value" -> "110.3"))
         .fold(
-            formWithErrors =>
-              { formWithErrors.errors.head.message must equalTo("error.max") }, {
-              number =>
-                "The mapping should fail." must equalTo("Error")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.max")
+            }, { number =>
+              "The mapping should fail." must equalTo("Error")
             }
         )
     }
@@ -253,10 +249,10 @@ object ValidationSpec extends Specification {
       Form("value" -> number(1, 10, strict = true))
         .bind(Map("value" -> "5"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              number =>
-                number must equalTo(5)
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { number =>
+              number must equalTo(5)
             }
         )
     }
@@ -265,10 +261,10 @@ object ValidationSpec extends Specification {
       Form("value" -> number(5, 10))
         .bind(Map("value" -> "5"))
         .fold(
-            formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
-              number =>
-                number must equalTo(5)
+            formWithErrors => {
+              "The mapping should not fail." must equalTo("Error")
+            }, { number =>
+              number must equalTo(5)
             }
         )
     }
@@ -277,10 +273,9 @@ object ValidationSpec extends Specification {
       Form("value" -> number(5, 10, strict = true))
         .bind(Map("value" -> "5"))
         .fold(
-            formWithErrors =>
-              {
-                formWithErrors.errors.head.message must equalTo(
-                    "error.min.strict")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo(
+                  "error.min.strict")
             }, { number =>
               "The mapping should fail." must equalTo("Error")
             }
@@ -291,10 +286,8 @@ object ValidationSpec extends Specification {
       Form("value" -> nonEmptyText)
         .bind(Map("value" -> " "))
         .fold(
-            formWithErrors =>
-              {
-                formWithErrors.errors.head.message must equalTo(
-                    "error.required")
+            formWithErrors => {
+              formWithErrors.errors.head.message must equalTo("error.required")
             }, { text =>
               "The mapping should fail." must equalTo("Error")
             }
@@ -326,8 +319,9 @@ object ValidationSpec extends Specification {
       val constraints =
         List(Constraints.maxLength(10), Constraints.minLength(1))
       val values = Seq(Some(""), Some("12345678910"), Some("valid"))
-      val expected = Invalid(List(ValidationError("error.minLength", 1),
-                                  ValidationError("error.maxLength", 10)))
+      val expected = Invalid(
+          List(ValidationError("error.minLength", 1),
+               ValidationError("error.maxLength", 10)))
 
       ParameterValidator(constraints, values: _*) must equalTo(expected)
     }

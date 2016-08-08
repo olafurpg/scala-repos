@@ -21,7 +21,8 @@ object MemberWeaklyUpSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(
+            ConfigFactory.parseString("""
         akka.remote.retry-gate-closed-for = 3 s
         akka.cluster.allow-weakly-up-members = on
         """))
@@ -37,7 +38,8 @@ class MemberWeaklyUpMultiJvmNode4 extends MemberWeaklyUpSpec
 class MemberWeaklyUpMultiJvmNode5 extends MemberWeaklyUpSpec
 
 abstract class MemberWeaklyUpSpec
-    extends MultiNodeSpec(MemberWeaklyUpSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(MemberWeaklyUpSpec)
+    with MultiNodeClusterSpec {
 
   import MemberWeaklyUpSpec._
 
@@ -66,12 +68,12 @@ abstract class MemberWeaklyUpSpec
 
       runOn(first) {
         awaitAssert(clusterView.unreachableMembers.map(_.address) should be(
-                Set(address(third), address(fourth))))
+            Set(address(third), address(fourth))))
       }
 
       runOn(third, fourth) {
         awaitAssert(clusterView.unreachableMembers.map(_.address) should be(
-                Set(address(first))))
+            Set(address(first))))
       }
 
       enterBarrier("after-2")

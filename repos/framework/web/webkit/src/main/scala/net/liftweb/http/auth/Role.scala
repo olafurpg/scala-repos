@@ -26,9 +26,8 @@ object AuthRole {
   }
 
   def apply(roleNames: String*): List[Role] =
-    roleNames.toList.map(
-        n =>
-          new Role {
+    roleNames.toList.map(n =>
+      new Role {
         def name = n
     })
 
@@ -84,9 +83,8 @@ trait Role {
   def getRoleByName(roleName: String): Box[Role] =
     (this.name == roleName) match {
       case false =>
-        childs.find(
-            role =>
-              role.getRoleByName(roleName) match {
+        childs.find(role =>
+          role.getRoleByName(roleName) match {
             case Empty => false
             case theRole @ _ => return theRole
         })

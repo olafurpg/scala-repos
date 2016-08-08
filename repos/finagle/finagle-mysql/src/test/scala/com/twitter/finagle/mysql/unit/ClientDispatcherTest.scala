@@ -1,7 +1,12 @@
 package com.twitter.finagle.exp.mysql
 
 import com.twitter.concurrent.AsyncQueue
-import com.twitter.finagle.exp.mysql.transport.{Buffer, BufferReader, BufferWriter, Packet}
+import com.twitter.finagle.exp.mysql.transport.{
+  Buffer,
+  BufferReader,
+  BufferWriter,
+  Packet
+}
 import com.twitter.finagle.transport.{Transport, QueueTransport}
 import com.twitter.util.{Await, Future, Try}
 import org.junit.runner.RunWith
@@ -81,8 +86,8 @@ class ClientDispatcherTest extends FunSuite {
     clientq.offer(okPacket)
   }
 
-  val okPacket = Packet(
-      1, Buffer(Array[Byte](0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00)))
+  val okPacket =
+    Packet(1, Buffer(Array[Byte](0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00)))
 
   test("handshaking") {
     val ctx = newCtx
@@ -172,7 +177,7 @@ class ClientDispatcherTest extends FunSuite {
 
     val sizeOfField =
       (strLen(f.catalog) + strLen(f.db) + strLen(f.table) +
-          strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
+        strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
 
     val fieldData = new Array[Byte](sizeOfField)
     val bw = BufferWriter(fieldData)
@@ -194,8 +199,8 @@ class ClientDispatcherTest extends FunSuite {
   val numFields = 5
   val numRows = 3
   val headerPacket = Packet(0, Buffer(Array(numFields.toByte)))
-  val eof = Packet(
-      0, Buffer(Array[Byte](Packet.EofByte, 0x00, 0x00, 0x00, 0x00)))
+  val eof =
+    Packet(0, Buffer(Array[Byte](Packet.EofByte, 0x00, 0x00, 0x00, 0x00)))
   val fields = createFields(numFields)
   val fieldPackets = fields map { toPacket(_) }
 

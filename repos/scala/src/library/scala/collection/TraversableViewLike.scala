@@ -73,8 +73,9 @@ trait TraversableViewLike[
     +A,
     +Coll,
     +This <: TraversableView[A, Coll] with TraversableViewLike[A, Coll, This]]
-    extends Traversable[A] with TraversableLike[A, This] with ViewMkString[A] {
-  self =>
+    extends Traversable[A]
+    with TraversableLike[A, This]
+    with ViewMkString[A] { self =>
 
   protected def underlying: Coll
   protected[this] def viewIdentifier: String = ""
@@ -93,7 +94,8 @@ trait TraversableViewLike[
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
-      extends Traversable[B] with Transformed[B]
+      extends Traversable[B]
+      with Transformed[B]
 
   /** The implementation base trait of this view.
     *  This trait and all its subtraits has to be re-implemented for each

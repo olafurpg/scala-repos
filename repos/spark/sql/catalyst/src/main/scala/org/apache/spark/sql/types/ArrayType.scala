@@ -61,8 +61,8 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
   /** No-arg constructor for kryo. */
   protected def this() = this(null, false)
 
-  private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+  private[sql] def buildFormattedString(prefix: String,
+                                        builder: StringBuilder): Unit = {
     builder.append(
         s"$prefix-- element: ${elementType.typeName} (containsNull = $containsNull)\n")
     DataType.buildFormattedString(elementType, s"$prefix    |", builder)
@@ -70,7 +70,7 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
 
   override private[sql] def jsonValue =
     ("type" -> typeName) ~ ("elementType" -> elementType.jsonValue) ~
-    ("containsNull" -> containsNull)
+      ("containsNull" -> containsNull)
 
   /**
     * The default size of a value of the ArrayType is 100 * the default size of the element type.

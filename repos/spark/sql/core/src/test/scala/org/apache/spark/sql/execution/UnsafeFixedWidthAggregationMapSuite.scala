@@ -23,7 +23,12 @@ import scala.util.control.NonFatal
 
 import org.scalatest.Matchers
 
-import org.apache.spark.{SparkConf, SparkFunSuite, TaskContext, TaskContextImpl}
+import org.apache.spark.{
+  SparkConf,
+  SparkFunSuite,
+  TaskContext,
+  TaskContextImpl
+}
 import org.apache.spark.memory.{TaskMemoryManager, TestMemoryManager}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.UnsafeRow
@@ -37,7 +42,9 @@ import org.apache.spark.unsafe.types.UTF8String
   * Use [[testWithMemoryLeakDetection]] rather than [[test]] to construct test cases.
   */
 class UnsafeFixedWidthAggregationMapSuite
-    extends SparkFunSuite with Matchers with SharedSQLContext {
+    extends SparkFunSuite
+    with Matchers
+    with SharedSQLContext {
 
   import UnsafeFixedWidthAggregationMap._
 
@@ -94,13 +101,17 @@ class UnsafeFixedWidthAggregationMapSuite
   }
 
   testWithMemoryLeakDetection("supported schemas") {
-    assert(supportsAggregationBufferSchema(
+    assert(
+        supportsAggregationBufferSchema(
             StructType(StructField("x", DecimalType.USER_DEFAULT) :: Nil)))
-    assert(supportsAggregationBufferSchema(
+    assert(
+        supportsAggregationBufferSchema(
             StructType(StructField("x", DecimalType.SYSTEM_DEFAULT) :: Nil)))
-    assert(!supportsAggregationBufferSchema(
+    assert(
+        !supportsAggregationBufferSchema(
             StructType(StructField("x", StringType) :: Nil)))
-    assert(!supportsAggregationBufferSchema(
+    assert(
+        !supportsAggregationBufferSchema(
             StructType(StructField("x", ArrayType(IntegerType)) :: Nil)))
   }
 
@@ -158,7 +169,8 @@ class UnsafeFixedWidthAggregationMapSuite
     val rand = new Random(42)
     val groupKeys: Set[String] = Seq.fill(512)(rand.nextString(1024)).toSet
     groupKeys.foreach { keyString =>
-      assert(map.getAggregationBuffer(
+      assert(
+          map.getAggregationBuffer(
               InternalRow(UTF8String.fromString(keyString))) != null)
     }
 

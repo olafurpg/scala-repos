@@ -8,9 +8,16 @@ import com.typesafe.config.ConfigFactory
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon._
-import mesosphere.marathon.core.leadership.{AlwaysElectedLeadershipModule, LeadershipModule}
+import mesosphere.marathon.core.leadership.{
+  AlwaysElectedLeadershipModule,
+  LeadershipModule
+}
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.tracker.{TaskCreationHandler, TaskTracker, TaskUpdater}
+import mesosphere.marathon.core.task.tracker.{
+  TaskCreationHandler,
+  TaskTracker,
+  TaskUpdater
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId.StringPathId
 import mesosphere.marathon.state._
@@ -24,7 +31,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class MarathonHealthCheckManagerTest
-    extends MarathonSpec with ScalaFutures with Logging
+    extends MarathonSpec
+    with ScalaFutures
+    with Logging
     with MarathonShutdownHookSupport {
 
   var hcManager: MarathonHealthCheckManager = _
@@ -59,11 +68,13 @@ class MarathonHealthCheckManagerTest
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskUpdater = taskTrackerModule.taskUpdater
 
-    appRepository = new AppRepository(
-        new MarathonStore[AppDefinition](
-            new InMemoryStore, metrics, () => AppDefinition(), "app:"),
-        None,
-        metrics)
+    appRepository =
+      new AppRepository(new MarathonStore[AppDefinition](new InMemoryStore,
+                                                         metrics,
+                                                         () => AppDefinition(),
+                                                         "app:"),
+                        None,
+                        metrics)
 
     eventStream = new EventStream()
 
@@ -97,8 +108,9 @@ class MarathonHealthCheckManagerTest
     taskId
   }
 
-  def updateTaskHealth(
-      taskId: Task.Id, version: Timestamp, healthy: Boolean): Unit = {
+  def updateTaskHealth(taskId: Task.Id,
+                       version: Timestamp,
+                       healthy: Boolean): Unit = {
     val taskStatus = mesos.TaskStatus.newBuilder
       .setTaskId(taskId.mesosTaskId)
       .setState(mesos.TaskState.TASK_RUNNING)
@@ -255,7 +267,8 @@ class MarathonHealthCheckManagerTest
                   version: Timestamp,
                   healthChecks: Set[HealthCheck]) = {
       appRepository
-        .store(AppDefinition(
+        .store(
+            AppDefinition(
                 id = appId,
                 versionInfo = AppDefinition.VersionInfo.forNewConfig(version),
                 healthChecks = healthChecks
@@ -311,8 +324,9 @@ class MarathonHealthCheckManagerTest
       startTask_i(2)
       hcManager.reconcileWith(appId).futureValue
     }
-    assert(captured3.map(_.eventType) == Vector("add_health_check_event",
-                                                "add_health_check_event"))
+    assert(
+        captured3.map(_.eventType) == Vector("add_health_check_event",
+                                             "add_health_check_event"))
     assert(hcManager.list(appId) == healthChecks(1) ++ healthChecks(2))
 
     // reconcileWith stops health checks which are not current and which are without tasks

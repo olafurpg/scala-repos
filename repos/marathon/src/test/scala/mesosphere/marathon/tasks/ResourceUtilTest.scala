@@ -9,7 +9,10 @@ import scala.collection.JavaConverters._
 import mesosphere.marathon.{MarathonTestHelper => MTH}
 
 class ResourceUtilTest
-    extends FunSuite with GivenWhenThen with Assertions with Matchers {
+    extends FunSuite
+    with GivenWhenThen
+    with Assertions
+    with Matchers {
   test("no base resources") {
     val leftOvers = ResourceUtil.consumeResources(
         Seq(),
@@ -62,8 +65,8 @@ class ResourceUtilTest
       .newBuilder()
       .setPersistence(Persistence.newBuilder().setId("persistenceId"))
       .build()
-    val resourceWithReservation = MTH.scalarResource(
-        "disk", 1024, "role", Some(reservationInfo), Some(disk))
+    val resourceWithReservation = MTH
+      .scalarResource("disk", 1024, "role", Some(reservationInfo), Some(disk))
     val resourceWithoutReservation =
       MTH.scalarResource("disk", 1024, "role", None, None)
 
@@ -82,26 +85,26 @@ class ResourceUtilTest
     // ensure that the correct choice is made
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithoutReservation,
-                             resourceWithReservation),
+        resources =
+          Iterable(resourceWithoutReservation, resourceWithReservation),
         usedResources = Iterable(resourceWithReservation)
     ) should be(Seq(resourceWithoutReservation))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation,
-                             resourceWithoutReservation),
+        resources =
+          Iterable(resourceWithReservation, resourceWithoutReservation),
         usedResources = Iterable(resourceWithReservation)
     ) should be(Seq(resourceWithoutReservation))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation,
-                             resourceWithoutReservation),
+        resources =
+          Iterable(resourceWithReservation, resourceWithoutReservation),
         usedResources = Iterable(resourceWithoutReservation)
     ) should be(Seq(resourceWithReservation))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithoutReservation,
-                             resourceWithReservation),
+        resources =
+          Iterable(resourceWithoutReservation, resourceWithReservation),
         usedResources = Iterable(resourceWithoutReservation)
     ) should be(Seq(resourceWithReservation))
 
@@ -150,26 +153,26 @@ class ResourceUtilTest
     // ensure that the correct choice is made
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation2,
-                             resourceWithReservation1),
+        resources =
+          Iterable(resourceWithReservation2, resourceWithReservation1),
         usedResources = Iterable(resourceWithReservation1)
     ) should be(Seq(resourceWithReservation2))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation1,
-                             resourceWithReservation2),
+        resources =
+          Iterable(resourceWithReservation1, resourceWithReservation2),
         usedResources = Iterable(resourceWithReservation1)
     ) should be(Seq(resourceWithReservation2))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation1,
-                             resourceWithReservation2),
+        resources =
+          Iterable(resourceWithReservation1, resourceWithReservation2),
         usedResources = Iterable(resourceWithReservation2)
     ) should be(Seq(resourceWithReservation1))
 
     ResourceUtil.consumeResources(
-        resources = Iterable(resourceWithReservation2,
-                             resourceWithReservation1),
+        resources =
+          Iterable(resourceWithReservation2, resourceWithReservation1),
         usedResources = Iterable(resourceWithReservation2)
     ) should be(Seq(resourceWithReservation1))
 
@@ -203,8 +206,8 @@ class ResourceUtilTest
       .newBuilder()
       .setPersistence(Persistence.newBuilder().setId("persistenceId"))
       .build()
-    val resource = MTH.scalarResource(
-        "disk", 1024, "role", Some(reservationInfo), Some(disk))
+    val resource = MTH
+      .scalarResource("disk", 1024, "role", Some(reservationInfo), Some(disk))
     val resourceString =
       ResourceUtil.displayResources(Seq(resource), maxRanges = 10)
     resourceString should equal(
@@ -228,8 +231,8 @@ class ResourceUtilTest
 
   portsTest(consumedResource = Seq(31084 to 31084),
             baseResource = Seq(31000 to 31096, 31098 to 32000),
-            expectedResult = Some(
-                  Seq(31000 to 31083, 31085 to 31096, 31098 to 32000)))
+            expectedResult =
+              Some(Seq(31000 to 31083, 31085 to 31096, 31098 to 32000)))
 
   // overlapping smaller
   portsTest(consumedResource = Seq(2 to 5),

@@ -17,8 +17,8 @@ import lila.game.tube.gameTube
 import lila.game.{Game, GameRepo, Query, PgnDump, Player}
 import lila.user.UserRepo
 
-private final class ExplorerIndexer(
-    endpoint: String, massImportEndpoint: String) {
+private final class ExplorerIndexer(endpoint: String,
+                                    massImportEndpoint: String) {
 
   private val maxGames = Int.MaxValue
   private val batchSize = 50
@@ -59,30 +59,32 @@ private final class ExplorerIndexer(
           } &> Enumeratee.collect { case Some(el) => el } &> Enumeratee
           .grouped(Iteratee takeUpTo batchSize) |>>> Iteratee
           .foldM[Seq[GamePGN], Long](nowMillis) {
-          case (millis, pairs) =>
-            WS.url(massImportEndPointUrl)
-              .put(pairs.map(_._2) mkString separator)
-              .flatMap {
-                case res if res.status == 200 =>
-                  val date =
-                    pairs.headOption.map(_._1.createdAt) ?? dateTimeFormatter.print
-                  val nb = pairs.size
-                  val gameMs = (nowMillis - millis) / nb.toDouble
-                  logger.info(
-                      s"$date $nb ${gameMs.toInt} ms/game ${(1000 / gameMs).toInt} games/s")
-                  funit
-                case res =>
-                  fufail(s"Stop import because of status ${res.status}")
-              } >> {
-              pairs.headOption match {
-                case None => fufail(s"No games left, import complete!")
-                case Some((g, _))
-                    if (g.createdAt.isAfter(DateTime.now.minusMinutes(10))) =>
-                  fufail(s"Found a recent game, import complete!")
-                case _ => funit
-              }
-            } inject nowMillis
-        } void
+            case (millis, pairs) =>
+              WS.url(massImportEndPointUrl)
+                .put(pairs.map(_._2) mkString separator)
+                .flatMap {
+                  case res if res.status == 200 =>
+                    val date =
+                      pairs.headOption
+                        .map(_._1.createdAt) ?? dateTimeFormatter.print
+                    val nb = pairs.size
+                    val gameMs = (nowMillis - millis) / nb.toDouble
+                    logger.info(
+                        s"$date $nb ${gameMs.toInt} ms/game ${(1000 / gameMs).toInt} games/s")
+                    funit
+                  case res =>
+                    fufail(s"Stop import because of status ${res.status}")
+                } >> {
+                pairs.headOption match {
+                  case None => fufail(s"No games left, import complete!")
+                  case Some((g, _))
+                      if (g.createdAt.isAfter(
+                          DateTime.now.minusMinutes(10))) =>
+                    fufail(s"Found a recent game, import complete!")
+                  case _ => funit
+                }
+              } inject nowMillis
+          } void
     }
 
   def apply(game: Game): Funit = makeFastPgn(game) map {
@@ -114,8 +116,8 @@ private final class ExplorerIndexer(
 
   private def valid(game: Game) =
     game.finished && game.rated && game.turns >= 10 &&
-    game.variant != chess.variant.FromPosition &&
-    (game.variant != chess.variant.Horde ||
+      game.variant != chess.variant.FromPosition &&
+      (game.variant != chess.variant.Horde ||
         game.createdAt.isAfter(Query.hordeWhitePawnsSince))
 
   private def stableRating(player: Player) =
@@ -147,10 +149,10 @@ private final class ExplorerIndexer(
       blackRating <- stableRating(game.blackPlayer)
       minPlayerRating = if (game.variant.exotic) 1400 else 1500
       minAverageRating = if (game.variant.exotic) 1520 else 1600
-          if whiteRating >= minPlayerRating
+      if whiteRating >= minPlayerRating
       if blackRating >= minPlayerRating
       averageRating = (whiteRating + blackRating) / 2
-          if averageRating >= minAverageRating
+      if averageRating >= minAverageRating
       if probability(game, averageRating) > nextFloat
       if valid(game)
     } yield

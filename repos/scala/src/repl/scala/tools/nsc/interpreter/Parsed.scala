@@ -33,8 +33,7 @@ class Parsed private (
     val buffer: String,
     val cursor: Int,
     val delimited: Char => Boolean
-)
-    extends Delimited {
+) extends Delimited {
   def isEmpty = args.isEmpty
   def isUnqualified = args.size == 1
   def isAtStart = cursor <= 0

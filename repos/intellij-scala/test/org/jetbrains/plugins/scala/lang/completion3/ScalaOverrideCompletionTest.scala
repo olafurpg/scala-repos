@@ -123,7 +123,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
       """
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString.contains("foo")).get, '\t')
+        activeLookup.find(le => le.getLookupString.contains("foo")).get,
+        '\t')
     checkResultByText(handleText(baseText + outText))
   }
 }

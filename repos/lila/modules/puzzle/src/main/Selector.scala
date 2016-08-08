@@ -45,8 +45,12 @@ private[puzzle] final class Selector(puzzleColl: Coll,
         val rating = user.perfs.puzzle.intRating min 2300 max 900
         val step = toleranceStepFor(rating)
         api.attempt.playedIds(user, maxAttempts) flatMap { ids =>
-          tryRange(
-              rating, step, step, difficultyDecay(difficulty), ids, isMate)
+          tryRange(rating,
+                   step,
+                   step,
+                   difficultyDecay(difficulty),
+                   ids,
+                   isMate)
         }
     }
   }.mon(_.puzzle.selector.time)
@@ -65,7 +69,8 @@ private[puzzle] final class Selector(puzzleColl: Coll,
                        ids: BSONArray,
                        isMate: Boolean): Fu[Option[Puzzle]] =
     puzzleColl
-      .find(mateSelector(isMate) ++ BSONDocument(
+      .find(
+          mateSelector(isMate) ++ BSONDocument(
               Puzzle.BSONFields.id -> BSONDocument("$nin" -> ids),
               Puzzle.BSONFields.rating -> BSONDocument(
                   "$gt" -> BSONInteger(rating - tolerance + decay),

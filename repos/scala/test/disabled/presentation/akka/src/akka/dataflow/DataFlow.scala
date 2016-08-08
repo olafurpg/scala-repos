@@ -85,7 +85,7 @@ object DataFlow {
           } else
             throw new DataFlowVariableException(
                 "Attempt to change data flow variable (from [" +
-                dataFlow.value.get + "] to [" + v + "])")
+                  dataFlow.value.get + "] to [" + v + "])")
         case Exit => self.stop()
       }
     }
@@ -114,7 +114,7 @@ object DataFlow {
       else
         throw new DataFlowVariableException(
             "Attempt to change data flow variable (from [" + this.value.get +
-            "] to [" + ref() + "])")
+              "] to [" + ref() + "])")
     }
 
     /**
@@ -131,7 +131,7 @@ object DataFlow {
       else
         throw new DataFlowVariableException(
             "Attempt to change data flow variable (from [" + this.value.get +
-            "] to [" + value + "])")
+              "] to [" + value + "])")
     }
 
     /**
@@ -164,7 +164,7 @@ object DataFlow {
 
         result.getOrElse(
             throw new DataFlowVariableException("Timed out (after " +
-                timeoutMs + " milliseconds) while waiting for result"))
+              timeoutMs + " milliseconds) while waiting for result"))
       }
     }
 

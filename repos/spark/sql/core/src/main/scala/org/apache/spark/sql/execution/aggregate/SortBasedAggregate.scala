@@ -22,7 +22,12 @@ import org.apache.spark.sql.catalyst.errors._
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
-import org.apache.spark.sql.catalyst.plans.physical.{AllTuples, ClusteredDistribution, Distribution, UnspecifiedDistribution}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  AllTuples,
+  ClusteredDistribution,
+  Distribution,
+  UnspecifiedDistribution
+}
 import org.apache.spark.sql.execution.{SparkPlan, UnaryNode}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 
@@ -41,7 +46,8 @@ case class SortBasedAggregate(
   }
 
   override def producedAttributes: AttributeSet =
-    AttributeSet(aggregateAttributes) ++ AttributeSet(resultExpressions
+    AttributeSet(aggregateAttributes) ++ AttributeSet(
+        resultExpressions
           .diff(groupingExpressions)
           .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
 
@@ -89,8 +95,9 @@ case class SortBasedAggregate(
               initialInputBufferOffset,
               resultExpressions,
               (expressions, inputSchema) =>
-                newMutableProjection(
-                    expressions, inputSchema, subexpressionEliminationEnabled),
+                newMutableProjection(expressions,
+                                     inputSchema,
+                                     subexpressionEliminationEnabled),
               numOutputRows)
           if (!hasInput && groupingExpressions.isEmpty) {
             // There is no input and there is no grouping expressions.

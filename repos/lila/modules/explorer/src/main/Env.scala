@@ -9,8 +9,9 @@ final class Env(config: Config, system: ActorSystem) {
   private val MassImportEndpoint = config getString "mass_import.endpoint"
   private val IndexFlow = config getBoolean "index_flow"
 
-  private lazy val indexer = new ExplorerIndexer(
-      endpoint = Endpoint, massImportEndpoint = MassImportEndpoint)
+  private lazy val indexer = new ExplorerIndexer(endpoint = Endpoint,
+                                                 massImportEndpoint =
+                                                   MassImportEndpoint)
 
   def cli = new lila.common.Cli {
     def process = {
@@ -29,8 +30,7 @@ final class Env(config: Config, system: ActorSystem) {
   }
 
   if (IndexFlow)
-    system.actorOf(
-        Props(new Actor {
+    system.actorOf(Props(new Actor {
       context.system.lilaBus.subscribe(self, 'finishGame)
       def receive = {
         case lila.game.actorApi.FinishGame(game, _, _) => indexer(game)

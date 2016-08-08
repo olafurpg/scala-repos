@@ -26,8 +26,9 @@ object InspectionsUtil {
     conformsToTypeFromClass(exprType, className, expr.getProject)
   }
 
-  def conformsToTypeFromClass(
-      scType: ScType, className: String, project: Project): Boolean = {
+  def conformsToTypeFromClass(scType: ScType,
+                              className: String,
+                              project: Project): Boolean = {
     def typeFromClassName(fqn: String, project: Project): Option[ScType] = {
       val clazz = JavaPsiFacade
         .getInstance(project)
@@ -38,8 +39,7 @@ object InspectionsUtil {
           case Seq() => designatorType
           case params =>
             val undefines = params.map(p =>
-                  ScUndefinedType(
-                      new ScTypeParameterType(p, ScSubstitutor.empty)))
+              ScUndefinedType(new ScTypeParameterType(p, ScSubstitutor.empty)))
             ScParameterizedType(designatorType, undefines)
         }
       }

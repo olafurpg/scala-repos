@@ -9,14 +9,15 @@ object Test extends App {
   val DefinitionsModule = JavaUniverseTpe.member(TermName("definitions"))
 
   def forceCode(prefix: String, tp: Type): String = {
-    def isLazyAccessorOrObject(sym: Symbol) = ((sym.isMethod &&
-            sym.asMethod.isLazy) || sym.isModule)
+    def isLazyAccessorOrObject(sym: Symbol) =
+      ((sym.isMethod &&
+        sym.asMethod.isLazy) || sym.isModule)
     val forceables = tp.members.sorted.filter(isLazyAccessorOrObject)
     forceables.map { sym =>
       val path = s"$prefix.${sym.name}"
       "    " +
-      (if (sym.isPrivate || sym.isProtected) s"// inaccessible: $path"
-       else path)
+        (if (sym.isPrivate || sym.isProtected) s"// inaccessible: $path"
+         else path)
     }.mkString("\n")
   }
 
@@ -50,19 +51,19 @@ object Test extends App {
         |
         |${forceCode("this", JavaUniverseTpe)}
         |${forceCode("definitions", DefinitionsModule.info)}
-        |${forceCode(
-           "refChecks", typeOf[scala.reflect.internal.transform.RefChecks])}
-        |${forceCode(
-           "uncurry", typeOf[scala.reflect.internal.transform.UnCurry])}
-        |${forceCode(
-           "erasure", typeOf[scala.reflect.internal.transform.Erasure])}
+        |${forceCode("refChecks",
+                     typeOf[scala.reflect.internal.transform.RefChecks])}
+        |${forceCode("uncurry",
+                     typeOf[scala.reflect.internal.transform.UnCurry])}
+        |${forceCode("erasure",
+                     typeOf[scala.reflect.internal.transform.Erasure])}
         |  }
         |}""".stripMargin
 
   import java.io.File
   val testFile = new File(sys.props("partest.test-path"))
   val actualFile = new java.io.File(testFile.getParent +
-      "/../../../src/reflect/scala/reflect/runtime/JavaUniverseForce.scala").getCanonicalFile
+    "/../../../src/reflect/scala/reflect/runtime/JavaUniverseForce.scala").getCanonicalFile
   val actual = scala.io.Source.fromFile(actualFile)
   val actualLines = actual.getLines.toList
   val generatedLines = code.lines.toList

@@ -23,7 +23,11 @@ import scala.concurrent.duration._
 import org.apache.spark.broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.plans.physical.{BroadcastMode, BroadcastPartitioning, Partitioning}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  BroadcastMode,
+  BroadcastPartitioning,
+  Partitioning
+}
 import org.apache.spark.sql.execution.{SparkPlan, SQLExecution}
 import org.apache.spark.util.ThreadUtils
 
@@ -80,7 +84,8 @@ case class BroadcastExchange(mode: BroadcastMode, child: SparkPlan)
         "BroadcastExchange does not support the execute() code path.")
   }
 
-  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
+  override protected[sql] def doExecuteBroadcast[T]()
+    : broadcast.Broadcast[T] = {
     val result = Await.result(relationFuture, timeout)
     result.asInstanceOf[broadcast.Broadcast[T]]
   }

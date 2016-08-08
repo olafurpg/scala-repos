@@ -109,12 +109,13 @@ private[repl] trait SparkImports { self: SparkIMain =>
     * (3) It imports multiple same-named implicits, but only the
     * last one imported is actually usable.
     */
-  case class SparkComputedImports(
-      prepend: String, append: String, access: String)
+  case class SparkComputedImports(prepend: String,
+                                  append: String,
+                                  access: String)
   def fallback = System.getProperty("spark.repl.fallback", "false").toBoolean
 
-  protected def importsCode(
-      wanted: Set[Name], definedClass: Boolean): SparkComputedImports = {
+  protected def importsCode(wanted: Set[Name],
+                            definedClass: Boolean): SparkComputedImports = {
 
     /** Narrow down the list of requests from which imports
       *  should be taken.  Removes requests which cannot contribute
@@ -133,7 +134,7 @@ private[repl] trait SparkImports { self: SparkIMain =>
         // try to finesse this, we will mimic all imports for now.
         def keepHandler(handler: MemberHandler) = handler match {
           /* This case clause tries to "precisely" import only what is required. And in this
-           * it may miss out on some implicits, because implicits are not known in `wanted`. Thus 
+           * it may miss out on some implicits, because implicits are not known in `wanted`. Thus
            * it is suitable for defining classes. AFAIK while defining classes implicits are not
            * needed.*/
           case h: ImportHandler if definedClass && !fallback =>
@@ -207,8 +208,9 @@ private[repl] trait SparkImports { self: SparkIMain =>
           // classes involved and may fail.
           for (imv <- x.definedNames) {
             val objName = req.lineRep.readPath
-            code.append("import " + objName + ".INSTANCE" + req.accessPath +
-                ".`" + imv + "`\n")
+            code.append(
+                "import " + objName + ".INSTANCE" + req.accessPath +
+                  ".`" + imv + "`\n")
           }
 
         case x =>
@@ -233,8 +235,9 @@ private[repl] trait SparkImports { self: SparkIMain =>
     // add one extra wrapper, to prevent warnings in the common case of
     // redefining the value bound in the last interpreter request.
     addWrapper()
-    SparkComputedImports(
-        code.toString, trailingBraces.toString, accessPath.toString)
+    SparkComputedImports(code.toString,
+                         trailingBraces.toString,
+                         accessPath.toString)
   }
 
   private def allReqAndHandlers =

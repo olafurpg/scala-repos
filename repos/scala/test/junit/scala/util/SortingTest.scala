@@ -31,12 +31,14 @@ class SortingTest {
 
   def isSorted(a: Array[N]): Boolean = {
     var i = 1;
-    while (i < a.length) { if (a(i).i < a(i - 1).i) return false; i += 1 }; true
+    while (i < a.length) { if (a(i).i < a(i - 1).i) return false; i += 1 };
+    true
   }
 
   def isAntisorted(a: Array[N]): Boolean = {
     var i = 1;
-    while (i < a.length) { if (a(i).i > a(i - 1).i) return false; i += 1 }; true
+    while (i < a.length) { if (a(i).i > a(i - 1).i) return false; i += 1 };
+    true
   }
 
   val sizes = Seq.range(0, 65) ++ Seq(256, 1024, 9121, 65539)
@@ -69,20 +71,20 @@ class SortingTest {
     assertTrue("Quicksort should be in order", isSorted(qxs))
     assertTrue("Quicksort should be in reverse order", isAntisorted(pxs))
     assertTrue("Stable sort should be sorted and stable", isStable(sxs))
-    assertTrue(
-        "Stable sort should be reverse sorted but stable", isAntistable(rxs))
+    assertTrue("Stable sort should be reverse sorted but stable",
+               isAntistable(rxs))
     assertTrue("Stable sorting by proxy should produce sorted stable list",
                isStable(sys.map(i => xs(i))))
-    assertTrue(
-        "Quicksort should produce canonical ordering", (qxs zip zs).forall {
-      case (a, b) => a.i == b.i
-    })
+    assertTrue("Quicksort should produce canonical ordering",
+               (qxs zip zs).forall {
+                 case (a, b) => a.i == b.i
+               })
     assertTrue("Reverse quicksort should produce canonical ordering",
                (pxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
-    assertTrue(
-        "Stable sort should produce exact ordering", (sxs zip zs).forall {
-      case (a, b) => a == b
-    })
+    assertTrue("Stable sort should produce exact ordering",
+               (sxs zip zs).forall {
+                 case (a, b) => a == b
+               })
     assertTrue("Reverse stable sort should produce canonical ordering",
                (rxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
     assertTrue(
@@ -95,21 +97,22 @@ class SortingTest {
       size <- sizes
       v <- variety
       i <- 0 until math.min(
-          100,
-          math
-            .max(math.min(
-                     math.floor(math.pow(v, size) / 2),
-                     math.ceil(workLimit /
-                         (math.log(math.max(2, size)) / math.log(2) * size))),
-                 1)
-            .toInt)
+              100,
+              math
+                .max(
+                    math.min(
+                        math.floor(math.pow(v, size) / 2),
+                        math.ceil(workLimit /
+                          (math.log(math.max(2, size)) / math.log(2) * size))),
+                    1)
+                .toInt)
     } runOneTest(size, v)
 
     for (size <- sizes) {
       val b = Array.fill(size)(rng.nextBoolean)
       val bfwd = Sorting.stableSort(b.clone: Seq[Boolean])
-      val bbkw = Sorting.stableSort(
-          b.clone: Seq[Boolean], (x: Boolean, y: Boolean) => x && !y)
+      val bbkw = Sorting
+        .stableSort(b.clone: Seq[Boolean], (x: Boolean, y: Boolean) => x && !y)
       assertTrue("All falses should be first",
                  bfwd.dropWhile(_ == false).forall(_ == true))
       assertTrue("All falses should be last when sorted backwards",

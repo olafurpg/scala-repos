@@ -46,29 +46,31 @@ object MockWebSpec extends Specification {
   LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
     // Global LiftRules setup
     LiftRules.statelessRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateless"), _, _, _), _, _) => {
-          RewriteResponse(List("stateless", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateless"), _, _, _),
+                          _,
+                          _) => {
+        RewriteResponse(List("stateless", "works"))
+      }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateful"), _, _, _), _, _) => {
-          RewriteResponse(List("stateful", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _),
+                          _,
+                          _) => {
+        RewriteResponse(List("stateful", "works"))
+      }
     }
 
     LiftRules.early.append { req =>
       req match {
         case httpReq: HTTPRequestServlet => {
-            httpReq.req match {
-              case mocked: MockHttpServletRequest => {
-                  mocked.remoteAddr = "1.2.3.4"
-                }
-              case _ => println("Not a mocked request?")
+          httpReq.req match {
+            case mocked: MockHttpServletRequest => {
+              mocked.remoteAddr = "1.2.3.4"
             }
+            case _ => println("Not a mocked request?")
           }
+        }
         case _ => println("Not a servlet request?")
       }
     }
@@ -139,7 +141,7 @@ object MockWebSpec extends Specification {
         useLiftRules.doWith(true) {
           testS("http://foo.com/test/stateless") {
             S.request.foreach(_.path.partPath must_==
-                  List("stateless", "works"))
+              List("stateless", "works"))
           }
         }
       }

@@ -54,8 +54,9 @@ import org.apache.spark.util.Utils
   * @param id A unique identifier for the broadcast variable.
   * @tparam T Type of the data contained in the broadcast variable.
   */
-abstract class Broadcast[T : ClassTag](val id: Long)
-    extends Serializable with Logging {
+abstract class Broadcast[T: ClassTag](val id: Long)
+    extends Serializable
+    with Logging {
 
   /**
     * Flag signifying whether the broadcast variable is valid
@@ -142,8 +143,8 @@ abstract class Broadcast[T : ClassTag](val id: Long)
   protected def assertValid() {
     if (!_isValid) {
       throw new SparkException(
-          "Attempted to use %s after it was destroyed (%s) ".format(
-              toString, _destroySite))
+          "Attempted to use %s after it was destroyed (%s) "
+            .format(toString, _destroySite))
     }
   }
 

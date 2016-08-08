@@ -36,22 +36,26 @@ import scala.concurrent.Future
   *  directly use the methods of `Future` on `Promise`s.
   */
 @js.native
-class Promise[+A](executor: js.Function2[
-        js.Function1[A | Thenable[A], _], js.Function1[scala.Any, _], _])
-    extends js.Object with js.Thenable[A] {
+class Promise[+A](
+    executor: js.Function2[js.Function1[A | Thenable[A], _],
+                           js.Function1[scala.Any, _],
+                           _])
+    extends js.Object
+    with js.Thenable[A] {
 
-  def `then`[B](onFulfilled: js.Function1[A, B | Thenable[B]],
-                onRejected: js.UndefOr[
-                    js.Function1[scala.Any, B | Thenable[B]]] = js.undefined)
-    : Thenable[B] = js.native
+  def `then`[B](
+      onFulfilled: js.Function1[A, B | Thenable[B]],
+      onRejected: js.UndefOr[js.Function1[scala.Any, B | Thenable[B]]] =
+        js.undefined): Thenable[B] = js.native
 
   def `then`[B >: A](
       onFulfilled: Unit,
       onRejected: js.UndefOr[js.Function1[scala.Any, B | Thenable[B]]])
     : Thenable[B] = js.native
 
-  def `catch`[B >: A](onRejected: js.UndefOr[js.Function1[
-              scala.Any, B | Thenable[B]]] = js.undefined): Promise[B] =
+  def `catch`[B >: A](
+      onRejected: js.UndefOr[js.Function1[scala.Any, B | Thenable[B]]] =
+        js.undefined): Promise[B] =
     js.native
 }
 

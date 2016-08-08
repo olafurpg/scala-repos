@@ -11,7 +11,13 @@ import akka.japi.{Option ⇒ JOption}
 import akka.pattern.ask
 import akka.routing.RoundRobinGroup
 import akka.serialization.JavaSerializer
-import akka.testkit.{AkkaSpec, DefaultTimeout, EventFilter, TimingTest, filterEvents}
+import akka.testkit.{
+  AkkaSpec,
+  DefaultTimeout,
+  EventFilter,
+  TimingTest,
+  filterEvents
+}
 import akka.util.Timeout
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
@@ -179,8 +185,12 @@ object TypedActorSpec {
   }
 
   class LifeCyclesImpl(val latch: CountDownLatch)
-      extends PreStart with PostStop with PreRestart with PostRestart
-      with LifeCycles with Receiver {
+      extends PreStart
+      with PostStop
+      with PreRestart
+      with PostRestart
+      with LifeCycles
+      with Receiver {
 
     private def ensureContextAvailable[T](f: ⇒ T): T =
       TypedActor.context match {
@@ -203,8 +213,7 @@ object TypedActorSpec {
       ensureContextAvailable(for (i ← 1 to 7) latch.countDown())
 
     override def onReceive(msg: Any, sender: ActorRef): Unit = {
-      ensureContextAvailable(
-          msg match {
+      ensureContextAvailable(msg match {
         case "pigdog" ⇒ sender ! "dogpig"
       })
     }
@@ -219,8 +228,10 @@ object TypedActorSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 
@@ -231,13 +242,15 @@ class TypedActorSpec
         TypedProps[Bar](classOf[Foo], classOf[Bar]).withTimeout(Timeout(d)))
 
   def newFooBar(dispatcher: String, d: FiniteDuration): Foo =
-    TypedActor(system).typedActorOf(TypedProps[Bar](classOf[Foo], classOf[Bar])
+    TypedActor(system).typedActorOf(
+        TypedProps[Bar](classOf[Foo], classOf[Bar])
           .withTimeout(Timeout(d))
           .withDispatcher(dispatcher))
 
   def newStacked(): Stacked =
-    TypedActor(system).typedActorOf(TypedProps[StackedImpl](
-            classOf[Stacked], classOf[StackedImpl]).withTimeout(timeout))
+    TypedActor(system).typedActorOf(
+        TypedProps[StackedImpl](classOf[Stacked], classOf[StackedImpl])
+          .withTimeout(timeout))
 
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)
@@ -378,7 +391,7 @@ class TypedActorSpec
         }))
         val t =
           Await.result((boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
-                             .withTimeout(2 seconds)).mapTo[Foo],
+                         .withTimeout(2 seconds)).mapTo[Foo],
                        timeout.duration)
 
         t.incr()
@@ -447,15 +460,15 @@ class TypedActorSpec
     }
 
     "be able to use balancing dispatcher" in within(timeout.duration) {
-      val thais = for (i ← 1 to 60) yield
-        newFooBar("pooled-dispatcher", 6 seconds)
+      val thais = for (i ← 1 to 60)
+        yield newFooBar("pooled-dispatcher", 6 seconds)
       val iterator = new CyclicIterator(thais)
 
-      val results = for (i ← 1 to 120) yield
-        (i, iterator.next.futurePigdog(200 millis, i))
+      val results = for (i ← 1 to 120)
+        yield (i, iterator.next.futurePigdog(200 millis, i))
 
-      for ((i, r) ← results) Await.result(r, remaining) should ===(
-          "Pigdog" + i)
+      for ((i, r) ← results)
+        Await.result(r, remaining) should ===("Pigdog" + i)
 
       for (t ← thais) mustStop(t)
     }
@@ -567,8 +580,10 @@ class TypedActorSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorRouterSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 

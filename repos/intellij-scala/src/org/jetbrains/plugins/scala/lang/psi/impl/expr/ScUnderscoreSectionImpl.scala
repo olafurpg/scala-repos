@@ -10,18 +10,34 @@ import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScMethodType,
+  ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScUnderscoreSectionImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScUnderscoreSection {
+    extends ScalaPsiElementImpl(node)
+    with ScUnderscoreSection {
   override def toString: String = "UnderscoreSection"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
@@ -32,11 +48,12 @@ class ScUnderscoreSectionImpl(node: ASTNode)
             case ScTypePolymorphicType(internalType, typeParameters) =>
               ScTypePolymorphicType(
                   ScMethodType(internalType, Nil, isImplicit = false)(
-                      getProject, getResolveScope),
+                      getProject,
+                      getResolveScope),
                   typeParameters)
             case tp: ScType =>
-              ScMethodType(tp, Nil, isImplicit = false)(
-                  getProject, getResolveScope)
+              ScMethodType(tp, Nil, isImplicit = false)(getProject,
+                                                        getResolveScope)
           }
         }
         ref.bind() match {
@@ -94,7 +111,7 @@ class ScUnderscoreSectionImpl(node: ASTNode)
             var forEqualsParamLength: Boolean =
               false //this is for working completion
             for (tp <- expr.expectedTypes(fromUnderscore = false)
-                          if result != None) {
+                 if result != None) {
 
               def processFunctionType(params: Seq[ScType]) {
                 if (result != null) {

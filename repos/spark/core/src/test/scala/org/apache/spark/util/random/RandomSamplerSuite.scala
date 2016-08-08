@@ -129,8 +129,9 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
   }
 
   // Returns the median KS 'D' statistic between two samples, over (m) sampling trials
-  def medianKSD(
-      data1: => Iterator[Int], data2: => Iterator[Int], m: Int = 5): Double = {
+  def medianKSD(data1: => Iterator[Int],
+                data2: => Iterator[Int],
+                m: Int = 5): Double = {
     val t = Array
       .fill[Double](m) {
         val (c1, c2) = cumulants(data1.take(sampleSize).toArray,
@@ -252,12 +253,12 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler = new BernoulliSampler[Int](1.0)
     sampler.sample(data.iterator).toArray should be(data)
 
-    sampler = new BernoulliSampler[Int](
-        0.0 - (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new BernoulliSampler[Int](0.0 - (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
-    sampler = new BernoulliSampler[Int](
-        1.0 + (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new BernoulliSampler[Int](1.0 + (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(data)
   }
 
@@ -270,27 +271,23 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler.setSeed(rngSeed.nextLong)
 
     // Array iterator (indexable type)
-    d = medianKSD(
-        gaps(sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
-        gaps(sample(Iterator.from(0), 0.1)))
+    d =
+      medianKSD(gaps(sampler.sample(
+                    Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
+                gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
-    d = medianKSD(gaps(
-                      sampler.sample(Iterator
-                            .from(0)
-                            .take(20 * sampleSize)
-                            .to[ArrayBuffer]
-                            .iterator)),
-                  gaps(sample(Iterator.from(0), 0.1)))
+    d = medianKSD(
+        gaps(sampler.sample(
+            Iterator.from(0).take(20 * sampleSize).to[ArrayBuffer].iterator)),
+        gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
 
     // List iterator (non-indexable type)
-    d = medianKSD(
-        gaps(sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toList.iterator)),
-        gaps(sample(Iterator.from(0), 0.1)))
+    d = medianKSD(gaps(sampler.sample(
+                      Iterator.from(0).take(20 * sampleSize).toList.iterator)),
+                  gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
   }
 
@@ -423,8 +420,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     var sampler = new PoissonSampler[Int](0.0)
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
-    sampler = new PoissonSampler[Int](
-        0.0 - (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new PoissonSampler[Int](0.0 - (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
     // sampling with replacement has no upper bound on sampling fraction
@@ -441,27 +438,23 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler.setSeed(rngSeed.nextLong)
 
     // Array iterator (indexable type)
-    d = medianKSD(
-        gaps(sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
-        gaps(sampleWR(Iterator.from(0), 0.1)))
+    d =
+      medianKSD(gaps(sampler.sample(
+                    Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
+                gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
-    d = medianKSD(gaps(
-                      sampler.sample(Iterator
-                            .from(0)
-                            .take(20 * sampleSize)
-                            .to[ArrayBuffer]
-                            .iterator)),
-                  gaps(sampleWR(Iterator.from(0), 0.1)))
+    d = medianKSD(
+        gaps(sampler.sample(
+            Iterator.from(0).take(20 * sampleSize).to[ArrayBuffer].iterator)),
+        gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
 
     // List iterator (non-indexable type)
-    d = medianKSD(
-        gaps(sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toList.iterator)),
-        gaps(sampleWR(Iterator.from(0), 0.1)))
+    d = medianKSD(gaps(sampler.sample(
+                      Iterator.from(0).take(20 * sampleSize).toList.iterator)),
+                  gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
   }
 

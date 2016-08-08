@@ -43,7 +43,7 @@ abstract class HiveQueryFileTest extends HiveComparisonTest {
 
   val runAll =
     !(System.getProperty("spark.hive.alltests") == null) ||
-    runOnlyDirectories.nonEmpty || skipDirectories.nonEmpty
+      runOnlyDirectories.nonEmpty || skipDirectories.nonEmpty
 
   val whiteListProperty = "spark.hive.whitelist"
   // Allow the whiteList to be overridden by a system property

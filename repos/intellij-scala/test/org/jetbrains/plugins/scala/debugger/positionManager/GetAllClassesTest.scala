@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.positionManager
 
-import org.jetbrains.plugins.scala.debugger.{ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * @author Nikolay.Tropin
@@ -8,7 +11,8 @@ import org.jetbrains.plugins.scala.debugger.{ScalaVersion_2_11, ScalaVersion_2_1
 class GetAllClassesTest extends GetAllClassesTestBase with ScalaVersion_2_11
 
 class GetAllClassesTest_212
-    extends GetAllClassesTestBase with ScalaVersion_2_12 {
+    extends GetAllClassesTestBase
+    with ScalaVersion_2_12 {
 
   override def testForStmt(): Unit = {
     checkGetAllClasses("ForStmt$")
@@ -27,8 +31,9 @@ class GetAllClassesTest_212
   }
 
   override def testPartialFunctionArg(): Unit = {
-    checkGetAllClasses(
-        "PartialFunctionArg$", "PartialFunctionArg$", "PartialFunctionArg$")
+    checkGetAllClasses("PartialFunctionArg$",
+                       "PartialFunctionArg$",
+                       "PartialFunctionArg$")
   }
 }
 
@@ -123,7 +128,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("InnerClassInObject$A")
   }
 
-  setupFile("LocalClassInAnonClass.scala", s"""
+  setupFile("LocalClassInAnonClass.scala",
+            s"""
        |object LocalClassInAnonClass {
        |  def main(args: Array[String]) {
        |    val r = new Runnable() {
@@ -141,8 +147,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
        |}
     """.stripMargin.trim)
   def testLocalClassInAnonClass(): Unit = {
-    checkGetAllClasses(
-        "LocalClassInAnonClass$$anon$1$A", "LocalClassInAnonClass$$anon$1")
+    checkGetAllClasses("LocalClassInAnonClass$$anon$1$A",
+                       "LocalClassInAnonClass$$anon$1")
   }
 
   setupFile("LocalObject.scala",
@@ -181,7 +187,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("LocalClassSymbolicName$$bang$bang$bang$1")
   }
 
-  setupFile("FunctionExprs.scala", s"""
+  setupFile("FunctionExprs.scala",
+            s"""
        |object FunctionExprs {
        |  def main(args: Array[String]): Unit = {
        |    val list = List(1, 2, 3)
@@ -203,7 +210,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
                        "FunctionExprs$$anonfun$main$4")
   }
 
-  setupFile("ByNameArgument.scala", s"""
+  setupFile("ByNameArgument.scala",
+            s"""
        |object ByNameArgument {
        |  def main(args: Array[String]) {
        |    Some(1).orElse(${offsetMarker}None).getOrElse(${offsetMarker}2)
@@ -212,11 +220,12 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
        |}
     """.stripMargin.trim)
   def testByNameArgument(): Unit = {
-    checkGetAllClasses(
-        "ByNameArgument$$anonfun$main$1", "ByNameArgument$$anonfun$main$2")
+    checkGetAllClasses("ByNameArgument$$anonfun$main$1",
+                       "ByNameArgument$$anonfun$main$2")
   }
 
-  setupFile("ForStmt.scala", s"""
+  setupFile("ForStmt.scala",
+            s"""
        |object ForStmt {
        |  def main(args: Array[String]) {
        |    val seq = Seq("a", "b", "c")
@@ -272,7 +281,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("ByNameParamInBlock$$anonfun$main$1")
   }
 
-  setupFile("ClassInBlock.scala", s"""
+  setupFile("ClassInBlock.scala",
+            s"""
        |object ClassInBlock {
        |  def main(args: Array[String]) {
        |    1 match {
@@ -290,7 +300,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("ClassInBlock$A$1")
   }
 
-  setupFile("PartialFunctionArg.scala", s"""
+  setupFile("PartialFunctionArg.scala",
+            s"""
        |object PartialFunctionArg {
        |  def main(args: Array[String]) {
        |    ${offsetMarker}Seq(Option(1)).exists {

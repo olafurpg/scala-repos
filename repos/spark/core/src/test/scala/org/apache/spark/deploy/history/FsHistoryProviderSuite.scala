@@ -17,7 +17,14 @@
 
 package org.apache.spark.deploy.history
 
-import java.io.{BufferedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream, OutputStreamWriter}
+import java.io.{
+  BufferedOutputStream,
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  File,
+  FileOutputStream,
+  OutputStreamWriter
+}
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
@@ -42,7 +49,10 @@ import org.apache.spark.scheduler._
 import org.apache.spark.util.{Clock, JsonProtocol, ManualClock, Utils}
 
 class FsHistoryProviderSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with Logging {
 
   private var testDir: File = null
 
@@ -118,11 +128,15 @@ class FsHistoryProviderSuite
                       lastMod: Long,
                       user: String,
                       completed: Boolean): ApplicationHistoryInfo = {
-        ApplicationHistoryInfo(
-            id,
-            name,
-            List(ApplicationAttemptInfo(
-                    None, start, end, lastMod, user, completed)))
+        ApplicationHistoryInfo(id,
+                               name,
+                               List(
+                                   ApplicationAttemptInfo(None,
+                                                          start,
+                                                          end,
+                                                          lastMod,
+                                                          user,
+                                                          completed)))
       }
 
       list(0) should be(
@@ -165,15 +179,21 @@ class FsHistoryProviderSuite
     writeFile(logFile1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1-1", Some("app1-1"), 1L, "test", None),
+              SparkListenerApplicationStart("app1-1",
+                                            Some("app1-1"),
+                                            1L,
+                                            "test",
+                                            None),
               SparkListenerApplicationEnd(2L))
     val logFile2 = newLogFile("new2", None, inProgress = false)
     writeFile(logFile2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1-2", Some("app1-2"), 1L, "test", None),
+              SparkListenerApplicationStart("app1-2",
+                                            Some("app1-2"),
+                                            1L,
+                                            "test",
+                                            None),
               SparkListenerApplicationEnd(2L))
     logFile2.setReadable(false, false)
 
@@ -195,14 +215,17 @@ class FsHistoryProviderSuite
         SparkListenerApplicationEnd(2L))
     updateAndCheck(provider) { list =>
       list.size should be(1)
-      list.head.attempts.head.asInstanceOf[FsApplicationAttemptInfo].logPath should endWith(
-          EventLoggingListener.IN_PROGRESS)
+      list.head.attempts.head
+        .asInstanceOf[FsApplicationAttemptInfo]
+        .logPath should endWith(EventLoggingListener.IN_PROGRESS)
     }
 
     logFile1.renameTo(newLogFile("app1", None, inProgress = false))
     updateAndCheck(provider) { list =>
       list.size should be(1)
-      list.head.attempts.head.asInstanceOf[FsApplicationAttemptInfo].logPath should not
+      list.head.attempts.head
+        .asInstanceOf[FsApplicationAttemptInfo]
+        .logPath should not
       endWith(EventLoggingListener.IN_PROGRESS)
     }
   }
@@ -243,8 +266,11 @@ class FsHistoryProviderSuite
     writeFile(attempt1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 1L, "test", Some("attempt1")))
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            1L,
+                                            "test",
+                                            Some("attempt1")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -255,8 +281,11 @@ class FsHistoryProviderSuite
     writeFile(attempt2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 2L, "test", Some("attempt2")))
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            2L,
+                                            "test",
+                                            Some("attempt2")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -268,8 +297,11 @@ class FsHistoryProviderSuite
     writeFile(attempt3,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 3L, "test", Some("attempt3")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            3L,
+                                            "test",
+                                            Some("attempt3")),
               SparkListenerApplicationEnd(4L))
 
     updateAndCheck(provider) { list =>
@@ -283,8 +315,11 @@ class FsHistoryProviderSuite
     writeFile(attempt1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app2", Some("app2"), 5L, "test", Some("attempt1")),
+              SparkListenerApplicationStart("app2",
+                                            Some("app2"),
+                                            5L,
+                                            "test",
+                                            Some("attempt1")),
               SparkListenerApplicationEnd(6L))
 
     updateAndCheck(provider) { list =>
@@ -315,8 +350,11 @@ class FsHistoryProviderSuite
     writeFile(log1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 1L, "test", Some("attempt1")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            1L,
+                                            "test",
+                                            Some("attempt1")),
               SparkListenerApplicationEnd(2L))
     log1.setLastModified(0L)
 
@@ -324,8 +362,11 @@ class FsHistoryProviderSuite
     writeFile(log2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 3L, "test", Some("attempt2")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            3L,
+                                            "test",
+                                            Some("attempt2")),
               SparkListenerApplicationEnd(4L))
     log2.setLastModified(clock.getTimeMillis())
 
@@ -384,8 +425,9 @@ class FsHistoryProviderSuite
       while (entry != null) {
         val actual = new String(ByteStreams.toByteArray(inputStream),
                                 StandardCharsets.UTF_8)
-        val expected = Files.toString(
-            logs.find(_.getName == entry.getName).get, StandardCharsets.UTF_8)
+        val expected =
+          Files.toString(logs.find(_.getName == entry.getName).get,
+                         StandardCharsets.UTF_8)
         actual should be(expected)
         totalEntries += 1
         entry = inputStream.getNextEntry
@@ -483,8 +525,7 @@ class FsHistoryProviderSuite
     val writer = new OutputStreamWriter(bstream, StandardCharsets.UTF_8)
     Utils.tryWithSafeFinally {
       events.foreach(e =>
-            writer.write(
-                compact(render(JsonProtocol.sparkEventToJson(e))) + "\n"))
+        writer.write(compact(render(JsonProtocol.sparkEventToJson(e))) + "\n"))
     } {
       writer.close()
     }

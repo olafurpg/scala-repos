@@ -44,13 +44,11 @@ private[akka] object Inbox {
   private case object Kick
 }
 
-trait Inbox {
-  this: ActorDSL.type ⇒
+trait Inbox { this: ActorDSL.type ⇒
 
   import Inbox._
 
-  protected trait InboxExtension {
-    this: Extension ⇒
+  protected trait InboxExtension { this: Extension ⇒
     val DSLInboxQueueSize = config.getInt("inbox-size")
 
     val inboxNr = new AtomicInteger
@@ -83,7 +81,7 @@ trait Inbox {
         if (!printedWarning) {
           log.warning(
               "dropping message: either your program is buggy or you might want to increase akka.actor.dsl.inbox-size, current value is " +
-              size)
+                size)
           printedWarning = true
         }
       }

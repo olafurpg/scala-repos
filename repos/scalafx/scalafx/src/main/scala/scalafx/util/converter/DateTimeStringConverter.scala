@@ -38,8 +38,8 @@ object DateTimeStringConverter {
     if (c != null) c.delegate else null
 }
 
-class DateTimeStringConverter(
-    delegate: jfxuc.DateTimeStringConverter = new jfxuc.DateTimeStringConverter)
+class DateTimeStringConverter(delegate: jfxuc.DateTimeStringConverter =
+  new jfxuc.DateTimeStringConverter)
     extends DateTimeStringConverterDelegate[jfxuc.DateTimeStringConverter](
         delegate) {
 

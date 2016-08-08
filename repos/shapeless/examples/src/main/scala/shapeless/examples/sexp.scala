@@ -114,15 +114,17 @@ package sexp.ast {
     val text = like.map(_.text).getOrElse("")
     val field = term.field
   }
-  case class PreferToken(
-      tree: TokenTree, before: Option[Prefer], after: Option[Prefer])
+  case class PreferToken(tree: TokenTree,
+                         before: Option[Prefer],
+                         after: Option[Prefer])
       extends TokenTree {
     val text = before.getOrElse("") + tree.text + after.getOrElse("")
   }
   case class InTerm(field: DatabaseField, value: String, text: String = "")
       extends CompressedToken
   case class QualifierToken(text: String, field: DatabaseField)
-      extends ContextualToken with Term
+      extends ContextualToken
+      with Term
 }
 
 /** Example AST with performance problems */
@@ -209,8 +211,8 @@ object SexpExamples extends App {
   val wibble = Wibble(Foo(13))
   val wibbleSexp = SexpCons(
       SexpAtom("Wibble"),
-      SexpProp(
-          "foo", SexpCons(SexpAtom("Foo"), SexpProp("i", SexpAtom("13")))))
+      SexpProp("foo",
+               SexpCons(SexpAtom("Foo"), SexpProp("i", SexpAtom("13")))))
 
   // SETUP
   val creator = SexpConvert[Super]

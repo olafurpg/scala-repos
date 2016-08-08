@@ -10,7 +10,12 @@ import mesosphere.marathon.plugin.auth.Identity
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{Group, GroupManager, PathId, Timestamp, _}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonConf,
+  MarathonSchedulerService,
+  MarathonSpec,
+  MarathonTestHelper
+}
 import mesosphere.mesos.protos.SlaveID
 import org.mockito.Matchers.{eq => equalTo}
 import org.mockito.Mockito._
@@ -21,7 +26,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AppTasksResourceTest
-    extends MarathonSpec with Matchers with GivenWhenThen with Mockito {
+    extends MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
 
   test("deleteMany") {
     val appId = "/my/app"
@@ -33,8 +41,8 @@ class AppTasksResourceTest
     groupManager.app(appId.toRootPath) returns Future.successful(
         Some(AppDefinition(appId.toRootPath)))
 
-    val response = appsTaskResource.deleteMany(
-        appId, host, scale = false, force = false, auth.request)
+    val response = appsTaskResource
+      .deleteMany(appId, host, scale = false, force = false, auth.request)
     response.getStatus shouldEqual 200
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -341,8 +349,12 @@ class AppTasksResourceTest
   }
 
   private[this] def useRealTaskKiller(): Unit = {
-    taskKiller = new TaskKiller(
-        taskTracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(taskTracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
     appsTaskResource = new AppTasksResource(
         service,
         taskTracker,

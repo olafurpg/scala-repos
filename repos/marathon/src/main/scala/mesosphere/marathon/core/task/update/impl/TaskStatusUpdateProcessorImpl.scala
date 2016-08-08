@@ -7,7 +7,10 @@ import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.core.task.update.{TaskStatusUpdateProcessor, TaskStatusUpdateStep}
+import mesosphere.marathon.core.task.update.{
+  TaskStatusUpdateProcessor,
+  TaskStatusUpdateStep
+}
 import mesosphere.marathon.metrics.Metrics.Timer
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import mesosphere.marathon.state.{PathId, Timestamp}

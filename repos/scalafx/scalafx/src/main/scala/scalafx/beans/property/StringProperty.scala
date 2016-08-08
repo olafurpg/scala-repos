@@ -46,8 +46,10 @@ object StringProperty {
 }
 
 class StringProperty(
-    override val delegate: jfxbp.StringProperty = new jfxbp.SimpleStringProperty)
-    extends ReadOnlyStringProperty(delegate) with Property[String, String]
+    override val delegate: jfxbp.StringProperty =
+      new jfxbp.SimpleStringProperty)
+    extends ReadOnlyStringProperty(delegate)
+    with Property[String, String]
     with SFXDelegate[jfxbp.StringProperty] {
 
   def this(initialValue: String) =

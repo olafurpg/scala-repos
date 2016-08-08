@@ -7,8 +7,9 @@ package scala.tools.partest.instrumented
 
 import scala.collection.JavaConverters._
 
-case class MethodCallTrace(
-    className: String, methodName: String, methodDescriptor: String) {
+case class MethodCallTrace(className: String,
+                           methodName: String,
+                           methodDescriptor: String) {
   override def toString(): String =
     className + "." + methodName + methodDescriptor
 }
@@ -77,12 +78,11 @@ object Instrumentation {
     res
   }
 
-  val standardFilter: MethodCallTrace => Boolean = t =>
-    {
-      // ignore all calls to Console trigger by printing
-      t.className != "scala/Console$" &&
-      // console accesses DynamicVariable, let's discard it too
-      !t.className.startsWith("scala/util/DynamicVariable")
+  val standardFilter: MethodCallTrace => Boolean = t => {
+    // ignore all calls to Console trigger by printing
+    t.className != "scala/Console$" &&
+    // console accesses DynamicVariable, let's discard it too
+    !t.className.startsWith("scala/util/DynamicVariable")
   }
 
   // Used in tests.

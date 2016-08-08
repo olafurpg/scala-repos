@@ -3,7 +3,14 @@ package std
 
 import java.math.BigInteger
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{
+  EuclideanRing,
+  IsIntegral,
+  MetricSpace,
+  NRoot,
+  Order,
+  Signed
+}
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def minus(a: BigInteger, b: BigInteger): BigInteger = a subtract b
@@ -18,8 +25,8 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
 
   def quot(a: BigInteger, b: BigInteger): BigInteger = a divide b
   def mod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
-  override def quotmod(
-      a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
+  override def quotmod(a: BigInteger,
+                       b: BigInteger): (BigInteger, BigInteger) = {
     val Array(d, r) = a.divideAndRemainder(b)
     (d, r)
   }
@@ -71,7 +78,9 @@ trait BigIntegerIsSigned extends Signed[BigInteger] {
 }
 
 trait BigIntegerIsReal
-    extends IsIntegral[BigInteger] with BigIntegerOrder with BigIntegerIsSigned
+    extends IsIntegral[BigInteger]
+    with BigIntegerOrder
+    with BigIntegerIsSigned
     with Serializable {
   def toDouble(n: BigInteger): Double = n.doubleValue
   def toBigInt(n: BigInteger): BigInt = n
@@ -83,8 +92,11 @@ trait BigIntegerIsMetricSpace extends MetricSpace[BigInteger, BigInteger] {
 
 @SerialVersionUID(0L)
 class BigIntegerAlgebra
-    extends BigIntegerIsEuclideanRing with BigIntegerIsNRoot
-    with BigIntegerIsMetricSpace with BigIntegerIsReal with Serializable
+    extends BigIntegerIsEuclideanRing
+    with BigIntegerIsNRoot
+    with BigIntegerIsMetricSpace
+    with BigIntegerIsReal
+    with Serializable
 
 trait BigIntegerInstances {
   implicit final val BigIntegerAlgebra = new BigIntegerAlgebra

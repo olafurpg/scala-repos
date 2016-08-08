@@ -25,7 +25,10 @@ import org.scalatest.{BeforeAndAfterAll, PrivateMethodTester}
 import org.scalatest.concurrent.Eventually._
 
 import org.apache.spark._
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, RequestMasterState}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse,
+  RequestMasterState
+}
 import org.apache.spark.deploy.master.ApplicationInfo
 import org.apache.spark.deploy.master.Master
 import org.apache.spark.deploy.worker.Worker
@@ -38,7 +41,9 @@ import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages.RegisterE
   * End-to-end tests for dynamic allocation in standalone mode.
   */
 class StandaloneDynamicAllocationSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfterAll
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfterAll
     with PrivateMethodTester {
 
   private val numWorkers = 2
@@ -56,11 +61,11 @@ class StandaloneDynamicAllocationSuite
     */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    masterRpcEnv = RpcEnv.create(
-        Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
+    masterRpcEnv =
+      RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
-      RpcEnv.create(
-          Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+      RpcEnv
+        .create(Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)
@@ -481,8 +486,8 @@ class StandaloneDynamicAllocationSuite
 
   /** Make a master to which our application will send executor requests. */
   private def makeMaster(): Master = {
-    val master = new Master(
-        masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
+    val master =
+      new Master(masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
     masterRpcEnv.setupEndpoint(Master.ENDPOINT_NAME, master)
     master
   }
@@ -527,8 +532,9 @@ class StandaloneDynamicAllocationSuite
   }
 
   /** Kill the given executor, specifying whether to force kill it. */
-  private def killExecutor(
-      sc: SparkContext, executorId: String, force: Boolean): Boolean = {
+  private def killExecutor(sc: SparkContext,
+                           executorId: String,
+                           force: Boolean): Boolean = {
     syncExecutors(sc)
     sc.schedulerBackend match {
       case b: CoarseGrainedSchedulerBackend =>

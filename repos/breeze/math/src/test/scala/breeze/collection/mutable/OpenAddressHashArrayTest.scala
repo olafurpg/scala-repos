@@ -33,7 +33,7 @@ class OpenAddressHashArrayTest extends FunSuite with Checkers {
     }
     check {
       Prop.forAll((data: List[Int], size: Int) =>
-            size <= 0 || {
+        size <= 0 || {
           val mdata = data.map(i => math.abs(i) % size).filter(_ >= 0).toSet
           val arr = new OpenAddressHashArray[Int](size)
           assert(arr.size > 0, size)
@@ -52,7 +52,7 @@ class OpenAddressHashArrayTest extends FunSuite with Checkers {
     }
     check {
       Prop.forAll((data: List[Int], size: Int) =>
-            size <= 0 || {
+        size <= 0 || {
           val mdata = data.map(i => math.abs(i) % size).filter(_ >= 0).toSet
           val arr = new OpenAddressHashArray[Int](size)
           val arr2 = new OpenAddressHashArray[Int](size)
@@ -62,7 +62,7 @@ class OpenAddressHashArrayTest extends FunSuite with Checkers {
             if (i != 0) arr2(i) = i
           }
           (arr == arr.copy && arr.hashCode == arr.copy.hashCode &&
-              arr2 == arr && arr2.copy.hashCode == arr.copy.hashCode)
+          arr2 == arr && arr2.copy.hashCode == arr.copy.hashCode)
       })
     }
   }

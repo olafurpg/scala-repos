@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -82,13 +82,14 @@ object ApiUtils {
     * Read an integer out of the bytebuffer from the current position and check that it falls within the given
     * range. If not, throw KafkaException.
     */
-  def readIntInRange(
-      buffer: ByteBuffer, name: String, range: (Int, Int)): Int = {
+  def readIntInRange(buffer: ByteBuffer,
+                     name: String,
+                     range: (Int, Int)): Int = {
     val value = buffer.getInt
     if (value < range._1 || value > range._2)
       throw new KafkaException(
           name + " has value " +
-          value + " which is not in the range " + range + ".")
+            value + " which is not in the range " + range + ".")
     else value
   }
 
@@ -96,13 +97,14 @@ object ApiUtils {
     * Read a short out of the bytebuffer from the current position and check that it falls within the given
     * range. If not, throw KafkaException.
     */
-  def readShortInRange(
-      buffer: ByteBuffer, name: String, range: (Short, Short)): Short = {
+  def readShortInRange(buffer: ByteBuffer,
+                       name: String,
+                       range: (Short, Short)): Short = {
     val value = buffer.getShort
     if (value < range._1 || value > range._2)
       throw new KafkaException(
           name + " has value " +
-          value + " which is not in the range " + range + ".")
+            value + " which is not in the range " + range + ".")
     else value
   }
 
@@ -110,13 +112,14 @@ object ApiUtils {
     * Read a long out of the bytebuffer from the current position and check that it falls within the given
     * range. If not, throw KafkaException.
     */
-  def readLongInRange(
-      buffer: ByteBuffer, name: String, range: (Long, Long)): Long = {
+  def readLongInRange(buffer: ByteBuffer,
+                      name: String,
+                      range: (Long, Long)): Long = {
     val value = buffer.getLong
     if (value < range._1 || value > range._2)
       throw new KafkaException(
           name + " has value " +
-          value + " which is not in the range " + range + ".")
+            value + " which is not in the range " + range + ".")
     else value
   }
 

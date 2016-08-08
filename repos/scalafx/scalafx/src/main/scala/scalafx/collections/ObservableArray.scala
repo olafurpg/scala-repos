@@ -68,10 +68,11 @@ object ObservableArray {
   * @constructor Create new base $OA.
   * @param delegate Wrapped JavaFX $OA instance providing implementation.
   */
-abstract class ObservableArray[
-    V : ClassTag, T <: ObservableArray[V, T, D], D <: jfxc.ObservableArray[D]](
-    override val delegate: D)
-    extends ArrayLike[V, T] with Builder[V, T] with Observable
+abstract class ObservableArray[V: ClassTag, T <: ObservableArray[V, T, D],
+D <: jfxc.ObservableArray[D]](override val delegate: D)
+    extends ArrayLike[V, T]
+    with Builder[V, T]
+    with Observable
     with SFXDelegate[D] {
 
   // ObservableArray[D] interface functions, allow class to act like it implements the JavaFX ObservableArray
@@ -413,8 +414,10 @@ abstract class ObservableArray[
   def onChange(op: (T, ObservableArray.Change) => Unit) {
     delegate.addListener {
       new jfxc.ArrayChangeListener[D] {
-        override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+        override def onChanged(array: D,
+                               sizeChanged: Boolean,
+                               start: Int,
+                               end: Int) {
           op(ObservableArray.this.asInstanceOf[T],
              ObservableArray.Change(sizeChanged, start, end))
         }
@@ -433,8 +436,10 @@ abstract class ObservableArray[
   def onChange(op: => Unit) {
     delegate.addListener {
       new jfxc.ArrayChangeListener[D] {
-        override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+        override def onChanged(array: D,
+                               sizeChanged: Boolean,
+                               start: Int,
+                               end: Int) {
           op
         }
       }

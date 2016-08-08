@@ -33,8 +33,8 @@ object ByteArrays {
     */
   def get64be(bytes: Array[Byte], i: Int): Long = {
     ((bytes(i) & 0xff).toLong << 56) | ((bytes(i + 1) & 0xff).toLong << 48) |
-    ((bytes(i + 2) & 0xff).toLong << 40) | ((bytes(i + 3) & 0xff).toLong << 32) |
-    ((bytes(i + 4) & 0xff).toLong << 24) | ((bytes(i + 5) & 0xff).toLong << 16) |
-    ((bytes(i + 6) & 0xff).toLong << 8) | (bytes(i + 7) & 0xff).toLong
+      ((bytes(i + 2) & 0xff).toLong << 40) | ((bytes(i + 3) & 0xff).toLong << 32) |
+      ((bytes(i + 4) & 0xff).toLong << 24) | ((bytes(i + 5) & 0xff).toLong << 16) |
+      ((bytes(i + 6) & 0xff).toLong << 8) | (bytes(i + 7) & 0xff).toLong
   }
 }

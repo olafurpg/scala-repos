@@ -154,7 +154,8 @@ private[io] case class ConcatBuf(chain: Vector[Buf]) extends Buf {
       val first: Buf =
         if (startBegin == 0 && startEnd >= untrimmedFirst.length) null
         else untrimmedFirst.slice(startBegin, startEnd)
-      ConcatBuf(if (first == null) chain.slice(start, length)
+      ConcatBuf(
+          if (first == null) chain.slice(start, length)
           else first +: chain.slice(start + 1, length))
     } else {
       val untrimmedFirst = chain(start)
@@ -222,8 +223,7 @@ object Buf {
       private[Buf] val bytes: Array[Byte],
       private[Buf] val begin: Int,
       private[Buf] val end: Int
-  )
-      extends Buf {
+  ) extends Buf {
 
     def write(buf: Array[Byte], off: Int): Unit =
       System.arraycopy(bytes, begin, buf, off, length)
@@ -622,7 +622,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff) << 24) | ((arr(1) & 0xff) << 16) |
-          ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
+            ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
         Some((value, rem))
       }
   }
@@ -657,9 +657,9 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff).toLong << 56) | ((arr(1) & 0xff).toLong << 48) |
-          ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
-          ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
-          ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
+            ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
+            ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
+            ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
         Some((value, rem))
       }
   }
@@ -690,7 +690,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff)) | ((arr(1) & 0xff) << 8) | ((arr(2) & 0xff) << 16) |
-          ((arr(3) & 0xff) << 24)
+            ((arr(3) & 0xff) << 24)
         Some((value, rem))
       }
   }
@@ -724,10 +724,10 @@ object Buf {
         val rem = buf.slice(8, buf.length)
 
         val value =
-          ( (arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
-          ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
-          ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
-          ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
+          ((arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
+            ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
+            ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
+            ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
         Some((value, rem))
       }
   }

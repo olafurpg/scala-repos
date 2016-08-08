@@ -3,16 +3,20 @@ package lang.psi.light.scala
 
 import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScTypeParam, ScTypeParamClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScTypeParam,
+  ScTypeParamClause
+}
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 
 /**
   * @author Alefas
   * @since 03/04/14.
   */
-class ScLightTypeParamClause(
-    tParams: List[TypeParameter], t: ScTypeParamClause)
-    extends LightElement(t.getManager, t.getLanguage) with ScTypeParamClause {
+class ScLightTypeParamClause(tParams: List[TypeParameter],
+                             t: ScTypeParamClause)
+    extends LightElement(t.getManager, t.getLanguage)
+    with ScTypeParamClause {
   override def getTextByStub: String = t.getTextByStub
 
   override def typeParameters: Seq[ScTypeParam] =

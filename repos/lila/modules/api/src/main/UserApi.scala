@@ -19,8 +19,9 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                                  prefApi: lila.pref.PrefApi,
                                  makeUrl: String => String) {
 
-  def list(
-      teamId: String, nb: Option[Int], engine: Option[Boolean]): Fu[JsObject] =
+  def list(teamId: String,
+           nb: Option[Int],
+           engine: Option[Boolean]): Fu[JsObject] =
     lila.team.MemberRepo userIdsByTeam teamId map (_ take makeNb(nb)) flatMap UserRepo.enabledByIds map {
       users =>
         Json.obj(
@@ -37,9 +38,9 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
       case None => fuccess(none)
       case Some(u) =>
         GameRepo mostUrgentGame u zip
-        (ctx.me.filter(u !=) ?? { me =>
-              crosstableApi.nbGames(me.id, u.id)
-            }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
+          (ctx.me.filter(u !=) ?? { me =>
+            crosstableApi.nbGames(me.id, u.id)
+          }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
             u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId.?? {
           relationApi.fetchRelation(_, u.id)
         } zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map {
@@ -50,8 +51,8 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
             jsonView(u) ++ {
               Json.obj(
                   "url" -> makeUrl(s"@/$username"),
-                  "playing" -> gameOption.map(
-                      g => makeUrl(s"${g.gameId}/${g.color.name}")),
+                  "playing" -> gameOption.map(g =>
+                    makeUrl(s"${g.gameId}/${g.color.name}")),
                   "nbFollowing" -> following,
                   "nbFollowers" -> followers,
                   "count" -> Json.obj("all" -> u.count.game,
@@ -65,7 +66,8 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                                       "winH" -> u.count.winH,
                                       "bookmark" -> bookmarkApi.countByUser(u),
                                       "me" -> nbGamesWithMe)
-              ) ++ ctx.isAuth.??(Json.obj(
+              ) ++ ctx.isAuth.??(
+                  Json.obj(
                       "followable" -> followable,
                       "following" -> relation.contains(true),
                       "blocking" -> relation.contains(false),

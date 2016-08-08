@@ -22,7 +22,11 @@ import com.twitter.algebird.{Semigroup, SummingQueue}
 import com.twitter.storehaus.algebra.Mergeable
 import com.twitter.bijection.Injection
 
-import com.twitter.summingbird.online.{FlatMapOperation, Externalizer, MergeableStoreFactory}
+import com.twitter.summingbird.online.{
+  FlatMapOperation,
+  Externalizer,
+  MergeableStoreFactory
+}
 import com.twitter.summingbird.online.option._
 import com.twitter.summingbird.option.CacheSize
 
@@ -53,10 +57,10 @@ import scala.util.control.NonFatal
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-class Summer[Key, Value : Semigroup, Event, S, D, RC](
+class Summer[Key, Value: Semigroup, Event, S, D, RC](
     @transient storeSupplier: MergeableStoreFactory[Key, Value],
-    @transient flatMapOp: FlatMapOperation[
-        (Key, (Option[Value], Value)), Event],
+    @transient flatMapOp: FlatMapOperation[(Key, (Option[Value], Value)),
+                                           Event],
     @transient successHandler: OnlineSuccessHandler,
     @transient exceptionHandler: OnlineExceptionHandler,
     summerBuilder: SummerBuilder,
@@ -67,7 +71,9 @@ class Summer[Key, Value : Semigroup, Event, S, D, RC](
     pDecoder: Injection[(Int, CMap[Key, Value]), D],
     pEncoder: Injection[Event, D])
     extends AsyncBase[(Int, CMap[Key, Value]), Event, InputState[S], D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures,
+        maxWaitingTime,
+        maxEmitPerExec) {
 
   val lockedOp = Externalizer(flatMapOp)
   val encoder = pEncoder
@@ -91,12 +97,14 @@ class Summer[Key, Value : Semigroup, Event, S, D, RC](
     storePromise.setValue(storeBox.get.mergeableStore())
     store.toString // Do the lazy evaluation now so we can connect before tuples arrive.
 
-    successHandlerOpt = if (includeSuccessHandler.get)
-      Some(successHandlerBox.get) else None
+    successHandlerOpt =
+      if (includeSuccessHandler.get)
+        Some(successHandlerBox.get)
+      else None
   }
 
-  override def notifyFailure(
-      inputs: Seq[InputState[S]], error: Throwable): Unit = {
+  override def notifyFailure(inputs: Seq[InputState[S]],
+                             error: Throwable): Unit = {
     super.notifyFailure(inputs, error)
     exceptionHandlerBox.get.apply(error)
   }

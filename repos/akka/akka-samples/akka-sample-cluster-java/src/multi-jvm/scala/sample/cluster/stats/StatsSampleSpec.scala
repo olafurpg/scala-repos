@@ -43,7 +43,9 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
     akka.cluster.roles = [compute]
@@ -69,8 +71,11 @@ class StatsSampleSpecMultiJvmNode2 extends StatsSampleSpec
 class StatsSampleSpecMultiJvmNode3 extends StatsSampleSpec
 
 abstract class StatsSampleSpec
-    extends MultiNodeSpec(StatsSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSpecConfig._
 

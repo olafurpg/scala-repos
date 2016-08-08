@@ -1,13 +1,22 @@
 package com.twitter.finagle.thrift
 
 import com.google.common.base.Charsets
-import com.twitter.finagle.stats.{NullStatsReceiver, Counter, DefaultStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  NullStatsReceiver,
+  Counter,
+  DefaultStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.logging.Logger
 import com.twitter.util.NonFatal
 import java.nio.{ByteBuffer, CharBuffer}
 import java.nio.charset.{CoderResult, CharsetEncoder}
 import java.security.{PrivilegedExceptionAction, AccessController}
-import org.apache.thrift.protocol.{TProtocol, TProtocolFactory, TBinaryProtocol}
+import org.apache.thrift.protocol.{
+  TProtocol,
+  TProtocolFactory,
+  TBinaryProtocol
+}
 import org.apache.thrift.transport.TTransport
 
 object Protocols {
@@ -19,26 +28,26 @@ object Protocols {
     } catch {
       case NonFatal(_) => // try reflection instead
         try {
-          AccessController.doPrivileged(
-              new PrivilegedExceptionAction[sun.misc.Unsafe]() {
-            def run(): sun.misc.Unsafe = {
-              val k = classOf[sun.misc.Unsafe]
-              for (f <- k.getDeclaredFields) {
-                f.setAccessible(true)
-                val x = f.get(null)
-                if (k.isInstance(x)) {
-                  return k.cast(x)
+          AccessController
+            .doPrivileged(new PrivilegedExceptionAction[sun.misc.Unsafe]() {
+              def run(): sun.misc.Unsafe = {
+                val k = classOf[sun.misc.Unsafe]
+                for (f <- k.getDeclaredFields) {
+                  f.setAccessible(true)
+                  val x = f.get(null)
+                  if (k.isInstance(x)) {
+                    return k.cast(x)
+                  }
                 }
+                throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
               }
-              throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
-            }
-          })
+            })
         } catch {
           case NonFatal(t) =>
             Logger
               .get()
-              .info(
-                  "%s unable to initialize sun.misc.Unsafe", getClass.getName)
+              .info("%s unable to initialize sun.misc.Unsafe",
+                    getClass.getName)
             null
         }
     }

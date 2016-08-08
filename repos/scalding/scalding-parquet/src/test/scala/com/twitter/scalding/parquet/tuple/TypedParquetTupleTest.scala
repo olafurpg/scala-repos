@@ -1,7 +1,10 @@
 package com.twitter.scalding.parquet.tuple
 
 import com.twitter.scalding.parquet.tuple.macros.Macros._
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopPlatformTest}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest,
+  HadoopPlatformTest
+}
 import com.twitter.scalding.typed.TypedPipe
 import com.twitter.scalding.{Args, Job, TypedTsv}
 import org.scalatest.{Matchers, WordSpec}
@@ -10,7 +13,9 @@ import org.apache.parquet.filter2.predicate.{FilterApi, FilterPredicate}
 import org.apache.parquet.io.api.Binary
 
 class TypedParquetTupleTest
-    extends WordSpec with Matchers with HadoopPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopPlatformTest {
   "TypedParquetTuple" should {
 
     "read and write correctly" in {
@@ -76,8 +81,11 @@ object TestValues {
                    Map(SampleClassD(0, "q") -> SampleClassF(4, 3))))
 }
 
-case class SampleClassA(
-    bool: Boolean, short: Short, long: Long, float: Float, byte: Byte)
+case class SampleClassA(bool: Boolean,
+                        short: Short,
+                        long: Long,
+                        float: Float,
+                        byte: Byte)
 
 case class SampleClassB(string: String,
                         double: Option[Double],

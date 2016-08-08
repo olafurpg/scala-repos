@@ -68,10 +68,10 @@ object CassandraTest {
     ConfigHelper.setInputRpcPort(job.getConfiguration(), port)
     ConfigHelper.setOutputInitialAddress(job.getConfiguration(), host)
     ConfigHelper.setOutputRpcPort(job.getConfiguration(), port)
-    ConfigHelper.setInputColumnFamily(
-        job.getConfiguration(), "casDemo", "Words")
-    ConfigHelper.setOutputColumnFamily(
-        job.getConfiguration(), "casDemo", "WordCount")
+    ConfigHelper
+      .setInputColumnFamily(job.getConfiguration(), "casDemo", "Words")
+    ConfigHelper
+      .setOutputColumnFamily(job.getConfiguration(), "casDemo", "WordCount")
 
     val predicate = new SlicePredicate()
     val sliceRange = new SliceRange()
@@ -80,10 +80,10 @@ object CassandraTest {
     predicate.setSlice_range(sliceRange)
     ConfigHelper.setInputSlicePredicate(job.getConfiguration(), predicate)
 
-    ConfigHelper.setInputPartitioner(
-        job.getConfiguration(), "Murmur3Partitioner")
-    ConfigHelper.setOutputPartitioner(
-        job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper
+      .setInputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper
+      .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
 
     // Make a new Hadoop RDD
     val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),
@@ -94,9 +94,8 @@ object CassandraTest {
     // Let us first get all the paragraphs from the retrieved rows
     val paraRdd = casRdd.map {
       case (key, value) => {
-          ByteBufferUtil.string(
-              value.get(ByteBufferUtil.bytes("para")).value())
-        }
+        ByteBufferUtil.string(value.get(ByteBufferUtil.bytes("para")).value())
+      }
     }
 
     // Lets get the word count in paras
@@ -111,29 +110,26 @@ object CassandraTest {
 
     counts.map {
       case (word, count) => {
-          val colWord = new org.apache.cassandra.thrift.Column()
-          colWord.setName(ByteBufferUtil.bytes("word"))
-          colWord.setValue(ByteBufferUtil.bytes(word))
-          colWord.setTimestamp(System.currentTimeMillis)
+        val colWord = new org.apache.cassandra.thrift.Column()
+        colWord.setName(ByteBufferUtil.bytes("word"))
+        colWord.setValue(ByteBufferUtil.bytes(word))
+        colWord.setTimestamp(System.currentTimeMillis)
 
-          val colCount = new org.apache.cassandra.thrift.Column()
-          colCount.setName(ByteBufferUtil.bytes("wcount"))
-          colCount.setValue(ByteBufferUtil.bytes(count.toLong))
-          colCount.setTimestamp(System.currentTimeMillis)
+        val colCount = new org.apache.cassandra.thrift.Column()
+        colCount.setName(ByteBufferUtil.bytes("wcount"))
+        colCount.setValue(ByteBufferUtil.bytes(count.toLong))
+        colCount.setTimestamp(System.currentTimeMillis)
 
-          val outputkey =
-            ByteBufferUtil.bytes(word + "-COUNT-" + System.currentTimeMillis)
+        val outputkey =
+          ByteBufferUtil.bytes(word + "-COUNT-" + System.currentTimeMillis)
 
-          val mutations = Arrays.asList(new Mutation(), new Mutation())
-          mutations.get(0).setColumn_or_supercolumn(new ColumnOrSuperColumn())
-          mutations.get(0).column_or_supercolumn.setColumn(colWord)
-          mutations.get(1).setColumn_or_supercolumn(new ColumnOrSuperColumn())
-          mutations
-            .get(1)
-            .column_or_supercolumn
-            .setColumn(colCount)
-            (outputkey, mutations)
-        }
+        val mutations = Arrays.asList(new Mutation(), new Mutation())
+        mutations.get(0).setColumn_or_supercolumn(new ColumnOrSuperColumn())
+        mutations.get(0).column_or_supercolumn.setColumn(colWord)
+        mutations.get(1).setColumn_or_supercolumn(new ColumnOrSuperColumn())
+        mutations.get(1).column_or_supercolumn.setColumn(colCount)
+        (outputkey, mutations)
+      }
     }.saveAsNewAPIHadoopFile("casDemo",
                              classOf[ByteBuffer],
                              classOf[List[Mutation]],

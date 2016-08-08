@@ -30,7 +30,9 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark._
 
 class AsyncRDDActionsSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Timeouts {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Timeouts {
 
   @transient private var sc: SparkContext = _
 

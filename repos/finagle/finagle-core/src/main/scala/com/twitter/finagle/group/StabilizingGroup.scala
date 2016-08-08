@@ -48,8 +48,7 @@ object StabilizingGroup {
       grace: Duration,
       statsReceiver: StatsReceiver,
       implicit val timer: Timer
-  )
-      extends Group[T] {
+  ) extends Group[T] {
     import State._
 
     private[this] val newSet = new Broker[Set[T]]()
@@ -117,8 +116,7 @@ object StabilizingGroup {
 
     loop(Queue.empty, Healthy)
 
-    underlying.set.changes.register(
-        Witness({ set =>
+    underlying.set.changes.register(Witness({ set =>
       // We can synchronize here because we know loop
       // is eager, and doesn't itself synchronize.
       newSet !! set

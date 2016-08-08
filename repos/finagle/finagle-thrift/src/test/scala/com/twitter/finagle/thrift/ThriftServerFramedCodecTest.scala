@@ -51,9 +51,9 @@ class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
       new thrift.ConnectionOptions().write(ignoreMsg())
       ignoreMsg().writeMessageEnd()
 
-      filter(ByteArrays.concat(
-                 OutputBuffer.messageToArray(header, protocolFactory),
-                 ignoreMsg.toArray),
+      filter(ByteArrays.concat(OutputBuffer.messageToArray(header,
+                                                           protocolFactory),
+                               ignoreMsg.toArray),
              service)
 
       bufferingTracer.iterator foreach { record =>

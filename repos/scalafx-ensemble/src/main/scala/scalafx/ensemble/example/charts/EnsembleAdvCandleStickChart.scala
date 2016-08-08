@@ -200,8 +200,10 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
                       xa.displayPosition(xa.tickUnit()) * 0.90
                     case _ => -1
                   }
-                  candle.update(
-                      yClose - yOpen, yHigh - yOpen, yLow - yOpen, candleWidth)
+                  candle.update(yClose - yOpen,
+                                yHigh - yOpen,
+                                yLow - yOpen,
+                                candleWidth)
                   candle.updateTooltip(item.YValue().doubleValue,
                                        dayValues.close,
                                        dayValues.high,
@@ -262,7 +264,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     }
 
     override protected def seriesAdded(
-        series: jfxsc.XYChart.Series[Number, Number], seriesIndex: Int) {
+        series: jfxsc.XYChart.Series[Number, Number],
+        seriesIndex: Int) {
       for (j <- 0 until series.data().size) {
         val item = series.data()(j)
         val candle = Candle(seriesIndex, item, j)
@@ -307,8 +310,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     override protected def updateAxisRange() {
 
       if (xAxis.isAutoRanging) {
-        val xData = for (series <- data; seriesData <- series.data()) yield
-          seriesData.XValue()
+        val xData = for (series <- data; seriesData <- series.data())
+          yield seriesData.XValue()
         xAxis.invalidateRange(xData)
       }
 
@@ -339,13 +342,14 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       * @param itemIndex   The index of the data item in the series
       * @return New candle node to represent the give data item
       */
-    def apply(
-        seriesIndex: Int, item: XYChart.Data[_, _], itemIndex: Int): Node = {
+    def apply(seriesIndex: Int,
+              item: XYChart.Data[_, _],
+              itemIndex: Int): Node = {
       var candle = item.node()
       candle match {
         case c: Candle =>
-          c.setSeriesAndDataStyleClasses(
-              "series" + seriesIndex, "data" + itemIndex)
+          c.setSeriesAndDataStyleClasses("series" + seriesIndex,
+                                         "data" + itemIndex)
         case _ =>
           candle = new Candle("series" + seriesIndex, "data" + itemIndex)
           item.node = candle
@@ -372,8 +376,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     tooltip.graphic = new TooltipContent()
     Tooltip.install(bar, tooltip)
 
-    def setSeriesAndDataStyleClasses(
-        seriesStyleClass: String, dataStyleClass: String) {
+    def setSeriesAndDataStyleClasses(seriesStyleClass: String,
+                                     dataStyleClass: String) {
       this.seriesStyleClass = seriesStyleClass
       this.dataStyleClass = dataStyleClass
       updateStyleClasses()
@@ -410,10 +414,10 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
         if (openAboveClose) "open-above-close" else "close-above-open"
 
       styleClass = Seq("candlestick-candle", seriesStyleClass, dataStyleClass)
-      highLowLine.styleClass = Seq(
-          "candlestick-line", seriesStyleClass, dataStyleClass, closeVsOpen)
-      bar.styleClass = Seq(
-          "candlestick-bar", seriesStyleClass, dataStyleClass, closeVsOpen)
+      highLowLine.styleClass =
+        Seq("candlestick-line", seriesStyleClass, dataStyleClass, closeVsOpen)
+      bar.styleClass =
+        Seq("candlestick-bar", seriesStyleClass, dataStyleClass, closeVsOpen)
     }
   }
 
@@ -438,8 +442,14 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     GridPane.setConstraints(highValue, 1, 2)
     GridPane.setConstraints(low, 0, 3)
     GridPane.setConstraints(lowValue, 1, 3)
-    getChildren.addAll(
-        open, openValue, close, closeValue, high, highValue, low, lowValue)
+    getChildren.addAll(open,
+                       openValue,
+                       close,
+                       closeValue,
+                       high,
+                       highValue,
+                       low,
+                       lowValue)
 
     def update(open: Double, close: Double, high: Double, low: Double) {
       openValue.text = open.toString

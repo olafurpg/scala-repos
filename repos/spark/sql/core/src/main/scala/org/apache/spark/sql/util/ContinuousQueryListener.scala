@@ -56,11 +56,11 @@ object ContinuousQueryListener {
   trait Event
 
   /** Event representing the start of a query */
-  class QueryStarted private[sql](val query: ContinuousQuery) extends Event
+  class QueryStarted private[sql] (val query: ContinuousQuery) extends Event
 
   /** Event representing any progress updates in a query */
-  class QueryProgress private[sql](val query: ContinuousQuery) extends Event
+  class QueryProgress private[sql] (val query: ContinuousQuery) extends Event
 
   /** Event representing that termination of a query */
-  class QueryTerminated private[sql](val query: ContinuousQuery) extends Event
+  class QueryTerminated private[sql] (val query: ContinuousQuery) extends Event
 }

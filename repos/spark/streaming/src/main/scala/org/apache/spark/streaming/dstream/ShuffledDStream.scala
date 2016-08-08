@@ -23,16 +23,14 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class ShuffledDStream[
-    K : ClassTag, V : ClassTag, C : ClassTag](
+private[streaming] class ShuffledDStream[K: ClassTag, V: ClassTag, C: ClassTag](
     parent: DStream[(K, V)],
     createCombiner: V => C,
     mergeValue: (C, V) => C,
     mergeCombiner: (C, C) => C,
     partitioner: Partitioner,
     mapSideCombine: Boolean = true
-)
-    extends DStream[(K, C)](parent.ssc) {
+) extends DStream[(K, C)](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 

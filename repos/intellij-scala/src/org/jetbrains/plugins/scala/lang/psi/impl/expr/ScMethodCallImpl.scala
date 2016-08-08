@@ -16,7 +16,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScMethodCallImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScMethodCall {
+    extends ScalaPsiElementImpl(node)
+    with ScMethodCall {
   def getInvokedExpr: ScExpression =
     findChildByClassScala(classOf[ScExpression])
 

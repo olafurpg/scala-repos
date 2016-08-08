@@ -4,7 +4,7 @@ import breeze.optimize.linear.LinearProgram
 import collection.mutable.ArrayBuffer
 
 /**
-  * 
+  *
   * @author dlwh
   */
 class LPMaxFlow[N](val g: FlowGraph[N]) {

@@ -14,15 +14,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamCla
   */
 class ScTypeParamClauseStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScTypeParamClause](parent, elemType)
     with ScTypeParamClauseStub {
   private var typeParamClauseText: String = ""
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            typeParamClauseText: String) = {
     this(
         parent,

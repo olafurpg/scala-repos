@@ -30,8 +30,10 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
   private lazy val booleanData = {
     sqlContext.createDataFrame(
-        sparkContext.parallelize(Row(false, false) :: Row(false, true) :: Row(
-                true, false) :: Row(true, true) :: Nil),
+        sparkContext.parallelize(
+            Row(false, false) :: Row(false, true) :: Row(true, false) :: Row(
+                true,
+                true) :: Nil),
         StructType(
             Seq(StructField("a", BooleanType), StructField("b", BooleanType))))
   }
@@ -86,13 +88,16 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     val origCol = $"a".as("b", metadata.build())
     val newCol = origCol.as("c")
     assert(
-        newCol.expr.asInstanceOf[NamedExpression].metadata.getString("key") === "value")
+        newCol.expr
+          .asInstanceOf[NamedExpression]
+          .metadata
+          .getString("key") === "value")
   }
 
   test("single explode") {
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
-    checkAnswer(
-        df.select(explode('intList)), Row(1) :: Row(2) :: Row(3) :: Nil)
+    checkAnswer(df.select(explode('intList)),
+                Row(1) :: Row(2) :: Row(3) :: Nil)
   }
 
   test("explode and other columns") {
@@ -237,8 +242,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         nullStrings.toDF.where($"s".isNotNull),
         nullStrings.collect().toSeq.filter(r => r.getString(1) ne null))
 
-    checkAnswer(
-        sql("select isnotnull(null), isnotnull('a')"), Row(false, true))
+    checkAnswer(sql("select isnotnull(null), isnotnull('a')"),
+                Row(false, true))
   }
 
   test("isNaN") {
@@ -246,17 +251,20 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         sparkContext.parallelize(
             Row(Double.NaN, Float.NaN) :: Row(math.log(-1),
                                               math.log(-3).toFloat) :: Row(
-                null, null) :: Row(Double.MaxValue, Float.MinValue) :: Nil),
+                null,
+                null) :: Row(Double.MaxValue, Float.MinValue) :: Nil),
         StructType(
             Seq(StructField("a", DoubleType), StructField("b", FloatType))))
 
     checkAnswer(testData.select($"a".isNaN, $"b".isNaN),
                 Row(true, true) :: Row(true, true) :: Row(false, false) :: Row(
-                    false, false) :: Nil)
+                    false,
+                    false) :: Nil)
 
     checkAnswer(testData.select(isnan($"a"), isnan($"b")),
                 Row(true, true) :: Row(true, true) :: Row(false, false) :: Row(
-                    false, false) :: Nil)
+                    false,
+                    false) :: Nil)
 
     checkAnswer(sql("select isnan(15), isnan('invalid')"), Row(false, false))
   }
@@ -290,8 +298,9 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     )
     testData.registerTempTable("t")
     checkAnswer(
-        sql("select nanvl(a, 5), nanvl(b, 10), nanvl(10, b), nanvl(c, null), nanvl(d, 10), " +
-            " nanvl(b, e), nanvl(e, f) from t"),
+        sql(
+            "select nanvl(a, 5), nanvl(b, 10), nanvl(10, b), nanvl(c, null), nanvl(d, 10), " +
+              " nanvl(b, e), nanvl(e, f) from t"),
         Row(null, 3.0, 10.0, null, Double.PositiveInfinity, 3.0, 1.0)
     )
   }
@@ -326,8 +335,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     checkAnswer(nullData.filter($"b" <=> null),
                 Row(1, null) :: Row(null, null) :: Nil)
 
-    checkAnswer(
-        nullData.filter($"a" <=> $"b"), Row(1, 1) :: Row(null, null) :: Nil)
+    checkAnswer(nullData.filter($"a" <=> $"b"),
+                Row(1, 1) :: Row(null, null) :: Nil)
 
     val nullData2 = sqlContext.createDataFrame(
         sparkContext.parallelize(Row("abc") :: Row(null) :: Row("xyz") :: Nil),
@@ -374,8 +383,10 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
   test("between") {
     val testData = sparkContext
-      .parallelize((0, 1, 2) :: (1, 2, 3) :: (2, 1, 0) :: (2, 2, 4) :: (
-              3, 1, 6) :: (3, 2, 0) :: Nil)
+      .parallelize(
+          (0, 1, 2) :: (1, 2, 3) :: (2, 1, 0) :: (2, 2, 4) :: (3, 1, 6) :: (3,
+                                                                            2,
+                                                                            0) :: Nil)
       .toDF("a", "b", "c")
     val expectAnswer = testData
       .collect()

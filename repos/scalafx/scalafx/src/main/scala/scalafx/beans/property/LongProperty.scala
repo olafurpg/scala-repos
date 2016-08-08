@@ -47,7 +47,8 @@ object LongProperty {
 
 class LongProperty(
     override val delegate: jfxbp.LongProperty = new jfxbp.SimpleLongProperty)
-    extends ReadOnlyLongProperty(delegate) with Property[Long, Number]
+    extends ReadOnlyLongProperty(delegate)
+    with Property[Long, Number]
     with SFXDelegate[jfxbp.LongProperty] {
 
   def this(bean: Object, name: String) =

@@ -70,7 +70,7 @@ object GeneratePredicate
       .compile(code)
       .generate(ctx.references.toArray)
       .asInstanceOf[Predicate]
-      (r: InternalRow) =>
+    (r: InternalRow) =>
       p.eval(r)
   }
 }
